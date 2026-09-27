@@ -1,0 +1,178 @@
+# elvinlab — Base de marca
+
+Versión aprobada de la base de marca. El borrador editable vive en un documento de Claude; cuando cambie, se actualiza este archivo.
+
+## Propósito
+
+Este documento es la única fuente de verdad de la marca elvinlab: qué se dice y cómo se ve. El perfil de GitHub, elvinlab.dev y LinkedIn consumen de aquí, nunca al revés.
+
+El sistema visual no se inventa: se formaliza el que ya existe en el perfil de GitHub (banner, tarjetas, línea de tiempo). Cuando exista `packages/core`, las secciones de tokens se convierten en `tokens.json` y dejan de mantenerse a mano.
+
+Regla de cambio: primero se edita este documento, después se aplica a cada superficie.
+
+## Narrativa
+
+La línea de posicionamiento es una sola y se usa igual en todas partes: **Full-stack engineer building with AI agents.** El resto de los textos la desarrollan, nunca la contradicen.
+
+| Pieza | Texto canónico (en inglés) | Dónde se usa |
+| --- | --- | --- |
+| Posicionamiento | Full-stack engineer building with AI agents. | Titular del README, hero del sitio, titular de LinkedIn |
+| Sublínea | Clean architecture · Fast systems · Production-ready cloud | Bajo el titular |
+| Bio corta (máx. 160 caracteres) | Full-stack Software Engineer · AI agents & workflows · Clean architecture · Performance. Writing at elvinlab.dev | Bio de GitHub, X |
+| Roles rotativos | Full-Stack Engineering · AI Agents & Workflows · Software Architecture · Performance & Optimization | Banner animado, hero del sitio |
+
+### Los cuatro pilares
+
+1. **AI Agents & Workflows** — orquestación multi-agente, routing de modelos, memoria persistente. Prueba: [`agentic-dev-setup`](https://github.com/elvinlab/agentic-dev-setup).
+2. **Software Architecture** — límites claros, dominios desacoplados, código predecible.
+3. **Full-Stack Engineering** — de punta a punta y sin casarse con un framework.
+4. **Performance & Optimization** — profiling, cuellos de botella, sistemas rápidos y baratos de operar.
+
+### Voz
+
+- Primera persona, directa y concreta. Números y nombres, no adjetivos.
+- El blog documenta decisiones y su razonamiento, no tutoriales genéricos.
+- Atemporal: nada que dependa de "en qué estoy trabajando este mes".
+- Sin frameworks como identidad: se nombran como herramientas, no como etiqueta profesional.
+- Humor con medida: el abanico y el footer retro son la firma; no compiten con el contenido.
+- Nunca anunciar proyectos que no existen todavía.
+
+### Datos duros
+
+| Dato | Valor |
+| --- | --- |
+| Nombre | Elvin González (elvinlab) |
+| Experiencia | 5+ años, contados desde 2020 (mismo cálculo en GitHub, sitio y LinkedIn) |
+| Ubicación | Costa Rica |
+| Sitio | [elvinlab.dev](https://elvinlab.dev) |
+| GitHub | [github.com/elvinlab](https://github.com/elvinlab) |
+| LinkedIn | [linkedin.com/in/elvinlab](https://www.linkedin.com/in/elvinlab) |
+| X | [@elvinlabweb](https://x.com/elvinlabweb) |
+| Contacto | Formulario en [elvinlab.dev/contact](https://elvinlab.dev/contact); el correo nunca se publica en texto plano |
+
+### Blog
+
+El blog se llama **Lab Notes**, con el subtítulo *by an eternal junior*, y vive en `elvinlab.dev/notes`. La home (`elvinlab.dev`) es el portafolio y muestra los últimos 3 posts.
+
+| Ruta | Contenido |
+| --- | --- |
+| `elvinlab.dev` | Portafolio: quién soy, proyectos destacados, últimos 3 posts |
+| `elvinlab.dev/notes` | Lab Notes — by an eternal junior: todos los posts |
+| `elvinlab.dev/notes/<slug>` | Cada post |
+| `elvinlab.dev/devlog` | Reservado a futuro: devlog numerado de proyectos (guides, emulador J2ME) |
+
+Contenido del blog: experiencia con tecnología, proyectos, aprendizajes, cómo me siento y cómo me adapto, consejos, razonamiento de decisiones. Se prefirió una ruta sobre un subdominio: un subdominio divide la autoridad SEO y exige otro deploy.
+
+### Idioma
+
+La interfaz del sitio es bilingüe (inglés y español). El README de GitHub y los textos canónicos van en inglés.
+
+- [ ] Pregunta abierta: ¿los posts del blog se escriben en un solo idioma o se traducen todos?
+
+## Tokens de diseño
+
+Los valores salen tal cual de los generadores del perfil (`tools/banner.py` y `tools/sections.py` en [elvinlab/elvinlab](https://github.com/elvinlab/elvinlab)). Lo marcado como **propuesto** todavía no existe en GitHub y se decide aquí.
+
+### Regla de temas
+
+Estos valores son el tema por defecto, `theme-elvinlab`, no constantes. `@elvinlab/core` se usará para que otros creen blogs y landings con este estilo, así que marca, colores y tipografías deben poder reemplazarse en un solo archivo.
+
+- Los componentes solo leen variables semánticas (`var(--brand-primary)`, `var(--surface)`), nunca un hex directo.
+- Lo que se comparte es el lenguaje visual (grilla, pulsos, bordes con luz, resplandores); lo que cambia es la identidad (colores, fuentes, logo).
+
+### Color de marca
+
+| Token | Valor | Uso |
+| --- | --- | --- |
+| `brand.violet` | `#8b5cf6` | Color primario, inicio del gradiente |
+| `brand.cyan` | `#06b6d4` | Acento, prompts, pulsos de datos |
+| `brand.pink` | `#ec4899` | Acento de énfasis: cursor, "ahora", modelo local |
+| `gradient.brand` | violeta → cian (55 %) → rosa | Nombre, títulos destacados, bordes, barra inferior |
+
+### Superficies por tema
+
+| Token | Oscuro | Claro |
+| --- | --- | --- |
+| `bg.start` | `#07070f` | `#fbfbff` |
+| `bg.end` | `#0f0b1f` | `#eef0ff` |
+| `surface.start` | `#0f0b1f` | `#faf8ff` |
+| `surface.end` | `#0a1220` | `#f2fbfe` |
+| `text.primary` | `#e6edf3` | `#0d1117` |
+| `text.muted` | `#8b949e` | `#57606a` |
+| `border` | `#30284d` | `#c9c3ee` |
+
+Inconsistencia a resolver: en modo claro el banner usa `#c9c3ee` como borde y las tarjetas `#d8d0f5`. Propuesta: unificar en `#c9c3ee`.
+
+### Tipografía
+
+| Rol | Familia | Pesos | Tamaños en uso |
+| --- | --- | --- | --- |
+| Display (nombre, títulos) | Space Grotesk | 700 | 58–64 px nombre · 24–27 px títulos |
+| Texto | Space Grotesk | 400, 500 | 16–18 px |
+| Mono (etiquetas, prompts, datos) | JetBrains Mono | 400, 600, 700 | 13–26 px, mayúsculas con tracking 1–1.5 px en etiquetas |
+
+Ambas desde [Fontsource](https://fontsource.org), autoalojadas; nunca desde un CDN en tiempo de ejecución.
+
+### Forma, espacio y movimiento
+
+| Token | Valor | Estado |
+| --- | --- | --- |
+| `radius.lg` | 18 px (banner, tarjetas) | En uso |
+| `radius.md` | 14 px (cajas de íconos) | En uso |
+| `radius.pill` | 9999 px (pastillas, badges) | En uso |
+| `space.*` | Base 4 px: 4 · 8 · 12 · 16 · 24 · 32 · 48 · 64 | Propuesto (24 y 32 ya se usan) |
+| `grid.size` | 32 px, línea 0.5 px al 35 % | En uso |
+| `glow.opacity` | 0.16–0.28 (gradiente radial, sin sombras duras) | En uso |
+| `motion.pulse` | 4 s lineal, infinito | En uso |
+| `motion.border` | 7 s lineal (luz que recorre el borde) | En uso |
+| `motion.blink` | 1 s por pasos (cursor) | En uso |
+| `motion.reduce` | Todas las animaciones se detienen con `prefers-reduced-motion` | Obligatorio |
+
+## Motivos visuales y reglas de uso
+
+La identidad es "laboratorio de IA sobre fondo oscuro": pocos elementos, siempre los mismos, con movimiento sutil.
+
+| Motivo | Qué es | Dónde va |
+| --- | --- | --- |
+| Gradiente de marca | Violeta → cian → rosa | Nombre, años de la línea de tiempo, bordes activos, barra de 4 px al pie de los banners |
+| Grilla de fondo | Cuadrícula de 32 px, casi invisible | Fondos de banners y hero |
+| Red de nodos con pulsos | Nodos conectados; los datos viajan por las líneas | Banner principal, diagramas de arquitectura |
+| Borde con luz | Un tramo de gradiente recorre el borde de la tarjeta | Tarjetas destacadas (máx. una fila por página) |
+| Resplandor | Gradiente radial en una esquina | Tarjetas y hero; nunca sombras duras |
+| Prompt de terminal | `// comentario`, `>` y cursor rosa parpadeante | Saludo del hero, títulos técnicos |
+| Firma retro | Abanico arriba y GIFs de los 90 al pie | Solo README de GitHub y footer del sitio |
+
+### Sí
+
+- Un solo acento dominante por bloque; el gradiente completo solo en piezas protagonistas.
+- Mismo componente en oscuro y claro, cambiando solo tokens de superficie y texto.
+- Etiquetas en JetBrains Mono y mayúsculas; títulos en Space Grotesk.
+- Capturas propias de los proyectos, nunca imágenes de stock.
+
+### No
+
+- Nada de badges genéricos mezclados con piezas propias (se ve a plantilla).
+- Nada de tablas con bordes grises como elemento de diseño.
+- Nada de estadísticas automáticas de terceros que puedan congelarse o caerse.
+- Nada de animaciones que no respeten `prefers-reduced-motion`.
+
+## Plan de sincronización
+
+Un solo archivo, `packages/core/tokens.json`, alimenta las dos superficies: el sitio lo convierte en variables CSS y los generadores del README lo leen antes de dibujar los SVG.
+
+1. **Sitio (elvinlab.dev):** un script de build genera `tokens.css` con variables por tema (`:root` y `[data-theme="light"]`).
+2. **README de GitHub:** `tools/build.sh` del repo `elvinlab` descarga `tokens.json` desde la rama `main` de este repo y reemplaza las constantes hardcodeadas de `banner.py` y `sections.py`.
+3. **Textos:** la tabla de narrativa se copia a `packages/core/i18n` como strings canónicos; bio de GitHub y LinkedIn se actualizan a mano desde ahí.
+
+### Antes de arrancar el sitio
+
+- [ ] Aprobar este documento (narrativa y tokens).
+- [ ] Unificar el borde claro en `#c9c3ee` en los generadores del perfil y regenerar los SVG.
+- [ ] Decidir el idioma de los posts (pregunta abierta en Narrativa).
+- [ ] Confirmar la escala de espaciado propuesta.
+
+### Cuando exista `packages/core`
+
+- [ ] Crear `tokens.json` con estos valores.
+- [ ] Hacer que los generadores del perfil lean ese archivo en lugar de constantes.
+- [ ] Revisar GitHub, sitio y LinkedIn contra la tabla de narrativa.
