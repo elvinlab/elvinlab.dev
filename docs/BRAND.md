@@ -109,9 +109,25 @@ Inconsistencia a resolver: en modo claro el banner usa `#c9c3ee` como borde y la
 | --- | --- | --- | --- |
 | Display (nombre, títulos) | Space Grotesk | 700 | 58–64 px nombre · 24–27 px títulos |
 | Texto | Space Grotesk | 400, 500 | 16–18 px |
-| Mono (etiquetas, prompts, datos) | JetBrains Mono | 400, 600, 700 | 13–26 px, mayúsculas con tracking 1–1.5 px en etiquetas |
+| Mono (números de nota, prompts, código) | JetBrains Mono | 400, 600, 700 | 12–16 px; en el sitio no se usa para etiquetas en mayúsculas |
+| Firma retro | Press Start 2P | 400 | Solo en la firma del footer y la página 404 |
 
 Ambas desde [Fontsource](https://fontsource.org), autoalojadas; nunca desde un CDN en tiempo de ejecución.
+
+### Variantes accesibles
+
+Los colores de marca se mantienen, pero el texto y los rellenos usan estas variantes para cumplir WCAG AA. Las reglas de aplicación están en [DESIGN.md](DESIGN.md).
+
+| Uso | Oscuro | Claro | Motivo |
+| --- | --- | --- | --- |
+| Botón con texto blanco | `#7c3aed` | `#7c3aed` | 5.7:1; `#8b5cf6` falla AA (4.2:1) |
+| Primario (enlaces, íconos) | `#a78bfa` | `#6d28d9` | Contraste sobre tarjeta |
+| Cian (texto) | `#22d3ee` | `#0e7490` | `#06b6d4` falla sobre fondo claro |
+| Rosa (texto, cursor) | `#ec4899` | `#be185d` | Contraste sobre fondo claro |
+| Texto secundario | `#c3c9d4` | `#30363d` | Jerarquía legible |
+| Silenciado | `#8b949e` | `#57606a` | ≥4.5:1 sobre tarjeta |
+| Tarjeta | `#121022` | `#ffffff` | Superficie sin bordes |
+| Página | `#07070f` | `#eef0ff` | Fondo |
 
 ### Forma, espacio y movimiento
 

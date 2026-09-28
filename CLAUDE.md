@@ -6,7 +6,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 Foundation phase. The pnpm workspace exists; Astro, CI and deploy land in T03–T04. Current work and history: `odd/tasks/elvinlab-site.md` and the GitHub Project (https://github.com/users/elvinlab/projects/2).
 
-Tool versions are pinned in `.mise.toml` (Node 24.21.0, pnpm 12.6.0). Run everything through mise:
+Tool versions are pinned in `.mise.toml` (single source of truth; `packageManager` in package.json must match). Run everything through mise:
 
 ```bash
 mise exec -- pnpm install       # install workspace dependencies
@@ -25,7 +25,7 @@ Use `pnpm run deploy`, not `pnpm deploy` (that is a built-in pnpm command). Norm
 
 pnpm enforces a minimum release age: when it proposes `minimumReleaseAgeExclude` entries, pin an older version instead of accepting them. Images are optimized at build time (`imageService: 'compile'`). There is no test runner yet (Vitest arrives in T06). Do not invent commands; add them here when they exist.
 
-Read `docs/PLAN.md` and `docs/BRAND.md` before any work. Both are in Spanish; decisions in them are settled.
+Read `docs/PLAN.md`, `docs/BRAND.md` (both in Spanish; decisions in them are settled), `docs/DESIGN.md`, `docs/CONVENTIONS.md` and `docs/adr/` before any work.
 
 ## What this repo is
 
