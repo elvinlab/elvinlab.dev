@@ -1,0 +1,63 @@
+---
+/** The full `/notes` page for one UI locale: hero banner, filter, year groups and sidebar. */
+import { getCollection } from 'astro:content';
+
+import { groupByYear, readingMinutes, sortNotes } from '@/features/notes/lib/notes.ts';
+import { type Locale, t } from '@/shared/i18n/index.ts';
+import Banner from '@/shared/layout/Banner.astro';
+import BaseLayout from '@/shared/layout/BaseLayout.astro';
+
+import NoteRow from './NoteRow.astro';
+import NotesFilter from './NotesFilter.astro';
+import NotesSidebar from './NotesSidebar.astro';
+
+type Props = { locale: Locale };
+
+const { locale } = Astro.props;
+
+const entries = await getCollection('notes');
+const notes = entries.map((entry) => ({
+  slug: entry.id,
+  data: entry.data,
+  readingMinutes: readingMinutes(entry.body ?? ''),
+}));
+const groups = groupByYear(notes);
+
+const categoryCounts = new Map<string, number>();
+for (const note of notes) categoryCounts.set(note.data.category, (categoryCounts.get(note.data.category) ?? 0) + 1);
+const categories = [...categoryCounts.entries()]
+  .map(([name, count]) => ({ name, count }))
+  .sort((a, b) => b.count - a.count);
+const tags = [...new Set(sortNotes(notes).flatMap((note) => note.data.tags))];
+---
+
+<BaseLayout locale={locale} path="/notes/" title={t(locale, 'notes.title')}>
+  <Banner slot="banner" height="320px">
+    <p class="font-mono text-sm text-cyan">{t(locale, 'notes.eyebrow')}</p>
+    <h1 class="mt-2 font-display text-5xl font-bold md:text-6xl">
+      {t(locale, 'notes.title')}<span class="ml-1 inline-block h-9 w-2.5 animate-blink bg-pink align-baseline md:h-11"></span>
+    </h1>
+    <p class="mt-3 max-w-[58ch] text-lg leading-relaxed text-text-secondary">{t(locale, 'notes.subtitle')}</p>
+  </Banner>
+
+  <div class="flex flex-col gap-6">
+    <NotesFilter locale={locale} />
+
+    {groups.length === 0 && <p class="text-text-secondary">{t(locale, 'notes.empty')}</p>}
+    <p data-notes-empty hidden class="text-text-secondary">{t(locale, 'notes.empty')}</p>
+
+    {groups.map((group) => (
+      <section data-year-group class="flex flex-col">
+        <h2 class="flex items-baseline gap-3 font-display text-3xl font-bold text-primary">
+          {group.year}
+          <span class="font-mono text-sm text-muted">{t(locale, 'notes.count', { count: group.notes.length })}</span>
+        </h2>
+        <div class="mt-2">
+          {group.notes.map((note) => <NoteRow note={note} locale={locale} />)}
+        </div>
+      </section>
+    ))}
+  </div>
+
+  <NotesSidebar slot="aside" locale={locale} categories={categories} tags={tags} />
+</BaseLayout>

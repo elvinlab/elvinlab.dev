@@ -1,0 +1,43 @@
+---
+/** One entry row in the notes index: number, title, excerpt, category and tag chips, meta column. */
+import { localizePath } from '@elvinlab/core';
+
+import { formatDate, type NoteLike, noteNumber, searchText } from '@/features/notes/lib/notes.ts';
+import { LOCALES, type Locale, t } from '@/shared/i18n/index.ts';
+import Chip from '@/shared/ui/Chip.astro';
+
+import LangBadge from './LangBadge.astro';
+
+type Props = { note: NoteLike & { readingMinutes: number }; locale: Locale };
+
+const { note, locale } = Astro.props;
+const { data } = note;
+const href = localizePath(`/notes/${note.slug}/`, data.lang, LOCALES);
+---
+
+<article
+  data-note-row
+  data-lang={data.lang}
+  data-search={searchText(note)}
+  class="grid grid-cols-[64px_1fr] gap-x-4 gap-y-2 border-t border-dashed border-divider py-5 transition-colors duration-150 hover:bg-card-hover md:grid-cols-[88px_1fr_auto] md:rounded-inner md:px-3"
+>
+  <span class="pt-1 font-mono text-sm text-muted">{noteNumber(data.number)}</span>
+
+  <div class="flex flex-col gap-2">
+    <h3 class="text-lg font-bold leading-snug">
+      <a href={href} class="transition-colors duration-150 hover:text-primary">{data.title}</a>
+    </h3>
+    <p class="text-sm leading-relaxed text-text-secondary">{data.description}</p>
+    <div class="flex flex-wrap items-center gap-1.5">
+      <Chip>{data.category}</Chip>
+      {data.tags.map((tag) => <Chip>#{tag}</Chip>)}
+    </div>
+  </div>
+
+  <div class="col-start-2 flex items-center gap-2 text-sm text-muted md:col-start-3 md:flex-col md:items-end md:gap-1 md:pt-1 md:text-right">
+    <time datetime={data.pubDate.toISOString()}>{formatDate(data.pubDate, locale)}</time>
+    <span aria-hidden="true" class="md:hidden">·</span>
+    <span>{t(locale, 'notes.readingTime', { min: note.readingMinutes })}</span>
+    <LangBadge lang={data.lang} />
+  </div>
+</article>

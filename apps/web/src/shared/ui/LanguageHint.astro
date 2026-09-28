@@ -28,6 +28,7 @@ const alternates = LOCALES.locales
       lang={alternate.locale}
       data-language-hint={alternate.locale}
       data-current-locale={locale}
+      aria-label={alternate.text}
       class="fixed inset-x-3 bottom-3 z-50 mx-auto flex max-w-md items-center gap-3 rounded-card bg-card p-3 pl-4 text-sm text-text shadow-lg"
     >
       <span class="grow">{alternate.text}</span>

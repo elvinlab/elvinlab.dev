@@ -1,0 +1,55 @@
+---
+/** Notes index sidebar: author card, category and tag lists, RSS callout. */
+import { localizePath } from '@elvinlab/core';
+
+import { site } from '@/shared/config/index.ts';
+import { LOCALES, type Locale, t } from '@/shared/i18n/index.ts';
+import Chip from '@/shared/ui/Chip.astro';
+
+type Props = {
+  locale: Locale;
+  categories: { name: string; count: number }[];
+  tags: string[];
+};
+
+const { locale, categories, tags } = Astro.props;
+const aboutHref = localizePath('/me/', locale, LOCALES);
+---
+
+<div class="flex flex-col gap-4 lg:sticky lg:top-24">
+  <section class="flex flex-col gap-3 rounded-card bg-card p-5">
+    <p class="font-display text-lg font-bold">{site.identity.name}</p>
+    <p class="text-sm text-text-secondary">{site.identity.role[locale]}</p>
+    <a href={aboutHref} class="text-sm text-primary underline decoration-dashed underline-offset-4">
+      {t(locale, 'notes.sidebar.about')}
+    </a>
+  </section>
+
+  {categories.length > 0 && (
+    <section class="flex flex-col gap-3 rounded-card bg-card p-5">
+      <h2 class="font-display text-base font-bold">{t(locale, 'notes.sidebar.categories')}</h2>
+      <ul class="flex flex-col gap-1 text-sm">
+        {categories.map((category) => (
+          <li class="flex items-center justify-between text-text-secondary">
+            <span>{category.name}</span>
+            <span class="font-mono text-muted">{category.count}</span>
+          </li>
+        ))}
+      </ul>
+    </section>
+  )}
+
+  {tags.length > 0 && (
+    <section class="flex flex-col gap-3 rounded-card bg-card p-5">
+      <h2 class="font-display text-base font-bold">{t(locale, 'notes.sidebar.tags')}</h2>
+      <div class="flex flex-wrap gap-1.5">{tags.map((tag) => <Chip>#{tag}</Chip>)}</div>
+    </section>
+  )}
+
+  <section class="flex flex-col gap-2 overflow-hidden rounded-card bg-card p-5">
+    <span class="-mx-5 -mt-5 mb-1 h-1 bg-gradient-to-r from-primary via-cyan to-pink"></span>
+    <h2 class="font-display text-base font-bold">{t(locale, 'notes.sidebar.rss.title')}</h2>
+    <p class="text-sm text-text-secondary">{t(locale, 'notes.sidebar.rss.body')}</p>
+    <a href="/rss.xml" class="text-sm text-primary underline decoration-dashed underline-offset-4">RSS</a>
+  </section>
+</div>

@@ -1,0 +1,72 @@
+---
+/** Search box and language pills for the notes index. Filters rows client-side (no reload). */
+import { type Locale, t } from '@/shared/i18n/index.ts';
+
+type Props = { locale: Locale };
+
+const { locale } = Astro.props;
+const pills: (Locale | 'all')[] = ['all', 'es', 'en'];
+const pillLabel = (value: Locale | 'all') => (value === 'all' ? t(locale, 'notes.filter.all') : value.toUpperCase());
+---
+
+<div class="flex flex-col gap-3 rounded-card bg-card p-4 sm:flex-row sm:items-center" data-notes-filter>
+  <label class="relative grow">
+    <span class="sr-only">{t(locale, 'notes.search')}</span>
+    <svg class="pointer-events-none absolute top-1/2 left-3 -translate-y-1/2 text-muted" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"></circle><path d="m21 21-4.3-4.3"></path></svg>
+    <input
+      type="search"
+      placeholder={t(locale, 'notes.search')}
+      class="h-11 w-full rounded-control bg-chip pr-3 pl-10 text-text placeholder:text-muted"
+      data-notes-search
+    />
+  </label>
+  {/* biome-ignore lint/a11y/useSemanticElements: a toggle-button group, not a form fieldset */}
+  <div class="flex gap-1" role="group" aria-label={t(locale, 'notes.filter.all')}>
+    {pills.map((value, index) => (
+      <button
+        type="button"
+        data-lang-pill={value}
+        aria-pressed={index === 0 ? 'true' : 'false'}
+        class="h-11 rounded-control px-4 font-mono text-sm transition-colors duration-150 hover:bg-card-hover aria-pressed:bg-button aria-pressed:text-white"
+      >
+        {pillLabel(value)}
+      </button>
+    ))}
+  </div>
+</div>
+
+<script>
+  const root = document.querySelector<HTMLElement>('[data-notes-filter]');
+  const search = root?.querySelector<HTMLInputElement>('[data-notes-search]');
+  const pills = [...(root?.querySelectorAll<HTMLButtonElement>('[data-lang-pill]') ?? [])];
+  const rows = [...document.querySelectorAll<HTMLElement>('[data-note-row]')];
+  const groups = [...document.querySelectorAll<HTMLElement>('[data-year-group]')];
+  const empty = document.querySelector<HTMLElement>('[data-notes-empty]');
+
+  let lang = 'all';
+
+  const apply = (): void => {
+    const query = (search?.value ?? '').trim().toLowerCase();
+    let visible = 0;
+    for (const row of rows) {
+      const matchesLang = lang === 'all' || row.dataset['lang'] === lang;
+      const matchesQuery = !query || (row.dataset['search'] ?? '').includes(query);
+      const show = matchesLang && matchesQuery;
+      row.hidden = !show;
+      if (show) visible += 1;
+    }
+    for (const group of groups) {
+      group.hidden = !group.querySelector('[data-note-row]:not([hidden])');
+    }
+    if (empty) empty.hidden = visible > 0;
+  };
+
+  search?.addEventListener('input', apply);
+  for (const pill of pills) {
+    pill.addEventListener('click', () => {
+      lang = pill.dataset['langPill'] ?? 'all';
+      for (const other of pills) other.setAttribute('aria-pressed', String(other === pill));
+      apply();
+    });
+  }
+</script>

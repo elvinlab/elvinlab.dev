@@ -1,7 +1,7 @@
 import { z } from 'astro/zod';
 import { describe, expect, it } from 'vitest';
 
-import { noteSchema } from '@/features/notes/index.ts';
+import { noteSchema } from '@/features/notes/schema.ts';
 
 import { nextNumber, scaffoldNote, slugify } from './scaffold-note.ts';
 

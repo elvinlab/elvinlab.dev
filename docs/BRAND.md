@@ -122,7 +122,7 @@ Los colores de marca se mantienen, pero el texto y los rellenos usan estas varia
 | --- | --- | --- | --- |
 | Botón con texto blanco | `#7c3aed` | `#7c3aed` | 5.7:1; `#8b5cf6` falla AA (4.2:1) |
 | Primario (enlaces, íconos) | `#a78bfa` | `#6d28d9` | Contraste sobre tarjeta |
-| Cian (texto) | `#22d3ee` | `#0e7490` | `#06b6d4` falla sobre fondo claro |
+| Cian (texto) | `#22d3ee` | `#155e75` | `#06b6d4` y `#0e7490` fallan sobre banner claro (AA 4.5:1) |
 | Rosa (texto, cursor) | `#ec4899` | `#be185d` | Contraste sobre fondo claro |
 | Texto secundario | `#c3c9d4` | `#30363d` | Jerarquía legible |
 | Silenciado | `#8b949e` | `#57606a` | ≥4.5:1 sobre tarjeta |

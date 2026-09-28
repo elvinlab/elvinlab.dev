@@ -26,7 +26,7 @@ No gradient text on headlines, no ALL-CAPS eyebrow labels, no meta strings joine
 | muted | `#8b949e` | `#57606a` | Meta (≥4.5:1 on card) |
 | primary | `#a78bfa` | `#6d28d9` | Links, accent bars, icons |
 | button | `#7c3aed` | `#7c3aed` | Fills behind white text (5.7:1) |
-| cyan / pink | `#22d3ee` / `#ec4899` | `#0e7490` / `#be185d` | Prompt, cursor, retro signature |
+| cyan / pink | `#22d3ee` / `#ec4899` | `#155e75` / `#be185d` | Prompt, cursor, retro signature |
 
 The brand gradient (violet → cyan → pink) appears only as a 3 px strip on recruiter cards and in the reading-progress bar. Brand violet `#8b5cf6` never carries white text (4.2:1 fails AA).
 

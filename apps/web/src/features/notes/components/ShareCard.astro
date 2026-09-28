@@ -1,0 +1,46 @@
+---
+/** Copy-link and LinkedIn share buttons for a note. */
+import { type Locale, t } from '@/shared/i18n/index.ts';
+
+type Props = { locale: Locale; url: string };
+
+const { locale, url } = Astro.props;
+const linkedin = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(url)}`;
+---
+
+<section class="flex flex-col gap-3 rounded-card bg-card p-5">
+  <h2 class="font-display text-base font-bold">{t(locale, 'note.share')}</h2>
+  <div class="flex gap-2">
+    <button
+      type="button"
+      data-copy-link
+      data-url={url}
+      data-label-copy={t(locale, 'note.share.copy')}
+      data-label-copied={t(locale, 'note.share.copied')}
+      class="flex h-11 grow items-center justify-center gap-2 rounded-control bg-chip px-3 text-sm transition-colors duration-150 hover:bg-card-hover"
+    >
+      <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7 0l3-3a5 5 0 0 0-7-7l-1 1"></path><path d="M14 11a5 5 0 0 0-7 0l-3 3a5 5 0 0 0 7 7l1-1"></path></svg>
+      <span data-copy-label>{t(locale, 'note.share.copy')}</span>
+    </button>
+    <a href={linkedin} rel="noopener" class="grid size-11 place-items-center rounded-control bg-chip transition-colors duration-150 hover:bg-card-hover"><span class="sr-only">LinkedIn</span>
+      <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor" aria-hidden="true"><path d="M4.98 3.5A2.5 2.5 0 1 1 0 3.5a2.5 2.5 0 0 1 4.98 0ZM.5 8h4V24h-4V8Zm7.5 0h3.8v2.2h.05c.53-1 1.83-2.2 3.77-2.2 4.03 0 4.78 2.65 4.78 6.1V24h-4v-7.1c0-1.7-.03-3.9-2.37-3.9-2.38 0-2.74 1.85-2.74 3.77V24H8V8Z"></path></svg>
+    </a>
+  </div>
+</section>
+
+<script>
+  for (const button of document.querySelectorAll<HTMLButtonElement>('[data-copy-link]')) {
+    const label = button.querySelector<HTMLElement>('[data-copy-label]');
+    button.addEventListener('click', async () => {
+      try {
+        await navigator.clipboard.writeText(button.dataset['url'] ?? location.href);
+        if (label) {
+          label.textContent = button.dataset['labelCopied'] ?? 'Copied';
+          setTimeout(() => (label.textContent = button.dataset['labelCopy'] ?? 'Copy link'), 1500);
+        }
+      } catch {
+        // Clipboard can be blocked; nothing else to do.
+      }
+    });
+  }
+</script>

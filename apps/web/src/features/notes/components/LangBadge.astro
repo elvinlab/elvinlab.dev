@@ -1,0 +1,10 @@
+---
+/** Small monospace badge showing a note's language (EN/ES). */
+import type { Locale } from '@/shared/i18n/index.ts';
+
+type Props = { lang: Locale };
+
+const { lang } = Astro.props;
+---
+
+<span class="rounded-pill bg-chip px-2 py-0.5 font-mono text-xs uppercase text-primary">{lang}</span>

@@ -1,0 +1,13 @@
+---
+/** Inline label pill (category, tag). Renders a link when `href` is set. */
+type Props = { href?: string; class?: string };
+
+const { href, class: className } = Astro.props;
+const base = 'inline-flex items-center rounded-pill bg-chip px-2.5 py-1 font-mono text-xs text-text-secondary';
+const Tag = href ? 'a' : 'span';
+---
+
+<Tag
+  class:list={[base, href && 'transition-colors duration-150 hover:text-primary', className]}
+  {...href ? { href } : {}}
+><slot /></Tag>

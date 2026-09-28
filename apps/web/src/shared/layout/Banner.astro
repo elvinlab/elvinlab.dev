@@ -1,0 +1,36 @@
+---
+/**
+ * Full-bleed banner: the brand grid and corner glows over the banner surface. The animated shader
+ * lands in T15; until then this is the static backdrop. Content is passed as the default slot.
+ */
+type Props = { height?: string };
+
+const { height = '320px' } = Astro.props;
+---
+
+<section
+  class="relative isolate overflow-hidden bg-banner"
+  style={`min-height:${height}`}
+  aria-hidden="false"
+>
+  <div class="banner-grid absolute inset-0 -z-10" aria-hidden="true"></div>
+  <div class="banner-glow absolute inset-0 -z-10" aria-hidden="true"></div>
+  <div class="mx-auto flex h-full max-w-[1200px] flex-col justify-end px-4 pt-16 pb-8" style={`min-height:${height}`}>
+    <slot />
+  </div>
+</section>
+
+<style>
+  .banner-grid {
+    background-image:
+      linear-gradient(var(--color-grid) 1px, transparent 1px),
+      linear-gradient(90deg, var(--color-grid) 1px, transparent 1px);
+    background-size: 32px 32px;
+    mask-image: radial-gradient(ellipse at center, black, transparent 78%);
+  }
+  .banner-glow {
+    background:
+      radial-gradient(40% 60% at 15% 20%, var(--color-glow-violet), transparent 70%),
+      radial-gradient(40% 60% at 85% 30%, var(--color-glow-cyan), transparent 70%);
+  }
+</style>

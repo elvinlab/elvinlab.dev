@@ -1,0 +1,27 @@
+---
+/** Sidebar widget listing notes related to the current one. */
+import { localizePath } from '@elvinlab/core';
+
+import { type NoteLike, noteNumber } from '@/features/notes/lib/notes.ts';
+import { LOCALES, type Locale, t } from '@/shared/i18n/index.ts';
+
+type Props = { locale: Locale; notes: NoteLike[] };
+
+const { locale, notes } = Astro.props;
+---
+
+{notes.length > 0 && (
+  <section class="flex flex-col gap-3 rounded-card bg-card p-5">
+    <h2 class="font-display text-base font-bold">{t(locale, 'note.related')}</h2>
+    <ul class="flex flex-col gap-3">
+      {notes.map((note) => (
+        <li>
+          <a href={localizePath(`/notes/${note.slug}/`, note.data.lang, LOCALES)} class="flex flex-col gap-0.5 transition-colors duration-150 hover:text-primary">
+            <span class="font-mono text-xs text-muted">{t(locale, 'notes.entry', { number: noteNumber(note.data.number) })}</span>
+            <span class="text-sm font-medium leading-snug">{note.data.title}</span>
+          </a>
+        </li>
+      ))}
+    </ul>
+  </section>
+)}
