@@ -35,7 +35,7 @@ Approved plan: `~/.claude/plans/ok-me-gusta-entonces-starry-truffle.md`. Design:
 ## Tasks
 
 - [x] T00 Design preview (Phase 0). Route: inline. Evidence: canvas v8, v3 approved by the user.
-- [ ] T01 Repo safety: scrub raw email and private repo name from history (rewrite the single commit while private), `.gitignore`, `develop` branch, rulesets on `main`/`develop`, secret scanning + push protection, Dependabot, `SECURITY.md`, then make the repo public. Route: inline (config and docs, mechanical). Check: `rg` finds no email/private names in tracked files and history; `gh api` shows rulesets and visibility.
+- [x] T01 Repo safety: scrub raw email and private repo name from history (rewrite the single commit while private), `.gitignore`, `develop` branch, rulesets on `main`/`develop`, secret scanning + push protection, Dependabot, `SECURITY.md`, then make the repo public. Route: inline (config and docs, mechanical). Check: `rg` finds no email/private names in tracked files and history; `gh api` shows rulesets and visibility.
 - [ ] T02 pnpm workspaces, TS strictest, Biome, path aliases. Route: delegated writer (2+ non-trivial files). Check: `pnpm -r typecheck`, `pnpm biome check`.
 - [ ] T03 Astro + `@astrojs/cloudflare` + Tailwind v4 placeholder page on a Cloudflare preview; verify `<Image>` on Workers. Route: delegated writer. Check: preview URL loads.
 - [ ] T04 CI (Biome, typecheck, test, build) as required checks; Cloudflare `main` → production, `develop` → staging, PR → preview. Route: delegated writer. Check: green Action + three URLs.
@@ -52,6 +52,8 @@ Blog live on elvinlab.dev with 3 posts, `/me`, `/contact`, both themes and both 
 - 2026-09-27: T01 in progress. History rewritten while private (commit `07d3247`, force-push once, authorized by the user); `git grep` over all history finds no email or private repo names. `develop` created. Branch `chore/repo-safety`: commits `47c9c46` (safety baseline), `c95d770` (CLAUDE.md + tracker). PR #1 into `develop`. Review: assessed high (SECURITY.md), user declined review for this candidate. Pending: merge PR #1, rulesets, secret scanning + push protection, private vulnerability reporting, make public, GitHub Project (needs `gh auth refresh -s project`).
 - Plan fix: linear history only on `develop`; `main` allows merge commits for releases.
 
+- 2026-09-27: T01 done. PR #1 squash-merged into `develop` (`dca878f`). Repo public. Rulesets active: `protect-main` (PR required, no deletion, no force-push) and `protect-develop` (same + linear history); required status checks added in T04. Rebase merges off, branches auto-deleted on merge. Secret scanning + push protection, private vulnerability reporting, Dependabot alerts and security updates enabled (verified via `gh api`). Rulesets only apply to public repos on the free plan, so they were created after going public.
+
 ## Next step
 
-Finish T01 (merge, rulesets, public), then set up the GitHub Project.
+Set up the GitHub Project (needs `gh auth refresh -s project`), then T02.
