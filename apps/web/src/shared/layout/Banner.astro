@@ -15,7 +15,7 @@ type Props = {
   locale?: Locale;
 };
 
-const { height = '320px', expandedHeight = '100svh', expandable = false, locale = 'es' } = Astro.props;
+const { height = '340px', expandedHeight = 'clamp(520px, 72vh, 640px)', expandable = false, locale = 'es' } = Astro.props;
 ---
 
 <section
@@ -27,7 +27,7 @@ const { height = '320px', expandedHeight = '100svh', expandable = false, locale 
   <div class="banner-grid absolute inset-0 -z-20" aria-hidden="true"></div>
   <div class="banner-glow absolute inset-0 -z-20 motion-reduce:opacity-100" aria-hidden="true"></div>
   <slot name="background" />
-  <div class="relative mx-auto flex h-full min-h-[inherit] max-w-[1200px] flex-col justify-end px-4 pt-16 pb-8">
+  <div class="relative mx-auto flex h-full min-h-[inherit] max-w-[1200px] flex-col justify-end px-4 pt-24 pb-8">
     <slot />
   </div>
 
