@@ -1,6 +1,7 @@
 {
-  "extends": "../../tsconfig.base.json",
-  "include": ["src"],
+  "extends": ["astro/tsconfigs/strictest", "../../tsconfig.base.json"],
+  "include": [".astro/types.d.ts", "**/*"],
+  "exclude": ["dist"],
   "compilerOptions": {
     "paths": {
       "@features/*": ["./src/features/*"],

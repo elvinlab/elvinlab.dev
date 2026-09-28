@@ -34,5 +34,17 @@
   },
   "html": {
     "experimentalFullSupportEnabled": true
-  }
+  },
+  "overrides": [
+    {
+      "includes": ["**/*.astro", "**/astro.config.*"],
+      "linter": {
+        "rules": {
+          "style": {
+            "noDefaultExport": "off"
+          }
+        }
+      }
+    }
+  ]
 }

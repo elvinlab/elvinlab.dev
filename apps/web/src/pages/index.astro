@@ -1,0 +1,25 @@
+---
+/**
+ * Walking-skeleton page (T03): proves the build, Tailwind v4, build-time image optimization and the
+ * Cloudflare deploy end to end. Replaced by the real home page in T14.
+ */
+import { Image } from 'astro:assets';
+import skeletonCheck from '../assets/skeleton-check.png';
+import '../styles/global.css';
+---
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex" />
+    <title>Coming soon</title>
+  </head>
+  <body class="grid min-h-dvh place-items-center bg-neutral-950 font-sans text-neutral-100">
+    <main class="flex flex-col items-center gap-4 p-6 text-center">
+      <Image src={skeletonCheck} alt="" width={96} height={64} class="rounded" />
+      <h1 class="text-3xl font-bold">Coming soon</h1>
+      <p class="text-neutral-400">Walking skeleton: Astro, Tailwind v4 and Cloudflare Workers.</p>
+    </main>
+  </body>
+</html>

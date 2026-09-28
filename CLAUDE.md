@@ -14,9 +14,14 @@ mise exec -- pnpm typecheck     # tsc in every package
 mise exec -- pnpm lint          # Biome check (format + lint), read-only
 mise exec -- pnpm lint:fix      # Biome check with fixes
 mise exec -- pnpm format        # Biome format
+
+mise exec -- pnpm --filter web dev          # Astro dev server (workerd runtime)
+mise exec -- pnpm --filter web build        # static build into apps/web/dist
+mise exec -- pnpm --filter web preview      # serve the build locally on workerd
+mise exec -- pnpm --filter web run deploy   # build + wrangler deploy (needs `wrangler login`)
 ```
 
-There is no test runner yet (Vitest arrives in T06). Do not invent commands; add them here when they exist.
+Use `pnpm run deploy`, not `pnpm deploy` (that is a built-in pnpm command). Images are optimized at build time (`imageService: 'compile'`). There is no test runner yet (Vitest arrives in T06). Do not invent commands; add them here when they exist.
 
 Read `docs/PLAN.md` and `docs/BRAND.md` before any work. Both are in Spanish; decisions in them are settled.
 
