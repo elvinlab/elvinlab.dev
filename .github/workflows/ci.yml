@@ -15,6 +15,7 @@ concurrency:
 
 env:
   STAGING_WORKER: elvinlab-dev-staging
+  PRODUCTION_WORKER: elvinlab-dev
   WORKERS_SUBDOMAIN: lab-previews
 
 jobs:
@@ -28,6 +29,8 @@ jobs:
       - run: pnpm lint
       - run: pnpm typecheck
       - run: pnpm --filter web build
+      - name: Write version.txt with commit SHA
+        run: echo "${GITHUB_SHA}" > apps/web/dist/client/version.txt
       - name: Assert build-time image optimization
         run: |
           count="$(find apps/web/dist/client/_astro -name '*.webp' | wc -l)"
@@ -38,6 +41,8 @@ jobs:
     name: preview
     needs: checks
     # Forks and Dependabot PRs do not receive repository secrets, so they get checks only.
+    # The Cloudflare token (scoped to Workers edit) reaches only PRs whose branch lives in this
+    # repository, i.e. code pushed by someone with write access; fork PRs never get it.
     if: >-
       github.event_name == 'pull_request'
       && github.event.pull_request.head.repo.full_name == github.repository
@@ -54,6 +59,8 @@ jobs:
       - uses: jdx/mise-action@c2a87611a18de5b3828c5652fe268e992400cb5c # v4.3.0
       - run: pnpm install --frozen-lockfile
       - run: pnpm --filter web build
+      - name: Write version.txt with commit SHA
+        run: echo "${GITHUB_SHA}" > apps/web/dist/client/version.txt
       - name: Upload preview version
         id: upload
         working-directory: apps/web
@@ -65,7 +72,7 @@ jobs:
           pnpm exec wrangler versions upload --name "$STAGING_WORKER" --preview-alias "$ALIAS" \
             --message "PR #${{ github.event.pull_request.number }} @ ${GITHUB_SHA::7}"
           echo "url=https://$ALIAS-$STAGING_WORKER.$WORKERS_SUBDOMAIN.workers.dev" >> "$GITHUB_OUTPUT"
-      - run: bash .github/scripts/smoke-check.sh "${{ steps.upload.outputs.url }}"
+      - run: bash .github/scripts/smoke-check.sh "${{ steps.upload.outputs.url }}" "${GITHUB_SHA}"
       - name: Comment preview URL
         env:
           GH_TOKEN: ${{ github.token }}
@@ -74,7 +81,7 @@ jobs:
         run: |
           marker='<!-- preview-url -->'
           body="$marker"$'\n'"**Preview:** $URL (commit ${GITHUB_SHA::7})"
-          existing="$(gh api "repos/$GITHUB_REPOSITORY/issues/$PR/comments" --jq ".[] | select(.body | startswith(\"$marker\")) | .id" | head -n 1)"
+          existing="$(gh api --paginate "repos/$GITHUB_REPOSITORY/issues/$PR/comments" --jq ".[] | select(.body | startswith(\"$marker\")) | .id" | head -n 1)"
           if [[ -n "$existing" ]]; then
             gh api -X PATCH "repos/$GITHUB_REPOSITORY/issues/comments/$existing" -f body="$body" > /dev/null
           else
@@ -94,20 +101,33 @@ jobs:
       - uses: jdx/mise-action@c2a87611a18de5b3828c5652fe268e992400cb5c # v4.3.0
       - run: pnpm install --frozen-lockfile
       - run: pnpm --filter web build
+      - name: Write version.txt with commit SHA
+        run: echo "${GITHUB_SHA}" > apps/web/dist/client/version.txt
       - name: Resolve target
         id: target
         run: |
           if [[ "$GITHUB_REF_NAME" == main ]]; then
-            echo "name=elvinlab-dev" >> "$GITHUB_OUTPUT"
-            echo "url=https://elvinlab-dev.$WORKERS_SUBDOMAIN.workers.dev" >> "$GITHUB_OUTPUT"
+            echo "name=$PRODUCTION_WORKER" >> "$GITHUB_OUTPUT"
+            echo "url=https://$PRODUCTION_WORKER.$WORKERS_SUBDOMAIN.workers.dev" >> "$GITHUB_OUTPUT"
           else
             echo "name=$STAGING_WORKER" >> "$GITHUB_OUTPUT"
             echo "url=https://$STAGING_WORKER.$WORKERS_SUBDOMAIN.workers.dev" >> "$GITHUB_OUTPUT"
           fi
       - name: Deploy
+        id: deploy
         working-directory: apps/web
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ vars.CLOUDFLARE_ACCOUNT_ID }}
         run: pnpm exec wrangler deploy --name "${{ steps.target.outputs.name }}"
-      - run: bash .github/scripts/smoke-check.sh "${{ steps.target.outputs.url }}"
+      - name: Smoke check with rollback on failure
+        working-directory: apps/web
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ vars.CLOUDFLARE_ACCOUNT_ID }}
+        run: |
+          if ! bash ../../.github/scripts/smoke-check.sh "${{ steps.target.outputs.url }}" "${GITHUB_SHA}"; then
+            echo "Smoke check failed, rolling back..."
+            pnpm exec wrangler rollback --name "${{ steps.target.outputs.name }}" --message "Automatic rollback: smoke check failed for ${GITHUB_SHA::7}"
+            exit 1
+          fi
