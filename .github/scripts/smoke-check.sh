@@ -9,7 +9,8 @@ page="$(mktemp)"
 trap 'rm -f "$page"' EXIT
 
 fetch_status() {
-  curl --silent --output "$2" --write-out '%{http_code}' --max-time 15 "$1" || echo 000
+  # curl already prints 000 on connection errors; ignore its exit code so the loop can retry.
+  curl --silent --output "$2" --write-out '%{http_code}' --max-time 15 "$1" || true
 }
 
 status=000
