@@ -49,7 +49,9 @@ Blog live on elvinlab.dev with 3 posts, `/me`, `/contact`, both themes and both 
 ## Progress and evidence
 
 - 2026-09-27: T00 done. Canvas https://claude.ai/artifact/9xzGdZD1e7cvoKsvrgCvTi v8.
+- 2026-09-27: T01 in progress. History rewritten while private (commit `07d3247`, force-push once, authorized by the user); `git grep` over all history finds no email or private repo names. `develop` created. Branch `chore/repo-safety`: commits `47c9c46` (safety baseline), `c95d770` (CLAUDE.md + tracker). PR #1 into `develop`. Review: assessed high (SECURITY.md), user declined review for this candidate. Pending: merge PR #1, rulesets, secret scanning + push protection, private vulnerability reporting, make public, GitHub Project (needs `gh auth refresh -s project`).
+- Plan fix: linear history only on `develop`; `main` allows merge commits for releases.
 
 ## Next step
 
-T01.
+Finish T01 (merge, rulesets, public), then set up the GitHub Project.
