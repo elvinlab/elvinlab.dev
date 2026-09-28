@@ -26,10 +26,10 @@ const linkClass =
   'flex h-11 items-center rounded-control px-3 font-medium transition-colors duration-150 hover:bg-card-hover aria-[current=page]:text-primary';
 ---
 
-<header class="sticky top-0 z-40 animate-fade-in-up">
+<header class="animate-fade-in-up">
   <nav
     aria-label={t(locale, 'nav.label')}
-    class="relative flex h-18 items-center gap-2 rounded-b-card bg-card px-3 md:px-4"
+    class="relative flex h-18 items-center gap-2 rounded-b-card bg-card/70 px-3 backdrop-blur-md md:px-4"
   >
     <a href={localizePath('/', locale, LOCALES)} class="mr-auto flex h-11 items-center rounded-control px-2 font-display text-lg font-bold">
       {site.title}

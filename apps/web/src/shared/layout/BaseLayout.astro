@@ -28,6 +28,7 @@ type Props = {
 
 const { locale, ...seo } = Astro.props;
 const hasAside = Astro.slots.has('aside');
+const hasBanner = Astro.slots.has('banner');
 ---
 
 <html lang={locale} data-theme={DEFAULT_THEME}>
@@ -41,11 +42,15 @@ const hasAside = Astro.slots.has('aside');
     <a href="#main" class="sr-only z-50 rounded-control bg-button px-4 py-3 font-medium text-white focus:not-sr-only focus:fixed focus:top-3 focus:left-3">
       {t(locale, 'skip.content')}
     </a>
-    <div class="mx-auto max-w-[1200px] px-3 md:px-4">
-      <Navbar locale={locale} />
-    </div>
     <main id="main" tabindex="-1" class="outline-none">
-      <slot name="banner" />
+      <div class="sticky top-0 z-40 mx-auto max-w-[1200px] px-3 md:px-4">
+        <Navbar locale={locale} />
+      </div>
+      {hasBanner ? (
+        <div class="-mt-18"><slot name="banner" /></div>
+      ) : (
+        <slot name="banner" />
+      )}
       <div class="mx-auto max-w-[1200px] px-3 md:px-4">
         <div class:list={['mt-4 grid gap-4', hasAside && 'lg:grid-cols-[minmax(0,1fr)_280px]']}>
           <div class="min-w-0 animate-fade-in-up [animation-delay:150ms]">
