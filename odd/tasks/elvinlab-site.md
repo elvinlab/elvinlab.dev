@@ -44,7 +44,7 @@ Approved plan: `~/.claude/plans/ok-me-gusta-entonces-starry-truffle.md`. Design:
 - [x] T00 Design preview (Phase 0). Route: inline. Evidence: canvas v8, v3 approved by the user.
 - [x] T01 Repo safety: scrub raw email and private repo name from history (rewrite the single commit while private), `.gitignore`, `develop` branch, rulesets on `main`/`develop`, secret scanning + push protection, Dependabot, `SECURITY.md`, then make the repo public. Route: inline (config and docs, mechanical). Check: `rg` finds no email/private names in tracked files and history; `gh api` shows rulesets and visibility.
 - [x] T02 pnpm workspaces, TS strictest, Biome, path aliases. Route: delegated writer (2+ non-trivial files). Check: `pnpm -r typecheck`, `pnpm biome check`.
-- [ ] T03 Astro + `@astrojs/cloudflare` + Tailwind v4 placeholder page on a Cloudflare preview; verify `<Image>` on Workers. Route: delegated writer. Check: preview URL loads.
+- [x] T03 Astro + `@astrojs/cloudflare` + Tailwind v4 placeholder page on a Cloudflare preview; verify `<Image>` on Workers. Route: delegated writer. Check: preview URL loads.
 - [ ] T04 CI (Biome, typecheck, test, build) as required checks; Cloudflare `main` → production, `develop` → staging, PR → preview. Route: delegated writer. Check: green Action + three URLs.
 - [ ] T05 `docs/CONVENTIONS.md`, `docs/DESIGN.md` (design brief v3), first ADRs, accessible token variants in `docs/BRAND.md`. Route: delegated writer. Check: structural readback.
 - [ ] T06–T23 as in the approved plan (core, content, interactivity, launch).
@@ -65,6 +65,9 @@ Blog live on elvinlab.dev with 3 posts, `/me`, `/contact`, both themes and both 
 
 - 2026-09-27: T02 done (#5). Route: delegated to OpenCode via herdr (`omniroute/elvinlabCode`, pane w8:p2); brief in the issue. Claude review: all 10 files match the brief; fixed a missing final newline in `pnpm-workspace.yaml` and migrated `biome.json` to the 2.5 `preset` key (`biome migrate`). Checks re-run by Claude: `pnpm install --frozen-lockfile` ok, `pnpm typecheck` ok, `pnpm lint` ok, negative check (`any` fails `noExplicitAny`) ok. TDD: not applicable (configuration only, no runtime behavior; Vitest arrives in T06). Commits `3483771` (mise pin), `2cfb079` (workspace). Native review: medium, granted, lens reliability, approved and acknowledged; advisory findings: `preset` key (refuted with the migrate + lint evidence) and no CI proof (covered by T04 #7). TypeScript pinned to 6.0.3 because `@astrojs/check` peer is ^5 || ^6.
 
+- 2026-09-27: Release PR #32 (develop → main, merge commit) moved the review baseline forward. Working agreement: one review per task PR, tracker committed before the review, advisory follow-ups recorded on issues.
+- 2026-09-27: T03 done (#6). Route: inline (Tier 3). Astro 7.3.5, `@astrojs/cloudflare` 14.3.3 with `imageService: 'compile'` (Sharp at build time; default `cloudflare-binding` would use Cloudflare Images), Tailwind 4.3.3 via `@tailwindcss/vite`, `@astrojs/check` 0.9.10, wrangler 4.142.0. `pnpm-workspace.yaml` `allowBuilds` limited to esbuild and workerd. Biome override allows default exports in `.astro` and `astro.config.*` (review follow-up from #6). Checks: `pnpm --filter web build` (WebP generated at build), `astro check` 0 errors, `pnpm lint` clean, local `astro preview` on workerd 200 + `image/webp`. Deployed with `wrangler deploy` as a static-assets-only Worker: https://elvinlab-dev.lab-previews.workers.dev → 200, image `image/webp` with `max-age=31536000, immutable`. workers.dev subdomain set to `lab-previews` (the auto-created one exposed the email handle). TDD: not applicable (scaffold only). Commit `ca3b11d` + tracker commit.
+
 ## Next step
 
-T03 (#6, Tier 3): Astro + Cloudflare adapter + Tailwind v4 walking skeleton.
+T04 (#7, Tier 3): CI (Biome, typecheck, build as required checks) and Cloudflare environments (main → production, develop → staging, PR → preview) with Workers Builds or wrangler in Actions.
