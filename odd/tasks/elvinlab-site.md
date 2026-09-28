@@ -25,7 +25,7 @@ Approved plan: `~/.claude/plans/ok-me-gusta-entonces-starry-truffle.md`. Design:
 ## TDD
 
 - Mode: strict (source: user/session configuration "Strict TDD Mode: enabled").
-- Runner: Vitest (to be installed in T02); Playwright for e2e (T17). Until T02 lands there is no runner; T01 is configuration and docs only.
+- Runner: Vitest (installed in T06, first task with runtime logic); Playwright for e2e (T17). T01–T05 are configuration and docs only.
 
 ## Delivery
 
@@ -43,7 +43,7 @@ Approved plan: `~/.claude/plans/ok-me-gusta-entonces-starry-truffle.md`. Design:
 
 - [x] T00 Design preview (Phase 0). Route: inline. Evidence: canvas v8, v3 approved by the user.
 - [x] T01 Repo safety: scrub raw email and private repo name from history (rewrite the single commit while private), `.gitignore`, `develop` branch, rulesets on `main`/`develop`, secret scanning + push protection, Dependabot, `SECURITY.md`, then make the repo public. Route: inline (config and docs, mechanical). Check: `rg` finds no email/private names in tracked files and history; `gh api` shows rulesets and visibility.
-- [ ] T02 pnpm workspaces, TS strictest, Biome, path aliases. Route: delegated writer (2+ non-trivial files). Check: `pnpm -r typecheck`, `pnpm biome check`.
+- [x] T02 pnpm workspaces, TS strictest, Biome, path aliases. Route: delegated writer (2+ non-trivial files). Check: `pnpm -r typecheck`, `pnpm biome check`.
 - [ ] T03 Astro + `@astrojs/cloudflare` + Tailwind v4 placeholder page on a Cloudflare preview; verify `<Image>` on Workers. Route: delegated writer. Check: preview URL loads.
 - [ ] T04 CI (Biome, typecheck, test, build) as required checks; Cloudflare `main` → production, `develop` → staging, PR → preview. Route: delegated writer. Check: green Action + three URLs.
 - [ ] T05 `docs/CONVENTIONS.md`, `docs/DESIGN.md` (design brief v3), first ADRs, accessible token variants in `docs/BRAND.md`. Route: delegated writer. Check: structural readback.
@@ -63,6 +63,8 @@ Blog live on elvinlab.dev with 3 posts, `/me`, `/contact`, both themes and both 
 
 - 2026-09-27: GitHub Project #2 created with 27 issues, 6 milestones, labels and a Tier field (1 trivial, 8 bounded, 15 complex, 3 human). Issue template `.github/ISSUE_TEMPLATE/task.yml` added. herdr, OpenCode and Ollama present; active profile: cloud.
 
+- 2026-09-27: T02 done (#5). Route: delegated to OpenCode via herdr (`omniroute/elvinlabCode`, pane w8:p2); brief in the issue. Claude review: all 10 files match the brief; fixed a missing final newline in `pnpm-workspace.yaml` and migrated `biome.json` to the 2.5 `preset` key (`biome migrate`). Checks re-run by Claude: `pnpm install --frozen-lockfile` ok, `pnpm typecheck` ok, `pnpm lint` ok, negative check (`any` fails `noExplicitAny`) ok. TDD: not applicable (configuration only, no runtime behavior; Vitest arrives in T06). Commits `3483771` (mise pin), `2cfb079` (workspace). Native review: medium, granted, lens reliability, approved and acknowledged; advisory findings: `preset` key (refuted with the migrate + lint evidence) and no CI proof (covered by T04 #7). TypeScript pinned to 6.0.3 because `@astrojs/check` peer is ^5 || ^6.
+
 ## Next step
 
-T02 (#5, Tier 2): finalize the brief, delegate to OpenCode with `TIER2_MODEL`, review the diff.
+T03 (#6, Tier 3): Astro + Cloudflare adapter + Tailwind v4 walking skeleton.
