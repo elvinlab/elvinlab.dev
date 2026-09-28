@@ -59,9 +59,10 @@ void main() {
   float s = stars(uv + parallax, 46.0, u_time);
   s += stars(uv + parallax * 2.0, 80.0, u_time + 5.0) * 0.7;
 
-  vec3 color = nebula * clouds;
+  // Stars take an accent tint (bright on dark themes, dark on light) so they read on both.
+  vec3 starColor = mix(u_primary, u_cyan, hash(uv * 10.0));
+  vec3 color = nebula * clouds + starColor * s;
   float alpha = clouds * 0.38 + s;
-  color += vec3(s);
   outColor = vec4(color, clamp(alpha, 0.0, 0.9));
 }`;
 

@@ -7,7 +7,7 @@
  * 30 fps, and clean bail-out on context loss. Callers must honor prefers-reduced-motion first.
  */
 import { clampDpr, frameInterval } from './color.ts';
-import type { Palette } from './contract.ts';
+import type { BackgroundHandle, Palette } from './contract.ts';
 
 const VERTEX = `#version 300 es
 in vec2 a_pos;
@@ -43,13 +43,13 @@ export function runShader(
   canvas: HTMLCanvasElement,
   palette: Palette,
   fragment: string,
-): () => void {
+): BackgroundHandle {
   const gl = canvas.getContext('webgl2', {
     alpha: true,
     antialias: false,
     premultipliedAlpha: false,
   });
-  const noop = (): void => {};
+  const noop: BackgroundHandle = { destroy: () => {}, setPalette: () => {} };
   if (!gl) return noop;
 
   const vs = compile(gl, gl.VERTEX_SHADER, VERTEX);
@@ -73,10 +73,17 @@ export function runShader(
   const uRes = loc('u_res');
   const uTime = loc('u_time');
   const uCursor = loc('u_cursor');
-  gl.uniform3fv(loc('u_base'), palette.base);
-  gl.uniform3fv(loc('u_primary'), palette.primary);
-  gl.uniform3fv(loc('u_cyan'), palette.cyan);
-  gl.uniform3fv(loc('u_pink'), palette.pink);
+  const uBase = loc('u_base');
+  const uPrimary = loc('u_primary');
+  const uCyan = loc('u_cyan');
+  const uPink = loc('u_pink');
+  const applyPalette = (next: Palette): void => {
+    gl.uniform3fv(uBase, next.base);
+    gl.uniform3fv(uPrimary, next.primary);
+    gl.uniform3fv(uCyan, next.cyan);
+    gl.uniform3fv(uPink, next.pink);
+  };
+  applyPalette(palette);
   gl.enable(gl.BLEND);
   gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
 
@@ -141,6 +148,9 @@ export function runShader(
   const onLost = (event: Event): void => {
     event.preventDefault();
     pause();
+    // Hide the canvas so the browser never paints its broken-context icon; the banner's static
+    // grid and glows show through instead.
+    canvas.style.display = 'none';
   };
   window.addEventListener('pointermove', onPointer, { passive: true });
   document.addEventListener('visibilitychange', onVisibility);
@@ -148,13 +158,18 @@ export function runShader(
   const resizeObserver = new ResizeObserver(resize);
   resizeObserver.observe(canvas);
 
-  return () => {
-    pause();
-    observer.disconnect();
-    resizeObserver.disconnect();
-    window.removeEventListener('pointermove', onPointer);
-    document.removeEventListener('visibilitychange', onVisibility);
-    canvas.removeEventListener('webglcontextlost', onLost);
-    gl.getExtension('WEBGL_lose_context')?.loseContext();
+  return {
+    setPalette: (next) => {
+      if (!gl.isContextLost()) applyPalette(next);
+    },
+    destroy: () => {
+      pause();
+      observer.disconnect();
+      resizeObserver.disconnect();
+      window.removeEventListener('pointermove', onPointer);
+      document.removeEventListener('visibilitychange', onVisibility);
+      canvas.removeEventListener('webglcontextlost', onLost);
+      gl.getExtension('WEBGL_lose_context')?.loseContext();
+    },
   };
 }

@@ -40,17 +40,14 @@ const effect = site.background;
       };
     };
 
-    let cleanup = create(canvas, readPalette());
+    const background = create(canvas, readPalette());
 
-    // Re-sample the palette when the theme changes so the effect tracks light/dark.
-    const observer = new MutationObserver(() => {
-      cleanup();
-      cleanup = create(canvas, readPalette());
-    });
+    // Recolor in place on theme change — rebuilding the GL context would lose it (broken canvas).
+    const observer = new MutationObserver(() => background.setPalette(readPalette()));
     observer.observe(document.documentElement, { attributeFilter: ['data-theme'] });
 
     const dispose = () => {
-      cleanup();
+      background.destroy();
       observer.disconnect();
     };
     document.addEventListener('astro:before-swap', dispose, { once: true });

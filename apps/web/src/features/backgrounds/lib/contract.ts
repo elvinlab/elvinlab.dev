@@ -8,8 +8,15 @@ export type Palette = {
   pink: Rgb;
 };
 
+/** Handle to a running background: stop it, or recolor it in place when the theme changes. */
+export type BackgroundHandle = {
+  destroy: () => void;
+  /** Update the palette without tearing down the GL context (a rebuild would lose it). */
+  setPalette: (palette: Palette) => void;
+};
+
 /**
- * A background effect: given a canvas and a palette, it starts drawing and returns a cleanup
- * function that stops it and releases every resource. Effects are presentation-only and never fetch.
+ * A background effect: given a canvas and a palette, it starts drawing and returns a handle.
+ * Presentation-only; never fetches.
  */
-export type Background = (canvas: HTMLCanvasElement, palette: Palette) => () => void;
+export type Background = (canvas: HTMLCanvasElement, palette: Palette) => BackgroundHandle;
