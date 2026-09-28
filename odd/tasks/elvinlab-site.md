@@ -74,6 +74,9 @@ Blog live on elvinlab.dev with 3 posts, `/me`, `/contact`, both themes and both 
 
 - 2026-09-28: T05 (#8). `docs/DESIGN.md` written by Claude from the approved v3 brief (Engram `elvinlab-dev/design-brief`; the session scratchpad copy was lost on resume). `docs/CONVENTIONS.md` and ADRs 0001–0004 delegated to OpenCode (`elvinlabCode`); the agent skipped the BRAND.md and CLAUDE.md edits, which Claude did. Claude review fixes: ADR 0002 rollback description, `pages/` wording in CONVENTIONS, final newlines. BRAND.md: accessible variants table, Press Start 2P row, mono role. Checks: `pnpm lint` clean, no email addresses in docs.
 
+- 2026-09-28: Phase 1 released (PR #39, develop → main): first automatic production deploy verified by SHA (`3f7a92a`) at https://elvinlab-dev.lab-previews.workers.dev. The user skipped the end-of-phase review.
+- 2026-09-28: T06 (#9). Route: inline (Tier 3). TDD: RED observed (module missing), GREEN 8/8 Vitest tests. `packages/core/src/tokens/`: `tokens.json` (source of truth: two themes with identical semantic colors, radii, fonts), Zod `parseTokens` (themes must share the default theme's colors, kebab-case names, known default theme), pure `renderTokensCss` → Tailwind `@theme inline` mapping to `--ui-*` runtime vars, default theme on `:root` + `[data-theme]` per theme. `pnpm --filter @elvinlab/core tokens` regenerates `tokens.css`; a test fails if it drifts. `apps/web` imports `DEFAULT_THEME` from core (typecheck proves the workspace link) and uses `bg-page`, `text-text`, `font-display`, `rounded-inner`. CI runs `pnpm test`. Deps: vitest 5.0.2, zod 4.6.5, @types/node 24 (all past the release-age cutoff).
+
 ## Next step
 
-Close Phase 1: re-enable reviews for this clone, one review of the whole phase, release PR develop → main (first automatic production deploy). Then Phase 2 (T06 tokens with TDD).
+T07 (#10): theme system — pre-paint script, toggle, persistence, N themes.
