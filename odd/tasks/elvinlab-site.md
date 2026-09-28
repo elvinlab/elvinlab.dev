@@ -46,7 +46,7 @@ Approved plan: `~/.claude/plans/ok-me-gusta-entonces-starry-truffle.md`. Design:
 - [x] T02 pnpm workspaces, TS strictest, Biome, path aliases. Route: delegated writer (2+ non-trivial files). Check: `pnpm -r typecheck`, `pnpm biome check`.
 - [x] T03 Astro + `@astrojs/cloudflare` + Tailwind v4 placeholder page on a Cloudflare preview; verify `<Image>` on Workers. Route: delegated writer. Check: preview URL loads.
 - [x] T04 CI (Biome, typecheck, test, build) as required checks; Cloudflare `main` → production, `develop` → staging, PR → preview. Route: inline (Tier 3, re-tiered from delegated). Check: green Action + three URLs.
-- [ ] T05 `docs/CONVENTIONS.md`, `docs/DESIGN.md` (design brief v3), first ADRs, accessible token variants in `docs/BRAND.md`. Route: delegated writer. Check: structural readback.
+- [x] T05 `docs/CONVENTIONS.md`, `docs/DESIGN.md` (design brief v3), first ADRs, accessible token variants in `docs/BRAND.md`. Route: delegated writer. Check: structural readback.
 - [ ] T06–T23 as in the approved plan (core, content, interactivity, launch).
 
 ## Acceptance criteria (feature)
@@ -72,6 +72,8 @@ Blog live on elvinlab.dev with 3 posts, `/me`, `/contact`, both themes and both 
 
 - 2026-09-28: T04b (#36). Route: delegated to OpenCode (`elvinlabCode`), reviewed by Claude. Build writes the commit SHA to `version.txt`; smoke check retries until `/version.txt` serves the expected SHA (proves the new build is live), retries asset HEADs, fails when no `/_astro/` asset is referenced, named retry budget; deploy rolls back with `wrangler rollback` when the smoke check fails; comment lookup paginates; production Worker name in `env`; preview token exposure documented. Claude fixes on top of the agent: rollback step had no Cloudflare credentials or `apps/web` working directory, SHA check only waited for 200 (not for the new SHA), missing final newlines; one smoke-check regression of mine (a `git checkout` reverted the file) was restored and re-tested. Dependabot PR #33 (TypeScript 7) closed; Dependabot now ignores TypeScript majors until `@astrojs/check` supports 7. Checks: actionlint + shellcheck clean; local preview smoke test passes with the right SHA and fails with a wrong one.
 
+- 2026-09-28: T05 (#8). `docs/DESIGN.md` written by Claude from the approved v3 brief (Engram `elvinlab-dev/design-brief`; the session scratchpad copy was lost on resume). `docs/CONVENTIONS.md` and ADRs 0001–0004 delegated to OpenCode (`elvinlabCode`); the agent skipped the BRAND.md and CLAUDE.md edits, which Claude did. Claude review fixes: ADR 0002 rollback description, `pages/` wording in CONVENTIONS, final newlines. BRAND.md: accessible variants table, Press Start 2P row, mono role. Checks: `pnpm lint` clean, no email addresses in docs.
+
 ## Next step
 
-T05 (#8, Tier 2): CONVENTIONS.md, DESIGN.md, first ADRs, accessible tokens in BRAND.md — then release develop → main to close Phase 1 and deploy production.
+Close Phase 1: re-enable reviews for this clone, one review of the whole phase, release PR develop → main (first automatic production deploy). Then Phase 2 (T06 tokens with TDD).
