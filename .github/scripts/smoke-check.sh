@@ -20,19 +20,6 @@ fetch_status() {
   curl --silent --output "$2" --write-out '%{http_code}' --max-time 15 "$1" || true
 }
 
-# Root page.
-status=000
-for attempt in $(seq 1 "$max_attempts"); do
-  status="$(fetch_status "$base_url/" "$page")"
-  [[ "$status" == 200 ]] && break
-  echo "attempt $attempt: $base_url/ -> $status, retrying in ${retry_delay}s"
-  sleep "$retry_delay"
-done
-[[ "$status" == 200 ]] || { echo "FAIL: $base_url/ returned $status after $max_attempts attempts"; exit 1; }
-grep -qi '<html' "$page" || { echo "FAIL: $base_url/ did not return HTML"; exit 1; }
-html_content="$(cat "$page")"
-echo "ok: $base_url/ -> 200"
-
 # The new build is live: retry until /version.txt serves the expected commit SHA.
 actual_sha=""
 for attempt in $(seq 1 "$max_attempts"); do
@@ -45,6 +32,19 @@ done
 [[ "$actual_sha" == "$expected_sha" ]] \
   || { echo "FAIL: version.txt serves '${actual_sha:0:40}', expected $expected_sha after $max_attempts attempts"; exit 1; }
 echo "ok: $base_url/version.txt -> $expected_sha"
+
+# Root page.
+status=000
+for attempt in $(seq 1 "$max_attempts"); do
+  status="$(fetch_status "$base_url/" "$page")"
+  [[ "$status" == 200 ]] && break
+  echo "attempt $attempt: $base_url/ -> $status, retrying in ${retry_delay}s"
+  sleep "$retry_delay"
+done
+[[ "$status" == 200 ]] || { echo "FAIL: $base_url/ returned $status after $max_attempts attempts"; exit 1; }
+grep -qi '<html' "$page" || { echo "FAIL: $base_url/ did not return HTML"; exit 1; }
+html_content="$(cat "$page")"
+echo "ok: $base_url/ -> 200"
 
 # Fingerprinted assets: one of each type present, with retries on transport errors.
 checked=0

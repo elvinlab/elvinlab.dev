@@ -41,10 +41,8 @@ jobs:
     name: preview
     needs: checks
     # Forks and Dependabot PRs do not receive repository secrets, so they get checks only.
-    # This preview job runs only for same-repo PRs (not forks) and non-Dependabot actors.
-    # The CLOUDFLARE_API_TOKEN is scoped to Workers edit and only the repository owner
-    # can push to branches that trigger this workflow, so the token is only exposed to
-    # trusted code running in the same repository context.
+    # The Cloudflare token (scoped to Workers edit) reaches only PRs whose branch lives in this
+    # repository, i.e. code pushed by someone with write access; fork PRs never get it.
     if: >-
       github.event_name == 'pull_request'
       && github.event.pull_request.head.repo.full_name == github.repository
