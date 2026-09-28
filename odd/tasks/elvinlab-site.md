@@ -32,6 +32,13 @@ Approved plan: `~/.claude/plans/ok-me-gusta-entonces-starry-truffle.md`. Design:
 - Strategy: `ask-on-risk` (default). Forecast: well above 400 authored lines across the feature → chained PRs per phase.
 - Slice boundaries are recorded per task below.
 
+## Project management
+
+- GitHub Project: https://github.com/users/elvinlab/projects/2 — fields Status, Phase, Size, Priority, Tier.
+- One issue per task (issue numbers below), milestones per phase with due dates, labels `type:*`, `area:*`, `tier:*`. PRs close their issue (`Closes #n`).
+- Tiers follow https://github.com/elvinlab/agentic-dev-setup: Tier 1/2 delegated to OpenCode via herdr (`TIER1_MODEL`/`TIER2_MODEL` from `~/.config/agent-routing/active.env`), Tier 3 by Claude Code, Human = written by Elvin. Claude reviews every delegated diff. Issue bodies are delegation briefs, finalized right before delegating.
+- Issue map: T00 #3, T01 #4, T02 #5, T03 #6, T04 #7, T05 #8, T06 #9, T07 #10, T08 #11, T09 #12, T10 #13, T11 #14, T12 #15, T13 #16, T14 #17, T15 #18, T16 #19, T17 #20, T24 (/me) #21, T18 #22, T19 #23, T20 #24, T21 #25, T22 #26, Note 001 #27, Note 002 #28, Note 003 #29. (T23 "publish 3 posts" is split into the three note issues.)
+
 ## Tasks
 
 - [x] T00 Design preview (Phase 0). Route: inline. Evidence: canvas v8, v3 approved by the user.
@@ -54,6 +61,8 @@ Blog live on elvinlab.dev with 3 posts, `/me`, `/contact`, both themes and both 
 
 - 2026-09-27: T01 done. PR #1 squash-merged into `develop` (`dca878f`). Repo public. Rulesets active: `protect-main` (PR required, no deletion, no force-push) and `protect-develop` (same + linear history); required status checks added in T04. Rebase merges off, branches auto-deleted on merge. Secret scanning + push protection, private vulnerability reporting, Dependabot alerts and security updates enabled (verified via `gh api`). Rulesets only apply to public repos on the free plan, so they were created after going public.
 
+- 2026-09-27: GitHub Project #2 created with 27 issues, 6 milestones, labels and a Tier field (1 trivial, 8 bounded, 15 complex, 3 human). Issue template `.github/ISSUE_TEMPLATE/task.yml` added. herdr, OpenCode and Ollama present; active profile: cloud.
+
 ## Next step
 
-Set up the GitHub Project (needs `gh auth refresh -s project`), then T02.
+T02 (#5, Tier 2): finalize the brief, delegate to OpenCode with `TIER2_MODEL`, review the diff.
