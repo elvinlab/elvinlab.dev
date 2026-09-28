@@ -17,6 +17,11 @@ packages/core/     → @elvinlab/core: tokens, themes, i18n (presentation-only)
 - **pages/** — thin Astro routes; they compose feature entry components and pass route params, with no logic of their own.
 - **shared/** — cross-feature code; `shared/ui` follows atomic design: atoms → molecules → organisms.
 
+### Imports
+- In `apps/web`, cross-folder imports use the `@/` alias (`apps/web/src`, defined once in `tsconfig.json`); `./` only for files in the same folder. Biome `noRestrictedImports` rejects `../`.
+- `packages/core` keeps relative imports: its source is consumed directly by the apps, where `@/` means the app's own `src`.
+- Biome sorts imports into groups separated by a blank line: `node:`, packages, `@/` aliases, relative paths. Side-effect imports (e.g. CSS) keep their position.
+
 ### Boundaries enforced in CI
 `pnpm depcruise` (rules in `.dependency-cruiser.cjs`) fails on: import cycles, unresolvable imports, `core` importing the apps, `shared/` importing `features/`, imports into a feature other than its `index.ts`, pages importing anything but feature entry points, `shared/` and `core`, and imports of pages. dependency-cruiser cannot parse `.astro`, so the script first mirrors `apps/web/src` with each `.astro` reduced to its frontmatter and bundled scripts.
 
@@ -26,7 +31,7 @@ packages/core/     → @elvinlab/core: tokens, themes, i18n (presentation-only)
 - **Born in the project, moved to `core` when repeated.** Do not design `core` ahead of need.
 
 ### White-label by design
-Personal data (name, bio, posts, experience, colors, favicon, socials) lives **only** in configuration (`site.config.ts`) and content collections. The visual system (layout, motion, motifs) stays in code.
+Personal data (name, bio, posts, experience, colors, favicon, socials) lives **only** in configuration (`apps/web/src/site.config.ts`) and content collections. The visual system (layout, motion, motifs) stays in code.
 
 ### Hexagonal ports/adapters
 Only where infrastructure exists (`contact`). No premature abstraction.

@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+
 import { suggestLocale } from './suggest-locale.ts';
 
 const locales = ['es', 'en'];

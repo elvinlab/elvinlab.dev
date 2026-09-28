@@ -1,6 +1,7 @@
 import cloudflare from '@astrojs/cloudflare';
 import tailwindcss from '@tailwindcss/vite';
 import { defineConfig } from 'astro/config';
+
 import { site } from './src/shared/config/index.ts';
 
 export default defineConfig({

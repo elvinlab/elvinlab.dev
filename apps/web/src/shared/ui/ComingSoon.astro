@@ -5,11 +5,13 @@
 
 import { Image } from 'astro:assets';
 import { DEFAULT_THEME, localizePath, switchLocale, THEME_BOOT_SCRIPT } from '@elvinlab/core';
-import skeletonCheck from '../../assets/skeleton-check.png';
-import { LOCALES, type Locale, t } from '../i18n';
+
+import skeletonCheck from '@/assets/skeleton-check.png';
+import { LOCALES, type Locale, t } from '@/shared/i18n/index.ts';
+
 import LanguageHint from './LanguageHint.astro';
 import ThemeToggle from './ThemeToggle.astro';
-import '../../styles/global.css';
+import '@/styles/global.css';
 
 type Props = { locale: Locale };
 

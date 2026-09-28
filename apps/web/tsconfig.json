@@ -4,8 +4,7 @@
   "exclude": ["dist", "boundaries-mirror"],
   "compilerOptions": {
     "paths": {
-      "@features/*": ["./src/features/*"],
-      "@shared/*": ["./src/shared/*"]
+      "@/*": ["./src/*"]
     }
   }
 }

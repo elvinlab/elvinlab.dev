@@ -42,7 +42,6 @@ function mirrorDir(dir: string): void {
 
 rmSync(mirror, { recursive: true, force: true });
 mirrorDir(source);
-copyFileSync(join(root, 'site.config.ts'), join(mirror, 'site.config.ts'));
 // Same aliases as apps/web/tsconfig.json, pointing at the mirror.
 writeFileSync(
   join(mirror, 'tsconfig.json'),
@@ -50,7 +49,7 @@ writeFileSync(
     include: ['src'],
     compilerOptions: {
       baseUrl: '.',
-      paths: { '@features/*': ['./src/features/*'], '@shared/*': ['./src/shared/*'] },
+      paths: { '@/*': ['./src/*'] },
     },
   }),
 );

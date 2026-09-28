@@ -1,5 +1,7 @@
 import { describe, expect, it } from 'vitest';
-import { siteConfig } from '../../../site.config.ts';
+
+import { siteConfig } from '@/site.config.ts';
+
 import { parseSiteConfig } from './schema.ts';
 
 describe('site.config.ts', () => {

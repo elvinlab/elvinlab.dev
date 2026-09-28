@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+
 import { type LocaleConfig, localeFromPath, localizePath, switchLocale } from './paths.ts';
 import { createTranslator } from './translate.ts';
 

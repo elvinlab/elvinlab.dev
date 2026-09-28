@@ -1,5 +1,7 @@
 import { readFileSync } from 'node:fs';
+
 import { describe, expect, it } from 'vitest';
+
 import { renderTokensCss } from './render-css.ts';
 import { parseTokens, type Tokens } from './schema.ts';
 

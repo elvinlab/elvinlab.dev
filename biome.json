@@ -35,16 +35,56 @@
       }
     }
   },
+  "assist": {
+    "actions": {
+      "source": {
+        "organizeImports": {
+          "level": "on",
+          "options": {
+            "groups": [
+              [":NODE:", ":BUN:"],
+              ":BLANK_LINE:",
+              [":PACKAGE_WITH_PROTOCOL:", ":PACKAGE:"],
+              ":BLANK_LINE:",
+              ":ALIAS:",
+              ":BLANK_LINE:",
+              ":PATH:"
+            ]
+          }
+        }
+      }
+    }
+  },
   "html": {
     "experimentalFullSupportEnabled": true
   },
   "overrides": [
     {
-      "includes": ["**/*.astro", "**/astro.config.*"],
+      "includes": ["**/*.astro", "**/astro.config.*", "**/vitest.config.*"],
       "linter": {
         "rules": {
           "style": {
             "noDefaultExport": "off"
+          }
+        }
+      }
+    },
+    {
+      "includes": ["apps/web/**"],
+      "linter": {
+        "rules": {
+          "style": {
+            "noRestrictedImports": {
+              "level": "error",
+              "options": {
+                "patterns": [
+                  {
+                    "group": ["../*", "../**"],
+                    "message": "Use the @/ alias (apps/web/src) instead of parent-relative imports; ./ is only for files in the same folder."
+                  }
+                ]
+              }
+            }
           }
         }
       }

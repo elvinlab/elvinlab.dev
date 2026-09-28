@@ -1,4 +1,5 @@
-import { siteConfig } from '../../../site.config.ts';
+import { siteConfig } from '@/site.config.ts';
+
 import { type Feature, parseSiteConfig, type SiteConfig } from './schema.ts';
 
 export { type Feature, parseSiteConfig, type SiteConfig } from './schema.ts';

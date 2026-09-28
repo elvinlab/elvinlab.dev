@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+
 import { buildThemeBootScript, THEME_STORAGE_KEY } from './boot-script.ts';
 import { resolveTheme, type ThemeOption } from './resolve-theme.ts';
 

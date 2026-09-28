@@ -88,6 +88,8 @@ Blog live on elvinlab.dev with 3 posts, `/me`, `/contact`, both themes and both 
 
 - 2026-09-28: T10 (#13). Route: inline (Tier 3: the brief's tool is blind to `.astro`, a design decision). dependency-cruiser 18.3.1 cannot parse `.astro` (only vue/svelte), so `apps/web/scripts/mirror-astro.ts` mirrors `src` into git-ignored `apps/web/boundaries-mirror/` with each `.astro` as `.astro.ts` (frontmatter + bundled scripts). Biome `noRestrictedImports` was rejected: it matches import strings, so relative cross-feature imports slip through. Rules: no-circular, no-unresolvable, core-is-standalone, shared-below-features, feature-public-api, no-cross-feature-internals, pages-are-thin, pages-are-leaves. Verified: a deliberate violation per rule fails `pnpm depcruise`; clean tree passes. CI runs it after lint. CONVENTIONS fixed: `index.ts` is the only public API of a feature. Gotcha: depcruise needs an absolute tsconfig path (TypeScript finds no inputs with a relative one).
 
+- 2026-09-28: Imports (user request). Route: inline. Single alias `@/*` → `apps/web/src/*` (replaces `@features/*`, `@shared/*`, which Biome sorts as npm scoped packages). `site.config.ts` moved to `apps/web/src/`. Biome `noRestrictedImports` bans `../` in `apps/web`; `organizeImports` groups node / packages / aliases / paths with blank lines. `core` keeps relative imports. Vitest uses a plain config with Vite 8 `resolve.tsconfigPaths` (Astro's `getViteConfig` boots the Cloudflare adapter and fails). Verified: lint, typecheck, 37 tests, depcruise (still catches violations through the alias), build.
+
 ## Next step
 
 T11 (#14): base layout, `shared/ui` atoms, `<Seo>`, footer with retro signature, 404.
