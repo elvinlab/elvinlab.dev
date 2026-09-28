@@ -35,9 +35,11 @@ jobs:
         run: echo "${GITHUB_SHA}" > apps/web/dist/client/version.txt
       - name: Assert build-time image optimization
         run: |
-          count="$(find apps/web/dist/client/_astro -name '*.webp' | wc -l)"
-          echo "optimized WebP images: $count"
-          test "$count" -gt 0
+          # Only meaningful once the site ships raster images (note covers, screenshots).
+          sources="$(find apps/web/src -type f \( -iname '*.png' -o -iname '*.jpg' -o -iname '*.jpeg' \) | wc -l)"
+          webp="$(find apps/web/dist/client/_astro -name '*.webp' | wc -l)"
+          echo "source raster images: $sources | optimized WebP: $webp"
+          if [ "$sources" -gt 0 ]; then test "$webp" -gt 0; else echo "No raster sources yet; skipping."; fi
 
   preview:
     name: preview
