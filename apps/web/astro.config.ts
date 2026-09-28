@@ -1,4 +1,5 @@
 import cloudflare from '@astrojs/cloudflare';
+import mdx from '@astrojs/mdx';
 import tailwindcss from '@tailwindcss/vite';
 import { defineConfig } from 'astro/config';
 
@@ -11,6 +12,7 @@ export default defineConfig({
     locales: site.locales.supported,
     routing: { prefixDefaultLocale: false },
   },
+  integrations: [mdx()],
   adapter: cloudflare({
     // Pages are prerendered, so images are optimized at build time with Sharp and served as
     // static files; the Workers runtime never transforms images (no Cloudflare Images billing).
