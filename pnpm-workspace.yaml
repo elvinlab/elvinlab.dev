@@ -6,3 +6,7 @@ packages:
 allowBuilds:
   esbuild: true
   workerd: true
+
+# One mature sharp for the whole workspace (astro pulls it as an optional ^0.35.4 dependency).
+overrides:
+  sharp: 0.35.4
