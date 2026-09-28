@@ -32,3 +32,11 @@ export const THEME_BOOT_SCRIPT: string = buildThemeBootScript({
   themes: THEMES,
   defaultTheme: DEFAULT_THEME,
 });
+
+export {
+  type LocaleConfig,
+  localeFromPath,
+  localizePath,
+  switchLocale,
+} from './i18n/paths.ts';
+export { createTranslator, type Dictionary, type Translator } from './i18n/translate.ts';

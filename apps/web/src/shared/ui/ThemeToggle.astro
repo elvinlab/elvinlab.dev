@@ -4,12 +4,16 @@
  * framework: the pre-paint script in <head> applies the saved theme, this button only changes it.
  */
 import { THEME_STORAGE_KEY, THEMES } from '@elvinlab/core';
+
+type Props = { label: string };
+
+const { label } = Astro.props;
 ---
 
 <button
   type="button"
   class="grid size-11 place-items-center rounded-control text-text transition-colors duration-150 hover:bg-card-hover active:scale-96"
-  aria-label="Switch theme"
+  aria-label={label}
   data-theme-toggle
   data-themes={JSON.stringify(THEMES)}
   data-storage-key={THEME_STORAGE_KEY}

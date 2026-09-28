@@ -80,6 +80,8 @@ Blog live on elvinlab.dev with 3 posts, `/me`, `/contact`, both themes and both 
 - 2026-09-28: Workflow change (user): PRs skipped during early development; commit straight to `develop` (ruleset keeps no-deletion, no force-push, linear history). `main` still requires a PR and `checks`.
 - 2026-09-28: T07 (#10). Route: inline (Tier 3). TDD: RED (module missing) → GREEN 15/15. `packages/core/src/themes/`: pure self-contained `resolveTheme` (stored theme if still available → theme matching the system scheme, default first → default) and `buildThemeBootScript` (inlines `resolveTheme` source; storage/matchMedia failures fall back safely). Core exports `THEMES`, `THEME_BOOT_SCRIPT`, `THEME_STORAGE_KEY`. Web: `<script is:inline>` pre-paint in `<head>` (no flash), `shared/ui/ThemeToggle.astro` (vanilla, cycles N themes, persists choice, suppresses transitions for one frame, scheme icon, 44 px target, `active:scale-96`). Playwright no-flash test deferred to T17 (runner not installed yet).
 
+- 2026-09-28: T08 (#11). Route: inline (Tier 3). TDD: RED → GREEN 25/25 (typecheck caught a locale inference bug that tests did not; fixed by inferring locales from the dictionaries). Core: typed `createTranslator` (keys from the default dictionary, per-key fallback, `{param}` interpolation) and path helpers `localeFromPath`, `localizePath`, `switchLocale`. Web: Astro i18n routing (`en` at root, `es` under `/es`, `prefixDefaultLocale: false`), `shared/i18n` dictionaries, `ComingSoon` shared by `/` and `/es/` with `lang`, canonical and a language link. Biome `useLiteralKeys` off (conflicts with `noPropertyAccessFromIndexSignature`).
+
 ## Next step
 
-T08 (#11): i18n infrastructure (EN root, ES under /es).
+T09 (#12): `site.config.ts` with Zod + feature flags + white-label test.

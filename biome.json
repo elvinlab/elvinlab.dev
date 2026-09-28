@@ -29,6 +29,9 @@
         "useImportType": "error",
         "noDefaultExport": "error",
         "useConst": "error"
+      },
+      "complexity": {
+        "useLiteralKeys": "off"
       }
     }
   },

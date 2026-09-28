@@ -1,0 +1,41 @@
+---
+/**
+ * Walking-skeleton page body shared by every locale (T03–T08). Replaced by the real home in T14.
+ */
+
+import { Image } from 'astro:assets';
+import { DEFAULT_THEME, localizePath, switchLocale, THEME_BOOT_SCRIPT } from '@elvinlab/core';
+import skeletonCheck from '../../assets/skeleton-check.png';
+import { LOCALES, type Locale, t } from '../i18n';
+import ThemeToggle from './ThemeToggle.astro';
+import '../../styles/global.css';
+
+type Props = { locale: Locale };
+
+const { locale } = Astro.props;
+const otherLocale: Locale = locale === 'en' ? 'es' : 'en';
+const otherHref = switchLocale(Astro.url.pathname, otherLocale, LOCALES);
+const canonical = new URL(localizePath('/', locale, LOCALES), Astro.site);
+---
+
+<html lang={locale} data-theme={DEFAULT_THEME}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex" />
+    <title>{t(locale, 'placeholder.title')}</title>
+    <link rel="canonical" href={canonical} />
+    <script is:inline set:html={THEME_BOOT_SCRIPT} />
+  </head>
+  <body class="grid min-h-dvh place-items-center bg-page font-body text-text">
+    <main class="flex flex-col items-center gap-4 p-6 text-center">
+      <ThemeToggle label={t(locale, 'theme.switch')} />
+      <Image src={skeletonCheck} alt="" width={96} height={64} class="rounded-inner" />
+      <h1 class="font-display text-3xl font-bold">{t(locale, 'placeholder.title')}</h1>
+      <p class="text-muted">{t(locale, 'placeholder.body')}</p>
+      <a href={otherHref} hreflang={otherLocale} lang={otherLocale} class="text-primary underline decoration-dashed underline-offset-4">
+        {t(locale, 'language.switch')}
+      </a>
+    </main>
+  </body>
+</html>
