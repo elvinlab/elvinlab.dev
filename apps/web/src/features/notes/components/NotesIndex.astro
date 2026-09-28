@@ -2,6 +2,7 @@
 /** The full `/notes` page for one UI locale: hero banner, filter, year groups and sidebar. */
 import { getCollection } from 'astro:content';
 
+import { BackgroundCanvas } from '@/features/backgrounds/index.ts';
 import { groupByYear, readingMinutes, sortNotes } from '@/features/notes/lib/notes.ts';
 import { type Locale, t } from '@/shared/i18n/index.ts';
 import Banner from '@/shared/layout/Banner.astro';
@@ -33,6 +34,7 @@ const tags = [...new Set(sortNotes(notes).flatMap((note) => note.data.tags))];
 
 <BaseLayout locale={locale} path="/notes/" title={t(locale, 'notes.title')}>
   <Banner slot="banner" height="320px">
+    <BackgroundCanvas slot="background" />
     <p class="font-mono text-sm text-cyan">{t(locale, 'notes.eyebrow')}</p>
     <h1 class="mt-2 font-display text-5xl font-bold md:text-6xl">
       {t(locale, 'notes.title')}<span class="ml-1 inline-block h-9 w-2.5 animate-blink bg-pink align-baseline md:h-11"></span>

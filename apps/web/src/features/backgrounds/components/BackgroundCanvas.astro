@@ -1,0 +1,46 @@
+---
+/**
+ * Mounts the cursor-waves shader over the banner, with its palette sampled from the active theme's
+ * tokens. Purely decorative: it does nothing under prefers-reduced-motion or without WebGL2, so the
+ * banner's static grid and glows remain the visible (and only) background there.
+ */
+---
+
+<canvas data-background aria-hidden="true" class="absolute inset-0 -z-10 size-full motion-reduce:hidden"></canvas>
+
+<script>
+  import { parseColor } from '@/features/backgrounds/lib/color.ts';
+  import { createCursorWaves } from '@/features/backgrounds/lib/cursor-waves.ts';
+
+  const canvas = document.querySelector<HTMLCanvasElement>('[data-background]');
+  const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  if (canvas && !reduced && 'WebGL2RenderingContext' in window) {
+    const readPalette = () => {
+      const styles = getComputedStyle(document.documentElement);
+      const token = (name: string) => parseColor(styles.getPropertyValue(name).trim());
+      return {
+        base: token('--ui-banner'),
+        primary: token('--ui-primary'),
+        cyan: token('--ui-cyan'),
+        pink: token('--ui-pink'),
+      };
+    };
+
+    let cleanup = createCursorWaves(canvas, readPalette());
+
+    // Re-sample the palette when the theme changes so the shader tracks light/dark.
+    const observer = new MutationObserver(() => {
+      cleanup();
+      cleanup = createCursorWaves(canvas, readPalette());
+    });
+    observer.observe(document.documentElement, { attributeFilter: ['data-theme'] });
+
+    const dispose = () => {
+      cleanup();
+      observer.disconnect();
+    };
+    document.addEventListener('astro:before-swap', dispose, { once: true });
+    window.addEventListener('pagehide', dispose, { once: true });
+  }
+</script>

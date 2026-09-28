@@ -3,6 +3,7 @@
  * pillars, and a sidebar with the author card, the recruiter card and the lab log. */
 import { getCollection } from 'astro:content';
 
+import { BackgroundCanvas } from '@/features/backgrounds/index.ts';
 import { sortNotes } from '@/features/notes/index.ts';
 import AuthorCard from '@/features/portfolio/components/AuthorCard.astro';
 import ExperimentsGrid from '@/features/portfolio/components/ExperimentsGrid.astro';
@@ -33,6 +34,7 @@ const experiments = isEnabled('experiments')
 
 <BaseLayout locale={locale} path="/">
   <Banner slot="banner" height="clamp(460px, 62vh, 600px)">
+    <BackgroundCanvas slot="background" />
     <p class="font-mono text-sm text-cyan">{t(locale, 'notes.eyebrow')}</p>
     <h1 class="mt-3 max-w-[16ch] font-display text-5xl font-bold leading-[1.05] md:text-6xl">
       {site.identity.role[locale]}<span class="ml-1 inline-block h-10 w-2.5 animate-blink bg-pink align-baseline md:h-12"></span>

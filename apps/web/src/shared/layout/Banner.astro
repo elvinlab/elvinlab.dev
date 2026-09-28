@@ -13,9 +13,10 @@ const { height = '320px' } = Astro.props;
   style={`min-height:${height}`}
   aria-hidden="false"
 >
-  <div class="banner-grid absolute inset-0 -z-10" aria-hidden="true"></div>
-  <div class="banner-glow absolute inset-0 -z-10" aria-hidden="true"></div>
-  <div class="mx-auto flex h-full max-w-[1200px] flex-col justify-end px-4 pt-16 pb-8" style={`min-height:${height}`}>
+  <div class="banner-grid absolute inset-0 -z-20" aria-hidden="true"></div>
+  <div class="banner-glow absolute inset-0 -z-20 motion-reduce:opacity-100" aria-hidden="true"></div>
+  <slot name="background" />
+  <div class="relative mx-auto flex h-full max-w-[1200px] flex-col justify-end px-4 pt-16 pb-8" style={`min-height:${height}`}>
     <slot />
   </div>
 </section>
