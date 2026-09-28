@@ -1,0 +1,50 @@
+---
+/** "Hiring?" recruiter card: availability, quick stats and links to /me and the CV. */
+import { localizePath } from '@elvinlab/core';
+
+import { yearsSince } from '@/features/portfolio/lib/portfolio.ts';
+import { site } from '@/shared/config/index.ts';
+import { LOCALES, type Locale, t } from '@/shared/i18n/index.ts';
+
+type Props = { locale: Locale };
+
+const { locale } = Astro.props;
+const { recruiter, identity } = site;
+const years = yearsSince(identity.startedYear);
+const stats = [
+  { label: t(locale, 'recruiter.experience'), value: t(locale, 'recruiter.years', { years }) },
+  { label: t(locale, 'recruiter.role'), value: identity.role[locale] },
+  { label: t(locale, 'recruiter.lookingFor'), value: recruiter.lookingFor[locale] },
+];
+---
+
+<section class="flex flex-col gap-4 overflow-hidden rounded-card bg-card p-5">
+  <span class="-mx-5 -mt-5 h-[3px] bg-gradient-to-r from-primary via-cyan to-pink"></span>
+  <div class="flex items-center justify-between gap-2">
+    <h2 class="font-display text-lg font-bold">{t(locale, 'recruiter.title')}</h2>
+    {recruiter.available && (
+      <span class="inline-flex items-center gap-1.5 rounded-pill bg-chip px-2.5 py-1 text-xs text-text-secondary">
+        <span class="size-2 rounded-pill bg-ok" aria-hidden="true"></span>{recruiter.status[locale]}
+      </span>
+    )}
+  </div>
+  <p class="text-sm text-text-secondary">{t(locale, 'recruiter.line')}</p>
+  <dl class="flex flex-col gap-2 text-sm">
+    {stats.map((stat) => (
+      <div class="flex items-center justify-between gap-3">
+        <dt class="text-muted">{stat.label}</dt>
+        <dd class="text-right font-medium">{stat.value}</dd>
+      </div>
+    ))}
+  </dl>
+  <div class="flex flex-col gap-2">
+    <a href={localizePath('/me/', locale, LOCALES)} class="flex h-11 items-center justify-center rounded-control bg-button px-4 font-medium text-white active:scale-96">
+      {t(locale, 'recruiter.openProfile')}
+    </a>
+    {recruiter.cvUrl && (
+      <a href={recruiter.cvUrl} class="flex h-11 items-center justify-center gap-2 rounded-control bg-chip px-4 text-sm transition-colors duration-150 hover:bg-card-hover">
+        {t(locale, 'recruiter.cv')}
+      </a>
+    )}
+  </div>
+</section>

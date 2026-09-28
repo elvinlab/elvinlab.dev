@@ -1,0 +1,26 @@
+---
+/** Compact notebook row (number, title, language, date) for the home notebook index. */
+import { localizePath } from '@elvinlab/core';
+
+import LangBadge from '@/features/notes/components/LangBadge.astro';
+import { formatDate, type NoteLike, noteNumber } from '@/features/notes/lib/notes.ts';
+import { LOCALES, type Locale } from '@/shared/i18n/index.ts';
+
+type Props = { note: NoteLike; locale: Locale };
+
+const { note, locale } = Astro.props;
+const { data } = note;
+const href = localizePath(`/notes/${note.slug}/`, data.lang, LOCALES);
+---
+
+<a
+  href={href}
+  class="group grid grid-cols-[56px_1fr_auto] items-center gap-3 border-t border-dashed border-divider py-3 transition-colors duration-150 hover:bg-card-hover md:rounded-inner md:px-2"
+>
+  <span class="font-mono text-sm text-muted">{noteNumber(data.number)}</span>
+  <span class="min-w-0 truncate font-medium transition-colors duration-150 group-hover:text-primary">{data.title}</span>
+  <span class="flex items-center gap-2 text-sm text-muted">
+    <time datetime={data.pubDate.toISOString()} class="hidden sm:inline">{formatDate(data.pubDate, locale)}</time>
+    <LangBadge lang={data.lang} />
+  </span>
+</a>

@@ -28,6 +28,13 @@ const siteConfigSchema = z
     socials: z.array(
       z.object({ label: z.string().min(1), url: httpsUrl, icon: z.string().min(1) }),
     ),
+    /** Recruiter card data (home "Hiring?" card and /me). cvUrl is https-only and optional. */
+    recruiter: z.object({
+      available: z.boolean(),
+      status: localized,
+      lookingFor: localized,
+      cvUrl: httpsUrl.optional(),
+    }),
     /** Each flag is one feature: off means its routes are not generated and its nav entry is hidden. */
     features: z.object({
       blog: z.boolean(),
@@ -51,6 +58,11 @@ const siteConfigSchema = z
       description: { path: ['description'], text: config.description },
       role: { path: ['identity', 'role'], text: config.identity.role },
       bio: { path: ['identity', 'bio'], text: config.identity.bio },
+      'recruiter.status': { path: ['recruiter', 'status'], text: config.recruiter.status },
+      'recruiter.lookingFor': {
+        path: ['recruiter', 'lookingFor'],
+        text: config.recruiter.lookingFor,
+      },
     };
     for (const { path, text } of Object.values(texts)) {
       if (!(defaultLocale in text)) {

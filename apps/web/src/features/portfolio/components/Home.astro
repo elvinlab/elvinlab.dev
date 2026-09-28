@@ -1,0 +1,62 @@
+---
+/** The home page for one UI locale: hero banner, latest note, notebook index, experiments,
+ * pillars, and a sidebar with the author card, the recruiter card and the lab log. */
+import { getCollection } from 'astro:content';
+
+import { sortNotes } from '@/features/notes/index.ts';
+import AuthorCard from '@/features/portfolio/components/AuthorCard.astro';
+import ExperimentsGrid from '@/features/portfolio/components/ExperimentsGrid.astro';
+import HiringCard from '@/features/portfolio/components/HiringCard.astro';
+import LabLog from '@/features/portfolio/components/LabLog.astro';
+import LatestNote from '@/features/portfolio/components/LatestNote.astro';
+import NotebookIndex from '@/features/portfolio/components/NotebookIndex.astro';
+import Pillars from '@/features/portfolio/components/Pillars.astro';
+import { sortExperiments } from '@/features/portfolio/lib/portfolio.ts';
+import { isEnabled, site } from '@/shared/config/index.ts';
+import { type Locale, t } from '@/shared/i18n/index.ts';
+import Banner from '@/shared/layout/Banner.astro';
+import BaseLayout from '@/shared/layout/BaseLayout.astro';
+
+type Props = { locale: Locale };
+
+const { locale } = Astro.props;
+const pills = [t(locale, 'home.pill.1'), t(locale, 'home.pill.2'), t(locale, 'home.pill.3')];
+
+const noteEntries = isEnabled('blog') ? await getCollection('notes') : [];
+const notes = sortNotes(noteEntries.map((entry) => ({ slug: entry.id, data: entry.data, body: entry.body ?? '' })));
+const [latest, ...rest] = notes;
+
+const experiments = isEnabled('experiments')
+  ? sortExperiments(await getCollection('experiments')).map((entry) => entry.data)
+  : [];
+---
+
+<BaseLayout locale={locale} path="/">
+  <Banner slot="banner" height="clamp(460px, 62vh, 600px)">
+    <p class="font-mono text-sm text-cyan">{t(locale, 'notes.eyebrow')}</p>
+    <h1 class="mt-3 max-w-[16ch] font-display text-5xl font-bold leading-[1.05] md:text-6xl">
+      {site.identity.role[locale]}<span class="ml-1 inline-block h-10 w-2.5 animate-blink bg-pink align-baseline md:h-12"></span>
+    </h1>
+    <p class="mt-4 max-w-[52ch] text-lg leading-relaxed text-text-secondary md:text-xl">{t(locale, 'home.intro')}</p>
+    <ul class="mt-5 hidden flex-wrap gap-2 md:flex">
+      {pills.map((pill) => (
+        <li class="rounded-pill bg-chip px-3 py-1.5 text-sm text-text-secondary">{pill}</li>
+      ))}
+    </ul>
+  </Banner>
+
+  <div class="flex flex-col gap-8">
+    {latest && <LatestNote locale={locale} slug={latest.slug} data={latest.data} body={latest.body} />}
+    {rest.length > 0 && <NotebookIndex locale={locale} notes={rest.slice(0, 5)} />}
+    <ExperimentsGrid locale={locale} experiments={experiments} />
+    <Pillars locale={locale} />
+  </div>
+
+  <Fragment slot="aside">
+    <div class="flex flex-col gap-4">
+      <AuthorCard locale={locale} />
+      <HiringCard locale={locale} />
+      <LabLog locale={locale} />
+    </div>
+  </Fragment>
+</BaseLayout>

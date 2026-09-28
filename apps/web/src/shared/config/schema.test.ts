@@ -17,6 +17,11 @@ const valid = {
   },
   socials: [{ label: 'GitHub', url: 'https://github.com/janedoe', icon: 'github' }],
   features: { blog: true, comments: false, contact: true, credentials: true, experiments: true },
+  recruiter: {
+    available: true,
+    status: { es: 'Disponible', en: 'Available' },
+    lookingFor: { es: 'Full-stack / IA', en: 'Full-stack / AI' },
+  },
 };
 
 describe('parseSiteConfig', () => {
@@ -49,6 +54,16 @@ describe('parseSiteConfig', () => {
     };
 
     expect(() => parseSiteConfig(broken)).toThrow(/"fr"/);
+  });
+
+  it('requires the recruiter status in the default locale', () => {
+    const broken = { ...valid, recruiter: { ...valid.recruiter, status: { en: 'Available' } } };
+    expect(() => parseSiteConfig(broken)).toThrow(/default locale "es"/);
+  });
+
+  it('rejects a recruiter cvUrl that is not https', () => {
+    const broken = { ...valid, recruiter: { ...valid.recruiter, cvUrl: 'http://x.dev/cv.pdf' } };
+    expect(() => parseSiteConfig(broken)).toThrow();
   });
 
   it('rejects social links that are not https URLs', () => {

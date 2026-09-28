@@ -1,0 +1,28 @@
+---
+/** One experiment (project) tile: image placeholder, title, status, description. */
+
+import type { Experiment } from '@/features/portfolio/schema.ts';
+import { type Locale, t } from '@/shared/i18n/index.ts';
+
+type Props = { experiment: Experiment; locale: Locale };
+
+const { experiment, locale } = Astro.props;
+const Tag = experiment.url ? 'a' : 'div';
+---
+
+<Tag
+  {...experiment.url ? { href: experiment.url, rel: 'noopener' } : {}}
+  class:list={['group flex flex-col gap-3 rounded-card bg-card p-4 transition-colors duration-150', experiment.url && 'hover:bg-card-hover']}
+>
+  <div class="grid aspect-[16/10] place-items-center rounded-inner bg-chip text-muted" aria-hidden="true">
+    <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="14" rx="2"></rect><path d="m3 15 4-4 4 4 4-5 6 6"></path><circle cx="8.5" cy="8.5" r="1.5"></circle></svg>
+  </div>
+  <div class="flex items-center justify-between gap-2">
+    <h3 class="font-display text-lg font-bold transition-colors duration-150 group-hover:text-primary">{experiment.title}</h3>
+    <span class="inline-flex items-center gap-1.5 rounded-pill bg-chip px-2 py-0.5 font-mono text-xs text-text-secondary">
+      <span class:list={['size-2 rounded-pill', experiment.status === 'running' ? 'bg-ok' : 'bg-primary']} aria-hidden="true"></span>
+      {t(locale, `exp.status.${experiment.status}`)}
+    </span>
+  </div>
+  <p class="text-sm leading-relaxed text-text-secondary">{experiment.description}</p>
+</Tag>

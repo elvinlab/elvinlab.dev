@@ -1,0 +1,26 @@
+---
+/** Small "Lab log" meta box: since when, cadence, languages. */
+import { site } from '@/shared/config/index.ts';
+import { type Locale, t } from '@/shared/i18n/index.ts';
+
+type Props = { locale: Locale };
+
+const { locale } = Astro.props;
+const rows = [
+  { label: t(locale, 'labLog.since'), value: String(site.identity.startedYear) },
+  { label: t(locale, 'labLog.cadence'), value: t(locale, 'labLog.cadence.value') },
+  { label: t(locale, 'labLog.languages'), value: t(locale, 'labLog.languages.value') },
+];
+---
+
+<section class="flex flex-col gap-3 rounded-card bg-card p-5">
+  <h2 class="font-display text-base font-bold">{t(locale, 'labLog.title')}</h2>
+  <dl class="flex flex-col gap-2 text-sm">
+    {rows.map((row) => (
+      <div class="flex items-center justify-between gap-3">
+        <dt class="text-muted">{row.label}</dt>
+        <dd class="text-right font-mono">{row.value}</dd>
+      </div>
+    ))}
+  </dl>
+</section>

@@ -1,0 +1,20 @@
+---
+/** The four pillars strip (one card, four cells with dashed dividers). Desktop-only per design. */
+import { type Locale, t } from '@/shared/i18n/index.ts';
+
+type Props = { locale: Locale };
+
+const { locale } = Astro.props;
+const pillars = [1, 2, 3, 4] as const;
+---
+
+<section class="hidden rounded-card bg-card p-6 lg:block" aria-label={t(locale, 'home.pillars')}>
+  <div class="grid grid-cols-4">
+    {pillars.map((n, index) => (
+      <div class:list={['flex flex-col gap-2 px-5', index > 0 && 'border-l border-dashed border-divider', index === 0 && 'pl-0']}>
+        <h3 class="font-display text-base font-bold">{t(locale, `home.pillar.${n}.title`)}</h3>
+        <p class="text-sm leading-relaxed text-text-secondary">{t(locale, `home.pillar.${n}.body`)}</p>
+      </div>
+    ))}
+  </div>
+</section>

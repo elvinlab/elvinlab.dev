@@ -30,4 +30,9 @@ export const siteConfig = {
     { label: 'LinkedIn', url: 'https://www.linkedin.com/in/elvinlab', icon: 'linkedin' },
   ],
   features: { blog: true, comments: true, contact: true, credentials: true, experiments: true },
+  recruiter: {
+    available: true,
+    status: { es: 'Abierto a oportunidades', en: 'Open to opportunities' },
+    lookingFor: { es: 'Full-stack senior · Agentes de IA', en: 'Senior full-stack · AI agents' },
+  },
 };

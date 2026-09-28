@@ -1,0 +1,44 @@
+---
+/** Home hero card for the most recent note: meta, title, decision record and a read CTA. */
+import { localizePath } from '@elvinlab/core';
+
+import {
+  DecisionRecord,
+  formatDate,
+  LangBadge,
+  type NoteData,
+  noteNumber,
+  readingMinutes,
+} from '@/features/notes/index.ts';
+import { LOCALES, type Locale, t } from '@/shared/i18n/index.ts';
+
+type Props = { locale: Locale; slug: string; data: NoteData; body: string };
+
+const { locale, slug, data, body } = Astro.props;
+const href = localizePath(`/notes/${slug}/`, data.lang, LOCALES);
+const readingLabel = t(locale, 'notes.readingTime', { min: readingMinutes(body) });
+---
+
+<section class="flex flex-col gap-5 rounded-card bg-card p-6 md:p-8">
+  <div class="flex flex-wrap items-center justify-between gap-2">
+    <span class="flex items-center gap-2 font-mono text-sm">
+      <span class="text-pink">{t(locale, 'notes.entry', { number: noteNumber(data.number) })}</span>
+      <span class="text-muted">{t(locale, 'home.latest')}</span>
+    </span>
+    <span class="flex items-center gap-2 font-mono text-sm text-muted">
+      <time datetime={data.pubDate.toISOString()} class="hidden sm:inline">{formatDate(data.pubDate, locale)}</time>
+      <span>{readingLabel}</span>
+      <LangBadge lang={data.lang} />
+    </span>
+  </div>
+
+  <h2 class="font-display text-3xl font-bold leading-tight md:text-4xl">
+    <a href={href} class="transition-colors duration-150 hover:text-primary">{data.title}</a>
+  </h2>
+
+  <DecisionRecord locale={locale} decision={data.decision} />
+
+  <a href={href} class="flex h-11 w-fit items-center rounded-control bg-button px-5 font-medium text-white active:scale-96">
+    {t(locale, 'home.readNote')}
+  </a>
+</section>

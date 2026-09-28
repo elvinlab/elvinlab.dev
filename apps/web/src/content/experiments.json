@@ -1,0 +1,10 @@
+{
+  "agentic-dev-setup": {
+    "title": "agentic-dev-setup",
+    "description": "Multi-agent development environment: model routing, tiered delegation and persistent memory.",
+    "tags": ["ai-agents", "tooling"],
+    "year": 2026,
+    "url": "https://github.com/elvinlab/agentic-dev-setup",
+    "featured": true
+  }
+}

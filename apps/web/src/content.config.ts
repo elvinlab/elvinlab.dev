@@ -1,7 +1,8 @@
 import { defineCollection } from 'astro:content';
-import { glob } from 'astro/loaders';
+import { file, glob } from 'astro/loaders';
 
 import { noteSchema } from '@/features/notes/index.ts';
+import { experimentSchema } from '@/features/portfolio/index.ts';
 
 // Drafts live in the git-ignored `content/drafts/` and only load in dev, so they never ship.
 // Publishing a note means moving its folder into `content/notes/`.
@@ -17,4 +18,10 @@ const notes = defineCollection({
   schema: ({ image }) => noteSchema(image),
 });
 
-export const collections = { notes };
+// Portfolio experiments: a keyed JSON file, one entry per project (keys become ids).
+const experiments = defineCollection({
+  loader: file('./src/content/experiments.json'),
+  schema: experimentSchema(),
+});
+
+export const collections = { notes, experiments };
