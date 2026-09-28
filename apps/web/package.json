@@ -3,9 +3,21 @@
   "private": true,
   "type": "module",
   "dependencies": {
-    "@elvinlab/core": "workspace:*"
+    "@astrojs/cloudflare": "14.3.3",
+    "@elvinlab/core": "workspace:*",
+    "@tailwindcss/vite": "4.3.3",
+    "astro": "7.3.5",
+    "tailwindcss": "4.3.3"
   },
   "scripts": {
-    "typecheck": "tsc -p tsconfig.json"
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "typecheck": "astro check",
+    "deploy": "astro build && wrangler deploy"
+  },
+  "devDependencies": {
+    "@astrojs/check": "0.9.10",
+    "wrangler": "4.142.0"
   }
 }
