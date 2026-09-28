@@ -11,10 +11,12 @@
     "lint": "biome check .",
     "lint:fix": "biome check --write .",
     "format": "biome format --write .",
-    "test": "pnpm -r --if-present test"
+    "test": "pnpm -r --if-present test",
+    "depcruise": "node apps/web/scripts/mirror-astro.ts && depcruise apps/web/boundaries-mirror/src packages/core/src"
   },
   "devDependencies": {
     "@biomejs/biome": "2.5.14",
+    "dependency-cruiser": "18.3.1",
     "typescript": "6.0.3",
     "vitest": "5.0.2"
   }

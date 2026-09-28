@@ -14,6 +14,8 @@ mise exec -- pnpm typecheck     # tsc in every package
 mise exec -- pnpm lint          # Biome check (format + lint), read-only
 mise exec -- pnpm lint:fix      # Biome check with fixes
 mise exec -- pnpm format        # Biome format
+mise exec -- pnpm test          # Vitest in every package
+mise exec -- pnpm depcruise     # architecture boundaries (.dependency-cruiser.cjs)
 
 mise exec -- pnpm --filter web dev          # Astro dev server (workerd runtime)
 mise exec -- pnpm --filter web build        # static build into apps/web/dist
@@ -23,7 +25,7 @@ mise exec -- pnpm --filter web run deploy   # build + wrangler deploy (needs `wr
 
 Use `pnpm run deploy`, not `pnpm deploy` (that is a built-in pnpm command). Normally you never deploy by hand: CI (`.github/workflows/ci.yml`) runs `checks` (required on `main` and `develop`), gives every PR a preview at `https://pr-<N>-elvinlab-dev-staging.lab-previews.workers.dev`, deploys `develop` to staging (`elvinlab-dev-staging`) and `main` to production (`elvinlab-dev`), and smoke-checks each deploy with `.github/scripts/smoke-check.sh`.
 
-pnpm enforces a minimum release age: when it proposes `minimumReleaseAgeExclude` entries, pin an older version instead of accepting them. Images are optimized at build time (`imageService: 'compile'`). There is no test runner yet (Vitest arrives in T06). Do not invent commands; add them here when they exist.
+pnpm enforces a minimum release age: when it proposes `minimumReleaseAgeExclude` entries, pin an older version instead of accepting them. Images are optimized at build time (`imageService: 'compile'`). dependency-cruiser cannot parse `.astro`, so `depcruise` first mirrors `apps/web/src` into the git-ignored `apps/web/boundaries-mirror/` (`apps/web/scripts/mirror-astro.ts`). Do not invent commands; add them here when they exist.
 
 Read `docs/PLAN.md`, `docs/BRAND.md` (both in Spanish; decisions in them are settled), `docs/DESIGN.md`, `docs/CONVENTIONS.md` and `docs/adr/` before any work.
 

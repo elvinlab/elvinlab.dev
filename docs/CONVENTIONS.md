@@ -13,9 +13,12 @@ packages/core/     → @elvinlab/core: tokens, themes, i18n (presentation-only)
 ```
 
 ### `apps/web` — Screaming architecture
-- **features/** — one folder per capability, acts as a feature flag; public API is `components/`, `lib/`, `schema.ts`, `index.ts` only.
+- **features/** — one folder per capability, acts as a feature flag; laid out as `components/`, `lib/`, `schema.ts`, `index.ts`. `index.ts` is the only public API: everything outside the feature imports from it (components too, e.g. `export { default as NoteCard } from './components/NoteCard.astro'`).
 - **pages/** — thin Astro routes; they compose feature entry components and pass route params, with no logic of their own.
 - **shared/** — cross-feature code; `shared/ui` follows atomic design: atoms → molecules → organisms.
+
+### Boundaries enforced in CI
+`pnpm depcruise` (rules in `.dependency-cruiser.cjs`) fails on: import cycles, unresolvable imports, `core` importing the apps, `shared/` importing `features/`, imports into a feature other than its `index.ts`, pages importing anything but feature entry points, `shared/` and `core`, and imports of pages. dependency-cruiser cannot parse `.astro`, so the script first mirrors `apps/web/src` with each `.astro` reduced to its frontmatter and bundled scripts.
 
 ### `packages/core` — Presentation-only boundary
 - Contains tokens, themes, i18n infrastructure.

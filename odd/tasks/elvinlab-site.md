@@ -86,6 +86,8 @@ Blog live on elvinlab.dev with 3 posts, `/me`, `/contact`, both themes and both 
 
 - 2026-09-28: T09 (#12). Route: inline (Tier 3). TDD: RED (module missing) → GREEN; web gets Vitest (8 tests). `apps/web/site.config.ts` holds identity, locales, socials and feature flags (`blog`, `comments`, `contact`, `credentials`, `experiments`); `shared/config/schema.ts` validates it with Zod (https-only URLs, so no `mailto:`; default locale must be supported; localized texts need the default locale and only supported locales). `shared/config` parses on import and exposes `site` + `isEnabled`; `astro.config.ts` reads `site.url` and locales from it. Verified: a config with `default: 'fr'` fails `astro build` with a readable error. Build-level white-label check (swap profile, grep HTML for owner strings) moves to T17 with Playwright, once real pages render the config.
 
+- 2026-09-28: T10 (#13). Route: inline (Tier 3: the brief's tool is blind to `.astro`, a design decision). dependency-cruiser 18.3.1 cannot parse `.astro` (only vue/svelte), so `apps/web/scripts/mirror-astro.ts` mirrors `src` into git-ignored `apps/web/boundaries-mirror/` with each `.astro` as `.astro.ts` (frontmatter + bundled scripts). Biome `noRestrictedImports` was rejected: it matches import strings, so relative cross-feature imports slip through. Rules: no-circular, no-unresolvable, core-is-standalone, shared-below-features, feature-public-api, no-cross-feature-internals, pages-are-thin, pages-are-leaves. Verified: a deliberate violation per rule fails `pnpm depcruise`; clean tree passes. CI runs it after lint. CONVENTIONS fixed: `index.ts` is the only public API of a feature. Gotcha: depcruise needs an absolute tsconfig path (TypeScript finds no inputs with a relative one).
+
 ## Next step
 
-T10 (#13): dependency-cruiser boundary rules in CI.
+T11 (#14): base layout, `shared/ui` atoms, `<Seo>`, footer with retro signature, 404.

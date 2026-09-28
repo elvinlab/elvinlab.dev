@@ -1,7 +1,7 @@
 {
   "extends": ["astro/tsconfigs/strictest", "../../tsconfig.base.json"],
   "include": [".astro/types.d.ts", "**/*"],
-  "exclude": ["dist"],
+  "exclude": ["dist", "boundaries-mirror"],
   "compilerOptions": {
     "paths": {
       "@features/*": ["./src/features/*"],
