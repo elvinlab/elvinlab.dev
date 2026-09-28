@@ -1,12 +1,13 @@
 import cloudflare from '@astrojs/cloudflare';
 import tailwindcss from '@tailwindcss/vite';
 import { defineConfig } from 'astro/config';
+import { site } from './src/shared/config/index.ts';
 
 export default defineConfig({
-  site: 'https://elvinlab.dev',
+  site: site.url,
   i18n: {
-    defaultLocale: 'es',
-    locales: ['es', 'en'],
+    defaultLocale: site.locales.default,
+    locales: site.locales.supported,
     routing: { prefixDefaultLocale: false },
   },
   adapter: cloudflare({

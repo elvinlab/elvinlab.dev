@@ -84,6 +84,8 @@ Blog live on elvinlab.dev with 3 posts, `/me`, `/contact`, both themes and both 
 
 - 2026-09-28: Locale direction changed by the user: Spanish is the default at `/`, English optional under `/en/`. Browser-language detection implemented SEO-safely: no redirect; `suggestLocale` (TDD, 4 tests, 29 total) drives a dismissible, fixed-position `LanguageHint` (no CLS). Pages emit `hreflang` for both locales plus `x-default` → Spanish. Biome `useLiteralKeys` off.
 
+- 2026-09-28: T09 (#12). Route: inline (Tier 3). TDD: RED (module missing) → GREEN; web gets Vitest (8 tests). `apps/web/site.config.ts` holds identity, locales, socials and feature flags (`blog`, `comments`, `contact`, `credentials`, `experiments`); `shared/config/schema.ts` validates it with Zod (https-only URLs, so no `mailto:`; default locale must be supported; localized texts need the default locale and only supported locales). `shared/config` parses on import and exposes `site` + `isEnabled`; `astro.config.ts` reads `site.url` and locales from it. Verified: a config with `default: 'fr'` fails `astro build` with a readable error. Build-level white-label check (swap profile, grep HTML for owner strings) moves to T17 with Playwright, once real pages render the config.
+
 ## Next step
 
-T09 (#12): `site.config.ts` with Zod + feature flags + white-label test.
+T10 (#13): dependency-cruiser boundary rules in CI.
