@@ -39,7 +39,7 @@ float stars(vec2 uv, float density, float t) {
   vec2 pos = vec2(hash(i + 1.3), hash(i + 2.7));
   float d = length(f - pos);
   float twinkle = 0.6 + 0.4 * sin(t * 2.0 + h * 6.28);
-  float star = smoothstep(0.06, 0.0, d) * step(0.72, h) * twinkle;
+  float star = smoothstep(0.05, 0.0, d) * step(0.55, h) * twinkle;
   return star;
 }
 
@@ -51,18 +51,18 @@ void main() {
 
   // Nebula clouds.
   float n = fbm(p * 2.4 + parallax * 4.0 + vec2(u_time * 0.03, u_time * 0.02));
-  float clouds = smoothstep(0.35, 0.9, n);
+  float clouds = smoothstep(0.2, 0.85, n);
   vec3 nebula = mix(u_primary, u_cyan, fbm(p * 1.7 - u_time * 0.02));
   nebula = mix(nebula, u_pink, smoothstep(0.6, 1.0, n));
 
   // Two star layers at different depths for parallax.
-  float s = stars(uv + parallax, 40.0, u_time);
-  s += stars(uv + parallax * 2.0, 70.0, u_time + 5.0) * 0.7;
+  float s = stars(uv + parallax, 46.0, u_time);
+  s += stars(uv + parallax * 2.0, 80.0, u_time + 5.0) * 0.7;
 
   vec3 color = nebula * clouds;
-  float alpha = clouds * 0.20 + s;
+  float alpha = clouds * 0.38 + s;
   color += vec3(s);
-  outColor = vec4(color, clamp(alpha, 0.0, 0.85));
+  outColor = vec4(color, clamp(alpha, 0.0, 0.9));
 }`;
 
 export const createGalaxy: Background = (canvas, palette) => runShader(canvas, palette, FRAGMENT);
