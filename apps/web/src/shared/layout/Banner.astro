@@ -1,27 +1,65 @@
 ---
 /**
- * Full-bleed banner: the brand grid and corner glows over the banner surface. The animated shader
- * lands in T15; until then this is the static backdrop. Content is passed as the default slot.
+ * Full-bleed banner: the brand grid and corner glows over the banner surface, with an optional
+ * animated background passed through the `background` slot. When `expandable`, a glass toggle lets
+ * the visitor grow or shrink the background height (remembered per visitor); the content never moves.
  */
-type Props = { height?: string };
+import { type Locale, t } from '@/shared/i18n/index.ts';
 
-const { height = '320px' } = Astro.props;
+type Props = {
+  height?: string;
+  /** Height when expanded (defaults to the viewport). */
+  expandedHeight?: string;
+  /** Show the expand/collapse toggle. */
+  expandable?: boolean;
+  locale?: Locale;
+};
+
+const { height = '320px', expandedHeight = '100svh', expandable = false, locale = 'es' } = Astro.props;
 ---
 
 <section
-  class="relative isolate overflow-hidden bg-banner"
-  style={`min-height:${height}`}
-  aria-hidden="false"
+  class="banner relative isolate overflow-hidden bg-banner"
+  style={`--h-collapsed:${height};--h-expanded:${expandedHeight}`}
+  data-banner
+  data-expanded={expandable ? true : undefined}
 >
   <div class="banner-grid absolute inset-0 -z-20" aria-hidden="true"></div>
   <div class="banner-glow absolute inset-0 -z-20 motion-reduce:opacity-100" aria-hidden="true"></div>
   <slot name="background" />
-  <div class="relative mx-auto flex h-full max-w-[1200px] flex-col justify-end px-4 pt-16 pb-8" style={`min-height:${height}`}>
+  <div class="relative mx-auto flex h-full min-h-[inherit] max-w-[1200px] flex-col justify-end px-4 pt-16 pb-8">
     <slot />
   </div>
+
+  {expandable && (
+    <button
+      type="button"
+      data-banner-toggle
+      aria-pressed="true"
+      class="absolute right-3 bottom-3 z-10 flex h-9 items-center gap-1.5 rounded-pill bg-card/70 px-3 font-mono text-xs text-text-secondary backdrop-blur-md transition-colors duration-150 hover:text-text"
+      data-label-expand={t(locale, 'banner.expand')}
+      data-label-collapse={t(locale, 'banner.collapse')}
+      aria-label={t(locale, 'banner.collapse')}
+    >
+      <svg data-icon-expand class="hidden" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3M3 16v3a2 2 0 0 0 2 2h3m13-5v3a2 2 0 0 1-2 2h-3"></path></svg>
+      <svg data-icon-collapse viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 3v3a2 2 0 0 1-2 2H3m18 0h-3a2 2 0 0 1-2-2V3M3 16h3a2 2 0 0 1 2 2v3m13-5h-3a2 2 0 0 0-2 2v3"></path></svg>
+    </button>
+  )}
 </section>
 
 <style>
+  .banner {
+    min-height: var(--h-collapsed);
+    transition: min-height 350ms ease;
+  }
+  .banner[data-expanded] {
+    min-height: var(--h-expanded);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .banner {
+      transition: none;
+    }
+  }
   .banner-grid {
     background-image:
       linear-gradient(var(--color-grid) 1px, transparent 1px),
@@ -35,3 +73,41 @@ const { height = '320px' } = Astro.props;
       radial-gradient(40% 60% at 85% 30%, var(--color-glow-cyan), transparent 70%);
   }
 </style>
+
+<script>
+  const STORAGE_KEY = 'banner-expanded';
+  const banner = document.querySelector<HTMLElement>('[data-banner]');
+  const toggle = banner?.querySelector<HTMLButtonElement>('[data-banner-toggle]');
+
+  if (banner && toggle) {
+    const expandIcon = toggle.querySelector<SVGElement>('[data-icon-expand]');
+    const collapseIcon = toggle.querySelector<SVGElement>('[data-icon-collapse]');
+
+    const apply = (expanded: boolean): void => {
+      banner.toggleAttribute('data-expanded', expanded);
+      toggle.setAttribute('aria-pressed', String(expanded));
+      toggle.setAttribute('aria-label', expanded ? toggle.dataset['labelCollapse'] ?? '' : toggle.dataset['labelExpand'] ?? '');
+      expandIcon?.classList.toggle('hidden', expanded);
+      collapseIcon?.classList.toggle('hidden', !expanded);
+    };
+
+    // Expanded by default; a visitor's saved choice ('0' collapsed / '1' expanded) wins.
+    let stored: string | null = null;
+    try {
+      stored = localStorage.getItem(STORAGE_KEY);
+    } catch {
+      // Storage can be blocked; keep the default.
+    }
+    if (stored === '0') apply(false);
+
+    toggle.addEventListener('click', () => {
+      const expanded = !banner.hasAttribute('data-expanded');
+      apply(expanded);
+      try {
+        localStorage.setItem(STORAGE_KEY, expanded ? '1' : '0');
+      } catch {
+        // Ignore storage failures; the toggle still works for this view.
+      }
+    });
+  }
+</script>

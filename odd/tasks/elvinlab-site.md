@@ -103,4 +103,6 @@ Blog live on elvinlab.dev with 3 posts, `/me`, `/contact`, both themes and both 
 
 ## Next step
 
+- 2026-09-28: Banner/navbar design pass (user feedback). (1) Glass navbar now floats over the banner: navbar moved inside <main>, banner pulled up behind it (-mt-18), bar is bg-card/70 + backdrop-blur-md. (2) Navbar auto-hides on scroll down, reveals on scroll up (past 120px). (3) Brand logo restored to the canvas/BRAND terminal-prompt motif: `> {handle}` in JetBrains Mono with a blinking pink cursor (was Space Grotesk `elvinlab.dev` — a fidelity regression the user caught). (4) Banner is expandable: a glass toggle (bottom-right) grows/shrinks the background height (default expandedHeight 100svh); DEFAULT EXPANDED, and a visitor's choice persists in localStorage ('banner-expanded' 0/1) so it sticks across visits. Rendered expanded in SSR to avoid a collapse flash. Enabled on the home banner (Banner `expandable` prop; notes/note banners stay fixed). Inspiration: astro-theme-leo. Verified: lint/typecheck/tests/depcruise/build; axe clean on home + notes/note pages. Also: the deploy that added the glass navbar first failed on a transient Cloudflare asset-propagation flake (a referenced CSS 404'd ~2min, smoke check rolled back); re-run succeeded, code was fine.
+
 T16 (#19): sitemap, RSS per language, robots.txt, JSON-LD.

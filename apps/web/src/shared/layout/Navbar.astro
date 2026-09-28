@@ -26,13 +26,13 @@ const linkClass =
   'flex h-11 items-center rounded-control px-3 font-medium transition-colors duration-150 hover:bg-card-hover aria-[current=page]:text-primary';
 ---
 
-<header class="animate-fade-in-up">
+<header data-navbar class="animate-fade-in-up transition-transform duration-300 will-change-transform">
   <nav
     aria-label={t(locale, 'nav.label')}
     class="relative flex h-18 items-center gap-2 rounded-b-card bg-card/70 px-3 backdrop-blur-md md:px-4"
   >
-    <a href={localizePath('/', locale, LOCALES)} class="mr-auto flex h-11 items-center rounded-control px-2 font-display text-lg font-bold">
-      {site.title}
+    <a href={localizePath('/', locale, LOCALES)} class="mr-auto flex h-11 items-center rounded-control px-2 font-mono text-base font-semibold">
+      <span class="text-muted">&gt;&nbsp;</span>{site.identity.handle}<span class="ml-0.5 inline-block h-4 w-2 animate-blink bg-pink align-[-2px]"></span>
     </a>
 
     <ul class="hidden items-center gap-1 md:flex">
@@ -87,4 +87,28 @@ const linkClass =
       toggle?.focus();
     }
   });
+</script>
+
+<script>
+  // Auto-hide the navbar on scroll down, reveal on scroll up (past a small threshold).
+  const header = document.querySelector<HTMLElement>('[data-navbar]');
+  if (header) {
+    let last = window.scrollY;
+    let ticking = false;
+    const onScroll = (): void => {
+      const y = window.scrollY;
+      if (Math.abs(y - last) > 6) {
+        const hide = y > last && y > 120;
+        header.classList.toggle('-translate-y-full', hide);
+        last = y;
+      }
+      ticking = false;
+    };
+    document.addEventListener('scroll', () => {
+      if (!ticking) {
+        ticking = true;
+        requestAnimationFrame(onScroll);
+      }
+    }, { passive: true });
+  }
 </script>

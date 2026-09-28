@@ -45,7 +45,7 @@ const readingLabel = t(locale, 'notes.readingTime', { min: readingMinutes(entry.
 
 <BaseLayout locale={locale} path={path} title={data.title} description={data.description} translated={Boolean(data.translationOf)}>
   <ReadingProgress slot="banner" />
-  <Banner slot="banner" height="360px">
+  <Banner slot="banner" height="360px" locale={locale}>
     <BackgroundCanvas slot="background" />
     <p class="font-mono text-sm text-muted">
       <a href={localizePath('/notes/', locale, LOCALES)} class="hover:text-primary">{t(locale, 'note.breadcrumb')}</a>

@@ -33,7 +33,7 @@ const tags = [...new Set(sortNotes(notes).flatMap((note) => note.data.tags))];
 ---
 
 <BaseLayout locale={locale} path="/notes/" title={t(locale, 'notes.title')}>
-  <Banner slot="banner" height="320px">
+  <Banner slot="banner" height="320px" locale={locale}>
     <BackgroundCanvas slot="background" />
     <p class="font-mono text-sm text-cyan">{t(locale, 'notes.eyebrow')}</p>
     <h1 class="mt-2 font-display text-5xl font-bold md:text-6xl">

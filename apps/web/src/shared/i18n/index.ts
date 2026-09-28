@@ -30,6 +30,8 @@ export const t = createTranslator({
       'nav.contact': 'Contacto',
       'footer.social': 'Redes',
       'aside.label': 'Barra lateral',
+      'banner.expand': 'Expandir el fondo',
+      'banner.collapse': 'Achicar el fondo',
       'home.intro':
         'Documento las decisiones detrás de lo que construyo: qué probé, qué descarté y por qué.',
       'home.pill.1': 'Clean architecture',
@@ -123,6 +125,8 @@ export const t = createTranslator({
       'nav.contact': 'Contact',
       'footer.social': 'Social links',
       'aside.label': 'Sidebar',
+      'banner.expand': 'Expand the background',
+      'banner.collapse': 'Collapse the background',
       'home.intro':
         'I write down the decisions behind what I build: what I tried, what I dropped and why.',
       'home.pill.1': 'Clean architecture',
