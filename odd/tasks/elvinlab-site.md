@@ -77,6 +77,9 @@ Blog live on elvinlab.dev with 3 posts, `/me`, `/contact`, both themes and both 
 - 2026-09-28: Phase 1 released (PR #39, develop → main): first automatic production deploy verified by SHA (`3f7a92a`) at https://elvinlab-dev.lab-previews.workers.dev. The user skipped the end-of-phase review.
 - 2026-09-28: T06 (#9). Route: inline (Tier 3). TDD: RED observed (module missing), GREEN 8/8 Vitest tests. `packages/core/src/tokens/`: `tokens.json` (source of truth: two themes with identical semantic colors, radii, fonts), Zod `parseTokens` (themes must share the default theme's colors, kebab-case names, known default theme), pure `renderTokensCss` → Tailwind `@theme inline` mapping to `--ui-*` runtime vars, default theme on `:root` + `[data-theme]` per theme. `pnpm --filter @elvinlab/core tokens` regenerates `tokens.css`; a test fails if it drifts. `apps/web` imports `DEFAULT_THEME` from core (typecheck proves the workspace link) and uses `bg-page`, `text-text`, `font-display`, `rounded-inner`. CI runs `pnpm test`. Deps: vitest 5.0.2, zod 4.6.5, @types/node 24 (all past the release-age cutoff).
 
+- 2026-09-28: Workflow change (user): PRs skipped during early development; commit straight to `develop` (ruleset keeps no-deletion, no force-push, linear history). `main` still requires a PR and `checks`.
+- 2026-09-28: T07 (#10). Route: inline (Tier 3). TDD: RED (module missing) → GREEN 15/15. `packages/core/src/themes/`: pure self-contained `resolveTheme` (stored theme if still available → theme matching the system scheme, default first → default) and `buildThemeBootScript` (inlines `resolveTheme` source; storage/matchMedia failures fall back safely). Core exports `THEMES`, `THEME_BOOT_SCRIPT`, `THEME_STORAGE_KEY`. Web: `<script is:inline>` pre-paint in `<head>` (no flash), `shared/ui/ThemeToggle.astro` (vanilla, cycles N themes, persists choice, suppresses transitions for one frame, scheme icon, 44 px target, `active:scale-96`). Playwright no-flash test deferred to T17 (runner not installed yet).
+
 ## Next step
 
-T07 (#10): theme system — pre-paint script, toggle, persistence, N themes.
+T08 (#11): i18n infrastructure (EN root, ES under /es).

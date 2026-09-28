@@ -1,0 +1,61 @@
+---
+/**
+ * Cycles through the themes defined in tokens.json and remembers the choice. Works without a
+ * framework: the pre-paint script in <head> applies the saved theme, this button only changes it.
+ */
+import { THEME_STORAGE_KEY, THEMES } from '@elvinlab/core';
+---
+
+<button
+  type="button"
+  class="grid size-11 place-items-center rounded-control text-text transition-colors duration-150 hover:bg-card-hover active:scale-96"
+  aria-label="Switch theme"
+  data-theme-toggle
+  data-themes={JSON.stringify(THEMES)}
+  data-storage-key={THEME_STORAGE_KEY}
+>
+  <svg data-icon="dark" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"></path></svg>
+  <svg data-icon="light" class="hidden" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"></path></svg>
+</button>
+
+<script>
+  import type { ThemeOption } from '@elvinlab/core';
+
+  const root = document.documentElement;
+
+  /** Applies a theme without letting every color transition fire at once (the switch snaps). */
+  const applyTheme = (name: string): void => {
+    const freeze = document.createElement('style');
+    freeze.textContent = '*,*::before,*::after{transition:none!important}';
+    document.head.append(freeze);
+    root.setAttribute('data-theme', name);
+    void root.offsetHeight;
+    requestAnimationFrame(() => freeze.remove());
+  };
+
+  const syncIcon = (button: HTMLElement, themes: ThemeOption[]): void => {
+    const current = themes.find((theme) => theme.name === root.getAttribute('data-theme'));
+    const scheme = current?.scheme ?? 'dark';
+    for (const icon of button.querySelectorAll<SVGElement>('[data-icon]')) {
+      icon.classList.toggle('hidden', icon.dataset['icon'] !== scheme);
+    }
+  };
+
+  for (const button of document.querySelectorAll<HTMLButtonElement>('[data-theme-toggle]')) {
+    const themes = JSON.parse(button.dataset['themes'] ?? '[]') as ThemeOption[];
+    const storageKey = button.dataset['storageKey'] ?? 'theme';
+    syncIcon(button, themes);
+    button.addEventListener('click', () => {
+      const index = themes.findIndex((theme) => theme.name === root.getAttribute('data-theme'));
+      const next = themes[(index + 1) % themes.length];
+      if (!next) return;
+      applyTheme(next.name);
+      try {
+        localStorage.setItem(storageKey, next.name);
+      } catch {
+        // Storage can be blocked (privacy modes); the theme still applies for this page view.
+      }
+      syncIcon(button, themes);
+    });
+  }
+</script>
