@@ -5,8 +5,8 @@ import { defineConfig } from 'astro/config';
 export default defineConfig({
   site: 'https://elvinlab.dev',
   i18n: {
-    defaultLocale: 'en',
-    locales: ['en', 'es'],
+    defaultLocale: 'es',
+    locales: ['es', 'en'],
     routing: { prefixDefaultLocale: false },
   },
   adapter: cloudflare({

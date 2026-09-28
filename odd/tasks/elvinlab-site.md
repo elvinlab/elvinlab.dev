@@ -82,6 +82,8 @@ Blog live on elvinlab.dev with 3 posts, `/me`, `/contact`, both themes and both 
 
 - 2026-09-28: T08 (#11). Route: inline (Tier 3). TDD: RED → GREEN 25/25 (typecheck caught a locale inference bug that tests did not; fixed by inferring locales from the dictionaries). Core: typed `createTranslator` (keys from the default dictionary, per-key fallback, `{param}` interpolation) and path helpers `localeFromPath`, `localizePath`, `switchLocale`. Web: Astro i18n routing (`en` at root, `es` under `/es`, `prefixDefaultLocale: false`), `shared/i18n` dictionaries, `ComingSoon` shared by `/` and `/es/` with `lang`, canonical and a language link. Biome `useLiteralKeys` off (conflicts with `noPropertyAccessFromIndexSignature`).
 
+- 2026-09-28: Locale direction changed by the user: Spanish is the default at `/`, English optional under `/en/`. Browser-language detection implemented SEO-safely: no redirect; `suggestLocale` (TDD, 4 tests, 29 total) drives a dismissible, fixed-position `LanguageHint` (no CLS). Pages emit `hreflang` for both locales plus `x-default` → Spanish. Biome `useLiteralKeys` off.
+
 ## Next step
 
 T09 (#12): `site.config.ts` with Zod + feature flags + white-label test.

@@ -39,4 +39,5 @@ export {
   localizePath,
   switchLocale,
 } from './i18n/paths.ts';
+export { suggestLocale } from './i18n/suggest-locale.ts';
 export { createTranslator, type Dictionary, type Translator } from './i18n/translate.ts';

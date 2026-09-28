@@ -4,7 +4,7 @@ Source of truth for how elvinlab.dev looks and moves (design v3, "lab notebook")
 
 ## Direction
 
-- Subject: a portfolio and the blog "Lab Notes — by an eternal junior" of a full-stack engineer who builds with AI agents. Audience: engineers, tech leads and recruiters (English first, Spanish second).
+- Subject: a portfolio and the blog "Lab Notes — by an eternal junior" of a full-stack engineer who builds with AI agents. Audience: engineers, tech leads and recruiters. Spanish is the default locale at `/`; English is optional under `/en/`. The browser language only triggers a dismissible "also available in …" hint, never a redirect (SEO and performance).
 - Identity comes from the subject: a lab and its notebook. Notes are numbered entries (`Note 003`), each summarized by a **decision record**: context, decision, outcome.
 - **One bold element:** the full-bleed banner with the live cursor-reactive WebGL2 background and a large solid display headline with the pink block cursor. Everything else stays quiet.
 - Varied hierarchy instead of identical cards: the latest entry is large, older entries are index rows, projects are "experiments" tiles, the four pillars share one strip.
