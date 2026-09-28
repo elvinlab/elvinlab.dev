@@ -30,6 +30,7 @@ export const siteConfig = {
     { label: 'LinkedIn', url: 'https://www.linkedin.com/in/elvinlab', icon: 'linkedin' },
   ],
   features: { blog: true, comments: true, contact: true, credentials: true, experiments: true },
+  background: 'galaxy',
   recruiter: {
     available: true,
     status: { es: 'Abierto a oportunidades', en: 'Open to opportunities' },

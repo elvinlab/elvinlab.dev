@@ -1,21 +1,34 @@
 ---
 /**
- * Mounts the cursor-waves shader over the banner, with its palette sampled from the active theme's
- * tokens. Purely decorative: it does nothing under prefers-reduced-motion or without WebGL2, so the
- * banner's static grid and glows remain the visible (and only) background there.
+ * Mounts the configured banner background (site.config `background`) with its palette sampled from
+ * the active theme's tokens. Purely decorative: it does nothing under prefers-reduced-motion, without
+ * WebGL2, or when the effect is "none", so the banner's static grid and glows remain the fallback.
  */
+import { site } from '@/shared/config/index.ts';
+
+const effect = site.background;
 ---
 
-<canvas data-background aria-hidden="true" class="absolute inset-0 -z-10 size-full motion-reduce:hidden"></canvas>
+{effect !== 'none' && (
+  <canvas data-background data-effect={effect} class="absolute inset-0 -z-10 size-full motion-reduce:hidden"></canvas>
+)}
 
 <script>
   import { parseColor } from '@/features/backgrounds/lib/color.ts';
+  import type { Background } from '@/features/backgrounds/lib/contract.ts';
   import { createCursorWaves } from '@/features/backgrounds/lib/cursor-waves.ts';
+  import { createGalaxy } from '@/features/backgrounds/lib/galaxy.ts';
+
+  const effects: Record<string, Background> = {
+    'cursor-waves': createCursorWaves,
+    galaxy: createGalaxy,
+  };
 
   const canvas = document.querySelector<HTMLCanvasElement>('[data-background]');
+  const create = canvas ? effects[canvas.dataset['effect'] ?? ''] : undefined;
   const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-  if (canvas && !reduced && 'WebGL2RenderingContext' in window) {
+  if (canvas && create && !reduced && 'WebGL2RenderingContext' in window) {
     const readPalette = () => {
       const styles = getComputedStyle(document.documentElement);
       const token = (name: string) => parseColor(styles.getPropertyValue(name).trim());
@@ -27,12 +40,12 @@
       };
     };
 
-    let cleanup = createCursorWaves(canvas, readPalette());
+    let cleanup = create(canvas, readPalette());
 
-    // Re-sample the palette when the theme changes so the shader tracks light/dark.
+    // Re-sample the palette when the theme changes so the effect tracks light/dark.
     const observer = new MutationObserver(() => {
       cleanup();
-      cleanup = createCursorWaves(canvas, readPalette());
+      cleanup = create(canvas, readPalette());
     });
     observer.observe(document.documentElement, { attributeFilter: ['data-theme'] });
 

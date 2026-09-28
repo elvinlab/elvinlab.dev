@@ -28,6 +28,8 @@ const siteConfigSchema = z
     socials: z.array(
       z.object({ label: z.string().min(1), url: httpsUrl, icon: z.string().min(1) }),
     ),
+    /** Which banner background effect to render (all read the theme palette). */
+    background: z.enum(['cursor-waves', 'galaxy', 'none']).default('galaxy'),
     /** Recruiter card data (home "Hiring?" card and /me). cvUrl is https-only and optional. */
     recruiter: z.object({
       available: z.boolean(),

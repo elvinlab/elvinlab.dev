@@ -17,6 +17,7 @@ const valid = {
   },
   socials: [{ label: 'GitHub', url: 'https://github.com/janedoe', icon: 'github' }],
   features: { blog: true, comments: false, contact: true, credentials: true, experiments: true },
+  background: 'galaxy',
   recruiter: {
     available: true,
     status: { es: 'Disponible', en: 'Available' },
@@ -64,6 +65,12 @@ describe('parseSiteConfig', () => {
   it('rejects a recruiter cvUrl that is not https', () => {
     const broken = { ...valid, recruiter: { ...valid.recruiter, cvUrl: 'http://x.dev/cv.pdf' } };
     expect(() => parseSiteConfig(broken)).toThrow();
+  });
+
+  it('defaults the background to galaxy and rejects an unknown one', () => {
+    const { background: _, ...rest } = valid;
+    expect(parseSiteConfig(rest).background).toBe('galaxy');
+    expect(() => parseSiteConfig({ ...valid, background: 'lava-lamp' })).toThrow();
   });
 
   it('rejects social links that are not https URLs', () => {
