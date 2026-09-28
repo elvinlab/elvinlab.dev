@@ -46,5 +46,13 @@
         }
       }
     }
-  ]
+  ],
+  "css": {
+    "parser": {
+      "tailwindDirectives": true
+    }
+  },
+  "files": {
+    "includes": ["**", "!packages/core/src/tokens/tokens.css"]
+  }
 }

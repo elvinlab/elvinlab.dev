@@ -28,6 +28,7 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - run: pnpm lint
       - run: pnpm typecheck
+      - run: pnpm test
       - run: pnpm --filter web build
       - name: Write version.txt with commit SHA
         run: echo "${GITHUB_SHA}" > apps/web/dist/client/version.txt

@@ -1,0 +1,86 @@
+/* Generated from tokens.json by `pnpm --filter @elvinlab/core tokens`. Do not edit by hand. */
+
+@theme inline {
+  --color-page: var(--ui-page);
+  --color-card: var(--ui-card);
+  --color-card-hover: var(--ui-card-hover);
+  --color-banner: var(--ui-banner);
+  --color-text: var(--ui-text);
+  --color-text-secondary: var(--ui-text-secondary);
+  --color-muted: var(--ui-muted);
+  --color-primary: var(--ui-primary);
+  --color-cyan: var(--ui-cyan);
+  --color-pink: var(--ui-pink);
+  --color-button: var(--ui-button);
+  --color-chip: var(--ui-chip);
+  --color-divider: var(--ui-divider);
+  --color-grid: var(--ui-grid);
+  --color-glow-violet: var(--ui-glow-violet);
+  --color-glow-cyan: var(--ui-glow-cyan);
+  --color-ok: var(--ui-ok);
+  --color-danger: var(--ui-danger);
+  --radius-card: var(--ui-radius-card);
+  --radius-control: var(--ui-radius-control);
+  --radius-inner: var(--ui-radius-inner);
+  --radius-pill: var(--ui-radius-pill);
+  --font-display: var(--ui-font-display);
+  --font-body: var(--ui-font-body);
+  --font-mono: var(--ui-font-mono);
+  --font-retro: var(--ui-font-retro);
+}
+
+:root {
+  --ui-radius-card: 16px;
+  --ui-radius-control: 12px;
+  --ui-radius-inner: 4px;
+  --ui-radius-pill: 9999px;
+  --ui-font-display: 'Space Grotesk', system-ui, sans-serif;
+  --ui-font-body: 'Space Grotesk', system-ui, sans-serif;
+  --ui-font-mono: 'JetBrains Mono', ui-monospace, monospace;
+  --ui-font-retro: 'Press Start 2P', ui-monospace, monospace;
+}
+
+:root,
+[data-theme="elvinlab-dark"] {
+  color-scheme: dark;
+  --ui-page: #07070f;
+  --ui-card: #121022;
+  --ui-card-hover: #1d1934;
+  --ui-banner: #0a0816;
+  --ui-text: #eceff4;
+  --ui-text-secondary: #c3c9d4;
+  --ui-muted: #8b949e;
+  --ui-primary: #a78bfa;
+  --ui-cyan: #22d3ee;
+  --ui-pink: #ec4899;
+  --ui-button: #7c3aed;
+  --ui-chip: rgb(167 139 250 / 0.12);
+  --ui-divider: rgb(255 255 255 / 0.14);
+  --ui-grid: rgb(139 92 246 / 0.09);
+  --ui-glow-violet: rgb(139 92 246 / 0.26);
+  --ui-glow-cyan: rgb(6 182 212 / 0.15);
+  --ui-ok: #34d399;
+  --ui-danger: #fb7185;
+}
+
+[data-theme="elvinlab-light"] {
+  color-scheme: light;
+  --ui-page: #eef0ff;
+  --ui-card: #ffffff;
+  --ui-card-hover: #f1edff;
+  --ui-banner: #e4e0fb;
+  --ui-text: #0d1117;
+  --ui-text-secondary: #30363d;
+  --ui-muted: #57606a;
+  --ui-primary: #6d28d9;
+  --ui-cyan: #0e7490;
+  --ui-pink: #be185d;
+  --ui-button: #7c3aed;
+  --ui-chip: rgb(124 58 237 / 0.08);
+  --ui-divider: rgb(0 0 0 / 0.14);
+  --ui-grid: rgb(124 58 237 / 0.09);
+  --ui-glow-violet: rgb(139 92 246 / 0.2);
+  --ui-glow-cyan: rgb(6 182 212 / 0.12);
+  --ui-ok: #047857;
+  --ui-danger: #be123c;
+}
