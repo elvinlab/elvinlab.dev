@@ -25,7 +25,7 @@ Approved plan: `~/.claude/plans/ok-me-gusta-entonces-starry-truffle.md`. Design:
 ## TDD
 
 - Mode: strict (source: user/session configuration "Strict TDD Mode: enabled").
-- Runner: Vitest (to be installed in T02); Playwright for e2e (T17). Until T02 lands there is no runner; T01 is configuration and docs only.
+- Runner: Vitest (installed in T06, first task with runtime logic); Playwright for e2e (T17). T01–T05 are configuration and docs only.
 
 ## Delivery
 

@@ -33,7 +33,7 @@ body:
     attributes:
       label: Conventions
       description: Point to an existing file as the example to follow.
-      value: Follow `CLAUDE.md` and `docs/CONVENTIONS.md`.
+      value: Follow `CLAUDE.md` (and `docs/CONVENTIONS.md` once T05 adds it).
   - type: textarea
     id: acceptance
     attributes:

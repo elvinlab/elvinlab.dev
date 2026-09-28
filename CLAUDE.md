@@ -2,47 +2,58 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
-## Status
+## Status and commands
 
-Planning phase — there is no code, package manager, build, lint, or test setup yet. Do not invent commands; add them here once the scaffold exists.
+Foundation phase. The pnpm workspace exists; Astro, CI and deploy land in T03–T04. Current work and history: `odd/tasks/elvinlab-site.md` and the GitHub Project (https://github.com/users/elvinlab/projects/2).
 
-Read `docs/PLAN.md` (vision, scope, rules, success criteria) and `docs/BRAND.md` (narrative and design tokens) before any work. Both are written in Spanish; decisions in them are settled starting points, not suggestions to re-validate.
+Tool versions are pinned in `.mise.toml` (Node 24.21.0, pnpm 12.6.0). Run everything through mise:
+
+```bash
+mise exec -- pnpm install       # install workspace dependencies
+mise exec -- pnpm typecheck     # tsc in every package
+mise exec -- pnpm lint          # Biome check (format + lint), read-only
+mise exec -- pnpm lint:fix      # Biome check with fixes
+mise exec -- pnpm format        # Biome format
+```
+
+There is no test runner yet (Vitest arrives in T06). Do not invent commands; add them here when they exist.
+
+Read `docs/PLAN.md` and `docs/BRAND.md` before any work. Both are in Spanish; decisions in them are settled.
 
 ## What this repo is
 
-- Portfolio at `elvinlab.dev` plus the blog **Lab Notes — by an eternal junior** at `/notes` (`/notes/<slug>` per post; `/devlog` reserved). The home page shows the latest 3 posts.
+- Portfolio at `elvinlab.dev` plus the blog **Lab Notes — by an eternal junior** at `/notes`, and a recruiter page at `/me`.
 - The birthplace of `@elvinlab/core`, a shared design base that later moves to its own repo so others can build blogs/landings with this style.
-- A from-scratch rebuild of the current live site (repo `portfolio-legacy`, Astro). Reuse only its content (bio, experience, bilingual copy) and i18n logic; discard its visual layer and component architecture. Fix on the way: missing accents, outdated experience count (5+ years since 2020), stock project images (use real screenshots).
+- **White-label by design:** another developer must be able to replace name, bio, posts, experience, colors, favicon and socials through configuration and content only, while the visual style (layout, motion, motifs) stays in code.
+- A from-scratch rebuild of the legacy site; reuse only content and ideas, never its components.
 
-## Planned architecture
+## Architecture
 
 ```
-apps/web/       → blog + portfolio
-packages/core/  → @elvinlab/core, shared design base (internal, unpublished)
+apps/web/        → blog + portfolio (Astro); screaming features/, thin pages/, shared/
+packages/core/   → @elvinlab/core: tokens, themes, i18n (presentation-only)
 ```
 
-- `core` contains only, from day one: design tokens (CSS variables), dark/light theme system, i18n infrastructure. Nothing else.
-- **Born in the project, moved to `core` when repeated.** Every component starts in `apps/web` and moves to `core` only when a second real project needs it. Do not design `core` ahead of need.
+- Stack: TypeScript (strictest options in `tsconfig.base.json`, pinned to 6.x because `@astrojs/check` supports ^5 || ^6), Astro, Tailwind v4, React only for real islands, Biome, Cloudflare Workers.
+- **Born in the project, moved to `core` when repeated.** Do not design `core` ahead of need.
 - **`core` is presentation-only:** no `fetch`, no persistence. Data in via props, events out.
-- **Themeable tokens:** BRAND.md values are the default theme `theme-elvinlab`, replaceable in one file. Components read semantic variables only (`var(--brand-primary)`, `var(--surface)`), never a raw hex.
-- `packages/core/tokens.json` will be the single source of truth: a build script generates `tokens.css` (`:root` and `[data-theme="light"]`), and the GitHub profile generators (`tools/` in repo `elvinlab/elvinlab`) read it from `main`. Changing token names/shape affects that external consumer.
-- No npm publishing, semver, or changelog while `core` lives here.
+- **Themeable tokens:** BRAND.md values are the default theme `theme-elvinlab`. Components read semantic variables only, never a raw hex.
+- Hexagonal ports/adapters only where infrastructure exists (`contact`). Atomic design only in `core` and `shared/ui`.
+- Biome rules that bite: no `any`, `import type` for types, no default exports (except where Astro/config requires them).
 
-## Brand rules that affect code
+## Workflow
+
+- Branches: `main` (production), `develop` (staging); work on `feat/*`, `fix/*`, `docs/*`, `chore/*` from `develop` and open a PR. Conventional Commits, no AI attribution.
+- Every task is a GitHub issue written as a delegation brief with a Tier (see `.github/ISSUE_TEMPLATE/task.yml`): Tier 1/2 are delegated to OpenCode via herdr; Tier 3 is done by Claude Code, which reviews every delegated diff.
+
+## Brand and safety rules that affect code
 
 - Fonts: Space Grotesk + JetBrains Mono, self-hosted via Fontsource; never a runtime CDN.
 - Every animation must stop under `prefers-reduced-motion`.
 - Brand changes go to `docs/BRAND.md` first, then to each surface.
 - Don't announce projects that don't exist yet; never name or link private repositories.
 - Never write the raw email address in tracked files or HTML (public repo, scrapers); contact goes through `/contact`.
-
-## Out of scope
-
-Comment backend/moderation, a standalone published component library, and features of other elvinlab projects.
-
-## Open decisions (resolve before scaffolding)
-
-Tracked in `docs/PLAN.md` → "Preguntas abiertas": post language, stack confirmation (likely Astro + React islands + Tailwind, Vue avoided on purpose), spacing scale, full monorepo vs. starting with `src/core/`, light border color (`#c9c3ee` vs `#d8d0f5`). Do not scaffold until the stack is explicitly confirmed.
+- Secrets only in Cloudflare or git-ignored `.dev.vars`.
 
 ## Success criterion
 
