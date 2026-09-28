@@ -1,0 +1,37 @@
+---
+/**
+ * Site footer with the retro signature: the handle in Press Start 2P and a blinking pink block
+ * cursor (the brand's terminal motif). The cursor stops blinking under reduced motion.
+ */
+import '@fontsource/press-start-2p/latin-400.css';
+
+import { site } from '@/shared/config/index.ts';
+import { type Locale, t } from '@/shared/i18n/index.ts';
+
+type Props = { locale: Locale };
+
+const { locale } = Astro.props;
+const year = new Date().getFullYear();
+---
+
+<footer class="mt-16 animate-fade-in-up border-t border-dashed border-divider py-8 [animation-delay:250ms]">
+  <div class="flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
+    <div class="flex flex-col gap-3">
+      <p class="font-retro text-xs leading-relaxed text-text-secondary">
+        {site.identity.handle}<span aria-hidden="true" class="ml-1 inline-block h-3 w-2 animate-blink bg-pink align-baseline"></span>
+      </p>
+      <p class="text-sm text-muted">© {year} {site.identity.name}</p>
+    </div>
+    {site.socials.length > 0 && (
+      <ul aria-label={t(locale, 'footer.social')} class="-mx-3 flex flex-wrap gap-1">
+        {site.socials.map((social) => (
+          <li>
+            <a href={social.url} rel="me noopener" class="flex h-11 items-center rounded-control px-3 text-sm text-text-secondary transition-colors duration-150 hover:bg-card-hover hover:text-text">
+              {social.label}
+            </a>
+          </li>
+        ))}
+      </ul>
+    )}
+  </div>
+</footer>

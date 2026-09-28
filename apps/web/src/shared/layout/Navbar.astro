@@ -1,0 +1,90 @@
+---
+/**
+ * Sticky 72 px navbar card. Sections follow the feature flags; under `md` they collapse into a
+ * disclosure menu. The language link and theme toggle stay visible at every width.
+ */
+import { localizePath, switchLocale } from '@elvinlab/core';
+
+import { site } from '@/shared/config/index.ts';
+import { LOCALES, type Locale, t } from '@/shared/i18n/index.ts';
+import { isCurrent, navItems } from '@/shared/layout/nav.ts';
+import ThemeToggle from '@/shared/ui/ThemeToggle.astro';
+
+type Props = { locale: Locale };
+
+const { locale } = Astro.props;
+const routePath = switchLocale(Astro.url.pathname, LOCALES.defaultLocale, LOCALES);
+const items = navItems(site.features).map((item) => ({
+  ...item,
+  href: localizePath(item.path, locale, LOCALES),
+  label: t(locale, `nav.${item.key}`),
+  current: isCurrent(routePath, item.path),
+}));
+const otherLocale: Locale = locale === 'es' ? 'en' : 'es';
+const otherHref = switchLocale(Astro.url.pathname, otherLocale, LOCALES);
+const linkClass =
+  'flex h-11 items-center rounded-control px-3 font-medium transition-colors duration-150 hover:bg-card-hover aria-[current=page]:text-primary';
+---
+
+<header class="sticky top-0 z-40 animate-fade-in-up">
+  <nav
+    aria-label={t(locale, 'nav.label')}
+    class="relative flex h-18 items-center gap-2 rounded-b-card bg-card px-3 md:px-4"
+  >
+    <a href={localizePath('/', locale, LOCALES)} class="mr-auto flex h-11 items-center rounded-control px-2 font-display text-lg font-bold">
+      {site.title}
+    </a>
+
+    <ul class="hidden items-center gap-1 md:flex">
+      {items.map((item) => (
+        <li><a href={item.href} class={linkClass} aria-current={item.current ? 'page' : undefined}>{item.label}</a></li>
+      ))}
+    </ul>
+
+    <a
+      href={otherHref}
+      hreflang={otherLocale}
+      lang={otherLocale}
+      class="grid h-11 min-w-11 place-items-center rounded-control px-2 font-mono text-sm uppercase transition-colors duration-150 hover:bg-card-hover"
+      aria-label={t(locale, 'language.switch')}
+    >
+      {otherLocale}
+    </a>
+    <ThemeToggle label={t(locale, 'theme.switch')} />
+    <button
+      type="button"
+      class="grid size-11 place-items-center rounded-control transition-colors duration-150 hover:bg-card-hover active:scale-96 md:hidden"
+      aria-label={t(locale, 'nav.menu')}
+      aria-expanded="false"
+      aria-controls="nav-menu"
+      data-nav-toggle
+    >
+      <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"></path></svg>
+    </button>
+
+    <ul id="nav-menu" hidden class="absolute inset-x-0 top-full mt-2 flex flex-col gap-1 rounded-card bg-card p-2 md:hidden">
+      {items.map((item) => (
+        <li><a href={item.href} class={linkClass} aria-current={item.current ? 'page' : undefined}>{item.label}</a></li>
+      ))}
+    </ul>
+  </nav>
+</header>
+
+<script>
+  const toggle = document.querySelector<HTMLButtonElement>('[data-nav-toggle]');
+  const menu = document.getElementById('nav-menu');
+
+  const setOpen = (open: boolean): void => {
+    if (!toggle || !menu) return;
+    toggle.setAttribute('aria-expanded', String(open));
+    menu.hidden = !open;
+  };
+
+  toggle?.addEventListener('click', () => setOpen(menu?.hidden === true));
+  document.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape' && menu && !menu.hidden) {
+      setOpen(false);
+      toggle?.focus();
+    }
+  });
+</script>

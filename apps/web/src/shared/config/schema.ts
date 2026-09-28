@@ -8,6 +8,9 @@ const localized = z.record(z.string(), z.string().trim().min(1));
 const siteConfigSchema = z
   .object({
     url: httpsUrl,
+    /** Site name: browser tab suffix, Open Graph site name, footer. */
+    title: z.string().trim().min(1),
+    description: localized,
     locales: z.object({
       default: z.string().min(2),
       supported: z.array(z.string().min(2)).nonempty(),
@@ -44,9 +47,12 @@ const siteConfigSchema = z
       });
     }
 
-    const texts = { role: config.identity.role, bio: config.identity.bio };
-    for (const [field, text] of Object.entries(texts)) {
-      const path = ['identity', field];
+    const texts = {
+      description: { path: ['description'], text: config.description },
+      role: { path: ['identity', 'role'], text: config.identity.role },
+      bio: { path: ['identity', 'bio'], text: config.identity.bio },
+    };
+    for (const { path, text } of Object.values(texts)) {
       if (!(defaultLocale in text)) {
         ctx.addIssue({
           code: 'custom',

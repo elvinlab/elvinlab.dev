@@ -1,0 +1,13 @@
+---
+/**
+ * Surface for grouped content: card color, 16 px radius, no border or shadow (design v3).
+ * Inner elements use `rounded-inner` to keep radii concentric.
+ */
+import type { HTMLAttributes } from 'astro/types';
+
+type Props = HTMLAttributes<'div'> & { as?: 'div' | 'section' | 'article' | 'aside' };
+
+const { as: Tag = 'div', class: className, ...attributes } = Astro.props;
+---
+
+<Tag class:list={['rounded-card bg-card p-5 md:p-6', className]} {...attributes}><slot /></Tag>

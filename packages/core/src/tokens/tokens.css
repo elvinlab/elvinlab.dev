@@ -34,9 +34,9 @@
   --ui-radius-control: 12px;
   --ui-radius-inner: 4px;
   --ui-radius-pill: 9999px;
-  --ui-font-display: 'Space Grotesk', system-ui, sans-serif;
-  --ui-font-body: 'Space Grotesk', system-ui, sans-serif;
-  --ui-font-mono: 'JetBrains Mono', ui-monospace, monospace;
+  --ui-font-display: 'Space Grotesk Variable', 'Space Grotesk', system-ui, sans-serif;
+  --ui-font-body: 'Space Grotesk Variable', 'Space Grotesk', system-ui, sans-serif;
+  --ui-font-mono: 'JetBrains Mono Variable', 'JetBrains Mono', ui-monospace, monospace;
   --ui-font-retro: 'Press Start 2P', ui-monospace, monospace;
 }
 

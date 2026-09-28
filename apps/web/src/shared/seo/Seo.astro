@@ -1,0 +1,53 @@
+---
+/**
+ * Every page's head metadata, driven by site config: title, description, canonical, hreflang
+ * alternates, Open Graph, Twitter, theme color and favicon.
+ */
+import { tokens } from '@elvinlab/core';
+
+import { site } from '@/shared/config/index.ts';
+import { LOCALES, type Locale } from '@/shared/i18n/index.ts';
+import { seoLinks } from '@/shared/seo/links.ts';
+
+type Props = {
+  locale: Locale;
+  /** Route path without locale prefix, e.g. `/notes/`. */
+  path: string;
+  /** Page title; the site title is appended. Omit on the home page. */
+  title?: string;
+  description?: string;
+  /** False for pages that exist in one locale only. */
+  translated?: boolean;
+  noindex?: boolean;
+};
+
+const { locale, path, title, description, translated = true, noindex = false } = Astro.props;
+const fullTitle = title ? `${title} — ${site.title}` : site.title;
+const summary = description ?? site.description[locale] ?? site.description[LOCALES.defaultLocale];
+const links = seoLinks({
+  path,
+  locale,
+  site: new URL(site.url),
+  locales: LOCALES,
+  translated,
+});
+// First theme of each scheme colors the browser UI to match the page.
+const themeColors = ['dark', 'light'].flatMap((scheme) => {
+  const theme = Object.values(tokens.themes).find((candidate) => candidate.scheme === scheme);
+  return theme ? [{ scheme, color: theme.colors['page'] }] : [];
+});
+---
+
+<title>{fullTitle}</title>
+<meta name="description" content={summary} />
+{noindex && <meta name="robots" content="noindex" />}
+<link rel="canonical" href={links.canonical} />
+{links.alternates.map((alternate) => <link rel="alternate" hreflang={alternate.hreflang} href={alternate.href} />)}
+<link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+{themeColors.map(({ scheme, color }) => <meta name="theme-color" media={`(prefers-color-scheme: ${scheme})`} content={color} />)}
+<meta property="og:type" content="website" />
+<meta property="og:site_name" content={site.title} />
+<meta property="og:title" content={fullTitle} />
+<meta property="og:description" content={summary} />
+<meta property="og:url" content={links.canonical} />
+<meta name="twitter:card" content="summary" />

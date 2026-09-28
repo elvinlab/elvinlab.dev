@@ -1,0 +1,61 @@
+---
+/**
+ * Page shell: head metadata, pre-paint theme script, skip link, navbar, content, footer and the
+ * language hint. Pages pass an `aside` slot to get the design's `main | sidebar 280 px` grid and a
+ * `banner` slot for the full-bleed banner above it.
+ */
+import '@fontsource-variable/jetbrains-mono';
+import '@fontsource-variable/space-grotesk';
+import '@/styles/global.css';
+
+import { DEFAULT_THEME, THEME_BOOT_SCRIPT } from '@elvinlab/core';
+
+import { type Locale, t } from '@/shared/i18n/index.ts';
+import Footer from '@/shared/layout/Footer.astro';
+import Navbar from '@/shared/layout/Navbar.astro';
+import Seo from '@/shared/seo/Seo.astro';
+import LanguageHint from '@/shared/ui/LanguageHint.astro';
+
+type Props = {
+  locale: Locale;
+  /** Route path without locale prefix, e.g. `/notes/`. */
+  path: string;
+  title?: string;
+  description?: string;
+  translated?: boolean;
+  noindex?: boolean;
+};
+
+const { locale, ...seo } = Astro.props;
+const hasAside = Astro.slots.has('aside');
+---
+
+<html lang={locale} data-theme={DEFAULT_THEME}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <script is:inline set:html={THEME_BOOT_SCRIPT} />
+    <Seo locale={locale} {...seo} />
+  </head>
+  <body class="min-h-dvh bg-page font-body text-text antialiased">
+    <a href="#main" class="sr-only z-50 rounded-control bg-button px-4 py-3 font-medium text-white focus:not-sr-only focus:fixed focus:top-3 focus:left-3">
+      {t(locale, 'skip.content')}
+    </a>
+    <div class="mx-auto max-w-[1200px] px-3 md:px-4">
+      <Navbar locale={locale} />
+    </div>
+    <slot name="banner" />
+    <div class="mx-auto max-w-[1200px] px-3 md:px-4">
+      <div class:list={['mt-4 grid gap-4', hasAside && 'lg:grid-cols-[minmax(0,1fr)_280px]']}>
+        <main id="main" tabindex="-1" class="min-w-0 animate-fade-in-up outline-none [animation-delay:150ms]">
+          <slot />
+        </main>
+        {hasAside && (
+          <aside class="animate-fade-in-up [animation-delay:100ms]"><slot name="aside" /></aside>
+        )}
+      </div>
+      <Footer locale={locale} />
+    </div>
+    <LanguageHint locale={locale} />
+  </body>
+</html>

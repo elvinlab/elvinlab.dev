@@ -1,0 +1,35 @@
+---
+/**
+ * One 404 for every locale (the host serves it for any unknown path), so it speaks both:
+ * Spanish first as the default locale, English below it.
+ */
+import { localizePath } from '@elvinlab/core';
+
+import { LOCALES, t } from '@/shared/i18n/index.ts';
+import BaseLayout from '@/shared/layout/BaseLayout.astro';
+import Card from '@/shared/ui/Card.astro';
+
+const others = LOCALES.locales.filter((locale) => locale !== LOCALES.defaultLocale);
+---
+
+<BaseLayout locale={LOCALES.defaultLocale} path="/404/" title={t('es', 'notFound.title')} translated={false} noindex>
+  <Card as="section" class="flex flex-col items-start gap-6 py-10 md:py-14">
+    <p class="font-retro text-4xl text-pink md:text-6xl" aria-hidden="true">404</p>
+    <div class="flex flex-col gap-2">
+      <h1 class="font-display text-3xl font-bold md:text-4xl">{t('es', 'notFound.title')}</h1>
+      <p class="text-text-secondary">{t('es', 'notFound.body')}</p>
+    </div>
+    <a href={localizePath('/', 'es', LOCALES)} class="flex h-11 items-center rounded-control bg-button px-4 font-medium text-white active:scale-96">
+      {t('es', 'notFound.home')}
+    </a>
+    {others.map((locale) => (
+      <div lang={locale} class="flex flex-col gap-2 self-stretch border-t border-dashed border-divider pt-6">
+        <h2 class="font-display text-xl font-bold">{t(locale, 'notFound.title')}</h2>
+        <p class="text-text-secondary">{t(locale, 'notFound.body')}</p>
+        <a href={localizePath('/', locale, LOCALES)} class="text-primary underline decoration-dashed underline-offset-4">
+          {t(locale, 'notFound.home')}
+        </a>
+      </div>
+    ))}
+  </Card>
+</BaseLayout>

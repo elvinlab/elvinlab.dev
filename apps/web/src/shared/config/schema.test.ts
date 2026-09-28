@@ -4,6 +4,8 @@ import { parseSiteConfig } from './schema.ts';
 
 const valid = {
   url: 'https://example.dev',
+  title: 'janedoe.dev',
+  description: { es: 'Notas y proyectos.', en: 'Notes and projects.' },
   locales: { default: 'es', supported: ['es', 'en'] },
   identity: {
     name: 'Jane Doe',
@@ -32,6 +34,12 @@ describe('parseSiteConfig', () => {
     const broken = { ...valid, identity: { ...valid.identity, role: { en: 'Engineer' } } };
 
     expect(() => parseSiteConfig(broken)).toThrow(/default locale "es"/);
+  });
+
+  it('requires the site description in the default locale', () => {
+    expect(() => parseSiteConfig({ ...valid, description: { en: 'Notes' } })).toThrow(
+      /default locale "es"[\s\S]*at description/,
+    );
   });
 
   it('rejects localized texts in locales the site does not support', () => {

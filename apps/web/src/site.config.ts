@@ -5,6 +5,11 @@
  */
 export const siteConfig = {
   url: 'https://elvinlab.dev',
+  title: 'elvinlab.dev',
+  description: {
+    es: 'Portafolio y Lab Notes de Elvin González: decisiones de ingeniería full-stack y agentes de IA, documentadas.',
+    en: "Elvin González's portfolio and Lab Notes: full-stack engineering and AI agent decisions, documented.",
+  },
   locales: { default: 'es', supported: ['es', 'en'] },
   identity: {
     name: 'Elvin González',

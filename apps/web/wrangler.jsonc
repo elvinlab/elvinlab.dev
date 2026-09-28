@@ -6,6 +6,10 @@
   "compatibility_flags": ["nodejs_compat"],
   "workers_dev": true,
   "preview_urls": true,
+  // Static site: unknown paths get dist/404.html with a 404 status instead of an empty body.
+  "assets": {
+    "not_found_handling": "404-page"
+  },
   "observability": {
     "enabled": true
   }

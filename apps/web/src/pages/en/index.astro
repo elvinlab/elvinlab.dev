@@ -1,5 +1,8 @@
 ---
-import ComingSoon from '@/shared/ui/ComingSoon.astro';
+import BaseLayout from '@/shared/layout/BaseLayout.astro';
+import Placeholder from '@/shared/ui/Placeholder.astro';
 ---
 
-<ComingSoon locale="en" />
+<BaseLayout locale="en" path="/" noindex>
+  <Placeholder locale="en" />
+</BaseLayout>
