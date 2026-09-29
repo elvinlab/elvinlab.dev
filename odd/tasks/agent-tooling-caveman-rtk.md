@@ -36,7 +36,7 @@ Caveman and RTK currently exist only in user-level tooling. Repository agents ne
 - Verification: `rtk init --dry-run` and `rtk init --codex --dry-run` previewed expected changes; actual Codex setup reported registered project hook; Claude setup reported local RTK instructions enabled. `rtk init --show` reports Claude local instructions enabled; it does not report Codex, which its summary does not cover.
 - Functional check skipped: `pnpm test` exercises application packages; no runtime/dependency code changed. Config-only structural assertions passed. `pnpm lint` did not yield usable lint output (RTK wrapper reported `ESLint output (JSON parse failed: EOF while parsing a value at line 1 column 0)`); `git diff --check` and JSON parsing of `.codex/hooks.json` passed.
 - Route: delegated (trigger: multi-file configuration integration); forecast remains under 400 authored lines.
-- Next step: finish checks, commit T1 on current non-default `develop` branch, record identity and RDD assessment.
+- Next step: none; T1 is implemented, checked, and committed on `feat/agent-tooling-caveman-rtk`.
 
 ## Delivery
 - Strategy: ask-on-risk.
