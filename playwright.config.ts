@@ -10,6 +10,9 @@ export default defineConfig({
   use: {
     baseURL: 'http://127.0.0.1:4322',
     trace: 'retain-on-failure',
+    // Deterministic rendering: disable the entry animations (fade-in-up) so checks never race a
+    // mid-animation opacity, and match the reduced-motion contract (the shader stays off too).
+    reducedMotion: 'reduce',
   },
   projects: [360, 768, 1280].map((width) => ({
     name: `chromium-${width}`,

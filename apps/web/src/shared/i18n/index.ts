@@ -73,7 +73,7 @@ export const t = createTranslator({
       'notFound.title': 'Página no encontrada',
       'notFound.body': 'Esta página no existe o se movió.',
       'notFound.home': 'Volver al inicio',
-      'notes.eyebrow': 'elvinlab / lab notes',
+      'notes.eyebrow': '{handle} / lab notes',
       'notes.title': 'Lab Notes',
       'notes.subtitle':
         'Decisiones de ingeniería documentadas: contexto, qué elegí y qué pasó después.',
@@ -168,7 +168,7 @@ export const t = createTranslator({
       'notFound.title': 'Page not found',
       'notFound.body': 'This page does not exist or has moved.',
       'notFound.home': 'Back to home',
-      'notes.eyebrow': 'elvinlab / lab notes',
+      'notes.eyebrow': '{handle} / lab notes',
       'notes.title': 'Lab Notes',
       'notes.subtitle':
         'Engineering decisions, documented: the context, what I chose and what happened.',
