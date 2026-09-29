@@ -38,6 +38,7 @@ Caveman and RTK currently exist only in user-level tooling. Repository agents ne
 - Functional check skipped: `pnpm test` exercises application packages; no runtime/dependency code changed. Config-only structural assertions passed. `pnpm lint` did not yield usable lint output (RTK wrapper reported `ESLint output (JSON parse failed: EOF while parsing a value at line 1 column 0)`); `git diff --check` and JSON parsing of `.codex/hooks.json` passed.
 - T2 outcome: Biome formatting violations fixed by adding the trailing newline to `.codex/hooks.json` and formatting the `PAGES` array in `tests/browser/a11y.spec.ts`. Added an RTK.md note to use `rtk proxy pnpm lint` when RTK lint parsing is unusable: the repo uses Biome while RTK rewrites `pnpm lint` to its ESLint-specific parser. `rtk proxy pnpm lint` passed: checked 146 files, no fixes applied. `git diff --check` passed. App tests skipped: formatting and workflow documentation only, no runtime behavior changed.
 - Route: delegated (trigger: multi-file configuration integration); forecast remains under 400 authored lines.
+- Next step: none; T1 and T2 are complete with verification recorded.
 - T2 work-unit commit: `f5e573c` (`fix: make repository Biome lint pass through RTK`).
 
 ## Delivery
