@@ -100,3 +100,53 @@
 .prose .expressive-code {
   margin-top: 1.5em;
 }
+
+/* Print stylesheet for pages that opt in with `printable` (the /me recruiter page prints as a CV).
+   Hides interactive chrome, drops the decorative banner, and forces the light palette so output is
+   legible and low on ink whatever theme the visitor chose. Values mirror elvinlab-light in
+   @elvinlab/core tokens.css. */
+@media print {
+  [data-printable] {
+    color-scheme: light;
+    --ui-page: #ffffff;
+    --ui-card: #ffffff;
+    --ui-card-hover: #ffffff;
+    --ui-banner: #ffffff;
+    --ui-text: #0d1117;
+    --ui-text-secondary: #30363d;
+    --ui-muted: #57606a;
+    --ui-primary: #6d28d9;
+    --ui-cyan: #155e75;
+    --ui-pink: #be185d;
+    --ui-button: #7c3aed;
+    --ui-chip: rgb(124 58 237 / 0.08);
+    --ui-divider: rgb(0 0 0 / 0.2);
+    --ui-grid: transparent;
+    --ui-glow-violet: transparent;
+    --ui-glow-cyan: transparent;
+  }
+  /* Honour the token backgrounds on badges and chips instead of the browser's ink-saving default. */
+  [data-printable],
+  [data-printable] * {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+  [data-printable] [data-site-chrome],
+  [data-printable] [data-language-hint] {
+    display: none;
+  }
+  /* Collapse the decorative banner; the hero content sits in a normal block flow below it. */
+  [data-printable] [data-banner-offset] {
+    margin-top: 0;
+  }
+  [data-printable] [data-banner] {
+    min-height: 0;
+    background: transparent;
+  }
+  [data-printable] [data-banner] canvas,
+  [data-printable] .banner-grid,
+  [data-printable] .banner-stars,
+  [data-printable] .banner-glow {
+    display: none;
+  }
+}

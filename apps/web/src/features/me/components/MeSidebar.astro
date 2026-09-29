@@ -1,0 +1,52 @@
+---
+/** /me sidebar: quick facts, tech stack and a "let's talk" card. */
+import { localizePath } from '@elvinlab/core';
+
+import { isEnabled, site } from '@/shared/config/index.ts';
+import { LOCALES, type Locale, t } from '@/shared/i18n/index.ts';
+import Chip from '@/shared/ui/Chip.astro';
+
+type Props = { locale: Locale };
+
+const { locale } = Astro.props;
+const facts = [
+  { label: t(locale, 'me.basedIn'), value: `${site.identity.location ?? ''}${site.me.timezone ? `, ${site.me.timezone}` : ''}` },
+  { label: t(locale, 'me.languagesLabel'), value: t(locale, 'me.languagesValue') },
+  { label: t(locale, 'me.workMode'), value: site.me.workMode[locale] },
+  ...(site.recruiter.available ? [{ label: t(locale, 'me.availability'), value: site.recruiter.status[locale] }] : []),
+];
+const contactHref = localizePath('/contact/', locale, LOCALES);
+---
+
+<div class="flex flex-col gap-4 lg:sticky lg:top-4">
+  <section class="flex flex-col gap-3 rounded-card bg-card p-5">
+    <h2 class="font-display text-base font-bold">{t(locale, 'me.quickFacts')}</h2>
+    <dl class="grid grid-cols-[auto_1fr] gap-x-3 gap-y-2.5 text-sm">
+      {facts.map((fact) => (
+        <>
+          <dt class="text-muted">{fact.label}</dt>
+          <dd class="text-right font-medium">{fact.value}</dd>
+        </>
+      ))}
+    </dl>
+  </section>
+
+  <section class="flex flex-col gap-3 rounded-card bg-card p-5">
+    <h2 class="font-display text-base font-bold">{t(locale, 'me.stack')}</h2>
+    {site.me.stack.map((group) => (
+      <div class="flex flex-col gap-1.5">
+        <p class="font-mono text-xs font-medium text-muted">{group.label[locale]}</p>
+        <div class="flex flex-wrap gap-1.5">{group.items.map((item) => <Chip>{item}</Chip>)}</div>
+      </div>
+    ))}
+  </section>
+
+  {isEnabled('contact') && (
+    <section class="flex flex-col gap-3 overflow-hidden rounded-card bg-card p-5 print:hidden">
+      <span class="-mx-5 -mt-5 h-[3px] bg-gradient-to-r from-primary via-cyan to-pink"></span>
+      <h2 class="font-display text-base font-bold">{t(locale, 'me.letsTalk.title')}</h2>
+      <p class="text-sm text-text-secondary">{t(locale, 'me.letsTalk.body')}</p>
+      <a href={contactHref} class="flex h-11 items-center justify-center rounded-control bg-button px-4 font-medium text-white active:scale-96">{t(locale, 'me.contactMe')}</a>
+    </section>
+  )}
+</div>

@@ -1,0 +1,10 @@
+---
+/** Section heading with the 4×20 primary accent pill (design v3). */
+type Props = { text: string };
+
+const { text } = Astro.props;
+---
+
+<h2 class="flex items-center gap-3 font-display text-2xl font-bold tracking-tight">
+  <span class="h-5 w-1 rounded-pill bg-primary" aria-hidden="true"></span>{text}
+</h2>

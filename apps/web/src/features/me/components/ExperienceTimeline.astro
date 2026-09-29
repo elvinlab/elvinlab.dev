@@ -1,0 +1,43 @@
+---
+/** Experience timeline: sorted entries with a dashed spine, current role marked with a solid dot. */
+
+import { sortExperience } from '@/features/me/lib/experience.ts';
+import type { Experience } from '@/features/me/schema.ts';
+import { type Locale, t } from '@/shared/i18n/index.ts';
+import Card from '@/shared/ui/Card.astro';
+import Chip from '@/shared/ui/Chip.astro';
+import SectionHeading from '@/shared/ui/SectionHeading.astro';
+
+type Props = { locale: Locale; entries: Experience[] };
+
+const { locale, entries } = Astro.props;
+const sorted = sortExperience(entries.map((data) => ({ data }))).map((e) => e.data);
+const period = (e: Experience) => `${e.start} — ${e.end ?? t(locale, 'me.present')}`;
+---
+
+{sorted.length > 0 && (
+  <Card as="section" class="flex flex-col gap-5 !p-7 md:!px-9">
+    <SectionHeading text={t(locale, 'me.experience')} />
+    <ol class="flex flex-col">
+      {sorted.map((entry, index) => (
+        <li class="grid grid-cols-[24px_1fr] gap-x-4 pb-7 last:pb-0 md:grid-cols-[140px_24px_1fr]">
+          <p class="col-span-2 mb-1 font-mono text-xs text-muted md:col-span-1 md:mb-0 md:pt-1">{period(entry)}</p>
+          <div class="relative flex justify-center" aria-hidden="true">
+            <span class:list={['z-10 mt-1.5 size-3 rounded-pill', entry.end === undefined ? 'bg-primary' : 'border-[3px] border-primary bg-card']}></span>
+            {index < sorted.length - 1 && <span class="absolute top-5 bottom-[-1.75rem] w-px border-l border-dashed border-divider"></span>}
+          </div>
+          <div class="flex flex-col gap-2">
+            <p class="flex flex-wrap items-baseline gap-x-2.5">
+              <span class="text-lg font-bold">{entry.role}</span>
+              <span class="text-sm font-medium text-primary">{entry.company}</span>
+            </p>
+            <p class="leading-relaxed text-text-secondary">{entry.summary}</p>
+            {entry.tags.length > 0 && (
+              <div class="flex flex-wrap gap-1.5">{entry.tags.map((tag) => <Chip>{tag}</Chip>)}</div>
+            )}
+          </div>
+        </li>
+      ))}
+    </ol>
+  </Card>
+)}

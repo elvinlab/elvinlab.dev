@@ -1,0 +1,66 @@
+---
+/** /me hero: photo placeholder, greeting, name, role and the recruiter call-to-action buttons. */
+import { localizePath } from '@elvinlab/core';
+
+import { isEnabled, site } from '@/shared/config/index.ts';
+import { LOCALES, type Locale, t } from '@/shared/i18n/index.ts';
+import SocialIcon from '@/shared/ui/SocialIcon.astro';
+
+type Props = { locale: Locale };
+
+const { locale } = Astro.props;
+const initials = site.identity.name.split(' ').slice(0, 2).map((p) => p[0]).join('');
+const contactHref = localizePath('/contact/', locale, LOCALES);
+---
+
+<section class="grid gap-8 md:grid-cols-[232px_1fr] md:items-center">
+  <div class="grid aspect-square w-40 place-items-center justify-self-start rounded-card bg-card p-2 md:w-[232px]">
+    <div class="grid size-full place-items-center rounded-inner bg-chip font-display text-5xl font-bold text-primary outline outline-1 -outline-offset-1 outline-divider" aria-hidden="true">{initials}</div>
+  </div>
+  <div class="flex flex-col gap-4">
+    <p class="font-mono text-sm text-cyan">{t(locale, 'me.hello')}</p>
+    <h1 class="font-display text-4xl font-bold leading-none tracking-tight md:text-6xl">
+      {site.identity.name}<span class="ml-1 inline-block h-8 w-2.5 animate-blink bg-pink align-baseline md:h-12"></span>
+    </h1>
+    <p class="text-xl text-text-secondary md:text-2xl">{site.identity.role[locale]}</p>
+    <div class="mt-1 flex flex-wrap gap-2.5 print:hidden">
+      {site.recruiter.cvUrl && (
+        <a href={site.recruiter.cvUrl} class="flex h-12 items-center gap-2 rounded-control bg-button px-5 font-medium text-white active:scale-96">
+          <SocialIcon name="download" />{t(locale, 'me.cv')}
+        </a>
+      )}
+      {isEnabled('contact') && (
+        <a href={contactHref} class="flex h-12 items-center gap-2 rounded-control bg-chip px-5 font-medium transition-colors duration-150 hover:bg-card-hover">
+          <SocialIcon name="mail" />{t(locale, 'me.contactMe')}
+        </a>
+      )}
+      {site.socials.map((social) => (
+        <a href={social.url} rel="me noopener" class="grid size-12 place-items-center rounded-control bg-chip transition-colors duration-150 hover:bg-card-hover">
+          <span class="sr-only">{social.label}</span><SocialIcon name={social.icon} />
+        </a>
+      ))}
+    </div>
+
+    {/* Interactive buttons above are useless on paper; print the reachable URLs as text instead. */}
+    <dl class="mt-1 hidden gap-x-3 text-sm print:grid print:grid-cols-[auto_1fr]">
+      {isEnabled('contact') && (
+        <>
+          <dt class="text-muted">{t(locale, 'me.contactMe')}</dt>
+          <dd>{site.url}{contactHref}</dd>
+        </>
+      )}
+      {site.recruiter.cvUrl && (
+        <>
+          <dt class="text-muted">{t(locale, 'me.cv')}</dt>
+          <dd>{site.recruiter.cvUrl}</dd>
+        </>
+      )}
+      {site.socials.map((social) => (
+        <>
+          <dt class="text-muted">{social.label}</dt>
+          <dd>{social.url}</dd>
+        </>
+      ))}
+    </dl>
+  </div>
+</section>

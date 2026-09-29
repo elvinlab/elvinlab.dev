@@ -44,6 +44,24 @@ const siteConfigSchema = z
       lookingFor: localized,
       cvUrl: httpsUrl.optional(),
     }),
+    /** Singular /me profile data (list data like experience/credentials lives in content). */
+    me: z.object({
+      /** Display timezone, e.g. `UTC−6`. */
+      timezone: z.string().trim().min(1),
+      workMode: localized,
+      /** The "what I bring" intro paragraph. */
+      intro: localized,
+      /** At-a-glance strip: value + label pairs (the design shows four). */
+      facts: z.array(z.object({ value: localized, label: localized })).min(1),
+      /** "What I bring" tiles: an icon name, a title and a body. */
+      strengths: z
+        .array(z.object({ icon: z.string().min(1), title: localized, body: localized }))
+        .min(1),
+      /** Tech-stack groups: a label and its items. */
+      stack: z
+        .array(z.object({ label: localized, items: z.array(z.string().min(1)).min(1) }))
+        .min(1),
+    }),
     /** Each flag is one feature: off means its routes are not generated and its nav entry is hidden. */
     features: z.object({
       blog: z.boolean(),
@@ -72,6 +90,8 @@ const siteConfigSchema = z
         path: ['recruiter', 'lookingFor'],
         text: config.recruiter.lookingFor,
       },
+      'me.workMode': { path: ['me', 'workMode'], text: config.me.workMode },
+      'me.intro': { path: ['me', 'intro'], text: config.me.intro },
     };
     for (const { path, text } of Object.values(texts)) {
       if (!(defaultLocale in text)) {

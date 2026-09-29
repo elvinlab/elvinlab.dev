@@ -23,6 +23,22 @@ const valid = {
     status: { es: 'Disponible', en: 'Available' },
     lookingFor: { es: 'Full-stack / IA', en: 'Full-stack / AI' },
   },
+  me: {
+    timezone: 'UTC-6',
+    workMode: { es: 'Remoto', en: 'Remote' },
+    intro: { es: 'Construyo cosas.', en: 'I build things.' },
+    facts: [
+      { value: { es: '5+ años', en: '5+ years' }, label: { es: 'construyendo', en: 'building' } },
+    ],
+    strengths: [
+      {
+        icon: 'layers',
+        title: { es: 'Arquitectura', en: 'Architecture' },
+        body: { es: 'Límites claros.', en: 'Clear boundaries.' },
+      },
+    ],
+    stack: [{ label: { es: 'Lenguajes', en: 'Languages' }, items: ['TypeScript'] }],
+  },
 };
 
 describe('parseSiteConfig', () => {

@@ -1,0 +1,17 @@
+{
+  "buo": {
+    "role": "Full-stack Engineer",
+    "company": "BUO",
+    "start": 2022,
+    "summary": "Full-stack engineering across frontend, backend and cloud.",
+    "tags": ["typescript", "react", "cloudflare"]
+  },
+  "earlier": {
+    "role": "[ROLE]",
+    "company": "[COMPANY]",
+    "start": 2020,
+    "end": 2022,
+    "summary": "[WHAT YOU OWNED AND ONE MEASURABLE RESULT]",
+    "tags": ["typescript", "node"]
+  }
+}

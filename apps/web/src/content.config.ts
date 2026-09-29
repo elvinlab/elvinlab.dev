@@ -1,6 +1,8 @@
 import { defineCollection } from 'astro:content';
 import { file, glob } from 'astro/loaders';
 
+import { credentialSchema } from '@/features/credentials/index.ts';
+import { experienceSchema } from '@/features/me/index.ts';
 import { noteSchema } from '@/features/notes/index.ts';
 import { experimentSchema } from '@/features/portfolio/index.ts';
 
@@ -24,4 +26,14 @@ const experiments = defineCollection({
   schema: experimentSchema(),
 });
 
-export const collections = { notes, experiments };
+// Recruiter data: keyed JSON files the owner edits (certificates/degrees and the CV timeline).
+const credentials = defineCollection({
+  loader: file('./src/content/credentials.json'),
+  schema: credentialSchema(),
+});
+const experience = defineCollection({
+  loader: file('./src/content/experience.json'),
+  schema: experienceSchema(),
+});
+
+export const collections = { notes, experiments, credentials, experience };
