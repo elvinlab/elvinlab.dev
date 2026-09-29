@@ -112,6 +112,20 @@ Blog live on elvinlab.dev with 3 posts, `/me`, `/contact`, both themes and both 
 
 - 2026-09-28: Cloudflare — renamed workers + production deploy (user disliked the old names). PRODUCTION_WORKER elvinlab-dev -> elvinlab, STAGING_WORKER elvinlab-dev-staging -> elvinlab-staging (wrangler.jsonc + CI env + CLAUDE.md). Released develop->main (PR #42) so staging AND prod both serve the current build (identical trees; prod=main is develop + a merge commit). Live: https://elvinlab.lab-previews.workers.dev (prod), https://elvinlab-staging.lab-previews.workers.dev (staging). Old workers deleted by the user (404). 'lab-previews' account subdomain kept as-is (user is happy with it; changing it is dashboard-only + globally unique). Real domain elvinlab.dev is a live GitHub Pages site; DNS cutover stays T22.
 
+## T17 — browser quality gates (#20)
+
+Objective: turn the manual browser checks into repeatable production-build gates, including the deferred T07 theme no-flash and T09 white-label checks. Fixtures stay isolated from publishable source and ordinary builds. Delivery: direct to `develop` (user chose it on 2026-09-28, overriding Codex's feature-branch-chain plan). TDD strict; RDD disabled. Do not lower budgets to make results green.
+
+- ✅ **T17.1 — harness + Playwright smoke.** `apps/web/scripts/fixture-workspace.ts` builds an isolated temp workspace (copies build inputs only, excludes drafts/secrets/dist, symlinks node_modules, links `@elvinlab/core` to the copy) + `fixture-preview.ts` (build + preview of that workspace); `tests/fixtures/notes/{smoke-es,smoke-en}` synthetic notes; `playwright.config.ts` (projects at 360/768/1280, webServer on :4322); `tests/browser/smoke.spec.ts` (home/notes/note × es/en × 3 widths: 200, `html[lang]`, main+h1 visible, note content + code block, no horizontal scroll, no page errors; bilingual 404; a negative control). `pnpm test:e2e` + `playwright install chromium`; `tsconfig.browser.json`; `@playwright/test` 1.63.0. Started by Codex (herdr), reviewed + verified here: 24 e2e pass, 97 unit (incl. 2 fixture-workspace tests), lint/typecheck/depcruise/build green.
+- 🔲 **T17.2 — accessibility + personalization.** Axe WCAG A/AA across pages/themes/widths (in Playwright), first-paint theme no-flash + persistence, an alternative-identity (white-label) fixture build asserting no owner strings leak, each with negative controls.
+- 🔲 **T17.3 — performance + CI.** Lighthouse mobile ≥95 all categories; LCP <2500ms, CLS <0.1, TBT <200ms; JS ≤30KB gzip (incl. inline/transitive); wire e2e + a11y (+ Lighthouse) into `.github/workflows/ci.yml` as gates before deploy.
+
+Closure checks per slice: `pnpm lint`, `pnpm typecheck`, `pnpm test`, `pnpm depcruise`, `pnpm --filter web build`, plus the new browser/white-label/performance commands. Respect the release-age policy; record failed/skipped checks honestly.
+
 ## Next step
 
-T17 (#20): Playwright smoke (360/768/1280) + axe + Lighthouse CI budgets. Also carries the deferred theme no-flash Playwright test and the build-level white-label test.
+T17.2: axe + theme no-flash + white-label fixture build (in Playwright), with negative controls.
+
+Recovery: the earlier Engram topic held only a historical summary; replace it with the full current tracker before source edits. Historical partial-hero banner notes and aggregate T06–T23 checkbox do not override current code or the detailed T06–T16 completion evidence.
+
+Rollback boundaries: T17.1 removes only the new fixture/smoke tooling and dependencies; T17.2 removes additional quality checks and any explicitly evidenced scoped fixes; T17.3 removes performance gates/CI additions without undoing production functionality. Record actual file boundaries and test results with each completed unit.

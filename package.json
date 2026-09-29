@@ -7,16 +7,19 @@
     "node": ">=24"
   },
   "scripts": {
-    "typecheck": "pnpm -r --if-present typecheck",
+    "typecheck": "pnpm -r --if-present typecheck && tsc -p tsconfig.browser.json",
     "lint": "biome check .",
     "lint:fix": "biome check --write .",
     "format": "biome format --write .",
     "test": "pnpm -r --if-present test",
+    "test:e2e": "playwright test",
     "depcruise": "node apps/web/scripts/mirror-astro.ts && depcruise apps/web/boundaries-mirror/src packages/core/src",
     "new-post": "pnpm --filter web new-post"
   },
   "devDependencies": {
     "@biomejs/biome": "2.5.14",
+    "@playwright/test": "1.63.0",
+    "@types/node": "24.19.0",
     "dependency-cruiser": "18.3.1",
     "typescript": "6.0.3",
     "vitest": "5.0.2"

@@ -60,7 +60,7 @@
   },
   "overrides": [
     {
-      "includes": ["**/*.astro", "**/astro.config.*", "**/vitest.config.*"],
+      "includes": ["**/*.astro", "**/astro.config.*", "**/vitest.config.*", "playwright.config.ts"],
       "linter": {
         "rules": {
           "style": {

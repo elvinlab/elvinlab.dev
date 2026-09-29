@@ -1,0 +1,95 @@
+import {
+  existsSync,
+  mkdirSync,
+  mkdtempSync,
+  readFileSync,
+  realpathSync,
+  rmSync,
+  writeFileSync,
+} from 'node:fs';
+import { tmpdir } from 'node:os';
+import { dirname, join } from 'node:path';
+
+import { afterEach, expect, it } from 'vitest';
+
+import { createFixtureWorkspace } from './fixture-workspace.ts';
+
+const temporary: string[] = [];
+afterEach(() => {
+  for (const directory of temporary.splice(0)) rmSync(directory, { recursive: true, force: true });
+});
+
+function write(root: string, path: string, content = '{}'): void {
+  const target = join(root, path);
+  mkdirSync(dirname(target), { recursive: true });
+  writeFileSync(target, content);
+}
+
+function sourceWorkspace(): string {
+  const root = mkdtempSync(join(tmpdir(), 'fixture-source-'));
+  temporary.push(root);
+  for (const path of [
+    'package.json',
+    'tsconfig.base.json',
+    'apps/web/package.json',
+    'apps/web/tsconfig.json',
+    'apps/web/astro.config.ts',
+    'apps/web/wrangler.jsonc',
+    'apps/web/public/favicon.svg',
+    'apps/web/src/site.config.ts',
+    'packages/core/package.json',
+    'packages/core/tsconfig.json',
+    'packages/core/src/tokens/tokens.json',
+    'node_modules/external/index.js',
+    'apps/web/node_modules/@astrojs/mdx/index.js',
+    'apps/web/node_modules/@elvinlab/core/index.js',
+    'packages/core/node_modules/zod/index.js',
+    'fixtures/smoke-es/index.mdx',
+  ])
+    write(root, path);
+  return root;
+}
+
+it('copies current source and fixtures without copying drafts, secrets or output', () => {
+  const source = sourceWorkspace();
+  for (const path of [
+    '.env',
+    'apps/web/.dev.vars',
+    'apps/web/dist/index.html',
+    'apps/web/src/content/drafts/private/index.mdx',
+  ])
+    write(source, path, 'private');
+  write(source, 'apps/web/src/site.config.ts', 'current uncommitted configuration');
+  const workspace = createFixtureWorkspace(source, join(source, 'fixtures'));
+  temporary.push(workspace.root);
+  expect(readFileSync(join(workspace.web, 'src/site.config.ts'), 'utf8')).toBe(
+    'current uncommitted configuration',
+  );
+  expect(existsSync(join(workspace.web, 'src/content/notes/smoke-es/index.mdx'))).toBe(true);
+  for (const path of [
+    '.env',
+    'apps/web/.dev.vars',
+    'apps/web/dist',
+    'apps/web/src/content/drafts',
+  ]) {
+    expect(existsSync(join(workspace.root, path))).toBe(false);
+  }
+  expect(existsSync(join(source, 'apps/web/src/content/notes/smoke-es/index.mdx'))).toBe(false);
+});
+
+it('links external dependencies but keeps the copied core independent of the source', () => {
+  const source = sourceWorkspace();
+  const workspace = createFixtureWorkspace(source, join(source, 'fixtures'));
+  temporary.push(workspace.root);
+  expect(realpathSync(join(workspace.web, 'node_modules/@astrojs/mdx'))).toBe(
+    join(source, 'apps/web/node_modules/@astrojs/mdx'),
+  );
+  expect(realpathSync(join(workspace.web, 'node_modules/@elvinlab/core'))).toBe(
+    join(workspace.root, 'packages/core'),
+  );
+  write(workspace.root, 'packages/core/src/tokens/tokens.json', 'replacement');
+  expect(readFileSync(join(source, 'packages/core/src/tokens/tokens.json'), 'utf8')).toBe('{}');
+  workspace.cleanup();
+  expect(existsSync(workspace.root)).toBe(false);
+  expect(existsSync(source)).toBe(true);
+});

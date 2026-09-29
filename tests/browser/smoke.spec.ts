@@ -1,0 +1,48 @@
+import { expect, test } from '@playwright/test';
+
+for (const { locale, prefix, slug } of [
+  { locale: 'es', prefix: '', slug: 'smoke-es' },
+  { locale: 'en', prefix: '/en', slug: 'smoke-en' },
+]) {
+  for (const path of [`${prefix}/`, `${prefix}/notes/`, `${prefix}/notes/${slug}/`]) {
+    test(`${path} renders production content`, async ({ page }) => {
+      const errors: string[] = [];
+      page.on('pageerror', (error) => errors.push(error.message));
+      const response = await page.goto(path);
+      expect(response?.status()).toBe(200);
+      await expect(page.locator('html')).toHaveAttribute('lang', locale);
+      await expect(page.getByRole('main')).toBeVisible();
+      await expect(page.getByRole('heading', { level: 1 })).toBeVisible();
+      await page.evaluate(async () => {
+        await document.fonts.ready;
+      });
+      if (path.endsWith(`/${slug}/`)) {
+        await expect(page.getByRole('heading', { level: 1 })).toHaveText(
+          `Synthetic smoke note ${locale.toUpperCase()}`,
+        );
+        await expect(page.locator('article pre')).toContainText("const fixture = 'isolated'");
+      } else {
+        await expect(page.locator(`a[href="${prefix}/notes/${slug}/"]`).first()).toBeVisible();
+      }
+      expect(
+        await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth),
+      ).toBe(true);
+      expect(errors).toEqual([]);
+    });
+  }
+}
+
+test('unknown routes render the bilingual 404, not a successful page', async ({ page }) => {
+  const response = await page.goto('/smoke-missing-page/');
+  expect(response?.status()).toBe(404);
+  await expect(page.getByRole('heading', { level: 1 })).toBeVisible();
+  await expect(page.locator('main [lang="en"] h2')).toBeVisible();
+});
+
+test('negative control: the heading check rejects a broken document', async ({ page }) => {
+  await page.goto('/notes/smoke-es/');
+  await page.getByRole('heading', { level: 1 }).evaluate((heading) => heading.remove());
+  await expect(
+    expect(page.getByRole('heading', { level: 1 })).toBeVisible({ timeout: 250 }),
+  ).rejects.toThrow();
+});

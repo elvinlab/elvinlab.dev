@@ -15,6 +15,8 @@ mise exec -- pnpm lint          # Biome check (format + lint), read-only
 mise exec -- pnpm lint:fix      # Biome check with fixes
 mise exec -- pnpm format        # Biome format
 mise exec -- pnpm test          # Vitest in every package
+mise exec -- pnpm test:e2e      # isolated production-build Playwright smoke checks
+mise exec -- pnpm exec playwright install chromium  # one-time local browser setup
 mise exec -- pnpm depcruise     # architecture boundaries (.dependency-cruiser.cjs)
 
 mise exec -- pnpm --filter web dev          # Astro dev server (workerd runtime)
