@@ -1,7 +1,15 @@
 import AxeBuilder from '@axe-core/playwright';
 import { expect, test } from '@playwright/test';
 
-const PAGES = ['/', '/me/', '/en/me/', '/notes/', '/notes/smoke-es/', '/en/', '/en/notes/smoke-en/'];
+const PAGES = [
+  '/',
+  '/me/',
+  '/en/me/',
+  '/notes/',
+  '/notes/smoke-es/',
+  '/en/',
+  '/en/notes/smoke-en/',
+];
 const THEMES = ['elvinlab-dark', 'elvinlab-light'];
 
 const scan = async (page: import('@playwright/test').Page) => {
