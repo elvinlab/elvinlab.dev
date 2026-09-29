@@ -23,10 +23,11 @@ void main() {
   float ripple = rings * reach;
   float glow = exp(-d * 2.0);
 
+  // Cool violet-to-cyan palette; the ripple highlights toward cyan (the pink stays a text accent).
   vec3 color = mix(u_primary, u_cyan, ambient);
-  color = mix(color, u_pink, ripple);
-  float intensity = ambient * 0.12 + glow * 0.42 + ripple * 0.3;
-  outColor = vec4(color, clamp(intensity, 0.0, 0.72));
+  color = mix(color, u_cyan, ripple * 0.6);
+  float intensity = ambient * 0.12 + glow * 0.4 + ripple * 0.28;
+  outColor = vec4(color, clamp(intensity, 0.0, 0.7));
 }`;
 
 export const createCursorWaves: Background = (canvas, palette) =>
