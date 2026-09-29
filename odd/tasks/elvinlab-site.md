@@ -127,9 +127,42 @@ Closure checks per slice: `pnpm lint`, `pnpm typecheck`, `pnpm test`, `pnpm depc
 
 - 2026-09-29: T24 (#21) done in `eff8403`. Route: inline (Tier 3, faithful to the LabMe v3 canvas). TDD: RED → GREEN on the two new pure lib modules (`sortExperience`, `groupCredentialsByYear`) + schema tests; the `.astro` presentation was verified structurally (build, axe, visual against the canvas), matching how the rest of the surfaces were built. Data model follows the centralization rule: singular profile data (timezone, workMode, intro, facts, strengths, stack) lives in the `site.config` `me` block validated by Zod (superRefine covers `me.workMode`/`me.intro` locales); list data lives in two new `file()` collections `experience.json` + `credentials.json`. New `features/me` (schema/lib/components/index: MeHero, AtAGlance, WhatIBring, ExperienceTimeline, MeSidebar, MePage) and `features/credentials` (schema/lib/CertificatesByYear); `SectionHeading` moved to `shared/ui` as a shared atom to avoid a cross-feature + circular-barrel depcruise violation. Print stylesheet is opt-in via `BaseLayout` `printable` (only `/me` sets it): forces the light palette, hides chrome (`data-site-chrome`) + the decorative banner, keeps `print-color-adjust: exact` for badges/chips, and renders contact/GitHub/LinkedIn URLs as text (the icon buttons are `print:hidden`), so `/me` prints as a clean CV. Added `me.*` i18n keys (es/en), a `download` icon, and `/me`+`/en/me` to the axe suite. Verified: lint (145 files), typecheck (0 errors), 110 unit tests, depcruise (100 modules/255 deps), production build (both `/me` routes emitted), axe clean on `/me` and `/en/me` × dark/light (found + fixed a `list` violation: certificate items were direct `<ul>` children, now wrapped in `<li>`), and desktop/mobile/print screenshots reviewed against LabMe. FLAG: `experience.json` (one real anchor: BUO Full-stack Engineer since 2022) and `credentials.json` are placeholders — the user must supply real experience + certificates, and optionally a real `recruiter.cvUrl` and photo — before `/me` is shared publicly.
 
+## T19 server slice — local preparation to unblock T18
+
+### Objective and authorized scope
+
+Add the real contact server action so Astro produces a Worker runtime while existing pages remain prerendered. The user authorized this local server slice on 2026-09-29 after Cloudflare rejected secrets on the static-only deployment. Resend Free is selected. The user reports that DNS verification through Porkbun is complete; this has not been independently verified.
+
+Authorized: local implementation, tests, configuration declarations, documentation, and work-unit commits. Not authorized: push, PR creation, merge, deployment, account/credential inspection, DNS changes, uploading secrets, or real email sends. The contact UI/React island and remaining T19 presentation are out of scope.
+
+### Execution and delivery
+
+- Branch: `develop`, explicitly requested by the user on 2026-09-29 instead of the proposed chain. Existing tooling commits were integrated locally with a fast-forward to `dadc546`, without rewriting history or contacting a remote. The preparatory `feat/t19-contact-server` branch remains unused; do not delete it automatically.
+- Route: delegated direct for all three tasks. Evidence: preparation spans 4+ files and implementation spans 2+ non-trivial files. Read-only preparation completed before source edits.
+- TDD: strict, inherited from this document's user/session setting; runner `mise exec -- pnpm test` (Vitest), with observed RED before implementation and GREEN afterward.
+- RDD: disabled/unmanaged; verified `gentle-ai review mode status`, deciding source `clone_local`. Do not enable or start native reviews.
+- Delivery: local `exception-ok` for this server slice, reflecting the user's explicit instruction to do everything on develop without chained branches. Forecast 600–750 authored additions/deletions, excluding generated output; keep three coherent work-unit commits and complete tests, not a line-count optimization. No PR, push or deployment is authorized. Future release PR delivery gates remain unchanged.
+- Running authored line count: 0 source lines; no implementation commits yet.
+
+### Tasks and acceptance
+
+- [x] **T19.S1 — Validated contact service and ports** (delegated; forecast 250–300 lines). Define bounded Zod input, MailSender/verifier/limiter contracts and orchestration. Test invalid email/CRLF, honeypot, minimum/future fill time, missing IP, limiter rejection/failure, failed verification, and exactly one send on success. Failed prerequisites must prevent downstream provider calls.
+- [ ] **T19.S2 — Resend and Turnstile adapters** (delegated; forecast 200–250 lines). Use mocked fetch, bounded timeouts, plain-text mail, fixed configured sender/recipient, validated user email only as Reply-To; verify Turnstile success plus expected hostname/action. Reject malformed responses and errors without exposing provider bodies or message content. No real credentials or network sends in tests.
+- [ ] **T19.S3 — Astro Action, runtime configuration and proof** (delegated; forecast 150–200 lines). Thin Action and per-request validated private configuration; fail closed when configuration/bindings are absent. Centralize public limits and binding declarations; keep API keys and addresses out of tracked files. Build must emit runtime code while retaining static HTML. Exercise the Action and existing static routes on a local preview without real credentials. Document remaining staging setup and preserve the contact UI for the later slice.
+
+### Checks, constraints and recovery
+
+Per task: focused Vitest RED/GREEN, lint, typecheck, unit suite, depcruise and build as applicable. Final runtime boundary: local production preview verifies the Action is reachable but cannot send while unconfigured, and static routes still render; run browser/white-label/JS-budget/Lighthouse regressions affected by the runtime transition. Report every unavailable, failed or skipped check.
+
+Cloudflare rate limiting is per-location/eventually consistent, not an exact global daily email quota. Proposed configurable baseline is 3 requests/minute/IP; missing limiter binding must fail closed. Sender/recipient addresses and expected Turnstile hostname are still unknown and must be supplied privately later, never invented or committed. No placeholder Worker solely to bypass the secrets restriction, no global SSR conversion, and no new provider framework.
+
+Rollback boundary: remove only this slice's contact service/adapters/tests, Action entrypoint, runtime types, binding declarations and setup documentation. Preserve existing pages and the preceding tooling commits. Record exact rollback files, commits and verification outcomes when each task closes.
+
+Progress: T19.S1 implemented with strict TDD: focused RED (missing config module) then GREEN 29/29; parent independently repeated GREEN. Full suite 139 (29 core + 110 web), lint 150 files, typecheck zero diagnostics, depcruise 103 modules/258 dependencies, static build 7 pages, and diff check all passed. Runtime harness: N/A for S1, pure service only, no endpoint yet. Rollback: remove contact/config.ts, ports.ts, contact.ts and contact.test.ts. RDD disabled/unmanaged. Next action: T19.S2 adapters with mocked providers.
+
 ## Next step
 
-T18/T19 — the contact flow (LabContact board): choose the email provider + Turnstile, then the Astro Action + `MailSender` port/adapter + React island. Before sharing `/me`, replace the placeholder experience/credentials with the user's real data.
+T19 server slice above is authorized locally to unblock T18. Resend is selected; finish the server runtime before attempting Cloudflare secrets again. Staging deployment/setup and the contact UI remain pending. Before sharing `/me`, replace the placeholder experience/credentials with the user's real data.
 
 Recovery: the earlier Engram topic held only a historical summary; replace it with the full current tracker before source edits. Historical partial-hero banner notes and aggregate T06–T23 checkbox do not override current code or the detailed T06–T16 completion evidence.
 
