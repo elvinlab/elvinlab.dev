@@ -13,18 +13,20 @@ void main() {
   vec2 p = vec2(uv.x * aspect, uv.y);
   vec2 cursor = vec2(u_cursor.x * aspect, u_cursor.y);
 
-  float w1 = sin(p.x * 3.0 + u_time * 0.35) * 0.5 + 0.5;
-  float w2 = sin(p.y * 2.2 - u_time * 0.28 + p.x * 1.5) * 0.5 + 0.5;
-  float field = w1 * w2;
+  // Gentle drifting ambience so the banner is alive even when the pointer is still.
+  float ambient = sin(p.x * 3.0 + u_time * 0.35) * sin(p.y * 2.4 - u_time * 0.3) * 0.5 + 0.5;
 
+  // Concentric ripples expanding from the pointer (the "drops" of the reference).
   float d = distance(p, cursor);
-  float ripple = sin(d * 14.0 - u_time * 1.6) * exp(-d * 2.6) * 0.5 + 0.5;
-  float glow = exp(-d * 1.8);
+  float rings = sin(d * 26.0 - u_time * 3.2) * 0.5 + 0.5;
+  float reach = smoothstep(0.85, 0.0, d);
+  float ripple = rings * reach;
+  float glow = exp(-d * 2.0);
 
-  vec3 color = mix(u_primary, u_cyan, field);
-  color = mix(color, u_pink, ripple * 0.6);
-  float intensity = (field * 0.16) + (glow * 0.22);
-  outColor = vec4(color, clamp(intensity, 0.0, 0.5));
+  vec3 color = mix(u_primary, u_cyan, ambient);
+  color = mix(color, u_pink, ripple);
+  float intensity = ambient * 0.12 + glow * 0.42 + ripple * 0.3;
+  outColor = vec4(color, clamp(intensity, 0.0, 0.72));
 }`;
 
 export const createCursorWaves: Background = (canvas, palette) =>

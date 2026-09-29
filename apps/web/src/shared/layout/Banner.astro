@@ -25,6 +25,7 @@ const { height = '340px', expandedHeight = 'clamp(520px, 72vh, 640px)', expandab
   data-expanded={expandable ? true : undefined}
 >
   <div class="banner-grid absolute inset-0 -z-20" aria-hidden="true"></div>
+  <div class="banner-stars absolute inset-0 -z-20" aria-hidden="true"></div>
   <div class="banner-glow absolute inset-0 -z-20 motion-reduce:opacity-100" aria-hidden="true"></div>
   <slot name="background" />
   <div class="relative mx-auto flex h-full min-h-[inherit] max-w-[1200px] flex-col justify-end px-4 pt-24 pb-8">
@@ -76,6 +77,34 @@ const { height = '340px', expandedHeight = 'clamp(520px, 72vh, 640px)', expandab
     background:
       radial-gradient(40% 60% at 15% 20%, var(--color-glow-violet), transparent 70%),
       radial-gradient(40% 60% at 85% 30%, var(--color-glow-cyan), transparent 70%);
+  }
+  /* CSS starfield: a resilient base that always shows, even if the WebGL shader can't run.
+     Colors come from tokens, so it reads on both themes; the shader layers richer motion on top. */
+  .banner-stars {
+    --star: color-mix(in srgb, var(--color-primary) 55%, transparent);
+    --star-cyan: color-mix(in srgb, var(--color-cyan) 55%, transparent);
+    background-image:
+      radial-gradient(1.2px 1.2px at 12% 22%, var(--star), transparent),
+      radial-gradient(1px 1px at 47% 65%, var(--star), transparent),
+      radial-gradient(1.4px 1.4px at 78% 34%, var(--star-cyan), transparent),
+      radial-gradient(1px 1px at 63% 18%, var(--star), transparent),
+      radial-gradient(1.2px 1.2px at 88% 72%, var(--star), transparent),
+      radial-gradient(1px 1px at 32% 48%, var(--star-cyan), transparent),
+      radial-gradient(1px 1px at 8% 78%, var(--star), transparent),
+      radial-gradient(1.3px 1.3px at 55% 88%, var(--star), transparent);
+    background-repeat: repeat;
+    background-size: 240px 200px;
+    animation: banner-twinkle 4s ease-in-out infinite;
+  }
+  @keyframes banner-twinkle {
+    50% {
+      opacity: 0.55;
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .banner-stars {
+      animation: none;
+    }
   }
 </style>
 

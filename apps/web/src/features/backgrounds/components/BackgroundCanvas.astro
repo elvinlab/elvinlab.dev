@@ -1,17 +1,21 @@
 ---
 /**
- * Mounts the configured banner background (site.config `background`) with its palette sampled from
- * the active theme's tokens. Purely decorative: it does nothing under prefers-reduced-motion, without
- * WebGL2, or when the effect is "none", so the banner's static grid and glows remain the fallback.
+ * Mounts the banner background effects enabled in site.config (`background.galaxy`,
+ * `background.cursorWaves`), one canvas each, with palettes sampled from the active theme's tokens.
+ * Purely decorative: it does nothing under prefers-reduced-motion, without WebGL2, or when every
+ * effect is off, so the banner's static grid, glows and CSS starfield remain the fallback.
  */
 import { site } from '@/shared/config/index.ts';
 
-const effect = site.background;
+const effects = [
+  { key: 'galaxy', on: site.background.galaxy },
+  { key: 'cursor-waves', on: site.background.cursorWaves },
+].filter((effect) => effect.on);
 ---
 
-{effect !== 'none' && (
-  <canvas data-background data-effect={effect} class="absolute inset-0 -z-10 size-full motion-reduce:hidden"></canvas>
-)}
+{effects.map((effect) => (
+  <canvas data-background data-effect={effect.key} class="absolute inset-0 -z-10 size-full motion-reduce:hidden"></canvas>
+))}
 
 <script>
   import { parseColor } from '@/features/backgrounds/lib/color.ts';
@@ -19,16 +23,15 @@ const effect = site.background;
   import { createCursorWaves } from '@/features/backgrounds/lib/cursor-waves.ts';
   import { createGalaxy } from '@/features/backgrounds/lib/galaxy.ts';
 
-  const effects: Record<string, Background> = {
-    'cursor-waves': createCursorWaves,
+  const factories: Record<string, Background> = {
     galaxy: createGalaxy,
+    'cursor-waves': createCursorWaves,
   };
 
-  const canvas = document.querySelector<HTMLCanvasElement>('[data-background]');
-  const create = canvas ? effects[canvas.dataset['effect'] ?? ''] : undefined;
+  const canvases = [...document.querySelectorAll<HTMLCanvasElement>('[data-background]')];
   const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-  if (canvas && create && !reduced && 'WebGL2RenderingContext' in window) {
+  if (canvases.length > 0 && !reduced && 'WebGL2RenderingContext' in window) {
     const readPalette = () => {
       const styles = getComputedStyle(document.documentElement);
       const token = (name: string) => parseColor(styles.getPropertyValue(name).trim());
@@ -40,14 +43,20 @@ const effect = site.background;
       };
     };
 
-    const background = create(canvas, readPalette());
+    const handles = canvases.flatMap((canvas) => {
+      const create = factories[canvas.dataset['effect'] ?? ''];
+      return create ? [create(canvas, readPalette())] : [];
+    });
 
-    // Recolor in place on theme change — rebuilding the GL context would lose it (broken canvas).
-    const observer = new MutationObserver(() => background.setPalette(readPalette()));
+    // Recolor every effect in place on theme change — rebuilding a GL context would lose it.
+    const observer = new MutationObserver(() => {
+      const palette = readPalette();
+      for (const handle of handles) handle.setPalette(palette);
+    });
     observer.observe(document.documentElement, { attributeFilter: ['data-theme'] });
 
     const dispose = () => {
-      background.destroy();
+      for (const handle of handles) handle.destroy();
       observer.disconnect();
     };
     document.addEventListener('astro:before-swap', dispose, { once: true });

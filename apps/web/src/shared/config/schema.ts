@@ -28,8 +28,15 @@ const siteConfigSchema = z
     socials: z.array(
       z.object({ label: z.string().min(1), url: httpsUrl, icon: z.string().min(1) }),
     ),
-    /** Which banner background effect to render (all read the theme palette). */
-    background: z.enum(['cursor-waves', 'galaxy', 'none']).default('galaxy'),
+    /** Banner background effects, each toggled independently (all read the theme palette). */
+    background: z
+      .object({
+        /** Nebula clouds + a twinkling star field. */
+        galaxy: z.boolean(),
+        /** Slow colour waves with a ripple that follows the pointer. */
+        cursorWaves: z.boolean(),
+      })
+      .default({ galaxy: true, cursorWaves: false }),
     /** Recruiter card data (home "Hiring?" card and /me). cvUrl is https-only and optional. */
     recruiter: z.object({
       available: z.boolean(),

@@ -17,7 +17,7 @@ const valid = {
   },
   socials: [{ label: 'GitHub', url: 'https://github.com/janedoe', icon: 'github' }],
   features: { blog: true, comments: false, contact: true, credentials: true, experiments: true },
-  background: 'galaxy',
+  background: { galaxy: true, cursorWaves: false },
   recruiter: {
     available: true,
     status: { es: 'Disponible', en: 'Available' },
@@ -67,10 +67,16 @@ describe('parseSiteConfig', () => {
     expect(() => parseSiteConfig(broken)).toThrow();
   });
 
-  it('defaults the background to galaxy and rejects an unknown one', () => {
+  it('defaults both background effects and lets each be toggled', () => {
     const { background: _, ...rest } = valid;
-    expect(parseSiteConfig(rest).background).toBe('galaxy');
-    expect(() => parseSiteConfig({ ...valid, background: 'lava-lamp' })).toThrow();
+    expect(parseSiteConfig(rest).background).toEqual({ galaxy: true, cursorWaves: false });
+    expect(
+      parseSiteConfig({ ...valid, background: { galaxy: false, cursorWaves: true } }).background
+        .cursorWaves,
+    ).toBe(true);
+    expect(() =>
+      parseSiteConfig({ ...valid, background: { galaxy: 'yes', cursorWaves: false } }),
+    ).toThrow();
   });
 
   it('rejects social links that are not https URLs', () => {

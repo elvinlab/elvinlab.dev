@@ -15,7 +15,7 @@ void main() { gl_Position = vec4(a_pos, 0.0, 1.0); }`;
 
 /** Uniform header every effect fragment can rely on; effects append their `void main()`. */
 export const SHADER_HEADER = `#version 300 es
-precision mediump float;
+precision highp float;
 out vec4 outColor;
 uniform vec2 u_res;
 uniform float u_time;
