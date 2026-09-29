@@ -55,6 +55,11 @@ const { height = '340px', expandedHeight = 'clamp(520px, 72vh, 640px)', expandab
   .banner[data-expanded] {
     min-height: var(--h-expanded);
   }
+  /* Collapsed: show a compact hero (eyebrow + title); the secondary copy returns when expanded.
+     :global targets slotted content, which carries a different style scope. */
+  .banner:not([data-expanded]) :global([data-hero-secondary]) {
+    display: none;
+  }
   @media (prefers-reduced-motion: reduce) {
     .banner {
       transition: none;
