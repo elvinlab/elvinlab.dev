@@ -27,3 +27,6 @@ drafts/
 # OS and editor noise
 .DS_Store
 *.log
+
+# CodeGraph index (per-checkout, never committed)
+.codegraph/

@@ -59,7 +59,9 @@ module.exports = {
         'Pages only compose feature entry points, shared/ and core; logic lives in features.',
       from: { path: `${WEB}pages/` },
       to: {
-        dependencyTypesNot: ['unknown'],
+        // Framework primitives (astro's APIRoute type, astro:* virtual modules) are allowed in
+        // page/endpoint files; only real logic/feature-internal imports are forbidden here.
+        dependencyTypesNot: ['unknown', 'type-only'],
         pathNot: [FEATURE_API, `${WEB}shared/`, '^packages/core/src/index\\.ts$'],
       },
     },

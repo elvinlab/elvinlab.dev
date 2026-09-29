@@ -43,7 +43,7 @@ const canonical = new URL(localizePath(path, data.lang, LOCALES), site.url).href
 const readingLabel = t(locale, 'notes.readingTime', { min: readingMinutes(entry.body ?? '') });
 ---
 
-<BaseLayout locale={locale} path={path} title={data.title} description={data.description} translated={Boolean(data.translationOf)}>
+<BaseLayout locale={locale} path={path} title={data.title} description={data.description} translated={Boolean(data.translationOf)} article={{ pubDate: data.pubDate, updatedDate: data.updatedDate }}>
   <ReadingProgress slot="banner" />
   <Banner slot="banner" height="360px" locale={locale}>
     <BackgroundCanvas slot="background" />

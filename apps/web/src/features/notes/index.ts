@@ -17,4 +17,5 @@ export {
   relatedNotes,
   sortNotes,
 } from './lib/notes.ts';
+export { buildRssFeed, escapeXml, type FeedNote } from './lib/rss.ts';
 export { type NoteData, noteSchema } from './schema.ts';

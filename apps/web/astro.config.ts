@@ -1,5 +1,6 @@
 import cloudflare from '@astrojs/cloudflare';
 import mdx from '@astrojs/mdx';
+import sitemap from '@astrojs/sitemap';
 import tailwindcss from '@tailwindcss/vite';
 import { defineConfig } from 'astro/config';
 import expressiveCode from 'astro-expressive-code';
@@ -27,6 +28,9 @@ export default defineConfig({
       },
     }),
     mdx(),
+    sitemap({
+      i18n: { defaultLocale: site.locales.default, locales: { es: 'es', en: 'en' } },
+    }),
   ],
   adapter: cloudflare({
     // Pages are prerendered, so images are optimized at build time with Sharp and served as

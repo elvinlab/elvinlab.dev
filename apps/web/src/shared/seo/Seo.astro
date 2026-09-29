@@ -7,6 +7,7 @@ import { tokens } from '@elvinlab/core';
 
 import { site } from '@/shared/config/index.ts';
 import { LOCALES, type Locale } from '@/shared/i18n/index.ts';
+import { blogPostingJsonLd, jsonLdScript, personJsonLd, websiteJsonLd } from '@/shared/seo/jsonld.ts';
 import { seoLinks } from '@/shared/seo/links.ts';
 
 type Props = {
@@ -19,11 +20,13 @@ type Props = {
   /** False for pages that exist in one locale only. */
   translated?: boolean;
   noindex?: boolean;
+  /** When set, emits BlogPosting structured data for a note. */
+  article?: { pubDate: Date; updatedDate?: Date | undefined };
 };
 
-const { locale, path, title, description, translated = true, noindex = false } = Astro.props;
+const { locale, path, title, description, translated = true, noindex = false, article } = Astro.props;
 const fullTitle = title ? `${title} — ${site.title}` : site.title;
-const summary = description ?? site.description[locale] ?? site.description[LOCALES.defaultLocale];
+const summary = description ?? site.description[locale] ?? site.description[LOCALES.defaultLocale] ?? site.title;
 const links = seoLinks({
   path,
   locale,
@@ -44,6 +47,7 @@ const themeColors = ['dark', 'light'].flatMap((scheme) => {
 <link rel="canonical" href={links.canonical} />
 {links.alternates.map((alternate) => <link rel="alternate" hreflang={alternate.hreflang} href={alternate.href} />)}
 <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+<link rel="alternate" type="application/rss+xml" title={`${site.title} — Lab Notes`} href={locale === 'en' ? '/en/rss.xml' : '/rss.xml'} />
 {themeColors.map(({ scheme, color }) => <meta name="theme-color" media={`(prefers-color-scheme: ${scheme})`} content={color} />)}
 <meta property="og:type" content="website" />
 <meta property="og:site_name" content={site.title} />
@@ -51,3 +55,13 @@ const themeColors = ['dark', 'light'].flatMap((scheme) => {
 <meta property="og:description" content={summary} />
 <meta property="og:url" content={links.canonical} />
 <meta name="twitter:card" content="summary" />
+<meta property="og:locale" content={locale} />
+<script type="application/ld+json" is:inline set:html={jsonLdScript(websiteJsonLd(site))} />
+<script type="application/ld+json" is:inline set:html={jsonLdScript(personJsonLd(site, locale))} />
+{article && (
+  <script
+    type="application/ld+json"
+    is:inline
+    set:html={jsonLdScript(blogPostingJsonLd({ site, locale, url: links.canonical, title: title ?? site.title, description: summary, pubDate: article.pubDate, updatedDate: article.updatedDate }))}
+  />
+)}

@@ -24,6 +24,7 @@ type Props = {
   description?: string;
   translated?: boolean;
   noindex?: boolean;
+  article?: { pubDate: Date; updatedDate?: Date | undefined };
 };
 
 const { locale, ...seo } = Astro.props;
