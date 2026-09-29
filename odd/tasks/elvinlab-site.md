@@ -142,7 +142,7 @@ Authorized: local implementation, tests, configuration declarations, documentati
 - TDD: strict, inherited from this document's user/session setting; runner `mise exec -- pnpm test` (Vitest), with observed RED before implementation and GREEN afterward.
 - RDD: disabled/unmanaged; verified `gentle-ai review mode status`, deciding source `clone_local`. Do not enable or start native reviews.
 - Delivery: local `exception-ok` for this server slice, reflecting the user's explicit instruction to do everything on develop without chained branches. Forecast 600–750 authored additions/deletions, excluding generated output; keep three coherent work-unit commits and complete tests, not a line-count optimization. No PR, push or deployment is authorized. Future release PR delivery gates remain unchanged.
-- Running authored line count: 0 source lines; no implementation commits yet.
+- Running authored line count: 238 in S1 work-unit `63a43ba` (203 contact source/test lines plus 35 tracker additions/deletions). Slice: S1 on develop; no PR created.
 
 ### Tasks and acceptance
 
@@ -158,7 +158,7 @@ Cloudflare rate limiting is per-location/eventually consistent, not an exact glo
 
 Rollback boundary: remove only this slice's contact service/adapters/tests, Action entrypoint, runtime types, binding declarations and setup documentation. Preserve existing pages and the preceding tooling commits. Record exact rollback files, commits and verification outcomes when each task closes.
 
-Progress: T19.S1 implemented with strict TDD: focused RED (missing config module) then GREEN 29/29; parent independently repeated GREEN. Full suite 139 (29 core + 110 web), lint 150 files, typecheck zero diagnostics, depcruise 103 modules/258 dependencies, static build 7 pages, and diff check all passed. Runtime harness: N/A for S1, pure service only, no endpoint yet. Rollback: remove contact/config.ts, ports.ts, contact.ts and contact.test.ts. RDD disabled/unmanaged. Next action: T19.S2 adapters with mocked providers.
+Progress: T19.S1 committed as `63a43ba` with strict TDD: focused RED (missing config module) then GREEN 29/29; parent independently repeated GREEN. Full suite 139 (29 core + 110 web), lint 150 files, typecheck zero diagnostics, depcruise 103 modules/258 dependencies, static build 7 pages, and diff check all passed. Runtime harness: N/A for S1, pure service only, no endpoint yet. Rollback: remove contact/config.ts, ports.ts, contact.ts and contact.test.ts. RDD disabled/unmanaged. Next action: T19.S2 adapters with mocked providers.
 
 ## Next step
 
