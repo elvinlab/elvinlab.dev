@@ -59,7 +59,7 @@ packages/core/   → @elvinlab/core: tokens, themes, i18n (presentation-only)
 
 ## Workflow
 
-- Branches: `main` (production), `develop` (staging); work on `feat/*`, `fix/*`, `docs/*`, `chore/*` from `develop` and open a PR. Conventional Commits, no AI attribution.
+- Branches: `main` (production), `develop` (staging). For routine development, work directly on `develop`; pushing to `develop` runs CI and automatically deploys staging. Production releases remain pull requests from `develop` to `main`. Conventional Commits, no AI attribution.
 - Every task is a GitHub issue written as a delegation brief with a Tier (see `.github/ISSUE_TEMPLATE/task.yml`): Tier 1/2 are delegated to OpenCode via herdr; Tier 3 is done by Claude Code, which reviews every delegated diff.
 
 ## Brand and safety rules that affect code

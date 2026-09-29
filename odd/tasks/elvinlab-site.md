@@ -19,7 +19,7 @@ Approved plan: `~/.claude/plans/ok-me-gusta-entonces-starry-truffle.md`. Design:
 - TypeScript strictest, Astro, Tailwind v4, React only for real islands, pnpm monorepo (`apps/web`, `packages/core`), Biome, Cloudflare Workers.
 - Screaming `features/`, hexagonal only in `contact`, atomic design only in `core` and `shared/ui`, boundaries enforced by dependency-cruiser.
 - Mobile first, WCAG AA, Lighthouse ≥95 (mobile), ≤30 KB JS on pages without islands.
-- Branches: `main` (production), `develop` (staging), `feat/*` · `fix/*` · `docs/*` · `chore/*` from `develop`. Conventional Commits, no AI attribution.
+- Branches: `main` (production), `develop` (staging). Routine development happens directly on `develop`; pushing there runs CI and automatically deploys staging. Production releases remain pull requests from `develop` to `main`. Conventional Commits, no AI attribution.
 - Never expose the raw email address or private repository names in the public repo.
 
 ## TDD
@@ -29,7 +29,7 @@ Approved plan: `~/.claude/plans/ok-me-gusta-entonces-starry-truffle.md`. Design:
 
 ## Delivery
 
-- Strategy: `ask-on-risk` (default). Forecast: well above 400 authored lines across the feature → chained PRs per phase.
+- Strategy: `ask-on-risk` (default). Routine development is committed directly to `develop`; production releases remain pull requests from `develop` to `main`. Forecast: well above 400 authored lines across the feature; use the existing delivery strategy when a release needs slicing.
 - Slice boundaries are recorded per task below.
 
 ## Project management
@@ -77,7 +77,7 @@ Blog live on elvinlab.dev with 3 posts, `/me`, `/contact`, both themes and both 
 - 2026-09-28: Phase 1 released (PR #39, develop → main): first automatic production deploy verified by SHA (`3f7a92a`) at https://elvinlab-dev.lab-previews.workers.dev. The user skipped the end-of-phase review.
 - 2026-09-28: T06 (#9). Route: inline (Tier 3). TDD: RED observed (module missing), GREEN 8/8 Vitest tests. `packages/core/src/tokens/`: `tokens.json` (source of truth: two themes with identical semantic colors, radii, fonts), Zod `parseTokens` (themes must share the default theme's colors, kebab-case names, known default theme), pure `renderTokensCss` → Tailwind `@theme inline` mapping to `--ui-*` runtime vars, default theme on `:root` + `[data-theme]` per theme. `pnpm --filter @elvinlab/core tokens` regenerates `tokens.css`; a test fails if it drifts. `apps/web` imports `DEFAULT_THEME` from core (typecheck proves the workspace link) and uses `bg-page`, `text-text`, `font-display`, `rounded-inner`. CI runs `pnpm test`. Deps: vitest 5.0.2, zod 4.6.5, @types/node 24 (all past the release-age cutoff).
 
-- 2026-09-28: Workflow change (user): PRs skipped during early development; commit straight to `develop` (ruleset keeps no-deletion, no force-push, linear history). `main` still requires a PR and `checks`.
+- 2026-09-28: Workflow change (user): routine development happens directly on `develop` (ruleset keeps no-deletion, no force-push, linear history); pushes run CI and deploy staging. Production releases remain PRs from `develop` to `main`, with `checks` required.
 - 2026-09-28: T07 (#10). Route: inline (Tier 3). TDD: RED (module missing) → GREEN 15/15. `packages/core/src/themes/`: pure self-contained `resolveTheme` (stored theme if still available → theme matching the system scheme, default first → default) and `buildThemeBootScript` (inlines `resolveTheme` source; storage/matchMedia failures fall back safely). Core exports `THEMES`, `THEME_BOOT_SCRIPT`, `THEME_STORAGE_KEY`. Web: `<script is:inline>` pre-paint in `<head>` (no flash), `shared/ui/ThemeToggle.astro` (vanilla, cycles N themes, persists choice, suppresses transitions for one frame, scheme icon, 44 px target, `active:scale-96`). Playwright no-flash test deferred to T17 (runner not installed yet).
 
 - 2026-09-28: T08 (#11). Route: inline (Tier 3). TDD: RED → GREEN 25/25 (typecheck caught a locale inference bug that tests did not; fixed by inferring locales from the dictionaries). Core: typed `createTranslator` (keys from the default dictionary, per-key fallback, `{param}` interpolation) and path helpers `localeFromPath`, `localizePath`, `switchLocale`. Web: Astro i18n routing (`en` at root, `es` under `/es`, `prefixDefaultLocale: false`), `shared/i18n` dictionaries, `ComingSoon` shared by `/` and `/es/` with `lang`, canonical and a language link. Biome `useLiteralKeys` off (conflicts with `noPropertyAccessFromIndexSignature`).
@@ -114,7 +114,7 @@ Blog live on elvinlab.dev with 3 posts, `/me`, `/contact`, both themes and both 
 
 ## T17 — browser quality gates (#20)
 
-Objective: turn the manual browser checks into repeatable production-build gates, including the deferred T07 theme no-flash and T09 white-label checks. Fixtures stay isolated from publishable source and ordinary builds. TDD strict; RDD disabled. Do not lower budgets to make results green. T17.1 and T17.2 are already committed on `develop` (`e3e5b61`, `28364f0`); preserve those commits and do not rewrite history. T17.3 continues on local feature branch `feat/t17-performance-ci` based on `28364f0`, per the approved feature-branch-chain direction. No push, PR, or deploy is authorized.
+Objective: turn the manual browser checks into repeatable production-build gates, including the deferred T07 theme no-flash and T09 white-label checks. Fixtures stay isolated from publishable source and ordinary builds. TDD strict; RDD disabled. Do not lower budgets to make results green. T17.1 and T17.2 are already committed on `develop` (`e3e5b61`, `28364f0`); preserve those commits and do not rewrite history. T17.3 is complete locally on `feat/t17-performance-ci` based on `28364f0`; its existing commits are authorized for direct integration into `develop`, push using the configured `gh` session, and verification of the automatic staging deployment. Production release is not authorized.
 
 - ✅ **T17.1 — harness + Playwright smoke.** `apps/web/scripts/fixture-workspace.ts` builds an isolated temp workspace (copies build inputs only, excludes drafts/secrets/dist, symlinks node_modules, links `@elvinlab/core` to the copy) + `fixture-preview.ts` (build + preview of that workspace); `tests/fixtures/notes/{smoke-es,smoke-en}` synthetic notes; `playwright.config.ts` (projects at 360/768/1280, webServer on :4322); `tests/browser/smoke.spec.ts` (home/notes/note × es/en × 3 widths: 200, `html[lang]`, main+h1 visible, note content + code block, no horizontal scroll, no page errors; bilingual 404; a negative control). `pnpm test:e2e` + `playwright install chromium`; `tsconfig.browser.json`; `@playwright/test` 1.63.0. Started by Codex (herdr), reviewed + verified here: 24 e2e pass, 97 unit (incl. 2 fixture-workspace tests), lint/typecheck/depcruise/build green.
 - ✅ **T17.2 — accessibility + personalization.** `tests/browser/a11y.spec.ts` (axe WCAG2 A/AA + WCAG21 AA on home/notes/note/404 × dark/light × 360/768/1280, seeds theme via localStorage before paint, negative control = injected img without alt); `tests/browser/theme.spec.ts` (stored theme applied on first paint / no-flash, toggle persists across reload, negative control). `playwright.config.ts` gets `reducedMotion: 'reduce'` (deterministic — was catching mid-`fade-in-up` opacity as false contrast fails). White-label: `apps/web/scripts/white-label-check.ts` + `tests/fixtures/site.config.alt.ts` build the site with an alternative identity (Jane Doe) and assert no owner strings leak (design-system names `@elvinlab/core` / `elvinlab-dark` allowlisted; negative control checks the tokens are real). `pnpm test:white-label`. CAUGHT A REAL LEAK: the hero eyebrow `elvinlab / lab notes` was hardcoded in i18n → now `{handle} / lab notes` from config. 97 unit + 69 e2e pass.
@@ -124,7 +124,7 @@ Closure checks per slice: `pnpm lint`, `pnpm typecheck`, `pnpm test`, `pnpm depc
 
 ## Next step
 
-T17.3 is complete locally; T18 remains paused until the user resumes it. No push, PR, or deploy is authorized.
+Close T17.3 remotely: integrate its existing local commits directly into `develop`, push with the configured `gh` session, and verify required CI checks and the automatic staging deployment. These operations are authorized by the user but are still pending; do not claim they have completed. No production release or deployment is authorized. After remote closure, T18 remains paused until the user resumes it.
 
 Recovery: the earlier Engram topic held only a historical summary; replace it with the full current tracker before source edits. Historical partial-hero banner notes and aggregate T06–T23 checkbox do not override current code or the detailed T06–T16 completion evidence.
 
