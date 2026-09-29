@@ -24,4 +24,24 @@ A negative control removes a heading in the browser and verifies that the smoke 
 the damaged document. Source files are not changed. Astro preview uses `--ignore-lock` to remain
 in the foreground under coding agents, so Playwright owns its lifetime.
 
-Accessibility, first-paint theme, white-label and performance gates follow in T17.2–T17.3.
+## Quality budgets and CI
+
+Run the same gates as CI from the repository root:
+
+```bash
+mise exec -- pnpm check:js-budget
+mise exec -- pnpm exec playwright install chromium  # one-time local browser setup
+mise exec -- pnpm test:e2e
+mise exec -- pnpm test:white-label
+mise exec -- pnpm test:lighthouse
+```
+
+The JavaScript budget checks every production-built HTML page, including inline scripts and local
+transitive imports, at no more than 30 KiB gzip. Lighthouse uses a separate temporary production
+build with synthetic English and Spanish note fixtures, emulates mobile, and checks all four
+categories at 95 or higher plus LCP < 2500 ms, CLS < 0.1 and TBT < 200 ms. Three runs are
+aggregated pessimistically so one bad run cannot be hidden by a better one.
+
+Lighthouse reports are written locally to `.lighthouseci/` (ignored by Git); the configuration
+does not upload them. CI runs every browser, white-label and performance gate in the `checks` job,
+which both PR previews and branch deploys require.

@@ -31,7 +31,9 @@ const effects = [
   const canvases = [...document.querySelectorAll<HTMLCanvasElement>('[data-background]')];
   const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-  if (canvases.length > 0 && !reduced && 'WebGL2RenderingContext' in window) {
+  const coarsePointer = matchMedia('(pointer: coarse)').matches;
+
+  if (canvases.length > 0 && !reduced && !coarsePointer && 'WebGL2RenderingContext' in window) {
     const readPalette = () => {
       const styles = getComputedStyle(document.documentElement);
       const token = (name: string) => parseColor(styles.getPropertyValue(name).trim());
@@ -63,3 +65,11 @@ const effects = [
     window.addEventListener('pagehide', dispose, { once: true });
   }
 </script>
+
+<style>
+  @media (pointer: coarse) {
+    canvas[data-background] {
+      display: none;
+    }
+  }
+</style>

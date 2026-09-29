@@ -31,6 +31,14 @@ jobs:
       - run: pnpm typecheck
       - run: pnpm test
       - run: pnpm --filter web build
+      - name: Check production JavaScript gzip budget
+        run: pnpm check:js-budget
+      - name: Install Chromium for browser checks
+        run: pnpm exec playwright install --with-deps chromium
+      - run: pnpm test:e2e
+      - run: pnpm test:white-label
+      - name: Check mobile Lighthouse budgets
+        run: pnpm test:lighthouse
       - name: Write version.txt with commit SHA
         run: echo "${GITHUB_SHA}" > apps/web/dist/client/version.txt
       - name: Assert build-time image optimization

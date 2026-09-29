@@ -15,11 +15,14 @@
     "test:e2e": "playwright test",
     "depcruise": "node apps/web/scripts/mirror-astro.ts && depcruise apps/web/boundaries-mirror/src packages/core/src",
     "new-post": "pnpm --filter web new-post",
-    "test:white-label": "node apps/web/scripts/white-label-check.ts"
+    "test:white-label": "node apps/web/scripts/white-label-check.ts",
+    "test:lighthouse": "node apps/web/scripts/run-lighthouse-ci.ts",
+    "check:js-budget": "node apps/web/scripts/performance-budget.ts"
   },
   "devDependencies": {
     "@axe-core/playwright": "4.13.0",
     "@biomejs/biome": "2.5.14",
+    "@lhci/cli": "0.15.1",
     "@playwright/test": "1.63.0",
     "@types/node": "24.19.0",
     "dependency-cruiser": "18.3.1",

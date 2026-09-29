@@ -16,6 +16,9 @@ mise exec -- pnpm lint:fix      # Biome check with fixes
 mise exec -- pnpm format        # Biome format
 mise exec -- pnpm test          # Vitest in every package
 mise exec -- pnpm test:e2e      # isolated production-build Playwright smoke checks
+mise exec -- pnpm test:white-label # build with alternate identity; reject owner-string leaks
+mise exec -- pnpm check:js-budget # enforce <=30 KiB gzip JavaScript per built page
+mise exec -- pnpm test:lighthouse # mobile Lighthouse scores and Core Web Vitals; local reports only
 mise exec -- pnpm exec playwright install chromium  # one-time local browser setup
 mise exec -- pnpm depcruise     # architecture boundaries (.dependency-cruiser.cjs)
 
@@ -28,6 +31,8 @@ mise exec -- pnpm --filter web run deploy   # build + wrangler deploy (needs `wr
 Use `pnpm run deploy`, not `pnpm deploy` (that is a built-in pnpm command). Normally you never deploy by hand: CI (`.github/workflows/ci.yml`) runs `checks` (required on `main` and `develop`), gives every PR a preview at `https://pr-<N>-elvinlab-staging.lab-previews.workers.dev`, deploys `develop` to staging (`elvinlab-staging`) and `main` to production (`elvinlab`), and smoke-checks each deploy with `.github/scripts/smoke-check.sh`.
 
 pnpm enforces a minimum release age: when it proposes `minimumReleaseAgeExclude` entries, pin an older version instead of accepting them. Images are optimized at build time (`imageService: 'compile'`). dependency-cruiser cannot parse `.astro`, so `depcruise` first mirrors `apps/web/src` into the git-ignored `apps/web/boundaries-mirror/` (`apps/web/scripts/mirror-astro.ts`). Do not invent commands; add them here when they exist.
+
+CI runs the production JavaScript gzip budget, Playwright/a11y/theme checks, white-label build, and mobile Lighthouse budgets before preview or deploy. Lighthouse audits an isolated production-build fixture and writes HTML/JSON reports to the ignored `.lighthouseci/` directory; it does not upload reports.
 
 Read `docs/PLAN.md`, `docs/BRAND.md` (both in Spanish; decisions in them are settled), `docs/DESIGN.md`, `docs/CONVENTIONS.md` and `docs/adr/` before any work.
 

@@ -9,6 +9,7 @@ coverage/
 boundaries-mirror/
 playwright-report/
 test-results/
+.lighthouseci/
 
 # Environment and secrets (use Cloudflare secrets; commit only *.example files)
 .env
