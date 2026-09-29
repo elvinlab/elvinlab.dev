@@ -23,7 +23,7 @@
           "disabled": false
         },
         "throttlingMethod": "simulate",
-        "chromeFlags": ["--no-sandbox", "--disable-dev-shm-usage"]
+        "chromeFlags": "--no-sandbox --disable-dev-shm-usage --headless=new"
       }
     },
     "assert": {
