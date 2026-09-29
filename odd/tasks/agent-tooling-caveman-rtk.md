@@ -41,5 +41,5 @@ Caveman and RTK currently exist only in user-level tooling. Repository agents ne
 ## Delivery
 - Strategy: ask-on-risk.
 - Forecast: under 400 authored changed lines.
-- Commit identity: pending.
-- RDD assessment/outcome: pending.
+- Commit identity: `2ae84f5` (`feat: configure repository agent tooling`).
+- RDD: clone-local mode is off (global on, clone-local off). Native risk assessment returned high/unassessable because intended untracked inventory was required; no review lifecycle was started because mode is off.
