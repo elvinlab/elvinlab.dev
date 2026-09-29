@@ -14,8 +14,8 @@ concurrency:
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 env:
-  STAGING_WORKER: elvinlab-dev-staging
-  PRODUCTION_WORKER: elvinlab-dev
+  STAGING_WORKER: elvinlab-staging
+  PRODUCTION_WORKER: elvinlab
   WORKERS_SUBDOMAIN: lab-previews
 
 jobs:

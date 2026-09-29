@@ -23,7 +23,7 @@ mise exec -- pnpm --filter web preview      # serve the build locally on workerd
 mise exec -- pnpm --filter web run deploy   # build + wrangler deploy (needs `wrangler login`)
 ```
 
-Use `pnpm run deploy`, not `pnpm deploy` (that is a built-in pnpm command). Normally you never deploy by hand: CI (`.github/workflows/ci.yml`) runs `checks` (required on `main` and `develop`), gives every PR a preview at `https://pr-<N>-elvinlab-dev-staging.lab-previews.workers.dev`, deploys `develop` to staging (`elvinlab-dev-staging`) and `main` to production (`elvinlab-dev`), and smoke-checks each deploy with `.github/scripts/smoke-check.sh`.
+Use `pnpm run deploy`, not `pnpm deploy` (that is a built-in pnpm command). Normally you never deploy by hand: CI (`.github/workflows/ci.yml`) runs `checks` (required on `main` and `develop`), gives every PR a preview at `https://pr-<N>-elvinlab-staging.lab-previews.workers.dev`, deploys `develop` to staging (`elvinlab-staging`) and `main` to production (`elvinlab`), and smoke-checks each deploy with `.github/scripts/smoke-check.sh`.
 
 pnpm enforces a minimum release age: when it proposes `minimumReleaseAgeExclude` entries, pin an older version instead of accepting them. Images are optimized at build time (`imageService: 'compile'`). dependency-cruiser cannot parse `.astro`, so `depcruise` first mirrors `apps/web/src` into the git-ignored `apps/web/boundaries-mirror/` (`apps/web/scripts/mirror-astro.ts`). Do not invent commands; add them here when they exist.
 
