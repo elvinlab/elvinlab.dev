@@ -122,9 +122,12 @@ Objective: turn the manual browser checks into repeatable production-build gates
 
 Closure checks per slice: `pnpm lint`, `pnpm typecheck`, `pnpm test`, `pnpm depcruise`, `pnpm --filter web build`, plus the new browser/white-label/performance commands. Respect the release-age policy; record failed/skipped checks honestly.
 
+- 2026-09-29: T17.3 closed and CI GREEN on develop (acd0319). The Lighthouse CI job was failing with Chrome `FATAL: No usable sandbox` (Ubuntu 24.04 runner blocks the sandbox); `--no-sandbox` in `lighthouserc.json` `chromeFlags` was an array LHCI didn't pass to the launcher — switched to a string `"--no-sandbox --disable-dev-shm-usage --headless=new"`. Now checks (unit, e2e, a11y, theme, white-label, js-budget, Lighthouse ≥95 + CWV) and staging deploy all pass. T17 (#20) fully done.
+- 2026-09-29: Confirmed design-canvas access from this Claude account (artifact 9xzGdZD1e7cvoKsvrgCvTi). v3 boards available for the remaining pages: LabMe/LabMeMobile/LabMeLight (/me), LabContact (/contact), plus LabHome/LabNotes/LabPost variants.
+
 ## Next step
 
-Close T17.3 remotely: integrate its existing local commits directly into `develop`, push with the configured `gh` session, and verify required CI checks and the automatic staging deployment. These operations are authorized by the user but are still pending; do not claim they have completed. No production release or deployment is authorized. After remote closure, T18 remains paused until the user resumes it.
+T18/T24 (paused, user resumes): the recruiter page `/me` (LabMe boards) and the contact flow (LabContact). Design access confirmed; build faithfully to the v3 canvas.
 
 Recovery: the earlier Engram topic held only a historical summary; replace it with the full current tracker before source edits. Historical partial-hero banner notes and aggregate T06–T23 checkbox do not override current code or the detailed T06–T16 completion evidence.
 
