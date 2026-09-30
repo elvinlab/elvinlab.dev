@@ -1,0 +1,15 @@
+{
+  "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "command": "echo '{\"hookSpecificOutput\":{\"hookEventName\":\"SessionStart\",\"additionalContext\":\"Caveman ULTRA mode is active for this entire session. Follow the caveman skill at ~/.claude/skills/caveman/SKILL.md, ultra intensity. Compress every response and every pre-tool status line: drop articles, filler, hedging, pleasantries; fragments OK; state each fact once; strip conjunctions only when cause-effect stays unambiguous. Never alter code, function or API names, CLI commands, error strings, numbers, or units, and never drop the words not, never, no, only, except. Drop caveman for security warnings, irreversible-action confirmations, and any multi-step sequence whose order could be misread, then resume. Keep the user language and the active output style language and rules; caveman compresses only, it never overrides safety, clarity, or language. Apply the style directly; do not call the Skill tool. Persist until the user says stop caveman or normal mode.\"}}'",
+            "type": "command"
+          }
+        ],
+        "matcher": "startup|resume|clear|compact"
+      }
+    ]
+  }
+}
