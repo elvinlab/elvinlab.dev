@@ -162,7 +162,13 @@ Progress: T19.S1 committed as `63a43ba` with strict TDD: focused RED (missing co
 
 ## Next step
 
-T19 server slice above is authorized locally to unblock T18. Resend is selected; finish the server runtime before attempting Cloudflare secrets again. Staging deployment/setup and the contact UI remain pending. Before sharing `/me`, replace the placeholder experience/credentials with the user's real data.
+State as of 2026-09-29: T19.S1/S2/S3 all done and merged to `develop`; remote `develop` CI is GREEN (checks + staging deploy `elvinlab-staging` + smoke). Contact server runtime is complete and fails closed until Cloudflare is configured.
+
+Next step (ordered, each needs user action or authorization — none started):
+1. Configure Cloudflare for staging/prod: set secrets `RESEND_API_KEY`, `CONTACT_FROM`, `CONTACT_TO`, `TURNSTILE_SECRET_KEY`, `TURNSTILE_HOSTNAME` and confirm the `CONTACT_RATE_LIMITER` ratelimit binding resolves at runtime. Until then the Action returns SERVICE_UNAVAILABLE by design.
+2. Build the contact UI slice (the remaining T19 presentation: form + React island that calls the `contact` Action). Out of scope of the server slice.
+3. Replace placeholder `/me` data (`experience.json`, `credentials.json`, optional `recruiter.cvUrl` + photo) with the user's real data before sharing `/me` publicly.
+4. Production release: open the `develop -> main` PR (25 commits ahead; `main` has no code `develop` lacks). User-owned under repo policy.
 
 Recovery: the earlier Engram topic held only a historical summary; replace it with the full current tracker before source edits. Historical partial-hero banner notes and aggregate T06–T23 checkbox do not override current code or the detailed T06–T16 completion evidence.
 
