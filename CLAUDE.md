@@ -50,7 +50,7 @@ apps/web/        → blog + portfolio (Astro); screaming features/, thin pages/,
 packages/core/   → @elvinlab/core: tokens, themes, i18n (presentation-only)
 ```
 
-- Stack: TypeScript (strictest options in `tsconfig.base.json`, pinned to 6.x because `@astrojs/check` supports ^5 || ^6), Astro, Tailwind v4, React only for real islands, Biome, Cloudflare Workers.
+- Stack: TypeScript (strictest options in `tsconfig.base.json`, pinned to 6.x because `@astrojs/check` supports ^5 || ^6), Astro, Tailwind v4, Preact only for real islands (ADR 0005), Biome, Cloudflare Workers.
 - **Born in the project, moved to `core` when repeated.** Do not design `core` ahead of need.
 - **`core` is presentation-only:** no `fetch`, no persistence. Data in via props, events out.
 - **Themeable tokens:** BRAND.md values are the default theme `theme-elvinlab`. Components read semantic variables only, never a raw hex.

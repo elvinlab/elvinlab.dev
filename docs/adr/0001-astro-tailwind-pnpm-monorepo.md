@@ -1,6 +1,6 @@
 # 0001. Astro + Tailwind v4 + React islands, pnpm workspace
 
-Status: Accepted
+Status: Accepted (React line amended by [0005](./0005-preact-for-islands.md))
 
 ## Context
 Need a stack for the blog/portfolio rebuild that matches the rest of elvinlab (PC guides site uses Astro + React islands + Tailwind) and supports a monorepo with an internal shared package (`@elvinlab/core`).
