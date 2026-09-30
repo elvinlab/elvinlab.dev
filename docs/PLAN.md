@@ -75,7 +75,9 @@ Señal de alerta: si a las 6 semanas se sigue puliendo `core` sin nada publicado
 - Librería de componentes publicada de forma independiente — se extrae después de probada, no se diseña de antemano.
 - Cualquier feature de los otros proyectos de elvinlab (presencia de Spotify, emulador, directorio de herramientas).
 
-## Stack — pendiente de confirmar explícitamente antes de iniciar
+## Stack — resuelto (ver [ADR 0001](adr/0001-astro-tailwind-pnpm-monorepo.md) y `apps/web`)
+
+> Histórico: así estaba planteado antes de confirmarse. Astro + React solo en islas + Tailwind v4 quedó fijado y el monorepo ya existe.
 
 El sitio actual está en Astro. Por consistencia con el resto de elvinlab (el sitio de guías de PC también usa Astro + React solo en islas interactivas + Tailwind, con Vue evitado a propósito como quiebre del stack de trabajo diario en BUO), lo lógico es mantener esa misma combinación — pero no quedó fijado explícitamente para este rebuild. Confirmar antes de generar el andamiaje del monorepo.
 
@@ -90,12 +92,19 @@ El sitio actual está en Astro. Por consistencia con el resto de elvinlab (el si
 - **Propósito de `core`:** que otras personas puedan crear un blog o una landing con este estilo.
 - **Distribución:** por GitHub, no por el registro público de npm. Se decide el mecanismo en la extracción (ver preguntas abiertas).
 - **Regla de temas:** los tokens de [`BRAND.md`](BRAND.md#tokens-de-diseño) son el tema por defecto `theme-elvinlab`, no constantes. Marca, colores y tipografías se reemplazan en un solo archivo. Los componentes solo leen variables semánticas (`var(--brand-primary)`, `var(--surface)`), nunca un hex directo. Se comparte el lenguaje visual; la identidad cambia.
-- **Coherencia con GitHub:** el perfil de GitHub y este sitio consumen la misma base de marca. `packages/core/tokens.json` será la única fuente de verdad para los tokens.
+- **Coherencia con GitHub:** el perfil de GitHub y este sitio consumen la misma base de marca. `packages/core/src/tokens/tokens.json` es la única fuente de verdad para los tokens (`tokens.css` se genera con `packages/core/scripts/build-tokens.ts`).
 
 ## Preguntas abiertas
 
-- [ ] ¿Los posts se escriben en un solo idioma o se traducen todos? (la interfaz es bilingüe)
-- [ ] Confirmar el stack (sección anterior).
+- [x] ¿Los posts se escriben en un solo idioma o se traducen todos? → Resuelto: un idioma por nota (ver "Decisiones 2026-09-30").
+- [x] Confirmar el stack → Resuelto: [ADR 0001](adr/0001-astro-tailwind-pnpm-monorepo.md).
 - [ ] Confirmar la escala de espaciado propuesta en `BRAND.md`.
 - [ ] Mecanismo de distribución por GitHub al extraer `core`: dependencia git con tags (`github:elvinlab/<repo>#v1.0.0`, sin autenticación en repos públicos), GitHub Packages (requiere token incluso para paquetes públicos) o repositorio plantilla ("Use this template") para el starter.
-- [ ] Evaluar arrancar con una sola app y una carpeta `src/core/` en lugar del monorepo completo, y moverla a `packages/core` cuando arranque el segundo proyecto.
+- [x] Evaluar arrancar con una sola app y una carpeta `src/core/` en lugar del monorepo completo → Resuelto: se construyó el monorepo (`apps/web` + `packages/core`, [ADR 0003](adr/0003-screaming-architecture-and-core-boundary.md)).
+
+## Decisiones 2026-09-30
+
+- Orden de notas: la Nota 003 ("Why I rebuilt my site from scratch") se adelanta y se escribe en paralelo a la infra restante (T18, T19 UI, T20, T21); cadencia de una nota cada ~2 semanas desde ya.
+- Definición de "live": exige cutover DNS (T22) a elvinlab.dev, hecho después de publicada la primera nota y con un mapa de redirects de las URLs viejas relevantes (hoy T22 no lo tiene).
+- Congelamiento: hasta tener 3 posts publicados se congela el trabajo decorativo y de tooling (selector de fondos #41, shaders adicionales, gates de calidad nuevos, mirror .astro); solo se toca si rompe CI o bloquea una nota. El backlog queda etiquetado post-launch.
+- Idioma de posts: un idioma por nota (ES por defecto); la traducción es opcional vía translationOf y nunca bloquea publicar.

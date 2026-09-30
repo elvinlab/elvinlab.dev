@@ -11,7 +11,7 @@ The monorepo needs clear boundaries: features must be independently togglable (f
 - **`shared/ui`** — atomic design (atoms → molecules → organisms) for cross-feature UI.
 - **`packages/core`** — presentation-only: tokens, themes, i18n. **No `fetch`, no persistence.** Data in via props, events out.
 - **Dependency rule**: `apps/web` → `packages/core` only. Reverse forbidden.
-- **Enforcement**: `dependency-cruiser` planned in T10 to block violations in CI.
+- **Enforcement**: `dependency-cruiser` (configured in `.dependency-cruiser.cjs`, implemented in T10) blocks violations in CI.
 
 ## Consequences
 - `core` never couples consumers to a backend.

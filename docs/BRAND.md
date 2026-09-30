@@ -67,7 +67,7 @@ Contenido del blog: experiencia con tecnología, proyectos, aprendizajes, cómo 
 
 La interfaz del sitio es bilingüe (inglés y español). El README de GitHub y los textos canónicos van en inglés.
 
-- [ ] Pregunta abierta: ¿los posts del blog se escriben en un solo idioma o se traducen todos?
+- [x] ¿Los posts del blog se escriben en un solo idioma o se traducen todos? → Resuelto: un idioma por nota, ES por defecto; la traducción es opcional vía `translationOf` (ver [`PLAN.md`](PLAN.md#decisiones-2026-09-30)).
 
 ## Tokens de diseño
 
@@ -184,7 +184,7 @@ Un solo archivo, `packages/core/tokens.json`, alimenta las dos superficies: el s
 
 - [ ] Aprobar este documento (narrativa y tokens).
 - [ ] Unificar el borde claro en `#c9c3ee` en los generadores del perfil y regenerar los SVG.
-- [ ] Decidir el idioma de los posts (pregunta abierta en Narrativa).
+- [x] Decidir el idioma de los posts → resuelto en [`PLAN.md`](PLAN.md#decisiones-2026-09-30).
 - [ ] Confirmar la escala de espaciado propuesta.
 
 ### Cuando exista `packages/core`

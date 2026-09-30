@@ -9,8 +9,8 @@ Need hosting for the static Astro build with free tier, image optimization at bu
 - **Cloudflare Workers free plan** for static assets (`apps/web/dist`).
 - **`imageService: 'compile'`** — images optimized at build time, no runtime Workers Images.
 - **GitHub Actions + wrangler** (not Workers Builds) for deploy control.
-- **Previews** via `--preview-alias` → `https://pr-<N>-elvinlab-dev-staging.lab-previews.workers.dev`.
-- **Production** (`main`) → `elvinlab-dev`; **staging** (`develop`) → `elvinlab-dev-staging`.
+- **Previews** via `--preview-alias` → `https://pr-<N>-elvinlab-staging.lab-previews.workers.dev`.
+- **Production** (`main`) → `elvinlab`; **staging** (`develop`) → `elvinlab-staging`.
 - **SHA-verified deploys** — the build writes the commit SHA to `version.txt`, the smoke check waits for it, and a failed check runs `wrangler rollback`.
 
 ## Consequences

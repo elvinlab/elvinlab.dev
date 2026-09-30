@@ -8,7 +8,7 @@ Another developer must be able to replace name, bio, posts, experience, colors, 
 ## Decision
 - **`site.config.ts`** with Zod schema — single source for personal data, socials, site metadata.
 - **Content collections** (Astro) for posts, experience, projects — no hardcoded data in components.
-- **One theme file** (`theme-elvinlab.css` or `tokens.json` → CSS vars) — all brand colors, typography, radii, motion tokens.
+- **One theme source** (`packages/core/src/tokens/tokens.json`, compiled to CSS vars in `tokens.css` by `packages/core/scripts/build-tokens.ts`) — all brand colors, typography, radii, motion tokens.
 - **Build-time verification**: a test build with a sample profile must find **no owner-specific strings** in the output (grep for "elvinlab", "Elvin", personal emails, etc.).
 
 ## Consequences

@@ -80,9 +80,9 @@ Only where infrastructure exists (`contact`). No premature abstraction.
 
 | Aspect | Convention |
 |--------|------------|
-| Branches | `main` (production), `develop` (staging); work on `feat/*`, `fix/*`, `docs/*`, `chore/*` from `develop`. |
+| Branches | `main` (production), `develop` (staging); routine work is committed directly on `develop` (auto-deploys staging). |
 | Commits | Conventional Commits; **no AI attribution**. |
-| Integration | Squash into `develop`; merge commit for releases `develop` → `main`. |
+| Integration | Releases are PRs `develop` → `main` (merge commit); `develop` gets direct commits. |
 | Release cadence | One release per phase with one review. |
 
 ---
@@ -95,7 +95,7 @@ Only where infrastructure exists (`contact`). No premature abstraction.
 | Tier 1/2 | Delegated to OpenCode via herdr. |
 | Tier 3 | Done by Claude Code, which reviews every delegated diff. |
 | CI | Required checks on `main` and `develop`. |
-| Previews | Every PR gets a preview at `https://pr-<N>-elvinlab-dev-staging.lab-previews.workers.dev`. |
+| Previews | Every PR gets a preview at `https://pr-<N>-elvinlab-staging.lab-previews.workers.dev`. |
 
 ---
 
@@ -104,7 +104,7 @@ Only where infrastructure exists (`contact`). No premature abstraction.
 | Aspect | Convention |
 |--------|------------|
 | Unit/Integration | **Strict TDD** with Vitest (from T06). |
-| E2E | Playwright + axe (from T17). |
+| E2E | Playwright + axe (implemented in T17). |
 | Performance budgets | Lighthouse: mobile ≥95, LCP < 2.5 s, CLS < 0.1, ≤30 KB JS on pages without islands. |
 
 ---

@@ -12,7 +12,7 @@ The legacy site works but is being rebuilt on purpose to build the habit of aski
 
 ## Scope
 
-Approved plan: `~/.claude/plans/ok-me-gusta-entonces-starry-truffle.md`. Design: canvas https://claude.ai/artifact/9xzGdZD1e7cvoKsvrgCvTi (page "v3 — Lab notebook"). Sources of truth: `docs/PLAN.md`, `docs/BRAND.md`.
+Approved plan: `docs/PLAN.md`. Design: canvas https://claude.ai/artifact/9xzGdZD1e7cvoKsvrgCvTi (page "v3 — Lab notebook"). Sources of truth: `docs/PLAN.md`, `docs/BRAND.md`.
 
 ## Constraints
 
@@ -47,7 +47,7 @@ Approved plan: `~/.claude/plans/ok-me-gusta-entonces-starry-truffle.md`. Design:
 - [x] T03 Astro + `@astrojs/cloudflare` + Tailwind v4 placeholder page on a Cloudflare preview; verify `<Image>` on Workers. Route: delegated writer. Check: preview URL loads.
 - [x] T04 CI (Biome, typecheck, test, build) as required checks; Cloudflare `main` → production, `develop` → staging, PR → preview. Route: inline (Tier 3, re-tiered from delegated). Check: green Action + three URLs.
 - [x] T05 `docs/CONVENTIONS.md`, `docs/DESIGN.md` (design brief v3), first ADRs, accessible token variants in `docs/BRAND.md`. Route: delegated writer. Check: structural readback.
-- [ ] T06–T23 as in the approved plan (core, content, interactivity, launch).
+- [ ] T06–T23 as in the GitHub Project (core, content, interactivity, launch).
 
 ## Acceptance criteria (feature)
 
