@@ -3,25 +3,34 @@
  * Sticky 72 px navbar card. Sections follow the feature flags; under `md` they collapse into a
  * disclosure menu. The language link and theme toggle stay visible at every width.
  */
+
+import { getCollection } from 'astro:content';
 import { localizePath, switchLocale } from '@elvinlab/core';
 
 import { site } from '@/shared/config/index.ts';
 import { LOCALES, type Locale, t } from '@/shared/i18n/index.ts';
-import { isCurrent, navItems } from '@/shared/layout/nav.ts';
+import { isCurrent, isSingleLocaleRoute, navItems } from '@/shared/layout/nav.ts';
+import { hasPublishedNotes } from '@/shared/lib/notes-helpers.ts';
 import ThemeToggle from '@/shared/ui/ThemeToggle.astro';
 
 type Props = { locale: Locale };
 
 const { locale } = Astro.props;
+const noteEntries = await getCollection('notes');
+const notes = noteEntries.map((entry) => ({ slug: entry.id, data: entry.data }));
 const routePath = switchLocale(Astro.url.pathname, LOCALES.defaultLocale, LOCALES);
-const items = navItems(site.features).map((item) => ({
+const items = navItems(site.features, locale, hasPublishedNotes(notes)).map((item) => ({
   ...item,
-  href: localizePath(item.path, locale, LOCALES),
-  label: t(locale, `nav.${item.key}`),
+  href: item.localize === false ? item.path : localizePath(item.path, locale, LOCALES),
+  label: item.labelOverride ? t(locale, item.labelOverride as keyof typeof import('@/shared/i18n/index.ts').t) : t(locale, `nav.${item.key}`),
   current: isCurrent(routePath, item.path),
+  hreflang: item.hreflang,
 }));
 const otherLocale: Locale = locale === 'es' ? 'en' : 'es';
-const otherHref = switchLocale(Astro.url.pathname, otherLocale, LOCALES);
+// Notes exist in Spanish only: the switcher goes to the other locale's home, never to a missing URL.
+const otherHref = isSingleLocaleRoute(routePath)
+  ? localizePath('/', otherLocale, LOCALES)
+  : switchLocale(Astro.url.pathname, otherLocale, LOCALES);
 const linkClass =
   'flex h-11 items-center rounded-control px-3 font-medium transition-colors duration-150 hover:bg-card-hover aria-[current=page]:text-primary';
 ---
@@ -37,7 +46,7 @@ const linkClass =
 
     <ul class="hidden items-center gap-1 md:flex">
       {items.map((item) => (
-        <li><a href={item.href} class={linkClass} aria-current={item.current ? 'page' : undefined}>{item.label}</a></li>
+        <li><a href={item.href} class={linkClass} aria-current={item.current ? 'page' : undefined} hreflang={item.hreflang}>{item.label}</a></li>
       ))}
     </ul>
 
@@ -64,7 +73,7 @@ const linkClass =
 
     <ul id="nav-menu" hidden class="absolute inset-x-0 top-full mt-2 flex flex-col gap-1 rounded-card bg-card p-2 md:hidden">
       {items.map((item) => (
-        <li><a href={item.href} class={linkClass} aria-current={item.current ? 'page' : undefined}>{item.label}</a></li>
+        <li><a href={item.href} class={linkClass} aria-current={item.current ? 'page' : undefined} hreflang={item.hreflang}>{item.label}</a></li>
       ))}
     </ul>
   </nav>

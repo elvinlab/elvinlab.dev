@@ -1,5 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
+import { hasPublishedNotes } from '@/shared/lib/notes-helpers.ts';
+
 import {
   adjacentNotes,
   filterByLang,
@@ -161,5 +163,16 @@ describe('searchText', () => {
     expect(text).toContain('astro seo');
     expect(text).toContain('perf');
     expect(text).toContain('arch');
+  });
+});
+
+describe('hasPublishedNotes', () => {
+  it('returns false for empty collection', () => {
+    expect(hasPublishedNotes([])).toBe(false);
+  });
+
+  it('returns true when at least one note exists', () => {
+    const notes = [note({ slug: 'a' })];
+    expect(hasPublishedNotes(notes)).toBe(true);
   });
 });

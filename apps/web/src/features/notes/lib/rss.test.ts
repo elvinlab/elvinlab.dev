@@ -21,14 +21,10 @@ describe('buildRssFeed', () => {
     expect(xml).not.toContain('<rebuilt>');
   });
 
-  it('builds locale-correct item and self links', () => {
+  it('builds locale-correct item and self links for Spanish (only locale)', () => {
     const es = buildRssFeed({ ...base, locale: 'es', notes });
     expect(es).toContain('<link>https://example.dev/notes/why-i-rebuilt/</link>');
     expect(es).toContain('href="https://example.dev/rss.xml"');
-
-    const en = buildRssFeed({ ...base, locale: 'en', notes });
-    expect(en).toContain('<link>https://example.dev/en/notes/why-i-rebuilt/</link>');
-    expect(en).toContain('href="https://example.dev/en/rss.xml"');
   });
 
   it('emits an RFC-822 pubDate and a valid RSS envelope', () => {

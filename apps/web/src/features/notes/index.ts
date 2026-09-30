@@ -1,4 +1,7 @@
 // Presentation atoms other features (the home) may reuse.
+
+export { hasPublishedNotes } from '@/shared/lib/notes-helpers.ts';
+
 export { default as DecisionRecord } from './components/DecisionRecord.astro';
 export { default as LangBadge } from './components/LangBadge.astro';
 export { default as NoteIndexRow } from './components/NoteIndexRow.astro';

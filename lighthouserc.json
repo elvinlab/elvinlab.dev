@@ -8,9 +8,7 @@
         "http://127.0.0.1:4323/",
         "http://127.0.0.1:4323/en/",
         "http://127.0.0.1:4323/notes/",
-        "http://127.0.0.1:4323/en/notes/",
-        "http://127.0.0.1:4323/notes/smoke-es/",
-        "http://127.0.0.1:4323/en/notes/smoke-en/"
+        "http://127.0.0.1:4323/notes/smoke-es/"
       ],
       "numberOfRuns": 3,
       "settings": {

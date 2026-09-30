@@ -3,10 +3,13 @@
  * Every page's head metadata, driven by site config: title, description, canonical, hreflang
  * alternates, Open Graph, Twitter, theme color and favicon.
  */
+
+import { getCollection } from 'astro:content';
 import { tokens } from '@elvinlab/core';
 
 import { site } from '@/shared/config/index.ts';
 import { LOCALES, type Locale } from '@/shared/i18n/index.ts';
+import { hasPublishedNotes } from '@/shared/lib/notes-helpers.ts';
 import { blogPostingJsonLd, jsonLdScript, personJsonLd, websiteJsonLd } from '@/shared/seo/jsonld.ts';
 import { seoLinks } from '@/shared/seo/links.ts';
 
@@ -27,6 +30,9 @@ type Props = {
 const { locale, path, title, description, translated = true, noindex = false, article } = Astro.props;
 const fullTitle = title ? `${title} — ${site.title}` : site.title;
 const summary = description ?? site.description[locale] ?? site.description[LOCALES.defaultLocale] ?? site.title;
+const noteEntries = await getCollection('notes');
+const notes = noteEntries.map((entry) => ({ slug: entry.id, data: entry.data }));
+const showRss = hasPublishedNotes(notes);
 const links = seoLinks({
   path,
   locale,
@@ -47,7 +53,7 @@ const themeColors = ['dark', 'light'].flatMap((scheme) => {
 <link rel="canonical" href={links.canonical} />
 {links.alternates.map((alternate) => <link rel="alternate" hreflang={alternate.hreflang} href={alternate.href} />)}
 <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
-<link rel="alternate" type="application/rss+xml" title={`${site.title} — Lab Notes`} href={locale === 'en' ? '/en/rss.xml' : '/rss.xml'} />
+{showRss && <link rel="alternate" type="application/rss+xml" title={`${site.title} — Lab Notes`} href="/rss.xml" />}
 {themeColors.map(({ scheme, color }) => <meta name="theme-color" media={`(prefers-color-scheme: ${scheme})`} content={color} />)}
 <meta property="og:type" content="website" />
 <meta property="og:site_name" content={site.title} />

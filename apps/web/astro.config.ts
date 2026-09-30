@@ -1,3 +1,5 @@
+import { fileURLToPath } from 'node:url';
+
 import cloudflare from '@astrojs/cloudflare';
 import mdx from '@astrojs/mdx';
 import sitemap from '@astrojs/sitemap';
@@ -6,7 +8,11 @@ import { defineConfig } from 'astro/config';
 import expressiveCode from 'astro-expressive-code';
 
 import { CONTACT_POLICY } from './src/features/contact/config.ts';
+import { hasPublishedNotesOnDisk } from './src/integrations/published-notes.ts';
 import { site } from './src/shared/config/index.ts';
+
+// /notes/ stays out of the sitemap until the first note is published.
+const hasNotes = hasPublishedNotesOnDisk(fileURLToPath(new URL('./src/content', import.meta.url)));
 
 export default defineConfig({
   site: site.url,
@@ -32,6 +38,7 @@ export default defineConfig({
     mdx(),
     sitemap({
       i18n: { defaultLocale: site.locales.default, locales: { es: 'es', en: 'en' } },
+      filter: (page) => hasNotes || new URL(page).pathname !== '/notes/',
     }),
   ],
   adapter: cloudflare({

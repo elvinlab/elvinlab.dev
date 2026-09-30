@@ -10,7 +10,6 @@ const PAGES = [
   '/privacy/',
   '/en/privacy/',
   '/en/',
-  '/en/notes/smoke-en/',
 ];
 const THEMES = ['elvinlab-dark', 'elvinlab-light'];
 

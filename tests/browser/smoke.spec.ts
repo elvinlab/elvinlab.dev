@@ -4,7 +4,12 @@ for (const { locale, prefix, slug } of [
   { locale: 'es', prefix: '', slug: 'smoke-es' },
   { locale: 'en', prefix: '/en', slug: 'smoke-en' },
 ]) {
-  for (const path of [`${prefix}/`, `${prefix}/notes/`, `${prefix}/notes/${slug}/`]) {
+  const paths =
+    locale === 'es'
+      ? [`${prefix}/`, `${prefix}/notes/`, `${prefix}/notes/${slug}/`]
+      : [`${prefix}/`];
+
+  for (const path of paths) {
     test(`${path} renders production content`, async ({ page }) => {
       const errors: string[] = [];
       page.on('pageerror', (error) => errors.push(error.message));

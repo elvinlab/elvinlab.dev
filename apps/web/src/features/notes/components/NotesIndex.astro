@@ -13,9 +13,9 @@ import NoteRow from './NoteRow.astro';
 import NotesFilter from './NotesFilter.astro';
 import NotesSidebar from './NotesSidebar.astro';
 
-type Props = { locale: Locale };
+type Props = { locale: Locale; noindex?: boolean };
 
-const { locale } = Astro.props;
+const { locale, noindex = false } = Astro.props;
 
 const entries = await getCollection('notes');
 const notes = entries.map((entry) => ({
@@ -33,7 +33,7 @@ const categories = [...categoryCounts.entries()]
 const tags = [...new Set(sortNotes(notes).flatMap((note) => note.data.tags))];
 ---
 
-<BaseLayout locale={locale} path="/notes/" title={t(locale, 'notes.title')}>
+<BaseLayout locale={locale} path="/notes/" title={t(locale, 'notes.title')} noindex={noindex} translated={false}>
   <Banner slot="banner" height="320px" locale={locale}>
     <BackgroundCanvas slot="background" />
     <p class="font-mono text-sm text-cyan">{t(locale, 'notes.eyebrow', { handle: site.identity.handle })}</p>

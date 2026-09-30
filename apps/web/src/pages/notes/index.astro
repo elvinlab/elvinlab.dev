@@ -1,5 +1,11 @@
 ---
-import { NotesIndex } from "@/features/notes/index.ts";
+import { getCollection } from 'astro:content';
+
+import { hasPublishedNotes, NotesIndex } from '@/features/notes/index.ts';
+
+const entries = await getCollection('notes');
+const notes = entries.map((entry) => ({ slug: entry.id, data: entry.data }));
+const noindex = !hasPublishedNotes(notes);
 ---
 
-<NotesIndex locale="es" />
+<NotesIndex locale="es" noindex={noindex} />

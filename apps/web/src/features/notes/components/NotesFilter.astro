@@ -1,12 +1,10 @@
 ---
-/** Search box and language pills for the notes index. Filters rows client-side (no reload). */
+/** Search box for the notes index. Filters rows client-side (no reload). */
 import { type Locale, t } from '@/shared/i18n/index.ts';
 
 type Props = { locale: Locale };
 
 const { locale } = Astro.props;
-const pills: (Locale | 'all')[] = ['all', 'es', 'en'];
-const pillLabel = (value: Locale | 'all') => (value === 'all' ? t(locale, 'notes.filter.all') : value.toUpperCase());
 ---
 
 <div class="flex flex-col gap-3 rounded-card bg-card p-4 sm:flex-row sm:items-center" data-notes-filter>
@@ -20,40 +18,22 @@ const pillLabel = (value: Locale | 'all') => (value === 'all' ? t(locale, 'notes
       data-notes-search
     />
   </label>
-  {/* biome-ignore lint/a11y/useSemanticElements: a toggle-button group, not a form fieldset */}
-  <div class="flex gap-1" role="group" aria-label={t(locale, 'notes.filter.all')}>
-    {pills.map((value, index) => (
-      <button
-        type="button"
-        data-lang-pill={value}
-        aria-pressed={index === 0 ? 'true' : 'false'}
-        class="h-11 rounded-control px-4 font-mono text-sm transition-colors duration-150 hover:bg-card-hover aria-pressed:bg-button aria-pressed:text-white"
-      >
-        {pillLabel(value)}
-      </button>
-    ))}
-  </div>
 </div>
 
 <script>
   const root = document.querySelector<HTMLElement>('[data-notes-filter]');
   const search = root?.querySelector<HTMLInputElement>('[data-notes-search]');
-  const pills = [...(root?.querySelectorAll<HTMLButtonElement>('[data-lang-pill]') ?? [])];
   const rows = [...document.querySelectorAll<HTMLElement>('[data-note-row]')];
   const groups = [...document.querySelectorAll<HTMLElement>('[data-year-group]')];
   const empty = document.querySelector<HTMLElement>('[data-notes-empty]');
-
-  let lang = 'all';
 
   const apply = (): void => {
     const query = (search?.value ?? '').trim().toLowerCase();
     let visible = 0;
     for (const row of rows) {
-      const matchesLang = lang === 'all' || row.dataset['lang'] === lang;
       const matchesQuery = !query || (row.dataset['search'] ?? '').includes(query);
-      const show = matchesLang && matchesQuery;
-      row.hidden = !show;
-      if (show) visible += 1;
+      row.hidden = !matchesQuery;
+      if (matchesQuery) visible += 1;
     }
     for (const group of groups) {
       group.hidden = !group.querySelector('[data-note-row]:not([hidden])');
@@ -62,11 +42,4 @@ const pillLabel = (value: Locale | 'all') => (value === 'all' ? t(locale, 'notes
   };
 
   search?.addEventListener('input', apply);
-  for (const pill of pills) {
-    pill.addEventListener('click', () => {
-      lang = pill.dataset['langPill'] ?? 'all';
-      for (const other of pills) other.setAttribute('aria-pressed', String(other === pill));
-      apply();
-    });
-  }
 </script>

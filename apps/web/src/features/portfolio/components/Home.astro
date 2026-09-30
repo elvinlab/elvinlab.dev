@@ -4,7 +4,7 @@
 import { getCollection } from 'astro:content';
 
 import { BackgroundCanvas } from '@/features/backgrounds/index.ts';
-import { sortNotes } from '@/features/notes/index.ts';
+import { hasPublishedNotes, sortNotes } from '@/features/notes/index.ts';
 import AuthorCard from '@/features/portfolio/components/AuthorCard.astro';
 import ExperimentsGrid from '@/features/portfolio/components/ExperimentsGrid.astro';
 import HiringCard from '@/features/portfolio/components/HiringCard.astro';
@@ -26,6 +26,7 @@ const pills = [t(locale, 'home.pill.1'), t(locale, 'home.pill.2'), t(locale, 'ho
 const noteEntries = isEnabled('blog') ? await getCollection('notes') : [];
 const notes = sortNotes(noteEntries.map((entry) => ({ slug: entry.id, data: entry.data, body: entry.body ?? '' })));
 const [latest, ...rest] = notes;
+const hasNotes = hasPublishedNotes(notes);
 
 const experiments = isEnabled('experiments')
   ? sortExperiments(await getCollection('experiments')).map((entry) => entry.data)
@@ -50,8 +51,8 @@ const experiments = isEnabled('experiments')
   </Banner>
 
   <div class="flex flex-col gap-8">
-    {latest && <LatestNote locale={locale} slug={latest.slug} data={latest.data} body={latest.body} />}
-    {rest.length > 0 && <NotebookIndex locale={locale} notes={rest.slice(0, 5)} />}
+    {hasNotes && latest && <LatestNote locale={locale} slug={latest.slug} data={latest.data} body={latest.body} />}
+    {hasNotes && rest.length > 0 && <NotebookIndex locale={locale} notes={rest.slice(0, 5)} />}
     <ExperimentsGrid locale={locale} experiments={experiments} />
     <Pillars locale={locale} />
   </div>

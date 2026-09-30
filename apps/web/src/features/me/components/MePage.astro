@@ -11,7 +11,7 @@ import ExperienceTimeline from '@/features/me/components/ExperienceTimeline.astr
 import MeHero from '@/features/me/components/MeHero.astro';
 import MeSidebar from '@/features/me/components/MeSidebar.astro';
 import WhatIBring from '@/features/me/components/WhatIBring.astro';
-import { NoteIndexRow, sortNotes } from '@/features/notes/index.ts';
+import { hasPublishedNotes, NoteIndexRow, sortNotes } from '@/features/notes/index.ts';
 import { ExperimentTile, sortExperiments } from '@/features/portfolio/index.ts';
 import { isEnabled } from '@/shared/config/index.ts';
 import { LOCALES, type Locale, t } from '@/shared/i18n/index.ts';
@@ -29,9 +29,10 @@ const credentials = isEnabled('credentials') ? (await getCollection('credentials
 const experiments = isEnabled('experiments')
   ? sortExperiments(await getCollection('experiments')).slice(0, 2).map((e) => e.data)
   : [];
-const notes = isEnabled('blog')
-  ? sortNotes((await getCollection('notes')).map((n) => ({ slug: n.id, data: n.data }))).slice(0, 3)
-  : [];
+const noteEntries = isEnabled('blog') ? await getCollection('notes') : [];
+const allNotes = sortNotes(noteEntries.map((n) => ({ slug: n.id, data: n.data })));
+const notes = allNotes.slice(0, 3);
+const hasNotes = hasPublishedNotes(allNotes);
 ---
 
 <BaseLayout locale={locale} path="/me/" title="/me" printable>
@@ -57,7 +58,7 @@ const notes = isEnabled('blog')
       </Card>
     )}
 
-    {notes.length > 0 && (
+    {hasNotes && notes.length > 0 && (
       <Card as="section" class="flex flex-col gap-2 !p-7 md:!px-9">
         <div class="flex items-baseline justify-between">
           <SectionHeading text={t(locale, 'me.notes.title')} />
