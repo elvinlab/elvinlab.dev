@@ -41,6 +41,11 @@ const valid = {
   },
 };
 
+const validWithNotice = {
+  ...valid,
+  notice: { es: 'En construcción', en: 'Under construction' },
+};
+
 describe('parseSiteConfig', () => {
   it('accepts a complete config', () => {
     expect(parseSiteConfig(valid).identity.name).toBe('Jane Doe');
@@ -108,5 +113,26 @@ describe('parseSiteConfig', () => {
     };
 
     expect(() => parseSiteConfig(broken)).toThrow();
+  });
+
+  it('accepts config without notice', () => {
+    expect(parseSiteConfig(valid).identity.name).toBe('Jane Doe');
+  });
+
+  it('accepts config with notice in both locales', () => {
+    expect(parseSiteConfig(validWithNotice).notice).toEqual({
+      es: 'En construcción',
+      en: 'Under construction',
+    });
+  });
+
+  it('rejects notice missing the default locale', () => {
+    const broken = { ...valid, notice: { en: 'Under construction' } };
+    expect(() => parseSiteConfig(broken)).toThrow(/default locale "es"/);
+  });
+
+  it('rejects notice with an unsupported locale', () => {
+    const broken = { ...valid, notice: { es: 'En construcción', fr: 'En construction' } };
+    expect(() => parseSiteConfig(broken)).toThrow(/"fr"/);
   });
 });

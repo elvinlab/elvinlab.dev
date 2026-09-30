@@ -1,0 +1,12 @@
+---
+import { getNotice } from './notice.ts';
+
+const { locale } = Astro.props;
+const noticeText = getNotice(locale);
+---
+
+{noticeText && (
+  <div role="status" data-site-notice data-site-chrome class="bg-card text-text-secondary border-b border-dashed border-divider text-sm px-3 py-2 text-center">
+    {noticeText}
+  </div>
+)}

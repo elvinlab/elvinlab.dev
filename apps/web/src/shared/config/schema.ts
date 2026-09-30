@@ -70,6 +70,8 @@ const siteConfigSchema = z
       credentials: z.boolean(),
       experiments: z.boolean(),
     }),
+    /** Optional site-wide notice strip (localized). White-label: remove the key to hide. */
+    notice: localized.optional(),
   })
   .superRefine((config, ctx) => {
     const { default: defaultLocale, supported } = config.locales;
@@ -92,6 +94,7 @@ const siteConfigSchema = z
       },
       'me.workMode': { path: ['me', 'workMode'], text: config.me.workMode },
       'me.intro': { path: ['me', 'intro'], text: config.me.intro },
+      ...(config.notice && { notice: { path: ['notice'], text: config.notice } }),
     };
     for (const { path, text } of Object.values(texts)) {
       if (!(defaultLocale in text)) {

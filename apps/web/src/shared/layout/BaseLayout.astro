@@ -14,6 +14,7 @@ import { type Locale, t } from '@/shared/i18n/index.ts';
 import { getBeaconToken, shouldRenderBeacon } from '@/shared/layout/analytics.ts';
 import Footer from '@/shared/layout/Footer.astro';
 import Navbar from '@/shared/layout/Navbar.astro';
+import SiteNotice from '@/shared/layout/SiteNotice.astro';
 import Seo from '@/shared/seo/Seo.astro';
 import LanguageHint from '@/shared/ui/LanguageHint.astro';
 
@@ -55,6 +56,7 @@ const beaconToken = getBeaconToken();
     <a href="#main" class="sr-only z-50 rounded-control bg-button px-4 py-3 font-medium text-white focus:not-sr-only focus:fixed focus:top-3 focus:left-3">
       {t(locale, 'skip.content')}
     </a>
+    <SiteNotice locale={locale} />
     <main id="main" tabindex="-1" class="outline-none">
       <div class="sticky top-0 z-40 mx-auto max-w-[1200px] px-3 md:px-4" data-site-chrome>
         <Navbar locale={locale} />

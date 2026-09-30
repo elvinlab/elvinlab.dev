@@ -36,6 +36,10 @@ export const siteConfig = {
     status: { es: 'Abierto a oportunidades', en: 'Open to opportunities' },
     lookingFor: { es: 'Full-stack senior · Agentes de IA', en: 'Senior full-stack · AI agents' },
   },
+  notice: {
+    es: 'Sitio en construcción: sigo terminando algunas páginas.',
+    en: "Under construction: I'm still finishing a few pages.",
+  },
   me: {
     timezone: 'UTC−6',
     workMode: { es: 'Remoto / Híbrido', en: 'Remote / Hybrid' },
