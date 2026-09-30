@@ -3,6 +3,8 @@
   "include": [".astro/types.d.ts", "**/*"],
   "exclude": ["dist", "boundaries-mirror"],
   "compilerOptions": {
+    "jsx": "react-jsx",
+    "jsxImportSource": "preact",
     "paths": {
       "@/*": ["./src/*"]
     }

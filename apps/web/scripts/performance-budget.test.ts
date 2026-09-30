@@ -43,6 +43,26 @@ describe('collectJavaScriptGzipBytes', () => {
     );
   });
 
+  it('counts astro-island component and renderer modules with their imports, and ignores remote urls', () => {
+    const { client, html } = createFixture();
+    const component = 'import "./lib.js"; export default 1;';
+    const renderer = 'export default 2;';
+    const lib = 'export const lib = 3;';
+    writeFileSync(
+      html,
+      `<astro-island component-url="/_astro/Form.js" renderer-url="/_astro/client.js" client="idle"></astro-island><astro-island component-url="https://cdn.example.com/remote.js"></astro-island>`,
+    );
+    writeFileSync(join(client, '_astro', 'Form.js'), component);
+    writeFileSync(join(client, '_astro', 'client.js'), renderer);
+    writeFileSync(join(client, '_astro', 'lib.js'), lib);
+
+    expect(collectJavaScriptGzipBytes(html, client)).toBe(
+      gzipSync(Buffer.from(component)).byteLength +
+        gzipSync(Buffer.from(renderer)).byteLength +
+        gzipSync(Buffer.from(lib)).byteLength,
+    );
+  });
+
   it('includes classic scripts and nested imports while ignoring non-script assets', () => {
     const { client, html } = createFixture();
     const classic = 'window.ready = true;';

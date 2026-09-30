@@ -4,6 +4,7 @@ import { fileURLToPath } from 'node:url';
 import { gzipSync } from 'node:zlib';
 
 const SCRIPT_TAG = /<script\b([^>]*)>([\s\S]*?)<\/script\s*>/gi;
+const ISLAND_MODULE = /\b(?:component|renderer)-url\s*=\s*(["'])(.*?)\1/gi;
 const IMPORT_PATH = /(?:\bfrom\s*|\bimport\s*(?:\(\s*)?)(["'])([^"']+)\1/g;
 
 function isJavaScriptType(attributes: string): boolean {
@@ -47,7 +48,15 @@ export function collectJavaScriptGzipBytes(htmlPath: string, clientRoot: string)
     }
   };
 
-  for (const match of readFileSync(htmlPath, 'utf8').matchAll(SCRIPT_TAG)) {
+  const html = readFileSync(htmlPath, 'utf8');
+
+  // Island chunks load through <astro-island> attributes, not <script> tags.
+  for (const match of html.matchAll(ISLAND_MODULE)) {
+    const file = resolveLocalScript(match[2] ?? '', htmlPath, root);
+    if (file) collectFile(file);
+  }
+
+  for (const match of html.matchAll(SCRIPT_TAG)) {
     const attributes = match[1] ?? '';
     if (!isJavaScriptType(attributes)) continue;
     const source = match[2] ?? '';
