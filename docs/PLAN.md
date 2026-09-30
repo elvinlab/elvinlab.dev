@@ -59,9 +59,11 @@ Los primeros posts son el propio proceso de decisión de qué construir: por qu�
 
 ## Meta / condición de éxito
 
-**Blog publicado con 3 posts en 6 semanas.**
+**Sitio en producción en `elvinlab.dev`** (revisado el 2026-09-30; ver "Decisiones 2026-09-30"). Los posts se escriben después del lanzamiento.
 
-Señal de alerta: si a las 6 semanas se sigue puliendo `core` sin nada publicado, es exactamente el riesgo que se identificó — quedarse atrapado en la arquitectura en vez de publicar.
+> Histórico: el criterio original era "blog publicado con 3 posts en 6 semanas".
+
+Señal de alerta: si se sigue puliendo `core`, los fondos o el tooling sin lanzar, o si pasan 4 semanas desde el lanzamiento sin un post publicado, es exactamente el riesgo que se identificó — quedarse atrapado en la arquitectura en vez de publicar.
 
 ## Qué viene después (no ahora, no es parte de este alcance)
 
@@ -104,7 +106,14 @@ El sitio actual está en Astro. Por consistencia con el resto de elvinlab (el si
 
 ## Decisiones 2026-09-30
 
-- Orden de notas: la Nota 003 ("Why I rebuilt my site from scratch") se adelanta y se escribe en paralelo a la infra restante (T18, T19 UI, T20, T21); cadencia de una nota cada ~2 semanas desde ya.
-- Definición de "live": exige cutover DNS (T22) a elvinlab.dev, hecho después de publicada la primera nota y con un mapa de redirects de las URLs viejas relevantes (hoy T22 no lo tiene).
-- Congelamiento: hasta tener 3 posts publicados se congela el trabajo decorativo y de tooling (selector de fondos #41, shaders adicionales, gates de calidad nuevos, mirror .astro); solo se toca si rompe CI o bloquea una nota. El backlog queda etiquetado post-launch.
-- Idioma de posts: un idioma por nota (ES por defecto); la traducción es opcional vía translationOf y nunca bloquea publicar.
+Revisión del plan hecha con el usuario. El detalle operativo (tareas, tiers, orden) vive en `odd/tasks/elvinlab-site.md`, sección "Plan revision 2026-09-30".
+
+- **Criterio de éxito:** sitio en producción en `elvinlab.dev`, con el cutover DNS (T22) hecho. Los posts los escribe el usuario después del lanzamiento (#27–29 etiquetadas `post-launch`, sin milestone). Alarma: 4 semanas desde el lanzamiento sin un post.
+- **Notas en español:** los posts son solo en español. `/notes` queda oculta (sin link, `noindex`, fuera del sitemap y del RSS) hasta el primer post. Se eliminan `/en/notes`, las píldoras de filtro ES/EN y `/en/rss.xml`; el "Notes" de la navegación en inglés apunta a `/notes/` con la etiqueta "(in Spanish)". Los campos `lang` y `translationOf` del schema no se tocan; todo post es `lang: es`.
+- **Interfaz bilingüe:** el resto de la app (`/`, `/me`, `/contact`, `/privacy`) mantiene soporte completo ES/EN.
+- **Congelamiento hasta el lanzamiento:** trabajo decorativo y de tooling (selector de fondos #41, shaders adicionales, gates de calidad nuevos, mirror `.astro`). Solo se toca si rompe CI o bloquea una tarea del lanzamiento. El backlog queda etiquetado `post-launch`, igual que T20 (Giscus, #24).
+- **Ahorro de tokens:** cada tarea lleva un tier; Claude hace solo Tier 3 y revisa diffs con `git diff --stat`, `rg` y re-ejecutando checks; el tracker y el espejo de Engram se actualizan una vez por unidad de trabajo; las tareas humanas quedan separadas.
+- **Sitio anterior:** solo `/` (ES) y `/en/` son indexables, sin sitemap, `robots.txt` ni feeds, y con las mismas URLs que el sitio nuevo. No hace falta un mapa de redirects; se verifica que `/index.html` redirija a `/` y `/en/index.html` a `/en/` en el Worker desplegado.
+- **Gate de SEO antes del cutover:** páginas `/contact` y `/privacy` (ES/EN), redirect `www` → apex, `noindex` en staging y previews de PR mediante un flag de build, Search Console verificado con el sitemap enviado, `lastmod` real y páginas nuevas en el sitemap, `og:image` por defecto con `summary_large_image`, headers básicos (`nosniff`, `Referrer-Policy`, `Permissions-Policy`), auditoría de los links de la navegación (`/contact/` es hoy un 404) y comprobar que `_headers` y `_redirects` se aplican en el Worker desplegado. Después del cutover: HSTS, desde el dashboard de Cloudflare, tras ~1 semana de HTTPS estable y sin `preload`. Con el primer post: `image` y `author.url` en `BlogPosting`. Descartados por ahora: `BreadcrumbList` y CSP.
+- **Privacidad:** página `/privacy` completa (ES/EN), con texto base tipo GDPR, responsable Elvin con contacto vía `/contact`, sin asesoría legal y con fecha de actualización. Cubre Cloudflare Web Analytics, el formulario de contacto (Resend, Turnstile, rate limiter por IP) y `localStorage`. No afirma "sin cookies" para Web Analytics hasta verificarlo en la documentación de Cloudflare. El texto de Giscus se suma con T20.
+- **Abiertas (sin respuesta del usuario):** (Q20) separar T22 en T22a (humano: agregar la zona a Cloudflare, importar y verificar registros DNS incluidos MX y TXT de Resend, registros de GitHub Pages en modo solo DNS, cambiar nameservers) y T22b (cutover al Custom Domain del Worker y regla `www`), y dónde está hoy el DNS y si el dominio tiene correo; (Q21) propiedad de Search Console y método de verificación (recomendado: propiedad de Dominio con TXT por DNS).

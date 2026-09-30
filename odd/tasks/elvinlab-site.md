@@ -8,7 +8,7 @@ Rebuild elvinlab.dev from scratch as a portfolio plus the blog "Lab Notes — by
 
 ## Problem and why
 
-The legacy site works but is being rebuilt on purpose to build the habit of asking, per component, "blog or shared base?". Success = 3 posts published in 6 weeks; the known risk is polishing architecture instead of publishing.
+The legacy site works but is being rebuilt on purpose to build the habit of asking, per component, "blog or shared base?". Success (revised 2026-09-30, see "Plan revision 2026-09-30") = site live in production on `elvinlab.dev`; posts are written by the user after launch. Known risk: polishing architecture instead of shipping; tripwire: 4 weeks after launch without a published post.
 
 ## Scope
 
@@ -37,7 +37,7 @@ Approved plan: `docs/PLAN.md`. Design: canvas https://claude.ai/artifact/9xzGdZD
 - GitHub Project: https://github.com/users/elvinlab/projects/2 — fields Status, Phase, Size, Priority, Tier.
 - One issue per task (issue numbers below), milestones per phase with due dates, labels `type:*`, `area:*`, `tier:*`. PRs close their issue (`Closes #n`).
 - Tiers follow https://github.com/elvinlab/agentic-dev-setup: Tier 1/2 delegated to OpenCode via herdr (`TIER1_MODEL`/`TIER2_MODEL` from `~/.config/agent-routing/active.env`), Tier 3 by Claude Code, Human = written by Elvin. Claude reviews every delegated diff. Issue bodies are delegation briefs, finalized right before delegating.
-- Issue map: T00 #3, T01 #4, T02 #5, T03 #6, T04 #7, T05 #8, T06 #9, T07 #10, T08 #11, T09 #12, T10 #13, T11 #14, T12 #15, T13 #16, T14 #17, T15 #18, T16 #19, T17 #20, T24 (/me) #21, T18 #22, T19 #23, T20 #24, T21 #25, T22 #26, Note 001 #27, Note 002 #28, Note 003 #29. (T23 "publish 3 posts" is split into the three note issues.)
+- Issue map: T00 #3, T01 #4, T02 #5, T03 #6, T04 #7, T05 #8, T06 #9, T07 #10, T08 #11, T09 #12, T10 #13, T11 #14, T12 #15, T13 #16, T14 #17, T15 #18, T16 #19, T17 #20, T24 (/me) #21, T18 #22, T19 #23, T20 #24, T21 #25, T22 #26, Note 001 #27, Note 002 #28, Note 003 #29. (T23 "publish 3 posts" is split into the three note issues.) Since 2026-09-30 #24, #27, #28, #29 and #41 carry label `post-launch` and #24, #27–29 have no milestone.
 
 ## Tasks
 
@@ -51,7 +51,7 @@ Approved plan: `docs/PLAN.md`. Design: canvas https://claude.ai/artifact/9xzGdZD
 
 ## Acceptance criteria (feature)
 
-Blog live on elvinlab.dev with 3 posts, `/me`, `/contact`, both themes and both languages, all CI budgets green.
+Revised 2026-09-30: site live on `elvinlab.dev` (DNS cutover done), full UI in ES and EN (posts Spanish-only), `/me` with real data, `/contact` and `/privacy` working, the pre-cutover SEO gate below met, both themes, all CI budgets green. Posts are post-launch.
 
 ## Progress and evidence
 
@@ -159,6 +159,42 @@ Cloudflare rate limiting is per-location/eventually consistent, not an exact glo
 Rollback boundary: remove only this slice's contact service/adapters/tests, Action entrypoint, runtime types, binding declarations and setup documentation. Preserve existing pages and the preceding tooling commits. Record exact rollback files, commits and verification outcomes when each task closes.
 
 Progress: T19.S1 committed as `63a43ba` with strict TDD: focused RED (missing config module) then GREEN 29/29; parent independently repeated GREEN. Full suite 139 (29 core + 110 web), lint 150 files, typecheck zero diagnostics, depcruise 103 modules/258 dependencies, static build 7 pages, and diff check all passed. Runtime harness: N/A for S1, pure service only, no endpoint yet. Rollback: remove contact/config.ts, ports.ts, contact.ts and contact.test.ts. RDD disabled/unmanaged. Next action: T19.S2 adapters with mocked providers.
+
+## Plan revision 2026-09-30
+
+Outcome of a plan review with the user (decisions mirrored in `docs/PLAN.md`, section "Decisiones 2026-09-30"). Supersedes the ordering in "Next step" below.
+
+Decisions:
+- **Success criterion:** site live in production (cutover done). Posts are the user's job after launch (#27–29 `post-launch`). Tripwire: 4 weeks after launch with no post → flag it.
+- **Notes:** `/notes` stays hidden (no nav link, `noindex`, out of sitemap and RSS) until the first post. Posts are Spanish-only; `/en/notes`, the ES/EN filter pills and `/en/rss.xml` are removed; the English nav "Notes" links to `/notes/` labelled "(in Spanish)". Schema fields `lang`/`translationOf` stay untouched; every post is `lang: es`. The rest of the app keeps full ES/EN support.
+- **Freeze** until launch: decorative and tooling work (#41 background picker, extra shaders, new quality gates, `.astro` mirror). Only touched if it breaks CI or blocks a launch task. Backlog label `post-launch`.
+- **Token-saving rules:** every task carries a tier; Claude does Tier 3 only and reviews diffs with `git diff --stat`, `rg` and re-run checks (a Tier 2 agent misreported edits on 2026-09-30); tracker and Engram mirror updated once per work unit; human tasks stay separate.
+- **Legacy site** (inventory 2026-09-30): only `/` (ES) and `/en/` are indexable, no sitemap/robots/feeds, same URLs as the new site. No redirect map; verify `/index.html` → `/` and `/en/index.html` → `/en/` on the deployed Worker.
+- **SEO gate before cutover:** `/contact` and `/privacy` pages (ES/EN), `www` → apex, `noindex` on staging and PR previews via a build flag, Search Console verified and sitemap submitted, real `lastmod` and new pages in the sitemap, default `og:image` with `summary_large_image`, basic headers (`nosniff`, `Referrer-Policy`, `Permissions-Policy`), nav-link audit (`/contact/` is a 404 today; `experiments` unverified), and confirm `_headers`/`_redirects` take effect on the deployed Worker. After cutover: HSTS (dashboard, after ~1 week of stable HTTPS, no preload). With the first post: `BlogPosting` `image` and `author.url`. Dropped for now: `BreadcrumbList`, CSP.
+- **Privacy:** full `/privacy` page (ES/EN), generic GDPR-baseline text, controller Elvin reachable via `/contact`, not legal advice, dated. Covers Cloudflare Web Analytics, contact form (Resend, Turnstile, rate limiter by IP), `localStorage`. Do not claim "no cookies" for Web Analytics until verified in Cloudflare's docs. Giscus text is added with T20 (post-launch).
+
+Open (user has not answered): **Q20** split T22 into T22a (human: add zone to Cloudflare, import and verify DNS records incl. MX and Resend TXT, GitHub Pages records DNS-only, change nameservers; legacy site keeps working) and T22b (cutover to the Worker Custom Domain + `www` rule), plus where DNS lives today and whether the domain has email; **Q21** Search Console property and verification method (recommended: Domain property with DNS TXT).
+
+Task routing (proposed tiers; issues marked *new* are not created yet):
+
+| Task | Issue | Tier | Who | When |
+|---|---|---|---|---|
+| T18 secrets in Cloudflare | #22 | human | user | before `/contact` goes live |
+| T19 `/contact` page + React island | #23 | 2 (Claude reviews the Action boundary) | delegated | pre-cutover |
+| `/privacy` page ES/EN | #25 scope widened | 2 | delegated | pre-cutover |
+| T21 Web Analytics snippet | #25 | 1 | delegated | pre-cutover |
+| `noindex` for staging and previews | *new* | 2 | delegated | pre-cutover |
+| SEO hardening (sitemap `lastmod`, `og:image`, `_headers`, redirect checks) | *new* | 2 | delegated | pre-cutover |
+| Spanish-only notes cleanup + `/notes` hidden until first post | *new* | 2 | delegated | pre-cutover |
+| Nav-link audit vs existing pages | *new* | 1 | delegated | pre-cutover |
+| `/me` real data, `noindex` until filled | *new* | human (data), 1 (flag) | user, delegated | pre-cutover |
+| T22a DNS zone to Cloudflare | *new* | human | user | after Q20 |
+| Search Console property + sitemap | *new* | human | user | before cutover, after T22a |
+| T22b cutover, `www` → apex, rollback | #26 | 3 | Claude + user | last pre-launch step |
+| HSTS | *new* | human | user | ~1 week after cutover |
+| Notes #27–29 | #27–29 | human | user | post-launch |
+| T20 Giscus + privacy update | #24 | 2 | delegated | post-launch |
+| #41 background picker | #41 | 2 | delegated | post-launch |
 
 ## Next step
 
