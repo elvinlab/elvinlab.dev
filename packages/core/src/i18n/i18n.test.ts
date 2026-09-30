@@ -38,6 +38,14 @@ describe('localizePath', () => {
     expect(localizePath('/notes/why', 'es', config)).toBe('/es/notes/why');
     expect(localizePath('/', 'es', config)).toBe('/es/');
   });
+
+  it('normalizes a path with no leading slash for default locale', () => {
+    expect(localizePath('notes/why', 'en', config)).toBe('/notes/why');
+  });
+
+  it('normalizes a path with no leading slash for non-default locale', () => {
+    expect(localizePath('notes/why', 'es', config)).toBe('/es/notes/why');
+  });
 });
 
 describe('localeFromPath', () => {
@@ -60,5 +68,19 @@ describe('switchLocale', () => {
     expect(switchLocale('/es/notes/why', 'en', config)).toBe('/notes/why');
     expect(switchLocale('/notes/why', 'es', config)).toBe('/es/notes/why');
     expect(switchLocale('/es', 'en', config)).toBe('/');
+  });
+
+  it('switching to the same locale is a no-op that still normalizes', () => {
+    expect(switchLocale('/es/notes', 'es', config)).toBe('/es/notes');
+    expect(switchLocale('/notes', 'en', config)).toBe('/notes');
+  });
+
+  it('default->default keeps root', () => {
+    expect(switchLocale('/notes', 'en', config)).toBe('/notes');
+    expect(switchLocale('/', 'en', config)).toBe('/');
+  });
+
+  it('bare "/" to a non-default locale', () => {
+    expect(switchLocale('/', 'es', config)).toBe('/es/');
   });
 });
