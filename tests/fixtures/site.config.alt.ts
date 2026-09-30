@@ -20,4 +20,29 @@ export const siteConfig = {
     status: { es: 'Disponible', en: 'Available' },
     lookingFor: { es: 'Full-stack', en: 'Full-stack' },
   },
+  me: {
+    timezone: 'UTC+0',
+    workMode: { es: 'Remoto', en: 'Remote' },
+    intro: {
+      es: 'Ingeniera full-stack construyendo software desde 2019.',
+      en: 'Full-stack engineer building software since 2019.',
+    },
+    facts: [
+      {
+        value: { es: 'Full stack', en: 'Full stack' },
+        label: { es: 'frontend y backend', en: 'frontend and backend' },
+      },
+    ],
+    strengths: [
+      {
+        icon: 'layers',
+        title: { es: 'Arquitectura clara', en: 'Clear architecture' },
+        body: {
+          es: 'Límites que mantienen el código fácil de cambiar.',
+          en: 'Boundaries that keep code easy to change.',
+        },
+      },
+    ],
+    stack: [{ label: { es: 'Lenguajes', en: 'Languages' }, items: ['TypeScript'] }],
+  },
 };
