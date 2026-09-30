@@ -37,7 +37,7 @@ Approved plan: `docs/PLAN.md`. Design: canvas https://claude.ai/artifact/9xzGdZD
 - GitHub Project: https://github.com/users/elvinlab/projects/2 — fields Status, Phase, Size, Priority, Tier.
 - One issue per task (issue numbers below), milestones per phase with due dates, labels `type:*`, `area:*`, `tier:*`. PRs close their issue (`Closes #n`).
 - Tiers follow https://github.com/elvinlab/agentic-dev-setup: Tier 1/2 delegated to OpenCode via herdr (`TIER1_MODEL`/`TIER2_MODEL` from `~/.config/agent-routing/active.env`), Tier 3 by Claude Code, Human = written by Elvin. Claude reviews every delegated diff. Issue bodies are delegation briefs, finalized right before delegating.
-- Issue map: T00 #3, T01 #4, T02 #5, T03 #6, T04 #7, T05 #8, T06 #9, T07 #10, T08 #11, T09 #12, T10 #13, T11 #14, T12 #15, T13 #16, T14 #17, T15 #18, T16 #19, T17 #20, T24 (/me) #21, T18 #22, T19 #23, T20 #24, T21 #25, T22 #26, Note 001 #27, Note 002 #28, Note 003 #29. (T23 "publish 3 posts" is split into the three note issues.) Since 2026-09-30 #24, #27, #28, #29 and #41 carry label `post-launch` and #24, #27–29 have no milestone.
+- Issue map: T00 #3, T01 #4, T02 #5, T03 #6, T04 #7, T05 #8, T06 #9, T07 #10, T08 #11, T09 #12, T10 #13, T11 #14, T12 #15, T13 #16, T14 #17, T15 #18, T16 #19, T17 #20, T24 (/me) #21, T18 #22, T19 #23, T20 #24, T21 #25, T22 #26, Note 001 #27, Note 002 #28, Note 003 #29, T25 noindex #43, T26 SEO hardening #44, T27 Spanish-only notes #45, T28 nav audit #46, T29 /me data #47, T30 T22a DNS zone #48, T31 Search Console #49, T32 HSTS #50, T33 BlogPosting #51 (T21 #25 widened to Web Analytics + /privacy; T22 #26 is now T22b). (T23 "publish 3 posts" is split into the three note issues.) Since 2026-09-30 #24, #27, #28, #29 and #41 carry label `post-launch` and #24, #27–29 have no milestone.
 
 ## Tasks
 
@@ -173,26 +173,26 @@ Decisions:
 - **SEO gate before cutover:** `/contact` and `/privacy` pages (ES/EN), `www` → apex, `noindex` on staging and PR previews via a build flag, Search Console verified and sitemap submitted, real `lastmod` and new pages in the sitemap, default `og:image` with `summary_large_image`, basic headers (`nosniff`, `Referrer-Policy`, `Permissions-Policy`), nav-link audit (`/contact/` is a 404 today; `experiments` unverified), and confirm `_headers`/`_redirects` take effect on the deployed Worker. After cutover: HSTS (dashboard, after ~1 week of stable HTTPS, no preload). With the first post: `BlogPosting` `image` and `author.url`. Dropped for now: `BreadcrumbList`, CSP.
 - **Privacy:** full `/privacy` page (ES/EN), generic GDPR-baseline text, controller Elvin reachable via `/contact`, not legal advice, dated. Covers Cloudflare Web Analytics, contact form (Resend, Turnstile, rate limiter by IP), `localStorage`. Do not claim "no cookies" for Web Analytics until verified in Cloudflare's docs. Giscus text is added with T20 (post-launch).
 
-Open (user has not answered): **Q20** split T22 into T22a (human: add zone to Cloudflare, import and verify DNS records incl. MX and Resend TXT, GitHub Pages records DNS-only, change nameservers; legacy site keeps working) and T22b (cutover to the Worker Custom Domain + `www` rule), plus where DNS lives today and whether the domain has email; **Q21** Search Console property and verification method (recommended: Domain property with DNS TXT).
+Adopted 2026-09-30 (user: "sí a todo"): **Q20** T22 is split into T22a/T30 (human: add the zone to Cloudflare, import and verify DNS records incl. MX and Resend TXT, GitHub Pages records DNS-only, change nameservers; legacy site keeps working) and T22b/#26 (cutover to the Worker Custom Domain + `www` rule); **Q21** Search Console as a Domain property verified by DNS TXT (T31, after T30). Still unknown (not answered): where DNS lives today (registrar) and whether the domain carries email; T30 must check MX before changing nameservers.
 
-Task routing (proposed tiers; issues marked *new* are not created yet):
+Task routing (issues created 2026-09-30; tiers are proposals until each brief is finalized):
 
 | Task | Issue | Tier | Who | When |
 |---|---|---|---|---|
 | T18 secrets in Cloudflare | #22 | human | user | before `/contact` goes live |
 | T19 `/contact` page + React island | #23 | 2 (Claude reviews the Action boundary) | delegated | pre-cutover |
-| `/privacy` page ES/EN | #25 scope widened | 2 | delegated | pre-cutover |
-| T21 Web Analytics snippet | #25 | 1 | delegated | pre-cutover |
-| `noindex` for staging and previews | *new* | 2 | delegated | pre-cutover |
-| SEO hardening (sitemap `lastmod`, `og:image`, `_headers`, redirect checks) | *new* | 2 | delegated | pre-cutover |
-| Spanish-only notes cleanup + `/notes` hidden until first post | *new* | 2 | delegated | pre-cutover |
-| Nav-link audit vs existing pages | *new* | 1 | delegated | pre-cutover |
-| `/me` real data, `noindex` until filled | *new* | human (data), 1 (flag) | user, delegated | pre-cutover |
-| T22a DNS zone to Cloudflare | *new* | human | user | after Q20 |
-| Search Console property + sitemap | *new* | human | user | before cutover, after T22a |
+| T21 Web Analytics + `/privacy` page ES/EN | #25 (widened) | 2 | delegated | pre-cutover |
+| T25 `noindex` for staging and previews | #43 | 2 | delegated | pre-cutover |
+| T26 SEO hardening (sitemap `lastmod`, `og:image`, `_headers`, redirect checks) | #44 | 2 | delegated | pre-cutover |
+| T27 Spanish-only notes cleanup + `/notes` hidden until first post | #45 | 2 | delegated | pre-cutover |
+| T28 Nav-link audit vs existing pages | #46 | 1 | delegated | pre-cutover |
+| T29 `/me` real data, `noindex` until filled | #47 | human (data), 1 (flag) | user, delegated | pre-cutover |
+| T30 (T22a) DNS zone to Cloudflare | #48 | human | user | after Q20 |
+| T31 Search Console property + sitemap | #49 | human | user | before cutover, after T22a |
 | T22b cutover, `www` → apex, rollback | #26 | 3 | Claude + user | last pre-launch step |
-| HSTS | *new* | human | user | ~1 week after cutover |
+| T32 HSTS | #50 | human | user | ~1 week after cutover |
 | Notes #27–29 | #27–29 | human | user | post-launch |
+| T33 `BlogPosting` image and `author.url` | #51 | 1 | delegated | with first post |
 | T20 Giscus + privacy update | #24 | 2 | delegated | post-launch |
 | #41 background picker | #41 | 2 | delegated | post-launch |
 
