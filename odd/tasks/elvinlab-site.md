@@ -208,6 +208,17 @@ Task routing (issues created 2026-09-30; tiers are proposals until each brief is
 - **Lessons (Engram `delegation/opencode-edit-loop-trailing-newline`):** opencode's Edit tool cannot add a trailing newline and rewrites HTML entities; agents loop on a failing Edit; `herdr agent wait` can return early. Verify every agent report with `git status`, `git diff --stat`, builds and independent checks. The agent panes were closed on the user's request.
 - **Still open from these tasks:** the `PUBLIC_CF_ANALYTICS_TOKEN` (user), `/contact/` is still a 404 until T19 UI, and the privacy text needs the user's review.
 
+## Upcoming (user-announced 2026-09-30, NOT started)
+
+Next tasks, to be worked later: (1) configure `elvinlab.dev` in Cloudflare (T30 / T22a), (2) launch to production (T22b + release PR `develop` → `main`, created by the user), (3) add an "under construction" notice somewhere in the app.
+
+Facts gathered for when these start (public DNS and staging, read-only):
+- DNS is at **Porkbun** (`*.ns.porkbun.com`). The domain has **no MX records** (no email on it). `elvinlab.dev` A records point to GitHub Pages (`185.199.108–111.153`); `www` is a CNAME to `elvinlab.github.io`. No CAA, no apex TXT (so no DNS-based Search Console verification today).
+- Records to preserve when moving the zone to Cloudflare: Resend DKIM TXT at `resend._domainkey`, MX and SPF TXT at `send`, DMARC TXT at `_dmarc` (`v=DMARC1; p=none;`). Keep the GitHub Pages A and `www` CNAME records DNS-only until the cutover, then replace them with the Worker Custom Domain (T22b) and a `www` → apex rule.
+- Staging today: nav links `/contact/` and `/experiments/` return 404 (flags `contact` and `experiments` are on but the pages do not exist); the home still shows an `/rss.xml` link while there are no notes (to verify); `/me/` shows placeholder data.
+- Proposed (open, **Q24 unanswered**): at launch show only finished pages (home, privacy) and switch off `contact`, `experiments` and `/me` (out of nav, `noindex`, out of sitemap) until ready; the notice text should come from `site.config` (ES/EN) so it stays white-label and is removed with a config change. Launch would then not need T18 (secrets) or T19 UI (#23).
+- No issues created yet for the notice or the flag work.
+
 ## Next step
 
 State as of 2026-09-29: T19.S1/S2/S3 all done and merged to `develop`; remote `develop` CI is GREEN (checks + staging deploy `elvinlab-staging` + smoke). Contact server runtime is complete and fails closed until Cloudflare is configured.
