@@ -7,7 +7,7 @@ const root = resolve(import.meta.dirname, '../../..');
 const cli = join(root, 'node_modules/@lhci/cli/src/cli.js');
 const result = spawnSync(process.execPath, [cli, 'autorun'], {
   cwd: root,
-  env: { ...process.env, CHROME_PATH: chromium.executablePath() },
+  env: { ...process.env, CHROME_PATH: chromium.executablePath(), SITE_INDEXABLE: 'true' },
   stdio: 'inherit',
 });
 

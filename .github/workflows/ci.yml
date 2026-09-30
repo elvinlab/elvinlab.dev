@@ -113,6 +113,8 @@ jobs:
       - uses: jdx/mise-action@c2a87611a18de5b3828c5652fe268e992400cb5c # v4.3.0
       - run: pnpm install --frozen-lockfile
       - run: pnpm --filter web build
+        env:
+          SITE_INDEXABLE: ${{ github.ref_name == 'main' && 'true' || '' }}
       - name: Write version.txt with commit SHA
         run: echo "${GITHUB_SHA}" > apps/web/dist/client/version.txt
       - name: Resolve target

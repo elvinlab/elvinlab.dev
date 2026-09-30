@@ -19,7 +19,11 @@ process.once('SIGTERM', stop);
 
 const run = (args: string[]): Promise<void> =>
   new Promise((accept, reject) => {
-    child = spawn(process.execPath, [cli, ...args], { cwd: workspace.web, stdio: 'inherit' });
+    child = spawn(process.execPath, [cli, ...args], {
+      cwd: workspace.web,
+      stdio: 'inherit',
+      env: { ...process.env, SITE_INDEXABLE: 'true' },
+    });
     child.once('error', reject);
     child.once('exit', (code) => {
       if (code === 0 || stopping) accept();

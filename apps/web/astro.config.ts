@@ -8,6 +8,7 @@ import { defineConfig } from 'astro/config';
 import expressiveCode from 'astro-expressive-code';
 
 import { CONTACT_POLICY } from './src/features/contact/config.ts';
+import { noindexHeaders } from './src/integrations/noindex-headers.ts';
 import { hasPublishedNotesOnDisk } from './src/integrations/published-notes.ts';
 import { site } from './src/shared/config/index.ts';
 
@@ -40,6 +41,7 @@ export default defineConfig({
       i18n: { defaultLocale: site.locales.default, locales: { es: 'es', en: 'en' } },
       filter: (page) => hasNotes || new URL(page).pathname !== '/notes/',
     }),
+    noindexHeaders(),
   ],
   adapter: cloudflare({
     // Pages are prerendered, so images are optimized at build time with Sharp and served as
@@ -48,5 +50,10 @@ export default defineConfig({
   }),
   vite: {
     plugins: [tailwindcss()],
+    // Vite only exposes PUBLIC_/VITE_ variables to import.meta.env, so the indexing switch is
+    // inlined explicitly. Unset or anything other than "true" means the build is noindex.
+    define: {
+      'import.meta.env.SITE_INDEXABLE': JSON.stringify(process.env['SITE_INDEXABLE'] ?? ''),
+    },
   },
 });

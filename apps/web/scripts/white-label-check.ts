@@ -50,6 +50,7 @@ try {
   const build = spawnSync(process.execPath, [cli, 'build'], {
     cwd: workspace.web,
     stdio: 'inherit',
+    env: { ...process.env, SITE_INDEXABLE: 'true' },
   });
   if (build.status !== 0) fail('the alternative-identity build failed');
 
