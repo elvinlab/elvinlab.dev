@@ -11,6 +11,7 @@ import '@/styles/global.css';
 import { DEFAULT_THEME, THEME_BOOT_SCRIPT } from '@elvinlab/core';
 
 import { type Locale, t } from '@/shared/i18n/index.ts';
+import { getBeaconToken, shouldRenderBeacon } from '@/shared/layout/analytics.ts';
 import Footer from '@/shared/layout/Footer.astro';
 import Navbar from '@/shared/layout/Navbar.astro';
 import Seo from '@/shared/seo/Seo.astro';
@@ -32,6 +33,8 @@ type Props = {
 const { locale, printable = false, ...seo } = Astro.props;
 const hasAside = Astro.slots.has('aside');
 const hasBanner = Astro.slots.has('banner');
+const renderBeacon = shouldRenderBeacon();
+const beaconToken = getBeaconToken();
 ---
 
 <html lang={locale} data-theme={DEFAULT_THEME}>
@@ -40,6 +43,13 @@ const hasBanner = Astro.slots.has('banner');
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <script is:inline set:html={THEME_BOOT_SCRIPT} />
     <Seo locale={locale} {...seo} />
+    {renderBeacon && beaconToken && (
+      <script
+        defer
+        src="https://static.cloudflareinsights.com/beacon.min.js"
+        data-cf-beacon={JSON.stringify({ token: beaconToken })}
+      />
+    )}
   </head>
   <body class="min-h-dvh bg-page font-body text-text antialiased" data-printable={printable ? '' : undefined}>
     <a href="#main" class="sr-only z-50 rounded-control bg-button px-4 py-3 font-medium text-white focus:not-sr-only focus:fixed focus:top-3 focus:left-3">

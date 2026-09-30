@@ -22,16 +22,28 @@ const year = new Date().getFullYear();
       </p>
       <p class="text-sm text-muted">© {year} {site.identity.name}</p>
     </div>
-    {site.socials.length > 0 && (
-      <ul aria-label={t(locale, 'footer.social')} class="-mx-3 flex flex-wrap gap-1">
-        {site.socials.map((social) => (
-          <li>
-            <a href={social.url} rel="me noopener" class="flex h-11 items-center rounded-control px-3 text-sm text-text-secondary transition-colors duration-150 hover:bg-card-hover hover:text-text">
-              {social.label}
-            </a>
-          </li>
-        ))}
-      </ul>
-    )}
+    <div class="flex flex-col gap-3 md:flex-row md:items-center md:justify-end">
+      <a
+        href={locale === 'es' ? '/privacy/' : '/en/privacy/'}
+        class="text-sm text-text-secondary transition-colors duration-150 hover:text-text"
+      >
+        {t(locale, 'footer.privacy')}
+      </a>
+      {site.socials.length > 0 && (
+        <ul aria-label={t(locale, 'footer.social')} class="-mx-3 flex flex-wrap gap-1">
+          {site.socials.map((social) => (
+            <li>
+              <a
+                href={social.url}
+                rel="me noopener"
+                class="flex h-11 items-center rounded-control px-3 text-sm text-text-secondary transition-colors duration-150 hover:bg-card-hover hover:text-text"
+              >
+                {social.label}
+              </a>
+            </li>
+          ))}
+        </ul>
+      )}
+    </div>
   </div>
 </footer>
