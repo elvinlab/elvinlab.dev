@@ -20,9 +20,9 @@ module.exports = {
     {
       name: 'no-unresolvable',
       severity: 'error',
-      comment: 'Every import must resolve (Astro virtual modules excepted).',
+      comment: 'Every import must resolve (Astro and Cloudflare virtual modules excepted).',
       from: {},
-      to: { couldNotResolve: true, pathNot: '^astro:' },
+      to: { couldNotResolve: true, pathNot: '^(astro|cloudflare):' },
     },
     {
       name: 'core-is-standalone',

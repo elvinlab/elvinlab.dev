@@ -8,5 +8,6 @@ export const CONTACT_POLICY = {
   minFillTimeMs: 3_000,
   providerTimeoutMs: 5_000,
   providerResponseMaxBytes: 8_192,
-  rateLimit: { limit: 3, period: 60 },
+  requestMaxBytes: 32_768,
+  turnstileAction: 'contact',
 } as const;

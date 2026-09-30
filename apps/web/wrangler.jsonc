@@ -6,10 +6,18 @@
   "compatibility_flags": ["nodejs_compat"],
   "workers_dev": true,
   "preview_urls": true,
-  // Static site: unknown paths get dist/404.html with a 404 status instead of an empty body.
+  // Prerendered pages: unknown paths get dist/404.html with a 404 status instead of an empty body.
   "assets": {
     "not_found_handling": "404-page"
   },
+  // Per-location abuse limit, not an exact global email quota.
+  "ratelimits": [
+    {
+      "name": "CONTACT_RATE_LIMITER",
+      "namespace_id": "1001",
+      "simple": { "limit": 3, "period": 60 }
+    }
+  ],
   "observability": {
     "enabled": true
   }

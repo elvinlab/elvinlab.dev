@@ -5,10 +5,12 @@ import tailwindcss from '@tailwindcss/vite';
 import { defineConfig } from 'astro/config';
 import expressiveCode from 'astro-expressive-code';
 
+import { CONTACT_POLICY } from './src/features/contact/config.ts';
 import { site } from './src/shared/config/index.ts';
 
 export default defineConfig({
   site: site.url,
+  security: { checkOrigin: true, actionBodySizeLimit: CONTACT_POLICY.requestMaxBytes },
   i18n: {
     defaultLocale: site.locales.default,
     locales: site.locales.supported,
