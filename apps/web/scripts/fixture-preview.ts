@@ -6,12 +6,14 @@ import {
   createFixtureWorkspace,
   enableFixtureComments,
   enableFixtureNotice,
+  neutralizeFixtureIntegrations,
 } from './fixture-workspace.ts';
 
 const source = resolve(import.meta.dirname, '../../..');
 const workspace = createFixtureWorkspace(source, join(source, 'tests/fixtures/notes'));
 enableFixtureComments(workspace.web);
 enableFixtureNotice(workspace.web);
+neutralizeFixtureIntegrations(workspace.web);
 const cli = join(realpathSync(join(source, 'apps/web/node_modules/astro')), 'bin/astro.mjs');
 let child: ChildProcess | undefined;
 let stopping = false;

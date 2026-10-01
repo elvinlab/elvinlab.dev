@@ -82,6 +82,23 @@ const siteConfigSchema = z
       readingMode: z.boolean(),
     }),
     /**
+     * Public ids of third-party services. They ship in the HTML by design, so they live here (not
+     * in secrets). An environment variable of the same purpose overrides each one (see ENV_VARS).
+     */
+    integrations: z
+      .object({
+        /** Cloudflare Web Analytics beacon token. Omit to turn analytics off. */
+        cloudflareAnalyticsToken: z.string().trim().min(1).optional(),
+        /** Cloudflare Turnstile public site key for the contact form (bound to the domain). */
+        turnstileSiteKey: z.string().trim().min(1).optional(),
+      })
+      .default({}),
+    /** "Last updated" dates (YYYY-MM-DD) shown on the legal pages. Bump one when its text changes. */
+    legal: z.object({
+      privacyUpdated: z.iso.date(),
+      termsUpdated: z.iso.date(),
+    }),
+    /**
      * Giscus comments (GitHub Discussions). Optional: without it the comments section renders
      * nothing even when `features.comments` is on. Values come from https://giscus.app.
      */

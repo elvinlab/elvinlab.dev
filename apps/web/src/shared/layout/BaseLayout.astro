@@ -10,8 +10,8 @@ import '@/styles/global.css';
 
 import { DEFAULT_THEME, THEME_BOOT_SCRIPT } from '@elvinlab/core';
 
+import { integrations } from '@/shared/config/index.ts';
 import { type Locale, t } from '@/shared/i18n/index.ts';
-import { getBeaconToken, shouldRenderBeacon } from '@/shared/layout/analytics.ts';
 import Footer from '@/shared/layout/Footer.astro';
 import Navbar from '@/shared/layout/Navbar.astro';
 import SiteNotice from '@/shared/layout/SiteNotice.astro';
@@ -37,8 +37,7 @@ type Props = {
 const { locale, printable = false, ...seo } = Astro.props;
 const hasAside = Astro.slots.has('aside');
 const hasBanner = Astro.slots.has('banner');
-const renderBeacon = shouldRenderBeacon();
-const beaconToken = getBeaconToken();
+const beaconToken = integrations.analyticsToken;
 ---
 
 <html lang={locale} data-theme={DEFAULT_THEME}>
@@ -48,7 +47,7 @@ const beaconToken = getBeaconToken();
     <script is:inline set:html={THEME_BOOT_SCRIPT} />
     <Seo locale={locale} {...seo} />
     <slot name="head" />
-    {renderBeacon && beaconToken && (
+    {beaconToken && (
       <script
         defer
         src="https://static.cloudflareinsights.com/beacon.min.js"

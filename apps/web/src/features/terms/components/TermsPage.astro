@@ -17,6 +17,7 @@ const content = buildTermsContent({
   owner: site.identity.name,
   domain: new URL(site.url).host,
   contact: { es: '/contact/', en: '/en/contact/' },
+  updated: site.legal.termsUpdated,
   privacy: { es: '/privacy/', en: '/en/privacy/' },
   comments: isEnabled('comments') && Boolean(site.giscus),
   me: isEnabled('me'),

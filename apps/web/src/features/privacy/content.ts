@@ -22,13 +22,13 @@ export type PrivacyInput = {
   owner: string;
   domain: string;
   contact: { es: string; en: string };
+  /** "Last updated" date (YYYY-MM-DD), from `legal` in the site config. */
+  updated: string;
   /** Present only when giscus comments are configured; the section is omitted otherwise. */
   comments?: { repo: string };
   /** True when the reading mode feature is on, which stores one more preference in the browser. */
   readingMode?: boolean;
 };
-
-const LAST_UPDATED = '2026-10-01';
 
 const CLOUDFLARE_FAQ = 'https://developers.cloudflare.com/web-analytics/faq/';
 const CLOUDFLARE_DATA = 'https://developers.cloudflare.com/web-analytics/data-metrics/';
@@ -78,6 +78,7 @@ function buildBaseContent({
   owner,
   domain,
   contact,
+  updated,
   readingMode = false,
 }: PrivacyInput): Record<'es' | 'en', PrivacyContent> {
   return {
@@ -85,7 +86,7 @@ function buildBaseContent({
       pageTitle: 'Privacidad',
       pageDescription: `Cómo se tratan tus datos en ${domain}: analítica, formulario de contacto, alojamiento, almacenamiento local y tus derechos.`,
       lastUpdatedLabel: 'Última actualización',
-      lastUpdated: LAST_UPDATED,
+      lastUpdated: updated,
       sections: [
         {
           id: 'controller',
@@ -128,7 +129,7 @@ function buildBaseContent({
       pageTitle: 'Privacy',
       pageDescription: `How your data is handled on ${domain}: analytics, contact form, hosting, local storage, and your rights.`,
       lastUpdatedLabel: 'Last updated',
-      lastUpdated: LAST_UPDATED,
+      lastUpdated: updated,
       sections: [
         {
           id: 'controller',

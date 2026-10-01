@@ -26,6 +26,7 @@ const valid = {
     changelog: true,
     readingMode: true,
   },
+  legal: { privacyUpdated: '2026-10-01', termsUpdated: '2026-10-01' },
   background: { galaxy: true, cursorWaves: false },
   recruiter: {
     available: true,
@@ -192,6 +193,47 @@ describe('parseSiteConfig', () => {
   it('rejects config missing the readingMode feature', () => {
     const { readingMode: _omitted, ...features } = valid.features;
     expect(() => parseSiteConfig({ ...valid, features })).toThrow(/readingMode/);
+  });
+
+  describe('integrations', () => {
+    it('defaults to no integrations', () => {
+      expect(parseSiteConfig(valid).integrations).toEqual({});
+    });
+
+    it('accepts the analytics token and the Turnstile site key', () => {
+      const config = {
+        ...valid,
+        integrations: { cloudflareAnalyticsToken: 'tok123', turnstileSiteKey: '0xKEY' },
+      };
+      expect(parseSiteConfig(config).integrations).toEqual({
+        cloudflareAnalyticsToken: 'tok123',
+        turnstileSiteKey: '0xKEY',
+      });
+    });
+
+    it('rejects an empty value instead of silently disabling the integration', () => {
+      const broken = { ...valid, integrations: { turnstileSiteKey: '  ' } };
+      expect(() => parseSiteConfig(broken)).toThrow(/turnstileSiteKey/);
+    });
+  });
+
+  describe('legal', () => {
+    it('keeps the two last-updated dates', () => {
+      expect(parseSiteConfig(valid).legal).toEqual({
+        privacyUpdated: '2026-10-01',
+        termsUpdated: '2026-10-01',
+      });
+    });
+
+    it('is required: a page that claims a date needs one', () => {
+      const { legal: _omitted, ...withoutLegal } = valid;
+      expect(() => parseSiteConfig(withoutLegal)).toThrow(/legal/);
+    });
+
+    it('rejects a date that is not YYYY-MM-DD', () => {
+      const broken = { ...valid, legal: { ...valid.legal, termsUpdated: '1 October 2026' } };
+      expect(() => parseSiteConfig(broken)).toThrow(/termsUpdated/);
+    });
   });
 
   it('rejects config missing me feature', () => {

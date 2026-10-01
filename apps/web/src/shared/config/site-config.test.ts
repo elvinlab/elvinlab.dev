@@ -24,6 +24,14 @@ describe('site.config.ts', () => {
     expect(siteConfig).not.toHaveProperty('notice');
   });
 
+  it('keeps the public integration ids and the legal dates in the config', () => {
+    const config = parseSiteConfig(siteConfig);
+    expect(config.integrations.cloudflareAnalyticsToken).toMatch(/^[0-9a-f]{32}$/);
+    expect(config.integrations.turnstileSiteKey).toMatch(/^0x[\w-]+$/);
+    expect(config.legal.privacyUpdated).toMatch(/^\d{4}-\d{2}-\d{2}$/);
+    expect(config.legal.termsUpdated).toMatch(/^\d{4}-\d{2}-\d{2}$/);
+  });
+
   it('contains no email address', () => {
     expect(JSON.stringify(siteConfig)).not.toMatch(/[\w.+-]+@[\w-]+\.[\w.]+/);
   });

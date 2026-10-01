@@ -40,6 +40,14 @@ export const siteConfig = {
     changelog: true,
     readingMode: true,
   },
+  // Public ids of third-party services. They ship in the HTML by design. An environment variable
+  // with the same purpose overrides each one (PUBLIC_CF_ANALYTICS_TOKEN, PUBLIC_TURNSTILE_SITE_KEY).
+  integrations: {
+    cloudflareAnalyticsToken: '7ff2a02f466f4c1eb19b0bb6b4868ec3',
+    turnstileSiteKey: '0x4AAAAAAFKtcGkx9Mt92EHt',
+  },
+  // "Last updated" dates of the legal pages: bump the one whose text you change (YYYY-MM-DD).
+  legal: { privacyUpdated: '2026-10-01', termsUpdated: '2026-10-01' },
   // Comments (https://giscus.app): GitHub Discussions of this repo, "Announcements" category.
   giscus: {
     repo: 'elvinlab/elvinlab.dev',

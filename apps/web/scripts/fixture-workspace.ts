@@ -42,6 +42,20 @@ export function enableFixtureNotice(web: string): void {
   writeFileSync(configPath, patched);
 }
 
+/**
+ * Drops the real third-party ids (analytics token, Turnstile key) from the copied site config, so
+ * fixture builds never load the Cloudflare beacon or call out to the network. Tests that need a
+ * Turnstile key set it through the environment override.
+ */
+export function neutralizeFixtureIntegrations(web: string): void {
+  const configPath = join(web, 'src/site.config.ts');
+  const config = readFileSync(configPath, 'utf8');
+  writeFileSync(
+    configPath,
+    config.replace(/\n {2}integrations: \{[^}]*\},/, '\n  integrations: {},'),
+  );
+}
+
 /** Copies only build inputs; fixture builds never write into publishable content or local drafts. */
 export function createFixtureWorkspace(source: string, fixtures: string) {
   const root = mkdtempSync(join(tmpdir(), 'elvinlab-verification-'));
