@@ -144,6 +144,34 @@ describe('parseSiteConfig', () => {
     expect(() => parseSiteConfig(broken)).toThrow(/"fr"/);
   });
 
+  describe('giscus', () => {
+    const giscus = {
+      repo: 'janedoe/janedoe.dev',
+      repoId: 'R_kgDOExample',
+      category: 'Comments',
+      categoryId: 'DIC_kwDOExample',
+    };
+
+    it('is optional', () => {
+      expect(parseSiteConfig(valid).giscus).toBeUndefined();
+    });
+
+    it('accepts a complete giscus block', () => {
+      expect(parseSiteConfig({ ...valid, giscus }).giscus).toEqual(giscus);
+    });
+
+    it('rejects a repo that is not owner/name', () => {
+      expect(() => parseSiteConfig({ ...valid, giscus: { ...giscus, repo: 'janedoe' } })).toThrow(
+        /repo/,
+      );
+    });
+
+    it('rejects a block with a missing id', () => {
+      const { categoryId: _omitted, ...incomplete } = giscus;
+      expect(() => parseSiteConfig({ ...valid, giscus: incomplete })).toThrow(/categoryId/);
+    });
+  });
+
   it('rejects config missing me feature', () => {
     const broken = {
       ...valid,
