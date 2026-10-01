@@ -37,6 +37,51 @@ for (const { locale, prefix, slug } of [
   }
 }
 
+const CONTACT_PAGES = [
+  { locale: 'es' as const, path: '/contact/' },
+  { locale: 'en' as const, path: '/en/contact/' },
+];
+
+const CONTACT_LABELS = {
+  es: { name: 'Nombre', email: 'Correo electrónico', message: 'Mensaje' },
+  en: { name: 'Name', email: 'Email', message: 'Message' },
+} as const;
+
+for (const { locale, path } of CONTACT_PAGES) {
+  test(`${path} renders contact form`, async ({ page }) => {
+    const errors: string[] = [];
+    page.on('pageerror', (error) => errors.push(error.message));
+
+    const turnstileRequests: string[] = [];
+    page.on('request', (request) => {
+      if (request.url().includes('challenges.cloudflare.com')) {
+        turnstileRequests.push(request.url());
+      }
+    });
+
+    const response = await page.goto(path);
+    expect(response?.status()).toBe(200);
+    await expect(page.locator('html')).toHaveAttribute('lang', locale);
+    await expect(page.getByRole('main')).toBeVisible();
+    await expect(page.getByRole('heading', { level: 1 })).toBeVisible();
+
+    const labels = CONTACT_LABELS[locale];
+    await expect(page.getByLabel(labels.name)).toBeVisible();
+    await expect(page.getByLabel(labels.email)).toBeVisible();
+    await expect(page.getByLabel(labels.message)).toBeVisible();
+
+    await expect(page.getByLabel(labels.name)).toBeEnabled();
+    await expect(page.getByLabel(labels.email)).toBeEnabled();
+    await expect(page.getByLabel(labels.message)).toBeEnabled();
+
+    expect(
+      await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth),
+    ).toBe(true);
+    expect(errors).toEqual([]);
+    expect(turnstileRequests).toEqual([]);
+  });
+}
+
 test('unknown routes render the bilingual 404, not a successful page', async ({ page }) => {
   const response = await page.goto('/smoke-missing-page/');
   expect(response?.status()).toBe(404);

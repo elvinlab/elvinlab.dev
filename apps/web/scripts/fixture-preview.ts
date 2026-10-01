@@ -22,7 +22,7 @@ const run = (args: string[]): Promise<void> =>
     child = spawn(process.execPath, [cli, ...args], {
       cwd: workspace.web,
       stdio: 'inherit',
-      env: { ...process.env, SITE_INDEXABLE: 'true' },
+      env: { ...process.env, SITE_INDEXABLE: 'true', PUBLIC_TURNSTILE_SITE_KEY: 'e2e-site-key' },
     });
     child.once('error', reject);
     child.once('exit', (code) => {
