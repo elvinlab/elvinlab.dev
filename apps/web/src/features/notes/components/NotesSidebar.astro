@@ -2,7 +2,7 @@
 /** Notes index sidebar: author card, category and tag lists, RSS callout. */
 import { localizePath } from '@elvinlab/core';
 
-import { site } from '@/shared/config/index.ts';
+import { isEnabled, site } from '@/shared/config/index.ts';
 import { LOCALES, type Locale, t } from '@/shared/i18n/index.ts';
 import Chip from '@/shared/ui/Chip.astro';
 
@@ -20,9 +20,11 @@ const aboutHref = localizePath('/me/', locale, LOCALES);
   <section class="flex flex-col gap-3 rounded-card bg-card p-5">
     <p class="font-display text-lg font-bold">{site.identity.name}</p>
     <p class="text-sm text-text-secondary">{site.identity.role[locale]}</p>
-    <a href={aboutHref} class="text-sm text-primary underline decoration-dashed underline-offset-4">
-      {t(locale, 'notes.sidebar.about')}
-    </a>
+    {isEnabled('me') && (
+      <a href={aboutHref} class="text-sm text-primary underline decoration-dashed underline-offset-4">
+        {t(locale, 'notes.sidebar.about')}
+      </a>
+    )}
   </section>
 
   {categories.length > 0 && (

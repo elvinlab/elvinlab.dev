@@ -11,6 +11,7 @@ import expressiveCode from 'astro-expressive-code';
 import { CONTACT_POLICY } from './src/features/contact/config.ts';
 import { noindexHeaders } from './src/integrations/noindex-headers.ts';
 import { hasPublishedNotesOnDisk } from './src/integrations/published-notes.ts';
+import { isHiddenFromSitemap } from './src/integrations/sitemap-filter.ts';
 import { site } from './src/shared/config/index.ts';
 
 // /notes/ stays out of the sitemap until the first note is published.
@@ -41,7 +42,9 @@ export default defineConfig({
     preact(),
     sitemap({
       i18n: { defaultLocale: site.locales.default, locales: { es: 'es', en: 'en' } },
-      filter: (page) => hasNotes || new URL(page).pathname !== '/notes/',
+      filter: (page) =>
+        (hasNotes || new URL(page).pathname !== '/notes/') &&
+        !isHiddenFromSitemap(new URL(page).pathname, site.features),
     }),
     noindexHeaders(),
   ],

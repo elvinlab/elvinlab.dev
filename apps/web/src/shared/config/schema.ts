@@ -69,6 +69,8 @@ const siteConfigSchema = z
       contact: z.boolean(),
       credentials: z.boolean(),
       experiments: z.boolean(),
+      /** /me recruiter page: off hides it from the nav, marks it noindex and keeps it out of the sitemap. */
+      me: z.boolean(),
     }),
     /** Optional site-wide notice strip (localized). White-label: remove the key to hide. */
     notice: localized.optional(),

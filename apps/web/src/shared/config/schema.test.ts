@@ -16,7 +16,14 @@ const valid = {
     startedYear: 2019,
   },
   socials: [{ label: 'GitHub', url: 'https://github.com/janedoe', icon: 'github' }],
-  features: { blog: true, comments: false, contact: true, credentials: true, experiments: true },
+  features: {
+    blog: true,
+    comments: false,
+    contact: true,
+    credentials: true,
+    experiments: true,
+    me: true,
+  },
   background: { galaxy: true, cursorWaves: false },
   recruiter: {
     available: true,
@@ -134,5 +141,13 @@ describe('parseSiteConfig', () => {
   it('rejects notice with an unsupported locale', () => {
     const broken = { ...valid, notice: { es: 'En construcción', fr: 'En construction' } };
     expect(() => parseSiteConfig(broken)).toThrow(/"fr"/);
+  });
+
+  it('rejects config missing me feature', () => {
+    const broken = {
+      ...valid,
+      features: { ...valid.features, me: undefined as unknown as boolean },
+    };
+    expect(() => parseSiteConfig(broken)).toThrow();
   });
 });

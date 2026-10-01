@@ -13,7 +13,7 @@ import MeSidebar from '@/features/me/components/MeSidebar.astro';
 import WhatIBring from '@/features/me/components/WhatIBring.astro';
 import { hasPublishedNotes, NoteIndexRow, sortNotes } from '@/features/notes/index.ts';
 import { ExperimentTile, sortExperiments } from '@/features/portfolio/index.ts';
-import { isEnabled } from '@/shared/config/index.ts';
+import { isEnabled, site } from '@/shared/config/index.ts';
 import { LOCALES, type Locale, t } from '@/shared/i18n/index.ts';
 import Banner from '@/shared/layout/Banner.astro';
 import BaseLayout from '@/shared/layout/BaseLayout.astro';
@@ -35,7 +35,7 @@ const notes = allNotes.slice(0, 3);
 const hasNotes = hasPublishedNotes(allNotes);
 ---
 
-<BaseLayout locale={locale} path="/me/" title="/me" printable>
+<BaseLayout locale={locale} path="/me/" title="/me" printable noindex={!site.features.me}>
   <Banner slot="banner" height="clamp(420px, 52vh, 520px)" locale={locale}>
     <BackgroundCanvas slot="background" />
     <MeHero locale={locale} />
@@ -50,7 +50,9 @@ const hasNotes = hasPublishedNotes(allNotes);
       <Card as="section" class="flex flex-col gap-4">
         <div class="flex items-baseline justify-between">
           <SectionHeading text={t(locale, 'me.experiments')} />
-          <a href={localizePath('/experiments/', locale, LOCALES)} class="text-sm text-primary underline decoration-dashed underline-offset-4 print:hidden">{t(locale, 'home.allExperiments')}</a>
+          {isEnabled('experiments') && (
+            <a href={localizePath('/experiments/', locale, LOCALES)} class="text-sm text-primary underline decoration-dashed underline-offset-4 print:hidden">{t(locale, 'home.allExperiments')}</a>
+          )}
         </div>
         <div class="grid gap-4 sm:grid-cols-2">
           {experiments.map((experiment) => <ExperimentTile experiment={experiment} locale={locale} />)}

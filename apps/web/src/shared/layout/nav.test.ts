@@ -2,7 +2,14 @@ import { describe, expect, it } from 'vitest';
 
 import { isCurrent, isSingleLocaleRoute, navItems } from './nav.ts';
 
-const allOn = { blog: true, comments: true, contact: true, credentials: true, experiments: true };
+const allOn = {
+  blog: true,
+  comments: true,
+  contact: true,
+  credentials: true,
+  experiments: true,
+  me: true,
+};
 
 describe('navItems', () => {
   it('lists every section in design order when all features are on and notes exist (ES)', () => {
@@ -51,6 +58,27 @@ describe('navItems', () => {
     );
 
     expect(items.map((item) => item.key)).toEqual(['home', 'about']);
+  });
+
+  it('hides about when me feature is off', () => {
+    const items = navItems({ ...allOn, me: false }, 'es', true);
+    expect(items.map((item) => item.key)).toEqual(['home', 'notes', 'experiments', 'contact']);
+  });
+
+  it('hides experiments when experiments feature is off', () => {
+    const items = navItems({ ...allOn, experiments: false }, 'es', true);
+    expect(items.map((item) => item.key)).toEqual(['home', 'notes', 'about', 'contact']);
+  });
+
+  it('preserves order when all features are on', () => {
+    const items = navItems(allOn, 'es', true);
+    expect(items.map((item) => item.key)).toEqual([
+      'home',
+      'notes',
+      'experiments',
+      'about',
+      'contact',
+    ]);
   });
 
   it('EN notes item has labelOverride and hreflang when notes exist', () => {

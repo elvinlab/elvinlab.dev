@@ -13,7 +13,14 @@ export const siteConfig = {
     startedYear: 2019,
   },
   socials: [{ label: 'GitHub', url: 'https://github.com/janedoe', icon: 'github' }],
-  features: { blog: true, comments: true, contact: true, credentials: true, experiments: true },
+  features: {
+    blog: true,
+    comments: true,
+    contact: true,
+    credentials: true,
+    experiments: true,
+    me: true,
+  },
   background: { galaxy: true, cursorWaves: false },
   recruiter: {
     available: true,

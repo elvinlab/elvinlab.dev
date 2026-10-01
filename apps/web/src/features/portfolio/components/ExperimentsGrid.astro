@@ -4,6 +4,7 @@ import { localizePath } from '@elvinlab/core';
 
 import ExperimentTile from '@/features/portfolio/components/ExperimentTile.astro';
 import type { Experiment } from '@/features/portfolio/schema.ts';
+import { isEnabled } from '@/shared/config/index.ts';
 import { LOCALES, type Locale, t } from '@/shared/i18n/index.ts';
 
 type Props = { locale: Locale; experiments: Experiment[] };
@@ -17,9 +18,11 @@ const { locale, experiments } = Astro.props;
       <h2 class="flex items-center gap-3 font-display text-2xl font-bold">
         <span class="h-5 w-1 rounded-pill bg-primary" aria-hidden="true"></span>{t(locale, 'home.experiments')}
       </h2>
-      <a href={localizePath('/experiments/', locale, LOCALES)} class="text-sm text-primary underline decoration-dashed underline-offset-4">
-        {t(locale, 'home.allExperiments')}
-      </a>
+      {isEnabled('experiments') && (
+        <a href={localizePath('/experiments/', locale, LOCALES)} class="text-sm text-primary underline decoration-dashed underline-offset-4">
+          {t(locale, 'home.allExperiments')}
+        </a>
+      )}
     </div>
     <div class="grid gap-4 sm:grid-cols-2">
       {experiments.map((experiment) => <ExperimentTile experiment={experiment} locale={locale} />)}

@@ -29,7 +29,14 @@ export const siteConfig = {
     { label: 'GitHub', url: 'https://github.com/elvinlab', icon: 'github' },
     { label: 'LinkedIn', url: 'https://www.linkedin.com/in/elvinlab', icon: 'linkedin' },
   ],
-  features: { blog: true, comments: true, contact: true, credentials: true, experiments: true },
+  features: {
+    blog: true,
+    comments: true,
+    contact: true,
+    credentials: true,
+    experiments: false,
+    me: false,
+  },
   background: { galaxy: true, cursorWaves: false },
   recruiter: {
     available: true,

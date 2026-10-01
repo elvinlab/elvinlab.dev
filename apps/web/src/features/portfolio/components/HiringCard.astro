@@ -3,7 +3,7 @@
 import { localizePath } from '@elvinlab/core';
 
 import { yearsSince } from '@/features/portfolio/lib/portfolio.ts';
-import { site } from '@/shared/config/index.ts';
+import { isEnabled, site } from '@/shared/config/index.ts';
 import { LOCALES, type Locale, t } from '@/shared/i18n/index.ts';
 
 type Props = { locale: Locale };
@@ -38,9 +38,11 @@ const stats = [
     ))}
   </dl>
   <div class="flex flex-col gap-2">
-    <a href={localizePath('/me/', locale, LOCALES)} class="flex h-11 items-center justify-center rounded-control bg-button px-4 font-medium text-white active:scale-96">
-      {t(locale, 'recruiter.openProfile')}
-    </a>
+    {isEnabled('me') && (
+      <a href={localizePath('/me/', locale, LOCALES)} class="flex h-11 items-center justify-center rounded-control bg-button px-4 font-medium text-white active:scale-96">
+        {t(locale, 'recruiter.openProfile')}
+      </a>
+    )}
     {recruiter.cvUrl && (
       <a href={recruiter.cvUrl} class="flex h-11 items-center justify-center gap-2 rounded-control bg-chip px-4 text-sm transition-colors duration-150 hover:bg-card-hover">
         {t(locale, 'recruiter.cv')}
