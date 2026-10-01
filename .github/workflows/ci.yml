@@ -144,7 +144,9 @@ jobs:
   deploy:
     name: deploy
     needs: checks
-    if: github.event_name == 'push'
+    # always(): on a push to main the gates behind `checks` are skipped, and a plain `success()`
+    # would skip the deploy too. The explicit result check keeps failed or cancelled gates blocking.
+    if: ${{ always() && github.event_name == 'push' && needs.checks.result == 'success' }}
     runs-on: ubuntu-latest
     environment:
       name: ${{ github.ref_name == 'main' && 'production' || 'staging' }}
