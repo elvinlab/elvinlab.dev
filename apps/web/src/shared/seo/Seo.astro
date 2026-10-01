@@ -13,6 +13,7 @@ import { hasPublishedNotes } from '@/shared/lib/notes-helpers.ts';
 import { isIndexable } from '@/shared/seo/isIndexable.ts';
 import { blogPostingJsonLd, jsonLdScript, personJsonLd, websiteJsonLd } from '@/shared/seo/jsonld.ts';
 import { seoLinks } from '@/shared/seo/links.ts';
+import { articleMetaTags, DEFAULT_OG_IMAGE, ogLocale } from '@/shared/seo/og.ts';
 
 type Props = {
   locale: Locale;
@@ -24,11 +25,13 @@ type Props = {
   /** False for pages that exist in one locale only. */
   translated?: boolean;
   noindex?: boolean;
-  /** When set, emits BlogPosting structured data for a note. */
-  article?: { pubDate: Date; updatedDate?: Date | undefined };
+  /** When set, emits BlogPosting structured data and `article:*` tags for a note. */
+  article?: { pubDate: Date; updatedDate?: Date | undefined; tags?: readonly string[] | undefined };
+  /** Site path of this page's share image; the default card is used when omitted. */
+  ogImage?: string;
 };
 
-const { locale, path, title, description, translated = true, noindex = false, article } = Astro.props;
+const { locale, path, title, description, translated = true, noindex = false, article, ogImage: ogImagePath } = Astro.props;
 const siteIndexable = isIndexable({ SITE_INDEXABLE: import.meta.env.SITE_INDEXABLE });
 const fullTitle = title ? `${title} — ${site.title}` : site.title;
 const summary = description ?? site.description[locale] ?? site.description[LOCALES.defaultLocale] ?? site.title;
@@ -42,7 +45,8 @@ const links = seoLinks({
   locales: LOCALES,
   translated,
 });
-const ogImage = new URL('/og-image.png', site.url).toString();
+const ogImage = new URL(ogImagePath ?? DEFAULT_OG_IMAGE, site.url).toString();
+const ogImageAlt = ogImagePath ? fullTitle : `${site.identity.name} — ${site.identity.role[locale] ?? site.title}`;
 // First theme of each scheme colors the browser UI to match the page.
 const themeColors = ['dark', 'light'].flatMap((scheme) => {
   const theme = Object.values(tokens.themes).find((candidate) => candidate.scheme === scheme);
@@ -58,7 +62,7 @@ const themeColors = ['dark', 'light'].flatMap((scheme) => {
 <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
 {showRss && <link rel="alternate" type="application/rss+xml" title={`${site.title} — Lab Notes`} href="/rss.xml" />}
 {themeColors.map(({ scheme, color }) => <meta name="theme-color" media={`(prefers-color-scheme: ${scheme})`} content={color} />)}
-<meta property="og:type" content="website" />
+<meta property="og:type" content={article ? 'article' : 'website'} />
 <meta property="og:site_name" content={site.title} />
 <meta property="og:title" content={fullTitle} />
 <meta property="og:description" content={summary} />
@@ -66,15 +70,19 @@ const themeColors = ['dark', 'light'].flatMap((scheme) => {
 <meta property="og:image" content={ogImage} />
 <meta property="og:image:width" content="1200" />
 <meta property="og:image:height" content="630" />
+<meta property="og:image:type" content="image/png" />
+<meta property="og:image:alt" content={ogImageAlt} />
 <meta name="twitter:card" content="summary_large_image" />
 <meta name="twitter:image" content={ogImage} />
-<meta property="og:locale" content={locale} />
+<meta name="twitter:image:alt" content={ogImageAlt} />
+<meta property="og:locale" content={ogLocale(locale)} />
+{article && articleMetaTags(article).map((tag) => <meta property={tag.property} content={tag.content} />)}
 <script type="application/ld+json" is:inline set:html={jsonLdScript(websiteJsonLd(site))} />
 <script type="application/ld+json" is:inline set:html={jsonLdScript(personJsonLd(site, locale))} />
 {article && (
   <script
     type="application/ld+json"
     is:inline
-    set:html={jsonLdScript(blogPostingJsonLd({ site, locale, url: links.canonical, title: title ?? site.title, description: summary, pubDate: article.pubDate, updatedDate: article.updatedDate }))}
+    set:html={jsonLdScript(blogPostingJsonLd({ site, locale, url: links.canonical, title: title ?? site.title, description: summary, pubDate: article.pubDate, updatedDate: article.updatedDate, image: ogImage }))}
   />
 )}

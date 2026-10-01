@@ -21,7 +21,9 @@ Every page shares one `/og-image.png`, so a shared note link shows the generic "
 ## Tasks
 - [x] T1 — Pure helpers + JSON-LD: `ogLocale`, `noteCardPath`, article meta, `BlogPosting` `image` and `author.url`; unit tests first.
 - [x] T2 — Card renderer + integration: `buildCardTree`, `renderCardPng`, `ogImages()` integration, devDependencies, tests (PNG signature, 1200x630, long titles), wired in `astro.config.ts`.
-- [ ] T3 — Wire `Seo.astro`/`BaseLayout`/`NotePage`, e2e (tags and real PNG responses), docs, changelog, visual check of both note cards, full suites.
+- [x] T3 — Wire `Seo.astro`/`BaseLayout`/`NotePage`, e2e (tags and real PNG responses), docs, changelog, visual check of both note cards, full suites.
+
+- [ ] T4 — `/me` profile card (requested by the user: it is the portfolio): per-locale card with photo, name, role, experience, location and availability from config, plus a real `<title>` and description for the page instead of `/me`.
 
 ## Acceptance criteria
 - Note pages emit `og:type=article`, `article:published_time` (and modified, tags), `og:image` and `twitter:image` pointing at that note's card, with alt text; other pages keep the default image. `og:locale` is `es_ES`/`en_US`.
@@ -32,6 +34,6 @@ Every page shares one `/og-image.png`, so a shared note link shows the generic "
 ## Progress and evidence
 Exploration done: `Seo.astro`, `jsonld.ts`, `note-dates.ts`, `noindex-headers.ts`, package versions (satori 0.33.5, @fontsource/jetbrains-mono 5.3.0, sharp 0.35.4 direct).
 
-T1 done: RED observed (missing `og.ts`, JSON-LD without `image`/`author.url`), then GREEN 21 SEO tests; typecheck 0 errors, Biome clean. T2 done: RED observed (modules missing), then GREEN 31 integration tests (title sizing, 1200x630 PNG, longest title, differing cards, frontmatter parsing incl. quoted/escaped titles, drafts ignored, hook writes PNGs); typecheck 0 errors. Real build logs `Generated 2 share card(s)` and both PNGs (~90 KB) were inspected visually: on-brand, accents render, titles wrap in 3 lines. Dependencies added without age-policy exceptions: satori 0.33.5 (+ pure JS/WASM transitive deps, no install scripts) and @fontsource/jetbrains-mono 5.3.0. Next step: T3 wire `Seo.astro`, e2e, docs, changelog.
+T1 done: RED observed (missing `og.ts`, JSON-LD without `image`/`author.url`), then GREEN 21 SEO tests; typecheck 0 errors, Biome clean. T2 done: RED observed (modules missing), then GREEN 31 integration tests (title sizing, 1200x630 PNG, longest title, differing cards, frontmatter parsing incl. quoted/escaped titles, drafts ignored, hook writes PNGs); typecheck 0 errors. Real build logs `Generated 2 share card(s)` and both PNGs (~90 KB) were inspected visually: on-brand, accents render, titles wrap in 3 lines. Dependencies added without age-policy exceptions: satori 0.33.5 (+ pure JS/WASM transitive deps, no install scripts) and @fontsource/jetbrains-mono 5.3.0. T3 done: RED observed (6 e2e failing), then GREEN 24 e2e (3 viewports x ES/EN notes, 2 home pages): `og:type` article, published time and tag, own card, alt text, `twitter:*`, `es_ES`/`en_US`, a real 1200x630 PNG per note served, `BlogPosting` with `image` and `author.url`. Two self-inflicted slips caught by the tests (alt text expectation, a replace that did not match). Typecheck 0 errors. Next step: T4 (new, requested mid-task): a profile card for `/me` and a proper title/description for that page.
 
 Engram mirror: `odd/link-previews/tasks`.
