@@ -11,6 +11,7 @@ import expressiveCode from 'astro-expressive-code';
 import { CONTACT_POLICY } from './src/features/contact/config.ts';
 import { noindexHeaders } from './src/integrations/noindex-headers.ts';
 import { readNoteDatesFromDisk } from './src/integrations/note-dates.ts';
+import { ogImages } from './src/integrations/og-images.ts';
 import { hasPublishedNotesOnDisk } from './src/integrations/published-notes.ts';
 import { isHiddenFromSitemap } from './src/integrations/sitemap-filter.ts';
 import { site } from './src/shared/config/index.ts';
@@ -62,6 +63,7 @@ export default defineConfig({
       }),
     }),
     noindexHeaders(),
+    ogImages(contentDir),
   ],
   adapter: cloudflare({
     // Pages are prerendered, so images are optimized at build time with Sharp and served as
