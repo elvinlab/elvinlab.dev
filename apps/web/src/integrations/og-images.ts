@@ -3,14 +3,26 @@ import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import type { AstroIntegration } from 'astro';
+import sharp from 'sharp';
 
-import { formatDate, noteNumber } from '@/features/notes/lib/notes.ts';
 import { site } from '@/shared/config/index.ts';
 import { LOCALES, type Locale, t } from '@/shared/i18n/index.ts';
 
 import { type CardContent, renderCardPng } from './og-card.ts';
+import {
+  type ProfileSite,
+  profileCardContentFor,
+  renderProfileCardPng,
+} from './og-profile-card.ts';
 
 const FRONTMATTER = /^---\r?\n([\s\S]*?)\r?\n---/;
+
+// Integrations are evaluated with `astro.config.ts`, which cannot load a feature barrel (it pulls
+// `.astro` components) and may not deep-import a feature. These mirror `noteNumber` and
+// `formatDate` of the notes feature; the label tests pin the exact output.
+const padNumber = (value: number): string => String(value).padStart(3, '0');
+const longDate = (date: Date, locale: Locale): string =>
+  new Intl.DateTimeFormat(locale, { dateStyle: 'long', timeZone: 'UTC' }).format(date);
 
 export type NoteCardSource = {
   slug: string;
@@ -79,28 +91,65 @@ export function cardContentFor(
     : LOCALES.defaultLocale;
   return {
     domain: owner.domain,
-    eyebrow: t(locale, 'notes.entry', { number: noteNumber(source.number) }),
+    eyebrow: t(locale, 'notes.entry', { number: padNumber(source.number) }),
     title: source.title,
-    footer: `${owner.owner} · ${formatDate(source.pubDate, locale)}`,
+    footer: `${owner.owner} · ${longDate(source.pubDate, locale)}`,
   };
 }
 
-/** Writes one share card per published note to `og/notes/<slug>.png` of the finished build. */
-export function ogImages(contentDir: string): AstroIntegration {
+export type OgSite = ProfileSite & {
+  identity: { avatar?: string | undefined };
+  features: { me: boolean };
+};
+export type OgOptions = { publicDir?: string; site?: OgSite };
+
+/** The profile photo as a square `data:` URI, or undefined when it is not configured or missing. */
+async function loadAvatar(publicDir: string | undefined, avatar: string | undefined) {
+  if (!publicDir || !avatar) return undefined;
+  const file = join(publicDir, avatar.replace(/^\//, ''));
+  if (!existsSync(file)) return undefined;
+  const png = await sharp(file).resize(300, 300, { fit: 'cover' }).png().toBuffer();
+  return `data:image/png;base64,${png.toString('base64')}`;
+}
+
+/**
+ * Writes the share cards of the finished build under `og/`: one per published note
+ * (`notes/<slug>.png`) and, when the `/me` feature is on, one per locale (`me-<locale>.png`).
+ */
+export function ogImages(contentDir: string, options: OgOptions = {}): AstroIntegration {
+  const config: OgSite = options.site ?? site;
   return {
     name: 'og-images',
     hooks: {
       'astro:build:done': async ({ dir, logger }) => {
+        const root = join(fileURLToPath(dir), 'og');
+        let written = 0;
+
         const sources = readNoteCardSourcesFromDisk(contentDir);
-        if (sources.length === 0) return;
-        const outDir = join(fileURLToPath(dir), 'og', 'notes');
-        mkdirSync(outDir, { recursive: true });
-        const owner = { domain: new URL(site.url).host, owner: site.identity.name };
-        for (const source of sources) {
-          const png = await renderCardPng(cardContentFor(source, owner));
-          writeFileSync(join(outDir, `${source.slug}.png`), png);
+        if (sources.length > 0) {
+          mkdirSync(join(root, 'notes'), { recursive: true });
+          const owner = { domain: new URL(config.url).host, owner: config.identity.name };
+          for (const source of sources) {
+            const png = await renderCardPng(cardContentFor(source, owner));
+            writeFileSync(join(root, 'notes', `${source.slug}.png`), png);
+            written += 1;
+          }
         }
-        logger.info(`Generated ${sources.length} share card(s)`);
+
+        if (config.features.me) {
+          mkdirSync(root, { recursive: true });
+          const avatar = await loadAvatar(options.publicDir, config.identity.avatar);
+          for (const locale of LOCALES.locales) {
+            const png = await renderProfileCardPng({
+              ...profileCardContentFor(config, locale),
+              ...(avatar ? { avatar } : {}),
+            });
+            writeFileSync(join(root, `me-${locale}.png`), png);
+            written += 1;
+          }
+        }
+
+        if (written > 0) logger.info(`Generated ${written} share card(s)`);
       },
     },
   };

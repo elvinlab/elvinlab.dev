@@ -10,22 +10,28 @@ export const CARD_SIZE = { width: 1200, height: 630 } as const;
 
 export type CardContent = { domain: string; eyebrow: string; title: string; footer: string };
 
-type CardChild = string | CardNode | CardChild[];
-type CardNode = {
+export type CardChild = string | CardNode | CardChild[];
+export type CardNode = {
   type: string;
-  props: { style: Record<string, string | number>; children?: CardChild };
+  props: {
+    style: Record<string, string | number>;
+    children?: CardChild;
+    src?: string;
+    width?: number;
+    height?: number;
+  };
 };
 type CardFont = { name: string; data: Buffer; weight: 400 | 700; style: 'normal' };
 
 const FONT_FAMILY = 'JetBrains Mono';
 
-const palette = (() => {
+export const palette = (() => {
   const dark = Object.values(tokens.themes).find((theme) => theme.scheme === 'dark');
   if (!dark) throw new Error('og-card: the tokens define no dark theme');
   return dark.colors;
 })();
 
-const rgba = (hex: string, alpha: number): string => {
+export const rgba = (hex: string, alpha: number): string => {
   const value = Number.parseInt(hex.slice(1), 16);
   return `rgba(${(value >> 16) & 255}, ${(value >> 8) & 255}, ${value & 255}, ${alpha})`;
 };
@@ -37,31 +43,32 @@ export function cardTitleSize(title: string): number {
   return 46;
 }
 
-const text = (style: Record<string, string | number>, children: string): CardNode => ({
+export const text = (style: Record<string, string | number>, children: string): CardNode => ({
   type: 'div',
   props: { style: { display: 'flex', ...style }, children },
 });
 
-/** The satori element tree of a share card, styled like `public/og-image.png`. */
+/** Root style shared by every share card: dark page with the cyan and pink glows. */
+export const cardRootStyle: Record<string, string | number> = {
+  display: 'flex',
+  width: CARD_SIZE.width,
+  height: CARD_SIZE.height,
+  padding: '72px 90px',
+  fontFamily: FONT_FAMILY,
+  color: palette['text'] ?? '#ffffff',
+  backgroundColor: palette['page'] ?? '#000000',
+  backgroundImage: [
+    `radial-gradient(circle at 18% 12%, ${rgba(palette['cyan'] ?? '#22d3ee', 0.16)} 0%, rgba(0, 0, 0, 0) 55%)`,
+    `radial-gradient(circle at 88% 92%, ${rgba(palette['pink'] ?? '#ec4899', 0.16)} 0%, rgba(0, 0, 0, 0) 50%)`,
+  ].join(', '),
+};
+
+/** The satori element tree of a note share card, styled like `public/og-image.png`. */
 export function buildCardTree(content: CardContent): CardNode {
   return {
     type: 'div',
     props: {
-      style: {
-        display: 'flex',
-        flexDirection: 'column',
-        justifyContent: 'space-between',
-        width: CARD_SIZE.width,
-        height: CARD_SIZE.height,
-        padding: '72px 90px',
-        fontFamily: FONT_FAMILY,
-        color: palette['text'] ?? '#ffffff',
-        backgroundColor: palette['page'] ?? '#000000',
-        backgroundImage: [
-          `radial-gradient(circle at 18% 12%, ${rgba(palette['cyan'] ?? '#22d3ee', 0.16)} 0%, rgba(0, 0, 0, 0) 55%)`,
-          `radial-gradient(circle at 88% 92%, ${rgba(palette['pink'] ?? '#ec4899', 0.16)} 0%, rgba(0, 0, 0, 0) 50%)`,
-        ].join(', '),
-      },
+      style: { ...cardRootStyle, flexDirection: 'column', justifyContent: 'space-between' },
       children: [
         text({ fontSize: 28, color: palette['cyan'] ?? '#22d3ee' }, content.domain),
         {
@@ -129,10 +136,13 @@ export function loadCardFonts(): CardFont[] {
   return fonts;
 }
 
-export async function renderCardPng(content: CardContent): Promise<Buffer> {
-  const svg = await satori(buildCardTree(content) as unknown as Parameters<typeof satori>[0], {
+export async function renderCardTree(tree: CardNode): Promise<Buffer> {
+  const svg = await satori(tree as unknown as Parameters<typeof satori>[0], {
     ...CARD_SIZE,
     fonts: loadCardFonts(),
   });
   return sharp(Buffer.from(svg)).png().toBuffer();
 }
+
+export const renderCardPng = (content: CardContent): Promise<Buffer> =>
+  renderCardTree(buildCardTree(content));

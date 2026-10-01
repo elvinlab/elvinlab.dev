@@ -1,6 +1,12 @@
 import { describe, expect, it } from 'vitest';
 
-import { articleMetaTags, DEFAULT_OG_IMAGE, noteCardPath, ogLocale } from './og.ts';
+import {
+  articleMetaTags,
+  DEFAULT_OG_IMAGE,
+  noteCardPath,
+  ogLocale,
+  profileCardPath,
+} from './og.ts';
 
 describe('ogLocale', () => {
   it('maps site locales to the language_TERRITORY form Open Graph expects', () => {
@@ -21,6 +27,13 @@ describe('noteCardPath', () => {
 
   it('keeps the default card for everything else', () => {
     expect(DEFAULT_OG_IMAGE).toBe('/og-image.png');
+  });
+});
+
+describe('profileCardPath', () => {
+  it('gives each locale its own /me card', () => {
+    expect(profileCardPath('es')).toBe('/og/me-es.png');
+    expect(profileCardPath('en')).toBe('/og/me-en.png');
   });
 });
 

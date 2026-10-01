@@ -12,6 +12,11 @@ export function noteCardPath(slug: string): string {
   return `/og/notes/${slug}.png`;
 }
 
+/** Site path of the `/me` share card for a locale, generated at build time. */
+export function profileCardPath(locale: string): string {
+  return `/og/me-${locale}.png`;
+}
+
 export type ArticleInput = {
   pubDate: Date;
   updatedDate?: Date | undefined;

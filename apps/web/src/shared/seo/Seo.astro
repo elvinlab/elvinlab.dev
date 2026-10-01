@@ -29,9 +29,11 @@ type Props = {
   article?: { pubDate: Date; updatedDate?: Date | undefined; tags?: readonly string[] | undefined };
   /** Site path of this page's share image; the default card is used when omitted. */
   ogImage?: string;
+  /** Alt text for the share image; defaults to the page title (or the owner's name on the default card). */
+  ogImageAlt?: string;
 };
 
-const { locale, path, title, description, translated = true, noindex = false, article, ogImage: ogImagePath } = Astro.props;
+const { locale, path, title, description, translated = true, noindex = false, article, ogImage: ogImagePath, ogImageAlt: ogImageAltProp } = Astro.props;
 const siteIndexable = isIndexable({ SITE_INDEXABLE: import.meta.env.SITE_INDEXABLE });
 const fullTitle = title ? `${title} — ${site.title}` : site.title;
 const summary = description ?? site.description[locale] ?? site.description[LOCALES.defaultLocale] ?? site.title;
@@ -46,7 +48,7 @@ const links = seoLinks({
   translated,
 });
 const ogImage = new URL(ogImagePath ?? DEFAULT_OG_IMAGE, site.url).toString();
-const ogImageAlt = ogImagePath ? fullTitle : `${site.identity.name} — ${site.identity.role[locale] ?? site.title}`;
+const ogImageAlt = ogImageAltProp ?? (ogImagePath ? fullTitle : `${site.identity.name} — ${site.identity.role[locale] ?? site.title}`);
 // First theme of each scheme colors the browser UI to match the page.
 const themeColors = ['dark', 'light'].flatMap((scheme) => {
   const theme = Object.values(tokens.themes).find((candidate) => candidate.scheme === scheme);

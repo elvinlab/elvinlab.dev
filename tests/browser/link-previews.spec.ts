@@ -80,3 +80,44 @@ test.describe('other pages keep the default card', () => {
     });
   }
 });
+
+for (const { path, locale, card, bio } of [
+  { path: '/me/', locale: 'es_ES', card: 'me-es', bio: 'Ingeniero full-stack' },
+  { path: '/en/me/', locale: 'en_US', card: 'me-en', bio: 'Full-stack engineer' },
+]) {
+  test.describe(`${path} link preview`, () => {
+    test('has its own card, a real title and a description', async ({ page }) => {
+      await page.goto(path);
+      await expect(meta(page, 'property', 'og:image')).toHaveAttribute(
+        'content',
+        `https://elvinlab.dev/og/${card}.png`,
+      );
+      await expect(meta(page, 'name', 'twitter:image')).toHaveAttribute(
+        'content',
+        `https://elvinlab.dev/og/${card}.png`,
+      );
+      await expect(meta(page, 'property', 'og:title')).toHaveAttribute(
+        'content',
+        'Elvin González — elvinlab.dev',
+      );
+      await expect(meta(page, 'property', 'og:description')).toHaveAttribute(
+        'content',
+        new RegExp(bio),
+      );
+      await expect(meta(page, 'property', 'og:image:alt')).toHaveAttribute(
+        'content',
+        /Elvin González/,
+      );
+      await expect(meta(page, 'property', 'og:locale')).toHaveAttribute('content', locale);
+      await expect(meta(page, 'property', 'og:type')).toHaveAttribute('content', 'website');
+    });
+
+    test('serves the real 1200x630 PNG card', async ({ request }) => {
+      const response = await request.get(`/og/${card}.png`);
+      expect(response.status()).toBe(200);
+      expect(response.headers()['content-type']).toContain('image/png');
+      const png = await response.body();
+      expect([png.readUInt32BE(16), png.readUInt32BE(20)]).toEqual([1200, 630]);
+    });
+  });
+}

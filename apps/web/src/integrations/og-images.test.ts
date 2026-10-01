@@ -1,4 +1,4 @@
-import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { pathToFileURL } from 'node:url';
@@ -104,5 +104,58 @@ describe('ogImages integration', () => {
     const png = readFileSync(join(out, 'og', 'notes', 'one-note.png'));
     const meta = await sharp(png).metadata();
     expect([meta.format, meta.width, meta.height]).toEqual(['png', 1200, 630]);
+  });
+});
+
+describe('ogImages integration: /me cards', () => {
+  const site = {
+    url: 'https://example.dev',
+    identity: {
+      name: 'Jane Doe',
+      role: { es: 'Ingeniera', en: 'Engineer' },
+      location: 'Lisboa',
+      startedYear: 2020,
+      avatar: '/avatar.png',
+    },
+    recruiter: { available: true, openToWork: true, status: { es: 'Disponible', en: 'Available' } },
+    features: { me: true },
+  };
+
+  async function run(options: { photo: boolean; me?: boolean }): Promise<string> {
+    const publicDir = mkdtempSync(join(tmpdir(), 'og-public-'));
+    const out = mkdtempSync(join(tmpdir(), 'og-out-'));
+    temporary.push(publicDir, out);
+    if (options.photo) {
+      const photo = await sharp({
+        create: { width: 400, height: 500, channels: 3, background: '#8b5cf6' },
+      })
+        .png()
+        .toBuffer();
+      writeFileSync(join(publicDir, 'avatar.png'), photo);
+    }
+    const config = { ...site, features: { me: options.me ?? true } };
+    const hook = ogImages(contentDir({}), { publicDir, site: config }).hooks[
+      'astro:build:done'
+    ] as (arg: unknown) => Promise<void>;
+    await hook({ dir: pathToFileURL(`${out}/`), logger: { info: () => undefined } });
+    return out;
+  }
+
+  it('writes a 1200x630 card per locale, with the photo', async () => {
+    const out = await run({ photo: true });
+    for (const locale of ['es', 'en']) {
+      const meta = await sharp(readFileSync(join(out, 'og', `me-${locale}.png`))).metadata();
+      expect([meta.format, meta.width, meta.height]).toEqual(['png', 1200, 630]);
+    }
+  });
+
+  it('still writes the cards when the photo file is missing', async () => {
+    const out = await run({ photo: false });
+    expect(existsSync(join(out, 'og', 'me-es.png'))).toBe(true);
+  });
+
+  it('writes no /me card when the /me feature is off', async () => {
+    const out = await run({ photo: true, me: false });
+    expect(existsSync(join(out, 'og', 'me-es.png'))).toBe(false);
   });
 });

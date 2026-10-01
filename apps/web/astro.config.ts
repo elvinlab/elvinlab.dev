@@ -63,7 +63,7 @@ export default defineConfig({
       }),
     }),
     noindexHeaders(),
-    ogImages(contentDir),
+    ogImages(contentDir, { publicDir: fileURLToPath(new URL('./public', import.meta.url)) }),
   ],
   adapter: cloudflare({
     // Pages are prerendered, so images are optimized at build time with Sharp and served as

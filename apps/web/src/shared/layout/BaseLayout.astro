@@ -29,6 +29,7 @@ type Props = {
   article?: { pubDate: Date; updatedDate?: Date | undefined; tags?: readonly string[] | undefined };
   /** Site path of this page's share image; the default card is used when omitted. */
   ogImage?: string;
+  ogImageAlt?: string;
   /** Opt into the print stylesheet: hide chrome, drop the banner, force the light palette. */
   printable?: boolean;
 };

@@ -100,5 +100,11 @@
     "category": "added",
     "title": "First two Lab Notes",
     "description": "How this site was built, and the multi-agent development setup behind it, both written in Spanish."
+  },
+  "link-previews": {
+    "date": "2026-10-01",
+    "category": "added",
+    "title": "Shared links now show a proper card",
+    "description": "Each note gets its own preview image with its title, and /me shows my photo, role and availability. The previews also carry correct language, alt text and article details."
   }
 }
