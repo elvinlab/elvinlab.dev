@@ -77,8 +77,16 @@ Verification (full local run, all green, re-run by the parent after every fix ab
 - `git diff docs/adr/README.md` — exactly one line added, nothing else touched.
 - Playwright e2e (`test:e2e`) not run locally in this session (requires `pnpm exec playwright install chromium` + isolated build fixture); new smoke cases follow the exact pattern of passing existing cases, but this is a disclosed gap, not a claimed pass.
 
-RDD: disabled/unmanaged for this clone — parent reviewed every file by hand instead (see list above). Not committed yet — pending explicit go-ahead.
+RDD: disabled/unmanaged for this clone — parent reviewed every file by hand instead (see list above). Committed as `d6d7bb3`, shipped in the first production release (`5124a69` lineage).
+
+## Follow-up 2026-10-01: proper backfill + switched to English
+
+User feedback after seeing it live: only 4 sparse entries, not actually reflecting the day's work, and wanted real dates/categories used properly (added/changed/fixed/removed). Backfilled 7 more entries covering everything shipped that day: CI simplification, staging removal, `/me` real data, SEO hardening, Web Analytics, the background picker, and its Firefox bugfix — now 11 entries total, exercising all 4 categories genuinely used so far (no `security`/`deprecated` entries yet, nothing to report there). Mid-task, user also asked to switch the single-language content from Spanish to English (still single-language per entry, ADR 0010's actual decision — just a different language choice, no ADR change needed).
+
+Deliberately did NOT revisit ADR 0010's no-semver/no-releases decision — the user said "releases" colloquially but the dated-entries approach stands; flagged this explicitly rather than silently reinterpreting the request as a versioning-scheme change.
+
+Verified: typecheck/lint/313 tests/white-label all green after the content change (pure content edit, no code touched). Committed as `a5b66f8` on develop+main (local, **not pushed yet**, holding with the other two pending commits per user's choice).
 
 ## Next step
 
-Delegate CH2-CH7 as one bounded Tier 2 writer batch (pattern-following, not architecturally novel); CH1 done inline first since it's a 2-value mechanical prerequisite the writer needs already in place.
+Done for now. Future entries should be added as part of each shipped change going forward (the pattern established today), not backfilled in bulk again.

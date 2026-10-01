@@ -60,8 +60,18 @@ Full re-verification after the parent's fixes (all green):
 
 **Deferred, not forgotten** (recorded per the "Correction" section above): the live-Worker half of this check (does `_headers` actually take effect once deployed, not just locally) must be re-verified at the next real production push — there is no staging to check it against first anymore.
 
-Not committed yet — pending explicit go-ahead. Issue #44 not yet closed/commented — will do alongside the commit.
+Committed as `dce026c` (shipped to production as part of the first release, commit `5124a69`'s lineage). Issue #44 closed with a summary comment, including the note about the deferred live-Worker header re-check.
+
+**Live re-check (deferred item above, now resolved)**: confirmed in production after the first deploy — `curl -sI https://elvinlab.dev/` showed `x-content-type-options`, `referrer-policy` and `permissions-policy` all present on the real Cloudflare Worker, not just the local preview.
+
+## Follow-up 2026-10-01: render-blocking CSS (user's live Chrome Lighthouse run)
+
+After production launch, the user ran Lighthouse in their own Chrome and flagged two things: a real finding (BaseLayout.css blocking first render, ~140ms) and two items that turned out to be about Cloudflare's own `beacon.min.js` (legacy-JS polyfills, short cache TTL) — not fixable from our code, since that script is served by `static.cloudflareinsights.com`, not us.
+
+- **Fix**: `apps/web/astro.config.ts` — `build: { inlineStylesheets: 'always' }`. Site CSS per page is small enough that inlining it (one `<style>` tag) costs less than a separate render-blocking stylesheet request.
+- **Verified locally** (`pnpm test:lighthouse`, after killing a stray orphaned `astro preview` process that was silently port-conflicting with the test's own fixture server on 4323 — that conflict, not a real bug, caused an earlier `CHROME_INTERSTITIAL_ERROR` crash of the same command): `render-blocking-resources` audit went from flagged to a perfect `1.0`/`1.0`; overall performance `0.96` (budget requires `0.95`). Remaining gap to literal 100 is local-dev-server artifacts (no gzip/brotli compression locally, unlike the real Cloudflare edge) — not reproducible in production and not something our code controls.
+- Committed as `f331508` on develop+main (local, **not pushed yet** — user chose to hold off and keep accumulating before the next release).
 
 ## Next step
 
-SEO1: finalize and send the opencode brief.
+Done. Next real task is whatever the user picks from the open backlog (see `odd/tasks/elvinlab-site.md` "Correction 2026-10-01" section for the current actual list).

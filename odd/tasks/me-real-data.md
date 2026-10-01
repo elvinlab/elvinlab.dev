@@ -62,8 +62,18 @@ Done inline (Tier 3 justification: real personal data entry from a just-read sou
 
 **Known gap, not a blocker per the user's explicit instruction**: both certificate entries carry `"issuer": "Plataforma sin confirmar"` (parent-visible placeholder, intentionally not a silent guess) since the source PDF listed no issuing platform for either course; dates on those two certificates (`claude-code-guide: 2026`, `full-stack-bootcamp: 2021`) are parent estimates from career-timeline context, not sourced from the PDF. Both are one-line JSON edits whenever the user has the real values.
 
-Not committed yet — pending explicit go-ahead.
+Committed as `95e651b`, shipped live in the first production release.
+
+## Follow-up 2026-10-01 (later the same day): real avatar + availability status
+
+User request: no longer available (working at Buo), and wanted a real photo instead of the initials placeholder.
+
+- **Schema**: `identity.avatar?: string` added to `shared/config/schema.ts` (site-relative path, e.g. `/avatar.png`; optional so white-label builds without a photo still work).
+- **Asset**: user's PNG (`~/Downloads/current_avatar.png`) copied into `apps/web/public/avatar.png` — never referenced from the Downloads path, copied into the repo's own asset directory.
+- **`MeHero.astro`**: renders `<img src={site.identity.avatar} ...>` when set, falls back to the existing initials box otherwise — verified via the white-label build (its fixture has no `avatar` set, confirming the fallback path still renders).
+- **`site.config.ts`**: `identity.avatar: '/avatar.png'`; `recruiter.available` stays `true` (that flag is the user's existing hide/show toggle for the whole status line, already wired into `HiringCard.astro` and `MeSidebar.astro` — no code change needed there) but `status`/`lookingFor` text changed to reflect being unavailable ("No disponible · trabajando en Buo" / "Currently at Buo") instead of removing the flag's meaning.
+- Verified: typecheck/lint/313 tests/depcruise/build/white-label/js-budget all green; confirmed in built HTML that `/avatar.png` renders on `/me/` and the new status text appears on the home page's hiring card.
 
 ## Next step
 
-ME1 and ME2 (data), then ME3 (flip the flag), then ME4 (full verification since this activates previously-dormant code paths).
+Done. Not committed yet — bundling with the next commit per the user's "hace push ya."

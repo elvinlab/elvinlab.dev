@@ -26,6 +26,10 @@ const buildTime = new Date();
 
 export default defineConfig({
   site: site.url,
+  // Inline every page's CSS instead of a separate stylesheet request: the site's CSS is small
+  // enough (well under the JS budget) that one extra render-blocking request costs more than the
+  // duplication of inlining it per page (Lighthouse's "render-blocking requests" audit).
+  build: { inlineStylesheets: 'always' },
   security: { checkOrigin: true, actionBodySizeLimit: CONTACT_POLICY.requestMaxBytes },
   i18n: {
     defaultLocale: site.locales.default,

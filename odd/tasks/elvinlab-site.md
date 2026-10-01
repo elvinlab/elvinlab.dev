@@ -227,9 +227,23 @@ This "Next step" section (and the "NOT DONE... contact UI/React island slice" li
 - Cloudflare secrets ARE configured: confirmed working in production 2026-10-01 (see the `bugfix/Contact form works in production` Engram memory) — the form sent a real email, root cause of the earlier failure was `redirect: 'error'` not supported by Workers' fetch (fixed `ec0536d`/`42abc56`).
 - So items 1 and 2 of the old "Next step" list below are DONE. Item 3 (`/me` real data) remains, plus the first production release itself, whose mechanism changed since that list was written: see ADR 0012 — it's now a direct push to `main`, not a PR.
 
-Current actual next steps (2026-10-01):
-1. Replace placeholder `/me` data (`experience.json`, `credentials.json`, optional `recruiter.cvUrl` + photo) with the user's real data before sharing `/me` publicly. Human-owned (the user's own information).
-2. First production release: `git checkout main && git merge develop && git push origin main` (ADR 0012) — user-owned, whenever ready.
+~~Current actual next steps (2026-10-01)~~ — both done later the same day: `/me` real data shipped (`95e651b`, see `odd/tasks/me-real-data.md`), first production release shipped and verified live (`5124a69`, see Engram `decision/First production release shipped`). This list is fully superseded; see the next correction below for the actual current state.
+
+## Correction 2026-10-01 (later the same day): full status after the first production release
+
+Everything above this point describes the pre-launch state. Since then, in one extended session: ADRs 0006-0012 written, visitor-facing changelog shipped (and later backfilled with 11 real entries in English, replacing the sparse seed), CI simplified twice (ADR 0011 then 0012 — direct push to `main`, no PR, no staging), `/me` shipped with real data, SEO hardening (og:image, security headers, real sitemap `lastmod`), Cloudflare Web Analytics token configured, a visitor background picker shipped (`#41`, freeze deliberately broken), a Firefox-specific WebGL context-loss bug in that picker found and fixed, and a Lighthouse render-blocking-CSS fix. **First production release done and verified live** at commit `5124a69` (CI run `36896615675`, all green), with one follow-up production push for the Firefox fix (`010a35f`, CI run `36899188925`).
+
+GitHub issues closed this session: #44 (T26 SEO), #47 (T29 `/me` data), #21 (T24 `/me` page), #25 (T21 Analytics/privacy), #41 (background picker).
+
+As of this correction, `main` and `develop` are 2 commits ahead of origin — `a5b66f8` (changelog backfill) and `f331508` (CSS-inline Lighthouse fix), held locally per the user's explicit choice to keep accumulating. The WebGL Firefox fix (`010a35f`) is already pushed and live. Check `git log origin/main..main` for the authoritative current gap, this note will go stale the moment another commit lands.
+
+Remaining real backlog (verify against `gh issue list --state open` for the current truth, issues get closed mid-session and this list rots fast):
+- `#25`-adjacent: none, closed.
+- `#49` T31 Search Console (tier:human) — needs the domain already on Cloudflare, which it is; the verification step itself is a human dashboard action.
+- `#50` T32 HSTS (tier:human, post-launch) — explicitly gated on "~1 week of stable HTTPS," can't start yet.
+- `#51` T33 BlogPosting image/author.url (tier:1, post-launch) — gated on the first note existing, which it doesn't yet.
+- Notes `#27`-`#29` (tier:human, post-launch) — the user's own content to write.
+- No open, non-human, non-gated code work remains as of this correction.
 
 ## Next step (historical, 2026-09-29 — superseded by the correction above, kept for the record)
 
