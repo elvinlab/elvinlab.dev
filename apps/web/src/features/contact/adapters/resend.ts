@@ -1,7 +1,7 @@
 import { z } from 'zod';
 
 import { CONTACT_POLICY } from '@/features/contact/config.ts';
-import type { MailSender } from '@/features/contact/ports.ts';
+import type { ContactReport, MailSender } from '@/features/contact/ports.ts';
 
 import { readProviderJson } from './response.ts';
 
@@ -17,6 +17,7 @@ const sentSchema = z.object({ id: z.uuid() });
 export function createResendSender(
   config: ResendConfig,
   request: typeof fetch = fetch,
+  report: ContactReport = () => {},
 ): MailSender {
   return {
     async send(message) {
@@ -36,6 +37,7 @@ export function createResendSender(
             text: `From: ${message.name}\n\n${message.message}`,
           }),
         });
+        if (!response.ok) report(`resend http ${response.status}`);
         sentSchema.parse(await readProviderJson(response, signal));
       } catch {
         throw new Error('Unable to send message.');

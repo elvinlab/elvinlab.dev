@@ -49,8 +49,10 @@ export async function submitConfiguredContact(
     return null;
   }
   const config = parsed.data;
+  const report = (detail: string) => log(`contact rejected: ${detail}`);
   return submitContact(input, ip, {
     now: Date.now,
+    report,
     limiter: {
       async allow(ip) {
         const result = await config.CONTACT_RATE_LIMITER.limit({ key: `contact:${ip}` });
@@ -64,6 +66,7 @@ export async function submitConfiguredContact(
         action: CONTACT_POLICY.turnstileAction,
       },
       request,
+      report,
     ),
     mailSender: createResendSender(
       {
@@ -72,6 +75,7 @@ export async function submitConfiguredContact(
         to: config.CONTACT_TO,
       },
       request,
+      report,
     ),
   });
 }

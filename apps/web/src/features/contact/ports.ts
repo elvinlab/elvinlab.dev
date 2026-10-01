@@ -17,9 +17,13 @@ export interface ContactLimiter {
   allow(ip: string): Promise<boolean>;
 }
 
+/** Diagnostic sink: receives codes and names only, never user data, secrets or tokens. */
+export type ContactReport = (detail: string) => void;
+
 export type ContactPorts = {
   mailSender: MailSender;
   verifier: ContactVerifier;
   limiter: ContactLimiter;
   now: () => number;
+  report?: ContactReport;
 };

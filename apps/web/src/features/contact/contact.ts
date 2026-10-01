@@ -39,19 +39,28 @@ export async function submitContact(
   ip: string | undefined,
   ports: ContactPorts,
 ): Promise<ContactResult> {
+  const reject = (stage: string): ContactResult => {
+    ports.report?.(stage);
+    return REJECTED;
+  };
   const parsed = inputSchema.safeParse(input);
-  if (!parsed.success || !ipSchema.safeParse(ip).success || !ip) return REJECTED;
+  if (!parsed.success || !ipSchema.safeParse(ip).success || !ip) return reject('invalid_input');
 
   try {
     const { name, email, message, startedAt, token } = parsed.data;
     // This client timestamp is only a spam heuristic, never proof of a human submission.
     const elapsed = ports.now() - startedAt;
-    if (!Number.isFinite(elapsed) || elapsed < CONTACT_POLICY.minFillTimeMs) return REJECTED;
-    if (!(await ports.limiter.allow(ip))) return REJECTED;
-    if (!(await ports.verifier.verify(token, ip))) return REJECTED;
-    await ports.mailSender.send({ name, email, message });
+    if (!Number.isFinite(elapsed) || elapsed < CONTACT_POLICY.minFillTimeMs)
+      return reject('fill_time');
+    if (!(await ports.limiter.allow(ip))) return reject('rate_limit');
+    if (!(await ports.verifier.verify(token, ip))) return reject('turnstile');
+    try {
+      await ports.mailSender.send({ name, email, message });
+    } catch {
+      return reject('mail');
+    }
     return { ok: true };
   } catch {
-    return REJECTED;
+    return reject('unexpected');
   }
 }
