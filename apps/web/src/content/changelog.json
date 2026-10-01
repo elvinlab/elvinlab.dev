@@ -76,5 +76,11 @@
     "category": "fixed",
     "title": "Easier reading and a language hint that stays out of the way",
     "description": "The language suggestion no longer covers content, privacy text follows a comfortable reading width, decorative blinking is calmer, and English note pages now open instead of showing a 404."
+  },
+  "privacy-local-storage": {
+    "date": "2026-10-01",
+    "category": "fixed",
+    "title": "Privacy page now lists every preference saved in your browser",
+    "description": "It only mentioned the theme and the language hint; it now also covers the background effect you pick and whether the banner is expanded."
   }
 }

@@ -49,6 +49,17 @@ describe('buildPrivacyContent', () => {
     expect(text).not.toMatch(/sin almacenar|without storing/i);
   });
 
+  it('lists every preference the site keeps in localStorage', () => {
+    const body = (page: PrivacyContent): string =>
+      page.sections.find((section) => section.id === 'local-storage')?.body ?? '';
+    for (const word of [/tema/i, /fondo/i, /banner/i, /aviso de idioma/i]) {
+      expect(body(content.es)).toMatch(word);
+    }
+    for (const word of [/theme/i, /background/i, /banner/i, /language hint/i]) {
+      expect(body(content.en)).toMatch(word);
+    }
+  });
+
   it('renders lists as HTML, not markdown', () => {
     for (const locale of ['es', 'en'] as const) {
       for (const section of content[locale].sections) {

@@ -26,7 +26,7 @@ export type PrivacyInput = {
   comments?: { repo: string };
 };
 
-const LAST_UPDATED = '2026-09-30';
+const LAST_UPDATED = '2026-10-01';
 
 const CLOUDFLARE_FAQ = 'https://developers.cloudflare.com/web-analytics/faq/';
 const CLOUDFLARE_DATA = 'https://developers.cloudflare.com/web-analytics/data-metrics/';
@@ -105,7 +105,7 @@ function buildBaseContent({
         {
           id: 'local-storage',
           title: 'Almacenamiento local',
-          body: '<p>Solo se guardan en <code>localStorage</code> la preferencia de tema y el descarte del aviso de idioma. No se usan para identificarte ni para seguimiento.</p>',
+          body: '<p>Este sitio solo guarda en <code>localStorage</code> cuatro preferencias de interfaz: el tema, el efecto de fondo que elijas, si el banner está expandido y el descarte del aviso de idioma. No se usan para identificarte ni para seguimiento.</p>',
         },
         {
           id: 'rights',
@@ -143,7 +143,7 @@ function buildBaseContent({
         {
           id: 'local-storage',
           title: 'Local storage',
-          body: '<p>Only the theme choice and the language-hint dismissal are stored in <code>localStorage</code>. They are not used to identify you or for tracking.</p>',
+          body: '<p>This site only keeps four interface preferences in <code>localStorage</code>: the theme, the background effect you pick, whether the banner is expanded, and the language hint dismissal. They are not used to identify you or for tracking.</p>',
         },
         {
           id: 'rights',
