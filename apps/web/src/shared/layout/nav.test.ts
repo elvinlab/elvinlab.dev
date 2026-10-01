@@ -9,6 +9,7 @@ const allOn = {
   credentials: true,
   experiments: true,
   changelog: true,
+  readingMode: true,
   me: true,
 };
 

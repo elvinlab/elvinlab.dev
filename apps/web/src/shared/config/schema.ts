@@ -78,6 +78,8 @@ const siteConfigSchema = z
       changelog: z.boolean(),
       /** /me recruiter page: off hides it from the nav, marks it noindex and keeps it out of the sitemap. */
       me: z.boolean(),
+      /** Reading mode on notes: off renders no toggle, loads no script and stores nothing in the browser. */
+      readingMode: z.boolean(),
     }),
     /**
      * Giscus comments (GitHub Discussions). Optional: without it the comments section renders

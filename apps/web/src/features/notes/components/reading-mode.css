@@ -1,0 +1,63 @@
+/* Reading mode (notes, `features.readingMode`): the visitor trades chrome for one calm column.
+   Driven only by `html[data-reading]`, set before first paint by an inline head script, so the
+   served HTML is identical for everyone and crawlers (no stored preference) see the normal page. */
+.reading-exit {
+  display: none;
+  position: fixed;
+  right: 0.75rem;
+  bottom: 0.75rem;
+  z-index: 50;
+  height: 2.25rem;
+  align-items: center;
+  border-radius: var(--radius-pill);
+  background: color-mix(in srgb, var(--color-card) 88%, transparent);
+  padding: 0 0.875rem;
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  color: var(--color-text-secondary);
+  box-shadow: 0 0 0 1px var(--color-divider);
+  backdrop-filter: blur(8px);
+  cursor: pointer;
+}
+html[data-reading] .reading-exit {
+  display: inline-flex;
+}
+html[data-reading] [data-site-notice],
+html[data-reading] [data-banner] .banner-grid,
+html[data-reading] [data-banner] .banner-stars,
+html[data-reading] [data-banner] .banner-glow,
+html[data-reading] [data-banner] canvas,
+html[data-reading] [data-banner-toggle],
+html[data-reading] main aside {
+  display: none;
+}
+html[data-reading] [data-banner] {
+  min-height: 0;
+  background: transparent;
+}
+html[data-reading] [data-banner-inner] {
+  max-width: 760px;
+  padding-inline: 1.25rem;
+  padding-bottom: 1rem;
+}
+html[data-reading] [data-banner] h1 {
+  max-width: none;
+  font-size: clamp(1.75rem, 6vw, 2.5rem);
+}
+html[data-reading] [data-content-container] {
+  max-width: 760px;
+  padding-inline: 1.25rem;
+}
+html[data-reading] [data-main-grid] {
+  grid-template-columns: minmax(0, 1fr);
+}
+html[data-reading] [data-article] {
+  border-radius: 0;
+  background: transparent;
+  padding: 0;
+}
+html[data-reading] .prose {
+  max-width: none;
+  font-size: 1.1875rem;
+  line-height: 1.8;
+}

@@ -24,6 +24,7 @@ const valid = {
     experiments: true,
     me: true,
     changelog: true,
+    readingMode: true,
   },
   background: { galaxy: true, cursorWaves: false },
   recruiter: {
@@ -186,6 +187,11 @@ describe('parseSiteConfig', () => {
       const { categoryId: _omitted, ...incomplete } = giscus;
       expect(() => parseSiteConfig({ ...valid, giscus: incomplete })).toThrow(/categoryId/);
     });
+  });
+
+  it('rejects config missing the readingMode feature', () => {
+    const { readingMode: _omitted, ...features } = valid.features;
+    expect(() => parseSiteConfig({ ...valid, features })).toThrow(/readingMode/);
   });
 
   it('rejects config missing me feature', () => {

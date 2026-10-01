@@ -87,7 +87,10 @@ import { site } from '@/shared/config/index.ts';
     } catch {
       // Storage can be blocked (privacy modes); fall back to the owner default for this view.
     }
-    run(resolveBackgroundChoice(stored, ownerDefault));
+    // Reading mode stops the effect without touching the visitor's saved choice.
+    let choice = resolveBackgroundChoice(stored, ownerDefault);
+    const reading = (): boolean => document.documentElement.hasAttribute('data-reading');
+    run(reading() ? 'off' : choice);
 
     // Recolor the running effect in place on theme change — rebuilding a GL context would lose it.
     const themeObserver = new MutationObserver(() => {
@@ -96,8 +99,10 @@ import { site } from '@/shared/config/index.ts';
     themeObserver.observe(document.documentElement, { attributeFilter: ['data-theme'] });
 
     document.addEventListener('background-change', (event) => {
-      run((event as CustomEvent<BackgroundChoice>).detail);
+      choice = (event as CustomEvent<BackgroundChoice>).detail;
+      run(reading() ? 'off' : choice);
     });
+    document.addEventListener('reading-mode-change', () => run(reading() ? 'off' : choice));
 
     const dispose = (): void => {
       stop();

@@ -9,6 +9,7 @@ import { Comments } from '@/features/comments/index.ts';
 import DecisionRecord from '@/features/notes/components/DecisionRecord.astro';
 import LangBadge from '@/features/notes/components/LangBadge.astro';
 import PrevNext from '@/features/notes/components/PrevNext.astro';
+import ReadingMode from '@/features/notes/components/ReadingMode.astro';
 import ReadingProgress from '@/features/notes/components/ReadingProgress.astro';
 import RelatedNotes from '@/features/notes/components/RelatedNotes.astro';
 import ShareCard from '@/features/notes/components/ShareCard.astro';
@@ -46,6 +47,7 @@ const readingLabel = t(locale, 'notes.readingTime', { min: readingMinutes(entry.
 ---
 
 <BaseLayout locale={locale} path={path} title={data.title} description={data.description} translated={false} article={{ pubDate: data.pubDate, updatedDate: data.updatedDate, tags: data.tags }} ogImage={noteCardPath(entry.id)}>
+  <ReadingMode slot="head" part="boot" locale={locale} />
   <ReadingProgress slot="banner" />
   <Banner slot="banner" height="360px" locale={locale}>
     <BackgroundCanvas slot="background" />
@@ -64,6 +66,7 @@ const readingLabel = t(locale, 'notes.readingTime', { min: readingMinutes(entry.
   </Banner>
 
   <article data-article class="flex flex-col gap-8 rounded-card bg-card p-6 md:p-10">
+    <ReadingMode part="toggle" locale={locale} />
     <DecisionRecord locale={locale} decision={data.decision} />
     <div class="prose"><Content /></div>
 
@@ -80,6 +83,7 @@ const readingLabel = t(locale, 'notes.readingTime', { min: readingMinutes(entry.
   <PrevNext locale={locale} prev={prev} next={next} />
 
   <Comments locale={locale} />
+  <ReadingMode slot="floating" part="exit" locale={locale} />
 
   <Fragment slot="aside">
     <div class="flex flex-col gap-4 lg:sticky lg:top-24">

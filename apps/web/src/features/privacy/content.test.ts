@@ -60,6 +60,18 @@ describe('buildPrivacyContent', () => {
     }
   });
 
+  it('mentions the reading mode preference only when that feature is on', () => {
+    const body = (page: PrivacyContent): string =>
+      page.sections.find((section) => section.id === 'local-storage')?.body ?? '';
+    expect(body(content.es)).not.toMatch(/modo lectura/i);
+    expect(body(content.en)).not.toMatch(/reading mode/i);
+    const on = buildPrivacyContent({ ...input, readingMode: true });
+    expect(body(on.es)).toMatch(/modo lectura/i);
+    expect(body(on.es)).toMatch(/cinco preferencias/i);
+    expect(body(on.en)).toMatch(/reading mode/i);
+    expect(body(on.en)).toMatch(/five interface preferences/i);
+  });
+
   it('renders lists as HTML, not markdown', () => {
     for (const locale of ['es', 'en'] as const) {
       for (const section of content[locale].sections) {

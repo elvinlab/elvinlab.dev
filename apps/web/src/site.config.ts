@@ -38,6 +38,7 @@ export const siteConfig = {
     experiments: false,
     me: true,
     changelog: true,
+    readingMode: true,
   },
   // Comments (https://giscus.app): GitHub Discussions of this repo, "Announcements" category.
   giscus: {

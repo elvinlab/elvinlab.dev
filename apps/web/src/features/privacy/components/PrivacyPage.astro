@@ -19,6 +19,7 @@ const content = buildPrivacyContent({
   domain: new URL(site.url).host,
   contact: { es: '/contact/', en: '/en/contact/' },
   ...(isEnabled('comments') && site.giscus && { comments: { repo: site.giscus.repo } }),
+  readingMode: isEnabled('readingMode'),
 })[locale];
 ---
 

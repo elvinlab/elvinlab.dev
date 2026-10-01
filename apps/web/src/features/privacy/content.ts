@@ -24,6 +24,8 @@ export type PrivacyInput = {
   contact: { es: string; en: string };
   /** Present only when giscus comments are configured; the section is omitted otherwise. */
   comments?: { repo: string };
+  /** True when the reading mode feature is on, which stores one more preference in the browser. */
+  readingMode?: boolean;
 };
 
 const LAST_UPDATED = '2026-10-01';
@@ -74,6 +76,7 @@ function buildBaseContent({
   owner,
   domain,
   contact,
+  readingMode = false,
 }: PrivacyInput): Record<'es' | 'en', PrivacyContent> {
   return {
     es: {
@@ -105,7 +108,7 @@ function buildBaseContent({
         {
           id: 'local-storage',
           title: 'Almacenamiento local',
-          body: '<p>Este sitio solo guarda en <code>localStorage</code> cuatro preferencias de interfaz: el tema, el efecto de fondo que elijas, si el banner está expandido y el descarte del aviso de idioma. No se usan para identificarte ni para seguimiento.</p>',
+          body: `<p>Este sitio solo guarda en <code>localStorage</code> ${readingMode ? 'cinco' : 'cuatro'} preferencias de interfaz: el tema, el efecto de fondo que elijas, si el banner está expandido, ${readingMode ? 'el descarte del aviso de idioma y si activaste el modo lectura' : 'y el descarte del aviso de idioma'}. No se usan para identificarte ni para seguimiento.</p>`,
         },
         {
           id: 'rights',
@@ -143,7 +146,7 @@ function buildBaseContent({
         {
           id: 'local-storage',
           title: 'Local storage',
-          body: '<p>This site only keeps four interface preferences in <code>localStorage</code>: the theme, the background effect you pick, whether the banner is expanded, and the language hint dismissal. They are not used to identify you or for tracking.</p>',
+          body: `<p>This site only keeps ${readingMode ? 'five' : 'four'} interface preferences in <code>localStorage</code>: the theme, the background effect you pick, whether the banner is expanded, ${readingMode ? 'the language hint dismissal, and whether you turned on reading mode' : 'and the language hint dismissal'}. They are not used to identify you or for tracking.</p>`,
         },
         {
           id: 'rights',
