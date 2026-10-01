@@ -106,5 +106,17 @@
     "category": "added",
     "title": "Shared links now show a proper card",
     "description": "Each note gets its own preview image with its title, and /me shows my photo, role and availability. The previews also carry correct language, alt text and article details."
+  },
+  "reading-mode": {
+    "date": "2026-10-01",
+    "category": "added",
+    "title": "Reading mode for notes",
+    "description": "A button on every note switches to a calm single column: no banner effects or sidebar, larger text and wider margins on phones. It is remembered in your browser and you can leave it any time."
+  },
+  "terms-and-privacy": {
+    "date": "2026-10-01",
+    "category": "added",
+    "title": "Terms of use and a clearer privacy page",
+    "description": "New terms page linked from every footer. The privacy page now cites what Cloudflare documents, lists every preference stored in your browser and says the site itself sets no cookies."
   }
 }

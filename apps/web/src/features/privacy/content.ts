@@ -32,6 +32,8 @@ const LAST_UPDATED = '2026-10-01';
 
 const CLOUDFLARE_FAQ = 'https://developers.cloudflare.com/web-analytics/faq/';
 const CLOUDFLARE_DATA = 'https://developers.cloudflare.com/web-analytics/data-metrics/';
+const CLOUDFLARE_COLLECTION =
+  'https://developers.cloudflare.com/web-analytics/data-metrics/data-origin-and-collection/';
 const TURNSTILE_PRIVACY = 'https://www.cloudflare.com/turnstile-privacy-policy/';
 const GISCUS_PRIVACY = 'https://github.com/giscus/giscus/blob/main/PRIVACY-POLICY.md';
 const GITHUB_PRIVACY =
@@ -93,7 +95,7 @@ function buildBaseContent({
         {
           id: 'analytics',
           title: 'Cloudflare Web Analytics',
-          body: `<p>Este sitio puede usar ${external('https://www.cloudflare.com/web-analytics/', 'Cloudflare Web Analytics')} para medir el tráfico de forma agregada: vistas de página, tiempos de carga y Core Web Vitals. Los parámetros de consulta (query strings) no se registran ${external(CLOUDFLARE_FAQ, '[fuente]')}. El detalle de los datos que Cloudflare recoge está en su ${external(CLOUDFLARE_DATA, 'documentación')}. El tratamiento se basa en el interés legítimo de entender el uso del sitio.</p>`,
+          body: `<p>Este sitio puede usar ${external('https://www.cloudflare.com/web-analytics/', 'Cloudflare Web Analytics')} para medir el tráfico de forma agregada: vistas de página, tiempos de carga y Core Web Vitals. Los parámetros de consulta (query strings) no se registran ${external(CLOUDFLARE_FAQ, '[fuente]')}. El detalle de los datos que Cloudflare recoge está en su ${external(CLOUDFLARE_DATA, 'documentación')}. Cloudflare indica que no rastrea a usuarios individuales entre las propiedades de sus clientes ${external(CLOUDFLARE_COLLECTION, '[fuente]')}. El tratamiento se basa en el interés legítimo de entender el uso del sitio.</p>`,
         },
         {
           id: 'contact-form',
@@ -109,6 +111,11 @@ function buildBaseContent({
           id: 'local-storage',
           title: 'Almacenamiento local',
           body: `<p>Este sitio solo guarda en <code>localStorage</code> ${readingMode ? 'cinco' : 'cuatro'} preferencias de interfaz: el tema, el efecto de fondo que elijas, si el banner está expandido, ${readingMode ? 'el descarte del aviso de idioma y si activaste el modo lectura' : 'y el descarte del aviso de idioma'}. No se usan para identificarte ni para seguimiento.</p>`,
+        },
+        {
+          id: 'cookies',
+          title: 'Cookies',
+          body: '<p>El código de este sitio no establece cookies propias. Los servicios de terceros que se cargan en algunas páginas (los de las secciones de analítica, formulario de contacto y comentarios) tienen sus propias políticas, enlazadas arriba, y son ellas las que determinan si usan cookies u otro almacenamiento.</p>',
         },
         {
           id: 'rights',
@@ -131,7 +138,7 @@ function buildBaseContent({
         {
           id: 'analytics',
           title: 'Cloudflare Web Analytics',
-          body: `<p>This site may use ${external('https://www.cloudflare.com/web-analytics/', 'Cloudflare Web Analytics')} to measure traffic in aggregate: page views, load times and Core Web Vitals. Query strings are not logged ${external(CLOUDFLARE_FAQ, '[source]')}. The details of the data Cloudflare collects are in its ${external(CLOUDFLARE_DATA, 'documentation')}. Processing relies on the legitimate interest of understanding site usage.</p>`,
+          body: `<p>This site may use ${external('https://www.cloudflare.com/web-analytics/', 'Cloudflare Web Analytics')} to measure traffic in aggregate: page views, load times and Core Web Vitals. Query strings are not logged ${external(CLOUDFLARE_FAQ, '[source]')}. The details of the data Cloudflare collects are in its ${external(CLOUDFLARE_DATA, 'documentation')}. Cloudflare states that it does not track individual end users across its customers' Internet properties ${external(CLOUDFLARE_COLLECTION, '[source]')}. Processing relies on the legitimate interest of understanding site usage.</p>`,
         },
         {
           id: 'contact-form',
@@ -147,6 +154,11 @@ function buildBaseContent({
           id: 'local-storage',
           title: 'Local storage',
           body: `<p>This site only keeps ${readingMode ? 'five' : 'four'} interface preferences in <code>localStorage</code>: the theme, the background effect you pick, whether the banner is expanded, ${readingMode ? 'the language hint dismissal, and whether you turned on reading mode' : 'and the language hint dismissal'}. They are not used to identify you or for tracking.</p>`,
+        },
+        {
+          id: 'cookies',
+          title: 'Cookies',
+          body: "<p>This site's own code does not set cookies. The third-party services loaded on some pages (those in the analytics, contact form and comments sections) have their own policies, linked above, and those policies determine whether they use cookies or other storage.</p>",
         },
         {
           id: 'rights',

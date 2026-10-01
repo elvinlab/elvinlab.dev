@@ -1,0 +1,44 @@
+---
+/**
+ * Terms of use: renders the locale-specific content. Owner, domain and page paths come from the
+ * site config so the page stays white-label; the comments and professional-information sections
+ * appear only when those features are on.
+ */
+
+import { buildTermsContent } from '@/features/terms/content.ts';
+import { isEnabled, site } from '@/shared/config/index.ts';
+import type { Locale } from '@/shared/i18n/index.ts';
+import BaseLayout from '@/shared/layout/BaseLayout.astro';
+
+type Props = { locale: Locale };
+
+const { locale } = Astro.props;
+const content = buildTermsContent({
+  owner: site.identity.name,
+  domain: new URL(site.url).host,
+  contact: { es: '/contact/', en: '/en/contact/' },
+  privacy: { es: '/privacy/', en: '/en/privacy/' },
+  comments: isEnabled('comments') && Boolean(site.giscus),
+  me: isEnabled('me'),
+})[locale];
+---
+
+<BaseLayout locale={locale} path="/terms/" title={content.pageTitle} description={content.pageDescription}>
+  <article class="max-w-[68ch]">
+    <header class="mb-8">
+      <h1 class="text-3xl font-bold tracking-tight">{content.pageTitle}</h1>
+      <p class="mt-2 text-muted">{content.pageDescription}</p>
+    </header>
+
+    {content.sections.map((section) => (
+      <section id={section.id} class="mb-10">
+        <h2 class="mb-3 text-xl font-semibold">{section.title}</h2>
+        <div class="space-y-3 text-text-secondary [&_a]:underline [&_ul]:list-disc [&_ul]:pl-6" set:html={section.body} />
+      </section>
+    ))}
+
+    <footer class="mt-12 border-t border-divider pt-6 text-sm text-muted">
+      <p>{content.lastUpdatedLabel}: {content.lastUpdated}</p>
+    </footer>
+  </article>
+</BaseLayout>

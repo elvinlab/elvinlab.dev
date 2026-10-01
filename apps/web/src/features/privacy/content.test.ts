@@ -43,33 +43,32 @@ describe('buildPrivacyContent', () => {
     expect(everyText(content)).not.toMatch(/[\w.+-]+@[\w-]+\.[\w.]+/);
   });
 
-  it('makes no cookie or IP-handling claims that Cloudflare docs do not state', () => {
+  it('makes no cookie or IP-handling claims that the providers do not state', () => {
     const text = everyText(content);
-    expect(text).not.toMatch(/cookie/i);
+    // Only the site's own behavior is claimed; no provider is said to be cookie-free.
+    expect(text).not.toMatch(
+      /sin cookies|no (usa|utiliza)n? cookies|cookie-?free|cookieless|no cookies/i,
+    );
     expect(text).not.toMatch(/sin almacenar|without storing/i);
   });
 
-  it('lists every preference the site keeps in localStorage', () => {
-    const body = (page: PrivacyContent): string =>
-      page.sections.find((section) => section.id === 'local-storage')?.body ?? '';
-    for (const word of [/tema/i, /fondo/i, /banner/i, /aviso de idioma/i]) {
-      expect(body(content.es)).toMatch(word);
+  it('says the site code sets no cookies of its own and points to the providers for the rest', () => {
+    for (const locale of ['es', 'en'] as const) {
+      const section = content[locale].sections.find((item) => item.id === 'cookies');
+      expect(section?.body).toMatch(/cookies/i);
+      expect(section?.body).toMatch(locale === 'es' ? /propias/ : /\bown\b/);
     }
-    for (const word of [/theme/i, /background/i, /banner/i, /language hint/i]) {
-      expect(body(content.en)).toMatch(word);
-    }
+    expect(content.es.sections.map((s) => s.id)).toContain('cookies');
   });
 
-  it('mentions the reading mode preference only when that feature is on', () => {
-    const body = (page: PrivacyContent): string =>
-      page.sections.find((section) => section.id === 'local-storage')?.body ?? '';
-    expect(body(content.es)).not.toMatch(/modo lectura/i);
-    expect(body(content.en)).not.toMatch(/reading mode/i);
-    const on = buildPrivacyContent({ ...input, readingMode: true });
-    expect(body(on.es)).toMatch(/modo lectura/i);
-    expect(body(on.es)).toMatch(/cinco preferencias/i);
-    expect(body(on.en)).toMatch(/reading mode/i);
-    expect(body(on.en)).toMatch(/five interface preferences/i);
+  it('cites what Cloudflare states: Web Analytics does not track individual users across sites', () => {
+    const analytics = (page: PrivacyContent): string =>
+      page.sections.find((section) => section.id === 'analytics')?.body ?? '';
+    for (const locale of ['es', 'en'] as const) {
+      expect(analytics(content[locale])).toContain(
+        'developers.cloudflare.com/web-analytics/data-metrics/data-origin-and-collection',
+      );
+    }
   });
 
   it('renders lists as HTML, not markdown', () => {
