@@ -41,7 +41,10 @@ const siteConfigSchema = z
       .default({ galaxy: true, cursorWaves: false }),
     /** Recruiter card data (home "Hiring?" card and /me). cvUrl is https-only and optional. */
     recruiter: z.object({
+      /** Show or hide the whole status line (not whether the owner is open to work). */
       available: z.boolean(),
+      /** Whether the owner is open to work: green status dot when true, the danger color when false. */
+      openToWork: z.boolean().default(true),
       status: localized,
       lookingFor: localized,
       cvUrl: httpsUrl.optional(),

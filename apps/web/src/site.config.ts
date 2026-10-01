@@ -42,6 +42,7 @@ export const siteConfig = {
   background: { galaxy: true, cursorWaves: false },
   recruiter: {
     available: true,
+    openToWork: false,
     status: { es: 'No disponible · trabajando en Buo', en: 'Not available · working at Buo' },
     lookingFor: { es: 'Actualmente en Buo', en: 'Currently at Buo' },
   },

@@ -82,5 +82,11 @@
     "category": "fixed",
     "title": "Privacy page now lists every preference saved in your browser",
     "description": "It only mentioned the theme and the language hint; it now also covers the background effect you pick and whether the banner is expanded."
+  },
+  "hiring-status-dot": {
+    "date": "2026-10-01",
+    "category": "fixed",
+    "title": "Hiring card no longer shows a green dot when I am not available",
+    "description": "The status dot now follows whether I am open to work: green when I am, red when I am not (currently working at Buo)."
   }
 }

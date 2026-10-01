@@ -91,6 +91,22 @@ describe('parseSiteConfig', () => {
     expect(() => parseSiteConfig(broken)).toThrow(/default locale "es"/);
   });
 
+  describe('recruiter.openToWork', () => {
+    it('defaults to true so existing configs keep the green status dot', () => {
+      expect(parseSiteConfig(valid).recruiter.openToWork).toBe(true);
+    });
+
+    it('accepts false for an owner who is not open to work', () => {
+      const config = { ...valid, recruiter: { ...valid.recruiter, openToWork: false } };
+      expect(parseSiteConfig(config).recruiter.openToWork).toBe(false);
+    });
+
+    it('rejects a non-boolean value', () => {
+      const broken = { ...valid, recruiter: { ...valid.recruiter, openToWork: 'no' } };
+      expect(() => parseSiteConfig(broken)).toThrow(/openToWork/);
+    });
+  });
+
   it('rejects a recruiter cvUrl that is not https', () => {
     const broken = { ...valid, recruiter: { ...valid.recruiter, cvUrl: 'http://x.dev/cv.pdf' } };
     expect(() => parseSiteConfig(broken)).toThrow();

@@ -70,7 +70,7 @@ WCAG AA contrast in both themes, visible 2 px focus ring, touch targets ≥44 px
 
 - The home banner blends into the page through a 120 px gradient; the animated background stays sharp and interactive.
 - Small static pink accents retain the terminal motif without repeated blinking. Retro type identifies the brand, not long-form text.
-- The home author card uses the configured profile image, with initials when no image is configured. The hiring card separates status from its heading and removes repeated employment information.
+- The home author card uses the configured profile image, with initials when no image is configured. The hiring card separates status from its heading and removes repeated employment information. Its status dot is the `ok` green only when `recruiter.openToWork` is true (the default) and the `danger` color otherwise; the status text always states the situation, so color is never the only signal. `recruiter.available` only shows or hides the whole status line. Evidence: `tests/browser/smoke.spec.ts` (recruiter card) and the `recruiter.openToWork` cases in `schema.test.ts`.
 - The locale hint sits after the footer: less immediately discoverable than an overlay, but it cannot cover reading or form controls or shift preceding content. The navbar language control remains available near the top.
 - Existing semantic colors, content/sidebar geometry and theme behavior are preserved. UI UX Pro Max's generic palette suggestions were not adopted because they conflicted with the established brand.
 

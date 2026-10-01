@@ -67,6 +67,9 @@ for (const { locale, path } of [
     });
     const availability = hiringCard.locator('[data-recruiter-status]');
     await expect(availability).toBeVisible();
+    // The owner is not open to work, so the status dot must not be the "available" green.
+    await expect(availability.locator('[aria-hidden="true"]')).toHaveClass(/bg-danger/);
+    await expect(availability.locator('[aria-hidden="true"]')).not.toHaveClass(/bg-ok/);
     await expect(
       hiringCard.getByText(locale === 'es' ? 'Actualmente en Buo' : 'Currently at Buo', {
         exact: true,
