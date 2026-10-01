@@ -36,3 +36,4 @@ Short (≤40 lines each).
 | [0009](./0009-contact-security-observability.md) | Contact form security and observability | Accepted |
 | [0010](./0010-visitor-changelog-no-semver-single-language.md) | Visitor-facing changelog: dated entries, no semver, single language | Accepted |
 | [0011](./0011-ci-gate-once-at-main-pr-no-staging.md) | CI gates once at the develop -> main PR; no staging environment | Accepted |
+| [0012](./0012-direct-push-to-main-no-pr-gate.md) | Direct push to main, no PR gate (scaling-back path documented) | Accepted |

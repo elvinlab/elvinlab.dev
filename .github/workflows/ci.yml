@@ -1,8 +1,6 @@
 name: CI
 
 on:
-  pull_request:
-    branches: [main]
   push:
     branches: [main]
 
@@ -11,8 +9,8 @@ permissions:
 
 concurrency:
   group: ci-${{ github.ref }}
-  # A newer push supersedes an older run, except on main: a production deploy must finish.
-  cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
+  # A push to main always runs to completion; a production deploy must finish.
+  cancel-in-progress: false
 
 env:
   PRODUCTION_WORKER: elvinlab
@@ -20,12 +18,11 @@ env:
 
 jobs:
   # The gates run as parallel jobs (wall time is the slowest one, not the sum), once per release,
-  # on the develop -> main PR. On the push that results from merging (always main) they are
-  # skipped: the same tree already passed them in the PR, and the protect-main ruleset requires
-  # the `checks` status, so an untested commit cannot reach main in the first place.
+  # directly on the push to main — there is no PR gate (ADR 0012): the `protect-main` ruleset only
+  # requires deletion/non_fast_forward/required_linear_history, not a passing check, so an untested
+  # commit CAN reach main; a failing gate here blocks the deploy, not the push.
   static:
     name: static
-    if: github.event_name != 'push'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -38,7 +35,6 @@ jobs:
 
   e2e:
     name: e2e
-    if: github.event_name != 'push'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -63,7 +59,6 @@ jobs:
 
   lighthouse:
     name: lighthouse
-    if: github.event_name != 'push'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -93,9 +88,9 @@ jobs:
   deploy:
     name: deploy
     needs: checks
-    # always(): on a push to main the gates behind `checks` are skipped, and a plain `success()`
-    # would skip the deploy too. The explicit result check keeps failed or cancelled gates blocking.
-    if: ${{ always() && github.event_name == 'push' && needs.checks.result == 'success' }}
+    # always(): `checks` itself runs with if: always(), so without this, a failed/cancelled gate
+    # would make `needs.checks` read as skipped and the explicit result check below would never run.
+    if: ${{ always() && needs.checks.result == 'success' }}
     runs-on: ubuntu-latest
     environment:
       name: production

@@ -28,11 +28,11 @@ mise exec -- pnpm --filter web preview      # serve the build locally on workerd
 mise exec -- pnpm --filter web run deploy   # build + wrangler deploy (needs `wrangler login`)
 ```
 
-Use `pnpm run deploy`, not `pnpm deploy` (that is a built-in pnpm command). Normally you never deploy by hand: work happens directly on `develop` with no CI attached to it (push freely, no wait). CI (`.github/workflows/ci.yml`) runs exactly once per release, on the `develop -> main` pull request (`checks` required on `main`); merging deploys straight to production (`elvinlab`) and smoke-checks it with `.github/scripts/smoke-check.sh`, rolling back on failure. There is no staging environment and no per-PR preview deploy (ADR 0011).
+Use `pnpm run deploy`, not `pnpm deploy` (that is a built-in pnpm command). Normally you never deploy by hand: work happens directly on `develop` with no CI attached to it (push freely, no wait). Releases are a direct push to `main` (fast-forward merge from `develop`, no PR) — that push is the only trigger for CI (`.github/workflows/ci.yml`): gates run once, and if they pass, the same run deploys straight to production (`elvinlab`) and smoke-checks it with `.github/scripts/smoke-check.sh`, rolling back on failure. There is no staging environment and no PR preview deploy (ADR 0011, ADR 0012). `main`'s ruleset no longer requires a passing check before the push lands — a failing gate blocks the deploy, not the push itself, so check the Actions run after pushing to `main`.
 
 pnpm enforces a minimum release age: when it proposes `minimumReleaseAgeExclude` entries, pin an older version instead of accepting them. Images are optimized at build time (`imageService: 'compile'`). dependency-cruiser cannot parse `.astro`, so `depcruise` first mirrors `apps/web/src` into the git-ignored `apps/web/boundaries-mirror/` (`apps/web/scripts/mirror-astro.ts`). Do not invent commands; add them here when they exist.
 
-CI runs the production JavaScript gzip budget, Playwright/a11y/theme checks, white-label build, and mobile Lighthouse budgets on the `develop -> main` PR, before the merge deploys. Lighthouse audits an isolated production-build fixture and writes HTML/JSON reports to the ignored `.lighthouseci/` directory; it does not upload reports.
+CI runs the production JavaScript gzip budget, Playwright/a11y/theme checks, white-label build, and mobile Lighthouse budgets on every push to `main`, before that same run deploys. Lighthouse audits an isolated production-build fixture and writes HTML/JSON reports to the ignored `.lighthouseci/` directory; it does not upload reports.
 
 Read `docs/PLAN.md`, `docs/BRAND.md` (both in Spanish; decisions in them are settled), `docs/DESIGN.md`, `docs/CONVENTIONS.md` and `docs/adr/` before any work.
 
@@ -59,7 +59,7 @@ packages/core/   → @elvinlab/core: tokens, themes, i18n (presentation-only)
 
 ## Workflow
 
-- Branches: `main` (production), `develop` (staging). For routine development, work directly on `develop`; pushing to `develop` runs CI and automatically deploys staging. Production releases remain pull requests from `develop` to `main`. Conventional Commits, no AI attribution.
+- Branches: `main` (production), `develop` (work branch, no CI attached). For routine development, work directly on `develop`; nothing runs on push. Production releases are a direct push to `main` (fast-forward merge from `develop`, no PR — ADR 0012): `git checkout main && git merge develop && git push origin main`. That push is the only CI run (gates + deploy, in one pass). Conventional Commits, no AI attribution.
 - Every task is a GitHub issue written as a delegation brief with a Tier (see `.github/ISSUE_TEMPLATE/task.yml`): Tier 1/2 are delegated to OpenCode via herdr; Tier 3 is done by Claude Code, which reviews every delegated diff.
 
 ## Brand and safety rules that affect code

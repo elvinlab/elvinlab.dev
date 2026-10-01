@@ -55,12 +55,31 @@ Done inline (Tier 3, no delegation — infra-sensitive, single-file-at-a-time ch
 - `docs/adr/README.md` diff confirmed as a single added line.
 - App code untouched, so `pnpm typecheck`/`lint`/`test` were not re-run for this change (CLAUDE.md/CI-workflow/ADR only).
 
-Not done (flagged to the user, human/infra follow-ups):
-- Deleting the `elvinlab-staging` Cloudflare Worker and its GitHub Environment/secrets.
+Infra follow-ups, done on explicit user request (2026-10-01, after the code change was committed):
+- `wrangler delete --name elvinlab-staging` — confirmed via `wrangler deployments list` returning a 404 afterward.
+- GitHub Environment `staging` deleted via `gh api --method DELETE repos/elvinlab/elvinlab.dev/environments/staging` — confirmed via `gh api .../environments` no longer listing it.
+- GitHub Environment `preview` deleted too, on explicit follow-up request — confirmed via `gh api .../environments` now listing only `production`.
+
+Still not done (human/infra follow-up):
 - Verifying the GitHub branch-protection ruleset still passes end-to-end with the new trigger shape (the required status check name `checks` is unchanged, so it should need no edit, but worth a live check on the next PR).
 
-Not committed yet — pending explicit go-ahead.
+Code change committed as 917b6cd. Infra deletions (Worker + GitHub environment) are not git-tracked — nothing further to commit for them.
+
+## Amendment 2026-10-01 (same session): drop the PR gate too
+
+After CI1-CI3 shipped (commit `917b6cd`), user tested the mental model and pushed back: a `develop -> main` PR still means waiting for the `checks` status before the merge button unblocks — the exact wait being eliminated. Asked one clarifying question (direct push to main with no PR vs. PR kept but check not required to merge); user asked for a recommendation; recommended direct push to main (consistent with the existing no-PR-on-develop precedent from 2026-09-28), user confirmed ("dale"), then asked explicitly that this stay "documentado y escalable en un futuro."
+
+- [x] **CI4** — `.github/workflows/ci.yml`: drop the `pull_request` trigger entirely, `on: push: branches: [main]` only. Gates no longer have an `if` guard (every trigger is the one we want to gate). `concurrency.cancel-in-progress` simplified to `false` (every trigger is now a main push that must finish). `deploy`'s `if` simplified (`github.event_name == 'push'` was always true, dropped). Route: direct inline (Tier 3, same file as CI1).
+- [x] **CI5** — GitHub `protect-main` ruleset (id `24092000`) updated via `gh api --method PUT` to match `protect-develop`'s shape: `deletion` + `non_fast_forward` + `required_linear_history` only, dropped `pull_request` and `required_status_checks` rules. Without this the PR gate removal in CI4 would be cosmetic — branch protection would still block a direct push requiring a nonexistent PR check. Route: direct inline (Tier 3, GitHub API, destructive/consequential — done on explicit user request).
+- [x] **CI6** — `docs/adr/0012-direct-push-to-main-no-pr-gate.md` written (supersedes the PR-gate part of ADR 0011) with an explicit "Scaling this back up" section (two independent, config-only steps: re-add the PR+review rule, re-add the required-status-check rule + restore the PR-triggered gate shape) per user's "que quede todo documentado y escalable en un futuro". `docs/adr/README.md` row added. `CLAUDE.md` "Status and commands" and "Workflow" sections updated (direct-push-to-main flow, exact git commands). Route: direct inline.
+
+## Checks run / evidence (amendment)
+
+- `python3 -c "import yaml; yaml.safe_load(...)"` + `mise exec -- actionlint .github/workflows/ci.yml` — both clean after CI4.
+- `gh api repos/elvinlab/elvinlab.dev/rulesets/24092000` read before and after the `PUT`, confirmed the new rule set matches `protect-develop`'s shape exactly (`deletion`, `non_fast_forward`, `required_linear_history`; no `pull_request`, no `required_status_checks`).
+- `docs/adr/README.md` diff is a single added line.
+- Not committed yet — pending explicit go-ahead (infra ruleset change is already live on GitHub; the repo-file changes are local only).
 
 ## Next step
 
-CI1 first (the actual workflow logic), then CI2/CI3 (documentation of the decision already encoded in CI1).
+CI1 first (the actual workflow logic), then CI2/CI3 (documentation of the decision already encoded in CI1). Then the amendment above (CI4-CI6). Commit the amendment, then the whole CI-simplification effort (0007/0011/0012 lineage) is done; next actual feature work is the Contact UI slice.
