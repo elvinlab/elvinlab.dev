@@ -10,6 +10,7 @@ const verificationSchema = z.object({
   success: z.boolean(),
   hostname: z.string().optional(),
   action: z.string().optional(),
+  metadata: z.object({ result_with_testing_key: z.boolean().optional() }).optional(),
   'error-codes': z
     .array(z.string().regex(/^[a-z0-9-]{1,64}$/))
     .max(10)
@@ -60,7 +61,9 @@ export function createTurnstileVerifier(
           report('turnstile hostname mismatch');
           return false;
         }
-        if (data.action !== config.action) {
+        // Cloudflare's testing secrets omit `action`; they already accept any token by design.
+        const testingKey = data.metadata?.result_with_testing_key === true;
+        if (!testingKey && data.action !== config.action) {
           report('turnstile action mismatch');
           return false;
         }

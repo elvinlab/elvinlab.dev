@@ -94,6 +94,24 @@ describe('turnstile verifier diagnostics', () => {
     expect(details).toEqual(['turnstile hostname mismatch']);
   });
 
+  it('accepts a testing-key result without an action (Cloudflare omits it for test secrets)', async () => {
+    const { ok, details } = await run(
+      Response.json({
+        success: true,
+        hostname: config.hostname,
+        metadata: { result_with_testing_key: true },
+      }),
+    );
+    expect(ok).toBe(true);
+    expect(details).toEqual([]);
+  });
+
+  it('still requires the action from a real (non-testing) result', async () => {
+    const { ok, details } = await run(Response.json({ success: true, hostname: config.hostname }));
+    expect(ok).toBe(false);
+    expect(details).toEqual(['turnstile action mismatch']);
+  });
+
   it('reports an action mismatch', async () => {
     const { details } = await run(
       Response.json({ success: true, hostname: config.hostname, action: 'other' }),
