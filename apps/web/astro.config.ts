@@ -10,12 +10,19 @@ import expressiveCode from 'astro-expressive-code';
 
 import { CONTACT_POLICY } from './src/features/contact/config.ts';
 import { noindexHeaders } from './src/integrations/noindex-headers.ts';
+import { readNoteDatesFromDisk } from './src/integrations/note-dates.ts';
 import { hasPublishedNotesOnDisk } from './src/integrations/published-notes.ts';
 import { isHiddenFromSitemap } from './src/integrations/sitemap-filter.ts';
 import { site } from './src/shared/config/index.ts';
 
+const contentDir = fileURLToPath(new URL('./src/content', import.meta.url));
 // /notes/ stays out of the sitemap until the first note is published.
-const hasNotes = hasPublishedNotesOnDisk(fileURLToPath(new URL('./src/content', import.meta.url)));
+const hasNotes = hasPublishedNotesOnDisk(contentDir);
+// sitemap `lastmod`: real per-note dates where known, one shared build timestamp otherwise.
+// `astro:content`/`getCollection` is not available at config time, so this reads frontmatter
+// straight off disk (same constraint as `hasPublishedNotesOnDisk`).
+const noteDates = readNoteDatesFromDisk(contentDir);
+const buildTime = new Date();
 
 export default defineConfig({
   site: site.url,
@@ -45,6 +52,10 @@ export default defineConfig({
       filter: (page) =>
         (hasNotes || new URL(page).pathname !== '/notes/') &&
         !isHiddenFromSitemap(new URL(page).pathname, site.features),
+      serialize: (item) => ({
+        ...item,
+        lastmod: (noteDates.get(new URL(item.url).pathname) ?? buildTime).toISOString(),
+      }),
     }),
     noindexHeaders(),
   ],
