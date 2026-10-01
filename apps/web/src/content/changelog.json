@@ -76,5 +76,53 @@
     "category": "fixed",
     "title": "Easier reading and a language hint that stays out of the way",
     "description": "The language suggestion no longer covers content, privacy text follows a comfortable reading width, decorative blinking is calmer, and English note pages now open instead of showing a 404."
+  },
+  "privacy-local-storage": {
+    "date": "2026-10-01",
+    "category": "fixed",
+    "title": "Privacy page now lists every preference saved in your browser",
+    "description": "It only mentioned the theme and the language hint; it now also covers the background effect you pick and whether the banner is expanded."
+  },
+  "hiring-status-dot": {
+    "date": "2026-10-01",
+    "category": "fixed",
+    "title": "Hiring card no longer shows a green dot when I am not available",
+    "description": "The status dot now follows whether I am open to work: green when I am, red when I am not (currently working at Buo)."
+  },
+  "note-comments": {
+    "date": "2026-10-01",
+    "category": "added",
+    "title": "Comments and reactions on notes",
+    "description": "Every note now has a discussion area powered by giscus: comments and reactions live in GitHub Discussions, you sign in with GitHub to take part, and nothing loads until you scroll down to it."
+  },
+  "first-notes": {
+    "date": "2026-10-01",
+    "category": "added",
+    "title": "First two Lab Notes",
+    "description": "How this site was built, and the multi-agent development setup behind it, both written in Spanish."
+  },
+  "link-previews": {
+    "date": "2026-10-01",
+    "category": "added",
+    "title": "Shared links now show a proper card",
+    "description": "Each note gets its own preview image with its title, and /me shows my photo, role and availability. The previews also carry correct language, alt text and article details."
+  },
+  "reading-mode": {
+    "date": "2026-10-01",
+    "category": "added",
+    "title": "Reading mode for notes",
+    "description": "A button on every note switches to a calm single column: no banner effects or sidebar, larger text and wider margins on phones. It is remembered in your browser and you can leave it any time."
+  },
+  "terms-and-privacy": {
+    "date": "2026-10-01",
+    "category": "added",
+    "title": "Terms of use and a clearer privacy page",
+    "description": "New terms page linked from every footer. The privacy page now cites what Cloudflare documents, lists every preference stored in your browser and says the site itself sets no cookies."
+  },
+  "quieter-navigation": {
+    "date": "2026-10-01",
+    "category": "changed",
+    "title": "A quieter language suggestion and roomier note navigation",
+    "description": "The language suggestion is now a small line of text shown only on Spanish pages, the English menu says plainly Notes, the under-construction banner is gone, and the previous/next links have room below the article."
   }
 }

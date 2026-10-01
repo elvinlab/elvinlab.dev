@@ -22,21 +22,63 @@ export type PrivacyInput = {
   owner: string;
   domain: string;
   contact: { es: string; en: string };
+  /** Present only when giscus comments are configured; the section is omitted otherwise. */
+  comments?: { repo: string };
+  /** True when the reading mode feature is on, which stores one more preference in the browser. */
+  readingMode?: boolean;
 };
 
-const LAST_UPDATED = '2026-09-30';
+const LAST_UPDATED = '2026-10-01';
 
 const CLOUDFLARE_FAQ = 'https://developers.cloudflare.com/web-analytics/faq/';
 const CLOUDFLARE_DATA = 'https://developers.cloudflare.com/web-analytics/data-metrics/';
+const CLOUDFLARE_COLLECTION =
+  'https://developers.cloudflare.com/web-analytics/data-metrics/data-origin-and-collection/';
 const TURNSTILE_PRIVACY = 'https://www.cloudflare.com/turnstile-privacy-policy/';
+const GISCUS_PRIVACY = 'https://github.com/giscus/giscus/blob/main/PRIVACY-POLICY.md';
+const GITHUB_PRIVACY =
+  'https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement';
 
 const external = (href: string, label: string): string =>
   `<a href="${href}" target="_blank" rel="noopener">${label}</a>`;
 
-export function buildPrivacyContent({
+const commentsSection = (repo: string): Record<'es' | 'en', PrivacySection> => {
+  const discussions = external(`https://github.com/${repo}/discussions`, 'GitHub Discussions');
+  const giscus = external('https://giscus.app', 'giscus');
+  return {
+    es: {
+      id: 'comments',
+      title: 'Comentarios (giscus)',
+      body: `<p>Los comentarios y reacciones de las notas los provee ${giscus}: al llegar a esa sección, tu navegador se conecta a giscus.app para cargarla. Se guardan como ${discussions} del repositorio público, por lo que son visibles para cualquiera.</p><p>Para comentar o reaccionar debes autorizar la aplicación giscus con el flujo OAuth de GitHub. Según su ${external(GISCUS_PRIVACY, 'política de privacidad')}, giscus guarda en el <code>localStorage</code> de tu navegador un token cifrado por su servidor para mantener tu sesión, y no recoge datos por su cuenta. El tratamiento por parte de GitHub se rige por su ${external(GITHUB_PRIVACY, 'declaración de privacidad')}.</p>`,
+    },
+    en: {
+      id: 'comments',
+      title: 'Comments (giscus)',
+      body: `<p>Comments and reactions on notes are provided by ${giscus}: when you scroll to that section, your browser connects to giscus.app to load it. They are stored as ${discussions} in the public repository, so anyone can see them.</p><p>To comment or react you must authorize the giscus app through GitHub's OAuth flow. According to its ${external(GISCUS_PRIVACY, 'privacy policy')}, giscus keeps a server-encrypted token in your browser's <code>localStorage</code> to keep you signed in, and does not collect data on its own. GitHub's handling is covered by its ${external(GITHUB_PRIVACY, 'privacy statement')}.</p>`,
+    },
+  };
+};
+
+export function buildPrivacyContent(input: PrivacyInput): Record<'es' | 'en', PrivacyContent> {
+  const content = buildBaseContent(input);
+  if (!input.comments) return content;
+  const section = commentsSection(input.comments.repo);
+  const withSection = (locale: 'es' | 'en'): PrivacyContent => {
+    const { sections } = content[locale];
+    const at = sections.findIndex((item) => item.id === 'contact-form') + 1;
+    return {
+      ...content[locale],
+      sections: [...sections.slice(0, at), section[locale], ...sections.slice(at)],
+    };
+  };
+  return { es: withSection('es'), en: withSection('en') };
+}
+
+function buildBaseContent({
   owner,
   domain,
   contact,
+  readingMode = false,
 }: PrivacyInput): Record<'es' | 'en', PrivacyContent> {
   return {
     es: {
@@ -53,7 +95,7 @@ export function buildPrivacyContent({
         {
           id: 'analytics',
           title: 'Cloudflare Web Analytics',
-          body: `<p>Este sitio puede usar ${external('https://www.cloudflare.com/web-analytics/', 'Cloudflare Web Analytics')} para medir el tráfico de forma agregada: vistas de página, tiempos de carga y Core Web Vitals. Los parámetros de consulta (query strings) no se registran ${external(CLOUDFLARE_FAQ, '[fuente]')}. El detalle de los datos que Cloudflare recoge está en su ${external(CLOUDFLARE_DATA, 'documentación')}. El tratamiento se basa en el interés legítimo de entender el uso del sitio.</p>`,
+          body: `<p>Este sitio puede usar ${external('https://www.cloudflare.com/web-analytics/', 'Cloudflare Web Analytics')} para medir el tráfico de forma agregada: vistas de página, tiempos de carga y Core Web Vitals. Los parámetros de consulta (query strings) no se registran ${external(CLOUDFLARE_FAQ, '[fuente]')}. El detalle de los datos que Cloudflare recoge está en su ${external(CLOUDFLARE_DATA, 'documentación')}. Cloudflare indica que no rastrea a usuarios individuales entre las propiedades de sus clientes ${external(CLOUDFLARE_COLLECTION, '[fuente]')}. El tratamiento se basa en el interés legítimo de entender el uso del sitio.</p>`,
         },
         {
           id: 'contact-form',
@@ -68,7 +110,12 @@ export function buildPrivacyContent({
         {
           id: 'local-storage',
           title: 'Almacenamiento local',
-          body: '<p>Solo se guardan en <code>localStorage</code> la preferencia de tema y el descarte del aviso de idioma. No se usan para identificarte ni para seguimiento.</p>',
+          body: `<p>Este sitio solo guarda en <code>localStorage</code> ${readingMode ? 'cinco' : 'cuatro'} preferencias de interfaz: el tema, el efecto de fondo que elijas, si el banner está expandido, ${readingMode ? 'el descarte del aviso de idioma y si activaste el modo lectura' : 'y el descarte del aviso de idioma'}. No se usan para identificarte ni para seguimiento.</p>`,
+        },
+        {
+          id: 'cookies',
+          title: 'Cookies',
+          body: '<p>El código de este sitio no establece cookies propias. Los servicios de terceros que se cargan en algunas páginas (los de las secciones de analítica, formulario de contacto y comentarios) tienen sus propias políticas, enlazadas arriba, y son ellas las que determinan si usan cookies u otro almacenamiento.</p>',
         },
         {
           id: 'rights',
@@ -91,7 +138,7 @@ export function buildPrivacyContent({
         {
           id: 'analytics',
           title: 'Cloudflare Web Analytics',
-          body: `<p>This site may use ${external('https://www.cloudflare.com/web-analytics/', 'Cloudflare Web Analytics')} to measure traffic in aggregate: page views, load times and Core Web Vitals. Query strings are not logged ${external(CLOUDFLARE_FAQ, '[source]')}. The details of the data Cloudflare collects are in its ${external(CLOUDFLARE_DATA, 'documentation')}. Processing relies on the legitimate interest of understanding site usage.</p>`,
+          body: `<p>This site may use ${external('https://www.cloudflare.com/web-analytics/', 'Cloudflare Web Analytics')} to measure traffic in aggregate: page views, load times and Core Web Vitals. Query strings are not logged ${external(CLOUDFLARE_FAQ, '[source]')}. The details of the data Cloudflare collects are in its ${external(CLOUDFLARE_DATA, 'documentation')}. Cloudflare states that it does not track individual end users across its customers' Internet properties ${external(CLOUDFLARE_COLLECTION, '[source]')}. Processing relies on the legitimate interest of understanding site usage.</p>`,
         },
         {
           id: 'contact-form',
@@ -106,7 +153,12 @@ export function buildPrivacyContent({
         {
           id: 'local-storage',
           title: 'Local storage',
-          body: '<p>Only the theme choice and the language-hint dismissal are stored in <code>localStorage</code>. They are not used to identify you or for tracking.</p>',
+          body: `<p>This site only keeps ${readingMode ? 'five' : 'four'} interface preferences in <code>localStorage</code>: the theme, the background effect you pick, whether the banner is expanded, ${readingMode ? 'the language hint dismissal, and whether you turned on reading mode' : 'and the language hint dismissal'}. They are not used to identify you or for tracking.</p>`,
+        },
+        {
+          id: 'cookies',
+          title: 'Cookies',
+          body: "<p>This site's own code does not set cookies. The third-party services loaded on some pages (those in the analytics, contact form and comments sections) have their own policies, linked above, and those policies determine whether they use cookies or other storage.</p>",
         },
         {
           id: 'rights',

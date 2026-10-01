@@ -37,6 +37,32 @@ describe('blogPostingJsonLd', () => {
     expect(post['datePublished']).toBe('2026-09-20T00:00:00.000Z');
     expect((post['author'] as { name: string }).name).toBe('Jane Doe');
   });
+
+  it('links the author to the site and includes the share image when given', () => {
+    const post = blogPostingJsonLd({
+      site,
+      locale: 'es',
+      url: 'https://example.dev/notes/x/',
+      title: 'Title',
+      description: 'Desc',
+      pubDate: new Date('2026-09-20T00:00:00Z'),
+      image: 'https://example.dev/og/notes/x.png',
+    });
+    expect((post['author'] as { url: string }).url).toBe('https://example.dev');
+    expect(post['image']).toBe('https://example.dev/og/notes/x.png');
+  });
+
+  it('omits the image when none is given', () => {
+    const post = blogPostingJsonLd({
+      site,
+      locale: 'es',
+      url: 'https://example.dev/notes/x/',
+      title: 'Title',
+      description: 'Desc',
+      pubDate: new Date('2026-09-20T00:00:00Z'),
+    });
+    expect(post).not.toHaveProperty('image');
+  });
 });
 
 describe('jsonLdScript', () => {

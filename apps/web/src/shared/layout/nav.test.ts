@@ -9,6 +9,7 @@ const allOn = {
   credentials: true,
   experiments: true,
   changelog: true,
+  readingMode: true,
   me: true,
 };
 
@@ -82,11 +83,12 @@ describe('navItems', () => {
     ]);
   });
 
-  it('EN notes item has labelOverride and hreflang when notes exist', () => {
+  it('EN notes item keeps the plain "Notes" label and only declares the Spanish target', () => {
     const items = navItems(allOn, 'en', true);
     const notesItem = items.find((item) => item.key === 'notes');
-    expect(notesItem?.labelOverride).toBe('nav.notes.es');
+    expect(notesItem).not.toHaveProperty('labelOverride');
     expect(notesItem?.hreflang).toBe('es');
+    expect(notesItem?.localize).toBe(false);
   });
 });
 

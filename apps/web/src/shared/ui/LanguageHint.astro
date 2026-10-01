@@ -1,8 +1,9 @@
 ---
 /**
- * Dismissible hint shown when the browser prefers another supported locale. Never redirects:
- * crawlers must reach every locale. It stays in document flow after the site chrome so it never
- * covers reading content, controls, or keyboard focus.
+ * Quiet, dismissible line of text shown on default-locale pages when the browser prefers another
+ * supported locale. It never nags the other way (a visitor already on /en/ chose it, and the
+ * navbar always offers the switch) and never redirects: crawlers must reach every locale. It stays
+ * in document flow after the site chrome so it never covers reading content or keyboard focus.
  */
 import { localizePath, switchLocale } from '@elvinlab/core';
 
@@ -34,15 +35,16 @@ const alternates = LOCALES.locales
       lang={alternate.locale}
       data-language-hint={alternate.locale}
       data-current-locale={locale}
+      data-default-locale={LOCALES.defaultLocale}
       aria-label={alternate.text}
-      class="mx-auto mt-4 flex max-w-md items-center gap-3 rounded-card bg-card p-3 pl-4 text-sm text-text"
+      class="mx-auto mt-2 flex items-center justify-center gap-1 text-xs text-muted"
     >
-      <span class="grow">{alternate.text}</span>
-      <a href={alternate.href} hreflang={alternate.locale} class="flex min-h-11 items-center rounded-control bg-button px-3 font-medium text-white">
+      <span>{alternate.text}</span>
+      <a href={alternate.href} hreflang={alternate.locale} class="flex min-h-11 items-center px-1 underline decoration-dashed underline-offset-4 transition-colors duration-150 hover:text-text">
         {alternate.action}
       </a>
-      <button type="button" data-language-hint-dismiss class="grid size-11 place-items-center rounded-control text-muted hover:bg-card-hover" aria-label={alternate.dismiss}>
-        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12" /></svg>
+      <button type="button" data-language-hint-dismiss class="grid size-11 place-items-center rounded-control text-muted transition-colors duration-150 hover:text-text" aria-label={alternate.dismiss}>
+        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12" /></svg>
       </button>
     </aside>
   ))
@@ -66,8 +68,12 @@ const alternates = LOCALES.locales
   const locales = [current, ...hints.map((hint) => hint.dataset['languageHint'])].filter(
     (value): value is string => Boolean(value),
   );
+  // Only default-locale pages suggest the other language; /en/ pages never do.
+  const onDefaultLocale = current !== undefined && current === hints[0]?.dataset['defaultLocale'];
   const suggested =
-    current && !isDismissed() ? suggestLocale({ preferred: navigator.languages, current, locales }) : null;
+    current && onDefaultLocale && !isDismissed()
+      ? suggestLocale({ preferred: navigator.languages, current, locales })
+      : null;
   const hint = hints.find((element) => element.dataset['languageHint'] === suggested);
 
   if (hint) {

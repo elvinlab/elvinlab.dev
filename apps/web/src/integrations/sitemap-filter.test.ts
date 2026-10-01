@@ -10,6 +10,7 @@ const allOn = {
   experiments: true,
   me: true,
   changelog: true,
+  readingMode: true,
 };
 
 describe('isHiddenFromSitemap', () => {

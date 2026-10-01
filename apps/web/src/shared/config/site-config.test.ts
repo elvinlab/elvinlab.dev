@@ -9,6 +9,21 @@ describe('site.config.ts', () => {
     expect(() => parseSiteConfig(siteConfig)).not.toThrow();
   });
 
+  it('configures giscus for this repository whenever comments are enabled', () => {
+    const config = parseSiteConfig(siteConfig);
+    expect(config.features.comments).toBe(true);
+    expect(config.giscus).toEqual({
+      repo: 'elvinlab/elvinlab.dev',
+      repoId: 'R_kgDOUvCLAA',
+      category: 'Announcements',
+      categoryId: 'DIC_kwDOUvCLAM4DG1yT',
+    });
+  });
+
+  it('shows no "under construction" notice now that the site is live', () => {
+    expect(siteConfig).not.toHaveProperty('notice');
+  });
+
   it('contains no email address', () => {
     expect(JSON.stringify(siteConfig)).not.toMatch(/[\w.+-]+@[\w-]+\.[\w.]+/);
   });

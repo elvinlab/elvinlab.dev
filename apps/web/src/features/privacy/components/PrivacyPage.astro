@@ -5,7 +5,7 @@
  */
 
 import { buildPrivacyContent } from '@/features/privacy/content.ts';
-import { site } from '@/shared/config/index.ts';
+import { isEnabled, site } from '@/shared/config/index.ts';
 import type { Locale } from '@/shared/i18n/index.ts';
 import BaseLayout from '@/shared/layout/BaseLayout.astro';
 
@@ -18,6 +18,8 @@ const content = buildPrivacyContent({
   owner: site.identity.name,
   domain: new URL(site.url).host,
   contact: { es: '/contact/', en: '/en/contact/' },
+  ...(isEnabled('comments') && site.giscus && { comments: { repo: site.giscus.repo } }),
+  readingMode: isEnabled('readingMode'),
 })[locale];
 ---
 

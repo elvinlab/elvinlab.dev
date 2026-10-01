@@ -12,7 +12,11 @@ import { dirname, join } from 'node:path';
 
 import { afterEach, expect, it } from 'vitest';
 
-import { createFixtureWorkspace } from './fixture-workspace.ts';
+import {
+  createFixtureWorkspace,
+  enableFixtureComments,
+  enableFixtureNotice,
+} from './fixture-workspace.ts';
 
 const temporary: string[] = [];
 afterEach(() => {
@@ -77,6 +81,16 @@ it('copies current source and fixtures without copying drafts, secrets or output
   expect(existsSync(join(source, 'apps/web/src/content/notes/smoke-es/index.mdx'))).toBe(false);
 });
 
+it('builds with only the fixture notes, never the published ones', () => {
+  const source = sourceWorkspace();
+  write(source, 'apps/web/src/content/notes/real-note/index.mdx', 'published by the owner');
+  const workspace = createFixtureWorkspace(source, join(source, 'fixtures'));
+  temporary.push(workspace.root);
+  expect(existsSync(join(workspace.web, 'src/content/notes/smoke-es/index.mdx'))).toBe(true);
+  expect(existsSync(join(workspace.web, 'src/content/notes/real-note'))).toBe(false);
+  workspace.cleanup();
+});
+
 it('links external dependencies but keeps the copied core independent of the source', () => {
   const source = sourceWorkspace();
   const workspace = createFixtureWorkspace(source, join(source, 'fixtures'));
@@ -92,4 +106,50 @@ it('links external dependencies but keeps the copied core independent of the sou
   workspace.cleanup();
   expect(existsSync(workspace.root)).toBe(false);
   expect(existsSync(source)).toBe(true);
+});
+
+function webWithConfig(config: string): string {
+  const web = mkdtempSync(join(tmpdir(), 'fixture-web-'));
+  temporary.push(web);
+  write(web, 'src/site.config.ts', config);
+  return web;
+}
+
+it('injects the fixture giscus block, replacing any real one', () => {
+  const web = webWithConfig(
+    "export const siteConfig = {\n  giscus: { repo: 'real/repo', repoId: 'R_real', category: 'C', categoryId: 'D_real' },\n  features: { comments: true },\n};\n",
+  );
+  enableFixtureComments(web);
+  const config = readFileSync(join(web, 'src/site.config.ts'), 'utf8');
+  expect(config).toContain("repo: 'fixture/fixture'");
+  expect(config).not.toContain('real/repo');
+  expect(config.match(/giscus:/g)).toHaveLength(1);
+});
+
+it('fails loudly when the config has no features block to anchor on', () => {
+  const web = webWithConfig('export const siteConfig = {};\n');
+  expect(() => enableFixtureComments(web)).toThrow(/giscus/);
+});
+
+it('injects a fixture site notice when the real config has none', () => {
+  const web = webWithConfig('export const siteConfig = {\n  features: { comments: true },\n};\n');
+  enableFixtureNotice(web);
+  const config = readFileSync(join(web, 'src/site.config.ts'), 'utf8');
+  expect(config).toContain('notice:');
+  expect(config.match(/notice:/g)).toHaveLength(1);
+});
+
+it('replaces a real notice instead of duplicating it', () => {
+  const web = webWithConfig(
+    "export const siteConfig = {\n  notice: {\n    es: 'real',\n    en: 'real',\n  },\n  features: { comments: true },\n};\n",
+  );
+  enableFixtureNotice(web);
+  const config = readFileSync(join(web, 'src/site.config.ts'), 'utf8');
+  expect(config.match(/notice:/g)).toHaveLength(1);
+  expect(config).not.toContain("'real'");
+});
+
+it('fails loudly when the config has no features block to anchor the notice on', () => {
+  const web = webWithConfig('export const siteConfig = {};\n');
+  expect(() => enableFixtureNotice(web)).toThrow(/notice/);
 });

@@ -9,6 +9,8 @@ const PAGES = [
   '/notes/smoke-es/',
   '/privacy/',
   '/en/privacy/',
+  '/terms/',
+  '/en/terms/',
   '/en/',
   '/contact/',
   '/en/contact/',

@@ -23,7 +23,7 @@ const routePath = switchLocale(Astro.url.pathname, LOCALES.defaultLocale, LOCALE
 const items = navItems(site.features, locale, hasPublishedNotes(notes)).map((item) => ({
   ...item,
   href: item.localize === false ? item.path : localizePath(item.path, locale, LOCALES),
-  label: item.labelOverride ? t(locale, item.labelOverride as keyof typeof import('@/shared/i18n/index.ts').t) : t(locale, `nav.${item.key}`),
+  label: t(locale, `nav.${item.key}`),
   current: isCurrent(routePath, item.path),
   hreflang: item.hreflang,
 }));

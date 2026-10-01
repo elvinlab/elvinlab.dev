@@ -41,7 +41,10 @@ const siteConfigSchema = z
       .default({ galaxy: true, cursorWaves: false }),
     /** Recruiter card data (home "Hiring?" card and /me). cvUrl is https-only and optional. */
     recruiter: z.object({
+      /** Show or hide the whole status line (not whether the owner is open to work). */
       available: z.boolean(),
+      /** Whether the owner is open to work: green status dot when true, the danger color when false. */
+      openToWork: z.boolean().default(true),
       status: localized,
       lookingFor: localized,
       cvUrl: httpsUrl.optional(),
@@ -75,7 +78,21 @@ const siteConfigSchema = z
       changelog: z.boolean(),
       /** /me recruiter page: off hides it from the nav, marks it noindex and keeps it out of the sitemap. */
       me: z.boolean(),
+      /** Reading mode on notes: off renders no toggle, loads no script and stores nothing in the browser. */
+      readingMode: z.boolean(),
     }),
+    /**
+     * Giscus comments (GitHub Discussions). Optional: without it the comments section renders
+     * nothing even when `features.comments` is on. Values come from https://giscus.app.
+     */
+    giscus: z
+      .object({
+        repo: z.string().regex(/^[\w.-]+\/[\w.-]+$/, { error: 'must be "owner/name"' }),
+        repoId: z.string().trim().min(1),
+        category: z.string().trim().min(1),
+        categoryId: z.string().trim().min(1),
+      })
+      .optional(),
     /** Optional site-wide notice strip (localized). White-label: remove the key to hide. */
     notice: localized.optional(),
   })

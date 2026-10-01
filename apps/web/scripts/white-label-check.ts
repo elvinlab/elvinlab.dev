@@ -58,6 +58,18 @@ try {
   if (!rawHtml.includes('Jane Doe') || !rawHtml.includes('janedoe')) {
     fail('the alternative identity did not render — the grep would be meaningless');
   }
+  // Comments stay inert without a `giscus` block, even though the alternative config enables the flag.
+  if (/<section[^>]*data-comments/.test(rawHtml)) {
+    fail('comments rendered although the config has no giscus block');
+  }
+  // The reading mode is off in the alternative config: no toggle, exit button or stored key.
+  if (
+    /data-reading-(?:toggle|exit)|html\[data-reading\]|localStorage\.\w+Item\(['"]reading-mode['"]/.test(
+      rawHtml,
+    )
+  ) {
+    fail('the reading mode rendered although features.readingMode is off');
+  }
   const html = DESIGN_SYSTEM.reduce((acc, token) => acc.replace(token, ''), rawHtml);
   const leaked = OWNER.filter((token) => token.test(html));
   if (leaked.length > 0) fail(`owner strings leaked into the build: ${leaked.join(', ')}`);

@@ -44,11 +44,13 @@ export type BlogPostingInput = {
   description: string;
   pubDate: Date;
   updatedDate?: Date | undefined;
+  /** Absolute URL of the note's share card. */
+  image?: string | undefined;
 };
 
 /** schema.org BlogPosting for a note, authored by the owner Person. */
 export function blogPostingJsonLd(input: BlogPostingInput): Record<string, unknown> {
-  const { site, url, title, description, pubDate, updatedDate } = input;
+  const { site, url, title, description, pubDate, updatedDate, image } = input;
   return {
     '@context': 'https://schema.org',
     '@type': 'BlogPosting',
@@ -56,9 +58,10 @@ export function blogPostingJsonLd(input: BlogPostingInput): Record<string, unkno
     description,
     datePublished: pubDate.toISOString(),
     ...(updatedDate ? { dateModified: updatedDate.toISOString() } : {}),
+    ...(image ? { image } : {}),
     mainEntityOfPage: url,
     url,
-    author: { '@type': 'Person', '@id': personId(site), name: site.identity.name },
+    author: { '@type': 'Person', '@id': personId(site), name: site.identity.name, url: site.url },
   };
 }
 

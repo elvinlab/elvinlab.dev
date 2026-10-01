@@ -28,6 +28,12 @@ const year = new Date().getFullYear();
       >
         {t(locale, 'footer.privacy')}
       </a>
+      <a
+        href={locale === 'es' ? '/terms/' : '/en/terms/'}
+        class="text-sm text-text-secondary transition-colors duration-150 hover:text-text"
+      >
+        {t(locale, 'footer.terms')}
+      </a>
       {site.features.changelog && (
         <a
           href={locale === 'es' ? '/changelog/' : '/en/changelog/'}

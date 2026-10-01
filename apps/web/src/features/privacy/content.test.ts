@@ -43,10 +43,32 @@ describe('buildPrivacyContent', () => {
     expect(everyText(content)).not.toMatch(/[\w.+-]+@[\w-]+\.[\w.]+/);
   });
 
-  it('makes no cookie or IP-handling claims that Cloudflare docs do not state', () => {
+  it('makes no cookie or IP-handling claims that the providers do not state', () => {
     const text = everyText(content);
-    expect(text).not.toMatch(/cookie/i);
+    // Only the site's own behavior is claimed; no provider is said to be cookie-free.
+    expect(text).not.toMatch(
+      /sin cookies|no (usa|utiliza)n? cookies|cookie-?free|cookieless|no cookies/i,
+    );
     expect(text).not.toMatch(/sin almacenar|without storing/i);
+  });
+
+  it('says the site code sets no cookies of its own and points to the providers for the rest', () => {
+    for (const locale of ['es', 'en'] as const) {
+      const section = content[locale].sections.find((item) => item.id === 'cookies');
+      expect(section?.body).toMatch(/cookies/i);
+      expect(section?.body).toMatch(locale === 'es' ? /propias/ : /\bown\b/);
+    }
+    expect(content.es.sections.map((s) => s.id)).toContain('cookies');
+  });
+
+  it('cites what Cloudflare states: Web Analytics does not track individual users across sites', () => {
+    const analytics = (page: PrivacyContent): string =>
+      page.sections.find((section) => section.id === 'analytics')?.body ?? '';
+    for (const locale of ['es', 'en'] as const) {
+      expect(analytics(content[locale])).toContain(
+        'developers.cloudflare.com/web-analytics/data-metrics/data-origin-and-collection',
+      );
+    }
   });
 
   it('renders lists as HTML, not markdown', () => {
@@ -60,5 +82,40 @@ describe('buildPrivacyContent', () => {
   it('localizes the last-updated label and dates the page', () => {
     expect(content.es.lastUpdatedLabel).not.toBe(content.en.lastUpdatedLabel);
     expect(content.es.lastUpdated).toMatch(/^\d{4}-\d{2}-\d{2}$/);
+  });
+});
+
+describe('buildPrivacyContent with comments', () => {
+  const withComments = buildPrivacyContent({ ...input, comments: { repo: 'ada/example.org' } });
+  const ids = (page: PrivacyContent): string[] => page.sections.map((section) => section.id);
+
+  it('has no comments section unless comments are configured', () => {
+    expect(ids(content.es)).not.toContain('comments');
+    expect(ids(content.en)).not.toContain('comments');
+    expect(everyText(content)).not.toMatch(/giscus/i);
+  });
+
+  it('adds the same comments section id to both locales, after the contact form', () => {
+    for (const locale of ['es', 'en'] as const) {
+      const sectionIds = ids(withComments[locale]);
+      expect(sectionIds).toContain('comments');
+      expect(sectionIds.indexOf('comments')).toBe(sectionIds.indexOf('contact-form') + 1);
+    }
+  });
+
+  it('discloses giscus, GitHub storage and sign-in, and the browser token, citing sources', () => {
+    for (const locale of ['es', 'en'] as const) {
+      const body = withComments[locale].sections.find((s) => s.id === 'comments')?.body ?? '';
+      expect(body).toContain('giscus.app');
+      expect(body).toContain('github.com/ada/example.org/discussions');
+      expect(body).toMatch(/OAuth/);
+      expect(body).toMatch(/localStorage/);
+      expect(body).toContain('github.com/giscus/giscus/blob/main/PRIVACY-POLICY.md');
+      expect(body).toContain('docs.github.com/en/site-policy/privacy-policies');
+    }
+  });
+
+  it('keeps the page free of email addresses and owner leaks', () => {
+    expect(everyText(withComments)).not.toMatch(/[\w.+-]+@[\w-]+\.[\w.]+/);
   });
 });

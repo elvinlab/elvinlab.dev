@@ -11,6 +11,7 @@ import expressiveCode from 'astro-expressive-code';
 import { CONTACT_POLICY } from './src/features/contact/config.ts';
 import { noindexHeaders } from './src/integrations/noindex-headers.ts';
 import { readNoteDatesFromDisk } from './src/integrations/note-dates.ts';
+import { ogImages } from './src/integrations/og-images.ts';
 import { hasPublishedNotesOnDisk } from './src/integrations/published-notes.ts';
 import { isHiddenFromSitemap } from './src/integrations/sitemap-filter.ts';
 import { site } from './src/shared/config/index.ts';
@@ -62,6 +63,7 @@ export default defineConfig({
       }),
     }),
     noindexHeaders(),
+    ogImages(contentDir, { publicDir: fileURLToPath(new URL('./public', import.meta.url)) }),
   ],
   adapter: cloudflare({
     // Pages are prerendered, so images are optimized at build time with Sharp and served as
@@ -70,6 +72,19 @@ export default defineConfig({
   }),
   vite: {
     plugins: [tailwindcss()],
+    // Dev server only. Vite finds these lazily, on the first page that uses a Preact island (the
+    // contact form), and answers with "optimized dependencies changed. reloading" plus a program
+    // reload: that first visit came back as a blank page. Listing them up front avoids it;
+    // `pnpm check:dev-cold-start` proves it. Add a dependency here if that check ever fails.
+    optimizeDeps: {
+      include: [
+        'preact',
+        'preact/hooks',
+        'preact/devtools',
+        'preact/jsx-runtime',
+        'astro/actions/runtime/entrypoints/client.js',
+      ],
+    },
     // Vite only exposes PUBLIC_/VITE_ variables to import.meta.env, so the indexing switch is
     // inlined explicitly. Unset or anything other than "true" means the build is noindex.
     define: {

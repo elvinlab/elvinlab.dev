@@ -3,17 +3,50 @@ import {
   mkdirSync,
   mkdtempSync,
   readdirSync,
+  readFileSync,
   realpathSync,
   rmSync,
   symlinkSync,
+  writeFileSync,
 } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { basename, dirname, join } from 'node:path';
+
+/**
+ * Gives the copied site config a fixture `giscus` block so the lazy comments loader is exercised
+ * (the real config has no ids until Discussions is enabled; the giscus origin is stubbed in e2e).
+ */
+export function enableFixtureComments(web: string): void {
+  const configPath = join(web, 'src/site.config.ts');
+  const withoutGiscus = readFileSync(configPath, 'utf8').replace(/\n {2}giscus: \{[^}]*\},/, '');
+  const patched = withoutGiscus.replace(
+    '\n  features: {',
+    "\n  giscus: { repo: 'fixture/fixture', repoId: 'R_fixture', category: 'Comments', categoryId: 'DIC_fixture' },\n  features: {",
+  );
+  if (patched === withoutGiscus) throw new Error('fixture: could not inject the giscus config');
+  writeFileSync(configPath, patched);
+}
+
+/**
+ * Gives the copied site config a fixture site notice so the notice strip stays covered by the
+ * browser tests (the real config has none now that the site is live).
+ */
+export function enableFixtureNotice(web: string): void {
+  const configPath = join(web, 'src/site.config.ts');
+  const withoutNotice = readFileSync(configPath, 'utf8').replace(/\n {2}notice: \{[^}]*\},/, '');
+  const patched = withoutNotice.replace(
+    '\n  features: {',
+    "\n  notice: { es: 'Aviso de prueba', en: 'Test notice' },\n  features: {",
+  );
+  if (patched === withoutNotice) throw new Error('fixture: could not inject the site notice');
+  writeFileSync(configPath, patched);
+}
 
 /** Copies only build inputs; fixture builds never write into publishable content or local drafts. */
 export function createFixtureWorkspace(source: string, fixtures: string) {
   const root = mkdtempSync(join(tmpdir(), 'elvinlab-verification-'));
   const web = join(root, 'apps/web');
+  const publishedNotes = join(source, 'apps/web/src/content/notes');
   const cleanup = (): void => rmSync(root, { recursive: true, force: true });
   try {
     for (const path of [
@@ -32,7 +65,9 @@ export function createFixtureWorkspace(source: string, fixtures: string) {
       mkdirSync(dirname(join(root, path)), { recursive: true });
       cpSync(join(source, path), join(root, path), {
         recursive: true,
-        filter: (path) => basename(path) !== 'drafts',
+        // Drafts and the owner's published notes never enter a fixture build: it must contain
+        // only the fixture notes (deterministic) and no owner-specific text (white-label).
+        filter: (path) => basename(path) !== 'drafts' && path !== publishedNotes,
       });
     }
     cpSync(fixtures, join(web, 'src/content/notes'), {

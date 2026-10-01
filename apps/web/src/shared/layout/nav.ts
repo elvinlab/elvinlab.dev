@@ -6,8 +6,6 @@ export type NavItem = {
   key: NavKey;
   /** Path in the default locale; localize it with `localizePath` before linking. */
   path: string;
-  /** Override the localized label for this locale (e.g. "(in Spanish)"). */
-  labelOverride?: string;
   /** Override hreflang for this item in a specific locale. */
   hreflang?: string;
   /** False keeps `path` as is in every locale (content that exists in one language only). */
@@ -38,9 +36,7 @@ export function navItems(
   );
   if (locale === 'en') {
     return items.map((item) =>
-      item.key === 'notes'
-        ? { ...item, labelOverride: 'nav.notes.es', hreflang: 'es', localize: false }
-        : item,
+      item.key === 'notes' ? { ...item, hreflang: 'es', localize: false } : item,
     );
   }
   return items;

@@ -26,7 +26,10 @@ type Props = {
   description?: string;
   translated?: boolean;
   noindex?: boolean;
-  article?: { pubDate: Date; updatedDate?: Date | undefined };
+  article?: { pubDate: Date; updatedDate?: Date | undefined; tags?: readonly string[] | undefined };
+  /** Site path of this page's share image; the default card is used when omitted. */
+  ogImage?: string;
+  ogImageAlt?: string;
   /** Opt into the print stylesheet: hide chrome, drop the banner, force the light palette. */
   printable?: boolean;
 };
@@ -44,6 +47,7 @@ const beaconToken = getBeaconToken();
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <script is:inline set:html={THEME_BOOT_SCRIPT} />
     <Seo locale={locale} {...seo} />
+    <slot name="head" />
     {renderBeacon && beaconToken && (
       <script
         defer
@@ -66,8 +70,8 @@ const beaconToken = getBeaconToken();
       ) : (
         <slot name="banner" />
       )}
-      <div class="mx-auto max-w-[1200px] px-3 md:px-4">
-        <div class:list={['mt-4 grid gap-4', hasAside && 'lg:grid-cols-[minmax(0,1fr)_280px]']}>
+      <div class="mx-auto max-w-[1200px] px-3 md:px-4" data-content-container>
+        <div class:list={['mt-4 grid gap-4', hasAside && 'lg:grid-cols-[minmax(0,1fr)_280px]']} data-main-grid>
           <div class="min-w-0 animate-fade-in-up [animation-delay:150ms]">
             <slot />
           </div>
@@ -85,5 +89,6 @@ const beaconToken = getBeaconToken();
     <div class="mx-auto max-w-[1200px] px-3 md:px-4">
       <LanguageHint locale={locale} />
     </div>
+    <slot name="floating" />
   </body>
 </html>

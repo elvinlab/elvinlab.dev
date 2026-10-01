@@ -2,10 +2,16 @@ import { type ChildProcess, spawn } from 'node:child_process';
 import { realpathSync } from 'node:fs';
 import { join, resolve } from 'node:path';
 
-import { createFixtureWorkspace } from './fixture-workspace.ts';
+import {
+  createFixtureWorkspace,
+  enableFixtureComments,
+  enableFixtureNotice,
+} from './fixture-workspace.ts';
 
 const source = resolve(import.meta.dirname, '../../..');
 const workspace = createFixtureWorkspace(source, join(source, 'tests/fixtures/notes'));
+enableFixtureComments(workspace.web);
+enableFixtureNotice(workspace.web);
 const cli = join(realpathSync(join(source, 'apps/web/node_modules/astro')), 'bin/astro.mjs');
 let child: ChildProcess | undefined;
 let stopping = false;

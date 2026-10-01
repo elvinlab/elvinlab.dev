@@ -21,6 +21,7 @@ export const siteConfig = {
     experiments: true,
     me: true,
     changelog: true,
+    readingMode: false,
   },
   background: { galaxy: true, cursorWaves: false },
   recruiter: {

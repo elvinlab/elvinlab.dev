@@ -67,6 +67,9 @@ for (const { locale, path } of [
     });
     const availability = hiringCard.locator('[data-recruiter-status]');
     await expect(availability).toBeVisible();
+    // The owner is not open to work, so the status dot must not be the "available" green.
+    await expect(availability.locator('[aria-hidden="true"]')).toHaveClass(/bg-danger/);
+    await expect(availability.locator('[aria-hidden="true"]')).not.toHaveClass(/bg-ok/);
     await expect(
       hiringCard.getByText(locale === 'es' ? 'Actualmente en Buo' : 'Currently at Buo', {
         exact: true,
@@ -140,6 +143,33 @@ test('locale suggestion stays in document flow and only appears for a locale mis
   expect(spanishNote?.status()).toBe(200);
   await expect(page).toHaveURL(/\/notes\/smoke-es\/$/);
   await expect(page.locator('[data-language-hint="en"] a')).toHaveAttribute('href', '/en/');
+});
+
+test('the locale suggestion is a quiet line of text, not a card', async ({ page }) => {
+  await page.addInitScript(() => {
+    Object.defineProperty(navigator, 'languages', { configurable: true, get: () => ['en'] });
+  });
+  await page.goto('/privacy/');
+  const hint = page.locator('[data-language-hint="en"]');
+  await expect(hint).toBeVisible();
+  await expect(hint).toHaveCSS('background-color', 'rgba(0, 0, 0, 0)');
+  await expect(hint).toHaveCSS('font-size', '12px');
+  await expect(hint.locator('a')).not.toHaveCSS('background-color', /rgb\(124, 58, 237\)/);
+});
+
+test('English pages never suggest switching to Spanish, whatever the browser prefers', async ({
+  page,
+}) => {
+  await page.addInitScript(() => {
+    Object.defineProperty(navigator, 'languages', {
+      configurable: true,
+      get: () => ['es-CR', 'es'],
+    });
+  });
+  for (const path of ['/en/', '/en/privacy/', '/en/notes/smoke-en/']) {
+    await page.goto(path);
+    await expect(page.locator('[data-language-hint="es"]')).toBeHidden();
+  }
 });
 
 test('locale suggestion remains hidden when the browser already matches the page', async ({

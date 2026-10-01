@@ -11,7 +11,7 @@ const { locale, prev, next } = Astro.props;
 const link = (note: NoteLike) => localizePath(`/notes/${note.slug}/`, note.data.lang, LOCALES);
 ---
 
-<nav class="grid gap-3 sm:grid-cols-2" aria-label={`${t(locale, 'note.prev')} / ${t(locale, 'note.next')}`}>
+<nav data-prev-next class="mt-8 grid gap-3 sm:grid-cols-2" aria-label={`${t(locale, 'note.prev')} / ${t(locale, 'note.next')}`}>
   {prev ? (
     <a href={link(prev)} class="flex flex-col gap-1 rounded-card bg-card p-4 transition-colors duration-150 hover:bg-card-hover">
       <span class="font-mono text-xs text-muted">{t(locale, 'note.prev')} · {t(locale, 'notes.entry', { number: noteNumber(prev.data.number) })}</span>

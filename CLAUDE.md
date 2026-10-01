@@ -21,6 +21,7 @@ mise exec -- pnpm check:js-budget # enforce <=30 KiB gzip JavaScript per built p
 mise exec -- pnpm test:lighthouse # mobile Lighthouse scores and Core Web Vitals; local reports only
 mise exec -- pnpm exec playwright install chromium  # one-time local browser setup
 mise exec -- pnpm depcruise     # architecture boundaries (.dependency-cruiser.cjs)
+mise exec -- pnpm check:dev-cold-start # cold `astro dev` in an isolated workspace: no blank page or late dependency reload
 
 mise exec -- pnpm --filter web dev          # Astro dev server (workerd runtime)
 mise exec -- pnpm --filter web build        # static build into apps/web/dist

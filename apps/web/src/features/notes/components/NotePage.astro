@@ -5,9 +5,11 @@ import { type CollectionEntry, getCollection, render } from 'astro:content';
 import { localizePath } from '@elvinlab/core';
 
 import { BackgroundCanvas } from '@/features/backgrounds/index.ts';
+import { Comments } from '@/features/comments/index.ts';
 import DecisionRecord from '@/features/notes/components/DecisionRecord.astro';
 import LangBadge from '@/features/notes/components/LangBadge.astro';
 import PrevNext from '@/features/notes/components/PrevNext.astro';
+import ReadingMode from '@/features/notes/components/ReadingMode.astro';
 import ReadingProgress from '@/features/notes/components/ReadingProgress.astro';
 import RelatedNotes from '@/features/notes/components/RelatedNotes.astro';
 import ShareCard from '@/features/notes/components/ShareCard.astro';
@@ -24,6 +26,7 @@ import { site } from '@/shared/config/index.ts';
 import { LOCALES, type Locale, t } from '@/shared/i18n/index.ts';
 import Banner from '@/shared/layout/Banner.astro';
 import BaseLayout from '@/shared/layout/BaseLayout.astro';
+import { noteCardPath } from '@/shared/seo/og.ts';
 import Chip from '@/shared/ui/Chip.astro';
 
 type Props = { entry: CollectionEntry<'notes'>; locale: Locale };
@@ -43,7 +46,8 @@ const canonical = new URL(localizePath(path, data.lang, LOCALES), site.url).href
 const readingLabel = t(locale, 'notes.readingTime', { min: readingMinutes(entry.body ?? '') });
 ---
 
-<BaseLayout locale={locale} path={path} title={data.title} description={data.description} translated={false} article={{ pubDate: data.pubDate, updatedDate: data.updatedDate }}>
+<BaseLayout locale={locale} path={path} title={data.title} description={data.description} translated={false} article={{ pubDate: data.pubDate, updatedDate: data.updatedDate, tags: data.tags }} ogImage={noteCardPath(entry.id)}>
+  <ReadingMode slot="head" part="boot" locale={locale} />
   <ReadingProgress slot="banner" />
   <Banner slot="banner" height="360px" locale={locale}>
     <BackgroundCanvas slot="background" />
@@ -62,6 +66,7 @@ const readingLabel = t(locale, 'notes.readingTime', { min: readingMinutes(entry.
   </Banner>
 
   <article data-article class="flex flex-col gap-8 rounded-card bg-card p-6 md:p-10">
+    <ReadingMode part="toggle" locale={locale} />
     <DecisionRecord locale={locale} decision={data.decision} />
     <div class="prose"><Content /></div>
 
@@ -77,10 +82,8 @@ const readingLabel = t(locale, 'notes.readingTime', { min: readingMinutes(entry.
 
   <PrevNext locale={locale} prev={prev} next={next} />
 
-  <section class="mt-8 flex flex-col gap-4 rounded-card bg-card p-6" aria-label={t(locale, 'note.discussion')}>
-    <h2 class="font-display text-xl font-bold">{t(locale, 'note.discussion')}</h2>
-    <p class="text-sm text-muted">{/* Giscus is wired in T20. */}0 comments</p>
-  </section>
+  <Comments locale={locale} />
+  <ReadingMode slot="floating" part="exit" locale={locale} />
 
   <Fragment slot="aside">
     <div class="flex flex-col gap-4 lg:sticky lg:top-24">
