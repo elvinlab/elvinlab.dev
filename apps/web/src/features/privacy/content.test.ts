@@ -62,3 +62,38 @@ describe('buildPrivacyContent', () => {
     expect(content.es.lastUpdated).toMatch(/^\d{4}-\d{2}-\d{2}$/);
   });
 });
+
+describe('buildPrivacyContent with comments', () => {
+  const withComments = buildPrivacyContent({ ...input, comments: { repo: 'ada/example.org' } });
+  const ids = (page: PrivacyContent): string[] => page.sections.map((section) => section.id);
+
+  it('has no comments section unless comments are configured', () => {
+    expect(ids(content.es)).not.toContain('comments');
+    expect(ids(content.en)).not.toContain('comments');
+    expect(everyText(content)).not.toMatch(/giscus/i);
+  });
+
+  it('adds the same comments section id to both locales, after the contact form', () => {
+    for (const locale of ['es', 'en'] as const) {
+      const sectionIds = ids(withComments[locale]);
+      expect(sectionIds).toContain('comments');
+      expect(sectionIds.indexOf('comments')).toBe(sectionIds.indexOf('contact-form') + 1);
+    }
+  });
+
+  it('discloses giscus, GitHub storage and sign-in, and the browser token, citing sources', () => {
+    for (const locale of ['es', 'en'] as const) {
+      const body = withComments[locale].sections.find((s) => s.id === 'comments')?.body ?? '';
+      expect(body).toContain('giscus.app');
+      expect(body).toContain('github.com/ada/example.org/discussions');
+      expect(body).toMatch(/OAuth/);
+      expect(body).toMatch(/localStorage/);
+      expect(body).toContain('github.com/giscus/giscus/blob/main/PRIVACY-POLICY.md');
+      expect(body).toContain('docs.github.com/en/site-policy/privacy-policies');
+    }
+  });
+
+  it('keeps the page free of email addresses and owner leaks', () => {
+    expect(everyText(withComments)).not.toMatch(/[\w.+-]+@[\w-]+\.[\w.]+/);
+  });
+});

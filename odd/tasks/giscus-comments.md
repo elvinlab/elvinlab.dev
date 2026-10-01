@@ -23,7 +23,7 @@ Add Giscus comments and reactions to note pages. The user asked on 2026-10-01 to
 ## Tasks
 - [x] T1 — Config + pure helpers: optional `giscus` schema (repo `owner/name`, repoId, category, categoryId), `buildGiscusAttributes(config, locale)`, `giscusThemeFor(siteTheme)`; unit tests first.
 - [x] T2 — `Comments.astro` lazy loader with theme sync, i18n strings, `NotePage` wiring replacing the placeholder, e2e (fixture override with a stubbed giscus script) and a11y coverage.
-- [ ] T3 — Privacy section (ES/EN, only when giscus is configured) with test, plus docs (`docs/DESIGN.md` comments surface, how to enable in `docs/CONVENTIONS.md` or PLAN).
+- [x] T3 — Privacy section (ES/EN, only when giscus is configured) with test, plus docs (`docs/DESIGN.md` comments surface, how to enable in `docs/CONVENTIONS.md` or PLAN).
 - [ ] T4 — USER-OWNED, blocked: enable GitHub Discussions on `elvinlab/elvinlab.dev`, create an "Announcements"-type category (e.g. "Comments"), install https://github.com/apps/giscus on the repo. Then Claude reads repo/category IDs with `gh api graphql`, fills `giscus` in `site.config.ts`, verifies live, adds the changelog entry and releases on request.
 
 ## Acceptance criteria
@@ -36,6 +36,6 @@ Add Giscus comments and reactions to note pages. The user asked on 2026-10-01 to
 ## Progress and evidence
 Exploration done (CodeGraph + targeted reads). Verified: `hasDiscussionsEnabled=false`, 0 discussion categories (so T4 is a real blocker for going live). Repo node id `R_kgDOUvCLAA`.
 
-T1 done: RED observed (missing module, schema without `giscus`), then GREEN 26 tests (schema + helpers); typecheck 0 errors, Biome clean. T2 done: RED observed (8 e2e failing, no `[data-comments]`), then GREEN 24 comments e2e (3 viewports x ES/EN); white-label asserts no section without config; fixture helper `enableFixtureComments` unit-tested (RED then GREEN); Lighthouse notes perf 96-98, CLS 0.023, a11y/SEO/best-practices 100; JS budget all pages PASS. Next step: T3 privacy section + docs.
+T1 done: RED observed (missing module, schema without `giscus`), then GREEN 26 tests (schema + helpers); typecheck 0 errors, Biome clean. T2 done: RED observed (8 e2e failing, no `[data-comments]`), then GREEN 24 comments e2e (3 viewports x ES/EN); white-label asserts no section without config; fixture helper `enableFixtureComments` unit-tested (RED then GREEN); Lighthouse notes perf 96-98, CLS 0.023, a11y/SEO/best-practices 100; JS budget all pages PASS. T3 done: RED observed (2 failing privacy tests), then GREEN 11 privacy tests; privacy wording limited to claims verified against giscus README and PRIVACY-POLICY.md (data in GitHub Discussions, GitHub OAuth, server-encrypted token in localStorage, no data collected by giscus); e2e privacy disclosure on the fixture; docs: `docs/DESIGN.md`, `docs/PLAN.md`. Full suite at closure: 362 unit (34 core + 328 web), 189 e2e, white-label, build, JS budget, typecheck, lint, depcruise, diff check all green. `LAST_UPDATED` on the privacy page is bumped at go-live (T4), not now, because the section is hidden until configured. Next step: T4 is user-owned (enable Discussions, create category, install giscus app); then Claude fills the ids and goes live.
 
 Engram mirror: `odd/giscus-comments/tasks`.

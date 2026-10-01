@@ -22,6 +22,8 @@ export type PrivacyInput = {
   owner: string;
   domain: string;
   contact: { es: string; en: string };
+  /** Present only when giscus comments are configured; the section is omitted otherwise. */
+  comments?: { repo: string };
 };
 
 const LAST_UPDATED = '2026-09-30';
@@ -29,11 +31,46 @@ const LAST_UPDATED = '2026-09-30';
 const CLOUDFLARE_FAQ = 'https://developers.cloudflare.com/web-analytics/faq/';
 const CLOUDFLARE_DATA = 'https://developers.cloudflare.com/web-analytics/data-metrics/';
 const TURNSTILE_PRIVACY = 'https://www.cloudflare.com/turnstile-privacy-policy/';
+const GISCUS_PRIVACY = 'https://github.com/giscus/giscus/blob/main/PRIVACY-POLICY.md';
+const GITHUB_PRIVACY =
+  'https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement';
 
 const external = (href: string, label: string): string =>
   `<a href="${href}" target="_blank" rel="noopener">${label}</a>`;
 
-export function buildPrivacyContent({
+const commentsSection = (repo: string): Record<'es' | 'en', PrivacySection> => {
+  const discussions = external(`https://github.com/${repo}/discussions`, 'GitHub Discussions');
+  const giscus = external('https://giscus.app', 'giscus');
+  return {
+    es: {
+      id: 'comments',
+      title: 'Comentarios (giscus)',
+      body: `<p>Los comentarios y reacciones de las notas los provee ${giscus}: al llegar a esa sección, tu navegador se conecta a giscus.app para cargarla. Se guardan como ${discussions} del repositorio público, por lo que son visibles para cualquiera.</p><p>Para comentar o reaccionar debes autorizar la aplicación giscus con el flujo OAuth de GitHub. Según su ${external(GISCUS_PRIVACY, 'política de privacidad')}, giscus guarda en el <code>localStorage</code> de tu navegador un token cifrado por su servidor para mantener tu sesión, y no recoge datos por su cuenta. El tratamiento por parte de GitHub se rige por su ${external(GITHUB_PRIVACY, 'declaración de privacidad')}.</p>`,
+    },
+    en: {
+      id: 'comments',
+      title: 'Comments (giscus)',
+      body: `<p>Comments and reactions on notes are provided by ${giscus}: when you scroll to that section, your browser connects to giscus.app to load it. They are stored as ${discussions} in the public repository, so anyone can see them.</p><p>To comment or react you must authorize the giscus app through GitHub's OAuth flow. According to its ${external(GISCUS_PRIVACY, 'privacy policy')}, giscus keeps a server-encrypted token in your browser's <code>localStorage</code> to keep you signed in, and does not collect data on its own. GitHub's handling is covered by its ${external(GITHUB_PRIVACY, 'privacy statement')}.</p>`,
+    },
+  };
+};
+
+export function buildPrivacyContent(input: PrivacyInput): Record<'es' | 'en', PrivacyContent> {
+  const content = buildBaseContent(input);
+  if (!input.comments) return content;
+  const section = commentsSection(input.comments.repo);
+  const withSection = (locale: 'es' | 'en'): PrivacyContent => {
+    const { sections } = content[locale];
+    const at = sections.findIndex((item) => item.id === 'contact-form') + 1;
+    return {
+      ...content[locale],
+      sections: [...sections.slice(0, at), section[locale], ...sections.slice(at)],
+    };
+  };
+  return { es: withSection('es'), en: withSection('en') };
+}
+
+function buildBaseContent({
   owner,
   domain,
   contact,

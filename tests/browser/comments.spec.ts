@@ -96,3 +96,17 @@ for (const { locale, path } of NOTES) {
     });
   });
 }
+
+for (const { path, title } of [
+  { path: '/privacy/', title: 'Comentarios (giscus)' },
+  { path: '/en/privacy/', title: 'Comments (giscus)' },
+]) {
+  test(`${path} discloses giscus when comments are configured`, async ({ page }) => {
+    await page.goto(path);
+    const heading = page.getByRole('heading', { name: title });
+    await expect(heading).toBeVisible();
+    await expect(
+      page.locator('a[href="https://github.com/fixture/fixture/discussions"]'),
+    ).toHaveCount(1);
+  });
+}
