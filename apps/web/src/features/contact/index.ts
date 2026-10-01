@@ -3,6 +3,7 @@
  * Client code (the island) must import only client/* and config.ts, never this barrel.
  */
 
+export { resolveClientIp } from './client-ip.ts';
 export { default as ContactPage } from './components/ContactPage.astro';
 export {
   buildContactContent,

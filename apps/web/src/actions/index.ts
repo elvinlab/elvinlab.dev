@@ -1,7 +1,7 @@
 import { ActionError, defineAction } from 'astro:actions';
 import { env } from 'cloudflare:workers';
 
-import { submitConfiguredContact } from '@/features/contact/index.ts';
+import { resolveClientIp, submitConfiguredContact } from '@/features/contact/index.ts';
 
 const FAILURE = 'Unable to send your message. Please try again later.';
 
@@ -16,7 +16,7 @@ export const server = {
       // Cloudflare overwrites this header; never use user input or X-Forwarded-For as identity.
       const result = await submitConfiguredContact(
         input,
-        request.headers.get('cf-connecting-ip') ?? undefined,
+        resolveClientIp(request.headers.get('cf-connecting-ip'), import.meta.env.DEV),
         env,
       );
       if (!result) throw new ActionError({ code: 'SERVICE_UNAVAILABLE', message: FAILURE });
