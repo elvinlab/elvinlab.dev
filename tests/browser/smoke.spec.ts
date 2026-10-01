@@ -37,6 +37,52 @@ for (const { locale, prefix, slug } of [
   }
 }
 
+for (const { locale, path } of [
+  { locale: 'es' as const, path: '/' },
+  { locale: 'en' as const, path: '/en/' },
+]) {
+  test(`${path} keeps the refined home identity and recruiter card`, async ({ page }) => {
+    await page.goto(path);
+
+    const hero = page.locator('[data-home-hero]');
+    await expect(hero).toBeVisible();
+    await expect(hero.locator('h1 .animate-blink')).toHaveCount(0);
+    const navbarBrand = page.locator('[data-navbar]').getByRole('link', { name: /elvinlab/ });
+    await expect(navbarBrand).toHaveAttribute('href', locale === 'es' ? '/' : '/en/');
+    await expect(navbarBrand).toContainText('elvinlab');
+    await expect(navbarBrand).toHaveClass(/font-retro/);
+    await expect(navbarBrand.locator('.animate-blink')).toHaveCount(0);
+    await expect(page.locator('[data-home-fade]')).toHaveCSS('height', '120px');
+
+    await expect(page.locator('img[src="/avatar.png"][alt="Elvin González"]')).toBeVisible();
+
+    const hiringCard = page.locator('section', {
+      has: page.getByRole('heading', { name: locale === 'es' ? '¿Contratando?' : 'Hiring?' }),
+    });
+    const availability = hiringCard.locator('[data-recruiter-status]');
+    await expect(availability).toBeVisible();
+    await expect(
+      hiringCard.getByText(locale === 'es' ? 'Actualmente en Buo' : 'Currently at Buo', {
+        exact: true,
+      }),
+    ).toHaveCount(0);
+    await expect(
+      hiringCard.getByRole('link', { name: locale === 'es' ? 'Ver mi perfil' : 'Open my profile' }),
+    ).toHaveAttribute('href', locale === 'es' ? '/me/' : '/en/me/');
+    await expect(
+      hiringCard.getByRole('link', { name: locale === 'es' ? 'Descargar CV' : 'Download CV' }),
+    ).toHaveCount(0);
+
+    const bannerToggle = page.locator('[data-banner-toggle]');
+    await expect(bannerToggle).toHaveAttribute('aria-pressed', 'true');
+    await bannerToggle.click();
+    await expect(bannerToggle).toHaveAttribute('aria-pressed', 'false');
+    await expect.poll(() => page.evaluate(() => localStorage.getItem('banner-expanded'))).toBe('0');
+    await page.reload();
+    await expect(page.locator('[data-banner-toggle]')).toHaveAttribute('aria-pressed', 'false');
+  });
+}
+
 const CONTACT_PAGES = [
   { locale: 'es' as const, path: '/contact/' },
   { locale: 'en' as const, path: '/en/contact/' },

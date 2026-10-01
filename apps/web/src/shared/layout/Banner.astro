@@ -12,10 +12,12 @@ type Props = {
   expandedHeight?: string;
   /** Show the expand/collapse toggle. */
   expandable?: boolean;
+  /** Blend the bottom edge into the page for the homepage hero only. */
+  homeFade?: boolean;
   locale?: Locale;
 };
 
-const { height = '340px', expandedHeight = 'clamp(520px, 72vh, 640px)', expandable = false, locale = 'es' } = Astro.props;
+const { height = '340px', expandedHeight = 'clamp(520px, 72vh, 640px)', expandable = false, homeFade = false, locale = 'es' } = Astro.props;
 ---
 
 <section
@@ -28,7 +30,8 @@ const { height = '340px', expandedHeight = 'clamp(520px, 72vh, 640px)', expandab
   <div class="banner-stars absolute inset-0 -z-20" aria-hidden="true"></div>
   <div class="banner-glow absolute inset-0 -z-20 motion-reduce:opacity-100" aria-hidden="true"></div>
   <slot name="background" />
-  <div class="relative mx-auto flex h-full min-h-[inherit] max-w-[1200px] flex-col justify-end px-4 pt-24 pb-8">
+  {homeFade && <div aria-hidden="true" class="pointer-events-none absolute inset-x-0 bottom-0 z-0 h-[120px] bg-gradient-to-b from-transparent to-page" data-home-fade></div>}
+  <div class:list={['relative mx-auto flex h-full min-h-[inherit] max-w-[1200px] flex-col justify-end px-4 pt-24 pb-8', homeFade && 'z-10']}>
     <slot />
   </div>
 

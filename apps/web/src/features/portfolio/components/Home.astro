@@ -34,12 +34,12 @@ const experiments = isEnabled('experiments')
 ---
 
 <BaseLayout locale={locale} path="/">
-  <Banner slot="banner" height="150px" expandedHeight="clamp(520px, 66vh, 620px)" locale={locale} expandable>
+  <Banner slot="banner" height="150px" expandedHeight="clamp(520px, 66vh, 620px)" locale={locale} expandable homeFade>
     <BackgroundCanvas slot="background" />
-    <div data-hero-content class="flex flex-col">
+    <div data-hero-content data-home-hero class="flex flex-col">
       <p class="font-mono text-sm text-cyan">{t(locale, 'notes.eyebrow', { handle: site.identity.handle })}</p>
       <h1 class="mt-3 max-w-[16ch] font-display text-5xl font-bold leading-[1.05] md:text-6xl">
-        {site.identity.role[locale]}<span class="ml-1 inline-block h-10 w-2.5 animate-blink bg-pink align-baseline md:h-12"></span>
+        {site.identity.role[locale]}<span aria-hidden="true" class="ml-1 inline-block h-3 w-2.5 bg-pink align-baseline md:h-4"></span>
       </h1>
       <p class="mt-4 max-w-[52ch] text-lg leading-relaxed text-text-secondary md:text-xl">{t(locale, 'home.intro')}</p>
       <ul class="mt-5 hidden flex-wrap gap-2 md:flex">
