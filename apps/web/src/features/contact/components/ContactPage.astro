@@ -1,0 +1,35 @@
+---
+/**
+ * Contact page component: renders the locale-specific contact content with the form island.
+ */
+
+import { ContactForm } from '@/features/contact/components/ContactForm.tsx';
+import { buildContactContent } from '@/features/contact/content.ts';
+import type { Locale } from '@/shared/i18n/index.ts';
+import BaseLayout from '@/shared/layout/BaseLayout.astro';
+
+type Props = {
+  locale: Locale;
+};
+
+const { locale } = Astro.props;
+const content = buildContactContent()[locale];
+const siteKey = import.meta.env.PUBLIC_TURNSTILE_SITE_KEY || undefined;
+---
+
+<BaseLayout locale={locale} path="/contact/" title={content.pageTitle} description={content.pageDescription}>
+  <article class="max-w-xl">
+    <header class="mb-8">
+      <h1 class="text-3xl font-bold tracking-tight">{content.pageTitle}</h1>
+      <p class="mt-2 text-muted">{content.pageDescription}</p>
+    </header>
+
+    <p class="mb-8 text-text-secondary">{content.intro}</p>
+
+    <ContactForm client:visible siteKey={siteKey} strings={content.form} />
+
+    <noscript>
+      <p class="mt-6 text-sm text-muted">{content.noscript}</p>
+    </noscript>
+  </article>
+</BaseLayout>

@@ -114,12 +114,18 @@ export function ContactForm({ siteKey, strings }: Props) {
   const [widgetId, setWidgetId] = useState<string | null>(null);
   const [verifying, setVerifying] = useState(false);
   const [turnstileLoadError, setTurnstileLoadError] = useState(false);
+  const [ready, setReady] = useState(false);
   // A ref, not state: the widget callback is created once and would capture a stale value.
   const submitPendingRef = useRef(false);
   const startedAtRef = useRef<number>(Date.now());
   const widgetContainerRef = useRef<HTMLDivElement>(null);
   const formRef = useRef<HTMLFormElement>(null);
   const loaderInitialized = useRef(false);
+
+  useEffect(() => {
+    setReady(true);
+    startedAtRef.current = Date.now();
+  }, []);
 
   const dispatch = useCallback((event: FormEvent) => {
     setState((prev: FormState) => formReducer(prev, event));
@@ -248,7 +254,7 @@ export function ContactForm({ siteKey, strings }: Props) {
 
   const isSubmitting = state.status === 'submitting';
   const isError = state.status === 'error';
-  const disabled = isSubmitting || !siteKey || turnstileLoadError;
+  const disabled = isSubmitting || !siteKey || turnstileLoadError || !ready;
 
   if (state.status === 'success') {
     return (
