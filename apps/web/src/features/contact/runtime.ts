@@ -39,9 +39,15 @@ export async function submitConfiguredContact(
   ip: string | undefined,
   bindings: unknown,
   request: typeof fetch = fetch,
+  log: (message: string) => void = console.error,
 ): Promise<ContactResult | null> {
   const parsed = bindingsSchema.safeParse(bindings);
-  if (!parsed.success) return null;
+  if (!parsed.success) {
+    // Names only: a rejected value may be a secret, so it never reaches the log.
+    const names = new Set(parsed.error.issues.map((issue) => String(issue.path[0] ?? 'bindings')));
+    log(`contact unavailable, bindings rejected: ${[...names].join(', ')}`);
+    return null;
+  }
   const config = parsed.data;
   return submitContact(input, ip, {
     now: Date.now,

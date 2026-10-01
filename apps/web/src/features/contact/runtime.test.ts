@@ -81,6 +81,30 @@ describe('configured contact runtime', () => {
     expect(request).not.toHaveBeenCalled();
   });
 
+  it('reports only the names of the invalid bindings, never their values', async () => {
+    const log = vi.fn<(message: string) => void>();
+    const secret = 'super-secret-value\n';
+    const env = { ...bindings(), RESEND_API_KEY: secret, CONTACT_FROM: 'invalid' };
+    delete (env as Record<string, unknown>)['TURNSTILE_HOSTNAME'];
+
+    expect(await submitConfiguredContact(input(), '192.0.2.1', env, mockFetch(), log)).toBeNull();
+
+    expect(log).toHaveBeenCalledTimes(1);
+    const message = log.mock.calls[0]?.[0] ?? '';
+    for (const name of ['RESEND_API_KEY', 'CONTACT_FROM', 'TURNSTILE_HOSTNAME']) {
+      expect(message).toContain(name);
+    }
+    expect(message).not.toContain('super-secret-value');
+    expect(message).not.toContain('invalid');
+    expect(message).not.toContain('TURNSTILE_SECRET_KEY');
+  });
+
+  it('stays silent when the bindings are valid', async () => {
+    const log = vi.fn<(message: string) => void>();
+    await submitConfiguredContact(input(), '192.0.2.1', bindings(), mockFetch(), log);
+    expect(log).not.toHaveBeenCalled();
+  });
+
   it('reads configuration each request, never caches a valid credential set', async () => {
     const env = bindings();
     const request = mockFetch();
