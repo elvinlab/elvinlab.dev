@@ -1,0 +1,103 @@
+---
+number: 2
+title: "Claude piensa, los modelos baratos teclean: mi entorno multi-agente por US$20 al mes"
+description: "Un orquestador de pago decide y revisa; modelos gratuitos y uno local ejecutan. Así enruto el trabajo con herdr, OpenCode, OmniRoute, Ollama y Engram."
+pubDate: 2026-10-01
+lang: es
+category: agentes-ia
+tags: [agentes-ia, herdr, opencode, ollama, engram]
+decision:
+  context: "Quería programar a diario con agentes de IA sin pagar una suscripción por cada modelo y sin quedarme sin trabajo cuando se agota una cuota."
+  decision: "Un solo cerebro de pago decide, delega y revisa; el trabajo acotado corre en modelos gratuitos enrutados por OmniRoute, con un modelo local como último escalón."
+  outcome: "US$20 al mes en total, US$0 en el trabajo delegado y una tubería que sigue funcionando aunque se agoten todas las cuotas en la nube."
+---
+
+## El problema
+
+Quería construir proyectos personales con agentes de IA todos los días, sin que la factura creciera con cada modelo nuevo y sin depender de que una cuota gratuita siguiera disponible. Cada herramienta resolvía una parte; ninguna resolvía el reparto del trabajo.
+
+Ese reparto es lo que hay en [`agentic-dev-setup`](https://github.com/elvinlab/agentic-dev-setup), el entorno con el que programo cada día y con el que construí [este sitio](/notes/como-construi-este-sitio/). Es de código abierto (MIT), con README en español e inglés.
+
+## Un cerebro, muchas manos
+
+**Claude Code** hace el razonamiento. Cuando una tarea es trivial o está bien delimitada, la pasa a través de **herdr** a agentes de **OpenCode**. Esos agentes hablan con **OmniRoute**, que enruta cada petición a modelos gratuitos en la nube y, si todos fallan, cae en **qwen3:14b corriendo en mi propia GPU**. **Engram** les da a todos la misma memoria, y Claude revisa cada diff antes de que cuente.
+
+```txt title="la tubería"
+Yo ─▶ Claude Code ──herdr──▶ OpenCode (niveles 1 y 2)
+                                  │
+                                  ▼
+                       OmniRoute (localhost:20128)
+        ┌─────────┬────────┬───────┴──┬─────────┐
+      Groq     NVIDIA   Mistral    Gemini   Ollama · qwen3:14b
+
+Engram: memoria compartida por todos los agentes
+```
+
+El trabajo se reparte en tres niveles:
+
+- **Nivel 1, trivial:** renombres, correcciones de lint, textos i18n, mensajes de commit, ediciones mecánicas de uno o dos archivos.
+- **Nivel 2, acotado:** tests, boilerplate, documentación, componentes simples y refactors con una especificación clara.
+- **Nivel 3, complejo:** arquitectura, decisiones de diseño, depuración difícil, código sensible a seguridad y requisitos ambiguos. Lo hace Claude Code, sin delegar.
+
+Hay una regla más, y es la que evita delegar por reflejo: si escribir el brief cuesta más que hacer el cambio, lo hago yo.
+
+## Combos y degradación elegante
+
+OmniRoute agrupa los modelos en tres combos con estrategia de prioridad: responde el primer proveedor sano y el resto son respaldo. Los dos primeros terminan siempre en el modelo local.
+
+```txt title="los tres combos"
+elvinlabFast   (nivel 1)  Groq gpt-oss-120b → Groq gpt-oss-20b → NVIDIA nemotron-3.5-lightning → qwen3:14b local
+elvinlabCode   (nivel 2)  NVIDIA nemotron-3-ultra → Mistral codestral → Gemini 3-flash → qwen3:14b local
+elvinlabLocal  (offline)  qwen3:14b local
+```
+
+Cambiar toda la delegación entre nube y local es un comando: `agent-profile cloud` o `agent-profile local`. Y ningún modelo está escrito a fuego: Claude lee un archivo de configuración antes de cada delegación, así que cambiar de proveedor es cambiar ese archivo, no las reglas.
+
+> Las cuotas se agotan; la tubería no.
+
+## Una IA local que cabe en 12 GB
+
+Un modelo de 14B en una GPU de consumidor solo funciona si cada byte de VRAM cuenta. La referencia es una RTX 3060 de 12 GB con `qwen3:14b` y 16k de contexto, y el servicio de Ollama está ajustado con una anulación de systemd:
+
+```ini title="ollama.service.d/override.conf"
+[Service]
+Environment="OLLAMA_FLASH_ATTENTION=1"
+Environment="OLLAMA_KV_CACHE_TYPE=q8_0"
+Environment="OLLAMA_CONTEXT_LENGTH=16384"
+Environment="OLLAMA_NUM_PARALLEL=1"
+Environment="OLLAMA_MAX_LOADED_MODELS=1"
+Environment="OLLAMA_KEEP_ALIVE=30m"
+```
+
+La caché KV en `q8_0` reduce a la mitad su tamaño para que el contexto de 16k quepa en VRAM; una sola petición a la vez y un solo modelo cargado evitan repartir la memoria. Además el servicio es bajo demanda: nunca arranca con el sistema. `ollama-up` y `ollama-down` lo inician y lo detienen, así la GPU queda libre cuando no estoy programando.
+
+## Una memoria para todos
+
+Engram persiste decisiones y convenciones a través de cada agente y de cada sesión. Claude Code, Codex y los agentes de OpenCode leen y escriben en la misma memoria, así que lo que se decide en una sesión no se pierde cuando empieza la siguiente.
+
+Codex, de hecho, entra como un segundo orquestador cuando Claude Code no está disponible: un par, no un agente delegado, con los mismos combos y la misma memoria.
+
+## Lo que aprendí delegando
+
+El repositorio tiene un archivo de lecciones donde escribo cada problema resuelto. Cuatro que cambiaron cómo trabajo:
+
+- **Las instrucciones también cuestan.** Cada petición lleva unos 45–50k tokens entre instrucciones y herramientas. Eso agota las cuotas rápido y ni siquiera cabe en el contexto de 16k del modelo local, que la recibe truncada.
+- **Los modelos gratuitos a veces inventan.** Uno guardó en la memoria que un proyecto usaba la Composition API cuando en realidad usaba la Options API. Por eso Claude verifica cada afirmación y cada resultado antes de darlo por bueno.
+- **Un modelo local que no cabe se nota en la GPU.** Si `ollama ps` muestra algo como `31%/69% CPU/GPU`, el modelo no entra en la VRAM. En mi caso otra aplicación estaba ocupando unos 3 GB.
+- **Los interruptores automáticos esconden el problema.** Si un combo salta directo al último paso sin probar los anteriores, es que sus proveedores quedaron marcados como no saludables tras muchos errores: se corrige la causa y se reinicia la puerta de enlace.
+
+De la parte de agentes, además, salió una regla que apliqué en este mismo sitio: verificar el reporte de cada agente con `git status`, `git diff --stat`, el build y comprobaciones independientes, en lugar de creerle al resumen.
+
+## Decisiones de diseño
+
+- **Los secretos nunca tocan git.** Se leen de variables de entorno, y las claves se respaldan en un archivo cifrado con `age`.
+- **Solo localhost.** La puerta de enlace se enlaza a `127.0.0.1` y exige clave de API. Sin túneles.
+- **"Local" significa enrutado a local, no sellado.** El modelo local se alcanza a través de OmniRoute, así que la garantía de privacidad vive en el enrutamiento y no en el cliente.
+- **Los humanos siguen al mando.** Los modelos baratos nunca envían código sin revisar.
+- **Todo es reconstruible.** Scripts idempotentes de arranque, restauración y parches devuelven una máquina nueva a este estado.
+
+## Probarlo
+
+El repositorio está pensado para quien quiere construir proyectos personales con agentes sin pagar una suscripción cara: una sola suscripción de US$20 al mes y una GPU de 12 GB alcanzan. Una nota de transparencia que también está en el README: se desarrolla y se prueba con Claude Sonnet a esfuerzo medio, no con el modelo más grande. Es a propósito, para mostrar que un modelo intermedio bien orquestado rinde lo suficiente para proyectos reales.
+
+Si lo pruebas, la caja de comentarios de abajo es el mejor lugar para contarme qué falló.

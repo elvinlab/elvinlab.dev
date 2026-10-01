@@ -94,5 +94,11 @@
     "category": "added",
     "title": "Comments and reactions on notes",
     "description": "Every note now has a discussion area powered by giscus: comments and reactions live in GitHub Discussions, you sign in with GitHub to take part, and nothing loads until you scroll down to it."
+  },
+  "first-notes": {
+    "date": "2026-10-01",
+    "category": "added",
+    "title": "First two Lab Notes",
+    "description": "How this site was built, and the multi-agent development setup behind it, both written in Spanish."
   }
 }

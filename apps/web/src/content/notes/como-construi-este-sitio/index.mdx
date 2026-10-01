@@ -1,0 +1,101 @@
+---
+number: 1
+title: "Cómo construí este sitio: decisiones, presupuestos y un CI que fui simplificando"
+description: "Del plan a producción en menos de una semana: qué decidí, qué medí y qué se rompió al construir elvinlab.dev desde cero con Astro, Cloudflare y agentes de IA."
+pubDate: 2026-10-01
+lang: es
+category: decisiones
+tags: [astro, cloudflare, arquitectura, ci, testing]
+decision:
+  context: "Tenía un sitio anterior que funcionaba, pero quería un blog con una base de diseño reutilizable, medible y configurable solo con contenido."
+  decision: "Reconstruir desde cero: monorepo con base compartida, identidad por configuración y presupuestos de rendimiento verificados en CI."
+  outcome: "En producción desde el 1 de octubre de 2026, con Lighthouse móvil de 95 o más y un CI que corre una sola vez y despliega si todo pasa."
+---
+
+## El punto de partida
+
+Tenía un sitio anterior que funcionaba. Copiar sus componentes habría sido lo más rápido, y justamente por eso lo descarté: el objetivo no era terminar pronto, era construir una base de diseño que pudiera sostener un blog, un portafolio y, más adelante, otros proyectos.
+
+Así que reconstruí desde cero y me quedé solo con el contenido y las ideas. El primer commit es del 27 de septiembre de 2026; la primera versión en producción, del 1 de octubre.
+
+## Una base compartida, pero solo cuando se repite
+
+El repositorio es un monorepo con dos paquetes:
+
+```txt title="estructura"
+apps/web/        → blog + portafolio (Astro)
+packages/core/   → @elvinlab/core: tokens, temas, i18n
+```
+
+La regla que más veces apliqué: **algo nace en el proyecto y se mueve a `core` el día que se repite**. No diseñé `core` por adelantado. Y `core` es solo presentación: no hace `fetch` ni guarda nada; recibe datos por props y emite eventos.
+
+Los componentes tampoco leen nunca un color directo. Leen variables semánticas (`--color-primary`, `--color-card`), y el tema es apenas un conjunto de valores para esas variables. Cambiar de tema es cambiar valores, no tocar componentes.
+
+## Blanco por diseño
+
+Otra persona debería poder reemplazar nombre, bio, posts, experiencia, colores, favicon y redes con configuración y contenido, y quedarse con el estilo visual: el layout, el movimiento, los motivos. Todo lo que hace que este sitio sea mío vive en un archivo:
+
+```ts title="site.config.ts (extracto)"
+export const siteConfig = {
+  url: 'https://elvinlab.dev',
+  title: 'elvinlab.dev',
+  locales: { default: 'es', supported: ['es', 'en'] },
+  identity: { name: 'Elvin González', handle: 'elvinlab', startedYear: 2020 },
+  features: { blog: true, comments: true, contact: true, me: true },
+};
+```
+
+Decir que algo es white-label es fácil; lo difícil es que siga siendo cierto. Por eso hay una comprobación que construye el sitio con una identidad alternativa (una tal Jane Doe) y falla si se filtra una sola cadena mía en el HTML. Y antes de confiar en esa prueba, ella misma se prueba: busca primero esas cadenas en la configuración real, para no pasar en vacío.
+
+## Presupuestos, no promesas
+
+Tres controles que se verifican en cada versión:
+
+- **30 KiB** de JavaScript comprimido como máximo por página. La home pesa unos 6.
+- **Lighthouse móvil** con las cuatro categorías en 95 o más, un LCP de 2.5 s como máximo y un CLS de 0.1 como máximo. Si no se cumple, el CI falla.
+- **Accesibilidad con axe** (reglas WCAG 2 A, AA y 2.1 AA) en los dos temas y en tres anchos: 360, 768 y 1280 px.
+
+Para que el JavaScript entre en el presupuesto, Preact aparece solo donde hay una isla real. Hoy es una: el formulario de contacto. El resto es HTML estático.
+
+## Un CI que fui simplificando
+
+Empezó con lo que hace casi todo el mundo. Puertas en paralelo (análisis estático, pruebas e2e y Lighthouse) detrás de un único job agregado que exigía la protección de ramas, más un entorno de staging y un despliegue de preview por cada PR.
+
+Para un proyecto de una sola persona que itera todo el día, eso significaba esperar un pipeline completo en cada push. El ADR 0011 movió la única ejecución al PR de `develop` hacia `main` y eliminó el staging. El ADR 0012 fue un paso más: `main` pasó a ser un push directo, sin PR. Ese push es lo único que dispara el CI, que corre primero las puertas y después despliega a producción con una comprobación de humo y rollback automático, todo en la misma ejecución.
+
+> Cada simplificación quedó escrita como un ADR que reemplaza al anterior, junto con lo que se pierde: ahora no hay un entorno previo a producción, y un commit roto llega al historial de `main` aunque no se despliegue.
+
+La regla de historial lineal del repositorio también tuvo su momento: un PR que se integró como squash hizo divergir `main`, y la salida fue publicar con un único commit cuyo árbol es el de `develop`.
+
+## Lo que se rompió
+
+Tres bugs reales, con su causa:
+
+- **El formulario de contacto fallaba en producción.** `fetch` en Cloudflare Workers no admite `redirect: 'error'`. La corrección es una línea:
+
+```ts title="adapters/turnstile.ts"
+redirect: 'manual', // Workers has no 'error'; a 3xx is not ok, so it is rejected below
+```
+
+- **El selector de fondos se quedaba en blanco en Firefox** después de cambiar de efecto unas cuantas veces. Firefox limita con más rigor los contextos WebGL simultáneos y yo abría uno nuevo en cada cambio. Ahora cada canvas reutiliza el suyo.
+- **Lighthouse marcaba el CSS como bloqueante.** El CSS de cada página es tan pequeño que una hoja de estilos aparte cuesta más que incrustarlo. Con `inlineStylesheets: 'always'` esa auditoría pasó a 1.0 y el rendimiento a 0.96.
+
+## Lanzar con compuertas
+
+Al lanzar había superficies sin terminar, como los experimentos y `/me`. En lugar de retrasar todo, las puse detrás de banderas en la configuración. Apagadas, no tienen enlace en la navegación, devuelven `noindex` y no aparecen en el sitemap (ADR 0008). Encenderlas es un cambio de configuración, y los tests ya lo verifican. Por eso el sitio pudo salir antes que su última página.
+
+## Cómo trabajo
+
+Cada tarea es un issue de GitHub escrito como un brief de delegación, con un nivel: 1 (trivial), 2 (acotado) o 3 (complejo). Los niveles 1 y 2 los ejecutan modelos más baratos; el 3 y la revisión de cada diff delegado los hace el modelo grande. Todo con TDD estricto. El detalle de esa tubería es el tema de la [nota 002](/notes/agentic-dev-setup/).
+
+## Y la caja de comentarios
+
+Si al final de esta nota ves comentarios, son de [giscus](https://giscus.app): viven en GitHub Discussions, hace falta una cuenta de GitHub para participar y no se carga nada hasta que se llega hasta ahí. Incluyen reacciones, y fue una de las últimas piezas en entrar.
+
+## Lo que me llevo
+
+Tres reglas que se repitieron a lo largo del proyecto:
+
+- Nace en el proyecto, se mueve a `core` cuando se repite.
+- Si no se mide, es una promesa.
+- Cada decisión que cambia queda escrita, con lo que cuesta.
