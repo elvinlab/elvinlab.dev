@@ -1,0 +1,70 @@
+---
+/**
+ * Cycles the banner background effect (galaxy -> cursor-waves -> off) and remembers the choice,
+ * the same way `ThemeToggle` works. Dispatches `background-change` so `BackgroundCanvas` swaps the
+ * running effect in place, without a page reload.
+ */
+import { site } from '@/shared/config/index.ts';
+import { BACKGROUND_STORAGE_KEY } from '@/shared/lib/background-preference.ts';
+
+type Props = { label: string };
+
+const { label } = Astro.props;
+---
+
+<button
+  type="button"
+  class="grid size-11 place-items-center rounded-control text-text transition-colors duration-150 hover:bg-card-hover active:scale-96"
+  aria-label={label}
+  data-background-toggle
+  data-storage-key={BACKGROUND_STORAGE_KEY}
+  data-owner-galaxy={site.background.galaxy}
+  data-owner-waves={site.background.cursorWaves}
+>
+  <svg data-icon="galaxy" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v3M12 18v3M3 12h3M18 12h3M5.6 5.6l2.1 2.1M16.3 16.3l2.1 2.1M18.4 5.6l-2.1 2.1M7.7 16.3l-2.1 2.1"></path><circle cx="12" cy="12" r="3"></circle></svg>
+  <svg data-icon="cursor-waves" class="hidden" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12c2-3 4-3 6 0s4 3 6 0 4-3 6 0M2 17c2-3 4-3 6 0s4 3 6 0 4-3 6 0"></path></svg>
+  <svg data-icon="off" class="hidden" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"></circle><path d="M5 5l14 14"></path></svg>
+</button>
+
+<script>
+  import {
+    type BackgroundChoice,
+    nextBackgroundChoice,
+    ownerDefaultChoice,
+    resolveBackgroundChoice,
+  } from '@/shared/lib/background-preference.ts';
+
+  const syncIcon = (button: HTMLElement, choice: BackgroundChoice): void => {
+    for (const icon of button.querySelectorAll<SVGElement>('[data-icon]')) {
+      icon.classList.toggle('hidden', icon.dataset['icon'] !== choice);
+    }
+  };
+
+  for (const button of document.querySelectorAll<HTMLButtonElement>('[data-background-toggle]')) {
+    const storageKey = button.dataset['storageKey'] ?? 'background';
+    const ownerDefault = ownerDefaultChoice({
+      galaxy: button.dataset['ownerGalaxy'] === 'true',
+      cursorWaves: button.dataset['ownerWaves'] === 'true',
+    });
+
+    let stored: string | null = null;
+    try {
+      stored = localStorage.getItem(storageKey);
+    } catch {
+      // Storage can be blocked (privacy modes); the picker still works for this page view.
+    }
+    let current = resolveBackgroundChoice(stored, ownerDefault);
+    syncIcon(button, current);
+
+    button.addEventListener('click', () => {
+      current = nextBackgroundChoice(current);
+      try {
+        localStorage.setItem(storageKey, current);
+      } catch {
+        // Storage can be blocked (privacy modes); the effect still swaps for this page view.
+      }
+      syncIcon(button, current);
+      document.dispatchEvent(new CustomEvent('background-change', { detail: current }));
+    });
+  }
+</script>

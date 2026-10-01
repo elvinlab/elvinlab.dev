@@ -1,39 +1,48 @@
 ---
 /**
- * Mounts the banner background effects enabled in site.config (`background.galaxy`,
- * `background.cursorWaves`), one canvas each, with palettes sampled from the active theme's tokens.
- * Purely decorative: it does nothing under prefers-reduced-motion, without WebGL2, or when every
- * effect is off, so the banner's static grid, glows and CSS starfield remain the fallback.
+ * Mounts the banner background: one canvas, running the visitor's chosen effect (persisted in
+ * localStorage via `BackgroundPicker`) or the owner's default from `site.config` when the visitor
+ * has none. Purely decorative: it does nothing under prefers-reduced-motion, without WebGL2, or
+ * when the resolved choice is 'off', so the banner's static grid, glows and CSS starfield remain
+ * the fallback. Swaps effects live, in place, without a page reload (`BackgroundPicker` dispatches
+ * a `background-change` event this script listens for).
  */
 import { site } from '@/shared/config/index.ts';
-
-const effects = [
-  { key: 'galaxy', on: site.background.galaxy },
-  { key: 'cursor-waves', on: site.background.cursorWaves },
-].filter((effect) => effect.on);
 ---
 
-{effects.map((effect) => (
-  <canvas data-background data-effect={effect.key} class="absolute inset-0 -z-10 size-full motion-reduce:hidden"></canvas>
-))}
+<canvas
+  data-background
+  data-owner-galaxy={site.background.galaxy}
+  data-owner-waves={site.background.cursorWaves}
+  class="absolute inset-0 -z-10 size-full motion-reduce:hidden"
+></canvas>
 
 <script>
   import { parseColor } from '@/features/backgrounds/lib/color.ts';
-  import type { Background } from '@/features/backgrounds/lib/contract.ts';
+  import type { Background, BackgroundHandle } from '@/features/backgrounds/lib/contract.ts';
   import { createCursorWaves } from '@/features/backgrounds/lib/cursor-waves.ts';
   import { createGalaxy } from '@/features/backgrounds/lib/galaxy.ts';
+  import type { BackgroundChoice } from '@/shared/lib/background-preference.ts';
+  import {
+    BACKGROUND_STORAGE_KEY,
+    ownerDefaultChoice,
+    resolveBackgroundChoice,
+  } from '@/shared/lib/background-preference.ts';
 
-  const factories: Record<string, Background> = {
+  const factories: Record<Exclude<BackgroundChoice, 'off'>, Background> = {
     galaxy: createGalaxy,
     'cursor-waves': createCursorWaves,
   };
 
-  const canvases = [...document.querySelectorAll<HTMLCanvasElement>('[data-background]')];
+  const canvas = document.querySelector<HTMLCanvasElement>('[data-background]');
   const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
-
   const coarsePointer = matchMedia('(pointer: coarse)').matches;
+  if (canvas && !reduced && !coarsePointer && 'WebGL2RenderingContext' in window) {
+    const ownerDefault = ownerDefaultChoice({
+      galaxy: canvas.dataset['ownerGalaxy'] === 'true',
+      cursorWaves: canvas.dataset['ownerWaves'] === 'true',
+    });
 
-  if (canvases.length > 0 && !reduced && !coarsePointer && 'WebGL2RenderingContext' in window) {
     const readPalette = () => {
       const styles = getComputedStyle(document.documentElement);
       const token = (name: string) => parseColor(styles.getPropertyValue(name).trim());
@@ -45,21 +54,42 @@ const effects = [
       };
     };
 
-    const handles = canvases.flatMap((canvas) => {
-      const create = factories[canvas.dataset['effect'] ?? ''];
-      return create ? [create(canvas, readPalette())] : [];
+    let handle: BackgroundHandle | null = null;
+
+    const stop = (): void => {
+      handle?.destroy();
+      handle = null;
+    };
+
+    const run = (choice: BackgroundChoice): void => {
+      stop();
+      // 'off' hides the canvas so the banner's CSS starfield fallback shows through underneath.
+      canvas.style.display = choice === 'off' ? 'none' : '';
+      if (choice === 'off') return;
+      handle = factories[choice](canvas, readPalette());
+    };
+
+    let stored: string | null = null;
+    try {
+      stored = localStorage.getItem(BACKGROUND_STORAGE_KEY);
+    } catch {
+      // Storage can be blocked (privacy modes); fall back to the owner default for this view.
+    }
+    run(resolveBackgroundChoice(stored, ownerDefault));
+
+    // Recolor the running effect in place on theme change — rebuilding a GL context would lose it.
+    const themeObserver = new MutationObserver(() => {
+      if (handle) handle.setPalette(readPalette());
+    });
+    themeObserver.observe(document.documentElement, { attributeFilter: ['data-theme'] });
+
+    document.addEventListener('background-change', (event) => {
+      run((event as CustomEvent<BackgroundChoice>).detail);
     });
 
-    // Recolor every effect in place on theme change — rebuilding a GL context would lose it.
-    const observer = new MutationObserver(() => {
-      const palette = readPalette();
-      for (const handle of handles) handle.setPalette(palette);
-    });
-    observer.observe(document.documentElement, { attributeFilter: ['data-theme'] });
-
-    const dispose = () => {
-      for (const handle of handles) handle.destroy();
-      observer.disconnect();
+    const dispose = (): void => {
+      stop();
+      themeObserver.disconnect();
     };
     document.addEventListener('astro:before-swap', dispose, { once: true });
     window.addEventListener('pagehide', dispose, { once: true });

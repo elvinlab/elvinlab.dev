@@ -1,5 +1,44 @@
 import { expect, test } from '@playwright/test';
 
+test('the background picker cycles galaxy -> cursor-waves -> off at runtime, no reload', async ({
+  browser,
+}) => {
+  // Effects are intentionally inert under prefers-reduced-motion (the project default); override
+  // it here, like the fine-pointer test below, to exercise the actual runtime swap.
+  const context = await browser.newContext({ reducedMotion: 'no-preference' });
+  const page = await context.newPage();
+  await page.goto('/');
+  const picker = page.getByRole('button', { name: /cambiar fondo|change background/i });
+  const stored = () => page.evaluate(() => localStorage.getItem('background'));
+
+  await picker.click();
+  expect(await stored()).toBe('cursor-waves');
+  await expect(page.locator('[data-background]')).toBeVisible();
+
+  await picker.click();
+  expect(await stored()).toBe('off');
+  await expect(page.locator('[data-background]')).not.toBeVisible();
+
+  await picker.click();
+  expect(await stored()).toBe('galaxy');
+  await expect(page.locator('[data-background]')).toBeVisible();
+  await context.close();
+});
+
+test('the background choice persists across reloads', async ({ browser }) => {
+  const context = await browser.newContext({ reducedMotion: 'no-preference' });
+  const page = await context.newPage();
+  await page.goto('/');
+  const picker = page.getByRole('button', { name: /cambiar fondo|change background/i });
+  await picker.click();
+  await picker.click();
+  expect(await page.evaluate(() => localStorage.getItem('background'))).toBe('off');
+
+  await page.reload();
+  await expect(page.locator('[data-background]')).not.toBeVisible();
+  await context.close();
+});
+
 type BackgroundProbe = { webgl2Attempts: number; animationFrames: number };
 
 const instrumentBackground = (): void => {
