@@ -15,20 +15,67 @@ type ImageSchema = () => z.ZodType;
 export function noteSchema(image: ImageSchema) {
   return z
     .object({
-      /** Entry number shown as `Note 003`; a translation reuses the number of its original. */
-      number: z.int().positive(),
-      title: z.string().trim().min(1).max(90),
-      /** Search snippet and card summary. */
-      description: z.string().trim().min(1).max(160),
-      pubDate: z.coerce.date(),
-      updatedDate: z.coerce.date().optional(),
-      lang: z.enum(LOCALES.locales),
-      /** Slug of the same note in another language, for hreflang and the language switch. */
-      translationOf: z.string().regex(kebab).optional(),
-      category: z.string().regex(kebab),
-      tags: z.array(z.string().regex(kebab)).max(5).default([]),
-      cover: image().optional(),
-      decision: z.object({ context: summary, decision: summary, outcome: summary }),
+      number: z
+        .int()
+        .positive()
+        .describe(
+          'Entry number shown as `Nota 001`; a translation reuses the number of its original.',
+        ),
+      title: z
+        .string()
+        .trim()
+        .min(1)
+        .max(90)
+        .describe(
+          'Note title (max 90 characters): the page title and the headline of the share card.',
+        ),
+      description: z
+        .string()
+        .trim()
+        .min(1)
+        .max(160)
+        .describe('One sentence for search results and link previews (max 160 characters).'),
+      pubDate: z.coerce.date().meta({
+        description: 'Publication date. Notes with the same date sort by number, highest first.',
+        'x-type': 'date (YYYY-MM-DD)',
+      }),
+      updatedDate: z.coerce.date().optional().meta({
+        description: 'Date of the last meaningful edit; must not be earlier than `pubDate`.',
+        'x-type': 'date (YYYY-MM-DD)',
+      }),
+      lang: z
+        .enum(LOCALES.locales)
+        .describe('Language the note is written in (one language per note).'),
+      translationOf: z
+        .string()
+        .regex(kebab)
+        .optional()
+        .describe(
+          'Reserved: slug of the same note in the other language. Recorded only; it does not yet drive hreflang or the language switch.',
+        ),
+      category: z
+        .string()
+        .regex(kebab)
+        .describe(
+          'One category in kebab-case (for example `decisiones`); shown above the title and used to group the index.',
+        ),
+      tags: z
+        .array(z.string().regex(kebab))
+        .max(5)
+        .default([])
+        .describe('Up to five kebab-case tags.'),
+      cover: image().optional().meta({
+        description:
+          'Reserved: accepted but not displayed yet (the share card is generated from the title).',
+        'x-type': 'image path',
+      }),
+      decision: z
+        .object({
+          context: summary.describe('What forced a decision (max 280 characters).'),
+          decision: summary.describe('What you chose and what you ruled out (max 280 characters).'),
+          outcome: summary.describe('What happened next (max 280 characters).'),
+        })
+        .describe('Decision record shown before the text: context, decision and outcome.'),
     })
     .refine((note) => !note.updatedDate || note.updatedDate >= note.pubDate, {
       path: ['updatedDate'],

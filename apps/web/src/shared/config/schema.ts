@@ -5,113 +5,242 @@ const httpsUrl = z.url({ protocol: /^https$/, error: 'must be an https URL' });
 /** Text keyed by locale, e.g. `{ es: 'Hola', en: 'Hello' }`. Checked against `locales` below. */
 const localized = z.record(z.string(), z.string().trim().min(1));
 
-const siteConfigSchema = z
+/**
+ * The shape of `src/site.config.ts`: the one file that holds every setting of the site. Each field
+ * is described with `.describe()`: those texts are the source of the reference tables in the
+ * configuration guide (`pnpm docs:config`), and a test fails if a field has no description.
+ */
+export const siteConfigSchema = z
   .object({
-    url: httpsUrl,
-    /** Site name: browser tab suffix, Open Graph site name, footer. */
-    title: z.string().trim().min(1),
-    description: localized,
-    locales: z.object({
-      default: z.string().min(2),
-      supported: z.array(z.string().min(2)).nonempty(),
-    }),
-    identity: z.object({
-      name: z.string().trim().min(1),
-      handle: z.string().regex(/^[a-z0-9-]+$/),
-      role: localized,
-      bio: localized,
-      location: z.string().trim().min(1).optional(),
-      /** First year of professional work; years of experience are derived from it. */
-      startedYear: z.int().min(1970),
-      /** Site-relative path to a profile photo (e.g. `/avatar.png`). Omit to show initials instead. */
-      avatar: z.string().trim().min(1).optional(),
-    }),
-    /** https only: an email address never belongs in public config (contact goes through /contact). */
-    socials: z.array(
-      z.object({ label: z.string().min(1), url: httpsUrl, icon: z.string().min(1) }),
+    url: httpsUrl.describe(
+      'Canonical origin of the site (https). Used for canonical links, the sitemap and share images.',
     ),
-    /** Banner background effects, each toggled independently (all read the theme palette). */
+    title: z
+      .string()
+      .trim()
+      .min(1)
+      .describe('Site name: browser tab suffix, Open Graph site name and footer.'),
+    description: localized.describe(
+      'Default meta description per locale (shown in search results and link previews).',
+    ),
+    locales: z
+      .object({
+        default: z
+          .string()
+          .min(2)
+          .describe('Default locale, served without a URL prefix (for example `es` at `/`).'),
+        supported: z
+          .array(z.string().min(2))
+          .nonempty()
+          .describe(
+            'Every locale the UI is translated into; non-default ones live under `/<locale>/`.',
+          ),
+      })
+      .describe('Languages of the site.'),
+    identity: z
+      .object({
+        name: z.string().trim().min(1).describe('Full name of the site owner.'),
+        handle: z
+          .string()
+          .regex(/^[a-z0-9-]+$/)
+          .describe('Short lowercase handle shown in the navbar and footer wordmark.'),
+        role: localized.describe('One-line professional headline per locale.'),
+        bio: localized.describe('Short bio per locale (also the description of the /me page).'),
+        location: z
+          .string()
+          .trim()
+          .min(1)
+          .optional()
+          .describe('City or country shown on /me and share cards.'),
+        startedYear: z
+          .int()
+          .min(1970)
+          .describe('First year of professional work; years of experience are derived from it.'),
+        avatar: z
+          .string()
+          .trim()
+          .min(1)
+          .optional()
+          .describe(
+            'Site-relative path to a profile photo in `public/` (for example `/avatar.png`). Omit to show initials.',
+          ),
+      })
+      .describe('Who the site is about.'),
+    socials: z
+      .array(
+        z.object({
+          label: z.string().min(1).describe('Link text and accessible name.'),
+          url: httpsUrl.describe(
+            'Profile URL (https only: an email address never belongs in public config).',
+          ),
+          icon: z.string().min(1).describe('Icon name (`github`, `linkedin`, ...).'),
+        }),
+      )
+      .describe(
+        'Social profile links shown in the footer and used as `sameAs` in structured data.',
+      ),
     background: z
       .object({
-        /** Nebula clouds + a twinkling star field. */
-        galaxy: z.boolean(),
-        /** Slow colour waves with a ripple that follows the pointer. */
-        cursorWaves: z.boolean(),
+        galaxy: z.boolean().describe('Nebula clouds and a twinkling star field.'),
+        cursorWaves: z
+          .boolean()
+          .describe('Slow colour waves with a ripple that follows the pointer.'),
       })
-      .default({ galaxy: true, cursorWaves: false }),
-    /** Recruiter card data (home "Hiring?" card and /me). cvUrl is https-only and optional. */
-    recruiter: z.object({
-      /** Show or hide the whole status line (not whether the owner is open to work). */
-      available: z.boolean(),
-      /** Whether the owner is open to work: green status dot when true, the danger color when false. */
-      openToWork: z.boolean().default(true),
-      status: localized,
-      lookingFor: localized,
-      cvUrl: httpsUrl.optional(),
-    }),
-    /** Singular /me profile data (list data like experience/credentials lives in content). */
-    me: z.object({
-      /** Display timezone, e.g. `UTC−6`. */
-      timezone: z.string().trim().min(1),
-      workMode: localized,
-      /** The "what I bring" intro paragraph. */
-      intro: localized,
-      /** At-a-glance strip: value + label pairs (the design shows four). */
-      facts: z.array(z.object({ value: localized, label: localized })).min(1),
-      /** "What I bring" tiles: an icon name, a title and a body. */
-      strengths: z
-        .array(z.object({ icon: z.string().min(1), title: localized, body: localized }))
-        .min(1),
-      /** Tech-stack groups: a label and its items. */
-      stack: z
-        .array(z.object({ label: localized, items: z.array(z.string().min(1)).min(1) }))
-        .min(1),
-    }),
-    /** Each flag is one feature: off means its routes are not generated and its nav entry is hidden. */
-    features: z.object({
-      blog: z.boolean(),
-      comments: z.boolean(),
-      contact: z.boolean(),
-      credentials: z.boolean(),
-      experiments: z.boolean(),
-      /** Visitor-facing /changelog page: off hides the footer link, marks it noindex and keeps it out of the sitemap. */
-      changelog: z.boolean(),
-      /** /me recruiter page: off hides it from the nav, marks it noindex and keeps it out of the sitemap. */
-      me: z.boolean(),
-      /** Reading mode on notes: off renders no toggle, loads no script and stores nothing in the browser. */
-      readingMode: z.boolean(),
-    }),
-    /**
-     * Public ids of third-party services. They ship in the HTML by design, so they live here (not
-     * in secrets). An environment variable of the same purpose overrides each one (see ENV_VARS).
-     */
+      .default({ galaxy: true, cursorWaves: false })
+      .describe(
+        'Default animated banner background (each visitor can change it). All effects read the theme palette.',
+      ),
+    recruiter: z
+      .object({
+        available: z
+          .boolean()
+          .describe('Show or hide the whole availability line (not whether you are open to work).'),
+        openToWork: z
+          .boolean()
+          .default(true)
+          .describe(
+            'Whether you are open to work: green status dot when true, the danger colour when false.',
+          ),
+        status: localized.describe('Availability text per locale (for example "Open to work").'),
+        lookingFor: localized.describe('What you are looking for, per locale.'),
+        cvUrl: httpsUrl
+          .optional()
+          .describe('Link to a downloadable CV (https). Omit to hide the CV button.'),
+      })
+      .describe('Recruiter card on the home page and /me.'),
+    me: z
+      .object({
+        timezone: z.string().trim().min(1).describe('Display timezone, for example `UTC−6`.'),
+        workMode: localized.describe('Work mode per locale (remote, hybrid, ...).'),
+        intro: localized.describe('The "what I bring" intro paragraph per locale.'),
+        facts: z
+          .array(
+            z.object({
+              value: localized.describe('The highlighted value.'),
+              label: localized.describe('What the value means.'),
+            }),
+          )
+          .min(1)
+          .describe('At-a-glance strip: value and label pairs (the design shows up to four).'),
+        strengths: z
+          .array(
+            z.object({
+              icon: z.string().min(1).describe('Icon name of the tile.'),
+              title: localized.describe('Tile title.'),
+              body: localized.describe('Tile text.'),
+            }),
+          )
+          .min(1)
+          .describe('"What I bring" tiles.'),
+        stack: z
+          .array(
+            z.object({
+              label: localized.describe('Group name (Languages, Frontend, ...).'),
+              items: z.array(z.string().min(1)).min(1).describe('Tools in the group.'),
+            }),
+          )
+          .min(1)
+          .describe('Tech stack groups.'),
+      })
+      .describe(
+        'Singular /me profile data. Lists that grow (experience, certificates) live in `src/content/`.',
+      ),
+    features: z
+      .object({
+        blog: z
+          .boolean()
+          .describe('Lab Notes: the notes index, note pages, RSS and the nav entry.'),
+        comments: z
+          .boolean()
+          .describe(
+            'Giscus comments on notes. Needs the `giscus` block below, otherwise nothing renders.',
+          ),
+        contact: z.boolean().describe('The /contact form and its nav entry.'),
+        credentials: z.boolean().describe('Certificates and degrees on /me.'),
+        experiments: z.boolean().describe('The experiments (projects) section and its pages.'),
+        changelog: z
+          .boolean()
+          .describe(
+            'Visitor-facing /changelog page: off hides the footer link, marks it noindex and keeps it out of the sitemap.',
+          ),
+        me: z
+          .boolean()
+          .describe(
+            'The /me recruiter page: off hides it from the nav, marks it noindex and keeps it out of the sitemap.',
+          ),
+        readingMode: z
+          .boolean()
+          .describe(
+            'Reading mode on notes: off renders no toggle, loads no script or CSS and stores nothing in the browser.',
+          ),
+      })
+      .describe(
+        'Feature flags: off means the routes are not generated and the nav entry is hidden.',
+      ),
     integrations: z
       .object({
-        /** Cloudflare Web Analytics beacon token. Omit to turn analytics off. */
-        cloudflareAnalyticsToken: z.string().trim().min(1).optional(),
-        /** Cloudflare Turnstile public site key for the contact form (bound to the domain). */
-        turnstileSiteKey: z.string().trim().min(1).optional(),
+        cloudflareAnalyticsToken: z
+          .string()
+          .trim()
+          .min(1)
+          .optional()
+          .describe(
+            'Cloudflare Web Analytics beacon token (public). Omit to turn analytics off. Env `PUBLIC_CF_ANALYTICS_TOKEN` overrides it.',
+          ),
+        turnstileSiteKey: z
+          .string()
+          .trim()
+          .min(1)
+          .optional()
+          .describe(
+            'Cloudflare Turnstile public site key for the contact form, bound to the domain. Env `PUBLIC_TURNSTILE_SITE_KEY` overrides it (use a test key locally).',
+          ),
       })
-      .default({}),
-    /** "Last updated" dates (YYYY-MM-DD) shown on the legal pages. Bump one when its text changes. */
-    legal: z.object({
-      privacyUpdated: z.iso.date(),
-      termsUpdated: z.iso.date(),
-    }),
-    /**
-     * Giscus comments (GitHub Discussions). Optional: without it the comments section renders
-     * nothing even when `features.comments` is on. Values come from https://giscus.app.
-     */
+      .default({})
+      .describe(
+        'Public ids of third-party services. They ship in the HTML by design, so they live here and not in secrets.',
+      ),
+    legal: z
+      .object({
+        privacyUpdated: z.iso
+          .date()
+          .describe('"Last updated" date of the privacy page. Bump it when its text changes.'),
+        termsUpdated: z.iso
+          .date()
+          .describe('"Last updated" date of the terms page. Bump it when its text changes.'),
+      })
+      .describe('Dates shown at the bottom of the legal pages.'),
     giscus: z
       .object({
-        repo: z.string().regex(/^[\w.-]+\/[\w.-]+$/, { error: 'must be "owner/name"' }),
-        repoId: z.string().trim().min(1),
-        category: z.string().trim().min(1),
-        categoryId: z.string().trim().min(1),
+        repo: z
+          .string()
+          .regex(/^[\w.-]+\/[\w.-]+$/, { error: 'must be "owner/name"' })
+          .describe('Repository whose Discussions store the comments, as `owner/name`.'),
+        repoId: z
+          .string()
+          .trim()
+          .min(1)
+          .describe('Repository node id from https://giscus.app (starts with `R_`).'),
+        category: z
+          .string()
+          .trim()
+          .min(1)
+          .describe('Discussion category name (an Announcements-type category).'),
+        categoryId: z
+          .string()
+          .trim()
+          .min(1)
+          .describe('Category node id from https://giscus.app (starts with `DIC_`).'),
       })
-      .optional(),
-    /** Optional site-wide notice strip (localized). White-label: remove the key to hide. */
-    notice: localized.optional(),
+      .optional()
+      .describe(
+        'Giscus comments (GitHub Discussions). Optional: without it nothing renders even when `features.comments` is on.',
+      ),
+    notice: localized
+      .optional()
+      .describe(
+        'Optional site-wide notice strip per locale (for example "under construction"). Remove the key to hide it.',
+      ),
   })
   .superRefine((config, ctx) => {
     const { default: defaultLocale, supported } = config.locales;
