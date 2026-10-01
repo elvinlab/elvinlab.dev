@@ -31,6 +31,7 @@ export function enableFixtureComments(web: string): void {
 export function createFixtureWorkspace(source: string, fixtures: string) {
   const root = mkdtempSync(join(tmpdir(), 'elvinlab-verification-'));
   const web = join(root, 'apps/web');
+  const publishedNotes = join(source, 'apps/web/src/content/notes');
   const cleanup = (): void => rmSync(root, { recursive: true, force: true });
   try {
     for (const path of [
@@ -49,7 +50,9 @@ export function createFixtureWorkspace(source: string, fixtures: string) {
       mkdirSync(dirname(join(root, path)), { recursive: true });
       cpSync(join(source, path), join(root, path), {
         recursive: true,
-        filter: (path) => basename(path) !== 'drafts',
+        // Drafts and the owner's published notes never enter a fixture build: it must contain
+        // only the fixture notes (deterministic) and no owner-specific text (white-label).
+        filter: (path) => basename(path) !== 'drafts' && path !== publishedNotes,
       });
     }
     cpSync(fixtures, join(web, 'src/content/notes'), {

@@ -77,6 +77,16 @@ it('copies current source and fixtures without copying drafts, secrets or output
   expect(existsSync(join(source, 'apps/web/src/content/notes/smoke-es/index.mdx'))).toBe(false);
 });
 
+it('builds with only the fixture notes, never the published ones', () => {
+  const source = sourceWorkspace();
+  write(source, 'apps/web/src/content/notes/real-note/index.mdx', 'published by the owner');
+  const workspace = createFixtureWorkspace(source, join(source, 'fixtures'));
+  temporary.push(workspace.root);
+  expect(existsSync(join(workspace.web, 'src/content/notes/smoke-es/index.mdx'))).toBe(true);
+  expect(existsSync(join(workspace.web, 'src/content/notes/real-note'))).toBe(false);
+  workspace.cleanup();
+});
+
 it('links external dependencies but keeps the copied core independent of the source', () => {
   const source = sourceWorkspace();
   const workspace = createFixtureWorkspace(source, join(source, 'fixtures'));
