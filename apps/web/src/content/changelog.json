@@ -88,5 +88,11 @@
     "category": "fixed",
     "title": "Hiring card no longer shows a green dot when I am not available",
     "description": "The status dot now follows whether I am open to work: green when I am, red when I am not (currently working at Buo)."
+  },
+  "note-comments": {
+    "date": "2026-10-01",
+    "category": "added",
+    "title": "Comments and reactions on notes",
+    "description": "Every note now has a discussion area powered by giscus: comments and reactions live in GitHub Discussions, you sign in with GitHub to take part, and nothing loads until you scroll down to it."
   }
 }
