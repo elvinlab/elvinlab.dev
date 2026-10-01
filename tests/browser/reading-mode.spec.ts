@@ -1,10 +1,16 @@
-import AxeBuilder from '@axe-core/playwright';
 import { expect, type Page, test } from '@playwright/test';
+
+import { describeViolations, scan } from './helpers/axe';
+import { stubThirdParties } from './helpers/third-party';
 
 const NOTES = [
   { path: '/notes/smoke-es/', toggle: 'Modo lectura', exit: 'Salir del modo lectura' },
   { path: '/en/notes/smoke-en/', toggle: 'Reading mode', exit: 'Exit reading mode' },
 ] as const;
+
+test.beforeEach(async ({ page }) => {
+  await stubThirdParties(page);
+});
 
 const toggleOf = (page: Page) => page.locator('[data-reading-toggle]');
 const isReading = (page: Page) =>
@@ -89,10 +95,8 @@ for (const { path, toggle, exit } of NOTES) {
         }, theme);
         await page.goto(path);
         await expect(page.locator('html')).toHaveAttribute('data-reading', '');
-        const result = await new AxeBuilder({ page })
-          .withTags(['wcag2a', 'wcag2aa', 'wcag21aa'])
-          .analyze();
-        expect(result.violations.map((violation) => violation.id)).toEqual([]);
+        const { violations } = await scan(page);
+        expect(describeViolations(violations)).toEqual([]);
       });
     }
   });
