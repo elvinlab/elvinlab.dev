@@ -2,9 +2,9 @@ name: CI
 
 on:
   pull_request:
-    branches: [develop, main]
+    branches: [main]
   push:
-    branches: [develop, main]
+    branches: [main]
 
 permissions:
   contents: read
@@ -15,17 +15,17 @@ concurrency:
   cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
 
 env:
-  STAGING_WORKER: elvinlab-staging
   PRODUCTION_WORKER: elvinlab
   WORKERS_SUBDOMAIN: lab-previews
 
 jobs:
-  # The gates run as parallel jobs (wall time is the slowest one, not the sum). On a push to main
-  # they are skipped: the same tree already passed them in the develop -> main PR, and the
-  # protect-main ruleset requires the `checks` status, so an untested commit cannot reach main.
+  # The gates run as parallel jobs (wall time is the slowest one, not the sum), once per release,
+  # on the develop -> main PR. On the push that results from merging (always main) they are
+  # skipped: the same tree already passed them in the PR, and the protect-main ruleset requires
+  # the `checks` status, so an untested commit cannot reach main in the first place.
   static:
     name: static
-    if: github.event_name != 'push' || github.ref != 'refs/heads/main'
+    if: github.event_name != 'push'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -38,7 +38,7 @@ jobs:
 
   e2e:
     name: e2e
-    if: github.event_name != 'push' || github.ref != 'refs/heads/main'
+    if: github.event_name != 'push'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -63,7 +63,7 @@ jobs:
 
   lighthouse:
     name: lighthouse
-    if: github.event_name != 'push' || github.ref != 'refs/heads/main'
+    if: github.event_name != 'push'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -90,57 +90,6 @@ jobs:
             *" failure "* | *" cancelled "*) exit 1 ;;
           esac
 
-  preview:
-    name: preview
-    needs: checks
-    # Forks and Dependabot PRs do not receive repository secrets, so they get checks only.
-    # The Cloudflare token (scoped to Workers edit) reaches only PRs whose branch lives in this
-    # repository, i.e. code pushed by someone with write access; fork PRs never get it.
-    if: >-
-      github.event_name == 'pull_request'
-      && github.event.pull_request.head.repo.full_name == github.repository
-      && github.actor != 'dependabot[bot]'
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      pull-requests: write
-    environment:
-      name: preview
-      url: ${{ steps.upload.outputs.url }}
-    steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-      - uses: jdx/mise-action@c2a87611a18de5b3828c5652fe268e992400cb5c # v4.3.0
-      - run: pnpm install --frozen-lockfile
-      - run: pnpm --filter web build
-      - name: Write version.txt with commit SHA
-        run: echo "${GITHUB_SHA}" > apps/web/dist/client/version.txt
-      - name: Upload preview version
-        id: upload
-        working-directory: apps/web
-        env:
-          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          CLOUDFLARE_ACCOUNT_ID: ${{ vars.CLOUDFLARE_ACCOUNT_ID }}
-          ALIAS: pr-${{ github.event.pull_request.number }}
-        run: |
-          pnpm exec wrangler versions upload --name "$STAGING_WORKER" --preview-alias "$ALIAS" \
-            --message "PR #${{ github.event.pull_request.number }} @ ${GITHUB_SHA::7}"
-          echo "url=https://$ALIAS-$STAGING_WORKER.$WORKERS_SUBDOMAIN.workers.dev" >> "$GITHUB_OUTPUT"
-      - run: bash .github/scripts/smoke-check.sh "${{ steps.upload.outputs.url }}" "${GITHUB_SHA}"
-      - name: Comment preview URL
-        env:
-          GH_TOKEN: ${{ github.token }}
-          URL: ${{ steps.upload.outputs.url }}
-          PR: ${{ github.event.pull_request.number }}
-        run: |
-          marker='<!-- preview-url -->'
-          body="$marker"$'\n'"**Preview:** $URL (commit ${GITHUB_SHA::7})"
-          existing="$(gh api --paginate "repos/$GITHUB_REPOSITORY/issues/$PR/comments" --jq ".[] | select(.body | startswith(\"$marker\")) | .id" | head -n 1)"
-          if [[ -n "$existing" ]]; then
-            gh api -X PATCH "repos/$GITHUB_REPOSITORY/issues/comments/$existing" -f body="$body" > /dev/null
-          else
-            gh pr comment "$PR" --body "$body"
-          fi
-
   deploy:
     name: deploy
     needs: checks
@@ -149,45 +98,35 @@ jobs:
     if: ${{ always() && github.event_name == 'push' && needs.checks.result == 'success' }}
     runs-on: ubuntu-latest
     environment:
-      name: ${{ github.ref_name == 'main' && 'production' || 'staging' }}
-      url: ${{ steps.target.outputs.url }}
+      name: production
+      url: https://${{ env.PRODUCTION_WORKER }}.${{ env.WORKERS_SUBDOMAIN }}.workers.dev
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - uses: jdx/mise-action@c2a87611a18de5b3828c5652fe268e992400cb5c # v4.3.0
       - run: pnpm install --frozen-lockfile
       - run: pnpm --filter web build
         env:
-          SITE_INDEXABLE: ${{ github.ref_name == 'main' && 'true' || '' }}
+          SITE_INDEXABLE: 'true'
           # Public by design (shipped in the HTML); set per GitHub environment, empty disables the feature.
           PUBLIC_TURNSTILE_SITE_KEY: ${{ vars.PUBLIC_TURNSTILE_SITE_KEY }}
           PUBLIC_CF_ANALYTICS_TOKEN: ${{ vars.PUBLIC_CF_ANALYTICS_TOKEN }}
       - name: Write version.txt with commit SHA
         run: echo "${GITHUB_SHA}" > apps/web/dist/client/version.txt
-      - name: Resolve target
-        id: target
-        run: |
-          if [[ "$GITHUB_REF_NAME" == main ]]; then
-            echo "name=$PRODUCTION_WORKER" >> "$GITHUB_OUTPUT"
-            echo "url=https://$PRODUCTION_WORKER.$WORKERS_SUBDOMAIN.workers.dev" >> "$GITHUB_OUTPUT"
-          else
-            echo "name=$STAGING_WORKER" >> "$GITHUB_OUTPUT"
-            echo "url=https://$STAGING_WORKER.$WORKERS_SUBDOMAIN.workers.dev" >> "$GITHUB_OUTPUT"
-          fi
       - name: Deploy
         id: deploy
         working-directory: apps/web
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ vars.CLOUDFLARE_ACCOUNT_ID }}
-        run: pnpm exec wrangler deploy --name "${{ steps.target.outputs.name }}"
+        run: pnpm exec wrangler deploy --name "$PRODUCTION_WORKER"
       - name: Smoke check with rollback on failure
         working-directory: apps/web
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ vars.CLOUDFLARE_ACCOUNT_ID }}
         run: |
-          if ! bash ../../.github/scripts/smoke-check.sh "${{ steps.target.outputs.url }}" "${GITHUB_SHA}"; then
+          if ! bash ../../.github/scripts/smoke-check.sh "https://$PRODUCTION_WORKER.$WORKERS_SUBDOMAIN.workers.dev" "${GITHUB_SHA}"; then
             echo "Smoke check failed, rolling back..."
-            pnpm exec wrangler rollback --name "${{ steps.target.outputs.name }}" --message "Automatic rollback: smoke check failed for ${GITHUB_SHA::7}"
+            pnpm exec wrangler rollback --name "$PRODUCTION_WORKER" --message "Automatic rollback: smoke check failed for ${GITHUB_SHA::7}"
             exit 1
           fi

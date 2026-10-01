@@ -28,11 +28,11 @@ mise exec -- pnpm --filter web preview      # serve the build locally on workerd
 mise exec -- pnpm --filter web run deploy   # build + wrangler deploy (needs `wrangler login`)
 ```
 
-Use `pnpm run deploy`, not `pnpm deploy` (that is a built-in pnpm command). Normally you never deploy by hand: CI (`.github/workflows/ci.yml`) runs `checks` (required on `main` and `develop`), gives every PR a preview at `https://pr-<N>-elvinlab-staging.lab-previews.workers.dev`, deploys `develop` to staging (`elvinlab-staging`) and `main` to production (`elvinlab`), and smoke-checks each deploy with `.github/scripts/smoke-check.sh`.
+Use `pnpm run deploy`, not `pnpm deploy` (that is a built-in pnpm command). Normally you never deploy by hand: work happens directly on `develop` with no CI attached to it (push freely, no wait). CI (`.github/workflows/ci.yml`) runs exactly once per release, on the `develop -> main` pull request (`checks` required on `main`); merging deploys straight to production (`elvinlab`) and smoke-checks it with `.github/scripts/smoke-check.sh`, rolling back on failure. There is no staging environment and no per-PR preview deploy (ADR 0011).
 
 pnpm enforces a minimum release age: when it proposes `minimumReleaseAgeExclude` entries, pin an older version instead of accepting them. Images are optimized at build time (`imageService: 'compile'`). dependency-cruiser cannot parse `.astro`, so `depcruise` first mirrors `apps/web/src` into the git-ignored `apps/web/boundaries-mirror/` (`apps/web/scripts/mirror-astro.ts`). Do not invent commands; add them here when they exist.
 
-CI runs the production JavaScript gzip budget, Playwright/a11y/theme checks, white-label build, and mobile Lighthouse budgets before preview or deploy. Lighthouse audits an isolated production-build fixture and writes HTML/JSON reports to the ignored `.lighthouseci/` directory; it does not upload reports.
+CI runs the production JavaScript gzip budget, Playwright/a11y/theme checks, white-label build, and mobile Lighthouse budgets on the `develop -> main` PR, before the merge deploys. Lighthouse audits an isolated production-build fixture and writes HTML/JSON reports to the ignored `.lighthouseci/` directory; it does not upload reports.
 
 Read `docs/PLAN.md`, `docs/BRAND.md` (both in Spanish; decisions in them are settled), `docs/DESIGN.md`, `docs/CONVENTIONS.md` and `docs/adr/` before any work.
 
