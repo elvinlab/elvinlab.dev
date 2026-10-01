@@ -2,25 +2,67 @@
   "dns-migration": {
     "date": "2026-09-30",
     "category": "changed",
-    "title": "Dominio migrado a Cloudflare",
-    "description": "La zona DNS pasó de Porkbun a Cloudflare, con dominios personalizados para el apex y www; www redirige al apex."
+    "title": "Domain migrated to Cloudflare",
+    "description": "DNS zone moved from Porkbun to Cloudflare, with custom domains for the apex and www; www redirects to the apex."
   },
   "contact-form": {
     "date": "2026-10-01",
     "category": "fixed",
-    "title": "Formulario de contacto funcionando en producción",
-    "description": "La causa era que Cloudflare Workers no soporta redirect: 'error' en fetch; se resolvió usando redirect: 'manual'."
+    "title": "Contact form working in production",
+    "description": "The cause was that Cloudflare Workers doesn't support redirect: 'error' in fetch; fixed by using redirect: 'manual'."
   },
   "adr-0006-0009": {
     "date": "2026-10-01",
     "category": "added",
-    "title": "Registros de arquitectura (ADR) 0006-0009",
-    "description": "Documentadas las decisiones de DNS, estructura de CI, feature flags de lanzamiento y seguridad del contacto."
+    "title": "Architecture Decision Records (ADR) 0006-0009",
+    "description": "Documented the DNS, CI structure, launch feature-flag and contact-security decisions."
   },
   "changelog-page": {
     "date": "2026-10-01",
     "category": "added",
-    "title": "Página de changelog",
-    "description": "Este mismo registro: un lugar para ver los cambios visibles del sitio a medida que se publican."
+    "title": "Changelog page",
+    "description": "This very log: a place to see visible site changes as they ship."
+  },
+  "ci-direct-to-main": {
+    "date": "2026-10-01",
+    "category": "changed",
+    "title": "CI/CD simplified: nothing runs while working on develop",
+    "description": "Pushing to develop no longer triggers anything. The only automated check now happens on the direct push to main, which also deploys if everything passes."
+  },
+  "staging-removed": {
+    "date": "2026-10-01",
+    "category": "removed",
+    "title": "Staging environment removed",
+    "description": "The staging Worker and its GitHub environment were decommissioned; the site now runs on a single production environment."
+  },
+  "me-real-data": {
+    "date": "2026-10-01",
+    "category": "added",
+    "title": "/me page with real data",
+    "description": "Real work experience, certificates and education replace the placeholder content; the page is now public."
+  },
+  "seo-hardening": {
+    "date": "2026-10-01",
+    "category": "added",
+    "title": "Social image, security headers and a sitemap with real dates",
+    "description": "A default image for shared links, security headers (nosniff, Referrer-Policy, Permissions-Policy), and real last-modified dates in the sitemap."
+  },
+  "web-analytics": {
+    "date": "2026-10-01",
+    "category": "added",
+    "title": "Cloudflare Web Analytics enabled",
+    "description": "Basic visit metrics, no cookies, no extra JavaScript weight for visitors."
+  },
+  "background-picker": {
+    "date": "2026-10-01",
+    "category": "added",
+    "title": "Visual background picker",
+    "description": "Pick the animated banner effect (galaxy, waves, or off) from the navbar; your choice is remembered in the browser."
+  },
+  "background-picker-firefox-fix": {
+    "date": "2026-10-01",
+    "category": "fixed",
+    "title": "Background broke in Firefox after switching effects a few times",
+    "description": "Firefox was losing the graphics context after a couple of switches, leaving the background blank. Fixed by reusing the same context instead of opening a new one on every switch."
   }
 }
