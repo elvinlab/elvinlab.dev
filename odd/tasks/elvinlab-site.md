@@ -240,3 +240,11 @@ T19.S3 work-unit `d7797f1` (originally drafted by a concurrent Codex session; re
 ## Launch gate Q24 (2026-09-30, user chose option 1)
 
 `features.experiments: false` and new `features.me: false` (white-label fixture keeps `me: true`). Off means: no nav entry, `/me` pages `noindex` and out of the sitemap (`integrations/sitemap-filter.ts`), no rendered link to `/experiments/` or `/me/` (Home hiring card, Home experiments grid, `/me` section, notes sidebar). Unit 35 files / 273 tests, e2e 126 passed, build, js-budget, white-label and depcruise green (parent re-run). Re-enable by flipping the flags once the pages and real `/me` data exist.
+
+## Backlog: changelog (noted 2026-10-01, NOT started)
+
+User idea: add a changelog. Open decision: audience. Options and recommendation:
+- Repo/dev changelog: GitHub Releases with auto-generated notes on each merge to `main` (zero dependencies, reuses Conventional Commits; recommended first step); optionally a `CHANGELOG.md` via `git-cliff` in CI later. Avoid `release-please` (opens PRs and versions on its own; too heavy for the `develop` -> `main` flow).
+- Visitor-facing "what's new": content and design work (a section in `/notes` or its own route); not a priority before the first post.
+Next step when picked up: ask which audience, then implement the chosen option (ODD feature `changelog`).
+
