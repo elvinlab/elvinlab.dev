@@ -24,7 +24,7 @@ Audit covered 15 desktop routes in light/dark and representative home, me, conta
   - Repair the verified English draft-note detail link through the existing content/i18n conventions; keep the Spanish notes index, optional translations, draft-production exclusion and feature flags intact. If resolving it requires changing product policy rather than a missing detail route, report the gap instead of inventing a policy.
   - Update existing `docs/DESIGN.md` and the relevant `docs/BRAND.md` statements; preserve each document's language, link implementation/check evidence, distinguish configuration-dependent contact states and audited/deferred coverage. No generic generated design-system dump.
   - Verify ES/EN, mobile/desktop, light/dark; preserve home refinements, theme controls, contact behavior, me printing, note reading UI and optional links. Inspect actual screenshots and run accessible interaction regressions.
-  - Evidence and commit: implemented (not yet committed when written; verified below). Diff: 11 files, +140/-21 (within the 300–380 forecast, no delivery-strategy trigger).
+  - Evidence and commit: committed as `28e91be`, fast-forwarded into `develop` and pushed. Diff: 12 files, +179/-21 (within the 300–380 forecast, no delivery-strategy trigger).
     - Focused Playwright (`tests/browser/smoke.spec.ts`): 48 passed.
     - `pnpm typecheck`: 0 errors/warnings/hints (astro check, 171 files).
     - `pnpm lint`: Biome, 211 files, no fixes needed.
@@ -36,4 +36,4 @@ Audit covered 15 desktop routes in light/dark and representative home, me, conta
   - Rollback: only this work unit's shared presentation, localized detail-route correction, regression tests and corresponding documentation; prior home work remains intact.
 
 ## Progress and next step
-T1 implemented and independently verified (all required checks green). Committing this work unit on `feat/sitewide-ui-polish`. No push/deployment — stays local per authorization. Next step: none pending for this feature; close/archive when the user confirms, or fold into the next UI iteration if new findings surface. Engram mirror: `odd/sitewide-ui-polish/tasks`.
+T1 implemented and independently verified (all required checks green). Committed (`28e91be`), integrated into `develop` and pushed (develop has no CI); the feature branch was deleted. Re-verified on `develop` 2026-10-01: typecheck, lint, 347 unit tests, depcruise, build, JS budget, white-label, 159 e2e and Lighthouse (performance 95–100, other categories 100) all green. Not in production yet: it ships with the next direct push to `main`. Feature closed. Engram mirror: `odd/sitewide-ui-polish/tasks`.

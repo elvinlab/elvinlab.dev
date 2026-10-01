@@ -245,6 +245,15 @@ Remaining real backlog (verify against `gh issue list --state open` for the curr
 - Notes `#27`-`#29` (tier:human, post-launch) — the user's own content to write.
 - No open, non-human, non-gated code work remains as of this correction.
 
+## Correction 2026-10-01 (evening): backlog markers below are stale
+
+- "Upcoming (NOT started)" above is done: Cloudflare, production launch and the launch gate all shipped.
+- "Backlog: changelog (NOT started)" is done: visitor-facing changelog shipped (`d6d7bb3`, ADR 0010), backfilled in `a5b66f8`.
+- "Backlog: ADRs (NOT started)" is done: ADRs 0006-0012 exist in `docs/adr/`.
+- Since the first release: home visual refinement (`96c185b`) and sitewide UI polish (`28e91be`) are on `develop` and pushed, not yet released to `main`. Trackers: `odd/tasks/home-visual-refinement.md`, `odd/tasks/sitewide-ui-polish.md`.
+- `main` was reset to `origin/main` (`a9e9d58`, squash-merge of PR #56, tree identical to `develop` at that time) after a cosmetic ahead/behind divergence; no content was lost.
+- Open issues now: #24 Giscus (post-launch, unblocked), #27-#29 notes (user content), #49 Search Console (human), #50 HSTS (time-gated), #51 BlogPosting fields (gated on first post).
+
 ## Next step (historical, 2026-09-29 — superseded by the correction above, kept for the record)
 
 State as of 2026-09-29: T19.S1/S2/S3 all done and merged to `develop`; remote `develop` CI is GREEN (checks + staging deploy `elvinlab-staging` + smoke). Contact server runtime is complete and fails closed until Cloudflare is configured.
