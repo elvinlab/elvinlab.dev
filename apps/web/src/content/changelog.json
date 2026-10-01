@@ -118,5 +118,11 @@
     "category": "added",
     "title": "Terms of use and a clearer privacy page",
     "description": "New terms page linked from every footer. The privacy page now cites what Cloudflare documents, lists every preference stored in your browser and says the site itself sets no cookies."
+  },
+  "quieter-navigation": {
+    "date": "2026-10-01",
+    "category": "changed",
+    "title": "A quieter language suggestion and roomier note navigation",
+    "description": "The language suggestion is now a small line of text shown only on Spanish pages, the English menu says plainly Notes, the under-construction banner is gone, and the previous/next links have room below the article."
   }
 }

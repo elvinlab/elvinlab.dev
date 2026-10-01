@@ -27,6 +27,21 @@ export function enableFixtureComments(web: string): void {
   writeFileSync(configPath, patched);
 }
 
+/**
+ * Gives the copied site config a fixture site notice so the notice strip stays covered by the
+ * browser tests (the real config has none now that the site is live).
+ */
+export function enableFixtureNotice(web: string): void {
+  const configPath = join(web, 'src/site.config.ts');
+  const withoutNotice = readFileSync(configPath, 'utf8').replace(/\n {2}notice: \{[^}]*\},/, '');
+  const patched = withoutNotice.replace(
+    '\n  features: {',
+    "\n  notice: { es: 'Aviso de prueba', en: 'Test notice' },\n  features: {",
+  );
+  if (patched === withoutNotice) throw new Error('fixture: could not inject the site notice');
+  writeFileSync(configPath, patched);
+}
+
 /** Copies only build inputs; fixture builds never write into publishable content or local drafts. */
 export function createFixtureWorkspace(source: string, fixtures: string) {
   const root = mkdtempSync(join(tmpdir(), 'elvinlab-verification-'));

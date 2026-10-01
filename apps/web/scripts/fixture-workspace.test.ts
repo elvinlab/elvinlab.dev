@@ -12,7 +12,11 @@ import { dirname, join } from 'node:path';
 
 import { afterEach, expect, it } from 'vitest';
 
-import { createFixtureWorkspace, enableFixtureComments } from './fixture-workspace.ts';
+import {
+  createFixtureWorkspace,
+  enableFixtureComments,
+  enableFixtureNotice,
+} from './fixture-workspace.ts';
 
 const temporary: string[] = [];
 afterEach(() => {
@@ -125,4 +129,27 @@ it('injects the fixture giscus block, replacing any real one', () => {
 it('fails loudly when the config has no features block to anchor on', () => {
   const web = webWithConfig('export const siteConfig = {};\n');
   expect(() => enableFixtureComments(web)).toThrow(/giscus/);
+});
+
+it('injects a fixture site notice when the real config has none', () => {
+  const web = webWithConfig('export const siteConfig = {\n  features: { comments: true },\n};\n');
+  enableFixtureNotice(web);
+  const config = readFileSync(join(web, 'src/site.config.ts'), 'utf8');
+  expect(config).toContain('notice:');
+  expect(config.match(/notice:/g)).toHaveLength(1);
+});
+
+it('replaces a real notice instead of duplicating it', () => {
+  const web = webWithConfig(
+    "export const siteConfig = {\n  notice: {\n    es: 'real',\n    en: 'real',\n  },\n  features: { comments: true },\n};\n",
+  );
+  enableFixtureNotice(web);
+  const config = readFileSync(join(web, 'src/site.config.ts'), 'utf8');
+  expect(config.match(/notice:/g)).toHaveLength(1);
+  expect(config).not.toContain("'real'");
+});
+
+it('fails loudly when the config has no features block to anchor the notice on', () => {
+  const web = webWithConfig('export const siteConfig = {};\n');
+  expect(() => enableFixtureNotice(web)).toThrow(/notice/);
 });

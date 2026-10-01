@@ -155,7 +155,6 @@ export const t = createTranslator({
       'nav.menu': 'Menu',
       'nav.home': 'Home',
       'nav.notes': 'Notes',
-      'nav.notes.es': 'Notes (in Spanish)',
       'nav.experiments': 'Experiments',
       'nav.about': 'About',
       'nav.contact': 'Contact',

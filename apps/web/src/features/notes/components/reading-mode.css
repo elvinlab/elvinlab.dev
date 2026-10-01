@@ -61,3 +61,7 @@ html[data-reading] .prose {
   font-size: 1.1875rem;
   line-height: 1.8;
 }
+/* The article card is flattened, so the next block needs more room to read as a separate thing. */
+html[data-reading] [data-prev-next] {
+  margin-top: 2.5rem;
+}

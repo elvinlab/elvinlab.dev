@@ -32,3 +32,12 @@ L1 done: RED (terms content module missing, 2 new privacy tests, e2e for pages, 
 Next step: R3 (changelog done above, full suites incl. Lighthouse, commit, release to `main`, verify production).
 
 Engram mirror: `odd/reading-mode-legal/tasks`.
+
+## Added during the work (user requests, 2026-10-01)
+All with a failing test first, all verified in the final run.
+- **Discreet language suggestion**: now a 12 px line of text, shown only on default-locale (Spanish) pages for a browser that prefers another supported language; English pages never suggest Spanish (the navbar always offers the switch). Tests: smoke spec (quiet style, never on `/en/`).
+- **Notes menu in English**: the label is plain "Notes" (the "(in Spanish)" suffix and its i18n key and `labelOverride` plumbing were removed; `hreflang="es"` and the Spanish target stay).
+- **Site notice off**: `notice` removed from `site.config.ts` (test asserts it); the fixture injects its own notice (`enableFixtureNotice`, unit-tested) so the strip and the reading-mode hiding stay covered.
+- **Previous/next spacing**: the block sat at 0 px from the article card in every layout; now 32 px (40 px in reading mode). Added a second synthetic fixture note so the block renders in browser tests (`notes-layout.spec.ts`).
+- **Blank contact page / notes that "do not open" in `astro dev`**: reproduced and root-caused with Vite's own debug log: on a cold cache the first page with a Preact island makes Vite discover `preact/devtools` (and the Astro Actions client) late, answer "optimized dependencies changed. reloading" plus a program reload, and `/contact/` came back with 0 characters of text. Fix: `vite.optimizeDeps.include` in `astro.config.ts`. New `pnpm check:dev-cold-start` (isolated workspace, never the user's dev server) passes with the fix and fails without it (negative control: blank contact page and the late-dependency log lines). Not reproducible in the production build, where every note opens (all links clicked on build and dev).
+- **Not reproduced**: language changing by itself. No code path can do it (no client navigation, middleware or redirects; the hint only suggests). Likely sources: the English "Notes" link goes to the Spanish-only index, English notes are reached from Spanish lists, and dev-server reloads. Left for the user to report a concrete case if it persists.

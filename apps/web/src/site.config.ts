@@ -54,10 +54,6 @@ export const siteConfig = {
     status: { es: 'No disponible · trabajando en Buo', en: 'Not available · working at Buo' },
     lookingFor: { es: 'Actualmente en Buo', en: 'Currently at Buo' },
   },
-  notice: {
-    es: 'Sitio en construcción: sigo terminando algunas páginas.',
-    en: "Under construction: I'm still finishing a few pages.",
-  },
   me: {
     timezone: 'UTC−6',
     workMode: { es: 'Remoto / Híbrido', en: 'Remote / Hybrid' },

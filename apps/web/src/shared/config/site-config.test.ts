@@ -20,6 +20,10 @@ describe('site.config.ts', () => {
     });
   });
 
+  it('shows no "under construction" notice now that the site is live', () => {
+    expect(siteConfig).not.toHaveProperty('notice');
+  });
+
   it('contains no email address', () => {
     expect(JSON.stringify(siteConfig)).not.toMatch(/[\w.+-]+@[\w-]+\.[\w.]+/);
   });
