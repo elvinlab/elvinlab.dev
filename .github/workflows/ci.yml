@@ -115,6 +115,9 @@ jobs:
       - run: pnpm --filter web build
         env:
           SITE_INDEXABLE: ${{ github.ref_name == 'main' && 'true' || '' }}
+          # Public by design (shipped in the HTML); set per GitHub environment, empty disables the feature.
+          PUBLIC_TURNSTILE_SITE_KEY: ${{ vars.PUBLIC_TURNSTILE_SITE_KEY }}
+          PUBLIC_CF_ANALYTICS_TOKEN: ${{ vars.PUBLIC_CF_ANALYTICS_TOKEN }}
       - name: Write version.txt with commit SHA
         run: echo "${GITHUB_SHA}" > apps/web/dist/client/version.txt
       - name: Resolve target

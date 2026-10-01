@@ -38,7 +38,7 @@ Out: changing the Action or server runtime, Cloudflare secrets and the Turnstile
 
 - [x] **C1 Preact integration and JS-budget fix.** Route: inline (Tier 3: lockfile, cross-cutting config, pinned versions). Added `preact` 10.29.8 and `@astrojs/preact` 6.0.5 (exact pins), `preact()` in `astro.config.ts`, `jsx: react-jsx` + `jsxImportSource: preact` in `apps/web/tsconfig.json`. `check:js-budget` now counts `component-url`/`renderer-url` island modules and their imports (RED observed: 0 bytes vs 131 expected; then GREEN). Evidence: lint, typecheck, test (218), depcruise, build, js-budget all pass locally; probe islands were temporary and deleted.
 - [x] **C2 Client logic and island (TDD).** Route: delegated (Tier 2, `omniroute/elvinlabCode`, two rounds) plus parent fixes. Preact (`preact/hooks`), not React. Pure form state machine and validation (limits from `config.ts`), error mapping (`SERVICE_UNAVAILABLE`, `BAD_REQUEST`, `FORBIDDEN`, rate limit), `startedAt` on mount, hidden honeypot `website`, submit via `actions.contact`, Turnstile widget loaded lazily on first interaction with `action: 'contact'`.
-- [ ] **C3 Pages, strings, env.** Route: delegated (Tier 2). `pages/contact/index.astro`, `pages/en/contact/index.astro`, `ContactPage.astro`, ES/EN strings (props into the island), `PUBLIC_TURNSTILE_SITE_KEY` in `env.d.ts`, graceful state when the key is missing, `client:visible` or `client:idle`.
+- [x] **C3 Pages, strings, env.** Route: delegated (Tier 2, `omniroute/elvinlabCode`) plus parent fixes. `pages/contact/index.astro`, `pages/en/contact/index.astro`, `ContactPage.astro`, ES/EN strings (props into the island), `PUBLIC_TURNSTILE_SITE_KEY` in `env.d.ts`, graceful state when the key is missing, `client:visible` or `client:idle`.
 - [ ] **C4 Quality gates.** Route: delegated (Tier 2). Add `/contact/` and `/en/contact/` to `a11y.spec.ts`, `smoke.spec.ts`, `lighthouserc.json`; docs note. Run `test:e2e`, `check:js-budget`, `test:lighthouse` locally; record scores.
 
 ## Authorized scope
@@ -54,14 +54,15 @@ Local implementation in the paths above, dependency additions listed in C1, test
 
 ## Progress and evidence
 
+- 2026-09-30: C3 done (commits feca970, 2b07ab1, plus CI env). `/contact/` and `/en/contact/` build; copy in `features/contact/content.ts` (8 tests, RED observed: module missing); `ContactPage` exported from the feature barrel; `PUBLIC_TURNSTILE_SITE_KEY` typed and passed in the deploy job as an environment variable (also wired `PUBLIC_CF_ANALYTICS_TOKEN`, which CI never passed before); hydration gate keeps the SSR form inert (a Enter before hydration would have sent a GET with the message in the URL). Page JS: 16.63 KiB gzip of 30. Parent review caught a masked failure: the agent edited `vitest.config.ts` (outside scope) with an `include` that silently dropped 13 tests (257 -> 244) to hide a real error (barrel re-exports an `.astro` file that plain Vite cannot parse). Replaced with a tiny stub plugin; suite is now 265 tests across 34 files. Checks re-run by the parent: lint, typecheck, test, depcruise, build, js-budget.
 - 2026-09-30: C2 done. Files: `features/contact/client/{form,turnstile}.ts` (+tests, 38 tests) and `components/ContactForm.tsx`. Round 1 review found 9 defects (honeypot never sent, Turnstile loader rebuilt per focusin, raw red colors, aria-hidden hiding the notice and the widget, duplicated markup, load failure only in console); round 2 fixed them; the parent then fixed two more that the agent missed or misreported (stale `submitPending` closure in the widget callback, missing `unavailable` notice when there is no site key) and a border class conflict. Evidence: lint, typecheck, test (257), depcruise, build, js-budget re-run by the parent, all pass. Gap: the agent never reported RED output (asked twice); the strict-TDD RED for C2 was not observed. The island has no unit test by design; Playwright covers it in C4.
 - 2026-09-30: C1 done (see task). React measured and rejected on size; Preact adopted.
 - 2026-09-30: feature created after exploration (mapper: server complete; no React, no pages, no Turnstile client, no strings; js-budget script skips island chunks; fixture build has no Turnstile key).
 
 ## User-owned pending
 
-Create the Turnstile widget and site key in Cloudflare, set `PUBLIC_TURNSTILE_SITE_KEY` and the T18 secrets. Until then the form shows the unavailable state by design.
+Create the Turnstile widget and site key in Cloudflare (one per environment, bound to its hostname). Set the GitHub environment variable `PUBLIC_TURNSTILE_SITE_KEY` in `staging` and `production` (and optionally `PUBLIC_CF_ANALYTICS_TOKEN`), and set the T18 Worker secrets. Until then the form shows the unavailable state by design.
 
 ## Next step
 
-C3 (pages, strings, env; brief then delegate to Tier 2).
+C4 (route lists, Lighthouse URLs, island e2e with stubbed Turnstile and Action, docs).
