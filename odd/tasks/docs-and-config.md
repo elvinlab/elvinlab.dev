@@ -18,11 +18,11 @@ The README is a stub that still says "Foundation phase". Settings are spread ove
 
 ## Tasks
 - [x] C1 — Central settings: `integrations` and `legal` in the config schema, `resolveIntegrations` (env over config), the `ENV_VARS` registry, one place that reads build env, callers updated, config values moved from GitHub variables, tests first.
-- [ ] C2 — Self-documenting schemas: `.describe()` on the site config, notes, experience, credentials, experiments and changelog schemas and the Worker bindings; `.dev.vars.example`.
-- [ ] C3 — Generator `pnpm docs:config` and the sync, parity and link tests.
-- [ ] C4 — `docs/CONFIGURATION` (ES/EN): map of where things live, generated reference, how to update everything, deploy and release, troubleshooting.
-- [ ] C5 — `docs/NOTES` (ES/EN): detailed guide to creating a note, verified against the real pipeline.
-- [ ] C6 — README (ES default, EN) with screenshots, and pointers in code headers, `CLAUDE.md` and `AGENTS.md`.
+- [x] C2 — Self-documenting schemas: `.describe()` on the site config, notes, experience, credentials, experiments and changelog schemas and the Worker bindings; `.dev.vars.example`.
+- [x] C3 — Generator `pnpm docs:config` and the sync, parity and link tests.
+- [x] C4 — `docs/CONFIGURATION` (ES/EN): map of where things live, generated reference, how to update everything, deploy and release, troubleshooting.
+- [x] C5 — `docs/NOTES` (ES/EN): detailed guide to creating a note, verified against the real pipeline.
+- [x] C6 — README (ES default, EN) with screenshots, and pointers in code headers, `CLAUDE.md` and `AGENTS.md`.
 - [ ] C7 — Full verification, release to `main`, production check.
 
 ## Acceptance criteria
@@ -36,6 +36,12 @@ The README is a stub that still says "Foundation phase". Settings are spread ove
 Evaluation done and approved. Values to move (public by design): analytics token and Turnstile site key, read from the `production` environment variables.
 
 C1 done: RED observed (9 failing tests plus two missing modules), then GREEN: 403 unit tests, typecheck 0 errors, lint and depcruise clean, 324 e2e and white-label green. Verified by building with NO environment variables: the Cloudflare beacon token, the Turnstile key and both legal dates come from `site.config.ts`. Slips caught on the way: a guard test tripping on my own comment, two imports dropped in a move, and a design catch (fixture builds would have inherited the real analytics token and loaded the beacon over the network; `neutralizeFixtureIntegrations`, tested, keeps them hermetic). Old `analytics.ts` removed: its logic is the tested `resolveIntegrations`. The `production` GitHub variables PUBLIC_CF_ANALYTICS_TOKEN and PUBLIC_TURNSTILE_SITE_KEY are now redundant (env still overrides if set).
-Next step: C2 `.describe()` on the schemas.
+C2-C6 done (2026-10-01). Evidence: 454 unit tests, typecheck/lint/depcruise clean, 324 e2e, white-label, build, JS budget, `pnpm check:dev-cold-start` and Lighthouse CI green.
+- C2: every field of the six schemas (site config, notes, experience, credentials, experiments, changelog) and the Worker bindings carries `.describe()`; `.dev.vars.example` and `.env.example` are generated from `ENV_VARS`.
+- C3: `pnpm docs:config` (plain Node, `@/` alias through `registerHooks`) renders the tables into the guides between `<!-- docs:start id -->` markers; `docs-config.test.ts` (generator, 10 tests) and `config-docs.test.ts` (sync, 23 tests: fails when a guide, `.env.example` or `.dev.vars.example` drifts, and when any field lacks a description). `docs-quality.test.ts`: every Spanish guide has an English twin with the same structure and the same local links, and every relative link and anchor in README and the guides resolves.
+- C4/C5: `docs/CONFIGURATION(.en).md` and `docs/NOTES(.en).md`. Facts were checked before being written: gitignore exceptions, the tokens command, Dependabot, per-language page trees, related-notes scoring, reading time, and a probe note built in an isolated workspace (relative images become WebP with width/height, tables, task lists, footnotes and Expressive Code title/marker/ins all render). Turnstile test keys verified in Cloudflare's docs.
+- C6: README (ES default) and README.en.md with a banner, home screenshots in dark and light, a note and the mobile reading mode (WebP, 32-56 KB each, from a real build), the philosophy, the agentic-dev-setup section (verified against that repo's README), the technology table with major versions, commands, structure and the docs index. Pointers added to `site.config.ts`, `astro.config.ts`, `wrangler.jsonc`, `ci.yml` and `CLAUDE.md`.
+Findings: (1) `translationOf` is accepted by the schema but nothing reads it (notes are always rendered with no hreflang alternates and the language switch goes to the other home), and `cover` is not displayed either; both are documented as reserved instead of promising behavior. The old schema comment claimed `translationOf` drove hreflang: corrected. (2) The repository has no LICENSE; README and the guides say so plainly. (3) Slips caught by the checks: a wrong expectation about row naming, unused imports after an edit that did not apply, `ls` denied by the user's tooling rule (replaced by `fd`/`eza`), and the project's own lint rule asking for the `@/` alias (the loader was built for exactly that).
+Next step: C7, release to `main` and production check.
 
 Engram mirror: `odd/docs-and-config/tasks`.

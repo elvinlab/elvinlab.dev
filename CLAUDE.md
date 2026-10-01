@@ -22,6 +22,7 @@ mise exec -- pnpm test:lighthouse # mobile Lighthouse scores and Core Web Vitals
 mise exec -- pnpm exec playwright install chromium  # one-time local browser setup
 mise exec -- pnpm depcruise     # architecture boundaries (.dependency-cruiser.cjs)
 mise exec -- pnpm check:dev-cold-start # cold `astro dev` in an isolated workspace: no blank page or late dependency reload
+mise exec -- pnpm docs:config      # regenerate the tables of docs/CONFIGURATION*.md and docs/NOTES*.md and the .env/.dev.vars examples
 
 mise exec -- pnpm --filter web dev          # Astro dev server (workerd runtime)
 mise exec -- pnpm --filter web build        # static build into apps/web/dist
@@ -35,7 +36,7 @@ pnpm enforces a minimum release age: when it proposes `minimumReleaseAgeExclude`
 
 CI runs the production JavaScript gzip budget, Playwright/a11y/theme checks, white-label build, and mobile Lighthouse budgets on every push to `main`, before that same run deploys. Lighthouse audits an isolated production-build fixture and writes HTML/JSON reports to the ignored `.lighthouseci/` directory; it does not upload reports.
 
-Read `docs/PLAN.md`, `docs/BRAND.md` (both in Spanish; decisions in them are settled), `docs/DESIGN.md`, `docs/CONVENTIONS.md` and `docs/adr/` before any work.
+Read `docs/PLAN.md`, `docs/BRAND.md` (both in Spanish; decisions in them are settled), `docs/DESIGN.md`, `docs/CONVENTIONS.md` and `docs/adr/` before any work. To change a setting, secret, dependency or release, follow `docs/CONFIGURATION.md`; to write a note, `docs/NOTES.md` (both have an English twin, `*.en.md`). Their reference tables are generated from the code: after changing a schema or `shared/config/env-vars.ts`, run `pnpm docs:config`.
 
 ## What this repo is
 

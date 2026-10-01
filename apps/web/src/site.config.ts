@@ -1,7 +1,12 @@
 /**
- * Everything that makes this site Elvin's. To reuse the site, replace this file and the content
- * collections; the visual style lives in code. Validated at build time: an invalid config fails it.
- * Never put an email address here: contact goes through /contact.
+ * Everything that makes this site Elvin's, and the only settings file: identity, languages,
+ * features, public third-party ids and legal dates. To reuse the site, replace this file and the
+ * content collections; the visual style lives in code. Validated at build time: an invalid config
+ * fails it, listing every problem.
+ *
+ * Every field is documented in docs/CONFIGURATION.md (generated from the schema in
+ * src/shared/config/schema.ts, so it cannot drift). Secrets and email addresses never go here:
+ * they are Cloudflare secrets (see src/shared/config/env-vars.ts), and contact goes through /contact.
  */
 export const siteConfig = {
   url: 'https://elvinlab.dev',

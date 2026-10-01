@@ -1,3 +1,6 @@
+# CI + production deploy. A push to main runs the gates once and, only if all pass, deploys.
+# Flow, rollback and the variables/secrets this uses: docs/CONFIGURATION.md (sections 5 and 7);
+# decisions: docs/adr/0011 and docs/adr/0012.
 name: CI
 
 on:
