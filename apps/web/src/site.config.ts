@@ -24,6 +24,7 @@ export const siteConfig = {
     },
     location: 'Costa Rica',
     startedYear: 2020,
+    avatar: '/avatar.png',
   },
   socials: [
     { label: 'GitHub', url: 'https://github.com/elvinlab', icon: 'github' },
@@ -41,8 +42,8 @@ export const siteConfig = {
   background: { galaxy: true, cursorWaves: false },
   recruiter: {
     available: true,
-    status: { es: 'Abierto a oportunidades', en: 'Open to opportunities' },
-    lookingFor: { es: 'Full-stack senior · Agentes de IA', en: 'Senior full-stack · AI agents' },
+    status: { es: 'No disponible · trabajando en Buo', en: 'Not available · working at Buo' },
+    lookingFor: { es: 'Actualmente en Buo', en: 'Currently at Buo' },
   },
   notice: {
     es: 'Sitio en construcción: sigo terminando algunas páginas.',

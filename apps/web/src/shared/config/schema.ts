@@ -23,6 +23,8 @@ const siteConfigSchema = z
       location: z.string().trim().min(1).optional(),
       /** First year of professional work; years of experience are derived from it. */
       startedYear: z.int().min(1970),
+      /** Site-relative path to a profile photo (e.g. `/avatar.png`). Omit to show initials instead. */
+      avatar: z.string().trim().min(1).optional(),
     }),
     /** https only: an email address never belongs in public config (contact goes through /contact). */
     socials: z.array(

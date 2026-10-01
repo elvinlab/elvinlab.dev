@@ -15,7 +15,15 @@ const contactHref = localizePath('/contact/', locale, LOCALES);
 
 <section class="grid gap-8 md:grid-cols-[232px_1fr] md:items-center">
   <div class="grid aspect-square w-40 place-items-center justify-self-start rounded-card bg-card p-2 md:w-[232px]">
-    <div class="grid size-full place-items-center rounded-inner bg-chip font-display text-5xl font-bold text-primary outline outline-1 -outline-offset-1 outline-divider" aria-hidden="true">{initials}</div>
+    {site.identity.avatar ? (
+      <img
+        src={site.identity.avatar}
+        alt={site.identity.name}
+        class="size-full rounded-inner object-cover outline outline-1 -outline-offset-1 outline-divider"
+      />
+    ) : (
+      <div class="grid size-full place-items-center rounded-inner bg-chip font-display text-5xl font-bold text-primary outline outline-1 -outline-offset-1 outline-divider" aria-hidden="true">{initials}</div>
+    )}
   </div>
   <div class="flex flex-col gap-4">
     <p class="font-mono text-sm text-cyan">{t(locale, 'me.hello')}</p>
