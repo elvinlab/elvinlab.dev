@@ -8,6 +8,7 @@ const allOn = {
   contact: true,
   credentials: true,
   experiments: true,
+  changelog: true,
   me: true,
 };
 

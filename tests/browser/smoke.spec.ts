@@ -82,6 +82,30 @@ for (const { locale, path } of CONTACT_PAGES) {
   });
 }
 
+const CHANGELOG_PAGES = [
+  { locale: 'es' as const, path: '/changelog/' },
+  { locale: 'en' as const, path: '/en/changelog/' },
+];
+
+for (const { locale, path } of CHANGELOG_PAGES) {
+  test(`${path} renders the changelog and is linked from the footer`, async ({ page }) => {
+    const errors: string[] = [];
+    page.on('pageerror', (error) => errors.push(error.message));
+
+    const response = await page.goto(path);
+    expect(response?.status()).toBe(200);
+    await expect(page.locator('html')).toHaveAttribute('lang', locale);
+    await expect(page.getByRole('main')).toBeVisible();
+    await expect(page.getByRole('heading', { level: 1 })).toBeVisible();
+    await expect(page.locator('footer a', { hasText: 'Changelog' })).toBeVisible();
+
+    expect(
+      await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth),
+    ).toBe(true);
+    expect(errors).toEqual([]);
+  });
+}
+
 test('unknown routes render the bilingual 404, not a successful page', async ({ page }) => {
   const response = await page.goto('/smoke-missing-page/');
   expect(response?.status()).toBe(404);

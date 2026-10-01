@@ -36,6 +36,7 @@ export const siteConfig = {
     credentials: true,
     experiments: false,
     me: false,
+    changelog: true,
   },
   background: { galaxy: true, cursorWaves: false },
   recruiter: {

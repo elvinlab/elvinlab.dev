@@ -20,5 +20,11 @@ export function isHiddenFromSitemap(pathname: string, features?: typeof site.fea
   ) {
     return true;
   }
+  if (
+    !flags.changelog &&
+    (withoutLocale === '/changelog/' || pathname === '/changelog/' || pathname === '/en/changelog/')
+  ) {
+    return true;
+  }
   return false;
 }

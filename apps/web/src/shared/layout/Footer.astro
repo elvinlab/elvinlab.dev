@@ -29,6 +29,14 @@ const year = new Date().getFullYear();
       >
         {t(locale, 'footer.privacy')}
       </a>
+      {site.features.changelog && (
+        <a
+          href={locale === 'es' ? '/changelog/' : '/en/changelog/'}
+          class="text-sm text-text-secondary transition-colors duration-150 hover:text-text"
+        >
+          {t(locale, 'footer.changelog')}
+        </a>
+      )}
       {site.socials.length > 0 && (
         <ul aria-label={t(locale, 'footer.social')} class="-mx-3 flex flex-wrap gap-1">
           {site.socials.map((social) => (

@@ -23,6 +23,7 @@ const valid = {
     credentials: true,
     experiments: true,
     me: true,
+    changelog: true,
   },
   background: { galaxy: true, cursorWaves: false },
   recruiter: {

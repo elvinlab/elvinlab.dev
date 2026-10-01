@@ -34,3 +34,4 @@ Short (≤40 lines each).
 | [0007](./0007-ci-parallel-gates-aggregate.md) | CI shape: parallel gates behind one required aggregate | Accepted |
 | [0008](./0008-launch-gate-feature-flags.md) | Launch gate via feature flags (experiments, /me) | Accepted |
 | [0009](./0009-contact-security-observability.md) | Contact form security and observability | Accepted |
+| [0010](./0010-visitor-changelog-no-semver-single-language.md) | Visitor-facing changelog: dated entries, no semver, single language | Accepted |

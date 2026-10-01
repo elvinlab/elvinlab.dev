@@ -1,0 +1,26 @@
+{
+  "dns-migration": {
+    "date": "2026-09-30",
+    "category": "changed",
+    "title": "Dominio migrado a Cloudflare",
+    "description": "La zona DNS pasó de Porkbun a Cloudflare, con dominios personalizados para el apex y www; www redirige al apex."
+  },
+  "contact-form": {
+    "date": "2026-10-01",
+    "category": "fixed",
+    "title": "Formulario de contacto funcionando en producción",
+    "description": "La causa era que Cloudflare Workers no soporta redirect: 'error' en fetch; se resolvió usando redirect: 'manual'."
+  },
+  "adr-0006-0009": {
+    "date": "2026-10-01",
+    "category": "added",
+    "title": "Registros de arquitectura (ADR) 0006-0009",
+    "description": "Documentadas las decisiones de DNS, estructura de CI, feature flags de lanzamiento y seguridad del contacto."
+  },
+  "changelog-page": {
+    "date": "2026-10-01",
+    "category": "added",
+    "title": "Página de changelog",
+    "description": "Este mismo registro: un lugar para ver los cambios visibles del sitio a medida que se publican."
+  }
+}

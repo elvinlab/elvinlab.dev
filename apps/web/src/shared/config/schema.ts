@@ -69,6 +69,8 @@ const siteConfigSchema = z
       contact: z.boolean(),
       credentials: z.boolean(),
       experiments: z.boolean(),
+      /** Visitor-facing /changelog page: off hides the footer link, marks it noindex and keeps it out of the sitemap. */
+      changelog: z.boolean(),
       /** /me recruiter page: off hides it from the nav, marks it noindex and keeps it out of the sitemap. */
       me: z.boolean(),
     }),
