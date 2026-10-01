@@ -30,5 +30,5 @@ void main() {
   outColor = vec4(color, clamp(intensity, 0.0, 0.7));
 }`;
 
-export const createCursorWaves: Background = (canvas, palette) =>
-  runShader(canvas, palette, FRAGMENT);
+export const createCursorWaves: Background = (gl, canvas, palette) =>
+  runShader(gl, canvas, palette, FRAGMENT);

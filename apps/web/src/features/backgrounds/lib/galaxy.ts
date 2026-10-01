@@ -66,4 +66,5 @@ void main() {
   outColor = vec4(color, clamp(alpha, 0.0, 0.9));
 }`;
 
-export const createGalaxy: Background = (canvas, palette) => runShader(canvas, palette, FRAGMENT);
+export const createGalaxy: Background = (gl, canvas, palette) =>
+  runShader(gl, canvas, palette, FRAGMENT);

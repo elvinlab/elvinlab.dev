@@ -39,6 +39,33 @@ test('the background choice persists across reloads', async ({ browser }) => {
   await context.close();
 });
 
+test('regression: cycling many times never loses the WebGL context (one context per canvas, reused across effects)', async ({
+  browser,
+}) => {
+  // A prior implementation opened a fresh WebGL2 context per effect switch; Firefox in particular
+  // enforces a low concurrent-context limit and would lose the context after a handful of cycles,
+  // leaving the banner blank. Regression for that: cycle well past where it used to break.
+  const context = await browser.newContext({ reducedMotion: 'no-preference' });
+  const page = await context.newPage();
+  const messages: string[] = [];
+  page.on('console', (msg) => {
+    if (msg.type() === 'error') messages.push(msg.text());
+  });
+  page.on('pageerror', (error) => messages.push(error.message));
+
+  await page.goto('/');
+  const picker = page.getByRole('button', { name: /cambiar fondo|change background/i });
+  for (let i = 0; i < 20; i++) {
+    await picker.click();
+  }
+  await page.waitForTimeout(200);
+
+  expect(messages).toEqual([]);
+  // Settled on a known state (20 clicks, 3-state cycle starting from galaxy -> off at i=19).
+  expect(await page.evaluate(() => localStorage.getItem('background'))).toBe('off');
+  await context.close();
+});
+
 type BackgroundProbe = { webgl2Attempts: number; animationFrames: number };
 
 const instrumentBackground = (): void => {

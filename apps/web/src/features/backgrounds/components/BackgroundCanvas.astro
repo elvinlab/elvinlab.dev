@@ -22,6 +22,7 @@ import { site } from '@/shared/config/index.ts';
   import type { Background, BackgroundHandle } from '@/features/backgrounds/lib/contract.ts';
   import { createCursorWaves } from '@/features/backgrounds/lib/cursor-waves.ts';
   import { createGalaxy } from '@/features/backgrounds/lib/galaxy.ts';
+  import { createGlContext } from '@/features/backgrounds/lib/gl-runner.ts';
   import type { BackgroundChoice } from '@/shared/lib/background-preference.ts';
   import {
     BACKGROUND_STORAGE_KEY,
@@ -55,6 +56,10 @@ import { site } from '@/shared/config/index.ts';
     };
 
     let handle: BackgroundHandle | null = null;
+    // One context for the canvas's whole lifetime: swapping effects recompiles a program on it
+    // rather than opening a new context each time (Firefox especially enforces a low limit on
+    // concurrent WebGL contexts, so repeated open/close on one canvas can lose the context).
+    let gl: WebGL2RenderingContext | null = null;
 
     const stop = (): void => {
       handle?.destroy();
@@ -66,7 +71,14 @@ import { site } from '@/shared/config/index.ts';
       // 'off' hides the canvas so the banner's CSS starfield fallback shows through underneath.
       canvas.style.display = choice === 'off' ? 'none' : '';
       if (choice === 'off') return;
-      handle = factories[choice](canvas, readPalette());
+      if (!gl) {
+        gl = createGlContext(canvas);
+        canvas.addEventListener('webglcontextlost', () => {
+          gl = null;
+        });
+      }
+      if (!gl || gl.isContextLost()) return;
+      handle = factories[choice](gl, canvas, readPalette());
     };
 
     let stored: string | null = null;
@@ -90,6 +102,8 @@ import { site } from '@/shared/config/index.ts';
     const dispose = (): void => {
       stop();
       themeObserver.disconnect();
+      // Only here, leaving the page for good, does the context itself get released.
+      if (gl && !gl.isContextLost()) gl.getExtension('WEBGL_lose_context')?.loseContext();
     };
     document.addEventListener('astro:before-swap', dispose, { once: true });
     window.addEventListener('pagehide', dispose, { once: true });

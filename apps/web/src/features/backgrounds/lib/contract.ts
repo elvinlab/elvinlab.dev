@@ -16,7 +16,13 @@ export type BackgroundHandle = {
 };
 
 /**
- * A background effect: given a canvas and a palette, it starts drawing and returns a handle.
+ * A background effect: given an existing GL context, its canvas and a palette, it starts drawing
+ * and returns a handle. Takes the context rather than creating one so effects can be swapped on
+ * the same canvas without exhausting the browser's (notably Firefox's) concurrent-context limit.
  * Presentation-only; never fetches.
  */
-export type Background = (canvas: HTMLCanvasElement, palette: Palette) => BackgroundHandle;
+export type Background = (
+  gl: WebGL2RenderingContext,
+  canvas: HTMLCanvasElement,
+  palette: Palette,
+) => BackgroundHandle;

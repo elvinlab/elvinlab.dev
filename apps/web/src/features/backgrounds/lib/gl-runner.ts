@@ -38,19 +38,29 @@ function compile(gl: WebGL2RenderingContext, type: number, source: string): WebG
   return shader;
 }
 
-/** Starts a fragment-shader background on `canvas` and returns a cleanup that releases everything. */
-export function runShader(
-  canvas: HTMLCanvasElement,
-  palette: Palette,
-  fragment: string,
-): BackgroundHandle {
-  const gl = canvas.getContext('webgl2', {
+/** Opens the single WebGL2 context a canvas uses for its whole lifetime (see `Background`'s doc). */
+export function createGlContext(canvas: HTMLCanvasElement): WebGL2RenderingContext | null {
+  return canvas.getContext('webgl2', {
     alpha: true,
     antialias: false,
     premultipliedAlpha: false,
   });
+}
+
+/**
+ * Compiles `fragment` onto an already-open `gl` context and starts drawing. `destroy()` only tears
+ * down this program/listeners, not the context itself — the context is reused when swapping to a
+ * different effect on the same canvas (creating a new one per swap can exhaust the browser's
+ * concurrent-WebGL-context limit, which Firefox enforces much more tightly than Chromium).
+ */
+export function runShader(
+  gl: WebGL2RenderingContext,
+  canvas: HTMLCanvasElement,
+  palette: Palette,
+  fragment: string,
+): BackgroundHandle {
   const noop: BackgroundHandle = { destroy: () => {}, setPalette: () => {} };
-  if (!gl) return noop;
+  if (gl.isContextLost()) return noop;
 
   const vs = compile(gl, gl.VERTEX_SHADER, VERTEX);
   const fs = compile(gl, gl.FRAGMENT_SHADER, fragment);
@@ -169,7 +179,13 @@ export function runShader(
       window.removeEventListener('pointermove', onPointer);
       document.removeEventListener('visibilitychange', onVisibility);
       canvas.removeEventListener('webglcontextlost', onLost);
-      gl.getExtension('WEBGL_lose_context')?.loseContext();
+      // Release this program, not the context: the context is reused by the next effect.
+      if (!gl.isContextLost()) {
+        gl.deleteProgram(program);
+        gl.deleteBuffer(buffer);
+        gl.deleteShader(vs);
+        gl.deleteShader(fs);
+      }
     },
   };
 }

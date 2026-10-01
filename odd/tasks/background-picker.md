@@ -60,6 +60,21 @@ Strict (project default). `background-preference.ts` is the pure-logic unit: RED
 
 Not committed yet — pending explicit go-ahead.
 
+## Bugfix 2026-10-01 (post-deploy): Firefox lost the WebGL context after a few cycles
+
+User reported the banner going blank/broken after clicking the picker "a couple of tries in," in production, on both desktop and (previously) mobile. Not reproducible in Chromium despite extensive attempts (sequential, rapid, combined with the theme toggle, light/dark, mobile viewport, `/me`, home). Reproduced by the user directly in Firefox, which logs the browser-level warning verbatim: `WebGL context was lost.`
+
+**Root cause**: `BackgroundCanvas`'s rewrite (this same feature) made it legal to swap effects on one long-lived canvas — but `createGalaxy`/`createCursorWaves`/`runShader` still called `canvas.getContext('webgl2', ...)` fresh on every swap, and `destroy()` explicitly force-lost that context via `WEBGL_lose_context`. Opening a new WebGL2 context on the same canvas repeatedly, several times in a row, hits Firefox's (much stricter than Chromium's) concurrent-context limit, so the browser forcibly loses a context — sometimes the one currently in use — mid-cycle. `gl-runner.ts`'s own `onLost` handler then hides the canvas (`display: none`), which is correct behavior for a genuine loss but was being triggered by our own code's churn, not an external GPU event.
+
+**Fix**: one `WebGL2RenderingContext` per canvas for its whole lifetime, reused across every effect swap; only the **program** (shaders + buffers) is recompiled per swap, never the context itself. The context is only ever actually lost once, on final page teardown (`astro:before-swap`/`pagehide`).
+- `features/backgrounds/lib/contract.ts`: `Background` type now takes `(gl, canvas, palette)` instead of `(canvas, palette)` — it receives an already-open context rather than creating one.
+- `features/backgrounds/lib/gl-runner.ts`: split out `createGlContext(canvas)`; `runShader(gl, canvas, palette, fragment)` now takes the context as a parameter, checks `gl.isContextLost()` up front, and its `destroy()` deletes only the program/buffer/shaders (`gl.deleteProgram`/`deleteBuffer`/`deleteShader`) — it no longer calls `loseContext()`.
+- `features/backgrounds/lib/galaxy.ts` / `cursor-waves.ts`: pass the new `gl` parameter through to `runShader`.
+- `features/backgrounds/components/BackgroundCanvas.astro`: opens one `gl` lazily on first need, reuses it across every `run(choice)` call, nulls it out if `webglcontextlost` ever fires for real (so the next swap recreates it), and only calls `loseContext()` in the component's own final `dispose()`.
+- New regression test in `tests/browser/background.spec.ts`: cycles the picker 20 times, asserts zero console errors and the correct final state.
+
+**Verified**: full check suite green (typecheck, lint, 313 unit tests, depcruise 0 violations, build, white-label, js-budget, full Playwright suite 141/141 incl. a11y). Manually stress-tested the fix in real Firefox (not just Chromium) against a local build — 20 rapid cycles, zero console messages, confirming the exact browser/error combination the user hit is resolved. Did not get a clean negative-control repro of the pre-fix bug in automation (Chromium's higher context limit didn't trigger it either, consistent with the user never seeing this in Chrome) — the root-cause mechanism and the fix's correctness were confirmed by code inspection and the matching error message, not by a failing-then-passing automated test.
+
 ## Next step
 
-Commit, close issue #41.
+Commit, close issue #41, ship the Firefox WebGL-context fix as its own follow-up commit.
