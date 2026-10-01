@@ -1,0 +1,116 @@
+---
+/** Giscus comments for a note. Renders nothing unless `features.comments` is on and the site
+ * config has a `giscus` block; the client script is only requested when the section nears the
+ * viewport. */
+import { isEnabled, site } from '@/shared/config/index.ts';
+import { type Locale, t } from '@/shared/i18n/index.ts';
+
+type Props = { locale: Locale };
+
+const { locale } = Astro.props;
+const giscus = isEnabled('comments') ? site.giscus : undefined;
+---
+
+{giscus && (
+  <section
+    data-comments
+    data-state="idle"
+    data-repo={giscus.repo}
+    data-repo-id={giscus.repoId}
+    data-category={giscus.category}
+    data-category-id={giscus.categoryId}
+    data-locale={locale}
+    data-error-text={t(locale, 'comments.error')}
+    aria-label={t(locale, 'note.discussion')}
+    class="mt-8 flex flex-col gap-4 rounded-card bg-card p-6 print:hidden"
+  >
+    <h2 class="font-display text-xl font-bold">{t(locale, 'note.discussion')}</h2>
+    <p class="text-sm text-muted" data-comments-status>{t(locale, 'comments.loading')}</p>
+    <div data-comments-mount></div>
+    <noscript>
+      <p class="text-sm text-muted">
+        {t(locale, 'comments.noscript')}
+        <a class="text-primary underline decoration-dashed underline-offset-4" href={`https://github.com/${giscus.repo}/discussions`} rel="noopener">GitHub</a>.
+      </p>
+    </noscript>
+  </section>
+)}
+
+<script>
+  import {
+    buildGiscusAttributes,
+    GISCUS_CLIENT_SRC,
+    GISCUS_ORIGIN,
+    giscusThemeFor,
+  } from '@/features/comments/lib/giscus.ts';
+
+  const section = document.querySelector<HTMLElement>('[data-comments]');
+  const mount = section?.querySelector<HTMLElement>('[data-comments-mount]');
+  const status = section?.querySelector<HTMLElement>('[data-comments-status]');
+
+  if (section && mount && status) {
+    const root = document.documentElement;
+    const read = (key: string): string => section.dataset[key] ?? '';
+    const currentTheme = () => giscusThemeFor(root.getAttribute('data-theme'));
+    const sendTheme = (frame: HTMLIFrameElement): void => {
+      frame.contentWindow?.postMessage({ giscus: { setConfig: { theme: currentTheme() } } }, GISCUS_ORIGIN);
+    };
+
+    const load = (): void => {
+      if (section.dataset['state'] !== 'idle') return;
+      section.dataset['state'] = 'loading';
+      section.setAttribute('aria-busy', 'true');
+
+      const script = document.createElement('script');
+      script.src = GISCUS_CLIENT_SRC;
+      script.async = true;
+      script.crossOrigin = 'anonymous';
+      const attributes = buildGiscusAttributes(
+        { repo: read('repo'), repoId: read('repoId'), category: read('category'), categoryId: read('categoryId') },
+        read('locale'),
+        currentTheme(),
+      );
+      for (const [name, value] of Object.entries(attributes)) script.setAttribute(name, value);
+
+      script.addEventListener('load', () => {
+        section.dataset['state'] = 'loaded';
+        section.removeAttribute('aria-busy');
+        status.hidden = true;
+      });
+      script.addEventListener('error', () => {
+        section.dataset['state'] = 'error';
+        section.removeAttribute('aria-busy');
+        status.textContent = read('errorText');
+      });
+      mount.append(script);
+    };
+
+    // A theme toggled before the frame finished loading is re-sent once the frame is ready.
+    section.addEventListener(
+      'load',
+      (event) => {
+        if (event.target instanceof HTMLIFrameElement) sendTheme(event.target);
+      },
+      true,
+    );
+    new MutationObserver(() => {
+      const frame = section.querySelector<HTMLIFrameElement>('iframe.giscus-frame');
+      if (frame) sendTheme(frame);
+    }).observe(root, { attributes: true, attributeFilter: ['data-theme'] });
+
+    if ('IntersectionObserver' in window) {
+      const observer = new IntersectionObserver(
+        (entries) => {
+          if (entries.some((entry) => entry.isIntersecting)) {
+            observer.disconnect();
+            load();
+          }
+        },
+        { rootMargin: '200px 0px' },
+      );
+      observer.observe(section);
+    } else {
+      load();
+    }
+  }
+</script>

@@ -5,6 +5,7 @@ import { type CollectionEntry, getCollection, render } from 'astro:content';
 import { localizePath } from '@elvinlab/core';
 
 import { BackgroundCanvas } from '@/features/backgrounds/index.ts';
+import { Comments } from '@/features/comments/index.ts';
 import DecisionRecord from '@/features/notes/components/DecisionRecord.astro';
 import LangBadge from '@/features/notes/components/LangBadge.astro';
 import PrevNext from '@/features/notes/components/PrevNext.astro';
@@ -77,10 +78,7 @@ const readingLabel = t(locale, 'notes.readingTime', { min: readingMinutes(entry.
 
   <PrevNext locale={locale} prev={prev} next={next} />
 
-  <section class="mt-8 flex flex-col gap-4 rounded-card bg-card p-6" aria-label={t(locale, 'note.discussion')}>
-    <h2 class="font-display text-xl font-bold">{t(locale, 'note.discussion')}</h2>
-    <p class="text-sm text-muted">{/* Giscus is wired in T20. */}0 comments</p>
-  </section>
+  <Comments locale={locale} />
 
   <Fragment slot="aside">
     <div class="flex flex-col gap-4 lg:sticky lg:top-24">

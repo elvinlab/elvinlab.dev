@@ -12,7 +12,7 @@ import { dirname, join } from 'node:path';
 
 import { afterEach, expect, it } from 'vitest';
 
-import { createFixtureWorkspace } from './fixture-workspace.ts';
+import { createFixtureWorkspace, enableFixtureComments } from './fixture-workspace.ts';
 
 const temporary: string[] = [];
 afterEach(() => {
@@ -92,4 +92,27 @@ it('links external dependencies but keeps the copied core independent of the sou
   workspace.cleanup();
   expect(existsSync(workspace.root)).toBe(false);
   expect(existsSync(source)).toBe(true);
+});
+
+function webWithConfig(config: string): string {
+  const web = mkdtempSync(join(tmpdir(), 'fixture-web-'));
+  temporary.push(web);
+  write(web, 'src/site.config.ts', config);
+  return web;
+}
+
+it('injects the fixture giscus block, replacing any real one', () => {
+  const web = webWithConfig(
+    "export const siteConfig = {\n  giscus: { repo: 'real/repo', repoId: 'R_real', category: 'C', categoryId: 'D_real' },\n  features: { comments: true },\n};\n",
+  );
+  enableFixtureComments(web);
+  const config = readFileSync(join(web, 'src/site.config.ts'), 'utf8');
+  expect(config).toContain("repo: 'fixture/fixture'");
+  expect(config).not.toContain('real/repo');
+  expect(config.match(/giscus:/g)).toHaveLength(1);
+});
+
+it('fails loudly when the config has no features block to anchor on', () => {
+  const web = webWithConfig('export const siteConfig = {};\n');
+  expect(() => enableFixtureComments(web)).toThrow(/giscus/);
 });
