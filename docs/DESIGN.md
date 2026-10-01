@@ -6,7 +6,7 @@ Source of truth for how elvinlab.dev looks and moves (design v3, "lab notebook")
 
 - Subject: a portfolio and the blog "Lab Notes — by an eternal junior" of a full-stack engineer who builds with AI agents. Audience: engineers, tech leads and recruiters. Spanish is the default locale at `/`; English is optional under `/en/`. The browser language only triggers a dismissible "also available in …" hint, never a redirect (SEO and performance).
 - Identity comes from the subject: a lab and its notebook. Notes are numbered entries (`Note 003`), each summarized by a **decision record**: context, decision, outcome.
-- **One bold element:** the full-bleed banner with the live cursor-reactive WebGL2 background and a large solid display headline with the pink block cursor. Everything else stays quiet.
+- **One bold element:** the full-bleed banner with the live cursor-reactive WebGL2 background and a large solid display headline. Pink block accents are small and static across the home, navbar, about page, notes index and footer. Everything else stays quiet.
 - Varied hierarchy instead of identical cards: the latest entry is large, older entries are index rows, projects are "experiments" tiles, the four pillars share one strip.
 - Mechanics from [Fuwari](https://github.com/saicaca/fuwari) (MIT): grid, measurements, sidebar, motion timing. Identity is ours.
 - White-label: another developer replaces name, bio, notes, experience, colors, favicon and socials through configuration, content and one theme file; the layout, motion and motifs above stay in code.
@@ -32,7 +32,7 @@ The brand gradient (violet → cyan → pink) appears only as a 3 px strip on re
 
 ## Type
 
-Space Grotesk for display and body, JetBrains Mono for entry numbers and code, both self-hosted via Fontsource. Press Start 2P only in the retro footer signature and the 404 page.
+Space Grotesk for display and body, JetBrains Mono for entry numbers and code, both self-hosted via Fontsource. Press Start 2P marks the navbar wordmark and retro footer signature, with a larger signature on the 404 page.
 
 Scale: note title 54 px (hero) / 36 px, card title 26–28 px, body 18 px at 1.75 line height inside a 68 ch measure (16 px minimum on mobile), meta 14 px.
 
@@ -40,6 +40,7 @@ Scale: note title 54 px (hero) / 36 px, card title 26–28 px, body 18 px at 1.7
 
 - Page width 1200 px; grid `main | sidebar 280 px`, gap 16 px. The sidebar sits on the right and moves below the content under 1024 px.
 - Navbar: 72 px card, radius `0 0 16px 16px`, sticky. Items: Home, Notes, Experiments, About (`/me`), Contact.
+- The dismissible locale suggestion stays in document flow after the footer, within the page gutters; it appears only for a browser-language mismatch and never covers content or focus. It can extend document height, but avoids an overlay and does not shift the content above it.
 - Banner: ~600 px on home, ~380 px elsewhere; content overlaps it by 56 px.
 - Cards: radius 16 px, no borders, no shadows; dashed dividers only. Inner radius follows the concentric rule (outer 16 − padding 12 = 4 px).
 - Section titles: sentence case with a 4 × 20 px accent bar.
@@ -48,10 +49,10 @@ Scale: note title 54 px (hero) / 36 px, card title 26–28 px, body 18 px at 1.7
 ## Pages
 
 - **Home:** banner, latest entry with its decision record, notebook index, "Hiring?" recruiter card (availability, CV, link to `/me`), experiments, pillars, lab log.
-- **/notes:** search, language filter, entries grouped by year, categories, tags, RSS.
-- **Note:** reading-progress bar, decision record before the text, heading anchors, "Lab note" callout, copyable code, prev/next, related notes, Giscus discussion, sticky table of contents with progress.
+- **/notes:** Spanish index with search, language filter, entries grouped by year, categories, tags and RSS. English notes have `/en/notes/<slug>` detail routes; there is no English index.
+- **Note:** reading-progress bar, decision record before the text, heading anchors, "Lab note" callout, copyable code, prev/next, related notes, and sticky table of contents with progress. Discussion is currently a placeholder; Giscus integration is planned, not active. Long-form policy prose uses a 68 ch measure without narrowing the page/sidebar grid.
 - **/me (recruiters):** photo, name, calls to action (CV, contact, LinkedIn, GitHub), at-a-glance strip, what I bring, experience timeline, latest experiments, latest notes, certificates and degrees by year, stack; prints cleanly to PDF.
-- **/contact:** form with topic chips, validation and sent state; email address only behind a click-to-reveal button.
+- **/contact:** when contact delivery is configured, the form has topic chips, validation and sent state; otherwise it exposes the configured unavailable state. The email address stays behind a click-to-reveal button.
 
 ## Motion
 
@@ -64,3 +65,17 @@ Scale: note title 54 px (hero) / 36 px, card title 26–28 px, body 18 px at 1.7
 ## Accessibility floor
 
 WCAG AA contrast in both themes, visible 2 px focus ring, touch targets ≥44 px, semantic landmarks (`header`, `nav`, `main`, `aside`, `footer`), `aria-label` on icon-only buttons, no information conveyed by color alone.
+
+## October 2026 refinement
+
+- The home banner blends into the page through a 120 px gradient; the animated background stays sharp and interactive.
+- Small static pink accents retain the terminal motif without repeated blinking. Retro type identifies the brand, not long-form text.
+- The home author card uses the configured profile image, with initials when no image is configured. The hiring card separates status from its heading and removes repeated employment information.
+- The locale hint sits after the footer: less immediately discoverable than an overlay, but it cannot cover reading or form controls or shift preceding content. The navbar language control remains available near the top.
+- Existing semantic colors, content/sidebar geometry and theme behavior are preserved. UI UX Pro Max's generic palette suggestions were not adopted because they conflicted with the established brand.
+
+Implementation and check evidence: [home refinement](../odd/tasks/home-visual-refinement.md) and [sitewide polish](../odd/tasks/sitewide-ui-polish.md).
+
+## Verification scope
+
+The current sitewide visual audit covered 15 desktop routes in both themes plus representative home, about, contact, notes and 404 layouts at 360 px and 768 px. No horizontal overflow or page errors were observed in that sample. Browser fixtures exercise Spanish and English note rendering, including the localized English detail route; current real notes are drafts, so published-note behavior is not represented. Contact checks cover the configured local form without submitting to a real service. Disabled experiments and external contact delivery remain outside runtime coverage.

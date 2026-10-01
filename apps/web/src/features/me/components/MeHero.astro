@@ -28,7 +28,7 @@ const contactHref = localizePath('/contact/', locale, LOCALES);
   <div class="flex flex-col gap-4">
     <p class="font-mono text-sm text-cyan">{t(locale, 'me.hello')}</p>
     <h1 class="font-display text-4xl font-bold leading-none tracking-tight md:text-6xl">
-      {site.identity.name}<span class="ml-1 inline-block h-8 w-2.5 animate-blink bg-pink align-baseline md:h-12"></span>
+      {site.identity.name}<span aria-hidden="true" class="ml-1 inline-block h-3 w-2 bg-pink align-baseline md:h-4"></span>
     </h1>
     <p class="text-xl text-text-secondary md:text-2xl">{site.identity.role[locale]}</p>
     <div class="mt-1 flex flex-wrap gap-2.5 print:hidden">

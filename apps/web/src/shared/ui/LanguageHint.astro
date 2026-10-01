@@ -1,7 +1,8 @@
 ---
 /**
  * Dismissible hint shown when the browser prefers another supported locale. Never redirects:
- * crawlers must reach every locale. Fixed positioning keeps it out of the layout (no CLS).
+ * crawlers must reach every locale. It stays in document flow after the site chrome so it never
+ * covers reading content, controls, or keyboard focus.
  */
 import { localizePath, switchLocale } from '@elvinlab/core';
 
@@ -11,7 +12,7 @@ import { isSingleLocaleRoute } from '@/shared/layout/nav.ts';
 type Props = { locale: Locale };
 
 const { locale } = Astro.props;
-// Notes exist in Spanish only: the hint goes to the other locale's home, never to a missing URL.
+// The notes index is Spanish-only; note translations are optional, so suggest the other locale's home.
 const routePath = switchLocale(Astro.url.pathname, LOCALES.defaultLocale, LOCALES);
 const alternates = LOCALES.locales
   .filter((other) => other !== locale)
@@ -34,10 +35,10 @@ const alternates = LOCALES.locales
       data-language-hint={alternate.locale}
       data-current-locale={locale}
       aria-label={alternate.text}
-      class="fixed inset-x-3 bottom-3 z-50 mx-auto flex max-w-md items-center gap-3 rounded-card bg-card p-3 pl-4 text-sm text-text shadow-lg"
+      class="mx-auto mt-4 flex max-w-md items-center gap-3 rounded-card bg-card p-3 pl-4 text-sm text-text"
     >
       <span class="grow">{alternate.text}</span>
-      <a href={alternate.href} hreflang={alternate.locale} class="rounded-control bg-button px-3 py-2 font-medium text-white">
+      <a href={alternate.href} hreflang={alternate.locale} class="flex min-h-11 items-center rounded-control bg-button px-3 font-medium text-white">
         {alternate.action}
       </a>
       <button type="button" data-language-hint-dismiss class="grid size-11 place-items-center rounded-control text-muted hover:bg-card-hover" aria-label={alternate.dismiss}>

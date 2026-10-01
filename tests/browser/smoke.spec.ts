@@ -7,7 +7,7 @@ for (const { locale, prefix, slug } of [
   const paths =
     locale === 'es'
       ? [`${prefix}/`, `${prefix}/notes/`, `${prefix}/notes/${slug}/`]
-      : [`${prefix}/`];
+      : [`${prefix}/`, `${prefix}/notes/${slug}/`];
 
   for (const path of paths) {
     test(`${path} renders production content`, async ({ page }) => {
@@ -26,6 +26,12 @@ for (const { locale, prefix, slug } of [
           `Synthetic smoke note ${locale.toUpperCase()}`,
         );
         await expect(page.locator('article pre')).toContainText("const fixture = 'isolated'");
+        if (locale === 'en') {
+          await expect(page.getByRole('link', { name: 'Lab Notes' })).toHaveAttribute(
+            'href',
+            '/notes/',
+          );
+        }
       } else {
         await expect(page.locator(`a[href="${prefix}/notes/${slug}/"]`).first()).toBeVisible();
       }
@@ -87,6 +93,87 @@ const CONTACT_PAGES = [
   { locale: 'es' as const, path: '/contact/' },
   { locale: 'en' as const, path: '/en/contact/' },
 ];
+
+test('locale suggestion stays in document flow and only appears for a locale mismatch', async ({
+  page,
+}) => {
+  await page.addInitScript(() => {
+    Object.defineProperty(navigator, 'languages', { configurable: true, get: () => ['en'] });
+  });
+  await page.goto('/');
+  await page.evaluate(() => localStorage.clear());
+
+  const privacyResponse = await page.goto('/privacy/');
+  expect(privacyResponse?.status()).toBe(200);
+  await expect(page).toHaveURL(/\/privacy\/$/);
+  const hint = page.locator('[data-language-hint="en"]');
+  await expect(hint).toBeVisible();
+  await expect(hint.locator('a')).toHaveAttribute('href', '/en/privacy/');
+  await expect(hint.locator('a')).toHaveAttribute('hreflang', 'en');
+  await expect(hint.locator('a')).toHaveCSS('min-height', '44px');
+
+  const separateFromContent = await page.evaluate(() => {
+    const hint = document.querySelector<HTMLElement>('[data-language-hint="en"]');
+    const article = document.querySelector<HTMLElement>('main article');
+    const footer = document.querySelector<HTMLElement>('body > div[data-site-chrome] footer');
+    if (!hint || !article || !footer) return false;
+    const hintRect = hint.getBoundingClientRect();
+    return (
+      hintRect.left >= 12 &&
+      hintRect.right <= window.innerWidth - 12 &&
+      (hintRect.top >= footer.getBoundingClientRect().bottom ||
+        hintRect.bottom <= article.getBoundingClientRect().top)
+    );
+  });
+  expect(separateFromContent).toBe(true);
+
+  await hint.getByRole('button').click();
+  await expect(hint).toBeHidden();
+  await expect
+    .poll(() => page.evaluate(() => localStorage.getItem('language-hint-dismissed')))
+    .toBe('1');
+  await page.reload();
+  await expect(hint).toBeHidden();
+
+  await page.evaluate(() => localStorage.removeItem('language-hint-dismissed'));
+  const spanishNote = await page.goto('/notes/smoke-es/');
+  expect(spanishNote?.status()).toBe(200);
+  await expect(page).toHaveURL(/\/notes\/smoke-es\/$/);
+  await expect(page.locator('[data-language-hint="en"] a')).toHaveAttribute('href', '/en/');
+});
+
+test('locale suggestion remains hidden when the browser already matches the page', async ({
+  page,
+}) => {
+  await page.addInitScript(() => {
+    Object.defineProperty(navigator, 'languages', { configurable: true, get: () => ['en'] });
+  });
+
+  await page.goto('/en/privacy/');
+  await expect(page.locator('[data-language-hint="es"]')).toBeHidden();
+});
+
+test('privacy prose follows the documented reading measure and secondary cursors are static', async ({
+  page,
+}) => {
+  await page.goto('/privacy/');
+  const measureFits = await page.locator('main article').evaluate((article) => {
+    const font = getComputedStyle(article).font;
+    const canvas = document.createElement('canvas');
+    const context = canvas.getContext('2d');
+    if (!context) return false;
+    context.font = font;
+    return article.getBoundingClientRect().width <= context.measureText('0'.repeat(68)).width + 1;
+  });
+  expect(measureFits).toBe(true);
+  await expect(page.locator('footer .animate-blink')).toHaveCount(0);
+
+  await page.goto('/me/');
+  await expect(page.locator('main h1 .animate-blink')).toHaveCount(0);
+
+  await page.goto('/notes/');
+  await expect(page.locator('main h1 .animate-blink')).toHaveCount(0);
+});
 
 const CONTACT_LABELS = {
   es: { name: 'Nombre', email: 'Correo electrónico', message: 'Mensaje' },

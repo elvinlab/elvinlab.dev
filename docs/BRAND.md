@@ -59,6 +59,7 @@ El blog se llama **Lab Notes**, con el subtítulo *by an eternal junior*, y vive
 | `elvinlab.dev` | Portafolio: quién soy, proyectos destacados, últimos 3 posts |
 | `elvinlab.dev/notes` | Lab Notes — by an eternal junior: todos los posts |
 | `elvinlab.dev/notes/<slug>` | Cada post |
+| `elvinlab.dev/en/notes/<slug>` | Detalle de una nota escrita en inglés; no hay índice en inglés |
 | `elvinlab.dev/devlog` | Reservado a futuro: devlog numerado de proyectos (guides, emulador J2ME) |
 
 Contenido del blog: experiencia con tecnología, proyectos, aprendizajes, cómo me siento y cómo me adapto, consejos, razonamiento de decisiones. Se prefirió una ruta sobre un subdominio: un subdominio divide la autoridad SEO y exige otro deploy.
@@ -110,7 +111,7 @@ Inconsistencia a resolver: en modo claro el banner usa `#c9c3ee` como borde y la
 | Display (nombre, títulos) | Space Grotesk | 700 | 58–64 px nombre · 24–27 px títulos |
 | Texto | Space Grotesk | 400, 500 | 16–18 px |
 | Mono (números de nota, prompts, código) | JetBrains Mono | 400, 600, 700 | 12–16 px; en el sitio no se usa para etiquetas en mayúsculas |
-| Firma retro | Press Start 2P | 400 | Solo en la firma del footer y la página 404 |
+| Firma retro | Press Start 2P | 400 | Wordmark del navbar, firma del footer y página 404 |
 
 Ambas desde [Fontsource](https://fontsource.org), autoalojadas; nunca desde un CDN en tiempo de ejecución.
 
@@ -141,7 +142,7 @@ Los colores de marca se mantienen, pero el texto y los rellenos usan estas varia
 | `glow.opacity` | 0.16–0.28 (gradiente radial, sin sombras duras) | En uso |
 | `motion.pulse` | 4 s lineal, infinito | En uso |
 | `motion.border` | 7 s lineal (luz que recorre el borde) | En uso |
-| `motion.blink` | 1 s por pasos (cursor) | En uso |
+| `motion.blink` | 1 s por pasos (cursor) | Sin uso visible; los acentos de cursor son estáticos en todas las páginas |
 | `motion.reduce` | Todas las animaciones se detienen con `prefers-reduced-motion` | Obligatorio |
 
 ## Motivos visuales y reglas de uso
@@ -155,7 +156,7 @@ La identidad es "laboratorio de IA sobre fondo oscuro": pocos elementos, siempre
 | Red de nodos con pulsos | Nodos conectados; los datos viajan por las líneas | Banner principal, diagramas de arquitectura |
 | Borde con luz | Un tramo de gradiente recorre el borde de la tarjeta | Tarjetas destacadas (máx. una fila por página) |
 | Resplandor | Gradiente radial en una esquina | Tarjetas y hero; nunca sombras duras |
-| Prompt de terminal | `// comentario`, `>` y cursor rosa parpadeante | Saludo del hero, títulos técnicos |
+| Prompt de terminal | `// comentario`, `>` y cursor rosa estático | Saludo y títulos técnicos; el acento es discreto y no parpadea |
 | Firma retro | Abanico arriba y GIFs de los 90 al pie | Solo README de GitHub y footer del sitio |
 
 ### Sí
