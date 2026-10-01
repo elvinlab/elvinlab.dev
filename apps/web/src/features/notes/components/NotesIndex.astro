@@ -38,7 +38,7 @@ const tags = [...new Set(sortNotes(notes).flatMap((note) => note.data.tags))];
     <BackgroundCanvas slot="background" />
     <p class="font-mono text-sm text-cyan">{t(locale, 'notes.eyebrow', { handle: site.identity.handle })}</p>
     <h1 class="mt-2 font-display text-5xl font-bold md:text-6xl">
-      {t(locale, 'notes.title')}<span class="ml-1 inline-block h-9 w-2.5 animate-blink bg-pink align-baseline md:h-11"></span>
+      {t(locale, 'notes.title')}<span aria-hidden="true" class="ml-1 inline-block h-3 w-2 bg-pink align-baseline md:h-4"></span>
     </h1>
     <p class="mt-3 max-w-[58ch] text-lg leading-relaxed text-text-secondary">{t(locale, 'notes.subtitle')}</p>
   </Banner>

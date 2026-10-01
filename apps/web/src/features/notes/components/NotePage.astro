@@ -48,7 +48,7 @@ const readingLabel = t(locale, 'notes.readingTime', { min: readingMinutes(entry.
   <Banner slot="banner" height="360px" locale={locale}>
     <BackgroundCanvas slot="background" />
     <p class="font-mono text-sm text-muted">
-      <a href={localizePath('/notes/', locale, LOCALES)} class="hover:text-primary">{t(locale, 'note.breadcrumb')}</a>
+      <a href={localizePath('/notes/', 'es', LOCALES)} class="hover:text-primary">{t(locale, 'note.breadcrumb')}</a>
       <span class="mx-1">/</span>{data.category}
     </p>
     <div class="mt-3 flex items-center gap-2">

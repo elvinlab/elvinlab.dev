@@ -64,5 +64,17 @@
     "category": "fixed",
     "title": "Background broke in Firefox after switching effects a few times",
     "description": "Firefox was losing the graphics context after a couple of switches, leaving the background blank. Fixed by reusing the same context instead of opening a new one on every switch."
+  },
+  "home-visual-refinement": {
+    "date": "2026-10-01",
+    "category": "changed",
+    "title": "Calmer home: softer hero, photo and lighter cards",
+    "description": "The animated banner now fades into the page, the blinking brand text is gone, the author photo is shown, and the hiring card is less crowded."
+  },
+  "sitewide-ui-polish": {
+    "date": "2026-10-01",
+    "category": "fixed",
+    "title": "Easier reading and a language hint that stays out of the way",
+    "description": "The language suggestion no longer covers content, privacy text follows a comfortable reading width, decorative blinking is calmer, and English note pages now open instead of showing a 404."
   }
 }

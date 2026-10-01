@@ -1,7 +1,6 @@
 ---
 /**
- * Site footer with the retro signature: the handle in Press Start 2P and a blinking pink block
- * cursor (the brand's terminal motif). The cursor stops blinking under reduced motion.
+ * Site footer with the retro signature: the handle in Press Start 2P and a small static pink accent.
  */
 import '@fontsource/press-start-2p/latin-400.css';
 
@@ -18,7 +17,7 @@ const year = new Date().getFullYear();
   <div class="flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
     <div class="flex flex-col gap-3">
       <p class="font-retro text-xs leading-relaxed text-text-secondary">
-        {site.identity.handle}<span aria-hidden="true" class="ml-1 inline-block h-3 w-2 animate-blink bg-pink align-baseline"></span>
+        {site.identity.handle}<span aria-hidden="true" class="ml-1 inline-block h-3 w-2 bg-pink align-baseline"></span>
       </p>
       <p class="text-sm text-muted">© {year} {site.identity.name}</p>
     </div>
