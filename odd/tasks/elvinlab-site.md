@@ -219,7 +219,19 @@ Facts gathered for when these start (public DNS and staging, read-only):
 - Proposed (open, **Q24 unanswered**): at launch show only finished pages (home, privacy) and switch off `contact`, `experiments` and `/me` (out of nav, `noindex`, out of sitemap) until ready; the notice text should come from `site.config` (ES/EN) so it stays white-label and is removed with a config change. Launch would then not need T18 (secrets) or T19 UI (#23).
 - No issues created yet for the notice or the flag work.
 
-## Next step
+## Correction 2026-10-01: T19 UI was already done, this doc just never said so
+
+This "Next step" section (and the "NOT DONE... contact UI/React island slice" line in the T19.S3 entry, and the "Still open... `/contact/` is still a 404 until T19 UI" line further up) describes a 2026-09-29 state that stopped being true the next day and was never corrected here. For the record, so a future session doesn't nearly redo this work (as almost happened 2026-10-01 when the user asked to "start" the Contact UI and it turned out to already exist, caught only via `codegraph_explore` before any file was touched):
+
+- **T19 UI shipped 2026-09-30**: `79be111` (form client logic, validation, Turnstile loader, the `ContactForm.tsx` island — not wired to a page yet) then `2b07ab1` (ES/EN pages, `ContactPage.astro`, copy in `content.ts`, hydration gate). Both on `develop`.
+- Cloudflare secrets ARE configured: confirmed working in production 2026-10-01 (see the `bugfix/Contact form works in production` Engram memory) — the form sent a real email, root cause of the earlier failure was `redirect: 'error'` not supported by Workers' fetch (fixed `ec0536d`/`42abc56`).
+- So items 1 and 2 of the old "Next step" list below are DONE. Item 3 (`/me` real data) remains, plus the first production release itself, whose mechanism changed since that list was written: see ADR 0012 — it's now a direct push to `main`, not a PR.
+
+Current actual next steps (2026-10-01):
+1. Replace placeholder `/me` data (`experience.json`, `credentials.json`, optional `recruiter.cvUrl` + photo) with the user's real data before sharing `/me` publicly. Human-owned (the user's own information).
+2. First production release: `git checkout main && git merge develop && git push origin main` (ADR 0012) — user-owned, whenever ready.
+
+## Next step (historical, 2026-09-29 — superseded by the correction above, kept for the record)
 
 State as of 2026-09-29: T19.S1/S2/S3 all done and merged to `develop`; remote `develop` CI is GREEN (checks + staging deploy `elvinlab-staging` + smoke). Contact server runtime is complete and fails closed until Cloudflare is configured.
 
