@@ -16,6 +16,7 @@
     "depcruise": "node apps/web/scripts/mirror-astro.ts && depcruise apps/web/boundaries-mirror/src packages/core/src",
     "new-post": "pnpm --filter web new-post",
     "test:white-label": "node apps/web/scripts/white-label-check.ts",
+    "check:dev-cold-start": "node apps/web/scripts/dev-cold-start-check.ts",
     "test:lighthouse": "node apps/web/scripts/run-lighthouse-ci.ts",
     "check:js-budget": "node apps/web/scripts/performance-budget.ts"
   },
