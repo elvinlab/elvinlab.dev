@@ -39,6 +39,13 @@ export const siteConfig = {
     me: true,
     changelog: true,
   },
+  // Comments (https://giscus.app): GitHub Discussions of this repo, "Announcements" category.
+  giscus: {
+    repo: 'elvinlab/elvinlab.dev',
+    repoId: 'R_kgDOUvCLAA',
+    category: 'Announcements',
+    categoryId: 'DIC_kwDOUvCLAM4DG1yT',
+  },
   background: { galaxy: true, cursorWaves: false },
   recruiter: {
     available: true,
