@@ -101,10 +101,34 @@ describe('turnstile verifier diagnostics', () => {
     expect(details).toEqual(['turnstile action mismatch']);
   });
 
+  it('treats a redirect as a failure (Workers only supports follow or manual)', async () => {
+    const { ok, details } = await run(
+      new Response(null, { status: 302, headers: { Location: 'https://elsewhere.test/' } }),
+    );
+    expect(ok).toBe(false);
+    expect(details).toEqual(['turnstile http 302']);
+  });
+
   it('reports the HTTP status of a failing provider', async () => {
     const { ok, details } = await run(new Response('{}', { status: 500 }));
     expect(ok).toBe(false);
     expect(details).toEqual(['turnstile http 500']);
+  });
+
+  it('names the error that broke the request, never the request body', async () => {
+    const report = vi.fn<(detail: string) => void>();
+    const verifier = createTurnstileVerifier(
+      config,
+      async () => {
+        throw new TypeError('network exploded');
+      },
+      report,
+    );
+    expect(await verifier.verify(TOKEN, IP)).toBe(false);
+    expect(report).toHaveBeenCalledExactlyOnceWith(
+      'turnstile request failed: TypeError: network exploded',
+    );
+    expect(report.mock.calls.flat().join(' ')).not.toContain(SECRET);
   });
 
   it('never leaks the secret or the token', async () => {
@@ -138,6 +162,20 @@ describe('resend sender diagnostics', () => {
       sender.send({ name: 'Visitor', email: address('visitor'), message: 'Hello' }),
     ).rejects.toThrow('Unable to send message.');
     expect(report).toHaveBeenCalledExactlyOnceWith('resend http 403');
+  });
+
+  it('treats a redirect as a failure', async () => {
+    const report = vi.fn<(detail: string) => void>();
+    const sender = createResendSender(
+      config,
+      async () =>
+        new Response(null, { status: 302, headers: { Location: 'https://elsewhere.test/' } }),
+      report,
+    );
+    await expect(
+      sender.send({ name: 'Visitor', email: address('visitor'), message: 'Hello' }),
+    ).rejects.toThrow('Unable to send message.');
+    expect(report).toHaveBeenCalledExactlyOnceWith('resend http 302');
   });
 
   it('never leaks the api key', async () => {

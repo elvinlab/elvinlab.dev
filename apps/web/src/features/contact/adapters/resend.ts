@@ -26,7 +26,7 @@ export function createResendSender(
         const signal = AbortSignal.timeout(CONTACT_POLICY.providerTimeoutMs);
         const response = await request('https://api.resend.com/emails', {
           method: 'POST',
-          redirect: 'error',
+          redirect: 'manual', // Workers has no 'error'; a 3xx is not ok, so it is rejected below
           headers: { Authorization: `Bearer ${config.apiKey}`, 'Content-Type': 'application/json' },
           signal,
           body: JSON.stringify({

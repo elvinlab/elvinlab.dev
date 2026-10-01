@@ -27,7 +27,7 @@ describe('Resend sender', () => {
     expect(url).toBe('https://api.resend.com/emails');
     expect(options).toMatchObject({
       method: 'POST',
-      redirect: 'error',
+      redirect: 'manual',
       headers: { Authorization: 'Bearer test-key', 'Content-Type': 'application/json' },
       signal: expect.any(AbortSignal),
     });

@@ -21,7 +21,7 @@ describe('Turnstile verifier', () => {
     expect(url).toBe('https://challenges.cloudflare.com/turnstile/v0/siteverify');
     expect(options).toMatchObject({
       method: 'POST',
-      redirect: 'error',
+      redirect: 'manual',
       signal: expect.any(AbortSignal),
     });
     expect(timeout).toHaveBeenCalledWith(CONTACT_POLICY.providerTimeoutMs);

@@ -16,6 +16,10 @@ const verificationSchema = z.object({
     .optional(),
 });
 
+/** Error type and message only: network errors never carry the request body or the secret. */
+const describeError = (error: unknown): string =>
+  error instanceof Error ? `${error.name}: ${error.message}`.slice(0, 160) : 'non-error';
+
 /** Verifies every token against the configured deployment identity; all failures deny delivery. */
 export function createTurnstileVerifier(
   config: TurnstileConfig,
@@ -30,7 +34,7 @@ export function createTurnstileVerifier(
           'https://challenges.cloudflare.com/turnstile/v0/siteverify',
           {
             method: 'POST',
-            redirect: 'error',
+            redirect: 'manual', // Workers has no 'error'; a 3xx is not ok, so it is rejected below
             headers: { 'Content-Type': 'application/json' },
             signal,
             body: JSON.stringify({ secret: config.secretKey, response: token, remoteip: ip }),
@@ -61,8 +65,8 @@ export function createTurnstileVerifier(
           return false;
         }
         return true;
-      } catch {
-        report('turnstile request failed');
+      } catch (error) {
+        report(`turnstile request failed: ${describeError(error)}`);
         return false;
       }
     },
