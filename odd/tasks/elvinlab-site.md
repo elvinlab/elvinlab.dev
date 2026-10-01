@@ -248,3 +248,12 @@ User idea: add a changelog. Open decision: audience. Options and recommendation:
 - Visitor-facing "what's new": content and design work (a section in `/notes` or its own route); not a priority before the first post.
 Next step when picked up: ask which audience, then implement the chosen option (ODD feature `changelog`).
 
+## Backlog: ADRs for decisions made 2026-09-30 / 2026-10-01 (NOT started)
+
+Candidate ADRs (format and index in `docs/adr/README.md`, 0006 onward):
+- DNS and hosting: zone on Cloudflare (moved from Porkbun DNS), Worker Custom Domains for apex and www, www -> apex 301 Redirect Rule, GitHub Pages retired.
+- CI shape: parallel gates (static, e2e, lighthouse) behind a stable `checks` aggregate required by `protect-main`; gates skipped on push to `main` (tree already passed in the PR); deploy guarded by `always()` and `needs.checks.result`; cancel superseded runs except on `main`.
+- Launch gate via feature flags: unfinished surfaces (`experiments`, `me`) are off, noindex and out of the sitemap, with no rendered links; re-enabled by config only.
+- Contact security and observability: lazy Turnstile, per-environment public site key, Worker secrets only, honeypot sent as typed, fail closed; diagnostics log stage and provider codes only (never values, secrets or tokens); `redirect: 'manual'` because Workers fetch rejects `'error'`.
+Next step when picked up: write them as one short batch (each <= 40 lines), together with the changelog decision.
+
