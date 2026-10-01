@@ -30,3 +30,7 @@ Short (≤40 lines each).
 | [0003](./0003-screaming-architecture-and-core-boundary.md) | Screaming architecture, core presentation-only boundary | Accepted |
 | [0004](./0004-white-label-configuration.md) | White-label via config + data collections + theme file | Accepted |
 | [0005](./0005-preact-for-islands.md) | Preact for islands (amends 0001) | Accepted |
+| [0006](./0006-dns-cloudflare-custom-domains.md) | DNS and hosting cutover: Porkbun to Cloudflare, Custom Domains | Accepted |
+| [0007](./0007-ci-parallel-gates-aggregate.md) | CI shape: parallel gates behind one required aggregate | Accepted |
+| [0008](./0008-launch-gate-feature-flags.md) | Launch gate via feature flags (experiments, /me) | Accepted |
+| [0009](./0009-contact-security-observability.md) | Contact form security and observability | Accepted |
