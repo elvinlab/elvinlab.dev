@@ -81,9 +81,10 @@ for (const { locale, path } of [
     await expect(
       hiringCard.getByRole('link', { name: locale === 'es' ? 'Ver mi perfil' : 'Open my profile' }),
     ).toHaveAttribute('href', locale === 'es' ? '/me/' : '/en/me/');
+    // The CV link exists now (one Drive PDF per language, see cv-and-credentials.spec.ts).
     await expect(
       hiringCard.getByRole('link', { name: locale === 'es' ? 'Descargar CV' : 'Download CV' }),
-    ).toHaveCount(0);
+    ).toHaveCount(1);
 
     const bannerToggle = page.locator('[data-banner-toggle]');
     await expect(bannerToggle).toHaveAttribute('aria-pressed', 'true');
