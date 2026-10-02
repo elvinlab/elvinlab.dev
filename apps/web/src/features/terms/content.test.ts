@@ -6,6 +6,7 @@ const input = {
   owner: 'Ada Lovelace',
   domain: 'example.org',
   contact: { es: '/contact/', en: '/en/contact/' },
+  updated: '2027-01-15',
   privacy: { es: '/privacy/', en: '/en/privacy/' },
 } as const;
 
@@ -74,6 +75,11 @@ describe('buildTermsContent', () => {
     const text = everyText(full);
     expect(text).not.toMatch(/gdpr|rgpd|cumple con|compliant|compliance/i);
     expect(text).not.toMatch(/cookie/i);
+  });
+
+  it('dates the page with the date it is given, in both locales', () => {
+    expect(content.es.lastUpdated).toBe('2027-01-15');
+    expect(content.en.lastUpdated).toBe('2027-01-15');
   });
 
   it('localizes the last-updated label and dates the page', () => {

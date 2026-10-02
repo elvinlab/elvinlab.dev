@@ -8,14 +8,30 @@ const kebab = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
  */
 export function experimentSchema() {
   return z.object({
-    title: z.string().trim().min(1).max(80),
-    description: z.string().trim().min(1).max(200),
-    tags: z.array(z.string().regex(kebab)).max(5).default([]),
-    year: z.int().min(2000),
-    status: z.enum(['running', 'shipped']).default('shipped'),
-    url: z.url({ protocol: /^https$/ }).optional(),
-    /** Featured experiments lead the home strip. */
-    featured: z.boolean().default(false),
+    title: z.string().trim().min(1).max(80).describe('Project name (max 80 characters).'),
+    description: z
+      .string()
+      .trim()
+      .min(1)
+      .max(200)
+      .describe('What it is, in one or two sentences (max 200 characters).'),
+    tags: z
+      .array(z.string().regex(kebab))
+      .max(5)
+      .default([])
+      .describe('Up to five kebab-case tags.'),
+    year: z.int().min(2000).describe('Year the project started or shipped.'),
+    status: z
+      .enum(['running', 'shipped'])
+      .default('shipped')
+      .describe('`running` shows a green dot; `shipped` a violet one.'),
+    url: z
+      .url({ protocol: /^https$/ })
+      .optional()
+      .describe(
+        'Public link (https only). Leave it out for private work: a private repository is never linked.',
+      ),
+    featured: z.boolean().default(false).describe('Featured projects lead the home strip.'),
   });
 }
 

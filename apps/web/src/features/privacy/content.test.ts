@@ -6,6 +6,7 @@ const input = {
   owner: 'Ada Lovelace',
   domain: 'example.org',
   contact: { es: '/contact/', en: '/en/contact/' },
+  updated: '2027-01-15',
 } as const;
 
 const content = buildPrivacyContent(input);
@@ -77,6 +78,11 @@ describe('buildPrivacyContent', () => {
         expect(section.body).not.toMatch(/^- /m);
       }
     }
+  });
+
+  it('dates the page with the date it is given, in both locales', () => {
+    expect(content.es.lastUpdated).toBe('2027-01-15');
+    expect(content.en.lastUpdated).toBe('2027-01-15');
   });
 
   it('localizes the last-updated label and dates the page', () => {

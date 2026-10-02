@@ -18,6 +18,8 @@ export type TermsInput = {
   owner: string;
   domain: string;
   contact: { es: string; en: string };
+  /** "Last updated" date (YYYY-MM-DD), from `legal` in the site config. */
+  updated: string;
   privacy: { es: string; en: string };
   /** True when giscus comments are configured. */
   comments?: boolean;
@@ -25,7 +27,6 @@ export type TermsInput = {
   me?: boolean;
 };
 
-const LAST_UPDATED = '2026-10-01';
 const CC_ES = 'https://creativecommons.org/licenses/by-nc-sa/4.0/deed.es';
 const CC_EN = 'https://creativecommons.org/licenses/by-nc-sa/4.0/';
 const GITHUB_TERMS = 'https://docs.github.com/en/site-policy/github-terms/github-terms-of-service';
@@ -37,6 +38,7 @@ export function buildTermsContent({
   owner,
   domain,
   contact,
+  updated,
   privacy,
   comments = false,
   me = false,
@@ -46,7 +48,7 @@ export function buildTermsContent({
       pageTitle: 'Términos de uso',
       pageDescription: `Condiciones de uso de ${domain}: contenido y licencias, comentarios, enlaces y responsabilidad.`,
       lastUpdatedLabel: 'Última actualización',
-      lastUpdated: LAST_UPDATED,
+      lastUpdated: updated,
       sections: [
         {
           id: 'owner',
@@ -102,7 +104,7 @@ export function buildTermsContent({
       pageTitle: 'Terms of use',
       pageDescription: `Terms of use for ${domain}: content and licenses, comments, links and liability.`,
       lastUpdatedLabel: 'Last updated',
-      lastUpdated: LAST_UPDATED,
+      lastUpdated: updated,
       sections: [
         {
           id: 'owner',

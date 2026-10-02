@@ -2,35 +2,10 @@ import { z } from 'zod';
 
 import { createResendSender } from './adapters/resend.ts';
 import { createTurnstileVerifier } from './adapters/turnstile.ts';
+import { bindingsSchema } from './bindings.ts';
 import { CONTACT_POLICY } from './config.ts';
 import { type ContactResult, submitContact } from './contact.ts';
 
-interface RateLimitBinding {
-  limit(options: { key: string }): Promise<unknown>;
-}
-const addressSchema = z
-  .string()
-  .max(CONTACT_POLICY.emailMaxLength)
-  .regex(/^[^\r\n]*$/)
-  .pipe(z.email());
-const secretSchema = z.string().min(1).max(4_096).regex(/^\S+$/);
-const bindingsSchema = z.object({
-  RESEND_API_KEY: secretSchema,
-  CONTACT_FROM: addressSchema,
-  CONTACT_TO: addressSchema,
-  TURNSTILE_SECRET_KEY: secretSchema,
-  TURNSTILE_HOSTNAME: z
-    .string()
-    .max(253)
-    .regex(/^(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\.)+[a-z]{2,63}$/),
-  CONTACT_RATE_LIMITER: z.custom<RateLimitBinding>(
-    (value) =>
-      typeof value === 'object' &&
-      value !== null &&
-      'limit' in value &&
-      typeof value.limit === 'function',
-  ),
-});
 const allowedSchema = z.object({ success: z.literal(true) });
 
 /** Reads private bindings per request; null means unavailable, never partial provider configuration. */

@@ -1,4 +1,3 @@
-import { z } from 'astro/zod';
 import { describe, expect, it } from 'vitest';
 
 import { noteSchema } from '@/features/notes/schema.ts';
@@ -32,7 +31,7 @@ describe('scaffoldNote', () => {
   });
 
   it('produces frontmatter that passes the notes schema', () => {
-    expect(() => noteSchema(() => z.string()).parse(note.data)).not.toThrow();
+    expect(() => noteSchema().parse(note.data)).not.toThrow();
   });
 
   it('writes the frontmatter as YAML ahead of the body', () => {

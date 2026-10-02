@@ -22,6 +22,7 @@ import {
   relatedNotes,
   sortNotes,
 } from '@/features/notes/lib/notes.ts';
+import { translationAlternates, translationsOf } from '@/features/notes/lib/translations.ts';
 import { site } from '@/shared/config/index.ts';
 import { LOCALES, type Locale, t } from '@/shared/i18n/index.ts';
 import Banner from '@/shared/layout/Banner.astro';
@@ -41,12 +42,25 @@ const sameLang = sortNotes(all.filter((note) => note.data.lang === data.lang));
 const { prev, next } = adjacentNotes(sameLang, entry.id);
 const related = relatedNotes(all, { slug: entry.id, data }, 3);
 
+// Notes translated into another language: hreflang alternates, and the language switch goes there.
+const group = translationsOf(all, entry.id);
+const notePath = (lang: string, slug: string): string => localizePath(`/notes/${slug}/`, lang as Locale, LOCALES);
+const alternates = translationAlternates(group, LOCALES.defaultLocale, notePath).map((alternate) => ({
+  hreflang: alternate.hreflang,
+  href: new URL(alternate.path, site.url).href,
+}));
+const translations = Object.fromEntries(
+  Object.entries(group)
+    .filter(([lang]) => lang !== data.lang)
+    .map(([lang, slug]) => [lang, notePath(lang, slug)]),
+);
+
 const path = `/notes/${entry.id}/`;
 const canonical = new URL(localizePath(path, data.lang, LOCALES), site.url).href;
 const readingLabel = t(locale, 'notes.readingTime', { min: readingMinutes(entry.body ?? '') });
 ---
 
-<BaseLayout locale={locale} path={path} title={data.title} description={data.description} translated={false} article={{ pubDate: data.pubDate, updatedDate: data.updatedDate, tags: data.tags }} ogImage={noteCardPath(entry.id)}>
+<BaseLayout locale={locale} path={path} title={data.title} description={data.description} translated={false} {...(alternates.length > 0 && { alternates })} translations={translations} article={{ pubDate: data.pubDate, updatedDate: data.updatedDate, tags: data.tags }} ogImage={noteCardPath(entry.id)}>
   <ReadingMode slot="head" part="boot" locale={locale} />
   <ReadingProgress slot="banner" />
   <Banner slot="banner" height="360px" locale={locale}>

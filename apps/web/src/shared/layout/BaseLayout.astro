@@ -10,8 +10,8 @@ import '@/styles/global.css';
 
 import { DEFAULT_THEME, THEME_BOOT_SCRIPT } from '@elvinlab/core';
 
+import { integrations } from '@/shared/config/index.ts';
 import { type Locale, t } from '@/shared/i18n/index.ts';
-import { getBeaconToken, shouldRenderBeacon } from '@/shared/layout/analytics.ts';
 import Footer from '@/shared/layout/Footer.astro';
 import Navbar from '@/shared/layout/Navbar.astro';
 import SiteNotice from '@/shared/layout/SiteNotice.astro';
@@ -27,6 +27,10 @@ type Props = {
   translated?: boolean;
   noindex?: boolean;
   article?: { pubDate: Date; updatedDate?: Date | undefined; tags?: readonly string[] | undefined };
+  /** Explicit hreflang alternates (absolute URLs) for a page translated at another slug. */
+  alternates?: { hreflang: string; href: string }[];
+  /** Path of this page's translation per locale: the language switch and hint go there. */
+  translations?: Record<string, string>;
   /** Site path of this page's share image; the default card is used when omitted. */
   ogImage?: string;
   ogImageAlt?: string;
@@ -34,11 +38,10 @@ type Props = {
   printable?: boolean;
 };
 
-const { locale, printable = false, ...seo } = Astro.props;
+const { locale, printable = false, translations, ...seo } = Astro.props;
 const hasAside = Astro.slots.has('aside');
 const hasBanner = Astro.slots.has('banner');
-const renderBeacon = shouldRenderBeacon();
-const beaconToken = getBeaconToken();
+const beaconToken = integrations.analyticsToken;
 ---
 
 <html lang={locale} data-theme={DEFAULT_THEME}>
@@ -48,7 +51,7 @@ const beaconToken = getBeaconToken();
     <script is:inline set:html={THEME_BOOT_SCRIPT} />
     <Seo locale={locale} {...seo} />
     <slot name="head" />
-    {renderBeacon && beaconToken && (
+    {beaconToken && (
       <script
         defer
         src="https://static.cloudflareinsights.com/beacon.min.js"
@@ -63,7 +66,7 @@ const beaconToken = getBeaconToken();
     <SiteNotice locale={locale} />
     <main id="main" tabindex="-1" class="outline-none">
       <div class="sticky top-0 z-40 mx-auto max-w-[1200px] px-3 md:px-4" data-site-chrome>
-        <Navbar locale={locale} />
+        <Navbar locale={locale} translations={translations} />
       </div>
       {hasBanner ? (
         <div class="-mt-18" data-banner-offset><slot name="banner" /></div>
@@ -87,7 +90,7 @@ const beaconToken = getBeaconToken();
       <Footer locale={locale} />
     </div>
     <div class="mx-auto max-w-[1200px] px-3 md:px-4">
-      <LanguageHint locale={locale} />
+      <LanguageHint locale={locale} translations={translations} />
     </div>
     <slot name="floating" />
   </body>

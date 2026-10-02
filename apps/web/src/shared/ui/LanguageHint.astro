@@ -10,18 +10,20 @@ import { localizePath, switchLocale } from '@elvinlab/core';
 import { LOCALES, type Locale, t } from '@/shared/i18n/index.ts';
 import { isSingleLocaleRoute } from '@/shared/layout/nav.ts';
 
-type Props = { locale: Locale };
+type Props = { locale: Locale; translations?: Record<string, string> | undefined };
 
-const { locale } = Astro.props;
+const { locale, translations } = Astro.props;
 // The notes index is Spanish-only; note translations are optional, so suggest the other locale's home.
 const routePath = switchLocale(Astro.url.pathname, LOCALES.defaultLocale, LOCALES);
 const alternates = LOCALES.locales
   .filter((other) => other !== locale)
   .map((other) => ({
     locale: other,
-    href: isSingleLocaleRoute(routePath)
-      ? localizePath('/', other, LOCALES)
-      : switchLocale(Astro.url.pathname, other, LOCALES),
+    href:
+      translations?.[other] ??
+      (isSingleLocaleRoute(routePath)
+        ? localizePath('/', other, LOCALES)
+        : switchLocale(Astro.url.pathname, other, LOCALES)),
     text: t(other, 'language.hint'),
     action: t(other, 'language.hint.action'),
     dismiss: t(other, 'language.hint.dismiss'),

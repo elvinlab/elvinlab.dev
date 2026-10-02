@@ -1,3 +1,9 @@
+/**
+ * Astro build config: integrations (MDX, Preact islands, sitemap, Expressive Code, share cards,
+ * noindex headers), the Cloudflare adapter and Vite. Site settings do NOT live here but in
+ * src/site.config.ts; environment variables are registered in src/shared/config/env-vars.ts.
+ * Guide: docs/CONFIGURATION.md.
+ */
 import { fileURLToPath } from 'node:url';
 
 import cloudflare from '@astrojs/cloudflare';

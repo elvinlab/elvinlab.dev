@@ -5,6 +5,7 @@
 
 import { ContactForm } from '@/features/contact/components/ContactForm.tsx';
 import { buildContactContent } from '@/features/contact/content.ts';
+import { integrations } from '@/shared/config/index.ts';
 import type { Locale } from '@/shared/i18n/index.ts';
 import BaseLayout from '@/shared/layout/BaseLayout.astro';
 
@@ -14,7 +15,7 @@ type Props = {
 
 const { locale } = Astro.props;
 const content = buildContactContent()[locale];
-const siteKey = import.meta.env.PUBLIC_TURNSTILE_SITE_KEY || undefined;
+const siteKey = integrations.turnstileSiteKey;
 ---
 
 <BaseLayout locale={locale} path="/contact/" title={content.pageTitle} description={content.pageDescription}>

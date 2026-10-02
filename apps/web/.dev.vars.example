@@ -1,0 +1,18 @@
+# Local Worker variables for `pnpm --filter web dev`. Copy to `.dev.vars` (git-ignored) and fill in.
+# Generated from ENV_VARS by `pnpm docs:config`: edit src/shared/config/env-vars.ts, not this file.
+# Never commit real values; in production these are Cloudflare Worker secrets.
+
+# Resend API key used to send the contact notification email.
+RESEND_API_KEY=
+
+# Sender address of the notification email, on a domain verified in Resend. An address is never written in tracked files.
+CONTACT_FROM=
+
+# Inbox that receives contact messages. Never written in tracked files; the site only exposes the /contact form.
+CONTACT_TO=
+
+# Cloudflare Turnstile secret key that verifies the anti-bot token server side.
+TURNSTILE_SECRET_KEY=
+
+# Hostname Turnstile must report for a valid token (for example the production domain). It makes a token from another site invalid.
+TURNSTILE_HOSTNAME=

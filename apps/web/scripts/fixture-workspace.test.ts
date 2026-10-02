@@ -16,6 +16,7 @@ import {
   createFixtureWorkspace,
   enableFixtureComments,
   enableFixtureNotice,
+  neutralizeFixtureIntegrations,
 } from './fixture-workspace.ts';
 
 const temporary: string[] = [];
@@ -152,4 +153,22 @@ it('replaces a real notice instead of duplicating it', () => {
 it('fails loudly when the config has no features block to anchor the notice on', () => {
   const web = webWithConfig('export const siteConfig = {};\n');
   expect(() => enableFixtureNotice(web)).toThrow(/notice/);
+});
+
+it('removes the real third-party ids from the fixture config', () => {
+  const web = webWithConfig(
+    "export const siteConfig = {\n  integrations: {\n    cloudflareAnalyticsToken: 'abc',\n    turnstileSiteKey: '0xKEY',\n  },\n  features: { comments: true },\n};\n",
+  );
+  neutralizeFixtureIntegrations(web);
+  const config = readFileSync(join(web, 'src/site.config.ts'), 'utf8');
+  expect(config).toContain('integrations: {}');
+  expect(config).not.toContain('abc');
+  expect(config).not.toContain('0xKEY');
+});
+
+it('does nothing to a config without integrations', () => {
+  const original = 'export const siteConfig = { features: {} };\n';
+  const web = webWithConfig(original);
+  neutralizeFixtureIntegrations(web);
+  expect(readFileSync(join(web, 'src/site.config.ts'), 'utf8')).toBe(original);
 });
