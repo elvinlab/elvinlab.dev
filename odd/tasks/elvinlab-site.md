@@ -333,3 +333,6 @@ State: `appearance: 'minimal' | 'full'` shipped on `feat/minimal-appearance-pres
 5. **Delegable, Tier 2 (tests and layout, spec is clear):** gaps left by the minimal preset: a test for the empty-aside layout; `/me/` avatar sits about 8 px under the navbar at 1440; the language badge can wrap a tag; screenshots at 360 and 1024 px for the docs.
 6. **Delegable, Tier 2 (measure first):** reuse the fixture build across e2e runs (about 9 s fixed cost per run) and tier `a11y` to one viewport for the daily loop (27% of e2e test time), keeping all three viewports for the closing run.
 7. **Optional, Tier 3:** `/me/` avatar LCP (2.2 s worst run, closest to the 2.5 s budget): try `fetchpriority` or a smaller source and re-measure.
+
+## Status 2026-10-02 (end of day): where to look
+The work after the first launch is tracked in `odd/tasks/plan-mejoras-elvinlab.md` (the owner's improvement plan: issues #58 to #72, the three releases of the day, measurements, the Lighthouse LCP lesson and the next step). Production serves the third release of 2026-10-02; the release method and the changelog audit baseline are in `CLAUDE.md` and `docs/CONFIGURATION.md` section 7. Open owner tasks: #49 Search Console, #50 HSTS (after about a week of stable HTTPS), #66 projects with evidence, #67 and #71 writing.
