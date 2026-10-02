@@ -1,4 +1,4 @@
-import { expect, test } from '@playwright/test';
+import { expect, type Page, test } from '@playwright/test';
 
 test('the background picker cycles galaxy -> cursor-waves -> off at runtime, no reload', async ({
   browser,
@@ -160,4 +160,95 @@ test('fine-pointer desktop keeps the animated WebGL background', async ({ browse
   expect(state.probe.webgl2Attempts).toBeGreaterThan(0);
   expect(state.probe.animationFrames).toBeGreaterThan(1);
   await context.close();
+});
+
+const PICKER = '[data-background-toggle]';
+/** `gap-1` between navbar controls (Tailwind spacing 1 = 4 px). */
+const NAVBAR_GAP_PX = 4;
+
+/** Horizontal gap between the theme toggle and the control that follows it in the navbar. */
+const gapAfterThemeToggle = async (page: Page, next: string): Promise<number> => {
+  const theme = await page.locator('[data-theme-toggle]').boundingBox();
+  const following = await page.locator(next).boundingBox();
+  if (!theme || !following) throw new Error('navbar control has no layout box');
+  return following.x - (theme.x + theme.width);
+};
+
+test.describe('background picker visibility', () => {
+  test('desktop with a fine pointer and motion allowed shows the picker', async ({ browser }) => {
+    const context = await browser.newContext({
+      isMobile: false,
+      hasTouch: false,
+      reducedMotion: 'no-preference',
+      viewport: { width: 1280, height: 900 },
+    });
+    const page = await context.newPage();
+    await page.goto('/');
+    await expect(page.locator(PICKER)).toBeVisible();
+    await context.close();
+  });
+
+  test('a narrow desktop window keeps the picker: width never hides it', async ({ browser }) => {
+    const context = await browser.newContext({
+      isMobile: false,
+      hasTouch: false,
+      reducedMotion: 'no-preference',
+      viewport: { width: 360, height: 800 },
+    });
+    const page = await context.newPage();
+    await page.goto('/');
+    expect(await page.evaluate(() => matchMedia('(pointer: fine)').matches)).toBe(true);
+    await expect(page.locator(PICKER)).toBeVisible();
+    await context.close();
+  });
+
+  for (const width of [360, 390]) {
+    test(`a ${width}px touch device hides the picker and leaves no gap in the navbar`, async ({
+      browser,
+    }) => {
+      const context = await browser.newContext({
+        isMobile: true,
+        hasTouch: true,
+        reducedMotion: 'no-preference',
+        viewport: { width, height: 844 },
+      });
+      const page = await context.newPage();
+      await page.goto('/');
+      // The picker only runs a fine-pointer effect, so the premise is a coarse primary pointer.
+      expect(await page.evaluate(() => matchMedia('(pointer: coarse)').matches)).toBe(true);
+      await expect(page.locator(PICKER)).toBeHidden();
+      expect(await gapAfterThemeToggle(page, '[data-nav-toggle]')).toBe(NAVBAR_GAP_PX);
+      expect(
+        await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth),
+      ).toBe(true);
+      await context.close();
+    });
+  }
+
+  test('prefers-reduced-motion hides the picker on desktop', async ({ browser }) => {
+    const context = await browser.newContext({
+      isMobile: false,
+      hasTouch: false,
+      reducedMotion: 'reduce',
+      viewport: { width: 1280, height: 900 },
+    });
+    const page = await context.newPage();
+    await page.goto('/');
+    await expect(page.locator(PICKER)).toBeHidden();
+    await context.close();
+  });
+
+  test('prefers-reduced-motion at 360px leaves no gap in the navbar', async ({ browser }) => {
+    const context = await browser.newContext({
+      isMobile: false,
+      hasTouch: false,
+      reducedMotion: 'reduce',
+      viewport: { width: 360, height: 800 },
+    });
+    const page = await context.newPage();
+    await page.goto('/');
+    await expect(page.locator(PICKER)).toBeHidden();
+    expect(await gapAfterThemeToggle(page, '[data-nav-toggle]')).toBe(NAVBAR_GAP_PX);
+    await context.close();
+  });
 });

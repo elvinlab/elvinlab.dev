@@ -9,7 +9,7 @@ import { expect, type Locator, type Page, test } from '@playwright/test';
  * from `src/styles/type-scale.css` (rem at 16 px; `md` is 48 rem, so 360 is the phone column and
  * 1280 the desktop one):
  *   minimal: hero 32/44, section 20, note title 30/40, card title 20/22, prose 17
- *   full:    hero 36/60, section 24, note title 36/48, card title 30/36, prose 18
+ *   full:    hero 32/52, section 22, note title 30/40, card title 24/30, prose 17
  */
 type Preset = 'minimal' | 'full';
 type Scale = { hero: number; noteTitle: number; cardTitle: number; section: number; prose: number };
@@ -20,8 +20,8 @@ const SCALES: Record<Preset, Record<string, Scale>> = {
     'chromium-1280': { hero: 44, noteTitle: 40, cardTitle: 22, section: 20, prose: 17 },
   },
   full: {
-    'chromium-360': { hero: 36, noteTitle: 36, cardTitle: 30, section: 24, prose: 18 },
-    'chromium-1280': { hero: 60, noteTitle: 48, cardTitle: 36, section: 24, prose: 18 },
+    'chromium-360': { hero: 32, noteTitle: 30, cardTitle: 24, section: 22, prose: 17 },
+    'chromium-1280': { hero: 52, noteTitle: 40, cardTitle: 30, section: 22, prose: 17 },
   },
 };
 const PROSE_LINE_HEIGHT = 1.75;

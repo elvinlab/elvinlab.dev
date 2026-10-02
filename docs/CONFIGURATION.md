@@ -410,6 +410,7 @@ Los textos de la interfaz están en `apps/web/src/shared/i18n/index.ts`. Añadir
 El flujo completo está decidido en los ADR [0011](adr/0011-ci-gate-once-at-main-pr-no-staging.md) y [0012](adr/0012-direct-push-to-main-no-pr-gate.md). En corto:
 
 - **Día a día**: se trabaja en `develop` y se hace push libre; no corre ningún CI.
+- **Antes de liberar**: corré las compuertas locales (`typecheck`, `lint`, `test`, `depcruise`, el build web, `check:js-budget`, `test:white-label`, `check:dev-cold-start`, `test:e2e` y `test:lighthouse`) y poné al día `changelog.json` (`CLAUDE.md` explica cómo encontrar los commits que faltan).
 - **Release**: lo que está en `develop` pasa a `main`. Ese push es lo **único** que dispara el CI (`static`, `e2e` y `lighthouse` en paralelo → `checks` → `deploy`). El despliegue va directo a producción y se comprueba con `.github/scripts/smoke-check.sh`, con rollback automático si falla.
 
 ```bash
@@ -422,7 +423,7 @@ Las reglas de `main` exigen **historial lineal** (sin merge commits). Si `main` 
 
 ```bash
 git fetch origin
-SHA=$(git commit-tree develop^{tree} -p origin/main -m "chore(release): resumen del release")
+SHA=$(git commit-tree develop^{tree} -p origin/main -m "chore(release): resumen del release" -m "develop: $(git rev-parse develop)")
 git checkout main && git reset --hard origin/main && git merge --ff-only "$SHA" && git push origin main
 git checkout develop
 ```

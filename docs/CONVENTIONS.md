@@ -50,6 +50,7 @@ Only where infrastructure exists (`contact`). No premature abstraction.
 | Functions | Small, pure, early returns. |
 | Magic values | None — extract to named constants. |
 | Documentation | TSDoc **only** on exported APIs and non-obvious *why*. |
+| Links | Any link whose destination can be another site spreads `externalLinkAttrs(url, site.url)` (new tab, `noopener noreferrer`) and ends with `<ExternalHint href={url} locale={locale} />`. Links inside the site stay in the same tab. |
 | Language | English (code, comments, identifiers, UI copy). |
 
 ---

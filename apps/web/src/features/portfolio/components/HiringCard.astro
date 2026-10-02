@@ -5,6 +5,8 @@ import { localizePath } from '@elvinlab/core';
 import { splitStatus, yearsSince } from '@/features/portfolio/lib/portfolio.ts';
 import { isEnabled, resolveCvUrl, site } from '@/shared/config/index.ts';
 import { LOCALES, type Locale, t } from '@/shared/i18n/index.ts';
+import { externalLinkAttrs } from '@/shared/lib/external-link.ts';
+import ExternalHint from '@/shared/ui/ExternalHint.astro';
 
 type Props = { locale: Locale };
 
@@ -46,8 +48,8 @@ const chips = (tags.length > 0 ? tags : [headline]).filter((chip) => chip !== ''
       </a>
     )}
     {cvUrl && (
-      <a href={cvUrl} class="flex h-11 items-center justify-center gap-2 rounded-control px-4 text-sm text-text-secondary underline decoration-dashed underline-offset-4 transition-colors duration-150 hover:text-text">
-        {t(locale, 'recruiter.cv')}
+      <a href={cvUrl} {...externalLinkAttrs(cvUrl, site.url)} class="flex h-11 items-center justify-center gap-2 rounded-control px-4 text-sm text-text-secondary underline decoration-dashed underline-offset-4 transition-colors duration-150 hover:text-text">
+        {t(locale, 'recruiter.cv')}<ExternalHint href={cvUrl} locale={locale} />
       </a>
     )}
   </div>

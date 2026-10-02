@@ -15,12 +15,14 @@ import { defineConfig } from 'astro/config';
 import expressiveCode from 'astro-expressive-code';
 
 import { CONTACT_POLICY } from './src/features/contact/config.ts';
+import { externalLinks } from './src/integrations/external-links.ts';
 import { noindexHeaders } from './src/integrations/noindex-headers.ts';
 import { readNoteDatesFromDisk } from './src/integrations/note-dates.ts';
 import { ogImages } from './src/integrations/og-images.ts';
 import { hasPublishedNotesOnDisk } from './src/integrations/published-notes.ts';
 import { isHiddenFromSitemap } from './src/integrations/sitemap-filter.ts';
 import { site } from './src/shared/config/index.ts';
+import { LOCALES, t } from './src/shared/i18n/index.ts';
 
 const contentDir = fileURLToPath(new URL('./src/content', import.meta.url));
 // /notes/ stays out of the sitemap until the first note is published.
@@ -60,6 +62,15 @@ export default defineConfig({
         uiFontFamily: 'var(--font-mono)',
         frames: { shadowColor: 'transparent' },
       },
+    }),
+    // Links in notes that leave the site open in a new tab, announced in the note's language.
+    externalLinks({
+      siteUrl: site.url,
+      hint: (lang) =>
+        t(
+          LOCALES.locales.find((locale) => locale === lang) ?? LOCALES.defaultLocale,
+          'link.newTab',
+        ),
     }),
     mdx(),
     preact(),

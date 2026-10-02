@@ -60,7 +60,7 @@ const bio = site.identity.bio[locale];
 
     {experiments.length > 0 && (
       <Card as="section" class="flex flex-col gap-4">
-        <div class="flex items-baseline justify-between">
+        <div class="flex flex-wrap items-baseline justify-between gap-3">
           <SectionHeading text={t(locale, 'me.experiments')} />
           {isEnabled('experiments') && (
             <a href={localizePath('/experiments/', locale, LOCALES)} class="relative text-sm text-primary underline decoration-dashed underline-offset-4 after:absolute after:-inset-x-2 after:-inset-y-3 print:hidden">{t(locale, 'home.allExperiments')}</a>
@@ -74,7 +74,7 @@ const bio = site.identity.bio[locale];
 
     {hasNotes && notes.length > 0 && (
       <Card as="section" class="flex flex-col gap-2 !p-7 md:!px-9">
-        <div class="flex items-baseline justify-between">
+        <div class="flex flex-wrap items-baseline justify-between gap-3">
           <SectionHeading text={t(locale, 'me.notes.title')} />
           <a href="/notes/" class="relative text-sm text-primary underline decoration-dashed underline-offset-4 after:absolute after:-inset-x-2 after:-inset-y-3 print:hidden">{t(locale, 'home.allNotes')}</a>
         </div>

@@ -6,12 +6,14 @@ import { localizePath } from '@elvinlab/core';
 import { formatNowDate } from '@/features/portfolio/lib/portfolio.ts';
 import { site } from '@/shared/config/index.ts';
 import { LOCALES, type Locale, t } from '@/shared/i18n/index.ts';
+import { externalLinkAttrs } from '@/shared/lib/external-link.ts';
+import ExternalHint from '@/shared/ui/ExternalHint.astro';
 
 type Props = { locale: Locale };
 
 const { locale } = Astro.props;
 const { now } = site;
-// Internal paths follow the visitor's locale; https links leave the site.
+// Internal paths follow the visitor's locale; links to other sites open in a new tab.
 const isInternal = (href: string) => href.startsWith('/');
 ---
 
@@ -30,9 +32,9 @@ const isInternal = (href: string) => href.startsWith('/');
             {item.href ? (
               <a
                 href={isInternal(item.href) ? localizePath(item.href, locale, LOCALES) : item.href}
-                rel={isInternal(item.href) ? undefined : 'noopener'}
+                {...externalLinkAttrs(item.href, site.url)}
                 class="text-sm text-primary underline decoration-dashed underline-offset-4"
-              >{text}</a>
+              >{text}<ExternalHint href={item.href} locale={locale} /></a>
             ) : (
               <span class="text-sm text-text-secondary">{text}</span>
             )}

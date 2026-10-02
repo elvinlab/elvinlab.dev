@@ -1,0 +1,16 @@
+---
+/**
+ * Visually hidden "opens in a new tab" note for the end of an external link's text (WCAG G201).
+ * Renders nothing for a link that stays on the site, so it can sit in any link unconditionally.
+ */
+import { site } from '@/shared/config/index.ts';
+import { type Locale, t } from '@/shared/i18n/index.ts';
+import { isExternalHref } from '@/shared/lib/external-link.ts';
+
+type Props = { href: string; locale: Locale };
+
+const { href, locale } = Astro.props;
+const external = isExternalHref(href, site.url);
+---
+
+{external && <span class="sr-only"> ({t(locale, 'link.newTab')})</span>}

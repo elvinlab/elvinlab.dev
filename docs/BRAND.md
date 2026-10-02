@@ -111,7 +111,7 @@ Inconsistencia a resolver: en modo claro el banner usa `#c9c3ee` como borde y la
 | Display (títulos de nota y de tarjeta) | Space Grotesk | 700 | 24–27 px títulos; 58–64 px nombre en los banners |
 | Texto | Space Grotesk | 400, 500 | 16–18 px |
 | Mono (números de nota, prompts, código) | JetBrains Mono | 400, 600, 700 | 12–16 px; en el sitio no se usa para etiquetas en mayúsculas |
-| Display pixelado (titular del hero, títulos de sección) | Pixelify Sans | 600 (variable) | Según el preset `appearance`: `minimal` hero 32 px en teléfono y 44 px desde `md`, títulos de sección 20 px; `full` (el de este sitio desde 2026-10-02) hero 36 px y 60 px, títulos de sección 24 px |
+| Display pixelado (titular del hero, títulos de sección) | Pixelify Sans | 600 (variable) | Según el preset `appearance`: `minimal` hero 32 px en teléfono y 44 px desde `md`, títulos de sección 20 px; `full` (el de este sitio desde 2026-10-02, escala reducida y aprobada ese día) hero 32 px en teléfono y 52 px desde `md`, títulos de sección 22 px |
 | Firma retro | Press Start 2P | 400 | Wordmark del navbar, firma del footer y página 404 |
 
 Todas desde [Fontsource](https://fontsource.org), autoalojadas; nunca desde un CDN en tiempo de ejecución.

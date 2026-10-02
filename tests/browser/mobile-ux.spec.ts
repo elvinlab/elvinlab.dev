@@ -94,15 +94,14 @@ for (const phone of PHONES) {
 
     test('navbar controls are at least 44 x 44 and nothing overflows', async ({ page }) => {
       await page.goto('/');
-      for (const selector of [
-        '[data-theme-toggle]',
-        '[data-background-toggle]',
-        '[data-nav-toggle]',
-      ]) {
+      for (const selector of ['[data-theme-toggle]', '[data-nav-toggle]']) {
         const box = await boxOf(page.locator(selector));
         expect(box.width, `${selector} width`).toBeGreaterThanOrEqual(MIN_TARGET);
         expect(box.height, `${selector} height`).toBeGreaterThanOrEqual(MIN_TARGET);
       }
+      // The effect never runs under a coarse pointer, so its picker is not rendered there
+      // (its 44 px target is checked under "desktop pointer" below).
+      await expect(page.locator('[data-background-toggle]')).toBeHidden();
       const brand = page.locator('[data-navbar] nav > a').first();
       const lang = page.locator('[data-navbar] a[hreflang="en"]').first();
       const brandBox = await boxOf(brand);
@@ -132,6 +131,26 @@ for (const phone of PHONES) {
 test.describe('desktop pointer', () => {
   test.use({ viewport: { width: 1280, height: 900 } });
 
+  test('the background picker is at least 44 x 44', async ({ browser }) => {
+    // The picker is hidden under prefers-reduced-motion (the project default), so opt out here.
+    const context = await browser.newContext({
+      viewport: { width: 1280, height: 900 },
+      reducedMotion: 'no-preference',
+    });
+    const page = await context.newPage();
+    await page.goto('/');
+    // Motion is on, so the navbar's entry animation (fade-in-up) shifts it by sub-pixels until done.
+    await page
+      .locator('[data-navbar]')
+      .evaluate((navbar) =>
+        Promise.all(navbar.getAnimations().map((animation) => animation.finished)),
+      );
+    const box = await boxOf(page.locator('[data-background-toggle]'));
+    expect(box.width).toBeGreaterThanOrEqual(MIN_TARGET);
+    expect(box.height).toBeGreaterThanOrEqual(MIN_TARGET);
+    await context.close();
+  });
+
   test('the expanded home banner keeps its desktop geometry', async ({ page }) => {
     await page.goto('/');
     const preset = await page.evaluate(() => document.documentElement.dataset['appearance']);
@@ -144,7 +163,8 @@ test.describe('desktop pointer', () => {
 });
 
 test.describe('background picker icon', () => {
-  test.use({ viewport: { width: 390, height: 844 } });
+  // Motion allowed: the picker is hidden under prefers-reduced-motion, the project default.
+  test.use({ viewport: { width: 390, height: 844 }, reducedMotion: 'no-preference' });
 
   test('never looks like the theme toggle (no sun-like circle with rays)', async ({ page }) => {
     await page.goto('/');

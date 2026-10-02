@@ -410,6 +410,7 @@ UI texts are in `apps/web/src/shared/i18n/index.ts`. Adding a third language mea
 The full flow is decided in ADRs [0011](adr/0011-ci-gate-once-at-main-pr-no-staging.md) and [0012](adr/0012-direct-push-to-main-no-pr-gate.md). In short:
 
 - **Day to day**: work on `develop` and push freely; no CI runs.
+- **Before releasing**: run the local gates (`typecheck`, `lint`, `test`, `depcruise`, the web build, `check:js-budget`, `test:white-label`, `check:dev-cold-start`, `test:e2e` and `test:lighthouse`) and bring `changelog.json` up to date (`CLAUDE.md` explains how to find the commits that are missing).
 - **Release**: what is on `develop` goes to `main`. That push is the **only** thing that triggers the CI (`static`, `e2e` and `lighthouse` in parallel → `checks` → `deploy`). The deploy goes straight to production and is checked with `.github/scripts/smoke-check.sh`, with an automatic rollback if it fails.
 
 ```bash
@@ -422,7 +423,7 @@ The `main` rules require a **linear history** (no merge commits). If `main` and 
 
 ```bash
 git fetch origin
-SHA=$(git commit-tree develop^{tree} -p origin/main -m "chore(release): release summary")
+SHA=$(git commit-tree develop^{tree} -p origin/main -m "chore(release): release summary" -m "develop: $(git rev-parse develop)")
 git checkout main && git reset --hard origin/main && git merge --ff-only "$SHA" && git push origin main
 git checkout develop
 ```

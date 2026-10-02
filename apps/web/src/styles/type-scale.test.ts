@@ -21,28 +21,30 @@ const FULL = ':root, [data-appearance="full"]';
 const MINIMAL = '[data-appearance="minimal"]';
 const { base, md } = split(scaleCss);
 
-describe('type scale: full is exactly the pre-preset look', () => {
-  it('phone values equal the Tailwind sizes the components used before', () => {
+describe('type scale: full is the balanced scale', () => {
+  // `full` was the pre-preset look (hero 36/60, card title 30/36, prose 18) until 2026-10-02, when
+  // the owner approved a smaller scale to stop headings wrapping to 4 or 5 lines on a phone.
+  it('phone values: hero 32, section 22, note 30, card 24, intro 17, body 17', () => {
     expect(base.get(FULL)).toMatchObject({
-      '--type-hero': '2.25rem', // text-4xl
-      '--type-section': '1.5rem', // text-2xl
-      '--type-section-leading': '2rem',
-      '--type-note-title': '2.25rem', // text-4xl
-      '--type-card-title': '1.875rem', // text-3xl
-      '--type-intro': '1.125rem', // text-lg
-      '--type-prose': '1.125rem', // 18 px body
-      '--type-prose-h2': '1.75rem',
-      '--type-prose-h3': '1.35rem',
-      '--type-prose-quote': '1.2rem',
+      '--type-hero': '2rem',
+      '--type-section': '1.375rem',
+      '--type-section-leading': '1.875rem',
+      '--type-note-title': '1.875rem',
+      '--type-card-title': '1.5rem',
+      '--type-intro': '1.0625rem',
+      '--type-prose': '1.0625rem',
+      '--type-prose-h2': '1.5rem',
+      '--type-prose-h3': '1.25rem',
+      '--type-prose-quote': '1.125rem',
     });
   });
 
-  it('values from md up equal the md: Tailwind sizes used before', () => {
+  it('values from md up: hero 52, note 40, card 30, intro 19', () => {
     expect(md.get(FULL)).toEqual({
-      '--type-hero': '3.75rem', // md:text-6xl
-      '--type-note-title': '3rem', // md:text-5xl
-      '--type-card-title': '2.25rem', // md:text-4xl
-      '--type-intro': '1.25rem', // md:text-xl
+      '--type-hero': '3.25rem',
+      '--type-note-title': '2.5rem',
+      '--type-card-title': '1.875rem',
+      '--type-intro': '1.1875rem',
     });
   });
 });

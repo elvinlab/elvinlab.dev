@@ -2,7 +2,10 @@
 /** One experiment (project) tile: image placeholder, title, status, description. */
 
 import type { Experiment } from '@/features/portfolio/schema.ts';
+import { site } from '@/shared/config/index.ts';
 import { type Locale, t } from '@/shared/i18n/index.ts';
+import { externalLinkAttrs } from '@/shared/lib/external-link.ts';
+import ExternalHint from '@/shared/ui/ExternalHint.astro';
 
 type Props = { experiment: Experiment; locale: Locale };
 
@@ -11,7 +14,7 @@ const Tag = experiment.url ? 'a' : 'div';
 ---
 
 <Tag
-  {...experiment.url ? { href: experiment.url, rel: 'noopener' } : {}}
+  {...experiment.url ? { href: experiment.url, ...externalLinkAttrs(experiment.url, site.url) } : {}}
   class:list={['group flex flex-col gap-3 rounded-card bg-card p-4 transition-colors duration-150', experiment.url && 'hover:bg-card-hover']}
 >
   <div class="grid aspect-[16/10] place-items-center rounded-inner bg-chip text-muted" aria-hidden="true">
@@ -25,4 +28,5 @@ const Tag = experiment.url ? 'a' : 'div';
     </span>
   </div>
   <p class="text-sm leading-relaxed text-text-secondary">{experiment.description}</p>
+  {experiment.url && <ExternalHint href={experiment.url} locale={locale} />}
 </Tag>

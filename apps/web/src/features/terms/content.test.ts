@@ -90,4 +90,22 @@ describe('buildTermsContent', () => {
   it('renders as HTML paragraphs', () => {
     expect(body(content.es, 'use')).toMatch(/^<p>/);
   });
+
+  it('opens every link to another site in a new tab and announces it in the page language', () => {
+    const full = buildTermsContent({ ...input, comments: true, me: true });
+    const hints = { es: 'se abre en una pestaña nueva', en: 'opens in a new tab' } as const;
+    for (const locale of ['es', 'en'] as const) {
+      const html = flatten(full[locale]);
+      const anchors = html.match(/<a href="https?:[^>]*>.*?<\/a>/g) ?? [];
+      expect(anchors.length).toBeGreaterThan(0);
+      for (const anchor of anchors) {
+        expect(anchor).toContain('target="_blank"');
+        expect(anchor).toContain('rel="noopener noreferrer"');
+        expect(anchor).toContain(`<span class="sr-only"> (${hints[locale]})</span>`);
+      }
+      // Links inside the site keep the default behavior.
+      for (const anchor of html.match(/<a href="\/[^>]*>/g) ?? [])
+        expect(anchor).not.toContain('target=');
+    }
+  });
 });

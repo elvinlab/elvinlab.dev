@@ -4,11 +4,14 @@
  * viewport. */
 import { isEnabled, site } from '@/shared/config/index.ts';
 import { type Locale, t } from '@/shared/i18n/index.ts';
+import { externalLinkAttrs } from '@/shared/lib/external-link.ts';
+import ExternalHint from '@/shared/ui/ExternalHint.astro';
 
 type Props = { locale: Locale };
 
 const { locale } = Astro.props;
 const giscus = isEnabled('comments') ? site.giscus : undefined;
+const discussionsUrl = giscus ? `https://github.com/${giscus.repo}/discussions` : '';
 ---
 
 {giscus && (
@@ -30,7 +33,7 @@ const giscus = isEnabled('comments') ? site.giscus : undefined;
     <noscript>
       <p class="text-sm text-muted">
         {t(locale, 'comments.noscript')}
-        <a class="text-primary underline decoration-dashed underline-offset-4" href={`https://github.com/${giscus.repo}/discussions`} rel="noopener">GitHub</a>.
+        <a class="text-primary underline decoration-dashed underline-offset-4" href={discussionsUrl} {...externalLinkAttrs(discussionsUrl, site.url)}>GitHub<ExternalHint href={discussionsUrl} locale={locale} /></a>.
       </p>
     </noscript>
   </section>

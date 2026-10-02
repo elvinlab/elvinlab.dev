@@ -3,6 +3,7 @@
  * Owner, domain and page paths come from the caller so the page stays white-label. It states only
  * what is true of this site; it makes no legal-compliance claim and is not legal advice.
  */
+import { externalAnchorHtml } from '@/shared/lib/external-anchor.ts';
 
 export type TermsSection = { id: string; title: string; body: string };
 
@@ -31,9 +32,6 @@ const CC_ES = 'https://creativecommons.org/licenses/by-nc-sa/4.0/deed.es';
 const CC_EN = 'https://creativecommons.org/licenses/by-nc-sa/4.0/';
 const GITHUB_TERMS = 'https://docs.github.com/en/site-policy/github-terms/github-terms-of-service';
 
-const external = (href: string, label: string): string =>
-  `<a href="${href}" target="_blank" rel="noopener">${label}</a>`;
-
 export function buildTermsContent({
   owner,
   domain,
@@ -58,7 +56,7 @@ export function buildTermsContent({
         {
           id: 'content',
           title: 'Contenido y licencias',
-          body: `<p>Las notas se publican bajo la licencia ${external(CC_ES, 'CC BY-NC-SA 4.0')}, que también se indica en cada nota: puedes compartirlas y adaptarlas citando la autoría, sin uso comercial y manteniendo la misma licencia.</p><p>Salvo que se indique lo contrario, el resto del contenido del sitio (diseño, imágenes y textos que no sean notas) no se ofrece para reutilización. Si quieres usarlo, escríbeme.</p>`,
+          body: `<p>Las notas se publican bajo la licencia ${externalAnchorHtml('es', CC_ES, 'CC BY-NC-SA 4.0')}, que también se indica en cada nota: puedes compartirlas y adaptarlas citando la autoría, sin uso comercial y manteniendo la misma licencia.</p><p>Salvo que se indique lo contrario, el resto del contenido del sitio (diseño, imágenes y textos que no sean notas) no se ofrece para reutilización. Si quieres usarlo, escríbeme.</p>`,
         },
         {
           id: 'use',
@@ -70,7 +68,7 @@ export function buildTermsContent({
               {
                 id: 'comments',
                 title: 'Comentarios',
-                body: `<p>Los comentarios de las notas los provee ${external('https://giscus.app', 'giscus')} y se publican en GitHub Discussions, por lo que además se rigen por los ${external(GITHUB_TERMS, 'términos de GitHub')}. Participa con respeto: me reservo la posibilidad de editar u ocultar comentarios que sean spam, ofensivos o ilegales.</p>`,
+                body: `<p>Los comentarios de las notas los provee ${externalAnchorHtml('es', 'https://giscus.app', 'giscus')} y se publican en GitHub Discussions, por lo que además se rigen por los ${externalAnchorHtml('es', GITHUB_TERMS, 'términos de GitHub')}. Participa con respeto: me reservo la posibilidad de editar u ocultar comentarios que sean spam, ofensivos o ilegales.</p>`,
               },
             ]
           : []),
@@ -114,7 +112,7 @@ export function buildTermsContent({
         {
           id: 'content',
           title: 'Content and licenses',
-          body: `<p>Notes are published under the ${external(CC_EN, 'CC BY-NC-SA 4.0')} license, which is also shown on every note: you may share and adapt them giving credit, for non-commercial purposes and under the same license.</p><p>Unless stated otherwise, the rest of the site's content (design, images and text that are not notes) is not offered for reuse. If you want to use it, write to me.</p>`,
+          body: `<p>Notes are published under the ${externalAnchorHtml('en', CC_EN, 'CC BY-NC-SA 4.0')} license, which is also shown on every note: you may share and adapt them giving credit, for non-commercial purposes and under the same license.</p><p>Unless stated otherwise, the rest of the site's content (design, images and text that are not notes) is not offered for reuse. If you want to use it, write to me.</p>`,
         },
         {
           id: 'use',
@@ -126,7 +124,7 @@ export function buildTermsContent({
               {
                 id: 'comments',
                 title: 'Comments',
-                body: `<p>Comments on notes are provided by ${external('https://giscus.app', 'giscus')} and posted in GitHub Discussions, so they are also governed by the ${external(GITHUB_TERMS, 'GitHub terms')}. Please be respectful: I reserve the option to edit or hide comments that are spam, offensive or illegal.</p>`,
+                body: `<p>Comments on notes are provided by ${externalAnchorHtml('en', 'https://giscus.app', 'giscus')} and posted in GitHub Discussions, so they are also governed by the ${externalAnchorHtml('en', GITHUB_TERMS, 'GitHub terms')}. Please be respectful: I reserve the option to edit or hide comments that are spam, offensive or illegal.</p>`,
               },
             ]
           : []),
