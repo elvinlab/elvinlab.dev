@@ -7,12 +7,12 @@ const resolve = (appearance: 'minimal' | 'full', home: HomeConfig = {}, experime
   resolveHome({ appearance, home, features: { experiments } });
 
 describe('resolveHome', () => {
-  it('minimal turns the hero pills, the lab log and the pillars off and keeps the rest', () => {
+  it('minimal turns the hero pills and the pillars off and keeps the rest (the Now card stays on)', () => {
     expect(resolve('minimal')).toEqual({
       heroPills: false,
       authorCard: true,
       hiringCard: true,
-      labLog: false,
+      now: true,
       pillars: false,
       notebookIndex: true,
       experiments: true,
@@ -24,7 +24,7 @@ describe('resolveHome', () => {
       heroPills: true,
       authorCard: true,
       hiringCard: true,
-      labLog: true,
+      now: true,
       pillars: true,
       notebookIndex: true,
       experiments: true,
@@ -35,7 +35,7 @@ describe('resolveHome', () => {
     'heroPills',
     'authorCard',
     'hiringCard',
-    'labLog',
+    'now',
     'pillars',
     'notebookIndex',
     'experiments',
@@ -44,6 +44,16 @@ describe('resolveHome', () => {
     expect(resolve('minimal', { [section]: false })[section]).toBe(false);
     expect(resolve('full', { [section]: true })[section]).toBe(true);
     expect(resolve('full', { [section]: false })[section]).toBe(false);
+  });
+
+  it('has no labLog section any more: it was renamed to now', () => {
+    expect(resolve('minimal')).not.toHaveProperty('labLog');
+    expect(resolve('full')).not.toHaveProperty('labLog');
+  });
+
+  it('home.now false hides the Now card under both presets', () => {
+    expect(resolve('minimal', { now: false }).now).toBe(false);
+    expect(resolve('full', { now: false }).now).toBe(false);
   });
 
   it('an override only changes its own section', () => {

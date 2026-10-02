@@ -20,3 +20,13 @@ export function sortExperiments<T extends ExperimentLike>(experiments: readonly 
     (a, b) => Number(b.data.featured) - Number(a.data.featured) || b.data.year - a.data.year,
   );
 }
+
+/**
+ * A `YYYY-MM-DD` calendar date as a long date in `locale` (for example "2 October 2026"). The date
+ * is read and printed as UTC, so the result never depends on the viewer's or the build's timezone.
+ */
+export function formatNowDate(date: string, locale: string): string {
+  return new Intl.DateTimeFormat(locale, { dateStyle: 'long', timeZone: 'UTC' }).format(
+    new Date(`${date}T00:00:00Z`),
+  );
+}

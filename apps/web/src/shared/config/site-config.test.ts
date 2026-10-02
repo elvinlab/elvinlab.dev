@@ -24,6 +24,22 @@ describe('site.config.ts', () => {
     expect(parseSiteConfig(siteConfig).appearance).toBe('full');
   });
 
+  it('shows one focus item in the Now card, dated with a real date', () => {
+    const config = parseSiteConfig(siteConfig);
+    expect(config.now).toEqual({
+      updatedAt: '2026-10-02',
+      items: [
+        {
+          kind: 'focus',
+          text: {
+            es: 'Optimizar IA y proyectos personales',
+            en: 'Optimizing AI and personal projects',
+          },
+        },
+      ],
+    });
+  });
+
   it('shows no "under construction" notice now that the site is live', () => {
     expect(siteConfig).not.toHaveProperty('notice');
   });

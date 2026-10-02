@@ -69,14 +69,20 @@ Las descripciones vienen del esquema (`.describe()`), por eso están en inglés.
 | `identity.startedYear` | `integer (min 1970)` | yes |  | First year of professional work; years of experience are derived from it. |
 | `identity.avatar` | `string` | no |  | File name of a profile photo placed in `apps/web/src/assets/` (for example `avatar.png`); it is optimized at build time. Omit to show initials. |
 | `appearance` | `'minimal' \| 'full'` | no | `full` | Visual preset. `minimal` is the calm look (smaller type, fewer home sections); `full` is the original look. Defaults to `full` so a config written before the preset existed does not change. |
-| `home` | `object` | no | `{}` | Show or hide each home section; a key you set wins over the `appearance` preset, a key you omit follows it. `minimal` hides `heroPills`, `labLog` and `pillars`; `full` shows everything. A hidden section renders nothing. |
+| `home` | `object` | no | `{}` | Show or hide each home section; a key you set wins over the `appearance` preset, a key you omit follows it. `minimal` hides `heroPills` and `pillars`; `full` shows everything. A hidden section renders nothing. |
 | `home.heroPills` | `boolean` | no |  | The three keyword pills under the hero intro (desktop only). |
 | `home.authorCard` | `boolean` | no |  | The sidebar author card: photo, name, bio and social buttons. |
 | `home.hiringCard` | `boolean` | no |  | The sidebar "Hiring?" recruiter card: availability and links to /me and the CV. |
-| `home.labLog` | `boolean` | no |  | The sidebar "Lab log" box: since when, cadence and languages. |
+| `home.now` | `boolean` | no |  | The sidebar "Now" card: what you are focused on, from the top-level `now` block. It also needs that block: without it the card never shows. |
 | `home.pillars` | `boolean` | no |  | The four pillars strip at the bottom of the home (desktop only). |
 | `home.notebookIndex` | `boolean` | no |  | The notebook index: compact rows for the notes after the latest one. |
 | `home.experiments` | `boolean` | no |  | The experiments section of the home. Also needs `features.experiments`: with that flag off it never shows. |
+| `now` | `object` | no |  | Optional dated "Now" block: what you are focused on, shown as a sidebar card on the home. Remove the key to hide the card. Update `updatedAt` whenever you change the rows. |
+| `now.updatedAt` | `date (YYYY-MM-DD)` | yes |  | Date of the last update of the block (`YYYY-MM-DD`), shown on the card. |
+| `now.items` | `object[] (max 3)` | yes |  | One to three rows, in display order. |
+| `now.items[].kind` | `'focus' \| 'building' \| 'exploring' \| 'learning'` | yes |  | Label of the row: `focus`, `building`, `exploring` or `learning`. |
+| `now.items[].text` | `{ <locale>: string }` | yes |  | What it is, per locale (the default locale is required). |
+| `now.items[].href` | `URL \| string` | no |  | Optional link for the text: an https URL or a site path starting with `/`. |
 | `socials` | `object[]` | yes |  | Social profile links shown in the footer and used as `sameAs` in structured data. |
 | `socials[].label` | `string` | yes |  | Link text and accessible name. |
 | `socials[].url` | `URL` | yes |  | Profile URL (https only: an email address never belongs in public config). |
@@ -317,19 +323,23 @@ Cada bandera de `features` apaga la función completa: no se genera la ruta, des
 
 #### Apariencia y secciones de la portada
 
-`appearance` elige el preset visual: `minimal` oculta en la portada los chips del hero (`heroPills`), la caja «Bitácora» (`labLog`) y la franja de pilares (`pillars`); `full` (el de este sitio desde 2026-10-02) es el aspecto original y lo muestra todo. Si omites `appearance`, vale `full`, así que una config escrita antes del preset no cambia.
+`appearance` elige el preset visual: `minimal` oculta en la portada los chips del hero (`heroPills`) y la franja de pilares (`pillars`); `full` (el de este sitio desde 2026-10-02) es el aspecto original y lo muestra todo. La tarjeta «Ahora» (`now`) se muestra en ambos presets. Si omites `appearance`, vale `full`, así que una config escrita antes del preset no cambia.
 
 **Escala tipográfica.** `appearance` también fija el tamaño del texto: queda en `<html data-appearance>` y `apps/web/src/styles/type-scale.css` define la escala una sola vez (variables `--type-*`), así que cambiarla en un fork es editar ese archivo. `minimal`: hero 32/44 px (móvil/`md`), títulos de sección 20, título de nota 30/40, tarjeta destacada 20/22, cuerpo y párrafo de intro 17. `full` conserva los tamaños originales (hero 36/60 px, secciones 24, título de nota 36/48, tarjeta destacada 30/36, cuerpo 18). El modo lectura tiene su propia escala y no cambia.
 
 **Banners y notas.** El mismo preset baja la altura de los banners (en `minimal`: 240 px en las páginas, portada expandida entre 360 y 460 px), hace que todos los banners se fundan con la página mediante un degradado de 120 px y, en las notas, deja en la cabecera solo la fecha y el tiempo de lectura (el idioma y el autor pasan al pie) con un registro de decisión más compacto. `full` conserva las alturas y la cabecera originales. Esos valores viven en `apps/web/src/styles/calm-layout.css`.
 
-`home` ajusta cada sección por separado y **siempre gana sobre el preset**: una clave que pones manda, una que omites sigue al preset. Claves: `heroPills`, `authorCard`, `hiringCard`, `labLog`, `pillars`, `notebookIndex` y `experiments` (esta además necesita `features.experiments`). Una sección apagada no renderiza nada (ni título ni hueco), y si se apagan las tres tarjetas de la barra lateral (`authorCard`, `hiringCard`, `labLog`) la columna lateral desaparece.
+`home` ajusta cada sección por separado y **siempre gana sobre el preset**: una clave que pones manda, una que omites sigue al preset. Claves: `heroPills`, `authorCard`, `hiringCard`, `now`, `pillars`, `notebookIndex` y `experiments` (esta además necesita `features.experiments`). Una sección apagada no renderiza nada (ni título ni hueco), y si se apagan las tres tarjetas de la barra lateral (`authorCard`, `hiringCard`, `now`) la columna lateral desaparece.
 
 ```ts
-// Aspecto calmado, pero con la Bitácora visible y sin la tarjeta de contratación.
+// Aspecto calmado, sin la tarjeta de contratación y sin la tarjeta «Ahora».
 appearance: 'minimal',
-home: { labLog: true, hiringCard: false },
+home: { now: false, hiringCard: false },
 ```
+
+**La tarjeta «Ahora».** Es una tarjeta fechada de la barra lateral con lo que estás haciendo ahora mismo. Sus datos viven en el bloque opcional `now` de `site.config.ts`: `updatedAt` (fecha real `YYYY-MM-DD`, se muestra como «Actualizado el 2 de octubre de 2026») y de uno a tres `items`, cada uno con `kind` (`focus`, `building`, `exploring` o `learning`), `text` por idioma (el idioma por defecto es obligatorio) y un `href` opcional (URL https o ruta del sitio que empieza con `/`). Actualiza `updatedAt` cada vez que cambies las filas. Si quitas el bloque `now`, la tarjeta no se renderiza (ni título ni hueco), aunque `home.now` esté activo. Es la única sección fechada del sitio: la excepción a la voz atemporal está en [BRAND.md](BRAND.md).
+
+> **Cambio incompatible para forks:** `home.labLog` pasó a llamarse `home.now`, y la caja «Bitácora» (desde cuándo, cadencia, idiomas) fue reemplazada por la tarjeta «Ahora». Un `home.labLog` en tu config ahora rompe el build (el esquema rechaza claves desconocidas): renómbralo a `home.now` y agrega el bloque `now`. El proyecto es anterior a 1.0 y ya hizo un cambio así antes con `identity.avatar`.
 
 ### 6.3 Experiencia, certificados y experimentos
 

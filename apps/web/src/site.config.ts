@@ -34,6 +34,20 @@ export const siteConfig = {
   // Calm look: smaller type and fewer home sections. Use 'full' for the original look, and `home`
   // to switch single sections on or off (see docs/CONFIGURATION.md, "Appearance and home sections").
   appearance: 'full',
+  // What the owner is focused on: the sidebar "Now" card of the home (one to three rows, dated).
+  // Bump `updatedAt` (YYYY-MM-DD) when the rows change; remove the whole block to hide the card.
+  now: {
+    updatedAt: '2026-10-02',
+    items: [
+      {
+        kind: 'focus',
+        text: {
+          es: 'Optimizar IA y proyectos personales',
+          en: 'Optimizing AI and personal projects',
+        },
+      },
+    ],
+  },
   socials: [
     { label: 'GitHub', url: 'https://github.com/elvinlab', icon: 'github' },
     { label: 'LinkedIn', url: 'https://www.linkedin.com/in/elvinlab', icon: 'linkedin' },

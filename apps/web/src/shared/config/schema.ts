@@ -5,6 +5,11 @@ const httpsUrl = z.url({ protocol: /^https$/, error: 'must be an https URL' });
 /** A bare image file name: no directories, so it can only point inside `src/assets`. */
 const AVATAR_FILE = /^[\w-][\w.-]*\.(?:png|jpe?g|webp|avif)$/i;
 
+/** A link target: an https URL, or a path inside the site (`/notes/`, never protocol-relative `//`). */
+const siteHref = z.union([httpsUrl, z.string().regex(/^\/(?!\/)\S*$/)], {
+  error: 'must be an https URL or a site path starting with "/"',
+});
+
 /** Text keyed by locale, e.g. `{ es: 'Hola', en: 'Hello' }`. Checked against `locales` below. */
 const localized = z.record(z.string(), z.string().trim().min(1));
 
@@ -91,10 +96,12 @@ export const siteConfigSchema = z
           .describe(
             'The sidebar "Hiring?" recruiter card: availability and links to /me and the CV.',
           ),
-        labLog: z
+        now: z
           .boolean()
           .optional()
-          .describe('The sidebar "Lab log" box: since when, cadence and languages.'),
+          .describe(
+            'The sidebar "Now" card: what you are focused on, from the top-level `now` block. It also needs that block: without it the card never shows.',
+          ),
         pillars: z
           .boolean()
           .optional()
@@ -112,7 +119,34 @@ export const siteConfigSchema = z
       })
       .default({})
       .describe(
-        'Show or hide each home section; a key you set wins over the `appearance` preset, a key you omit follows it. `minimal` hides `heroPills`, `labLog` and `pillars`; `full` shows everything. A hidden section renders nothing.',
+        'Show or hide each home section; a key you set wins over the `appearance` preset, a key you omit follows it. `minimal` hides `heroPills` and `pillars`; `full` shows everything. A hidden section renders nothing.',
+      ),
+    now: z
+      .strictObject({
+        updatedAt: z.iso
+          .date()
+          .describe('Date of the last update of the block (`YYYY-MM-DD`), shown on the card.'),
+        items: z
+          .array(
+            z.strictObject({
+              kind: z
+                .enum(['focus', 'building', 'exploring', 'learning'])
+                .describe('Label of the row: `focus`, `building`, `exploring` or `learning`.'),
+              text: localized.describe('What it is, per locale (the default locale is required).'),
+              href: siteHref
+                .optional()
+                .describe(
+                  'Optional link for the text: an https URL or a site path starting with `/`.',
+                ),
+            }),
+          )
+          .min(1)
+          .max(3)
+          .describe('One to three rows, in display order.'),
+      })
+      .optional()
+      .describe(
+        'Optional dated "Now" block: what you are focused on, shown as a sidebar card on the home. Remove the key to hide the card. Update `updatedAt` whenever you change the rows.',
       ),
     socials: z
       .array(
@@ -314,6 +348,12 @@ export const siteConfigSchema = z
       'me.workMode': { path: ['me', 'workMode'], text: config.me.workMode },
       'me.intro': { path: ['me', 'intro'], text: config.me.intro },
       ...(config.notice && { notice: { path: ['notice'], text: config.notice } }),
+      ...Object.fromEntries(
+        (config.now?.items ?? []).map((item, index) => [
+          `now.items.${index}`,
+          { path: ['now', 'items', index, 'text'], text: item.text },
+        ]),
+      ),
     };
     for (const { path, text } of Object.values(texts)) {
       if (!(defaultLocale in text)) {

@@ -1,0 +1,44 @@
+---
+/** Dated "Now" card: what the owner is focused on, from the `now` block of the site config. Renders
+ * nothing without that block, so no empty heading or wrapper is left behind. */
+import { localizePath } from '@elvinlab/core';
+
+import { formatNowDate } from '@/features/portfolio/lib/portfolio.ts';
+import { site } from '@/shared/config/index.ts';
+import { LOCALES, type Locale, t } from '@/shared/i18n/index.ts';
+
+type Props = { locale: Locale };
+
+const { locale } = Astro.props;
+const { now } = site;
+// Internal paths follow the visitor's locale; https links leave the site.
+const isInternal = (href: string) => href.startsWith('/');
+---
+
+{now && (
+  <section data-now-card class="flex flex-col gap-3 rounded-card bg-card p-5">
+    <div class="flex flex-col gap-1">
+      <h2 class="font-display text-base font-bold">{t(locale, 'now.title')}</h2>
+      <p class="text-meta text-muted">{t(locale, 'now.updated', { date: formatNowDate(now.updatedAt, locale) })}</p>
+    </div>
+    <ul class="flex flex-col gap-3">
+      {now.items.map((item) => {
+        const text = item.text[locale] ?? item.text[LOCALES.defaultLocale] ?? '';
+        return (
+          <li class="flex flex-col gap-1 not-first:border-t not-first:border-dashed not-first:border-divider not-first:pt-3">
+            <span class="font-mono text-meta text-muted">{t(locale, `now.kind.${item.kind}`)}</span>
+            {item.href ? (
+              <a
+                href={isInternal(item.href) ? localizePath(item.href, locale, LOCALES) : item.href}
+                rel={isInternal(item.href) ? undefined : 'noopener'}
+                class="text-sm text-primary underline decoration-dashed underline-offset-4"
+              >{text}</a>
+            ) : (
+              <span class="text-sm text-text-secondary">{text}</span>
+            )}
+          </li>
+        );
+      })}
+    </ul>
+  </section>
+)}

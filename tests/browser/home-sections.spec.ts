@@ -2,17 +2,17 @@ import { expect, type Page, test } from '@playwright/test';
 
 /**
  * The fixture build copies the real `site.config.ts` (`FIXTURE_APPEARANCE` overrides the preset of
- * the copy). Under `minimal` the home drops the hero pills, the lab log and the pillars; under
- * `full` it shows them. Both presets keep the author card, the recruiter card and the notebook
+ * the copy). Under `minimal` the home drops the hero pills and the pillars; under `full` it shows
+ * them. Both presets keep the author card, the recruiter card, the Now card and the notebook
  * index. A section that is off must leave no heading or wrapper behind. The expectations follow
  * `html[data-appearance]`, mirroring `HOME_PRESETS` in `shared/config/appearance.ts`.
  */
 type Preset = 'minimal' | 'full';
 
 /** Whether each preset-driven section is on (`HOME_PRESETS` in `shared/config/appearance.ts`). */
-const PRESET_SECTIONS: Record<Preset, { heroPills: boolean; labLog: boolean; pillars: boolean }> = {
-  minimal: { heroPills: false, labLog: false, pillars: false },
-  full: { heroPills: true, labLog: true, pillars: true },
+const PRESET_SECTIONS: Record<Preset, { heroPills: boolean; pillars: boolean }> = {
+  minimal: { heroPills: false, pillars: false },
+  full: { heroPills: true, pillars: true },
 };
 
 const presetOf = async (page: Page): Promise<Preset> => {
@@ -31,23 +31,29 @@ test.beforeEach(({ browserName: _browserName }, testInfo) => {
 const HOMES = [
   {
     path: '/',
-    labLog: 'Bitácora',
+    now: 'Ahora',
+    nowDate: 'Actualizado el 2 de octubre de 2026',
+    nowFocus: 'Optimizar IA y proyectos personales',
+    retired: 'Bitácora',
     pillars: 'En qué trabajo',
     notebook: 'Cuaderno',
     hiring: '¿Contratando?',
   },
   {
     path: '/en/',
-    labLog: 'Lab log',
+    now: 'Now',
+    nowDate: 'Updated October 2, 2026',
+    nowFocus: 'Optimizing AI and personal projects',
+    retired: 'Lab log',
     pillars: 'What I work on',
     notebook: 'Notebook',
     hiring: 'Hiring?',
   },
 ];
 
-for (const { path, labLog, pillars, notebook, hiring } of HOMES) {
+for (const { path, now, nowDate, nowFocus, retired, pillars, notebook, hiring } of HOMES) {
   test.describe(`home sections at ${path}`, () => {
-    test('shows or hides the hero pills, the lab log and the pillars to match the preset, leaving nothing behind', async ({
+    test('shows or hides the hero pills and the pillars to match the preset, leaving nothing behind', async ({
       page,
     }) => {
       await page.goto(path);
@@ -55,10 +61,21 @@ for (const { path, labLog, pillars, notebook, hiring } of HOMES) {
       await expect(page.locator('[data-home-hero] h1')).toBeVisible();
       await expect(page.locator('[data-home-hero] ul')).toHaveCount(countFor(on.heroPills));
       await expect(page.getByText('Clean architecture')).toHaveCount(countFor(on.heroPills));
-      await expect(page.getByRole('heading', { name: labLog })).toHaveCount(countFor(on.labLog));
       await expect(page.locator(`section[aria-label="${pillars}"]`)).toHaveCount(
         countFor(on.pillars),
       );
+    });
+
+    test('shows the Now card with its date and focus under every preset, and no retired lab log', async ({
+      page,
+    }) => {
+      await page.goto(path);
+      await expect(page.getByRole('heading', { name: now, exact: true })).toHaveCount(1);
+      const card = page.locator('[data-now-card]');
+      await expect(card).toBeVisible();
+      await expect(card.getByText(nowDate)).toBeVisible();
+      await expect(card.getByText(nowFocus)).toBeVisible();
+      await expect(page.getByRole('heading', { name: retired })).toHaveCount(0);
     });
 
     test('keeps the author card, the recruiter card and the notebook index', async ({ page }) => {
