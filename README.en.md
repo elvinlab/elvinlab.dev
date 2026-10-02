@@ -95,6 +95,7 @@ This is how work goes here: every task is an *issue* written as a delegation bri
 - **`/me`**: a portfolio with experience, certificates and experiments; it prints cleanly to PDF.
 - A safe **contact form**: Turnstile, a send limit and it fails closed when configuration is missing.
 - A **public changelog**, **privacy and terms pages** and a **light/dark theme** with selectable animated backgrounds.
+- **Configurable appearance**: the `appearance` preset (`minimal` or `full`) sets the type scale, the banner heights and the note detail, and `home` switches each home section on or off.
 - **Bilingual** (ES/EN) with no language redirects.
 
 ## Measured quality

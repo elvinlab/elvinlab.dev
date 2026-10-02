@@ -46,8 +46,26 @@ Make the site calmer and more minimalist while keeping the modern look, and make
     - Tests: `calm-layout.test.ts` and `note-meta.test.ts` RED then GREEN (26/26 with `type-scale.test.ts`); `calm-pages.spec.ts` written after the implementation (no RED: reverting was not possible without stash or checkout), 9/9 at chromium-1280 and 8 passed, 1 skipped at chromium-360; fade present on all 7 banner pages in both themes, in the served HTML, reading mode, collapsed home, minimal heights, compact decision record, note meta, no overflow. Related specs (smoke, mobile-ux, pixel-display, reading-mode, notes-layout, type-scale, home-sections) 87/87 at chromium-1280. Changed assertions: `[data-home-fade]` renamed to `[data-banner-fade]`; expanded home banner at 1280x900 from 594 to 432 px (the minimal cap). `full` heights are proven at CSS level.
     - Caveats: BEFORE screenshots were lost with the interrupted session, so the before/after comparison rests on what the writer saw earlier; the AFTER set (56 PNGs) was taken in a scratch folder. On `/me/` at 1440 the avatar sits about 8 px under the navbar (minimum padding, the banner is sized by content). On `/notes/` index rows the language badge shares the chip line and can push a tag onto a second row.
 
-## Progress and next step
-Branch and document created. Next: M1. Engram mirror: `odd/minimal-appearance-preset/tasks`.
+## Closure (2026-10-01): feature closed
+Status: closed. M1, M2 and M3 are done and committed on `feat/minimal-appearance-preset` (`3684303`, `52f2bb9`, `97387d2`). The feature is merged into local `develop` by fast-forward, NOT pushed and NOT released to `main`. Documentation unit (DESIGN, BRAND, CONFIGURATION, README, this tracker and `elvinlab-site.md`) written afterwards, uncommitted at the time of writing.
+
+Corrections to the specification above, recorded where they were found: the schema default of `appearance` is `full` (not `minimal`); the `full` note title is 36/48 px (not 36/54) and the old docs value was wrong; the decision record body stays 14 px.
+
+Final light verification (owner asked twice for less local testing, so the tiered plan above was used):
+- Unit tests: 37 core and 529 web tests passed; typecheck and lint clean.
+- `pnpm test:e2e` at `chromium-1280` only: 189 passed, about 49 s (the full 3-viewport suite takes about 1.6 min).
+- `pnpm --filter web build` and `pnpm test:white-label`: passed (the config schema changed).
+- Skipped on purpose and NOT re-run for this feature: the full 3-viewport e2e suite, mobile Lighthouse, `check:js-budget`, `check:dev-cold-start`, `depcruise`.
+- Gaps: no automated test for the empty-aside layout; M3 BEFORE screenshots were lost, so the banner-edge before/after rests on what the writer saw plus an AFTER set; on `/me/` at 1440 the avatar sits about 8 px under the navbar; on `/notes/` index rows the language badge can push a tag onto a second row.
+
+Open follow-ups (none started):
+- Faster local test loop: fast script, local workers, fixture-build reuse, tiered verification. Measure first.
+- Audit point 7: the hiring card shows "not available" next to its primary CTA; content decision of the owner.
+- LCP is the hero headline text (~2.3 s, unchanged); INP and the real-GPU banner cost are unmeasured; Lighthouse was not re-run after this feature.
+- Release plan for the diverged `main`: its tree equals `develop` before the 2026-10-01 work, but its history diverges (release commits are separate), so a release is not a plain fast-forward and needs a plan.
+- Push of `develop` to origin is pending the owner's explicit authorization (the remote has only `main` and `develop`; `develop` was last pushed at `4b6e618`).
+
+Engram mirror: `odd/minimal-appearance-preset/tasks` (resync with this document when Engram is available).
 
 ## Route declaration
 M1-M3: delegated direct, one Claude writer per unit; trigger evidence: more than four non-trivial files per unit.

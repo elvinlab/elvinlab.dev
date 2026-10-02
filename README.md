@@ -95,6 +95,7 @@ Así se trabaja aquí: cada tarea es un *issue* escrito como un brief de delegac
 - **`/me`**: portafolio con experiencia, certificados y experimentos; se imprime limpio a PDF.
 - **Formulario de contacto** seguro: Turnstile, límite de envíos y falla cerrado si falta configuración.
 - **Changelog público**, **páginas de privacidad y términos** y **tema claro/oscuro** con fondos animados elegibles.
+- **Aspecto configurable**: el preset `appearance` (`minimal` o `full`) fija la escala tipográfica, la altura de los banners y el detalle de las notas, y `home` activa o apaga cada sección de la portada.
 - **Bilingüe** (ES/EN) sin redirecciones por idioma.
 
 ## Calidad medida
