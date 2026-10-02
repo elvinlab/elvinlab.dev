@@ -43,10 +43,10 @@ const experiments = homeSections.experiments
     <BackgroundCanvas slot="background" />
     <div data-hero-content data-home-hero class="flex flex-col">
       <p class="font-mono text-sm text-cyan">{t(locale, 'notes.eyebrow', { handle: site.identity.handle })}</p>
-      <h1 class="mt-3 max-w-[16ch] font-pixel text-4xl font-semibold leading-[1.1] text-balance md:text-6xl">
+      <h1 class="mt-3 max-w-[16ch] font-pixel text-hero font-semibold leading-[1.1] text-balance">
         {site.identity.role[locale]}<span aria-hidden="true" class="ml-1 inline-block h-3 w-2.5 bg-pink align-baseline md:h-4"></span>
       </h1>
-      <p class="mt-4 max-w-[52ch] text-lg leading-relaxed text-text-secondary md:text-xl">{t(locale, 'home.intro')}</p>
+      <p class="mt-4 max-w-[52ch] text-intro leading-relaxed text-text-secondary">{t(locale, 'home.intro')}</p>
       {homeSections.heroPills && (
         <ul class="mt-5 hidden flex-wrap gap-2 md:flex">
           {pills.map((pill) => (

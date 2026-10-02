@@ -1,5 +1,6 @@
 @import "tailwindcss";
 @import "@elvinlab/core/tokens.css";
+@import "./type-scale.css";
 
 @theme {
   --spacing-18: 4.5rem;
@@ -53,7 +54,7 @@
 /* Article body (design v3): 68ch measure, generous line height, dashed dividers, pink quote bar. */
 .prose {
   max-width: 68ch;
-  font-size: 1.125rem;
+  font-size: var(--type-prose);
   line-height: 1.75;
   color: var(--color-text);
 }
@@ -64,14 +65,14 @@
   scroll-margin-top: 6rem;
   margin-top: 2em;
   font-family: var(--font-display);
-  font-size: 1.75rem;
+  font-size: var(--type-prose-h2);
   font-weight: 700;
   line-height: 1.2;
 }
 .prose h3 {
   margin-top: 1.6em;
   font-family: var(--font-display);
-  font-size: 1.35rem;
+  font-size: var(--type-prose-h3);
   font-weight: 700;
 }
 .prose a {
@@ -90,7 +91,7 @@
 .prose blockquote {
   border-left: 3px solid var(--color-pink);
   padding-left: 1.25rem;
-  font-size: 1.2rem;
+  font-size: var(--type-prose-quote);
   color: var(--color-text-secondary);
 }
 .prose ul,

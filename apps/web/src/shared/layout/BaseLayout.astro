@@ -13,7 +13,7 @@ import { DEFAULT_THEME, THEME_BOOT_SCRIPT } from '@elvinlab/core';
 import jetbrainsMonoLatin from '@fontsource-variable/jetbrains-mono/files/jetbrains-mono-latin-wght-normal.woff2?url';
 import spaceGroteskLatin from '@fontsource-variable/space-grotesk/files/space-grotesk-latin-wght-normal.woff2?url';
 
-import { integrations } from '@/shared/config/index.ts';
+import { appearance, integrations } from '@/shared/config/index.ts';
 import { type Locale, t } from '@/shared/i18n/index.ts';
 import Footer from '@/shared/layout/Footer.astro';
 import Navbar from '@/shared/layout/Navbar.astro';
@@ -54,7 +54,7 @@ const beaconToken = integrations.analyticsToken;
 const preloadedFonts = [spaceGroteskLatin, jetbrainsMonoLatin];
 ---
 
-<html lang={locale} data-theme={DEFAULT_THEME}>
+<html lang={locale} data-theme={DEFAULT_THEME} data-appearance={appearance}>
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />

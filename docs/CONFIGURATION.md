@@ -318,6 +318,8 @@ Cada bandera de `features` apaga la función completa: no se genera la ruta, des
 
 `appearance` elige el preset visual: `minimal` (el de este sitio) oculta en la portada los chips del hero (`heroPills`), la caja «Bitácora» (`labLog`) y la franja de pilares (`pillars`); `full` es el aspecto original y lo muestra todo. Si omites `appearance`, vale `full`, así que una config escrita antes del preset no cambia.
 
+**Escala tipográfica.** `appearance` también fija el tamaño del texto: queda en `<html data-appearance>` y `apps/web/src/styles/type-scale.css` define la escala una sola vez (variables `--type-*`), así que cambiarla en un fork es editar ese archivo. `minimal`: hero 32/44 px (móvil/`md`), títulos de sección 20, título de nota 30/40, tarjeta destacada 20/22, cuerpo y párrafo de intro 17. `full` conserva los tamaños originales. El modo lectura tiene su propia escala y no cambia.
+
 `home` ajusta cada sección por separado y **siempre gana sobre el preset**: una clave que pones manda, una que omites sigue al preset. Claves: `heroPills`, `authorCard`, `hiringCard`, `labLog`, `pillars`, `notebookIndex` y `experiments` (esta además necesita `features.experiments`). Una sección apagada no renderiza nada (ni título ni hueco), y si se apagan las tres tarjetas de la barra lateral (`authorCard`, `hiringCard`, `labLog`) la columna lateral desaparece.
 
 ```ts

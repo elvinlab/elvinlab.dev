@@ -318,6 +318,8 @@ Each `features` flag switches the whole feature off: the route is not generated,
 
 `appearance` picks the visual preset: `minimal` (this site's choice) hides the hero pills (`heroPills`), the "Lab log" box (`labLog`) and the pillars strip (`pillars`) on the home page; `full` is the original look and shows everything. If you omit `appearance` it is `full`, so a config written before the preset existed does not change.
 
+**Type scale.** `appearance` also sets the text size: it lands on `<html data-appearance>` and `apps/web/src/styles/type-scale.css` defines the scale once (`--type-*` variables), so a fork changes it by editing that file. `minimal`: hero 32/44 px (phone/`md`), section titles 20, note title 30/40, featured card 20/22, body and intro paragraph 17. `full` keeps the original sizes. Reading mode has its own scale and does not change.
+
 `home` tunes each section on its own and **always wins over the preset**: a key you set rules, a key you omit follows the preset. Keys: `heroPills`, `authorCard`, `hiringCard`, `labLog`, `pillars`, `notebookIndex` and `experiments` (which also needs `features.experiments`). A section that is off renders nothing (no heading, no gap), and when all three sidebar cards (`authorCard`, `hiringCard`, `labLog`) are off the sidebar column disappears.
 
 ```ts

@@ -66,6 +66,10 @@ html[data-reading] .prose {
   max-width: none;
   font-size: 1.1875rem;
   line-height: 1.8;
+  /* Reading mode has its own scale: the headings stay as in the `full` preset. */
+  --type-prose-h2: 1.75rem;
+  --type-prose-h3: 1.35rem;
+  --type-prose-quote: 1.2rem;
 }
 /* The article card is flattened, so the next block needs more room to read as a separate thing. */
 html[data-reading] [data-prev-next] {
