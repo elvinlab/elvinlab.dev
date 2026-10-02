@@ -12,7 +12,7 @@ Prototype Pixelify Sans as a second, readable pixel face for the home hero headl
 - `docs/BRAND.md` is not edited here; the result is judged first. If kept, a follow-up updates BRAND.md and DESIGN.md. (Kept: that follow-up landed on 2026-10-01, see `docs/BRAND.md` Tipografía and `docs/DESIGN.md` Type.)
 
 ## Execution and checks
-- Branch: `exp/pixel-display-font` from `feat/mobile-ux-performance-pass` (`b58b437`). Outcome: fast-forwarded into `develop` (local, NOT pushed, not released to `main`) after the owner adopted it; both local branches were deleted after the merge.
+- Branch: `exp/pixel-display-font` from `feat/mobile-ux-performance-pass` (`b58b437`). Outcome: fast-forwarded into `develop` (pushed to `origin/develop` with the minimal preset on 2026-10-01, not released to `main`) after the owner adopted it; both local branches were deleted after the merge.
 - Route: delegated direct, one Claude writer; spans more than four files.
 - Strict TDD: enabled (user global config). Runner: `pnpm exec playwright test tests/browser/<file>.spec.ts` and `pnpm --filter web test`.
 - Required: focused Playwright, `pnpm test`, `pnpm typecheck`, `pnpm lint`, `pnpm --filter web build`, `pnpm check:js-budget`, `pnpm test:white-label`, `pnpm depcruise`, `git diff --check`; Lighthouse compared with the T2 baseline (perf 0.98, FCP 1.74 s, LCP 2.26 s).
@@ -28,7 +28,7 @@ Prototype Pixelify Sans as a second, readable pixel face for the home hero headl
     - Parent visual judgment: coherent with the Press Start 2P wordmark, but the pixel `e` reads like a reversed `e` at hero size ("engineer"), the hero is louder than before (it conflicts with the minimalist direction and the "text too large" feedback), and `text-balance` leaves "Full-stack" alone on the first line. Section titles work well. Leaning: keep the pixel face for section titles and small labels, keep the hero in Space Grotesk, or use it at a much smaller size. Owner decides; BRAND.md untouched.
 
 ## Progress and next step
-E1 done. The owner reviewed the trial on screen and kept it as built, hero included (the parent's leaning above to narrow it was not followed). It is merged into `develop` by fast-forward (local only, NOT pushed, not released to `main`). BRAND.md and DESIGN.md were updated on 2026-10-01 (decision date 2026-10-01). Known caveat carried forward: the pixel `e` is less legible at hero size; revisit with the minimal type scale. Next: the minimalist preset and smaller type scale (see `odd/tasks/elvinlab-site.md`). Engram mirror: `odd/pixel-display-font-experiment/tasks`.
+E1 done. The owner reviewed the trial on screen and kept it as built, hero included (the parent's leaning above to narrow it was not followed). It is merged into `develop` by fast-forward (pushed to `origin/develop` on 2026-10-01, not released to `main`). BRAND.md and DESIGN.md were updated on 2026-10-01 (decision date 2026-10-01). Known caveat carried forward: the pixel `e` is less legible at hero size; revisit with the minimal type scale. Next: the minimalist preset and smaller type scale (see `odd/tasks/elvinlab-site.md`). Engram mirror: `odd/pixel-display-font-experiment/tasks`.
 
 ## Route declaration
 E1: delegated direct, one Claude writer; trigger evidence: more than four files (core token, layout, hero, section title component, config/package, tests).

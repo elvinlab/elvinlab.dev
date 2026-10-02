@@ -47,7 +47,7 @@ Make the site calmer and more minimalist while keeping the modern look, and make
     - Caveats: BEFORE screenshots were lost with the interrupted session, so the before/after comparison rests on what the writer saw earlier; the AFTER set (56 PNGs) was taken in a scratch folder. On `/me/` at 1440 the avatar sits about 8 px under the navbar (minimum padding, the banner is sized by content). On `/notes/` index rows the language badge shares the chip line and can push a tag onto a second row.
 
 ## Closure (2026-10-01): feature closed
-Status: closed. M1, M2 and M3 are done and committed on `feat/minimal-appearance-preset` (`3684303`, `52f2bb9`, `97387d2`). The feature is merged into local `develop` by fast-forward, NOT pushed and NOT released to `main`. Documentation unit (DESIGN, BRAND, CONFIGURATION, README, this tracker and `elvinlab-site.md`) written afterwards, uncommitted at the time of writing.
+Status: closed. M1, M2 and M3 are done and committed on `feat/minimal-appearance-preset` (`3684303`, `52f2bb9`, `97387d2`). The feature is merged into `develop` by fast-forward and pushed to `origin/develop` (`ffbeb31`, 2026-10-01, owner-authorized), NOT released to `main`. Documentation unit (DESIGN, BRAND, CONFIGURATION, README, this tracker and `elvinlab-site.md`) written afterwards, uncommitted at the time of writing.
 
 Corrections to the specification above, recorded where they were found: the schema default of `appearance` is `full` (not `minimal`); the `full` note title is 36/48 px (not 36/54) and the old docs value was wrong; the decision record body stays 14 px.
 
@@ -63,7 +63,7 @@ Open follow-ups (none started):
 - Audit point 7: the hiring card shows "not available" next to its primary CTA; content decision of the owner.
 - LCP is the hero headline text (~2.3 s, unchanged); INP and the real-GPU banner cost are unmeasured; Lighthouse was not re-run after this feature.
 - Release plan for the diverged `main`: its tree equals `develop` before the 2026-10-01 work, but its history diverges (release commits are separate), so a release is not a plain fast-forward and needs a plan.
-- Push of `develop` to origin is pending the owner's explicit authorization (the remote has only `main` and `develop`; `develop` was last pushed at `4b6e618`).
+- `develop` was pushed to `origin` at `ffbeb31` on 2026-10-01 with the owner's explicit authorization (previous push `4b6e618`); the remote has only `main` and `develop`.
 
 Engram mirror: `odd/minimal-appearance-preset/tasks` (resync with this document when Engram is available).
 
