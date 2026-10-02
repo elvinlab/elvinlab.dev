@@ -1,6 +1,7 @@
 {
   "name": "elvinlab.dev",
   "private": true,
+  "license": "MIT",
   "type": "module",
   "packageManager": "pnpm@12.6.0",
   "engines": {

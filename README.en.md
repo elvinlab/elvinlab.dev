@@ -174,7 +174,7 @@ The site is meant to be adopted by someone else by replacing `site.config.ts`, t
 
 In production at [elvinlab.dev](https://elvinlab.dev) since October 1, 2026. Progress is in the [GitHub Project](https://github.com/users/elvinlab/projects/2) and the history of visible changes in the [changelog](https://elvinlab.dev/en/changelog/).
 
-This repository **does not declare a license yet**. Notes are published under [CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/).
+The code is released under the [MIT license](LICENSE). The notes (the content of `content/notes`) are published under [CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/).
 
 ## Author
 
