@@ -208,5 +208,35 @@
     "category": "fixed",
     "title": "The shared profile card no longer shows a red dot",
     "description": "The preview card of the profile page showed a red dot next to \"open to chat\". It now uses the brand colour, like the hiring card on the home."
+  },
+  "rss-feed": {
+    "date": "2026-10-01",
+    "category": "added",
+    "title": "RSS feed for the notes",
+    "description": "You can follow the Lab Notes at /rss.xml. Every page advertises the feed, so feed readers find it on their own."
+  },
+  "readme-and-guides": {
+    "date": "2026-10-01",
+    "category": "added",
+    "title": "README and configuration guides in Spanish and English",
+    "description": "The repository explains how to run, configure and white-label the site in both languages, and the configuration tables are generated from the code so they cannot drift."
+  },
+  "open-licence": {
+    "date": "2026-10-01",
+    "category": "added",
+    "title": "Open licence: MIT for the code, CC BY-NC-SA for the notes",
+    "description": "The code can be reused under the MIT licence; the notes keep a non-commercial share-alike licence."
+  },
+  "languages-in-page-language": {
+    "date": "2026-10-02",
+    "category": "fixed",
+    "title": "Languages on the profile are named in the page language",
+    "description": "The quick facts on the profile now read Spanish and English in the language of the page instead of the same mixed text on both."
+  },
+  "faster-browser-tests": {
+    "date": "2026-10-02",
+    "category": "changed",
+    "title": "Browser tests run about 30% faster",
+    "description": "The full suite takes about 73 seconds instead of 107 on a 12-core machine, and a one-viewport script exists for day-to-day work."
   }
 }
