@@ -40,6 +40,19 @@
   [data-card-link] :focus-visible {
     outline: none;
   }
+
+  /* Headings break into even lines and body text avoids a one-word last line. */
+  h1,
+  h2,
+  h3 {
+    text-wrap: balance;
+  }
+
+  p,
+  li,
+  dd {
+    text-wrap: pretty;
+  }
 }
 
 /* Every animation and transition stops for visitors who ask for less motion. */

@@ -25,7 +25,9 @@ const contactHref = localizePath('/contact/', locale, LOCALES);
       {facts.map((fact) => (
         <>
           <dt class="text-muted">{fact.label}</dt>
-          <dd class="text-right font-medium">{fact.value}</dd>
+          <dd class="text-right font-medium">
+            {(fact.value ?? '').split(' · ').map((part) => <span class="block">{part}</span>)}
+          </dd>
         </>
       ))}
     </dl>

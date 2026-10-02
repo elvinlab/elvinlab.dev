@@ -22,7 +22,7 @@ const facts = [
     {facts.map((fact, index) => (
       <div class:list={['flex flex-col gap-1.5 px-6 py-1', index > 0 && 'border-l border-dashed border-divider']}>
         <dt class="order-2 text-sm text-muted">{fact.label}</dt>
-        <dd class="order-1 font-display text-2xl font-bold tracking-tight md:text-3xl">{fact.value}</dd>
+        <dd class="order-1 font-display text-xl font-bold tracking-tight text-balance md:text-2xl">{fact.value}</dd>
       </div>
     ))}
   </dl>
