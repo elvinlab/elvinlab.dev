@@ -238,5 +238,29 @@
     "category": "changed",
     "title": "Browser tests run about 30% faster",
     "description": "The full suite takes about 73 seconds instead of 107 on a 12-core machine, and a one-viewport script exists for day-to-day work."
+  },
+  "balanced-type-scale": {
+    "date": "2026-10-02",
+    "category": "changed",
+    "title": "Smaller text sizes and cleaner line breaks",
+    "description": "Headings and card titles are a little smaller, so titles no longer take four or five lines on a phone, and paragraphs avoid a last line with a single word. The figures strip and the availability line on the profile also wrap more tidily."
+  },
+  "whole-note-cards": {
+    "date": "2026-10-02",
+    "category": "changed",
+    "title": "Whole note cards are clickable",
+    "description": "In the notes list and in the latest note on the home you can click or tap anywhere on the card, not only on the title."
+  },
+  "background-picker-touch": {
+    "date": "2026-10-02",
+    "category": "changed",
+    "title": "The background picker is hidden where it does nothing",
+    "description": "On touch screens and with reduced motion the animated background never runs, so its picker button is no longer shown there."
+  },
+  "latin-fonts-only": {
+    "date": "2026-10-02",
+    "category": "changed",
+    "title": "Pages are about 4 KB lighter",
+    "description": "The self-hosted fonts now ship only the Latin alphabets that Spanish and English use, which keeps the notes pages within their loading budget."
   }
 }
