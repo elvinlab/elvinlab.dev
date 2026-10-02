@@ -1,6 +1,6 @@
 ---
 /** The home page for one UI locale: hero banner, latest note, notebook index, experiments,
- * pillars, and a sidebar with the author card, the recruiter card and the lab log. Each of those
+ * pillars, and a sidebar with the author card, the recruiter card and the Now card. Each of those
  * sections follows `homeSections` (appearance preset plus `home` overrides) and renders nothing
  * when it is off; the sidebar column only exists while at least one of its cards is on. */
 import { getCollection } from 'astro:content';
@@ -11,9 +11,9 @@ import { hasPublishedNotes, sortNotes } from '@/features/notes/index.ts';
 import AuthorCard from '@/features/portfolio/components/AuthorCard.astro';
 import ExperimentsGrid from '@/features/portfolio/components/ExperimentsGrid.astro';
 import HiringCard from '@/features/portfolio/components/HiringCard.astro';
-import LabLog from '@/features/portfolio/components/LabLog.astro';
 import LatestNote from '@/features/portfolio/components/LatestNote.astro';
 import NotebookIndex from '@/features/portfolio/components/NotebookIndex.astro';
+import NowCard from '@/features/portfolio/components/NowCard.astro';
 import Pillars from '@/features/portfolio/components/Pillars.astro';
 import { sortExperiments } from '@/features/portfolio/lib/portfolio.ts';
 import { homeSections, isEnabled, site } from '@/shared/config/index.ts';
@@ -30,7 +30,10 @@ const noteEntries = isEnabled('blog') ? await getCollection('notes') : [];
 const notes = sortNotes(noteEntries.map((entry) => ({ slug: entry.id, data: entry.data, body: entry.body ?? '' })));
 const [latest, ...rest] = notes;
 const hasNotes = hasPublishedNotes(notes);
-const hasSidebar = homeSections.authorCard || homeSections.hiringCard || homeSections.labLog;
+// The Now card needs both its switch and a `now` block in the config, so it can never leave an
+// empty sidebar column behind.
+const showNow = homeSections.now && site.now !== undefined;
+const hasSidebar = homeSections.authorCard || homeSections.hiringCard || showNow;
 
 const experiments = homeSections.experiments
   ? sortExperiments(await getCollection('experiments')).map((entry) => entry.data)
@@ -69,7 +72,7 @@ const experiments = homeSections.experiments
       <div class="flex flex-col gap-4">
         {homeSections.authorCard && <AuthorCard locale={locale} />}
         {homeSections.hiringCard && <HiringCard locale={locale} />}
-        {homeSections.labLog && <LabLog locale={locale} />}
+        {showNow && <NowCard locale={locale} />}
       </div>
     </Fragment>
   )}

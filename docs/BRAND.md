@@ -32,7 +32,7 @@ La línea de posicionamiento es una sola y se usa igual en todas partes: **Full-
 
 - Primera persona, directa y concreta. Números y nombres, no adjetivos.
 - El blog documenta decisiones y su razonamiento, no tutoriales genéricos.
-- Atemporal: nada que dependa de "en qué estoy trabajando este mes".
+- Atemporal: nada que dependa de "en qué estoy trabajando este mes". Única excepción: la sección **Ahora** del inicio (decidida 2026-10-02, a pedido del dueño). Es la única superficie con actividad fechada: muestra siempre su fecha real de actualización, lleva como máximo tres entradas y se oculta entera si no hay contenido vigente. Identidad, bio, notas y proyectos siguen siendo atemporales.
 - Sin frameworks como identidad: se nombran como herramientas, no como etiqueta profesional.
 - Humor con medida: el abanico y el footer retro son la firma; no compiten con el contenido.
 - Nunca anunciar proyectos que no existen todavía.
@@ -111,7 +111,7 @@ Inconsistencia a resolver: en modo claro el banner usa `#c9c3ee` como borde y la
 | Display (títulos de nota y de tarjeta) | Space Grotesk | 700 | 24–27 px títulos; 58–64 px nombre en los banners |
 | Texto | Space Grotesk | 400, 500 | 16–18 px |
 | Mono (números de nota, prompts, código) | JetBrains Mono | 400, 600, 700 | 12–16 px; en el sitio no se usa para etiquetas en mayúsculas |
-| Display pixelado (titular del hero, títulos de sección) | Pixelify Sans | 600 (variable) | Según el preset `appearance`: `minimal` (el de este sitio) hero 32 px en teléfono y 44 px desde `md`, títulos de sección 20 px; `full` hero 36 px y 60 px, títulos de sección 24 px |
+| Display pixelado (titular del hero, títulos de sección) | Pixelify Sans | 600 (variable) | Según el preset `appearance`: `minimal` hero 32 px en teléfono y 44 px desde `md`, títulos de sección 20 px; `full` (el de este sitio desde 2026-10-02) hero 36 px y 60 px, títulos de sección 24 px |
 | Firma retro | Press Start 2P | 400 | Wordmark del navbar, firma del footer y página 404 |
 
 Todas desde [Fontsource](https://fontsource.org), autoalojadas; nunca desde un CDN en tiempo de ejecución.

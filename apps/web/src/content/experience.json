@@ -1,34 +1,47 @@
 {
   "buo": {
-    "role": "Full Stack Developer",
+    "role": { "es": "Ingeniero de software", "en": "Software Engineer" },
     "company": "Buo",
     "start": 2024,
-    "summary": "Ingeniería full-stack end-to-end: frontend, backend y nube.",
-    "tags": ["typescript", "react", "cloudflare"]
+    "location": { "es": "Remoto", "en": "Remote" },
+    "summary": {
+      "es": "Entrega de extremo a extremo en un SaaS de recursos humanos: interfaces Vue/Vuetify, servicios Java/Spring Boot y datos SQL. Integro IA en producto y creo skills reutilizables para revisión de PRs, pruebas y documentación, con supervisión humana.",
+      "en": "End-to-end delivery on an HR SaaS: Vue/Vuetify interfaces, Java/Spring Boot services and SQL data. I integrate AI into the product and build reusable skills for PR review, testing and documentation, with human oversight."
+    },
+    "tags": ["vue", "vuetify", "java", "spring-boot", "aws"]
   },
   "blue-zone": {
-    "role": "Ingeniero de desarrollo de software",
+    "role": { "es": "Desarrollador de software", "en": "Software Developer" },
     "company": "Blue Zone Consulting Partners",
     "start": 2022,
     "end": 2024,
     "location": "Liberia, Guanacaste, Costa Rica",
-    "summary": "ETL hacia AWS S3, optimización de Java de alto rendimiento y dashboards en AngularJS.",
-    "tags": ["java", "angularjs", "aws", "mysql", "javascript"]
+    "summary": {
+      "es": "Flujos ETL desde Excel hacia AWS S3 con transformación de datos y manejo de errores; procesamiento en Java e interfaces AngularJS que consumían APIs REST; apoyo en QA, visualización de datos e incorporación de nuevos desarrolladores.",
+      "en": "ETL flows from Excel to AWS S3 with data transformation and error handling; Java processing and AngularJS interfaces consuming REST APIs; support for QA, data visualization and onboarding of new developers."
+    },
+    "tags": ["java", "angularjs", "aws"]
   },
   "cnet": {
-    "role": "Desarrollador full-stack",
-    "company": "CNET Technology System",
+    "role": { "es": "Desarrollador full-stack", "en": "Full-stack Developer" },
+    "company": "CNET Technology Systems",
     "start": 2021,
     "end": 2022,
-    "summary": "Arquitectura full-stack con .NET y React, liderazgo de proyecto bajo SCRUM.",
-    "tags": ["dotnet", "reactjs", "mysql", "sql-server", "gitlab"]
+    "summary": {
+      "es": "Análisis de requisitos y desarrollo con .NET Framework y React, incluidos roles y permisos; liderazgo de entregas y coordinación con clientes bajo Scrum, modelado SQL Server/MySQL y capacitación de usuarios.",
+      "en": "Requirements analysis and development with .NET Framework and React, including roles and permissions; led delivery and client coordination under Scrum, SQL Server/MySQL modeling and user training."
+    },
+    "tags": ["dotnet", "reactjs", "sql-server", "mysql"]
   },
   "hacienda-el-orosi": {
-    "role": "Desarrollador de software",
+    "role": { "es": "Desarrollador de software", "en": "Software Developer" },
     "company": "Hacienda el Orosi",
     "start": 2020,
     "end": 2021,
-    "summary": "Liderazgo de equipo y stack MERN de principio a fin, con CI/CD propio.",
+    "summary": {
+      "es": "Liderazgo del desarrollo con el stack MERN desde los requisitos hasta las pruebas y la capacitación de usuarios; módulo contable para colaboradores, manejo multimedia con Firebase/AWS S3 y flujos de CI/CD.",
+      "en": "Led development with the MERN stack from requirements to testing and user training; employee accounting module, multimedia handling with Firebase/AWS S3 and CI/CD workflows."
+    },
     "tags": ["mongodb", "express", "react", "node", "firebase"]
   }
 }

@@ -7,6 +7,7 @@ import {
   enableFixtureComments,
   enableFixtureNotice,
   neutralizeFixtureIntegrations,
+  overrideFixtureAppearance,
 } from './fixture-workspace.ts';
 
 const source = resolve(import.meta.dirname, '../../..');
@@ -14,6 +15,7 @@ const workspace = createFixtureWorkspace(source, join(source, 'tests/fixtures/no
 enableFixtureComments(workspace.web);
 enableFixtureNotice(workspace.web);
 neutralizeFixtureIntegrations(workspace.web);
+overrideFixtureAppearance(workspace.web, process.env['FIXTURE_APPEARANCE']);
 const cli = join(realpathSync(join(source, 'apps/web/node_modules/astro')), 'bin/astro.mjs');
 let child: ChildProcess | undefined;
 let stopping = false;

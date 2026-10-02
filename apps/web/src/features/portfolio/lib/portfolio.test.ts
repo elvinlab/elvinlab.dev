@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { sortExperiments, yearsSince } from './portfolio.ts';
+import { formatNowDate, sortExperiments, splitStatus, yearsSince } from './portfolio.ts';
 
 describe('yearsSince', () => {
   it('counts full years from a start year to a reference year', () => {
@@ -27,5 +27,35 @@ describe('sortExperiments', () => {
     const copy = [...items];
     sortExperiments(items);
     expect(items).toEqual(copy);
+  });
+});
+
+describe('splitStatus', () => {
+  it('uses the first part as the headline and the rest as short tags', () => {
+    expect(splitStatus('Working at Buo · open to chat')).toEqual({
+      headline: 'Working at Buo',
+      tags: ['open to chat'],
+    });
+  });
+
+  it('keeps a single-part status as a headline with no tags', () => {
+    expect(splitStatus('Open to work')).toEqual({ headline: 'Open to work', tags: [] });
+  });
+
+  it('trims the parts and drops empty ones', () => {
+    expect(splitStatus('  A  ·  · B ·   · C ')).toEqual({ headline: 'A', tags: ['B', 'C'] });
+  });
+});
+
+describe('formatNowDate', () => {
+  it('formats a calendar date as a long date in each locale', () => {
+    expect(formatNowDate('2026-10-02', 'es')).toBe('2 de octubre de 2026');
+    expect(formatNowDate('2026-10-02', 'en')).toBe('October 2, 2026');
+  });
+
+  it('reads the date as UTC so a month boundary never shifts with the viewer timezone', () => {
+    expect(formatNowDate('2026-03-01', 'es')).toBe('1 de marzo de 2026');
+    expect(formatNowDate('2026-12-31', 'en')).toBe('December 31, 2026');
+    expect(formatNowDate('2026-01-01', 'en')).toBe('January 1, 2026');
   });
 });

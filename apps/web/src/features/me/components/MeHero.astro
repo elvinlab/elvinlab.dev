@@ -4,7 +4,7 @@
 import { Image } from 'astro:assets';
 import { localizePath } from '@elvinlab/core';
 
-import { isEnabled, site } from '@/shared/config/index.ts';
+import { isEnabled, resolveCvUrl, site } from '@/shared/config/index.ts';
 import { LOCALES, type Locale, t } from '@/shared/i18n/index.ts';
 import { resolveAvatar } from '@/shared/lib/avatar.ts';
 import SocialIcon from '@/shared/ui/SocialIcon.astro';
@@ -13,6 +13,7 @@ type Props = { locale: Locale };
 
 const { locale } = Astro.props;
 const avatar = resolveAvatar(site.identity.avatar);
+const cvUrl = resolveCvUrl(site.recruiter.cvUrl, locale, LOCALES.defaultLocale);
 const initials = site.identity.name.split(' ').slice(0, 2).map((p) => p[0]).join('');
 const contactHref = localizePath('/contact/', locale, LOCALES);
 ---
@@ -40,8 +41,8 @@ const contactHref = localizePath('/contact/', locale, LOCALES);
     </h1>
     <p class="text-xl text-text-secondary md:text-2xl">{site.identity.role[locale]}</p>
     <div class="mt-1 flex flex-wrap gap-2.5 print:hidden">
-      {site.recruiter.cvUrl && (
-        <a href={site.recruiter.cvUrl} class="flex h-12 items-center gap-2 rounded-control bg-button px-5 font-medium text-white active:scale-96">
+      {cvUrl && (
+        <a href={cvUrl} class="flex h-12 items-center gap-2 rounded-control bg-button px-5 font-medium text-white active:scale-96">
           <SocialIcon name="download" />{t(locale, 'me.cv')}
         </a>
       )}
@@ -65,10 +66,10 @@ const contactHref = localizePath('/contact/', locale, LOCALES);
           <dd>{site.url}{contactHref}</dd>
         </>
       )}
-      {site.recruiter.cvUrl && (
+      {cvUrl && (
         <>
           <dt class="text-muted">{t(locale, 'me.cv')}</dt>
-          <dd>{site.recruiter.cvUrl}</dd>
+          <dd>{cvUrl}</dd>
         </>
       )}
       {site.socials.map((social) => (

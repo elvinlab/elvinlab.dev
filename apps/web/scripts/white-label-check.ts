@@ -21,10 +21,17 @@ function fail(message: string): never {
   process.exit(1);
 }
 
+// Owner text of the "Now" card: the alternative config has no `now` block, so none of it may render.
+const NOW_FOCUS = ['Optimizar IA y proyectos personales', 'Optimizing AI and personal projects'];
+
 // Negative control: the tokens we search for really are owner strings present in the real config.
 const realConfig = readFileSync(join(source, 'apps/web/src/site.config.ts'), 'utf8');
 if (!OWNER.every((token) => token.test(realConfig))) {
   fail('owner tokens not found in the real site.config.ts — the check would be vacuous');
+}
+
+if (!NOW_FOCUS.every((text) => realConfig.includes(text))) {
+  fail('the Now card text is not in the real site.config.ts — the check would be vacuous');
 }
 
 function collectHtml(dir: string): string {
@@ -69,6 +76,10 @@ try {
     )
   ) {
     fail('the reading mode rendered although features.readingMode is off');
+  }
+  // No `now` block in the alternative config: the card renders nothing, not even an empty wrapper.
+  if (/data-now-card/.test(rawHtml) || NOW_FOCUS.some((text) => rawHtml.includes(text))) {
+    fail('the Now card rendered although the config has no `now` block');
   }
   const html = DESIGN_SYSTEM.reduce((acc, token) => acc.replace(token, ''), rawHtml);
   const leaked = OWNER.filter((token) => token.test(html));

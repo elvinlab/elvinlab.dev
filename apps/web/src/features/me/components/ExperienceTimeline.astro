@@ -3,7 +3,8 @@
 
 import { sortExperience } from '@/features/me/lib/experience.ts';
 import type { Experience } from '@/features/me/schema.ts';
-import { type Locale, t } from '@/shared/i18n/index.ts';
+import { LOCALES, type Locale, t } from '@/shared/i18n/index.ts';
+import { pickLocale } from '@/shared/lib/localized.ts';
 import Card from '@/shared/ui/Card.astro';
 import Chip from '@/shared/ui/Chip.astro';
 import SectionHeading from '@/shared/ui/SectionHeading.astro';
@@ -12,6 +13,7 @@ type Props = { locale: Locale; entries: Experience[] };
 
 const { locale, entries } = Astro.props;
 const sorted = sortExperience(entries.map((data) => ({ data }))).map((e) => e.data);
+const pick = (text: Experience['role']) => pickLocale(text, locale, LOCALES.defaultLocale);
 const period = (e: Experience) => `${e.start} — ${e.end ?? t(locale, 'me.present')}`;
 ---
 
@@ -28,10 +30,10 @@ const period = (e: Experience) => `${e.start} — ${e.end ?? t(locale, 'me.prese
           </div>
           <div class="flex flex-col gap-2">
             <p class="flex flex-wrap items-baseline gap-x-2.5">
-              <span class="text-lg font-bold">{entry.role}</span>
+              <span class="text-lg font-bold">{pick(entry.role)}</span>
               <span class="text-sm font-medium text-primary">{entry.company}</span>
             </p>
-            <p class="leading-relaxed text-text-secondary">{entry.summary}</p>
+            <p class="leading-relaxed text-text-secondary">{pick(entry.summary)}</p>
             {entry.tags.length > 0 && (
               <div class="flex flex-wrap gap-1.5">{entry.tags.map((tag) => <Chip>{tag}</Chip>)}</div>
             )}

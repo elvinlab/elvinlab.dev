@@ -24,6 +24,7 @@ import SectionHeading from '@/shared/ui/SectionHeading.astro';
 type Props = { locale: Locale };
 
 const { locale } = Astro.props;
+// The notes index exists only at `/notes/` (one index, no `/en/notes/`), so its link is not localized.
 
 const experience = (await getCollection('experience')).map((entry) => entry.data);
 const credentials = isEnabled('credentials') ? (await getCollection('credentials')).map((c) => c.data) : [];
@@ -75,7 +76,7 @@ const bio = site.identity.bio[locale];
       <Card as="section" class="flex flex-col gap-2 !p-7 md:!px-9">
         <div class="flex items-baseline justify-between">
           <SectionHeading text={t(locale, 'me.notes.title')} />
-          <a href={localizePath('/notes/', locale, LOCALES)} class="relative text-sm text-primary underline decoration-dashed underline-offset-4 after:absolute after:-inset-x-2 after:-inset-y-3 print:hidden">{t(locale, 'home.allNotes')}</a>
+          <a href="/notes/" class="relative text-sm text-primary underline decoration-dashed underline-offset-4 after:absolute after:-inset-x-2 after:-inset-y-3 print:hidden">{t(locale, 'home.allNotes')}</a>
         </div>
         <p class="text-sm text-muted">{t(locale, 'me.notes.subtitle')}</p>
         <div>{notes.map((note) => <NoteIndexRow note={note} locale={locale} />)}</div>

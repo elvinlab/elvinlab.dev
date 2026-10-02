@@ -20,8 +20,31 @@ describe('site.config.ts', () => {
     });
   });
 
-  it('uses the minimal appearance for this site', () => {
-    expect(parseSiteConfig(siteConfig).appearance).toBe('minimal');
+  it('uses the full appearance for this site', () => {
+    expect(parseSiteConfig(siteConfig).appearance).toBe('full');
+  });
+
+  it('shows the focus and the learning rows in the Now card, dated with a real date', () => {
+    const config = parseSiteConfig(siteConfig);
+    expect(config.now).toEqual({
+      updatedAt: '2026-10-02',
+      items: [
+        {
+          kind: 'focus',
+          text: {
+            es: 'Optimizar IA y proyectos personales',
+            en: 'Optimizing AI and personal projects',
+          },
+        },
+        {
+          kind: 'learning',
+          text: {
+            es: 'Orquestación de contenedores, redes en AWS, observabilidad y arquitectura cloud',
+            en: 'Container orchestration, AWS networking, observability and cloud architecture',
+          },
+        },
+      ],
+    });
   });
 
   it('shows no "under construction" notice now that the site is live', () => {

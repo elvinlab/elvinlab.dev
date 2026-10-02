@@ -1,6 +1,6 @@
 import type { SiteConfig } from './schema.ts';
 
-/** Visual preset of the site: `minimal` is the calm default of this site, `full` the original look. */
+/** Visual preset of the site: `minimal` is the calm look, `full` the original look (the default). */
 export type Appearance = SiteConfig['appearance'];
 
 /** The per-section overrides of `home` in the site config (each key is optional). */
@@ -18,7 +18,7 @@ const HOME_PRESETS: Record<Appearance, ResolvedHome> = {
     heroPills: false,
     authorCard: true,
     hiringCard: true,
-    labLog: false,
+    now: true,
     pillars: false,
     notebookIndex: true,
     experiments: true,
@@ -27,7 +27,7 @@ const HOME_PRESETS: Record<Appearance, ResolvedHome> = {
     heroPills: true,
     authorCard: true,
     hiringCard: true,
-    labLog: true,
+    now: true,
     pillars: true,
     notebookIndex: true,
     experiments: true,

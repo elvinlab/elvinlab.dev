@@ -50,7 +50,44 @@ aggregated pessimistically so one bad run cannot be hidden by a better one.
 
 Lighthouse reports are written locally to `.lighthouseci/` (ignored by Git); the configuration
 does not upload them. CI runs every browser, white-label and performance gate in the `checks` job,
-which both PR previews and branch deploys require.
+which the deploy job requires.
+
+### The note-page LCP gate is sensitive to a few bytes
+
+Lighthouse measures a fixture served by `astro preview`, which does **not** compress responses, under
+simulated slow 4G (about 1.6 Mbps, 150 ms round trip). The note page is about 98 KB of HTML, of which
+about 52 KB is inline CSS (the whole site stylesheet is inlined in every page), and it sits right at a
+TCP slow-start round-trip boundary: a few hundred more bytes cost one extra round trip, about 150 ms,
+and the LCP budget is 2500 ms with only about 90 ms to spare.
+
+Measured on 2026-10-02 on `/notes/smoke-es/` (worst of three runs; same machine, same fixture):
+
+| Commit | HTML / inline CSS | FCP | LCP |
+|---|---|---|---|
+| `3c83905` (before the Now card) | 98 287 / 52 423 bytes | 1812 ms | 2434 ms |
+| `f6bb257` (Now card with four new `not-first:` variant utilities) | 98 624 / 52 760 bytes | 1962 ms | **2586 ms (gate fails)** |
+| `14fa586` (same card reusing utilities the site already has) | 98 330 / 52 466 bytes | 1812 ms | 2413 ms |
+
+Adding 337 bytes of CSS failed the gate, and the card was visually identical. The check that passed on
+the previous release (`8c7968a`) had only about 64 ms of margin. What to do:
+
+- **Never relax the budget** to land a change. Find what grew.
+- **Prefer utility classes the site already uses.** Each new utility or variant (`not-first:`,
+  `md:`, arbitrary values) adds a rule to the stylesheet that every page inlines. Reuse existing
+  classes or `class:list` conditions.
+- **Measure before and after** a change that touches shared markup or CSS: build, then compare the
+  note page, for example
+  `wc -c apps/web/dist/client/notes/<slug>/index.html` (HTML) and the length of its `<style>` blocks.
+  A growth of a few hundred bytes is worth a Lighthouse run on that page alone (a copy of
+  `lighthouserc.json` with a single `url` and `numberOfRuns: 3`).
+- **To find the commit that regressed**, run that single-page Lighthouse at a few commits
+  (`git checkout --detach <commit>`, run, `git checkout develop`). Do not run it in the background:
+  the fixture server dies with its parent process and every run is then skipped.
+- The first run after a checkout can fail with "Chrome prevented page load with an interstitial" when
+  the fixture server is slow to start; run it again before trusting a number.
+
+Follow-up: the margin is thin, so the next additions to shared CSS can break the gate again. Cutting the
+inline stylesheet is the durable fix (tracked as a GitHub issue).
 
 ## Playwright contact form island
 

@@ -160,5 +160,41 @@
     "category": "changed",
     "title": "Hiring card reads more openly",
     "description": "The card now says I am working at Buo and open to chat, instead of simply not being available. The profile share card carries the same wording."
+  },
+  "full-preset": {
+    "date": "2026-10-02",
+    "category": "changed",
+    "title": "Back to the fuller home look",
+    "description": "The home shows the hero chips and the pillars strip again, with the larger type of the original look."
+  },
+  "hiring-card-layout": {
+    "date": "2026-10-02",
+    "category": "changed",
+    "title": "Hiring card: a clearer status",
+    "description": "Where I work now is a headline and \"open to chat\" is its own tag, so the status no longer wraps onto two lines or shows a red dot."
+  },
+  "now-card": {
+    "date": "2026-10-02",
+    "category": "added",
+    "title": "A Now card on the home",
+    "description": "The Lab log box is replaced by a dated card with what I am focused on and what I am learning. It is edited from the site config."
+  },
+  "english-notes-link": {
+    "date": "2026-10-02",
+    "category": "fixed",
+    "title": "\"All notes\" in English no longer leads to a missing page",
+    "description": "On the English home and profile the link pointed to a page that does not exist. It now opens the notes index."
+  },
+  "cv-per-language": {
+    "date": "2026-10-02",
+    "category": "added",
+    "title": "CV in Spanish and English",
+    "description": "The CV button opens the PDF in the language of the page you are reading."
+  },
+  "profile-from-cv": {
+    "date": "2026-10-02",
+    "category": "changed",
+    "title": "Profile updated from my CV",
+    "description": "The experience is now in English on the English profile, the stack lists my professional tools, and the courses name their real platforms."
   }
 }

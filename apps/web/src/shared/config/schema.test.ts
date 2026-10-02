@@ -115,7 +115,7 @@ describe('parseSiteConfig', () => {
         heroPills: true,
         authorCard: false,
         hiringCard: true,
-        labLog: true,
+        now: true,
         pillars: false,
         notebookIndex: true,
         experiments: false,
@@ -128,7 +128,85 @@ describe('parseSiteConfig', () => {
     });
 
     it('rejects a non-boolean override', () => {
-      expect(() => parseSiteConfig({ ...valid, home: { labLog: 'off' } })).toThrow(/labLog/);
+      expect(() => parseSiteConfig({ ...valid, home: { now: 'off' } })).toThrow(/now/);
+    });
+  });
+
+  it('rejects the retired home.labLog switch (renamed to home.now)', () => {
+    expect(() => parseSiteConfig({ ...valid, home: { labLog: true } })).toThrow(/labLog/);
+  });
+
+  describe('now', () => {
+    const item = { kind: 'focus', text: { es: 'Optimizar IA', en: 'Optimizing AI' } };
+    const withNow = (now: unknown) => ({ ...valid, now });
+    const block = { updatedAt: '2026-10-02', items: [item] };
+
+    it('is optional (without it the Now card does not render)', () => {
+      expect(parseSiteConfig(valid).now).toBeUndefined();
+    });
+
+    it('accepts a valid block', () => {
+      expect(parseSiteConfig(withNow(block)).now).toEqual(block);
+    });
+
+    it('accepts one to three items of every kind, with an optional href', () => {
+      const items = [
+        { ...item, kind: 'building', href: 'https://example.dev/x' },
+        { ...item, kind: 'exploring', href: '/notes/' },
+        { ...item, kind: 'learning' },
+      ];
+      expect(parseSiteConfig(withNow({ ...block, items })).now?.items).toHaveLength(3);
+    });
+
+    it('rejects more than three items', () => {
+      const items = [item, item, item, item];
+      expect(() => parseSiteConfig(withNow({ ...block, items }))).toThrow(/items/);
+    });
+
+    it('rejects an empty item list', () => {
+      expect(() => parseSiteConfig(withNow({ ...block, items: [] }))).toThrow(/items/);
+    });
+
+    it.each(['2026-13-40', '10/02/2026', '2026-02-30', '2 October 2026', ''])(
+      'rejects the date %s (a real YYYY-MM-DD date is required)',
+      (updatedAt) => {
+        expect(() => parseSiteConfig(withNow({ ...block, updatedAt }))).toThrow(/updatedAt/);
+      },
+    );
+
+    it('requires the item text in the default locale', () => {
+      const items = [{ kind: 'focus', text: { en: 'Optimizing AI' } }];
+      expect(() => parseSiteConfig(withNow({ ...block, items }))).toThrow(
+        /default locale "es"[\s\S]*now/,
+      );
+    });
+
+    it('rejects item texts in locales the site does not support', () => {
+      const items = [{ kind: 'focus', text: { es: 'Hola', fr: 'Salut' } }];
+      expect(() => parseSiteConfig(withNow({ ...block, items }))).toThrow(/"fr"/);
+    });
+
+    it('rejects an unknown kind', () => {
+      const items = [{ ...item, kind: 'sleeping' }];
+      expect(() => parseSiteConfig(withNow({ ...block, items }))).toThrow(/kind/);
+    });
+
+    it.each([
+      'http://example.dev',
+      'javascript:alert(1)',
+      '//evil.example',
+      'notes/',
+      'mailto:someone@example.dev',
+    ])('rejects the href %s (https or a site path only)', (href) => {
+      const items = [{ ...item, href }];
+      expect(() => parseSiteConfig(withNow({ ...block, items }))).toThrow(/href/);
+    });
+
+    it('rejects unknown keys on the block and on an item', () => {
+      expect(() => parseSiteConfig(withNow({ ...block, extra: 1 }))).toThrow();
+      expect(() =>
+        parseSiteConfig(withNow({ ...block, items: [{ ...item, extra: 1 }] })),
+      ).toThrow();
     });
   });
 
@@ -171,6 +249,29 @@ describe('parseSiteConfig', () => {
   it('rejects a recruiter cvUrl that is not https', () => {
     const broken = { ...valid, recruiter: { ...valid.recruiter, cvUrl: 'http://x.dev/cv.pdf' } };
     expect(() => parseSiteConfig(broken)).toThrow();
+  });
+
+  describe('recruiter.cvUrl per locale', () => {
+    const withCv = (cvUrl: unknown) => ({ ...valid, recruiter: { ...valid.recruiter, cvUrl } });
+
+    it('still accepts one https URL for every locale', () => {
+      expect(parseSiteConfig(withCv('https://x.dev/cv.pdf')).recruiter.cvUrl).toBe(
+        'https://x.dev/cv.pdf',
+      );
+    });
+
+    it('accepts one https URL per locale', () => {
+      const cvUrl = { es: 'https://x.dev/cv-es.pdf', en: 'https://x.dev/cv-en.pdf' };
+      expect(parseSiteConfig(withCv(cvUrl)).recruiter.cvUrl).toEqual(cvUrl);
+    });
+
+    it('rejects a per-locale URL that is not https', () => {
+      expect(() => parseSiteConfig(withCv({ es: 'http://x.dev/cv-es.pdf' }))).toThrow();
+    });
+
+    it('rejects an empty per-locale map', () => {
+      expect(() => parseSiteConfig(withCv({}))).toThrow();
+    });
   });
 
   it('defaults both background effects and lets each be toggled', () => {
