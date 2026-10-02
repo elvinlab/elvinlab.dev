@@ -1,6 +1,8 @@
 ---
 /** The home page for one UI locale: hero banner, latest note, notebook index, experiments,
- * pillars, and a sidebar with the author card, the recruiter card and the lab log. */
+ * pillars, and a sidebar with the author card, the recruiter card and the lab log. Each of those
+ * sections follows `homeSections` (appearance preset plus `home` overrides) and renders nothing
+ * when it is off; the sidebar column only exists while at least one of its cards is on. */
 import { getCollection } from 'astro:content';
 import pixelifySansLatin from '@fontsource-variable/pixelify-sans/files/pixelify-sans-latin-wght-normal.woff2?url';
 
@@ -14,7 +16,7 @@ import LatestNote from '@/features/portfolio/components/LatestNote.astro';
 import NotebookIndex from '@/features/portfolio/components/NotebookIndex.astro';
 import Pillars from '@/features/portfolio/components/Pillars.astro';
 import { sortExperiments } from '@/features/portfolio/lib/portfolio.ts';
-import { isEnabled, site } from '@/shared/config/index.ts';
+import { homeSections, isEnabled, site } from '@/shared/config/index.ts';
 import { type Locale, t } from '@/shared/i18n/index.ts';
 import Banner from '@/shared/layout/Banner.astro';
 import BaseLayout from '@/shared/layout/BaseLayout.astro';
@@ -28,8 +30,9 @@ const noteEntries = isEnabled('blog') ? await getCollection('notes') : [];
 const notes = sortNotes(noteEntries.map((entry) => ({ slug: entry.id, data: entry.data, body: entry.body ?? '' })));
 const [latest, ...rest] = notes;
 const hasNotes = hasPublishedNotes(notes);
+const hasSidebar = homeSections.authorCard || homeSections.hiringCard || homeSections.labLog;
 
-const experiments = isEnabled('experiments')
+const experiments = homeSections.experiments
   ? sortExperiments(await getCollection('experiments')).map((entry) => entry.data)
   : [];
 ---
@@ -44,26 +47,30 @@ const experiments = isEnabled('experiments')
         {site.identity.role[locale]}<span aria-hidden="true" class="ml-1 inline-block h-3 w-2.5 bg-pink align-baseline md:h-4"></span>
       </h1>
       <p class="mt-4 max-w-[52ch] text-lg leading-relaxed text-text-secondary md:text-xl">{t(locale, 'home.intro')}</p>
-      <ul class="mt-5 hidden flex-wrap gap-2 md:flex">
-        {pills.map((pill) => (
-          <li class="rounded-pill bg-chip px-3 py-1.5 text-sm text-text-secondary">{pill}</li>
-        ))}
-      </ul>
+      {homeSections.heroPills && (
+        <ul class="mt-5 hidden flex-wrap gap-2 md:flex">
+          {pills.map((pill) => (
+            <li class="rounded-pill bg-chip px-3 py-1.5 text-sm text-text-secondary">{pill}</li>
+          ))}
+        </ul>
+      )}
     </div>
   </Banner>
 
   <div class="flex flex-col gap-8">
     {hasNotes && latest && <LatestNote locale={locale} slug={latest.slug} data={latest.data} body={latest.body} />}
-    {hasNotes && rest.length > 0 && <NotebookIndex locale={locale} notes={rest.slice(0, 5)} />}
-    <ExperimentsGrid locale={locale} experiments={experiments} />
-    <Pillars locale={locale} />
+    {homeSections.notebookIndex && hasNotes && rest.length > 0 && <NotebookIndex locale={locale} notes={rest.slice(0, 5)} />}
+    {homeSections.experiments && <ExperimentsGrid locale={locale} experiments={experiments} />}
+    {homeSections.pillars && <Pillars locale={locale} />}
   </div>
 
-  <Fragment slot="aside">
-    <div class="flex flex-col gap-4">
-      <AuthorCard locale={locale} />
-      <HiringCard locale={locale} />
-      <LabLog locale={locale} />
-    </div>
-  </Fragment>
+  {hasSidebar && (
+    <Fragment slot="aside">
+      <div class="flex flex-col gap-4">
+        {homeSections.authorCard && <AuthorCard locale={locale} />}
+        {homeSections.hiringCard && <HiringCard locale={locale} />}
+        {homeSections.labLog && <LabLog locale={locale} />}
+      </div>
+    </Fragment>
+  )}
 </BaseLayout>

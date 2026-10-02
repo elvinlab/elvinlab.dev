@@ -20,6 +20,10 @@ describe('site.config.ts', () => {
     });
   });
 
+  it('uses the minimal appearance for this site', () => {
+    expect(parseSiteConfig(siteConfig).appearance).toBe('minimal');
+  });
+
   it('shows no "under construction" notice now that the site is live', () => {
     expect(siteConfig).not.toHaveProperty('notice');
   });

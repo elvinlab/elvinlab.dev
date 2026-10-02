@@ -1,8 +1,8 @@
 ---
 /**
  * Page shell: head metadata, pre-paint theme script, skip link, navbar, content, footer and the
- * language hint. Pages pass an `aside` slot to get the design's `main | sidebar 280 px` grid and a
- * `banner` slot for the full-bleed banner above it.
+ * language hint. Pages pass an `aside` slot to get the design's `main | sidebar 280 px` grid (only
+ * while the slot renders something) and a `banner` slot for the full-bleed banner above it.
  */
 import '@fontsource-variable/jetbrains-mono';
 import '@fontsource-variable/pixelify-sans';
@@ -42,7 +42,10 @@ type Props = {
 };
 
 const { locale, printable = false, translations, ...seo } = Astro.props;
-const hasAside = Astro.slots.has('aside');
+// `Astro.slots.has` is true even when the slot's content is a conditional that rendered nothing,
+// which would leave an empty sidebar column. Render the slot once and keep it only if it has content.
+const asideHtml = Astro.slots.has('aside') ? (await Astro.slots.render('aside')).trim() : '';
+const hasAside = asideHtml !== '';
 const hasBanner = Astro.slots.has('banner');
 const beaconToken = integrations.analyticsToken;
 // Page CSS is inlined, so the browser only learns its font URLs after parsing it. Preloading the
@@ -90,7 +93,7 @@ const preloadedFonts = [spaceGroteskLatin, jetbrainsMonoLatin];
           </div>
           {hasAside && (
             <aside aria-label={t(locale, 'aside.label')} class="animate-fade-in-up [animation-delay:100ms]">
-              <slot name="aside" />
+              <Fragment set:html={asideHtml} />
             </aside>
           )}
         </div>

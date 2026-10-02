@@ -69,6 +69,51 @@ export const siteConfigSchema = z
           ),
       })
       .describe('Who the site is about.'),
+    appearance: z
+      .enum(['minimal', 'full'])
+      .default('full')
+      .describe(
+        'Visual preset. `minimal` is the calm look (smaller type, fewer home sections); `full` is the original look. Defaults to `full` so a config written before the preset existed does not change.',
+      ),
+    home: z
+      .strictObject({
+        heroPills: z
+          .boolean()
+          .optional()
+          .describe('The three keyword pills under the hero intro (desktop only).'),
+        authorCard: z
+          .boolean()
+          .optional()
+          .describe('The sidebar author card: photo, name, bio and social buttons.'),
+        hiringCard: z
+          .boolean()
+          .optional()
+          .describe(
+            'The sidebar "Hiring?" recruiter card: availability and links to /me and the CV.',
+          ),
+        labLog: z
+          .boolean()
+          .optional()
+          .describe('The sidebar "Lab log" box: since when, cadence and languages.'),
+        pillars: z
+          .boolean()
+          .optional()
+          .describe('The four pillars strip at the bottom of the home (desktop only).'),
+        notebookIndex: z
+          .boolean()
+          .optional()
+          .describe('The notebook index: compact rows for the notes after the latest one.'),
+        experiments: z
+          .boolean()
+          .optional()
+          .describe(
+            'The experiments section of the home. Also needs `features.experiments`: with that flag off it never shows.',
+          ),
+      })
+      .default({})
+      .describe(
+        'Show or hide each home section; a key you set wins over the `appearance` preset, a key you omit follows it. `minimal` hides `heroPills`, `labLog` and `pillars`; `full` shows everything. A hidden section renders nothing.',
+      ),
     socials: z
       .array(
         z.object({

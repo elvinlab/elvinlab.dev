@@ -31,6 +31,9 @@ export const siteConfig = {
     startedYear: 2020,
     avatar: 'avatar.png',
   },
+  // Calm look: smaller type and fewer home sections. Use 'full' for the original look, and `home`
+  // to switch single sections on or off (see docs/CONFIGURATION.md, "Appearance and home sections").
+  appearance: 'minimal',
   socials: [
     { label: 'GitHub', url: 'https://github.com/elvinlab', icon: 'github' },
     { label: 'LinkedIn', url: 'https://www.linkedin.com/in/elvinlab', icon: 'linkedin' },

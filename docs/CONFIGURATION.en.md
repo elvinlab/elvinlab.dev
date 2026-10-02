@@ -68,6 +68,15 @@ The descriptions come from the schema (`.describe()`), which is why they are in 
 | `identity.location` | `string` | no |  | City or country shown on /me and share cards. |
 | `identity.startedYear` | `integer (min 1970)` | yes |  | First year of professional work; years of experience are derived from it. |
 | `identity.avatar` | `string` | no |  | File name of a profile photo placed in `apps/web/src/assets/` (for example `avatar.png`); it is optimized at build time. Omit to show initials. |
+| `appearance` | `'minimal' \| 'full'` | no | `full` | Visual preset. `minimal` is the calm look (smaller type, fewer home sections); `full` is the original look. Defaults to `full` so a config written before the preset existed does not change. |
+| `home` | `object` | no | `{}` | Show or hide each home section; a key you set wins over the `appearance` preset, a key you omit follows it. `minimal` hides `heroPills`, `labLog` and `pillars`; `full` shows everything. A hidden section renders nothing. |
+| `home.heroPills` | `boolean` | no |  | The three keyword pills under the hero intro (desktop only). |
+| `home.authorCard` | `boolean` | no |  | The sidebar author card: photo, name, bio and social buttons. |
+| `home.hiringCard` | `boolean` | no |  | The sidebar "Hiring?" recruiter card: availability and links to /me and the CV. |
+| `home.labLog` | `boolean` | no |  | The sidebar "Lab log" box: since when, cadence and languages. |
+| `home.pillars` | `boolean` | no |  | The four pillars strip at the bottom of the home (desktop only). |
+| `home.notebookIndex` | `boolean` | no |  | The notebook index: compact rows for the notes after the latest one. |
+| `home.experiments` | `boolean` | no |  | The experiments section of the home. Also needs `features.experiments`: with that flag off it never shows. |
 | `socials` | `object[]` | yes |  | Social profile links shown in the footer and used as `sameAs` in structured data. |
 | `socials[].label` | `string` | yes |  | Link text and accessible name. |
 | `socials[].url` | `URL` | yes |  | Profile URL (https only: an email address never belongs in public config). |
@@ -304,6 +313,18 @@ Each `features` flag switches the whole feature off: the route is not generated,
 | `changelog` | The `/changelog` page and its link | |
 | `me` | The `/me` page (portfolio) | |
 | `readingMode` | Reading mode on notes | Off: no button, script or CSS ships and nothing is stored in the browser |
+
+#### Appearance and home sections
+
+`appearance` picks the visual preset: `minimal` (this site's choice) hides the hero pills (`heroPills`), the "Lab log" box (`labLog`) and the pillars strip (`pillars`) on the home page; `full` is the original look and shows everything. If you omit `appearance` it is `full`, so a config written before the preset existed does not change.
+
+`home` tunes each section on its own and **always wins over the preset**: a key you set rules, a key you omit follows the preset. Keys: `heroPills`, `authorCard`, `hiringCard`, `labLog`, `pillars`, `notebookIndex` and `experiments` (which also needs `features.experiments`). A section that is off renders nothing (no heading, no gap), and when all three sidebar cards (`authorCard`, `hiringCard`, `labLog`) are off the sidebar column disappears.
+
+```ts
+// Calm look, but keep the Lab log and drop the hiring card.
+appearance: 'minimal',
+home: { labLog: true, hiringCard: false },
+```
 
 ### 6.3 Experience, certificates and experiments
 
