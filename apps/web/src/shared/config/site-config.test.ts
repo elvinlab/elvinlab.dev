@@ -24,7 +24,7 @@ describe('site.config.ts', () => {
     expect(parseSiteConfig(siteConfig).appearance).toBe('full');
   });
 
-  it('shows one focus item in the Now card, dated with a real date', () => {
+  it('shows the focus and the learning rows in the Now card, dated with a real date', () => {
     const config = parseSiteConfig(siteConfig);
     expect(config.now).toEqual({
       updatedAt: '2026-10-02',
@@ -34,6 +34,13 @@ describe('site.config.ts', () => {
           text: {
             es: 'Optimizar IA y proyectos personales',
             en: 'Optimizing AI and personal projects',
+          },
+        },
+        {
+          kind: 'learning',
+          text: {
+            es: 'Orquestación de contenedores, redes en AWS, observabilidad y arquitectura cloud',
+            en: 'Container orchestration, AWS networking, observability and cloud architecture',
           },
         },
       ],

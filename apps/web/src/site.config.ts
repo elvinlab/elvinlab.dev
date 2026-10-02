@@ -46,6 +46,13 @@ export const siteConfig = {
           en: 'Optimizing AI and personal projects',
         },
       },
+      {
+        kind: 'learning',
+        text: {
+          es: 'Orquestación de contenedores, redes en AWS, observabilidad y arquitectura cloud',
+          en: 'Container orchestration, AWS networking, observability and cloud architecture',
+        },
+      },
     ],
   },
   socials: [
@@ -88,8 +95,8 @@ export const siteConfig = {
     timezone: 'UTC−6',
     workMode: { es: 'Remoto / Híbrido', en: 'Remote / Hybrid' },
     intro: {
-      es: 'Ingeniero full-stack de Costa Rica, construyendo software desde 2020. Me importan la arquitectura clara, los sistemas rápidos y usar agentes de IA como parte real de cómo trabajo.',
-      en: 'Full-stack engineer from Costa Rica, building software since 2020. I care about clear architecture, fast systems and using AI agents as a real part of how I work.',
+      es: 'Ingeniero de software full-stack de Costa Rica, construyendo software desde 2020, con enfoque en frontend y experiencia en SaaS en producción. Conecto necesidades de producto con arquitectura mantenible, servicios backend e interfaces accesibles, e integro la IA en productos y procesos de ingeniería con validación explícita y revisión humana.',
+      en: 'Full-stack software engineer from Costa Rica, building software since 2020, with a frontend focus and production SaaS experience. I connect product requirements with maintainable architecture, backend services and accessible interfaces, and integrate AI into products and engineering workflows with explicit validation and human review.',
     },
     facts: [
       {
@@ -101,8 +108,8 @@ export const siteConfig = {
         label: { es: 'parte de mi día a día', en: 'part of my daily workflow' },
       },
       {
-        value: { es: 'EN / ES', en: 'EN / ES' },
-        label: { es: 'idiomas de trabajo', en: 'working languages' },
+        value: { es: 'ES · EN', en: 'ES · EN' },
+        label: { es: 'español nativo, inglés B1', en: 'Spanish native, English B1' },
       },
     ],
     strengths: [
@@ -118,8 +125,8 @@ export const siteConfig = {
         icon: 'bot',
         title: { es: 'IA en el flujo', en: 'AI in the workflow' },
         body: {
-          es: 'Agentes, routing de modelos y memoria en el trabajo real.',
-          en: 'Agents, model routing and memory in real daily work.',
+          es: 'Agentes, routing de modelos y skills reutilizables, con revisión humana explícita.',
+          en: 'Agents, model routing and reusable skills, with explicit human review.',
         },
       },
       {
@@ -132,13 +139,27 @@ export const siteConfig = {
       },
     ],
     stack: [
-      { label: { es: 'Lenguajes', en: 'Languages' }, items: ['TypeScript', 'JavaScript'] },
-      { label: { es: 'Frontend', en: 'Frontend' }, items: ['Astro', 'React', 'Tailwind CSS'] },
       {
-        label: { es: 'Backend y cloud', en: 'Backend and cloud' },
-        items: ['Node.js', 'Cloudflare'],
+        label: { es: 'Frontend', en: 'Frontend' },
+        items: ['JavaScript', 'Vue 2', 'Vuetify 2', 'Vuex', 'Axios'],
       },
-      { label: { es: 'IA', en: 'AI' }, items: ['Agentes', 'Routing de modelos'] },
+      {
+        label: { es: 'Backend y datos', en: 'Backend and data' },
+        items: ['Java 21', 'Spring Boot', 'Spring Data JPA', 'MySQL', 'SQL'],
+      },
+      {
+        label: { es: 'Calidad y arquitectura', en: 'Quality and architecture' },
+        items: ['Jest', 'Vue Test Utils', 'JUnit', 'Clean/Hexagonal', 'ADRs'],
+      },
+      {
+        label: { es: 'Cloud y entrega', en: 'Cloud and delivery' },
+        items: ['AWS', 'Docker', 'GitHub Actions', 'CI/CD'],
+      },
+      { label: { es: 'IA', en: 'AI' }, items: ['LLM APIs', 'Claude Code', 'OpenCode'] },
+      {
+        label: { es: 'Proyectos personales', en: 'Personal projects' },
+        items: ['TypeScript', 'Astro', 'React', 'Tailwind CSS', 'Cloudflare Workers'],
+      },
     ],
   },
 };
