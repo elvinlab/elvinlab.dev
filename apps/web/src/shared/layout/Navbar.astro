@@ -42,9 +42,9 @@ const linkClass =
 <header data-navbar class="animate-fade-in-up transition-transform duration-300 will-change-transform">
   <nav
     aria-label={t(locale, 'nav.label')}
-    class="relative flex h-18 items-center gap-2 rounded-b-card bg-card/70 px-3 backdrop-blur-md md:px-4"
+    class="relative flex h-18 items-center gap-1 rounded-b-card bg-card/70 px-3 backdrop-blur-md md:gap-2 md:px-4"
   >
-    <a href={localizePath('/', locale, LOCALES)} class="mr-auto flex h-11 items-center rounded-control px-2 font-retro text-xs">
+    <a href={localizePath('/', locale, LOCALES)} class="mr-auto flex h-11 items-center rounded-control px-1 font-retro text-xs md:px-2">
       <span class="text-muted">&gt;&nbsp;</span>{site.identity.handle}<span aria-hidden="true" class="ml-0.5 inline-block h-4 w-2 bg-pink align-[-2px]"></span>
     </a>
 
@@ -58,7 +58,7 @@ const linkClass =
       href={otherHref}
       hreflang={otherLocale}
       lang={otherLocale}
-      class="grid h-11 min-w-11 place-items-center rounded-control px-2 font-mono text-sm uppercase transition-colors duration-150 hover:bg-card-hover"
+      class="grid h-11 min-w-11 shrink-0 place-items-center rounded-control px-2 font-mono text-sm uppercase transition-colors duration-150 hover:bg-card-hover"
       aria-label={t(locale, 'language.switch')}
     >
       {otherLocale}
@@ -67,7 +67,7 @@ const linkClass =
     <BackgroundPicker label={t(locale, 'background.switch')} />
     <button
       type="button"
-      class="grid size-11 place-items-center rounded-control transition-colors duration-150 hover:bg-card-hover active:scale-96 md:hidden"
+      class="grid size-11 shrink-0 place-items-center rounded-control transition-colors duration-150 hover:bg-card-hover active:scale-96 md:hidden"
       aria-label={t(locale, 'nav.menu')}
       aria-expanded="false"
       aria-controls="nav-menu"

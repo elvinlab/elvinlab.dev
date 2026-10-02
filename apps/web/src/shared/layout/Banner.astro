@@ -10,6 +10,8 @@ type Props = {
   height?: string;
   /** Height when expanded (defaults to the viewport). */
   expandedHeight?: string;
+  /** Expanded height on touch and narrow screens, where the canvas is hidden or the hero is tall. */
+  compactExpandedHeight?: string;
   /** Show the expand/collapse toggle. */
   expandable?: boolean;
   /** Blend the bottom edge into the page for the homepage hero only. */
@@ -17,12 +19,19 @@ type Props = {
   locale?: Locale;
 };
 
-const { height = '340px', expandedHeight = 'clamp(520px, 72vh, 640px)', expandable = false, homeFade = false, locale = 'es' } = Astro.props;
+const {
+  height = '340px',
+  expandedHeight = 'clamp(520px, 72vh, 640px)',
+  compactExpandedHeight = expandedHeight,
+  expandable = false,
+  homeFade = false,
+  locale = 'es',
+} = Astro.props;
 ---
 
 <section
   class="banner relative isolate overflow-hidden bg-banner"
-  style={`--h-collapsed:${height};--h-expanded:${expandedHeight}`}
+  style={`--h-collapsed:${height};--h-expanded:${expandedHeight};--h-expanded-compact:${compactExpandedHeight}`}
   data-banner
   data-expanded={expandable ? true : undefined}
 >
@@ -40,7 +49,7 @@ const { height = '340px', expandedHeight = 'clamp(520px, 72vh, 640px)', expandab
       type="button"
       data-banner-toggle
       aria-pressed="true"
-      class="absolute right-3 bottom-3 z-10 flex h-9 items-center gap-1.5 rounded-pill bg-card/70 px-3 font-mono text-xs text-text-secondary backdrop-blur-md transition-colors duration-150 hover:text-text"
+      class="absolute right-3 bottom-3 z-10 flex h-9 items-center gap-1.5 rounded-pill bg-card/70 px-3 font-mono text-meta text-text-secondary backdrop-blur-md transition-colors duration-150 before:absolute before:-inset-1.5 hover:text-text"
       data-label-expand={t(locale, 'banner.expand')}
       data-label-collapse={t(locale, 'banner.collapse')}
       aria-label={t(locale, 'banner.collapse')}
@@ -58,6 +67,13 @@ const { height = '340px', expandedHeight = 'clamp(520px, 72vh, 640px)', expandab
   }
   .banner[data-expanded] {
     min-height: var(--h-expanded);
+  }
+  /* Touch and phone-width screens: the canvas is hidden on coarse pointers, so a viewport-tall banner is
+     mostly empty. A smaller floor lets the hero text size the banner (min-height never clips it). */
+  @media (pointer: coarse), (max-width: 767px) {
+    .banner[data-expanded] {
+      min-height: var(--h-expanded-compact);
+    }
   }
   /* Collapsed: hide the whole hero so the banner becomes a thin background band and the content
      below rises immediately. :global targets slotted content (a different Astro style scope). */

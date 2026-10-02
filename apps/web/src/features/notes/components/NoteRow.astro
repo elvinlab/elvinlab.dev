@@ -37,7 +37,7 @@ const href = localizePath(`/notes/${note.slug}/`, data.lang, LOCALES);
   <div class="col-start-2 flex items-center gap-2 text-sm text-muted md:col-start-3 md:flex-col md:items-end md:gap-1 md:pt-1 md:text-right">
     <time datetime={data.pubDate.toISOString()}>{formatDate(data.pubDate, locale)}</time>
     <span aria-hidden="true" class="md:hidden">·</span>
-    <span>{t(locale, 'notes.readingTime', { min: note.readingMinutes })}</span>
+    <span class="whitespace-nowrap">{t(locale, 'notes.readingTime', { min: note.readingMinutes })}</span>
     <LangBadge lang={data.lang} />
   </div>
 </article>

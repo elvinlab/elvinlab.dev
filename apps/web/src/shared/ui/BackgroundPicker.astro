@@ -1,7 +1,8 @@
 ---
 /**
  * Cycles the banner background effect (galaxy -> cursor-waves -> off) and remembers the choice,
- * the same way `ThemeToggle` works. Dispatches `background-change` so `BackgroundCanvas` swaps the
+ * the same way `ThemeToggle` works. The galaxy icon is a sparkle so it never reads as the theme
+ * toggle's sun. Dispatches `background-change` so `BackgroundCanvas` swaps the
  * running effect in place, without a page reload.
  */
 import { site } from '@/shared/config/index.ts';
@@ -14,14 +15,14 @@ const { label } = Astro.props;
 
 <button
   type="button"
-  class="grid size-11 place-items-center rounded-control text-text transition-colors duration-150 hover:bg-card-hover active:scale-96"
+  class="grid size-11 shrink-0 place-items-center rounded-control text-text transition-colors duration-150 hover:bg-card-hover active:scale-96"
   aria-label={label}
   data-background-toggle
   data-storage-key={BACKGROUND_STORAGE_KEY}
   data-owner-galaxy={site.background.galaxy}
   data-owner-waves={site.background.cursorWaves}
 >
-  <svg data-icon="galaxy" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v3M12 18v3M3 12h3M18 12h3M5.6 5.6l2.1 2.1M16.3 16.3l2.1 2.1M18.4 5.6l-2.1 2.1M7.7 16.3l-2.1 2.1"></path><circle cx="12" cy="12" r="3"></circle></svg>
+  <svg data-icon="galaxy" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9.94 15.5A2 2 0 0 0 8.5 14.06l-6.14-1.58a.5.5 0 0 1 0-.96L8.5 9.94A2 2 0 0 0 9.94 8.5l1.58-6.14a.5.5 0 0 1 .96 0L14.06 8.5a2 2 0 0 0 1.44 1.44l6.14 1.58a.5.5 0 0 1 0 .96L15.5 14.06a2 2 0 0 0-1.44 1.44l-1.58 6.14a.5.5 0 0 1-.96 0zM20 3v4M22 5h-4M4 17v2M5 18H3"></path></svg>
   <svg data-icon="cursor-waves" class="hidden" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12c2-3 4-3 6 0s4 3 6 0 4-3 6 0M2 17c2-3 4-3 6 0s4 3 6 0 4-3 6 0"></path></svg>
   <svg data-icon="off" class="hidden" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"></circle><path d="M5 5l14 14"></path></svg>
 </button>

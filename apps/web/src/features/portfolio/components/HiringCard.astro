@@ -20,7 +20,7 @@ const years = yearsSince(identity.startedYear);
   </div>
   {recruiter.available && (
     <div>
-      <span data-recruiter-status class="inline-flex items-center gap-1.5 rounded-pill bg-chip px-2.5 py-1 text-xs text-text-secondary">
+      <span data-recruiter-status class="inline-flex items-center gap-1.5 rounded-pill bg-chip px-2.5 py-1 text-meta text-text-secondary">
         <span class:list={['size-2 rounded-pill', recruiter.openToWork ? 'bg-ok' : 'bg-danger']} aria-hidden="true"></span>{recruiter.status[locale]}
       </span>
     </div>

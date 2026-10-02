@@ -27,7 +27,7 @@ const readingLabel = t(locale, 'notes.readingTime', { min: readingMinutes(body) 
     </span>
     <span class="flex items-center gap-2 font-mono text-sm text-muted">
       <time datetime={data.pubDate.toISOString()} class="hidden sm:inline">{formatDate(data.pubDate, locale)}</time>
-      <span>{readingLabel}</span>
+      <span class="whitespace-nowrap">{readingLabel}</span>
       <LangBadge lang={data.lang} />
     </span>
   </div>

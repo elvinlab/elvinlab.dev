@@ -35,7 +35,7 @@ const contactHref = localizePath('/contact/', locale, LOCALES);
     <h2 class="font-display text-base font-bold">{t(locale, 'me.stack')}</h2>
     {site.me.stack.map((group) => (
       <div class="flex flex-col gap-1.5">
-        <p class="font-mono text-xs font-medium text-muted">{group.label[locale]}</p>
+        <p class="font-mono text-meta font-medium text-muted">{group.label[locale]}</p>
         <div class="flex flex-wrap gap-1.5">{group.items.map((item) => <Chip>{item}</Chip>)}</div>
       </div>
     ))}

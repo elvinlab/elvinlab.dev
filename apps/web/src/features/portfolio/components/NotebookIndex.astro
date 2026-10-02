@@ -16,7 +16,7 @@ const { locale, notes } = Astro.props;
       <h2 class="flex items-center gap-3 font-display text-2xl font-bold">
         <span class="h-5 w-1 rounded-pill bg-primary" aria-hidden="true"></span>{t(locale, 'home.notebook')}
       </h2>
-      <a href={localizePath('/notes/', locale, LOCALES)} class="text-sm text-primary underline decoration-dashed underline-offset-4">
+      <a href={localizePath('/notes/', locale, LOCALES)} class="relative text-sm text-primary underline decoration-dashed underline-offset-4 after:absolute after:-inset-x-2 after:-inset-y-3">
         {t(locale, 'home.allNotes')}
       </a>
     </div>

@@ -34,7 +34,7 @@ const experiments = isEnabled('experiments')
 ---
 
 <BaseLayout locale={locale} path="/">
-  <Banner slot="banner" height="150px" expandedHeight="clamp(520px, 66vh, 620px)" locale={locale} expandable homeFade>
+  <Banner slot="banner" height="150px" expandedHeight="clamp(520px, 66vh, 620px)" compactExpandedHeight="28rem" locale={locale} expandable homeFade>
     <BackgroundCanvas slot="background" />
     <div data-hero-content data-home-hero class="flex flex-col">
       <p class="font-mono text-sm text-cyan">{t(locale, 'notes.eyebrow', { handle: site.identity.handle })}</p>

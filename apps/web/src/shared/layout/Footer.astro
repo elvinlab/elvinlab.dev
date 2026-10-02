@@ -11,6 +11,9 @@ type Props = { locale: Locale };
 
 const { locale } = Astro.props;
 const year = new Date().getFullYear();
+// 44 px tall hit area; -mx-3 cancels the px-3 so the text keeps its column alignment under md.
+const footerLink =
+  '-mx-3 flex h-11 items-center rounded-control px-3 text-sm text-text-secondary transition-colors duration-150 hover:bg-card-hover hover:text-text md:mx-0';
 ---
 
 <footer class="mt-16 animate-fade-in-up border-t border-dashed border-divider py-8 [animation-delay:250ms]">
@@ -21,23 +24,23 @@ const year = new Date().getFullYear();
       </p>
       <p class="text-sm text-muted">© {year} {site.identity.name}</p>
     </div>
-    <div class="flex flex-col gap-3 md:flex-row md:items-center md:justify-end">
+    <div class="flex flex-col md:flex-row md:items-center md:justify-end md:gap-1">
       <a
         href={locale === 'es' ? '/privacy/' : '/en/privacy/'}
-        class="text-sm text-text-secondary transition-colors duration-150 hover:text-text"
+        class={footerLink}
       >
         {t(locale, 'footer.privacy')}
       </a>
       <a
         href={locale === 'es' ? '/terms/' : '/en/terms/'}
-        class="text-sm text-text-secondary transition-colors duration-150 hover:text-text"
+        class={footerLink}
       >
         {t(locale, 'footer.terms')}
       </a>
       {site.features.changelog && (
         <a
           href={locale === 'es' ? '/changelog/' : '/en/changelog/'}
-          class="text-sm text-text-secondary transition-colors duration-150 hover:text-text"
+          class={footerLink}
         >
           {t(locale, 'footer.changelog')}
         </a>

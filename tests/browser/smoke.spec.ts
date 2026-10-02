@@ -157,7 +157,7 @@ test('the locale suggestion is a quiet line of text, not a card', async ({ page 
   const hint = page.locator('[data-language-hint="en"]');
   await expect(hint).toBeVisible();
   await expect(hint).toHaveCSS('background-color', 'rgba(0, 0, 0, 0)');
-  await expect(hint).toHaveCSS('font-size', '12px');
+  await expect(hint).toHaveCSS('font-size', '13px');
   await expect(hint.locator('a')).not.toHaveCSS('background-color', /rgb\(124, 58, 237\)/);
 });
 

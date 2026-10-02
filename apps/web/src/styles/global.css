@@ -3,6 +3,9 @@
 
 @theme {
   --spacing-18: 4.5rem;
+  /* Smallest text for mono meta and chips: 13 px, never the 12 px of `text-xs`. */
+  --text-meta: 0.8125rem;
+  --text-meta--line-height: 1.125rem;
   --animate-fade-in-up: fade-in-up 300ms ease-out both;
   --animate-blink: blink 1s steps(1) infinite;
 
