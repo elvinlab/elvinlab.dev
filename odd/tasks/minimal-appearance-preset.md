@@ -47,7 +47,7 @@ Make the site calmer and more minimalist while keeping the modern look, and make
     - Caveats: BEFORE screenshots were lost with the interrupted session, so the before/after comparison rests on what the writer saw earlier; the AFTER set (56 PNGs) was taken in a scratch folder. On `/me/` at 1440 the avatar sits about 8 px under the navbar (minimum padding, the banner is sized by content). On `/notes/` index rows the language badge shares the chip line and can push a tag onto a second row.
 
 ## Closure (2026-10-01): feature closed
-Status: closed. M1, M2 and M3 are done and committed on `feat/minimal-appearance-preset` (`3684303`, `52f2bb9`, `97387d2`). The feature is merged into `develop` by fast-forward and pushed to `origin/develop` (`ffbeb31`, 2026-10-01, owner-authorized), NOT released to `main`. Documentation unit (DESIGN, BRAND, CONFIGURATION, README, this tracker and `elvinlab-site.md`) written afterwards, uncommitted at the time of writing.
+Status: closed. M1, M2 and M3 are done and committed on `feat/minimal-appearance-preset` (`3684303`, `52f2bb9`, `97387d2`). The feature is merged into `develop` by fast-forward and pushed to `origin/develop` (`ffbeb31`, 2026-10-01, owner-authorized), released to `main` as `c62dfb4` on 2026-10-01. Documentation unit (DESIGN, BRAND, CONFIGURATION, README, this tracker and `elvinlab-site.md`) written afterwards, uncommitted at the time of writing.
 
 Corrections to the specification above, recorded where they were found: the schema default of `appearance` is `full` (not `minimal`); the `full` note title is 36/48 px (not 36/54) and the old docs value was wrong; the decision record body stays 14 px.
 
@@ -62,7 +62,7 @@ Open follow-ups (none started):
 - Faster local test loop: fast script, local workers, fixture-build reuse, tiered verification. Measure first.
 - Audit point 7: the hiring card shows "not available" next to its primary CTA; content decision of the owner.
 - LCP is the hero headline text (~2.3 s, unchanged); INP and the real-GPU banner cost are unmeasured; Lighthouse was not re-run after this feature.
-- Release plan for the diverged `main`: its tree equals `develop` before the 2026-10-01 work, but its history diverges (release commits are separate), so a release is not a plain fast-forward and needs a plan.
+- Release done on 2026-10-01 (owner-authorized, after a full local battery: typecheck, lint, 37 core + 529 web unit tests, depcruise, build, js-budget 16 pages PASS, white-label, full e2e 426 passed / 141 skipped, dev cold start, Lighthouse mobile perf 0.97-0.98 with CLS 0 and TBT 0 ms). `main` and `develop` have diverged histories (release commits are separate squashes), so merging `develop` conflicts in many files. The release is therefore a commit on `main` (`c62dfb4`, `release: audit pass, pixel display face and minimal appearance preset`) built with `git commit-tree` from `develop`'s tree on top of `main`, so the trees are identical and the push was a fast-forward. CI (lighthouse, static, e2e, checks, deploy with smoke check and rollback) passed and `https://elvinlab.dev/version.txt` reports `c62dfb4`; production HTML carries `data-appearance="minimal"`, `data-banner-fade` and the Pixelify Sans preload. Use the same method for the next release.
 - `develop` was pushed to `origin` at `ffbeb31` on 2026-10-01 with the owner's explicit authorization (previous push `4b6e618`); the remote has only `main` and `develop`.
 
 Engram mirror: `odd/minimal-appearance-preset/tasks` (resync with this document when Engram is available).

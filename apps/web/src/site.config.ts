@@ -67,7 +67,7 @@ export const siteConfig = {
   recruiter: {
     available: true,
     openToWork: false,
-    status: { es: 'No disponible · trabajando en Buo', en: 'Not available · working at Buo' },
+    status: { es: 'Trabajando en Buo · abierto a charlar', en: 'Working at Buo · open to chat' },
     lookingFor: { es: 'Actualmente en Buo', en: 'Currently at Buo' },
   },
   me: {

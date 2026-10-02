@@ -124,5 +124,41 @@
     "category": "changed",
     "title": "A quieter language suggestion and roomier note navigation",
     "description": "The language suggestion is now a small line of text shown only on Spanish pages, the English menu says plainly Notes, the under-construction banner is gone, and the previous/next links have room below the article."
+  },
+  "minimal-appearance": {
+    "date": "2026-10-01",
+    "category": "changed",
+    "title": "A calmer, more minimal look with smaller type",
+    "description": "The home now has a minimal preset that hides the hero pills, the lab log and the pillars strip. Text sizes follow a smaller theme-driven scale, note pages are calmer and the banner edge is consistent."
+  },
+  "pixel-display-font": {
+    "date": "2026-10-01",
+    "category": "changed",
+    "title": "Pixel font on the home hero and section titles",
+    "description": "The home headline and section titles now use Pixelify Sans, self-hosted like the other fonts."
+  },
+  "mobile-touch-pass": {
+    "date": "2026-10-01",
+    "category": "changed",
+    "title": "Easier to use on a phone",
+    "description": "Controls have at least a 44 px tap area, the home banner is shorter on phones, the code copy button has its own strip on touch screens, and hiding the navbar closes the open menu."
+  },
+  "loading-performance": {
+    "date": "2026-10-01",
+    "category": "changed",
+    "title": "Pages load with fewer delays",
+    "description": "The main fonts are preloaded, the profile photo is optimized, the animated banner pauses when it is off screen, and links are prefetched when you hover them."
+  },
+  "note-translations": {
+    "date": "2026-10-01",
+    "category": "added",
+    "title": "Notes can link to their translation",
+    "description": "A note can point to its translation in the other language, with a language switch on the page and hreflang tags for search engines."
+  },
+  "hiring-card-wording": {
+    "date": "2026-10-02",
+    "category": "changed",
+    "title": "Hiring card reads more openly",
+    "description": "The card now says I am working at Buo and open to chat, instead of simply not being available. The profile share card carries the same wording."
   }
 }

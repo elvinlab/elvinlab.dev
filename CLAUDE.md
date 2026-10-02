@@ -15,7 +15,8 @@ mise exec -- pnpm lint          # Biome check (format + lint), read-only
 mise exec -- pnpm lint:fix      # Biome check with fixes
 mise exec -- pnpm format        # Biome format
 mise exec -- pnpm test          # Vitest in every package
-mise exec -- pnpm test:e2e      # isolated production-build Playwright smoke checks
+mise exec -- pnpm test:e2e      # isolated production-build Playwright smoke checks (3 viewports)
+mise exec -- pnpm test:e2e:quick # same checks at 1280 px only; pass a spec path to narrow further
 mise exec -- pnpm test:white-label # build with alternate identity; reject owner-string leaks
 mise exec -- pnpm check:js-budget # enforce <=30 KiB gzip JavaScript per built page
 mise exec -- pnpm test:lighthouse # mobile Lighthouse scores and Core Web Vitals; local reports only

@@ -14,6 +14,7 @@
     "format": "biome format --write .",
     "test": "pnpm -r --if-present test",
     "test:e2e": "playwright test",
+    "test:e2e:quick": "playwright test --project=chromium-1280",
     "depcruise": "node apps/web/scripts/mirror-astro.ts && depcruise apps/web/boundaries-mirror/src packages/core/src",
     "new-post": "pnpm --filter web new-post",
     "test:white-label": "node apps/web/scripts/white-label-check.ts",
