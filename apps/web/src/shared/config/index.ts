@@ -24,3 +24,4 @@ export function isEnabled(feature: Feature): boolean {
 export const integrations = resolveIntegrations(site.integrations, buildEnv);
 
 export { buildEnv } from './env.ts';
+export { resolveCvUrl } from './recruiter.ts';

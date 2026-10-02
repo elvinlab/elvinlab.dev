@@ -95,7 +95,7 @@ Las descripciones vienen del esquema (`.describe()`), por eso están en inglés.
 | `recruiter.openToWork` | `boolean` | no | `true` | Whether you are open to work: green status dot when true, the brand accent colour when false. |
 | `recruiter.status` | `{ <locale>: string }` | yes |  | Availability text per locale. Parts separated by " · " show as a headline plus short tags on the home card (for example "Working at Buo · open to chat"); a single part is one tag (for example "Open to work"). |
 | `recruiter.lookingFor` | `{ <locale>: string }` | yes |  | What you are looking for, per locale. |
-| `recruiter.cvUrl` | `URL` | no |  | Link to a downloadable CV (https). Omit to hide the CV button. |
+| `recruiter.cvUrl` | `URL \| { <locale>: URL }` | no |  | Link to a downloadable CV (https): one URL for every locale, or one per locale (`{ es: ..., en: ... }`, a locale without one falls back to the default locale). Omit to hide the CV button. |
 | `me` | `object` | yes |  | Singular /me profile data. Lists that grow (experience, certificates) live in `src/content/`. |
 | `me.timezone` | `string` | yes |  | Display timezone, for example `UTC−6`. |
 | `me.workMode` | `{ <locale>: string }` | yes |  | Work mode per locale (remote, hybrid, ...). |

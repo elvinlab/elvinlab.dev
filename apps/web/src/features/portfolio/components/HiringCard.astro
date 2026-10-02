@@ -3,7 +3,7 @@
 import { localizePath } from '@elvinlab/core';
 
 import { splitStatus, yearsSince } from '@/features/portfolio/lib/portfolio.ts';
-import { isEnabled, site } from '@/shared/config/index.ts';
+import { isEnabled, resolveCvUrl, site } from '@/shared/config/index.ts';
 import { LOCALES, type Locale, t } from '@/shared/i18n/index.ts';
 
 type Props = { locale: Locale };
@@ -11,6 +11,7 @@ type Props = { locale: Locale };
 const { locale } = Astro.props;
 const { recruiter, identity } = site;
 const years = yearsSince(identity.startedYear);
+const cvUrl = resolveCvUrl(recruiter.cvUrl, locale, LOCALES.defaultLocale);
 // "Working at Buo · open to chat": the first part leads, the rest are short tags with a dot. A
 // status without extra parts is shown as a single tag, as before.
 const { headline, tags } = splitStatus(recruiter.status[locale] ?? '');
@@ -44,8 +45,8 @@ const chips = (tags.length > 0 ? tags : [headline]).filter((chip) => chip !== ''
         {t(locale, 'recruiter.openProfile')}
       </a>
     )}
-    {recruiter.cvUrl && (
-      <a href={recruiter.cvUrl} class="flex h-11 items-center justify-center gap-2 rounded-control px-4 text-sm text-text-secondary underline decoration-dashed underline-offset-4 transition-colors duration-150 hover:text-text">
+    {cvUrl && (
+      <a href={cvUrl} class="flex h-11 items-center justify-center gap-2 rounded-control px-4 text-sm text-text-secondary underline decoration-dashed underline-offset-4 transition-colors duration-150 hover:text-text">
         {t(locale, 'recruiter.cv')}
       </a>
     )}

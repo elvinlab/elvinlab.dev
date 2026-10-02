@@ -187,9 +187,17 @@ export const siteConfigSchema = z
           'Availability text per locale. Parts separated by " · " show as a headline plus short tags on the home card (for example "Working at Buo · open to chat"); a single part is one tag (for example "Open to work").',
         ),
         lookingFor: localized.describe('What you are looking for, per locale.'),
-        cvUrl: httpsUrl
+        cvUrl: z
+          .union([
+            httpsUrl,
+            z
+              .record(z.string(), httpsUrl)
+              .refine((urls) => Object.keys(urls).length > 0, 'needs at least one locale'),
+          ])
           .optional()
-          .describe('Link to a downloadable CV (https). Omit to hide the CV button.'),
+          .describe(
+            'Link to a downloadable CV (https): one URL for every locale, or one per locale (`{ es: ..., en: ... }`, a locale without one falls back to the default locale). Omit to hide the CV button.',
+          ),
       })
       .describe('Recruiter card on the home page and /me.'),
     me: z

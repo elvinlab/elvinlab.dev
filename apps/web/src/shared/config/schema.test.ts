@@ -251,6 +251,29 @@ describe('parseSiteConfig', () => {
     expect(() => parseSiteConfig(broken)).toThrow();
   });
 
+  describe('recruiter.cvUrl per locale', () => {
+    const withCv = (cvUrl: unknown) => ({ ...valid, recruiter: { ...valid.recruiter, cvUrl } });
+
+    it('still accepts one https URL for every locale', () => {
+      expect(parseSiteConfig(withCv('https://x.dev/cv.pdf')).recruiter.cvUrl).toBe(
+        'https://x.dev/cv.pdf',
+      );
+    });
+
+    it('accepts one https URL per locale', () => {
+      const cvUrl = { es: 'https://x.dev/cv-es.pdf', en: 'https://x.dev/cv-en.pdf' };
+      expect(parseSiteConfig(withCv(cvUrl)).recruiter.cvUrl).toEqual(cvUrl);
+    });
+
+    it('rejects a per-locale URL that is not https', () => {
+      expect(() => parseSiteConfig(withCv({ es: 'http://x.dev/cv-es.pdf' }))).toThrow();
+    });
+
+    it('rejects an empty per-locale map', () => {
+      expect(() => parseSiteConfig(withCv({}))).toThrow();
+    });
+  });
+
   it('defaults both background effects and lets each be toggled', () => {
     const { background: _, ...rest } = valid;
     expect(parseSiteConfig(rest).background).toEqual({ galaxy: true, cursorWaves: false });
