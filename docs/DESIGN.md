@@ -6,7 +6,7 @@ Source of truth for how elvinlab.dev looks and moves (design v3, "lab notebook")
 
 - Subject: a portfolio and the blog "Lab Notes — by an eternal junior" of a full-stack engineer who builds with AI agents. Audience: engineers, tech leads and recruiters. Spanish is the default locale at `/`; English is optional under `/en/`. The browser language only triggers a quiet, dismissible line of text ("also available in English") on Spanish pages, never a redirect (SEO and performance) and never on English pages, where the navbar always offers the switch. The English menu says plainly "Notes" even though the notes index is Spanish, and the site notice strip only appears when `notice` is set in the config (it is off now that the site is live).
 - Identity comes from the subject: a lab and its notebook. Notes are numbered entries (`Note 003`), each summarized by a **decision record**: context, decision, outcome.
-- **One bold element:** the full-bleed banner with the live cursor-reactive WebGL2 background and a large solid display headline. Pink block accents are small and static across the home, navbar, about page, notes index and footer. Everything else stays quiet.
+- **One bold element:** the full-bleed banner with the live cursor-reactive WebGL2 background and a large pixel-face display headline. Pink block accents are small and static across the home, navbar, about page, notes index and footer. Everything else stays quiet.
 - Varied hierarchy instead of identical cards: the latest entry is large, older entries are index rows, projects are "experiments" tiles, the four pillars share one strip.
 - Mechanics from [Fuwari](https://github.com/saicaca/fuwari) (MIT): grid, measurements, sidebar, motion timing. Identity is ours.
 - White-label: another developer replaces name, bio, notes, experience, colors, favicon and socials through configuration, content and one theme file; the layout, motion and motifs above stay in code.
@@ -32,16 +32,21 @@ The brand gradient (violet → cyan → pink) appears only as a 3 px strip on re
 
 ## Type
 
-Space Grotesk for display and body, JetBrains Mono for entry numbers and code, both self-hosted via Fontsource. Press Start 2P marks the navbar wordmark and retro footer signature, with a larger signature on the 404 page.
+Space Grotesk for body, UI and note titles, JetBrains Mono for entry numbers and code, all self-hosted via Fontsource. Two pixel faces, each with one job:
 
-Scale: note title 54 px (hero) / 36 px, card title 26–28 px, body 18 px at 1.75 line height inside a 68 ch measure (16 px minimum on mobile), meta 14 px.
+- **Pixelify Sans** (`@fontsource-variable/pixelify-sans`, one variable file, weight 600) is the display face for the home hero headline and the accent-bar section titles (`SectionHeading`, so `/me` titles too). It is the core font token `pixel` (`font-pixel`, `packages/core/src/tokens/tokens.json`), so a theme can replace it. Only the Latin file is preloaded, on the home page only (~12 KB). Hero: `text-4xl` on phones, `text-6xl` from `md`, `text-balance`, 16 ch maximum width; section titles `text-2xl`.
+- **Press Start 2P** stays the brand mark: navbar wordmark, retro footer signature and a larger signature on the 404 page.
+
+Rule: pixel faces are for short, large text only, never paragraphs, note prose, note titles, navigation or forms. Known caveat: the pixel `e` is less legible at hero size; revisit when the minimal type scale lands. Brand decision in [BRAND.md](BRAND.md#tipografía).
+
+Scale: note title 54 px (hero) / 36 px, card title 26–28 px, body 18 px at 1.75 line height inside a 68 ch measure (16 px minimum on mobile), meta 13–14 px (mono meta and chips use the 13 px `text-meta` token; the retro wordmark and signature stay 12 px).
 
 ## Layout
 
 - Page width 1200 px; grid `main | sidebar 280 px`, gap 16 px. The sidebar sits on the right and moves below the content under 1024 px.
 - Navbar: 72 px card, radius `0 0 16px 16px`, sticky. Items: Home, Notes, Experiments, About (`/me`), Contact. It hides on scroll down and returns on scroll up; hiding closes an open mobile menu, and focus entering the navbar (or keyboard focus already inside it) keeps it on screen, so no control is focused off screen.
 - The dismissible locale suggestion stays in document flow after the footer, within the page gutters; it appears only for a browser-language mismatch and never covers content or focus. It can extend document height, but avoids an overlay and does not shift the content above it.
-- Banner: ~600 px on home, ~380 px elsewhere; content overlaps it by 56 px.
+- Banner: ~600 px on home on desktop, ~490 px on touch or phone-width screens (compact floor of 28 rem, so the latest note starts near the fold at 390 px), ~380 px elsewhere; content overlaps it by 56 px.
 - Cards: radius 16 px, no borders, no shadows; dashed dividers only. Inner radius follows the concentric rule (outer 16 − padding 12 = 4 px).
 - Section titles: sentence case with a 4 × 20 px accent bar.
 - Mobile first (390 px reference): single column, sidebar content moves below the main content, notes collapse into one card with dashed dividers.
@@ -66,7 +71,7 @@ Scale: note title 54 px (hero) / 36 px, card title 26–28 px, body 18 px at 1.7
 
 ## Accessibility floor
 
-WCAG AA contrast in both themes, visible 2 px focus ring, touch targets ≥44 px (including the reading-mode toggle and exit button, whose pill stays 36 px with an invisible expansion, the language suggestion and the code copy button), semantic landmarks (`header`, `nav`, `main`, `aside`, `footer`), `aria-label` on icon-only buttons, no information conveyed by color alone.
+WCAG AA contrast in both themes, visible 2 px focus ring, touch targets ≥44 px (including every navbar control, footer link, "all" link and the banner toggle, the reading-mode toggle and exit button, whose pill stays 36 px with an invisible expansion, the language suggestion and the code copy button), mono meta text at least 13 px, semantic landmarks (`header`, `nav`, `main`, `aside`, `footer`), `aria-label` on icon-only buttons, no information conveyed by color alone.
 
 ## October 2026 refinement
 
@@ -74,11 +79,23 @@ WCAG AA contrast in both themes, visible 2 px focus ring, touch targets ≥44 px
 - Small static pink accents retain the terminal motif without repeated blinking. Retro type identifies the brand, not long-form text.
 - The home author card uses the configured profile image, with initials when no image is configured. The hiring card separates status from its heading and removes repeated employment information. Its status dot is the `ok` green only when `recruiter.openToWork` is true (the default) and the `danger` color otherwise; the status text always states the situation, so color is never the only signal. `recruiter.available` only shows or hides the whole status line. Evidence: `tests/browser/smoke.spec.ts` (recruiter card) and the `recruiter.openToWork` cases in `schema.test.ts`.
 - The locale hint sits after the footer: less immediately discoverable than an overlay, but it cannot cover reading or form controls or shift preceding content. The navbar language control remains available near the top.
-- Performance pass: the Latin Space Grotesk and JetBrains Mono variable files are preloaded in `BaseLayout` (page CSS is inlined, so the browser would otherwise find the font URLs late; Latin-ext, Vietnamese and Press Start 2P stay lazy); the profile photo is served as an optimized webp with explicit dimensions through Astro's image pipeline (the source file lives in `src/assets`); the banner's WebGL loop resumes on tab visibility only while the banner intersects the viewport. Evidence: `tests/browser/performance.spec.ts`, `gl-runner.test.ts`.
 - Existing semantic colors, content/sidebar geometry and theme behavior are preserved. UI UX Pro Max's generic palette suggestions were not adopted because they conflicted with the established brand.
 
-Implementation and check evidence: [home refinement](../odd/tasks/home-visual-refinement.md) and [sitewide polish](../odd/tasks/sitewide-ui-polish.md).
+### Audit pass (2026-10-01)
+
+From the mobile and performance audit (Lighthouse mobile, screenshots, source review); all merged into `develop`, not yet released.
+
+- **Touch and responsive:** the expanded home banner has a compact floor on touch or phone-width screens (557 px to ~490 px at 390 px); every navbar control, footer link, "all" link and the banner toggle has a ≥44 px hit area; mono meta and chips use the 13 px `text-meta` token; reading time never splits across lines; the background picker's galaxy icon is a sparkle, distinct from the theme sun.
+- **Performance:** the Latin Space Grotesk and JetBrains Mono variable files are preloaded in `BaseLayout` (page CSS is inlined, so the browser would otherwise find the font URLs late; Latin-ext, Vietnamese and Press Start 2P stay lazy). The profile photo goes through Astro Image as webp with explicit dimensions; `identity.avatar` is a bare file name inside `apps/web/src/assets/` (breaking for forks that used a `public/` path; a missing file fails the build). The WebGL loop resumes on tab visibility only while the banner intersects the viewport. Hover and focus prefetch is on (`prefetch: { prefetchAll: true, defaultStrategy: 'hover' }`). Measured (Lighthouse mobile, fixture server, median of 3): home performance 0.96 to 0.98 (0.97 with the pixel font), FCP 2.19 s to 1.74 s, LCP unchanged at ~2.26 s (2.34 s with the pixel font, possibly noise), CLS 0. LCP is the hero headline text, so the remaining lever is the HTML/CSS path, not fonts or images. Evidence: `tests/browser/performance.spec.ts`, `gl-runner.test.ts`.
+- **Interaction:** on touch devices (`hover: none`) the code copy button gets its own 44 px strip above the first line (about 40 px per code block); hiding the navbar closes the open mobile menu, and focus inside it reveals the navbar and keeps it visible; the reading-mode toggle and exit button have a 44 px hit area; `/contact` shows a single intro sentence (the `intro` field was removed, `pageDescription` carries it). Evidence: `tests/browser/mobile-ux.spec.ts` (touch, banner, meta), `tests/browser/interaction-polish.spec.ts` (interaction), `tests/browser/pixel-display.spec.ts` (pixel face).
+- **Pixel display face:** adopted by the owner after a trial on screen (see Type).
+- **Not done on purpose:** the hiring card shows "not available" next to its primary CTA; that is a content decision owned by the owner (`recruiter.openToWork`), not a defect.
+- **Next (not started):** a minimalist preset (`appearance: 'minimal' | 'full'` plus per-section `home.*` flags), a smaller type scale through theme tokens, calmer note pages (compact decision record, lower banner, reduced meta) and a faster local test loop (workers, fast script, build reuse, tiered verification).
+
+Implementation and check evidence: [home refinement](../odd/tasks/home-visual-refinement.md), [sitewide polish](../odd/tasks/sitewide-ui-polish.md), [mobile, UX and performance pass](../odd/tasks/mobile-ux-performance-pass.md) and [pixel display font](../odd/tasks/pixel-display-font-experiment.md).
 
 ## Verification scope
 
 The current sitewide visual audit covered 15 desktop routes in both themes plus representative home, about, contact, notes and 404 layouts at 360 px and 768 px. No horizontal overflow or page errors were observed in that sample. Browser fixtures exercise Spanish and English note rendering, including the localized English detail route; current real notes are drafts, so published-note behavior is not represented. Contact checks cover the configured local form without submitting to a real service. Disabled experiments and external contact delivery remain outside runtime coverage.
+
+The 2026-10-01 mobile and performance audit covered mobile Lighthouse (home and the other fixture URLs, strict budgets), screenshots at 390, 768 and 1440 px in both themes, and browser assertions for hit areas, overflow, fold position and font loading. It did not cover screenshots at 360 and 1024 px, INP, or the real-GPU cost of the WebGL banner (the fixture runs on software rendering).

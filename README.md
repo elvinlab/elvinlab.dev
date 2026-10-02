@@ -79,7 +79,7 @@ Así se trabaja aquí: cada tarea es un *issue* escrito como un brief de delegac
 | Interfaz | **Tailwind CSS 4**, **Preact 10**, **TypeScript 6** (estricto) | Estilos con tokens semánticos; una sola isla (el formulario de contacto) |
 | Contenido | **Content Collections** con **Zod 4**, **Expressive Code** | Notas MDX y JSON validados al compilar; bloques de código con marcos y copiar |
 | SEO y compartir | Sitemap, RSS, JSON-LD, **Sharp**, **Satori** | Metadatos, imágenes optimizadas y una tarjeta al compartir por nota |
-| Tipografía y gráficos | Space Grotesk, JetBrains Mono, Press Start 2P (Fontsource) y **WebGL2** propio | Fuentes autoalojadas y fondos animados del banner, sin librerías |
+| Tipografía y gráficos | Space Grotesk, JetBrains Mono, Pixelify Sans, Press Start 2P (Fontsource) y **WebGL2** propio | Fuentes autoalojadas y fondos animados del banner, sin librerías |
 | Hosting | **Cloudflare Workers** + **Wrangler** | Un solo entorno; dominio y DNS en Cloudflare |
 | Servicios | **Turnstile**, **Resend**, **Web Analytics**, **Giscus** | Anti-bot, correo del formulario, analítica mínima y comentarios en GitHub Discussions |
 | Calidad | **Vitest 5**, **Playwright** + **axe-core**, **Lighthouse CI**, **Biome**, **dependency-cruiser** | Tests, accesibilidad, rendimiento, formato y fronteras de arquitectura |

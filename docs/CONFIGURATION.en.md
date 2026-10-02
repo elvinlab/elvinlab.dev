@@ -346,7 +346,7 @@ The text lives in `apps/web/src/features/privacy/content.ts` and `apps/web/src/f
 - **Profile photo**: put the file in `apps/web/src/assets/` and write only its file name in `identity.avatar` (for example `avatar.png`; png, jpg, webp or avif). It is optimized at build time (webp with explicit dimensions) and used on the home page, on `/me` and on the `/me` card. A missing file fails the build.
 - **Favicon**: `apps/web/public/favicon.svg`.
 - **Default share image**: `apps/web/public/og-image.png` (1200 × 630). It is a static file with the person's name drawn on it: **replace it** if you use the site for someone else. Notes and `/me` generate their own card at build time.
-- **Fonts**: self-hosted (Fontsource); never loaded from a CDN.
+- **Fonts**: self-hosted (Fontsource); never loaded from a CDN. The pixel display face (Pixelify Sans) is the `pixel` font token in `tokens.json`; a theme can replace it.
 
 ### 6.10 UI texts and a new language
 

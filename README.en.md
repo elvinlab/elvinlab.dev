@@ -79,7 +79,7 @@ This is how work goes here: every task is an *issue* written as a delegation bri
 | Interface | **Tailwind CSS 4**, **Preact 10**, **TypeScript 6** (strict) | Styles with semantic tokens; a single island (the contact form) |
 | Content | **Content Collections** with **Zod 4**, **Expressive Code** | MDX notes and JSON validated at build time; code blocks with frames and copy |
 | SEO and sharing | Sitemap, RSS, JSON-LD, **Sharp**, **Satori** | Metadata, optimized images and one share card per note |
-| Typography and graphics | Space Grotesk, JetBrains Mono, Press Start 2P (Fontsource) and custom **WebGL2** | Self-hosted fonts and animated banner backgrounds, no libraries |
+| Typography and graphics | Space Grotesk, JetBrains Mono, Pixelify Sans, Press Start 2P (Fontsource) and custom **WebGL2** | Self-hosted fonts and animated banner backgrounds, no libraries |
 | Hosting | **Cloudflare Workers** + **Wrangler** | A single environment; domain and DNS on Cloudflare |
 | Services | **Turnstile**, **Resend**, **Web Analytics**, **Giscus** | Anti-bot, form email, minimal analytics and comments on GitHub Discussions |
 | Quality | **Vitest 5**, **Playwright** + **axe-core**, **Lighthouse CI**, **Biome**, **dependency-cruiser** | Tests, accessibility, performance, formatting and architecture boundaries |
