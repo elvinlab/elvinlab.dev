@@ -109,6 +109,26 @@ describe('parseSiteConfig', () => {
     });
   });
 
+  describe('identity.avatar', () => {
+    const withAvatar = (avatar: unknown) => ({ ...valid, identity: { ...valid.identity, avatar } });
+
+    it('is optional (initials are shown without it)', () => {
+      expect(parseSiteConfig(valid).identity.avatar).toBeUndefined();
+    });
+
+    it('accepts the file name of an image placed in src/assets', () => {
+      expect(parseSiteConfig(withAvatar('avatar.png')).identity.avatar).toBe('avatar.png');
+      expect(parseSiteConfig(withAvatar('me.JPG')).identity.avatar).toBe('me.JPG');
+    });
+
+    it.each(['/avatar.png', '../avatar.png', 'photos/avatar.png', 'avatar.gif', 'avatar'])(
+      'rejects %s (only a bare png, jpg, webp or avif file name is allowed)',
+      (avatar) => {
+        expect(() => parseSiteConfig(withAvatar(avatar))).toThrow(/avatar/);
+      },
+    );
+  });
+
   it('rejects a recruiter cvUrl that is not https', () => {
     const broken = { ...valid, recruiter: { ...valid.recruiter, cvUrl: 'http://x.dev/cv.pdf' } };
     expect(() => parseSiteConfig(broken)).toThrow();

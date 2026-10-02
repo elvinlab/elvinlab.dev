@@ -1,14 +1,18 @@
 ---
 /** Sidebar author card: profile photo or initials, name, bio and social icon buttons. */
+
+import { Image } from 'astro:assets';
 import { localizePath } from '@elvinlab/core';
 
 import { isEnabled, site } from '@/shared/config/index.ts';
 import { LOCALES, type Locale, t } from '@/shared/i18n/index.ts';
+import { resolveAvatar } from '@/shared/lib/avatar.ts';
 import SocialIcon from '@/shared/ui/SocialIcon.astro';
 
 type Props = { locale: Locale };
 
 const { locale } = Astro.props;
+const avatar = resolveAvatar(site.identity.avatar);
 const initials = site.identity.name.split(' ').slice(0, 2).map((part) => part[0]).join('');
 const links = [
   ...site.socials.map((social) => ({ href: social.url, label: social.label, icon: social.icon, external: true })),
@@ -19,8 +23,9 @@ const links = [
 
 <section class="flex flex-col gap-4 rounded-card bg-card p-5">
   <div class="aspect-square w-full overflow-hidden rounded-inner bg-gradient-to-br from-primary/25 to-cyan/15">
-    {site.identity.avatar ? (
-      <img src={site.identity.avatar} alt={site.identity.name} class="size-full object-cover" loading="lazy" decoding="async" />
+    {avatar ? (
+      // Lazy: on phones the sidebar sits below the content, so the photo is never the LCP element.
+      <Image src={avatar} alt={site.identity.name} format="webp" quality={80} class="size-full object-cover" loading="lazy" decoding="async" />
     ) : (
       <div class="grid size-full place-items-center font-display text-5xl font-bold text-primary" aria-hidden="true">
         {initials}

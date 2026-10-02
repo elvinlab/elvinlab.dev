@@ -9,6 +9,8 @@ import '@fontsource-variable/space-grotesk';
 import '@/styles/global.css';
 
 import { DEFAULT_THEME, THEME_BOOT_SCRIPT } from '@elvinlab/core';
+import jetbrainsMonoLatin from '@fontsource-variable/jetbrains-mono/files/jetbrains-mono-latin-wght-normal.woff2?url';
+import spaceGroteskLatin from '@fontsource-variable/space-grotesk/files/space-grotesk-latin-wght-normal.woff2?url';
 
 import { integrations } from '@/shared/config/index.ts';
 import { type Locale, t } from '@/shared/i18n/index.ts';
@@ -42,12 +44,19 @@ const { locale, printable = false, translations, ...seo } = Astro.props;
 const hasAside = Astro.slots.has('aside');
 const hasBanner = Astro.slots.has('banner');
 const beaconToken = integrations.analyticsToken;
+// Page CSS is inlined, so the browser only learns its font URLs after parsing it. Preloading the
+// two Latin variable files (the only subsets Spanish and English text use) starts them with the
+// HTML. Latin-ext, Vietnamese and Press Start 2P stay lazy via `unicode-range`/on-demand loading.
+const preloadedFonts = [spaceGroteskLatin, jetbrainsMonoLatin];
 ---
 
 <html lang={locale} data-theme={DEFAULT_THEME}>
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    {preloadedFonts.map((href) => (
+      <link rel="preload" as="font" type="font/woff2" href={href} crossorigin />
+    ))}
     <script is:inline set:html={THEME_BOOT_SCRIPT} />
     <Seo locale={locale} {...seo} />
     <slot name="head" />

@@ -67,7 +67,7 @@ Las descripciones vienen del esquema (`.describe()`), por eso están en inglés.
 | `identity.bio` | `{ <locale>: string }` | yes |  | Short bio per locale (also the description of the /me page). |
 | `identity.location` | `string` | no |  | City or country shown on /me and share cards. |
 | `identity.startedYear` | `integer (min 1970)` | yes |  | First year of professional work; years of experience are derived from it. |
-| `identity.avatar` | `string` | no |  | Site-relative path to a profile photo in `public/` (for example `/avatar.png`). Omit to show initials. |
+| `identity.avatar` | `string` | no |  | File name of a profile photo placed in `apps/web/src/assets/` (for example `avatar.png`); it is optimized at build time. Omit to show initials. |
 | `socials` | `object[]` | yes |  | Social profile links shown in the footer and used as `sameAs` in structured data. |
 | `socials[].label` | `string` | yes |  | Link text and accessible name. |
 | `socials[].url` | `URL` | yes |  | Profile URL (https only: an email address never belongs in public config). |
@@ -343,7 +343,7 @@ El texto vive en `apps/web/src/features/privacy/content.ts` y `apps/web/src/feat
 ### 6.9 Colores, tipografía, foto e imágenes
 
 - **Tema**: `packages/core/src/tokens/tokens.json` y luego `mise exec -- pnpm --filter @elvinlab/core tokens` (regenera `tokens.css`). Los componentes leen variables semánticas, nunca un color directo.
-- **Foto de perfil**: pon el archivo en `apps/web/public/` y apunta `identity.avatar` a él. Se usa en la home, en `/me` y en la tarjeta de `/me`.
+- **Foto de perfil**: pon el archivo en `apps/web/src/assets/` y escribe solo su nombre en `identity.avatar` (por ejemplo `avatar.png`; png, jpg, webp o avif). Se optimiza en el build (webp con dimensiones explícitas) y se usa en la home, en `/me` y en la tarjeta de `/me`. Si el archivo no existe, el build falla.
 - **Favicon**: `apps/web/public/favicon.svg`.
 - **Imagen por defecto al compartir**: `apps/web/public/og-image.png` (1200 × 630). Es un archivo estático con el nombre de la persona dibujado: **reemplázalo** si usas el sitio para otra persona. Las notas y `/me` generan su propia tarjeta al compilar.
 - **Tipografías**: se autoalojan (Fontsource); nunca se cargan desde un CDN.

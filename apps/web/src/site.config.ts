@@ -29,7 +29,7 @@ export const siteConfig = {
     },
     location: 'Costa Rica',
     startedYear: 2020,
-    avatar: '/avatar.png',
+    avatar: 'avatar.png',
   },
   socials: [
     { label: 'GitHub', url: 'https://github.com/elvinlab', icon: 'github' },

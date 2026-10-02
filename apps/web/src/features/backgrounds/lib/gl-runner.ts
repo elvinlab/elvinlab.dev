@@ -149,12 +149,19 @@ export function runShader(
     cancelAnimationFrame(raf);
   };
 
+  // Drawing runs only while the canvas intersects the viewport AND the tab is visible; both
+  // signals can change independently (a tab can come back while the banner is scrolled away).
+  let intersecting = false;
+  const sync = (): void => (intersecting && !document.hidden ? play() : pause());
   const observer = new IntersectionObserver(
-    ([entry]) => (entry?.isIntersecting ? play() : pause()),
+    ([entry]) => {
+      intersecting = entry?.isIntersecting ?? false;
+      sync();
+    },
     { threshold: 0 },
   );
   observer.observe(canvas);
-  const onVisibility = (): void => (document.hidden ? pause() : play());
+  const onVisibility = sync;
   const onLost = (event: Event): void => {
     event.preventDefault();
     pause();

@@ -67,7 +67,7 @@ The descriptions come from the schema (`.describe()`), which is why they are in 
 | `identity.bio` | `{ <locale>: string }` | yes |  | Short bio per locale (also the description of the /me page). |
 | `identity.location` | `string` | no |  | City or country shown on /me and share cards. |
 | `identity.startedYear` | `integer (min 1970)` | yes |  | First year of professional work; years of experience are derived from it. |
-| `identity.avatar` | `string` | no |  | Site-relative path to a profile photo in `public/` (for example `/avatar.png`). Omit to show initials. |
+| `identity.avatar` | `string` | no |  | File name of a profile photo placed in `apps/web/src/assets/` (for example `avatar.png`); it is optimized at build time. Omit to show initials. |
 | `socials` | `object[]` | yes |  | Social profile links shown in the footer and used as `sameAs` in structured data. |
 | `socials[].label` | `string` | yes |  | Link text and accessible name. |
 | `socials[].url` | `URL` | yes |  | Profile URL (https only: an email address never belongs in public config). |
@@ -343,7 +343,7 @@ The text lives in `apps/web/src/features/privacy/content.ts` and `apps/web/src/f
 ### 6.9 Colors, typography, photo and images
 
 - **Theme**: `packages/core/src/tokens/tokens.json`, then `mise exec -- pnpm --filter @elvinlab/core tokens` (regenerates `tokens.css`). Components read semantic variables, never a raw color.
-- **Profile photo**: put the file in `apps/web/public/` and point `identity.avatar` at it. It is used on the home page, on `/me` and on the `/me` card.
+- **Profile photo**: put the file in `apps/web/src/assets/` and write only its file name in `identity.avatar` (for example `avatar.png`; png, jpg, webp or avif). It is optimized at build time (webp with explicit dimensions) and used on the home page, on `/me` and on the `/me` card. A missing file fails the build.
 - **Favicon**: `apps/web/public/favicon.svg`.
 - **Default share image**: `apps/web/public/og-image.png` (1200 × 630). It is a static file with the person's name drawn on it: **replace it** if you use the site for someone else. Notes and `/me` generate their own card at build time.
 - **Fonts**: self-hosted (Fontsource); never loaded from a CDN.

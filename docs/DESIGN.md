@@ -59,7 +59,7 @@ Scale: note title 54 px (hero) / 36 px, card title 26–28 px, body 18 px at 1.7
 ## Motion
 
 - Onload: fade-in-up 300 ms, staggered (navbar 0, sidebar 100, content 150, footer 250 ms).
-- Page transitions: Astro View Transitions, fade plus 16 px slide, 200 ms.
+- Page transitions: none. Navigation is a normal full page load (no View Transitions, no client router); hover and keyboard-focus prefetch (Astro `prefetch`, `hover` strategy, tap on slow or data-saver connections) makes it feel instant without prefetching links nobody shows interest in.
 - Press: `scale(0.96)`; state transitions ≤150 ms on named properties only.
 - Theme switch suppresses transitions for one frame.
 - Everything stops under `prefers-reduced-motion`.
@@ -74,6 +74,7 @@ WCAG AA contrast in both themes, visible 2 px focus ring, touch targets ≥44 px
 - Small static pink accents retain the terminal motif without repeated blinking. Retro type identifies the brand, not long-form text.
 - The home author card uses the configured profile image, with initials when no image is configured. The hiring card separates status from its heading and removes repeated employment information. Its status dot is the `ok` green only when `recruiter.openToWork` is true (the default) and the `danger` color otherwise; the status text always states the situation, so color is never the only signal. `recruiter.available` only shows or hides the whole status line. Evidence: `tests/browser/smoke.spec.ts` (recruiter card) and the `recruiter.openToWork` cases in `schema.test.ts`.
 - The locale hint sits after the footer: less immediately discoverable than an overlay, but it cannot cover reading or form controls or shift preceding content. The navbar language control remains available near the top.
+- Performance pass: the Latin Space Grotesk and JetBrains Mono variable files are preloaded in `BaseLayout` (page CSS is inlined, so the browser would otherwise find the font URLs late; Latin-ext, Vietnamese and Press Start 2P stay lazy); the profile photo is served as an optimized webp with explicit dimensions through Astro's image pipeline (the source file lives in `src/assets`); the banner's WebGL loop resumes on tab visibility only while the banner intersects the viewport. Evidence: `tests/browser/performance.spec.ts`, `gl-runner.test.ts`.
 - Existing semantic colors, content/sidebar geometry and theme behavior are preserved. UI UX Pro Max's generic palette suggestions were not adopted because they conflicted with the established brand.
 
 Implementation and check evidence: [home refinement](../odd/tasks/home-visual-refinement.md) and [sitewide polish](../odd/tasks/sitewide-ui-polish.md).
