@@ -14,9 +14,9 @@ import { hasPublishedNotes } from '@/shared/lib/notes-helpers.ts';
 import BackgroundPicker from '@/shared/ui/BackgroundPicker.astro';
 import ThemeToggle from '@/shared/ui/ThemeToggle.astro';
 
-type Props = { locale: Locale };
+type Props = { locale: Locale; translations?: Record<string, string> | undefined };
 
-const { locale } = Astro.props;
+const { locale, translations } = Astro.props;
 const noteEntries = await getCollection('notes');
 const notes = noteEntries.map((entry) => ({ slug: entry.id, data: entry.data }));
 const routePath = switchLocale(Astro.url.pathname, LOCALES.defaultLocale, LOCALES);
@@ -29,9 +29,12 @@ const items = navItems(site.features, locale, hasPublishedNotes(notes)).map((ite
 }));
 const otherLocale: Locale = locale === 'es' ? 'en' : 'es';
 // Notes exist in Spanish only: the switcher goes to the other locale's home, never to a missing URL.
-const otherHref = isSingleLocaleRoute(routePath)
-  ? localizePath('/', otherLocale, LOCALES)
-  : switchLocale(Astro.url.pathname, otherLocale, LOCALES);
+// A note that has a translation switches to it; other notes go to the other locale's home.
+const otherHref =
+  translations?.[otherLocale] ??
+  (isSingleLocaleRoute(routePath)
+    ? localizePath('/', otherLocale, LOCALES)
+    : switchLocale(Astro.url.pathname, otherLocale, LOCALES));
 const linkClass =
   'flex h-11 items-center rounded-control px-3 font-medium transition-colors duration-150 hover:bg-card-hover aria-[current=page]:text-primary';
 ---

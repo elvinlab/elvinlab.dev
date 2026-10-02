@@ -72,10 +72,9 @@ Es el bloque entre `---` al inicio del archivo. El sitio lo valida al compilar: 
 | `pubDate` | `date (YYYY-MM-DD)` | yes |  | Publication date. Notes with the same date sort by number, highest first. |
 | `updatedDate` | `date (YYYY-MM-DD)` | no |  | Date of the last meaningful edit; must not be earlier than `pubDate`. |
 | `lang` | `'es' \| 'en'` | yes |  | Language the note is written in (one language per note). |
-| `translationOf` | `string` | no |  | Reserved: slug of the same note in the other language. Recorded only; it does not yet drive hreflang or the language switch. |
+| `translationOf` | `string` | no |  | Slug of the same note in the other language. One side is enough (the link works both ways). Both notes then point at each other with hreflang and the language switch goes to the translation. The target must be published too, or the build fails. |
 | `category` | `string` | yes |  | One category in kebab-case (for example `decisiones`); shown above the title and used to group the index. |
 | `tags` | `string[] (max 5)` | no | `[]` | Up to five kebab-case tags. |
-| `cover` | `image path` | no |  | Reserved: accepted but not displayed yet (the share card is generated from the title). |
 | `decision` | `object` | yes |  | Decision record shown before the text: context, decision and outcome. |
 | `decision.context` | `string (max 280)` | yes |  | What forced a decision (max 280 characters). |
 | `decision.decision` | `string (max 280)` | yes |  | What you chose and what you ruled out (max 280 characters). |
@@ -109,7 +108,7 @@ Detalles que evitan errores:
 - **`category`**: una sola, en minúsculas con guiones. No hay una lista cerrada; **mantén las mismas** que ya usas (las que ves en la barra lateral del índice) para que agrupen bien.
 - **`tags`**: hasta cinco, en minúsculas con guiones. Se usan para calcular las «notas relacionadas».
 - **`updatedDate`**: solo cuando editas una nota ya publicada de forma relevante (sección 10).
-- **`cover`** y **`translationOf`** están **reservados**: el esquema los acepta pero hoy no se usan (la tarjeta al compartir se genera sola desde el título).
+- **`translationOf`**: el slug de la misma nota en el otro idioma (sección 8). Con indicarlo en una de las dos notas basta.
 
 ## 4. El registro de decisión
 
@@ -198,6 +197,7 @@ Al publicar una nota **no tienes que hacer nada más** para esto:
 - **Tiempo de lectura** (a 220 palabras por minuto) y **fecha** en el encabezado.
 - **Índice lateral** con las secciones `##`, **botones de compartir** (copiar enlace y LinkedIn) y **notas relacionadas**: las del mismo idioma que comparten etiquetas (pesan el doble) o categoría; salen hasta tres.
 - **Anterior / Siguiente** entre notas del mismo idioma.
+- Si la nota tiene traducción: **`hreflang`** entre ambas y el **cambio de idioma** directo (sección 8).
 - **Comentarios y reacciones** (si Giscus está configurado): el hilo se asocia a la ruta de la nota.
 - **Tarjeta al compartir** propia (1200 × 630) con «Nota 001», el título, tu nombre y la fecha.
 - **Metadatos para buscadores y redes**: tipo `article`, fechas, etiquetas y datos estructurados `BlogPosting` con imagen y autor.
@@ -214,7 +214,10 @@ mise exec -- pnpm new-post "Why I rebuilt my site from scratch" --lang en --numb
 - Reutiliza el **mismo número** del original y escribe el texto en el otro idioma (adáptalo, no lo traduzcas palabra por palabra).
 - Una nota en inglés se sirve en `/en/notes/<slug>/` y aparece en el **índice** (que es uno solo, en español) con su insignia de idioma. No hay un índice en inglés.
 - Cada idioma tiene su propia conversación de comentarios, y «relacionadas» y «anterior/siguiente» solo recorren notas del mismo idioma.
-- Puedes anotar `translationOf` con el slug de la otra versión, pero hoy **no se usa** para enlazarlas ni para el cambio de idioma.
+- Enlázalas con `translationOf`: en la traducción pon el slug del original (o al revés; **con un lado basta**, funciona en los dos sentidos). Con tres idiomas o más, todas quedan en el mismo grupo.
+- Entonces las dos notas se declaran mutuamente con `hreflang` (más `x-default`, que apunta a la versión en el idioma por defecto), y el **cambio de idioma del menú** y la **sugerencia de idioma** llevan directamente a la traducción en lugar de a la home del otro idioma. Una nota sin traducción sigue llevando a la home.
+- Los **slugs pueden ser distintos** en cada idioma (`por-que-descarte-x` y `why-i-dropped-x`).
+- Si `translationOf` apunta a una nota que no existe (por ejemplo, un borrador sin publicar), **el build falla** con el nombre de las notas: publica las dos juntas o quita `translationOf` hasta entonces. También falla si una nota se traduce a sí misma, si la traducción está en el mismo idioma o si dos notas del mismo idioma quedan en un grupo.
 
 ## 9. Publicar
 
@@ -241,6 +244,7 @@ mise exec -- pnpm new-post "Why I rebuilt my site from scratch" --lang en --numb
 - [ ] Sin título `#`; secciones con `##`.
 - [ ] Todas las imágenes tienen texto alternativo.
 - [ ] Ningún repositorio privado, ningún correo, ningún proyecto que aún no exista.
+- [ ] Si tiene traducción, `translationOf` apunta a una nota que también se publica.
 - [ ] Se lee bien en 360 px, en tema claro y oscuro y en modo lectura.
 - [ ] `pnpm test`, `typecheck`, `lint` y `build` pasan.
 - [ ] La tarjeta de `dist/client/og/notes/<slug>.png` se ve bien.
@@ -256,4 +260,5 @@ mise exec -- pnpm new-post "Why I rebuilt my site from scratch" --lang en --numb
 | La tarjeta al compartir no existe en desarrollo | Es normal: solo se genera al compilar notas publicadas (sección 6) |
 | Los comentarios no aparecen | Revisa la receta 6.5 de la guía de configuración |
 | La imagen no se muestra | La ruta relativa es incorrecta o el archivo no está junto a `index.mdx` |
+| El build dice «says it translates … which does not exist» | `translationOf` apunta a un slug que no existe o es un borrador: publica ambas notas o quita `translationOf` |
 | La tabla se ve plana en el móvil | Las tablas no tienen estilo propio: cámbiala por una lista |

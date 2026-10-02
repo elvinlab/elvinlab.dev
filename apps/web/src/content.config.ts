@@ -18,7 +18,7 @@ const notes = defineCollection({
     // `notes/<slug>/index.mdx` → `<slug>`, so a note keeps its URL when it leaves drafts.
     generateId: ({ entry }) => entry.split('/')[1] ?? entry,
   }),
-  schema: ({ image }) => noteSchema(image),
+  schema: noteSchema(),
 });
 
 // Portfolio experiments: a keyed JSON file, one entry per project (keys become ids).

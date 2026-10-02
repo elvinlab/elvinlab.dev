@@ -1,10 +1,9 @@
-import { z } from 'astro/zod';
 import { describe, expect, it } from 'vitest';
 
 import { noteSchema } from './schema.ts';
 
 // Stand-in for Astro's `image()` helper, which only exists inside the content layer.
-const schema = noteSchema(() => z.string());
+const schema = noteSchema();
 
 const valid = {
   number: 3,
@@ -22,6 +21,10 @@ const valid = {
 };
 
 describe('noteSchema', () => {
+  it('has no cover field: nothing displays one', () => {
+    expect(schema.parse({ ...valid, cover: './cover.png' })).not.toHaveProperty('cover');
+  });
+
   it('accepts a complete note and coerces dates', () => {
     const note = schema.parse(valid);
 

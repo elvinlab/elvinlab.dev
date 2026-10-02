@@ -18,12 +18,9 @@ import { type DocRow, renderTable, schemaRows } from './docs-config.ts';
 const json = (schema: z.ZodType): object =>
   z.toJSONSchema(schema, { io: 'input', unrepresentable: 'any' });
 
-/** Astro's `image()` helper, stood in for here: the docs only need the field to exist. */
-const imageStub = () => z.string();
-
 const SCHEMAS: Record<string, z.ZodType> = {
   'site-config': siteConfigSchema,
-  'note-frontmatter': noteSchema(imageStub),
+  'note-frontmatter': noteSchema(),
   experience: experienceSchema() as unknown as z.ZodType,
   credentials: credentialSchema(),
   experiments: experimentSchema(),

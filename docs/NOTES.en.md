@@ -72,10 +72,9 @@ It is the block between `---` at the top of the file. The site validates it at b
 | `pubDate` | `date (YYYY-MM-DD)` | yes |  | Publication date. Notes with the same date sort by number, highest first. |
 | `updatedDate` | `date (YYYY-MM-DD)` | no |  | Date of the last meaningful edit; must not be earlier than `pubDate`. |
 | `lang` | `'es' \| 'en'` | yes |  | Language the note is written in (one language per note). |
-| `translationOf` | `string` | no |  | Reserved: slug of the same note in the other language. Recorded only; it does not yet drive hreflang or the language switch. |
+| `translationOf` | `string` | no |  | Slug of the same note in the other language. One side is enough (the link works both ways). Both notes then point at each other with hreflang and the language switch goes to the translation. The target must be published too, or the build fails. |
 | `category` | `string` | yes |  | One category in kebab-case (for example `decisiones`); shown above the title and used to group the index. |
 | `tags` | `string[] (max 5)` | no | `[]` | Up to five kebab-case tags. |
-| `cover` | `image path` | no |  | Reserved: accepted but not displayed yet (the share card is generated from the title). |
 | `decision` | `object` | yes |  | Decision record shown before the text: context, decision and outcome. |
 | `decision.context` | `string (max 280)` | yes |  | What forced a decision (max 280 characters). |
 | `decision.decision` | `string (max 280)` | yes |  | What you chose and what you ruled out (max 280 characters). |
@@ -109,7 +108,7 @@ Details that avoid mistakes:
 - **`category`**: just one, lowercase and hyphenated. There is no closed list; **keep using the same ones** you already have (the ones in the index sidebar) so they group well.
 - **`tags`**: up to five, lowercase and hyphenated. They are used to compute the "related notes".
 - **`updatedDate`**: only when you make a relevant edit to a published note (section 10).
-- **`cover`** and **`translationOf`** are **reserved**: the schema accepts them but they are not used today (the share card is generated from the title).
+- **`translationOf`**: the slug of the same note in the other language (section 8). Setting it on one of the two notes is enough.
 
 ## 4. The decision record
 
@@ -198,6 +197,7 @@ When you publish a note **you do not have to do anything else** for this:
 - **Reading time** (at 220 words per minute) and **date** in the header.
 - **Side table of contents** with the `##` sections, **share buttons** (copy link and LinkedIn) and **related notes**: those in the same language sharing tags (weighted double) or category; up to three show.
 - **Previous / Next** between notes of the same language.
+- If the note has a translation: **`hreflang`** between both and a direct **language switch** (section 8).
 - **Comments and reactions** (if Giscus is configured): the thread is tied to the note's path.
 - Its own **share card** (1200 × 630) with "Note 001", the title, your name and the date.
 - **Search and social metadata**: `article` type, dates, tags and `BlogPosting` structured data with image and author.
@@ -214,7 +214,10 @@ mise exec -- pnpm new-post "Why I rebuilt my site from scratch" --lang en --numb
 - Reuse the **same number** as the original and write the text in the other language (adapt it, do not translate word for word).
 - An English note is served at `/en/notes/<slug>/` and appears in the **index** (a single one, in Spanish) with its language badge. There is no English index.
 - Each language has its own comment conversation, and "related" and "previous/next" only walk notes of the same language.
-- You can set `translationOf` to the other version's slug, but today it is **not used** to link them or for the language switch.
+- Link them with `translationOf`: on the translation put the original's slug (or the other way round; **one side is enough**, it works in both directions). With three languages or more, they all end up in the same group.
+- The two notes then declare each other with `hreflang` (plus `x-default`, pointing at the default-language version), and the **navbar language switch** and the **language suggestion** go straight to the translation instead of the other language's home. A note without a translation still goes to the home.
+- The **slugs can differ** per language (`por-que-descarte-x` and `why-i-dropped-x`).
+- If `translationOf` points to a note that does not exist (for example an unpublished draft), **the build fails** naming the notes: publish both together or remove `translationOf` until then. It also fails if a note translates itself, if the translation is in the same language or if two notes of the same language end up in one group.
 
 ## 9. Publishing
 
@@ -241,6 +244,7 @@ mise exec -- pnpm new-post "Why I rebuilt my site from scratch" --lang en --numb
 - [ ] No `#` title; sections with `##`.
 - [ ] Every image has alt text.
 - [ ] No private repository, no email, no project that does not exist yet.
+- [ ] If it has a translation, `translationOf` points to a note that is published too.
 - [ ] It reads well at 360 px, in light and dark theme and in reading mode.
 - [ ] `pnpm test`, `typecheck`, `lint` and `build` pass.
 - [ ] The card in `dist/client/og/notes/<slug>.png` looks right.
@@ -256,4 +260,5 @@ mise exec -- pnpm new-post "Why I rebuilt my site from scratch" --lang en --numb
 | The share card does not exist in development | That is normal: it is only generated when building published notes (section 6) |
 | Comments do not show up | See recipe 6.5 of the configuration guide |
 | The image does not show | The relative path is wrong or the file is not next to `index.mdx` |
+| The build says "says it translates ... which does not exist" | `translationOf` points to a slug that does not exist or is a draft: publish both notes or remove `translationOf` |
 | The table looks plain on a phone | Tables have no styling of their own: replace it with a list |

@@ -26,13 +26,15 @@ type Props = {
   noindex?: boolean;
   /** When set, emits BlogPosting structured data and `article:*` tags for a note. */
   article?: { pubDate: Date; updatedDate?: Date | undefined; tags?: readonly string[] | undefined };
+  /** Explicit hreflang alternates (absolute URLs), for pages whose translation lives at another slug. */
+  alternates?: { hreflang: string; href: string }[];
   /** Site path of this page's share image; the default card is used when omitted. */
   ogImage?: string;
   /** Alt text for the share image; defaults to the page title (or the owner's name on the default card). */
   ogImageAlt?: string;
 };
 
-const { locale, path, title, description, translated = true, noindex = false, article, ogImage: ogImagePath, ogImageAlt: ogImageAltProp } = Astro.props;
+const { locale, path, title, description, translated = true, noindex = false, article, alternates, ogImage: ogImagePath, ogImageAlt: ogImageAltProp } = Astro.props;
 const siteIndexable = buildEnv.siteIndexable;
 const fullTitle = title ? `${title} — ${site.title}` : site.title;
 const summary = description ?? site.description[locale] ?? site.description[LOCALES.defaultLocale] ?? site.title;
@@ -59,7 +61,7 @@ const themeColors = ['dark', 'light'].flatMap((scheme) => {
 <meta name="description" content={summary} />
 {(!siteIndexable || noindex) && <meta name="robots" content="noindex" />}
 <link rel="canonical" href={links.canonical} />
-{links.alternates.map((alternate) => <link rel="alternate" hreflang={alternate.hreflang} href={alternate.href} />)}
+{(alternates ?? links.alternates).map((alternate) => <link rel="alternate" hreflang={alternate.hreflang} href={alternate.href} />)}
 <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
 {showRss && <link rel="alternate" type="application/rss+xml" title={`${site.title} — Lab Notes`} href="/rss.xml" />}
 {themeColors.map(({ scheme, color }) => <meta name="theme-color" media={`(prefers-color-scheme: ${scheme})`} content={color} />)}

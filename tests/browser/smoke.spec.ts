@@ -142,7 +142,11 @@ test('locale suggestion stays in document flow and only appears for a locale mis
   const spanishNote = await page.goto('/notes/smoke-es/');
   expect(spanishNote?.status()).toBe(200);
   await expect(page).toHaveURL(/\/notes\/smoke-es\/$/);
-  await expect(page.locator('[data-language-hint="en"] a')).toHaveAttribute('href', '/en/');
+  // smoke-es has an English translation (smoke-en), so the suggestion lands on it.
+  await expect(page.locator('[data-language-hint="en"] a')).toHaveAttribute(
+    'href',
+    '/en/notes/smoke-en/',
+  );
 });
 
 test('the locale suggestion is a quiet line of text, not a card', async ({ page }) => {

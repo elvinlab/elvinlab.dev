@@ -27,6 +27,10 @@ type Props = {
   translated?: boolean;
   noindex?: boolean;
   article?: { pubDate: Date; updatedDate?: Date | undefined; tags?: readonly string[] | undefined };
+  /** Explicit hreflang alternates (absolute URLs) for a page translated at another slug. */
+  alternates?: { hreflang: string; href: string }[];
+  /** Path of this page's translation per locale: the language switch and hint go there. */
+  translations?: Record<string, string>;
   /** Site path of this page's share image; the default card is used when omitted. */
   ogImage?: string;
   ogImageAlt?: string;
@@ -34,7 +38,7 @@ type Props = {
   printable?: boolean;
 };
 
-const { locale, printable = false, ...seo } = Astro.props;
+const { locale, printable = false, translations, ...seo } = Astro.props;
 const hasAside = Astro.slots.has('aside');
 const hasBanner = Astro.slots.has('banner');
 const beaconToken = integrations.analyticsToken;
@@ -62,7 +66,7 @@ const beaconToken = integrations.analyticsToken;
     <SiteNotice locale={locale} />
     <main id="main" tabindex="-1" class="outline-none">
       <div class="sticky top-0 z-40 mx-auto max-w-[1200px] px-3 md:px-4" data-site-chrome>
-        <Navbar locale={locale} />
+        <Navbar locale={locale} translations={translations} />
       </div>
       {hasBanner ? (
         <div class="-mt-18" data-banner-offset><slot name="banner" /></div>
@@ -86,7 +90,7 @@ const beaconToken = integrations.analyticsToken;
       <Footer locale={locale} />
     </div>
     <div class="mx-auto max-w-[1200px] px-3 md:px-4">
-      <LanguageHint locale={locale} />
+      <LanguageHint locale={locale} translations={translations} />
     </div>
     <slot name="floating" />
   </body>

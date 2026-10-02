@@ -5,14 +5,11 @@ import { LOCALES } from '@/shared/i18n/index.ts';
 const kebab = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 const summary = z.string().trim().min(1).max(280);
 
-/** Astro's `image()` helper type, injected so the schema stays testable outside the content layer. */
-type ImageSchema = () => z.ZodType;
-
 /**
  * Frontmatter of a Lab Note. Each note is a numbered notebook entry written in one language and
  * summarized by a decision record (context, decision, outcome) shown before the text.
  */
-export function noteSchema(image: ImageSchema) {
+export function noteSchema() {
   return z
     .object({
       number: z
@@ -51,7 +48,7 @@ export function noteSchema(image: ImageSchema) {
         .regex(kebab)
         .optional()
         .describe(
-          'Reserved: slug of the same note in the other language. Recorded only; it does not yet drive hreflang or the language switch.',
+          'Slug of the same note in the other language. One side is enough (the link works both ways). Both notes then point at each other with hreflang and the language switch goes to the translation. The target must be published too, or the build fails.',
         ),
       category: z
         .string()
@@ -64,11 +61,6 @@ export function noteSchema(image: ImageSchema) {
         .max(5)
         .default([])
         .describe('Up to five kebab-case tags.'),
-      cover: image().optional().meta({
-        description:
-          'Reserved: accepted but not displayed yet (the share card is generated from the title).',
-        'x-type': 'image path',
-      }),
       decision: z
         .object({
           context: summary.describe('What forced a decision (max 280 characters).'),
