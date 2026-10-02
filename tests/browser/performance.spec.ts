@@ -1,11 +1,17 @@
 import { expect, test } from '@playwright/test';
 
 /** The two body fonts every page needs; Press Start 2P and the non-Latin subsets stay lazy. */
-const PRELOADED_FONTS = [
+const BODY_FONTS = [
   /space-grotesk-latin-wght-normal.*\.woff2$/,
   /jetbrains-mono-latin-wght-normal.*\.woff2$/,
 ];
-const PAGES = ['/', '/en/', '/notes/'];
+/** The home hero headline is above the fold in Pixelify Sans, so only the home pages add it. */
+const PIXEL_FONT = /pixelify-sans-latin-wght-normal.*\.woff2$/;
+const PAGES = [
+  { path: '/', preloads: [...BODY_FONTS, PIXEL_FONT] },
+  { path: '/en/', preloads: [...BODY_FONTS, PIXEL_FONT] },
+  { path: '/notes/', preloads: BODY_FONTS },
+];
 /** The raw profile photo is a 59 KB PNG; the optimized variant must be far below that. */
 const RAW_AVATAR_BYTES = 59_000;
 
@@ -13,8 +19,10 @@ test.beforeEach(({ browserName: _browserName }, testInfo) => {
   test.skip(testInfo.project.name !== 'chromium-1280', 'asset loading does not depend on width');
 });
 
-for (const path of PAGES) {
-  test(`${path} preloads exactly the two Latin variable fonts and uses them`, async ({ page }) => {
+for (const { path, preloads: expectedPreloads } of PAGES) {
+  test(`${path} preloads exactly the Latin variable fonts it renders and uses them`, async ({
+    page,
+  }) => {
     const fontRequests: string[] = [];
     page.on('response', (response) => {
       if (response.request().resourceType() === 'font') fontRequests.push(response.url());
@@ -31,8 +39,8 @@ for (const path of PAGES) {
         })),
       );
 
-    expect(preloads).toHaveLength(PRELOADED_FONTS.length);
-    for (const [index, pattern] of PRELOADED_FONTS.entries()) {
+    expect(preloads).toHaveLength(expectedPreloads.length);
+    for (const [index, pattern] of expectedPreloads.entries()) {
       const preload = preloads[index];
       expect(preload?.href).toMatch(pattern);
       expect(preload?.type).toBe('font/woff2');

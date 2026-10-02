@@ -70,6 +70,31 @@ describe('parseTokens', () => {
   });
 });
 
+describe('default pixel display font token', () => {
+  const json: unknown = JSON.parse(readFileSync(new URL('./tokens.json', import.meta.url), 'utf8'));
+  const tokens = parseTokens(json);
+
+  it('defines `pixel` in the default theme file with a monospace fallback chain', () => {
+    expect(tokens.fonts['pixel']).toBe(
+      "'Pixelify Sans Variable', 'Pixelify Sans', ui-monospace, monospace",
+    );
+  });
+
+  it('exposes it as the `font-pixel` utility and a runtime variable', () => {
+    const css = renderTokensCss(tokens);
+
+    expect(css).toContain('  --font-pixel: var(--ui-font-pixel);');
+    expect(css).toContain(
+      "  --ui-font-pixel: 'Pixelify Sans Variable', 'Pixelify Sans', ui-monospace, monospace;",
+    );
+  });
+
+  it('keeps the brand mark face distinct from the display pixel face', () => {
+    expect(tokens.fonts['retro']).toContain('Press Start 2P');
+    expect(tokens.fonts['pixel']).not.toContain('Press Start 2P');
+  });
+});
+
 describe('committed tokens.css', () => {
   it('matches the output generated from tokens.json', () => {
     const json: unknown = JSON.parse(
