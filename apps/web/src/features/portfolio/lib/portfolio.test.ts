@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { sortExperiments, yearsSince } from './portfolio.ts';
+import { sortExperiments, splitStatus, yearsSince } from './portfolio.ts';
 
 describe('yearsSince', () => {
   it('counts full years from a start year to a reference year', () => {
@@ -27,5 +27,22 @@ describe('sortExperiments', () => {
     const copy = [...items];
     sortExperiments(items);
     expect(items).toEqual(copy);
+  });
+});
+
+describe('splitStatus', () => {
+  it('uses the first part as the headline and the rest as short tags', () => {
+    expect(splitStatus('Working at Buo · open to chat')).toEqual({
+      headline: 'Working at Buo',
+      tags: ['open to chat'],
+    });
+  });
+
+  it('keeps a single-part status as a headline with no tags', () => {
+    expect(splitStatus('Open to work')).toEqual({ headline: 'Open to work', tags: [] });
+  });
+
+  it('trims the parts and drops empty ones', () => {
+    expect(splitStatus('  A  ·  · B ·   · C ')).toEqual({ headline: 'A', tags: ['B', 'C'] });
   });
 });

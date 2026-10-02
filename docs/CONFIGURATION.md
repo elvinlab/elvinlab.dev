@@ -86,8 +86,8 @@ Las descripciones vienen del esquema (`.describe()`), por eso están en inglés.
 | `background.cursorWaves` | `boolean` | yes |  | Slow colour waves with a ripple that follows the pointer. |
 | `recruiter` | `object` | yes |  | Recruiter card on the home page and /me. |
 | `recruiter.available` | `boolean` | yes |  | Show or hide the whole availability line (not whether you are open to work). |
-| `recruiter.openToWork` | `boolean` | no | `true` | Whether you are open to work: green status dot when true, the danger colour when false. |
-| `recruiter.status` | `{ <locale>: string }` | yes |  | Availability text per locale (for example "Open to work"). |
+| `recruiter.openToWork` | `boolean` | no | `true` | Whether you are open to work: green status dot when true, the brand accent colour when false. |
+| `recruiter.status` | `{ <locale>: string }` | yes |  | Availability text per locale. Parts separated by " · " show as a headline plus short tags on the home card (for example "Working at Buo · open to chat"); a single part is one tag (for example "Open to work"). |
 | `recruiter.lookingFor` | `{ <locale>: string }` | yes |  | What you are looking for, per locale. |
 | `recruiter.cvUrl` | `URL` | no |  | Link to a downloadable CV (https). Omit to hide the CV button. |
 | `me` | `object` | yes |  | Singular /me profile data. Lists that grow (experience, certificates) live in `src/content/`. |

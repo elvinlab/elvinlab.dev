@@ -2,7 +2,7 @@
 /** "Hiring?" recruiter card: availability, relevant experience and links to /me and the CV. */
 import { localizePath } from '@elvinlab/core';
 
-import { yearsSince } from '@/features/portfolio/lib/portfolio.ts';
+import { splitStatus, yearsSince } from '@/features/portfolio/lib/portfolio.ts';
 import { isEnabled, site } from '@/shared/config/index.ts';
 import { LOCALES, type Locale, t } from '@/shared/i18n/index.ts';
 
@@ -11,6 +11,11 @@ type Props = { locale: Locale };
 const { locale } = Astro.props;
 const { recruiter, identity } = site;
 const years = yearsSince(identity.startedYear);
+// "Working at Buo · open to chat": the first part leads, the rest are short tags with a dot. A
+// status without extra parts is shown as a single tag, as before.
+const { headline, tags } = splitStatus(recruiter.status[locale] ?? '');
+const lead = tags.length > 0 ? headline : '';
+const chips = (tags.length > 0 ? tags : [headline]).filter((chip) => chip !== '');
 ---
 
 <section class="flex flex-col gap-4 overflow-hidden rounded-card bg-card p-5">
@@ -19,10 +24,17 @@ const years = yearsSince(identity.startedYear);
     <h2 class="font-display text-lg font-bold">{t(locale, 'recruiter.title')}</h2>
   </div>
   {recruiter.available && (
-    <div>
-      <span data-recruiter-status class="inline-flex items-center gap-1.5 rounded-pill bg-chip px-2.5 py-1 text-meta text-text-secondary">
-        <span class:list={['size-2 rounded-pill', recruiter.openToWork ? 'bg-ok' : 'bg-danger']} aria-hidden="true"></span>{recruiter.status[locale]}
-      </span>
+    <div data-recruiter-status class="flex flex-col gap-2">
+      {lead && <p class="text-sm font-medium">{lead}</p>}
+      {chips.length > 0 && (
+        <ul class="flex flex-wrap gap-1.5">
+          {chips.map((chip) => (
+            <li class="flex items-center gap-1.5 rounded-control bg-chip px-2.5 py-1 text-meta text-text-secondary">
+              <span class:list={['size-2 shrink-0 rounded-pill', recruiter.openToWork ? 'bg-ok' : 'bg-primary']} aria-hidden="true"></span>{chip}
+            </li>
+          ))}
+        </ul>
+      )}
     </div>
   )}
   <p class="text-sm text-text-secondary">{t(locale, 'recruiter.experience')}: {t(locale, 'recruiter.years', { years })}</p>

@@ -147,9 +147,11 @@ export const siteConfigSchema = z
           .boolean()
           .default(true)
           .describe(
-            'Whether you are open to work: green status dot when true, the danger colour when false.',
+            'Whether you are open to work: green status dot when true, the brand accent colour when false.',
           ),
-        status: localized.describe('Availability text per locale (for example "Open to work").'),
+        status: localized.describe(
+          'Availability text per locale. Parts separated by " · " show as a headline plus short tags on the home card (for example "Working at Buo · open to chat"); a single part is one tag (for example "Open to work").',
+        ),
         lookingFor: localized.describe('What you are looking for, per locale.'),
         cvUrl: httpsUrl
           .optional()

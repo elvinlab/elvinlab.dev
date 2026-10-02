@@ -68,6 +68,17 @@ for (const { path, labLog, pillars, notebook, hiring } of HOMES) {
       await expect(page.getByRole('heading', { name: notebook })).toBeVisible();
     });
 
+    test('shows the hiring status tags on a single line', async ({ page }) => {
+      await page.goto(path);
+      const tags = page.locator('[data-recruiter-status] li');
+      await expect(tags.first()).toBeVisible();
+      // A tag is about 26 px tall on one line and about 44 px once its text wraps.
+      const heights = await tags.evaluateAll((els) =>
+        els.map((el) => el.getBoundingClientRect().height),
+      );
+      for (const height of heights) expect(height).toBeLessThan(32);
+    });
+
     test('renders no empty heading and no empty section', async ({ page }) => {
       await page.goto(path);
       const empty = await page.evaluate(() => [
