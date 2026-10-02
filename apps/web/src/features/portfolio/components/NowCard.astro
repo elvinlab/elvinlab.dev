@@ -22,10 +22,10 @@ const isInternal = (href: string) => href.startsWith('/');
       <p class="text-meta text-muted">{t(locale, 'now.updated', { date: formatNowDate(now.updatedAt, locale) })}</p>
     </div>
     <ul class="flex flex-col gap-3">
-      {now.items.map((item) => {
+      {now.items.map((item, index) => {
         const text = item.text[locale] ?? item.text[LOCALES.defaultLocale] ?? '';
         return (
-          <li class="flex flex-col gap-1 not-first:border-t not-first:border-dashed not-first:border-divider not-first:pt-3">
+          <li class:list={['flex flex-col gap-1', index > 0 && 'border-t border-dashed border-divider pt-3']}>
             <span class="font-mono text-meta text-muted">{t(locale, `now.kind.${item.kind}`)}</span>
             {item.href ? (
               <a
