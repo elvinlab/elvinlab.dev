@@ -15,11 +15,11 @@ const { locale, experiments } = Astro.props;
 {experiments.length > 0 && (
   <section class="flex flex-col gap-4">
     <div class="flex items-baseline justify-between">
-      <h2 class="flex items-center gap-3 font-display text-2xl font-bold">
+      <h2 class="flex items-center gap-3 font-pixel text-section font-semibold">
         <span class="h-5 w-1 rounded-pill bg-primary" aria-hidden="true"></span>{t(locale, 'home.experiments')}
       </h2>
       {isEnabled('experiments') && (
-        <a href={localizePath('/experiments/', locale, LOCALES)} class="text-sm text-primary underline decoration-dashed underline-offset-4">
+        <a href={localizePath('/experiments/', locale, LOCALES)} class="relative text-sm text-primary underline decoration-dashed underline-offset-4 after:absolute after:-inset-x-2 after:-inset-y-3">
           {t(locale, 'home.allExperiments')}
         </a>
       )}

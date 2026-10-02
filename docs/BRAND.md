@@ -108,12 +108,20 @@ Inconsistencia a resolver: en modo claro el banner usa `#c9c3ee` como borde y la
 
 | Rol | Familia | Pesos | Tamaños en uso |
 | --- | --- | --- | --- |
-| Display (nombre, títulos) | Space Grotesk | 700 | 58–64 px nombre · 24–27 px títulos |
+| Display (títulos de nota y de tarjeta) | Space Grotesk | 700 | 24–27 px títulos; 58–64 px nombre en los banners |
 | Texto | Space Grotesk | 400, 500 | 16–18 px |
 | Mono (números de nota, prompts, código) | JetBrains Mono | 400, 600, 700 | 12–16 px; en el sitio no se usa para etiquetas en mayúsculas |
+| Display pixelado (titular del hero, títulos de sección) | Pixelify Sans | 600 (variable) | Según el preset `appearance`: `minimal` (el de este sitio) hero 32 px en teléfono y 44 px desde `md`, títulos de sección 20 px; `full` hero 36 px y 60 px, títulos de sección 24 px |
 | Firma retro | Press Start 2P | 400 | Wordmark del navbar, firma del footer y página 404 |
 
-Ambas desde [Fontsource](https://fontsource.org), autoalojadas; nunca desde un CDN en tiempo de ejecución.
+Todas desde [Fontsource](https://fontsource.org), autoalojadas; nunca desde un CDN en tiempo de ejecución.
+
+**Cara pixelada de display (decisión del 2026-10-01).** Pixelify Sans es una segunda cara pixelada, más legible que Press Start 2P, que se probó en pantalla y el propietario del sitio decidió conservar, titular del hero incluido. Se expone como el token de fuente `pixel` del tema por defecto (`font-pixel`), nunca como una familia escrita en un componente.
+
+- **Dónde va:** el titular del hero de la home y los títulos de sección con barra de acento (también los de `/me`).
+- **Dónde nunca va:** párrafos, prosa de las notas, títulos de nota, navbar, formularios ni código. Regla general: las caras pixeladas son solo para texto corto y grande.
+- **Press Start 2P** sigue siendo la marca (wordmark del navbar, firma del footer, 404); Space Grotesk sigue siendo el texto y la interfaz; JetBrains Mono, el código y los números de nota.
+- **Límite conocido:** la `e` pixelada pierde legibilidad en tamaños grandes. Con la escala `minimal` (hero de 32 y 44 px) se juzgó aceptable en una revisión visual; en `full` (36 y 60 px) el límite sigue vigente.
 
 ### Variantes accesibles
 
@@ -163,7 +171,7 @@ La identidad es "laboratorio de IA sobre fondo oscuro": pocos elementos, siempre
 
 - Un solo acento dominante por bloque; el gradiente completo solo en piezas protagonistas.
 - Mismo componente en oscuro y claro, cambiando solo tokens de superficie y texto.
-- Etiquetas en JetBrains Mono y mayúsculas; títulos en Space Grotesk.
+- Etiquetas en JetBrains Mono y mayúsculas; títulos de nota y de tarjeta en Space Grotesk; titular del hero y títulos de sección en Pixelify Sans.
 - Capturas propias de los proyectos, nunca imágenes de stock.
 
 ### No

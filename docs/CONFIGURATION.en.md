@@ -67,7 +67,16 @@ The descriptions come from the schema (`.describe()`), which is why they are in 
 | `identity.bio` | `{ <locale>: string }` | yes |  | Short bio per locale (also the description of the /me page). |
 | `identity.location` | `string` | no |  | City or country shown on /me and share cards. |
 | `identity.startedYear` | `integer (min 1970)` | yes |  | First year of professional work; years of experience are derived from it. |
-| `identity.avatar` | `string` | no |  | Site-relative path to a profile photo in `public/` (for example `/avatar.png`). Omit to show initials. |
+| `identity.avatar` | `string` | no |  | File name of a profile photo placed in `apps/web/src/assets/` (for example `avatar.png`); it is optimized at build time. Omit to show initials. |
+| `appearance` | `'minimal' \| 'full'` | no | `full` | Visual preset. `minimal` is the calm look (smaller type, fewer home sections); `full` is the original look. Defaults to `full` so a config written before the preset existed does not change. |
+| `home` | `object` | no | `{}` | Show or hide each home section; a key you set wins over the `appearance` preset, a key you omit follows it. `minimal` hides `heroPills`, `labLog` and `pillars`; `full` shows everything. A hidden section renders nothing. |
+| `home.heroPills` | `boolean` | no |  | The three keyword pills under the hero intro (desktop only). |
+| `home.authorCard` | `boolean` | no |  | The sidebar author card: photo, name, bio and social buttons. |
+| `home.hiringCard` | `boolean` | no |  | The sidebar "Hiring?" recruiter card: availability and links to /me and the CV. |
+| `home.labLog` | `boolean` | no |  | The sidebar "Lab log" box: since when, cadence and languages. |
+| `home.pillars` | `boolean` | no |  | The four pillars strip at the bottom of the home (desktop only). |
+| `home.notebookIndex` | `boolean` | no |  | The notebook index: compact rows for the notes after the latest one. |
+| `home.experiments` | `boolean` | no |  | The experiments section of the home. Also needs `features.experiments`: with that flag off it never shows. |
 | `socials` | `object[]` | yes |  | Social profile links shown in the footer and used as `sameAs` in structured data. |
 | `socials[].label` | `string` | yes |  | Link text and accessible name. |
 | `socials[].url` | `URL` | yes |  | Profile URL (https only: an email address never belongs in public config). |
@@ -305,6 +314,22 @@ Each `features` flag switches the whole feature off: the route is not generated,
 | `me` | The `/me` page (portfolio) | |
 | `readingMode` | Reading mode on notes | Off: no button, script or CSS ships and nothing is stored in the browser |
 
+#### Appearance and home sections
+
+`appearance` picks the visual preset: `minimal` (this site's choice) hides the hero pills (`heroPills`), the "Lab log" box (`labLog`) and the pillars strip (`pillars`) on the home page; `full` is the original look and shows everything. If you omit `appearance` it is `full`, so a config written before the preset existed does not change.
+
+**Type scale.** `appearance` also sets the text size: it lands on `<html data-appearance>` and `apps/web/src/styles/type-scale.css` defines the scale once (`--type-*` variables), so a fork changes it by editing that file. `minimal`: hero 32/44 px (phone/`md`), section titles 20, note title 30/40, featured card 20/22, body and intro paragraph 17. `full` keeps the original sizes (hero 36/60 px, sections 24, note title 36/48, featured card 30/36, body 18). Reading mode has its own scale and does not change.
+
+**Banners and notes.** The same preset lowers the banner heights (in `minimal`: 240 px on pages, expanded home between 360 and 460 px), makes every banner blend into the page through a 120 px gradient and, on notes, keeps only the date and reading time in the header (language and author move to the foot) with a more compact decision record. `full` keeps the original heights and header. Those values live in `apps/web/src/styles/calm-layout.css`.
+
+`home` tunes each section on its own and **always wins over the preset**: a key you set rules, a key you omit follows the preset. Keys: `heroPills`, `authorCard`, `hiringCard`, `labLog`, `pillars`, `notebookIndex` and `experiments` (which also needs `features.experiments`). A section that is off renders nothing (no heading, no gap), and when all three sidebar cards (`authorCard`, `hiringCard`, `labLog`) are off the sidebar column disappears.
+
+```ts
+// Calm look, but keep the Lab log and drop the hiring card.
+appearance: 'minimal',
+home: { labLog: true, hiringCard: false },
+```
+
 ### 6.3 Experience, certificates and experiments
 
 Add an entry to the matching JSON (section 4) with a new key. To remove one, delete it. Build (`pnpm --filter web build`) to validate: an invalid field breaks the build and names the field.
@@ -343,10 +368,10 @@ The text lives in `apps/web/src/features/privacy/content.ts` and `apps/web/src/f
 ### 6.9 Colors, typography, photo and images
 
 - **Theme**: `packages/core/src/tokens/tokens.json`, then `mise exec -- pnpm --filter @elvinlab/core tokens` (regenerates `tokens.css`). Components read semantic variables, never a raw color.
-- **Profile photo**: put the file in `apps/web/public/` and point `identity.avatar` at it. It is used on the home page, on `/me` and on the `/me` card.
+- **Profile photo**: put the file in `apps/web/src/assets/` and write only its file name in `identity.avatar` (for example `avatar.png`; png, jpg, webp or avif). It is optimized at build time (webp with explicit dimensions) and used on the home page, on `/me` and on the `/me` card. A missing file fails the build.
 - **Favicon**: `apps/web/public/favicon.svg`.
 - **Default share image**: `apps/web/public/og-image.png` (1200 × 630). It is a static file with the person's name drawn on it: **replace it** if you use the site for someone else. Notes and `/me` generate their own card at build time.
-- **Fonts**: self-hosted (Fontsource); never loaded from a CDN.
+- **Fonts**: self-hosted (Fontsource); never loaded from a CDN. The pixel display face (Pixelify Sans) is the `pixel` font token in `tokens.json`; a theme can replace it.
 
 ### 6.10 UI texts and a new language
 

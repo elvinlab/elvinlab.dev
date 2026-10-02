@@ -3,6 +3,10 @@
  * Full-bleed banner: the brand grid and corner glows over the banner surface, with an optional
  * animated background passed through the `background` slot. When `expandable`, a glass toggle lets
  * the visitor grow or shrink the background height (remembered per visitor); the content never moves.
+ * Every banner blends its bottom edge into the page through the same 120 px gradient, drawn by the
+ * server-rendered markup and CSS only (no script), so the first paint of every page is already right.
+ * The heights below are what `full` shows; the `appearance` preset lowers them through the caps in
+ * `calm-layout.css`, so a page never needs to know the preset.
  */
 import { type Locale, t } from '@/shared/i18n/index.ts';
 
@@ -10,19 +14,25 @@ type Props = {
   height?: string;
   /** Height when expanded (defaults to the viewport). */
   expandedHeight?: string;
+  /** Expanded height on touch and narrow screens, where the canvas is hidden or the hero is tall. */
+  compactExpandedHeight?: string;
   /** Show the expand/collapse toggle. */
   expandable?: boolean;
-  /** Blend the bottom edge into the page for the homepage hero only. */
-  homeFade?: boolean;
   locale?: Locale;
 };
 
-const { height = '340px', expandedHeight = 'clamp(520px, 72vh, 640px)', expandable = false, homeFade = false, locale = 'es' } = Astro.props;
+const {
+  height = '340px',
+  expandedHeight = 'clamp(520px, 72vh, 640px)',
+  compactExpandedHeight = expandedHeight,
+  expandable = false,
+  locale = 'es',
+} = Astro.props;
 ---
 
 <section
   class="banner relative isolate overflow-hidden bg-banner"
-  style={`--h-collapsed:${height};--h-expanded:${expandedHeight}`}
+  style={`--h-collapsed-base:${height};--h-expanded-base:${expandedHeight};--h-expanded-compact-base:${compactExpandedHeight}`}
   data-banner
   data-expanded={expandable ? true : undefined}
 >
@@ -30,8 +40,8 @@ const { height = '340px', expandedHeight = 'clamp(520px, 72vh, 640px)', expandab
   <div class="banner-stars absolute inset-0 -z-20" aria-hidden="true"></div>
   <div class="banner-glow absolute inset-0 -z-20 motion-reduce:opacity-100" aria-hidden="true"></div>
   <slot name="background" />
-  {homeFade && <div aria-hidden="true" class="pointer-events-none absolute inset-x-0 bottom-0 z-0 h-[120px] bg-gradient-to-b from-transparent to-page" data-home-fade></div>}
-  <div data-banner-inner class:list={['relative mx-auto flex h-full min-h-[inherit] max-w-[1200px] flex-col justify-end px-4 pt-24 pb-8', homeFade && 'z-10']}>
+  <div aria-hidden="true" class="pointer-events-none absolute inset-x-0 bottom-0 z-0 h-[120px] bg-gradient-to-b from-transparent to-page" data-banner-fade></div>
+  <div data-banner-inner class="relative z-10 mx-auto flex h-full min-h-[inherit] max-w-[1200px] flex-col justify-end px-4">
     <slot />
   </div>
 
@@ -40,7 +50,7 @@ const { height = '340px', expandedHeight = 'clamp(520px, 72vh, 640px)', expandab
       type="button"
       data-banner-toggle
       aria-pressed="true"
-      class="absolute right-3 bottom-3 z-10 flex h-9 items-center gap-1.5 rounded-pill bg-card/70 px-3 font-mono text-xs text-text-secondary backdrop-blur-md transition-colors duration-150 hover:text-text"
+      class="absolute right-3 bottom-3 z-10 flex h-9 items-center gap-1.5 rounded-pill bg-card/70 px-3 font-mono text-meta text-text-secondary backdrop-blur-md transition-colors duration-150 before:absolute before:-inset-1.5 hover:text-text"
       data-label-expand={t(locale, 'banner.expand')}
       data-label-collapse={t(locale, 'banner.collapse')}
       aria-label={t(locale, 'banner.collapse')}
@@ -52,12 +62,27 @@ const { height = '340px', expandedHeight = 'clamp(520px, 72vh, 640px)', expandab
 </section>
 
 <style>
+  /* The page asks for a height (`--*-base`, inline); the preset caps it (`calm-layout.css`). */
   .banner {
+    --h-collapsed: min(var(--h-collapsed-base), var(--banner-page-cap));
+    --h-expanded: min(var(--h-expanded-base), var(--banner-expanded-cap));
+    --h-expanded-compact: min(var(--h-expanded-compact-base), var(--banner-expanded-compact-cap));
     min-height: var(--h-collapsed);
     transition: min-height 350ms ease;
   }
+  [data-banner-inner] {
+    padding-top: var(--banner-pad-top);
+    padding-bottom: var(--banner-pad-bottom);
+  }
   .banner[data-expanded] {
     min-height: var(--h-expanded);
+  }
+  /* Touch and phone-width screens: the canvas is hidden on coarse pointers, so a viewport-tall banner is
+     mostly empty. A smaller floor lets the hero text size the banner (min-height never clips it). */
+  @media (pointer: coarse), (max-width: 767px) {
+    .banner[data-expanded] {
+      min-height: var(--h-expanded-compact);
+    }
   }
   /* Collapsed: hide the whole hero so the banner becomes a thin background band and the content
      below rises immediately. :global targets slotted content (a different Astro style scope). */

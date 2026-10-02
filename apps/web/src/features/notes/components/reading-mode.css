@@ -19,6 +19,12 @@
   backdrop-filter: blur(8px);
   cursor: pointer;
 }
+/* Invisible expansion: the pill stays 36 px tall, the hit area reaches 44 px. */
+.reading-exit::before {
+  content: "";
+  position: absolute;
+  inset: -0.25rem 0;
+}
 html[data-reading] .reading-exit {
   display: inline-flex;
 }
@@ -27,6 +33,7 @@ html[data-reading] [data-banner] .banner-grid,
 html[data-reading] [data-banner] .banner-stars,
 html[data-reading] [data-banner] .banner-glow,
 html[data-reading] [data-banner] canvas,
+html[data-reading] [data-banner] [data-banner-fade],
 html[data-reading] [data-banner-toggle],
 html[data-reading] main aside {
   display: none;
@@ -60,6 +67,10 @@ html[data-reading] .prose {
   max-width: none;
   font-size: 1.1875rem;
   line-height: 1.8;
+  /* Reading mode has its own scale: the headings stay as in the `full` preset. */
+  --type-prose-h2: 1.75rem;
+  --type-prose-h3: 1.35rem;
+  --type-prose-quote: 1.2rem;
 }
 /* The article card is flattened, so the next block needs more room to read as a separate thing. */
 html[data-reading] [data-prev-next] {

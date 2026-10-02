@@ -1,16 +1,19 @@
 ---
 /**
  * Page shell: head metadata, pre-paint theme script, skip link, navbar, content, footer and the
- * language hint. Pages pass an `aside` slot to get the design's `main | sidebar 280 px` grid and a
- * `banner` slot for the full-bleed banner above it.
+ * language hint. Pages pass an `aside` slot to get the design's `main | sidebar 280 px` grid (only
+ * while the slot renders something) and a `banner` slot for the full-bleed banner above it.
  */
 import '@fontsource-variable/jetbrains-mono';
+import '@fontsource-variable/pixelify-sans';
 import '@fontsource-variable/space-grotesk';
 import '@/styles/global.css';
 
 import { DEFAULT_THEME, THEME_BOOT_SCRIPT } from '@elvinlab/core';
+import jetbrainsMonoLatin from '@fontsource-variable/jetbrains-mono/files/jetbrains-mono-latin-wght-normal.woff2?url';
+import spaceGroteskLatin from '@fontsource-variable/space-grotesk/files/space-grotesk-latin-wght-normal.woff2?url';
 
-import { integrations } from '@/shared/config/index.ts';
+import { appearance, integrations } from '@/shared/config/index.ts';
 import { type Locale, t } from '@/shared/i18n/index.ts';
 import Footer from '@/shared/layout/Footer.astro';
 import Navbar from '@/shared/layout/Navbar.astro';
@@ -39,15 +42,25 @@ type Props = {
 };
 
 const { locale, printable = false, translations, ...seo } = Astro.props;
-const hasAside = Astro.slots.has('aside');
+// `Astro.slots.has` is true even when the slot's content is a conditional that rendered nothing,
+// which would leave an empty sidebar column. Render the slot once and keep it only if it has content.
+const asideHtml = Astro.slots.has('aside') ? (await Astro.slots.render('aside')).trim() : '';
+const hasAside = asideHtml !== '';
 const hasBanner = Astro.slots.has('banner');
 const beaconToken = integrations.analyticsToken;
+// Page CSS is inlined, so the browser only learns its font URLs after parsing it. Preloading the
+// two Latin variable files (the only subsets Spanish and English text use) starts them with the
+// HTML. Latin-ext, Vietnamese and Press Start 2P stay lazy via `unicode-range`/on-demand loading.
+const preloadedFonts = [spaceGroteskLatin, jetbrainsMonoLatin];
 ---
 
-<html lang={locale} data-theme={DEFAULT_THEME}>
+<html lang={locale} data-theme={DEFAULT_THEME} data-appearance={appearance}>
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    {preloadedFonts.map((href) => (
+      <link rel="preload" as="font" type="font/woff2" href={href} crossorigin />
+    ))}
     <script is:inline set:html={THEME_BOOT_SCRIPT} />
     <Seo locale={locale} {...seo} />
     <slot name="head" />
@@ -80,7 +93,7 @@ const beaconToken = integrations.analyticsToken;
           </div>
           {hasAside && (
             <aside aria-label={t(locale, 'aside.label')} class="animate-fade-in-up [animation-delay:100ms]">
-              <slot name="aside" />
+              <Fragment set:html={asideHtml} />
             </aside>
           )}
         </div>

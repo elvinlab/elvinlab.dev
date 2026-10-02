@@ -1,8 +1,13 @@
 @import "tailwindcss";
 @import "@elvinlab/core/tokens.css";
+@import "./calm-layout.css";
+@import "./type-scale.css";
 
 @theme {
   --spacing-18: 4.5rem;
+  /* Smallest text for mono meta and chips: 13 px, never the 12 px of `text-xs`. */
+  --text-meta: 0.8125rem;
+  --text-meta--line-height: 1.125rem;
   --animate-fade-in-up: fade-in-up 300ms ease-out both;
   --animate-blink: blink 1s steps(1) infinite;
 
@@ -50,7 +55,7 @@
 /* Article body (design v3): 68ch measure, generous line height, dashed dividers, pink quote bar. */
 .prose {
   max-width: 68ch;
-  font-size: 1.125rem;
+  font-size: var(--type-prose);
   line-height: 1.75;
   color: var(--color-text);
 }
@@ -61,14 +66,14 @@
   scroll-margin-top: 6rem;
   margin-top: 2em;
   font-family: var(--font-display);
-  font-size: 1.75rem;
+  font-size: var(--type-prose-h2);
   font-weight: 700;
   line-height: 1.2;
 }
 .prose h3 {
   margin-top: 1.6em;
   font-family: var(--font-display);
-  font-size: 1.35rem;
+  font-size: var(--type-prose-h3);
   font-weight: 700;
 }
 .prose a {
@@ -87,7 +92,7 @@
 .prose blockquote {
   border-left: 3px solid var(--color-pink);
   padding-left: 1.25rem;
-  font-size: 1.2rem;
+  font-size: var(--type-prose-quote);
   color: var(--color-text-secondary);
 }
 .prose ul,
@@ -99,6 +104,19 @@
 }
 .prose .expressive-code {
   margin-top: 1.5em;
+}
+/* Touch screens (no hover): Expressive Code keeps the copy button always visible over the first
+   lines of code, so long lines ran underneath it. Make it a 44 px target and give it its own
+   strip above the first line instead of overlaying text. Mouse devices keep the upstream
+   hover-only 32 px button untouched. */
+@media (hover: none) {
+  .prose .expressive-code .copy button {
+    width: 2.75rem;
+    height: 2.75rem;
+  }
+  .prose .expressive-code pre > code {
+    padding-block-start: 3.5rem;
+  }
 }
 
 /* Print stylesheet for pages that opt in with `printable` (the /me recruiter page prints as a CV).

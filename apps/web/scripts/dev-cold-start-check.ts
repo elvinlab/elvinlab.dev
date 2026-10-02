@@ -30,6 +30,21 @@ const finish = (code: number): never => {
   process.exit(code);
 };
 
+// The isolated workspace links `node_modules` to this checkout, so assets imported with `?url`
+// (the preloaded fonts) resolve outside the workspace root, which Vite's dev server denies by
+// default. A real clone keeps `node_modules` inside the project root and needs no such rule.
+{
+  const config = join(workspace.web, 'astro.config.ts');
+  const original = readFileSync(config, 'utf8');
+  const allowed = JSON.stringify([workspace.root, source]);
+  const patched = original.replace(
+    'plugins: [tailwindcss()],',
+    `plugins: [tailwindcss()],\n    server: { fs: { allow: ${allowed} } },`,
+  );
+  if (patched === original) throw new Error('dev check: could not allow the linked node_modules');
+  writeFileSync(config, patched);
+}
+
 if (process.env['DEV_CHECK_STRIP_DEPS'] === '1') {
   const config = join(workspace.web, 'astro.config.ts');
   const stripped = readFileSync(config, 'utf8').replace(

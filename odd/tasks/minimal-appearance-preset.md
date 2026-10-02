@@ -1,0 +1,71 @@
+# Minimal appearance preset
+
+## Objective and authorization
+Make the site calmer and more minimalist while keeping the modern look, and make the home sections configurable so the owner can switch them on or off by taste. The owner confirmed on 2026-10-01: "minimal configurable", smaller and less loud text, calmer notes. Local implementation and work-unit commits on a feature branch only; push, merge and release are separate decisions (the owner authorized one push of `develop` and remote branch cleanup earlier; that does not extend to this feature).
+
+## Specification (owner-approved direction, defaults are mine)
+- Config in `site.config.ts` (white-label, schema-validated, documented by `pnpm docs:config`):
+  - `appearance: 'minimal' | 'full'`, default `'minimal'`. `'full'` reproduces today's home and note pages.
+  - `home`: optional booleans `heroPills`, `authorCard`, `hiringCard`, `labLog`, `pillars`, `notebookIndex`, `experiments` that override the preset. Preset `minimal`: `heroPills` off, `labLog` off, `pillars` off, the rest on; `experiments` still also needs `features.experiments`. Preset `full`: everything on.
+  - A section that is off renders nothing (no empty heading or placeholder); layout closes the gap.
+- Type scale driven by the theme, not by scattered classes: `appearance` sets a document attribute and CSS variables for the scale. Minimal targets (owner finds current text too large and loud): hero 32 px phone / 44 px from `md` (pixel face), section titles 20 px, note title 30 px phone / 40 px desktop, card titles 20-22 px, body 17 px at the same line height ratio, meta stays 13 px. `full` keeps today's sizes (hero 36/60, section 24, note 36/54, card 26-28, body 18).
+- Calmer home banner in minimal: lower expanded height; the WebGL background and brand motifs stay.
+- Banner bottom edge on every page (owner request, 2026-10-01): the home hero blends into the page through a 120 px gradient (`homeFade`), which the owner likes, but on the other pages (notes index, note, `/me`, `/contact`, legal, changelog, 404) navigating between pages shows a hard or inconsistent edge between the animated banner and where the content starts. The same blend must apply on every page that has a banner, in both themes, with no flash during navigation (including the collapsed banner state and reading mode), without changing the home result. Verify with screenshots of each page at 390 and 1440 in dark and light, before and after.
+- Calmer note pages in minimal: lower banner, compact decision record (smaller type, tighter padding), reduced header meta (date and reading time; language badge and tags move to the foot), no change to reading mode, TOC, comments or prev/next behavior.
+- Constraints: accessibility floor unchanged (44 px targets, contrast AA both themes, no overflow at 360/390/768/1280, reduced motion), JS budget and CLS unchanged, brand tokens and fonts unchanged, `full` is covered by the same tests as today.
+
+## Execution and checks
+- Branch: `feat/minimal-appearance-preset` from `develop` (`4b6e618`).
+- Route: delegated direct, one Claude writer per unit, parent reviews each diff.
+- Strict TDD: enabled (user global config). Runner: `pnpm exec playwright test tests/browser/<spec> --project=chromium-1280` for focused browser checks (add `chromium-360` only for layout tests), `pnpm --filter web test` and `pnpm --filter @elvinlab/core test` for unit tests.
+- Tiered verification (owner twice asked for less testing, 2026-10-01): per unit run only the new or changed unit tests, `pnpm typecheck`, `pnpm lint`, `git diff --check`, and at most one focused Playwright spec at `chromium-1280` filtered with `-g` when the behavior cannot be proven at unit level. At feature close the parent runs `pnpm test:e2e` once on the chromium-1280 project only (plus `pnpm --filter web build` and `pnpm test:white-label` because the config schema changes), and skips Lighthouse, `check:js-budget` and `check:dev-cold-start` unless a change touches fonts, scripts or the build graph. The parent spot-checks instead of repeating the writer's runs. Record anything skipped as skipped.
+- Autonomy (owner, 2026-10-01): the owner is away and authorized finishing this feature unattended. Scope: complete M1-M3, commit each unit locally, and fast-forward the feature into `develop` locally if it ends green. Not authorized: push, merge into `main`, release, or any remote operation.
+- Delivery: ask-on-risk, forecast 450-650 authored lines across three units; the repo has no PR flow (ADR 0012), so the count is recorded only.
+- RDD: off (clone-local), unmanaged.
+
+## Work units
+- [x] M1 - Config and home sections: schema, preset resolution, home section flags, generated docs, tests for both presets.
+  - Evidence: committed with this document update (subject `feat(config): appearance preset and per-section home switches`). 9 tracked files +172/-22 plus `appearance.ts`, `appearance.test.ts`, `home-sections.spec.ts`. Route: delegated (Claude writer, sonnet); parent reviewed the diff.
+    - RED then GREEN (writer-observed): config vitest 7 failed / 3 files failed (missing `appearance.ts`) then 69 pass; new browser spec 2 of 6 failed (pills still present) then 6 pass; empty-aside checked by hand against the dev server (before: `<aside>` and the two-column grid still rendered with every card off; after: neither).
+    - Parent spot checks: aside renders on `/`, `/me/`, `/notes/` and a note page (TOC present) through the dev server (read-only requests); resolver and schema reviewed by reading.
+    - Decisions: schema default `appearance` is `'full'` (forks keep today's look); the repo's `site.config.ts` sets `'minimal'` explicitly and a unit test asserts it. `experiments` also needs `features.experiments`, resolved inside `resolveHome`. `BaseLayout` renders the `aside` slot once and keeps the sidebar only when it produced content (`Astro.slots.has` stays true for a slot whose content renders nothing).
+    - Gap: the empty-aside case has no committed automated test (the fixture build copies the real minimal config and the repo has no Astro container test setup).
+    - Skipped by owner policy: full `pnpm test`, other Playwright specs, `depcruise`, white-label (optional keys keep the alt config valid).
+- [x] M2 - Theme-driven type scale: minimal and full scales, hero/section/card sizes, tests of computed sizes in both modes.
+  - Evidence: committed with this document update (subject `feat(ui): theme-driven type scale for the minimal and full presets`). 11 tracked files +22/-13 plus `type-scale.css` (68 lines), `type-scale.test.ts` (9 unit tests) and `type-scale.spec.ts` (3 browser tests). Route: delegated (Claude writer, sonnet); parent read `type-scale.css` and viewed the 390 px home screenshot.
+    - RED then GREEN (writer-observed): unit RED (`type-scale.css` missing) then 9 of 9; browser 6 of 6 failed (no `data-appearance`, note title 48 px not 40) then 6 of 6. Minimal computes hero 32/44, section 20, card title 20/22, note title 30/40, prose 17 px at 1.75. Existing `pixel-display`, `reading-mode`, `home-sections` and mobile-ux fold specs passed once at chromium-1280 with no edits.
+    - Mechanism: `html[data-appearance]` set in `BaseLayout`; the whole scale lives in `apps/web/src/styles/type-scale.css` (web app, not core: the scale is keyed by `appearance`, core tokens by color theme); utilities `text-hero`, `text-section`, `text-note-title`, `text-card-title`, `text-intro`; `.prose` reads `--type-prose*`. Components never test the preset.
+    - Corrections to the specification: `full` is today's real sizes. The note title was 36/48 px (not 36/54, so DESIGN.md's 54 is wrong and is fixed in the docs unit); the latest-note card title was 30/36 px; small card titles are already 18 px and stay as is in both modes. Prose h2/h3/blockquote follow the scale too (24/19.2/17.6 px minimal, 28/21.6/19.2 full); reading mode pins the `full` values locally.
+    - Not on the scale (out of scope): `/me` hero, notes index h1, contact, legal and 404 headings.
+    - Follow-up for M3: the hero measure (`max-w-[16ch]`) shrinks with the font, so the hero stays at three lines on desktop; give `minimal` a wider measure (about 22ch from `md`) through a variable.
+- [x] M3 - Calm note pages and banners: consistent bottom blend on every page's banner (see specification), lower banners, compact decision record, reduced meta, tests.
+  - Evidence: committed with this document update (subject `feat(ui): consistent banner edge and calm notes for the minimal preset`). 12 tracked files +51/-45 plus 6 new files (`calm-layout.css`, `calm-layout.test.ts`, `css-rules.ts`, `note-meta.ts`, `note-meta.test.ts`, `calm-pages.spec.ts`). Route: delegated (Claude writer, sonnet; the session was interrupted once and the same writer resumed from the working tree); parent read the Banner diff and `calm-layout.css` and viewed the note (light 1440), `/me/` (light 1440) and home (dark 1440) screenshots.
+    - Root cause of the inconsistent edge: only the home banner drew the 120 px fade (`homeFade` prop); `/notes/`, note pages and `/me/` had a hard step where the banner colour met the page colour (worst in light theme, note page at y~372). `/contact/`, `/privacy/`, `/terms/`, `/changelog/` and the 404 have no banner.
+    - Fix: the fade is always rendered (`data-banner-fade`, server-rendered, CSS only, no script, so the first paint is right), the `homeFade` prop is gone, the home is unchanged; reading mode hides it with the other banner effects. Banner heights are `min(requested, preset cap)` through variables in `calm-layout.css`; `full` caps are `100rem` (no-ops), `minimal` caps: page banners 240 px, expanded home `clamp(360px, 48vh, 460px)`, compact 24rem. Hero measure variable: 16ch in `full`, 22ch from `md` in `minimal` (hero on two lines on desktop).
+    - Notes in minimal: header keeps date and reading time; language badge moves to the foot (next to the tags on a note, in the chip line on index rows, beside the CTA on the home card); author name moves to the foot meta line; decision record tightened through `--record-*` variables (padding 20 to 16 px, gap 20 to 14 px, label 13 px; the body stays 14 px because it was already 14, not the 15-16 px the brief assumed).
+    - Tests: `calm-layout.test.ts` and `note-meta.test.ts` RED then GREEN (26/26 with `type-scale.test.ts`); `calm-pages.spec.ts` written after the implementation (no RED: reverting was not possible without stash or checkout), 9/9 at chromium-1280 and 8 passed, 1 skipped at chromium-360; fade present on all 7 banner pages in both themes, in the served HTML, reading mode, collapsed home, minimal heights, compact decision record, note meta, no overflow. Related specs (smoke, mobile-ux, pixel-display, reading-mode, notes-layout, type-scale, home-sections) 87/87 at chromium-1280. Changed assertions: `[data-home-fade]` renamed to `[data-banner-fade]`; expanded home banner at 1280x900 from 594 to 432 px (the minimal cap). `full` heights are proven at CSS level.
+    - Caveats: BEFORE screenshots were lost with the interrupted session, so the before/after comparison rests on what the writer saw earlier; the AFTER set (56 PNGs) was taken in a scratch folder. On `/me/` at 1440 the avatar sits about 8 px under the navbar (minimum padding, the banner is sized by content). On `/notes/` index rows the language badge shares the chip line and can push a tag onto a second row.
+
+## Closure (2026-10-01): feature closed
+Status: closed. M1, M2 and M3 are done and committed on `feat/minimal-appearance-preset` (`3684303`, `52f2bb9`, `97387d2`). The feature is merged into `develop` by fast-forward and pushed to `origin/develop` (`ffbeb31`, 2026-10-01, owner-authorized), NOT released to `main`. Documentation unit (DESIGN, BRAND, CONFIGURATION, README, this tracker and `elvinlab-site.md`) written afterwards, uncommitted at the time of writing.
+
+Corrections to the specification above, recorded where they were found: the schema default of `appearance` is `full` (not `minimal`); the `full` note title is 36/48 px (not 36/54) and the old docs value was wrong; the decision record body stays 14 px.
+
+Final light verification (owner asked twice for less local testing, so the tiered plan above was used):
+- Unit tests: 37 core and 529 web tests passed; typecheck and lint clean.
+- `pnpm test:e2e` at `chromium-1280` only: 189 passed, about 49 s (the full 3-viewport suite takes about 1.6 min).
+- `pnpm --filter web build` and `pnpm test:white-label`: passed (the config schema changed).
+- Skipped on purpose and NOT re-run for this feature: the full 3-viewport e2e suite, mobile Lighthouse, `check:js-budget`, `check:dev-cold-start`, `depcruise`.
+- Gaps: no automated test for the empty-aside layout; M3 BEFORE screenshots were lost, so the banner-edge before/after rests on what the writer saw plus an AFTER set; on `/me/` at 1440 the avatar sits about 8 px under the navbar; on `/notes/` index rows the language badge can push a tag onto a second row.
+
+Open follow-ups (none started):
+- Faster local test loop: fast script, local workers, fixture-build reuse, tiered verification. Measure first.
+- Audit point 7: the hiring card shows "not available" next to its primary CTA; content decision of the owner.
+- LCP is the hero headline text (~2.3 s, unchanged); INP and the real-GPU banner cost are unmeasured; Lighthouse was not re-run after this feature.
+- Release plan for the diverged `main`: its tree equals `develop` before the 2026-10-01 work, but its history diverges (release commits are separate), so a release is not a plain fast-forward and needs a plan.
+- `develop` was pushed to `origin` at `ffbeb31` on 2026-10-01 with the owner's explicit authorization (previous push `4b6e618`); the remote has only `main` and `develop`.
+
+Engram mirror: `odd/minimal-appearance-preset/tasks` (resync with this document when Engram is available).
+
+## Route declaration
+M1-M3: delegated direct, one Claude writer per unit; trigger evidence: more than four non-trivial files per unit.

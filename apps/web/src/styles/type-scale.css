@@ -1,0 +1,64 @@
+/* Theme-driven type scale. The `appearance` preset of the site config reaches the document as
+   `html[data-appearance]` (BaseLayout), and this file is the only place where the preset changes
+   a size: components use the `text-hero`, `text-section`, `text-note-title`, `text-card-title`
+   and `text-intro` utilities (and `.prose` reads the `--type-prose*` variables) and never test
+   the preset. A fork changes its scale by editing the two blocks below.
+
+   It lives in the web app, not in `@elvinlab/core`: the scale is keyed by `appearance`, an
+   app-level setting, while core tokens are keyed by color theme.
+
+   `full` is the look before the preset existed, and it is also the default without the attribute.
+   Every value is in rem so the visitor's font-size setting still scales it. `md` is 48rem. */
+:root,
+[data-appearance="full"] {
+  --type-hero: 2.25rem;
+  --type-section: 1.5rem;
+  --type-section-leading: 2rem;
+  --type-note-title: 2.25rem;
+  --type-card-title: 1.875rem;
+  --type-intro: 1.125rem;
+  --type-prose: 1.125rem;
+  --type-prose-h2: 1.75rem;
+  --type-prose-h3: 1.35rem;
+  --type-prose-quote: 1.2rem;
+}
+
+[data-appearance="minimal"] {
+  --type-hero: 2rem;
+  --type-section: 1.25rem;
+  --type-section-leading: 1.75rem;
+  --type-note-title: 1.875rem;
+  --type-card-title: 1.25rem;
+  --type-intro: 1.0625rem;
+  --type-prose: 1.0625rem;
+  --type-prose-h2: 1.5rem;
+  --type-prose-h3: 1.2rem;
+  --type-prose-quote: 1.1rem;
+}
+
+@media (min-width: 48rem) {
+  :root,
+  [data-appearance="full"] {
+    --type-hero: 3.75rem;
+    --type-note-title: 3rem;
+    --type-card-title: 2.25rem;
+    --type-intro: 1.25rem;
+  }
+
+  [data-appearance="minimal"] {
+    --type-hero: 2.75rem;
+    --type-note-title: 2.5rem;
+    --type-card-title: 1.375rem;
+    --type-intro: 1.1875rem;
+  }
+}
+
+/* Tailwind utilities that read the runtime variables above (`inline` keeps the `var()` as is). */
+@theme inline {
+  --text-hero: var(--type-hero);
+  --text-section: var(--type-section);
+  --text-section--line-height: var(--type-section-leading);
+  --text-note-title: var(--type-note-title);
+  --text-card-title: var(--type-card-title);
+  --text-intro: var(--type-intro);
+}

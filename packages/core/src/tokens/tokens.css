@@ -27,6 +27,7 @@
   --font-body: var(--ui-font-body);
   --font-mono: var(--ui-font-mono);
   --font-retro: var(--ui-font-retro);
+  --font-pixel: var(--ui-font-pixel);
 }
 
 :root {
@@ -38,6 +39,7 @@
   --ui-font-body: 'Space Grotesk Variable', 'Space Grotesk', system-ui, sans-serif;
   --ui-font-mono: 'JetBrains Mono Variable', 'JetBrains Mono', ui-monospace, monospace;
   --ui-font-retro: 'Press Start 2P', ui-monospace, monospace;
+  --ui-font-pixel: 'Pixelify Sans Variable', 'Pixelify Sans', ui-monospace, monospace;
 }
 
 :root,

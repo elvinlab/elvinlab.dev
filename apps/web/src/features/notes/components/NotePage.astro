@@ -14,6 +14,7 @@ import ReadingProgress from '@/features/notes/components/ReadingProgress.astro';
 import RelatedNotes from '@/features/notes/components/RelatedNotes.astro';
 import ShareCard from '@/features/notes/components/ShareCard.astro';
 import Toc from '@/features/notes/components/Toc.astro';
+import { secondaryMetaSlot } from '@/features/notes/lib/note-meta.ts';
 import {
   adjacentNotes,
   formatDate,
@@ -71,11 +72,11 @@ const readingLabel = t(locale, 'notes.readingTime', { min: readingMinutes(entry.
     </p>
     <div class="mt-3 flex items-center gap-2">
       <span class="font-mono text-sm text-pink">{t(locale, 'notes.entry', { number: noteNumber(data.number) })}</span>
-      <LangBadge lang={data.lang} />
+      {secondaryMetaSlot === 'header' && <LangBadge lang={data.lang} />}
     </div>
-    <h1 class="mt-2 max-w-[22ch] font-display text-4xl font-bold leading-tight md:text-5xl">{data.title}</h1>
+    <h1 class="mt-2 max-w-[22ch] font-display text-note-title font-bold leading-tight">{data.title}</h1>
     <p class="mt-3 font-mono text-sm text-muted">
-      {site.identity.name} · <time datetime={data.pubDate.toISOString()}>{formatDate(data.pubDate, locale)}</time> · {readingLabel}
+      {secondaryMetaSlot === 'header' && <><span class="whitespace-nowrap">{site.identity.name}</span> · </>}<time class="whitespace-nowrap" datetime={data.pubDate.toISOString()}>{formatDate(data.pubDate, locale)}</time> · <span class="whitespace-nowrap">{readingLabel}</span>
     </p>
   </Banner>
 
@@ -85,11 +86,12 @@ const readingLabel = t(locale, 'notes.readingTime', { min: readingMinutes(entry.
     <div class="prose"><Content /></div>
 
     <div class="flex flex-col gap-3 border-t border-dashed border-divider pt-6">
-      <div class="flex flex-wrap gap-1.5">
+      <div class="flex flex-wrap items-center gap-1.5">
+        {secondaryMetaSlot === 'foot' && <LangBadge lang={data.lang} />}
         {data.tags.map((tag) => <Chip>#{tag}</Chip>)}
       </div>
-      <p class="font-mono text-xs text-muted">
-        {data.updatedDate && <>{t(locale, 'note.updated', { date: formatDate(data.updatedDate, locale) })} · </>}{t(locale, 'note.license')}
+      <p class="font-mono text-meta text-muted">
+        {secondaryMetaSlot === 'foot' && <><span class="whitespace-nowrap">{site.identity.name}</span> · </>}{data.updatedDate && <><span class="whitespace-nowrap">{t(locale, 'note.updated', { date: formatDate(data.updatedDate, locale) })}</span> · </>}<span class="whitespace-nowrap">{t(locale, 'note.license')}</span>
       </p>
     </div>
   </article>

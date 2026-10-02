@@ -2,6 +2,9 @@ import { z } from 'zod';
 
 const httpsUrl = z.url({ protocol: /^https$/, error: 'must be an https URL' });
 
+/** A bare image file name: no directories, so it can only point inside `src/assets`. */
+const AVATAR_FILE = /^[\w-][\w.-]*\.(?:png|jpe?g|webp|avif)$/i;
+
 /** Text keyed by locale, e.g. `{ es: 'Hola', en: 'Hello' }`. Checked against `locales` below. */
 const localized = z.record(z.string(), z.string().trim().min(1));
 
@@ -59,13 +62,58 @@ export const siteConfigSchema = z
         avatar: z
           .string()
           .trim()
-          .min(1)
+          .regex(AVATAR_FILE, 'must be a bare file name (png, jpg, webp or avif) in src/assets')
           .optional()
           .describe(
-            'Site-relative path to a profile photo in `public/` (for example `/avatar.png`). Omit to show initials.',
+            'File name of a profile photo placed in `apps/web/src/assets/` (for example `avatar.png`); it is optimized at build time. Omit to show initials.',
           ),
       })
       .describe('Who the site is about.'),
+    appearance: z
+      .enum(['minimal', 'full'])
+      .default('full')
+      .describe(
+        'Visual preset. `minimal` is the calm look (smaller type, fewer home sections); `full` is the original look. Defaults to `full` so a config written before the preset existed does not change.',
+      ),
+    home: z
+      .strictObject({
+        heroPills: z
+          .boolean()
+          .optional()
+          .describe('The three keyword pills under the hero intro (desktop only).'),
+        authorCard: z
+          .boolean()
+          .optional()
+          .describe('The sidebar author card: photo, name, bio and social buttons.'),
+        hiringCard: z
+          .boolean()
+          .optional()
+          .describe(
+            'The sidebar "Hiring?" recruiter card: availability and links to /me and the CV.',
+          ),
+        labLog: z
+          .boolean()
+          .optional()
+          .describe('The sidebar "Lab log" box: since when, cadence and languages.'),
+        pillars: z
+          .boolean()
+          .optional()
+          .describe('The four pillars strip at the bottom of the home (desktop only).'),
+        notebookIndex: z
+          .boolean()
+          .optional()
+          .describe('The notebook index: compact rows for the notes after the latest one.'),
+        experiments: z
+          .boolean()
+          .optional()
+          .describe(
+            'The experiments section of the home. Also needs `features.experiments`: with that flag off it never shows.',
+          ),
+      })
+      .default({})
+      .describe(
+        'Show or hide each home section; a key you set wins over the `appearance` preset, a key you omit follows it. `minimal` hides `heroPills`, `labLog` and `pillars`; `full` shows everything. A hidden section renders nothing.',
+      ),
     socials: z
       .array(
         z.object({

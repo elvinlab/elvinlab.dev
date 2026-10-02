@@ -62,7 +62,7 @@ const bio = site.identity.bio[locale];
         <div class="flex items-baseline justify-between">
           <SectionHeading text={t(locale, 'me.experiments')} />
           {isEnabled('experiments') && (
-            <a href={localizePath('/experiments/', locale, LOCALES)} class="text-sm text-primary underline decoration-dashed underline-offset-4 print:hidden">{t(locale, 'home.allExperiments')}</a>
+            <a href={localizePath('/experiments/', locale, LOCALES)} class="relative text-sm text-primary underline decoration-dashed underline-offset-4 after:absolute after:-inset-x-2 after:-inset-y-3 print:hidden">{t(locale, 'home.allExperiments')}</a>
           )}
         </div>
         <div class="grid gap-4 sm:grid-cols-2">
@@ -75,7 +75,7 @@ const bio = site.identity.bio[locale];
       <Card as="section" class="flex flex-col gap-2 !p-7 md:!px-9">
         <div class="flex items-baseline justify-between">
           <SectionHeading text={t(locale, 'me.notes.title')} />
-          <a href={localizePath('/notes/', locale, LOCALES)} class="text-sm text-primary underline decoration-dashed underline-offset-4 print:hidden">{t(locale, 'home.allNotes')}</a>
+          <a href={localizePath('/notes/', locale, LOCALES)} class="relative text-sm text-primary underline decoration-dashed underline-offset-4 after:absolute after:-inset-x-2 after:-inset-y-3 print:hidden">{t(locale, 'home.allNotes')}</a>
         </div>
         <p class="text-sm text-muted">{t(locale, 'me.notes.subtitle')}</p>
         <div>{notes.map((note) => <NoteIndexRow note={note} locale={locale} />)}</div>

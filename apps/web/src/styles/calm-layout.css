@@ -1,0 +1,58 @@
+/* Preset-driven layout: banner heights, banner padding, hero measure and the decision record.
+   Same mechanism as `type-scale.css`: the `appearance` preset reaches the document as
+   `html[data-appearance]` (BaseLayout) and this file is the only place where the preset changes
+   these values. Components read the variables and never test the preset. A fork changes its calm
+   layout by editing the `minimal` blocks below.
+
+   `full` is the look before the preset existed, and it is also the default without the attribute.
+   Banner caps: Banner.astro takes `min()` of the height a page asks for and the cap of the
+   preset, so a page never needs to know the preset. `100rem` is larger than any banner, which
+   makes it a no-op cap (`full` keeps every height exactly as the page asked). `md` is 48rem. */
+:root,
+[data-appearance="full"] {
+  --banner-page-cap: 100rem;
+  --banner-expanded-cap: 100rem;
+  --banner-expanded-compact-cap: 100rem;
+  --banner-pad-top: 6rem;
+  --banner-pad-bottom: 2rem;
+  --hero-measure: 16ch;
+  --record-pad: 1.25rem;
+  --record-gap: 1.25rem;
+  --record-title-gap: 1rem;
+  --record-col-pad: 1.25rem;
+  --record-title: 0.875rem;
+  --record-label: 0.8125rem;
+  --record-body: 0.875rem;
+}
+
+[data-appearance="minimal"] {
+  --banner-page-cap: 240px;
+  --banner-expanded-cap: clamp(360px, 48vh, 460px);
+  --banner-expanded-compact-cap: 24rem;
+  --banner-pad-top: 5.5rem;
+  --banner-pad-bottom: 1.5rem;
+  --hero-measure: 16ch;
+  --record-pad: 1rem;
+  --record-gap: 0.875rem;
+  --record-title-gap: 0.75rem;
+  --record-col-pad: 1rem;
+  --record-title: 0.8125rem;
+  --record-label: 0.8125rem;
+  --record-body: 0.875rem;
+}
+
+@media (min-width: 48rem) {
+  :root,
+  [data-appearance="full"] {
+    --hero-measure: 16ch;
+  }
+
+  [data-appearance="minimal"] {
+    --hero-measure: 22ch;
+  }
+}
+
+/* The `max-w-hero` utility reads the runtime variable (`inline` keeps the `var()` as is). */
+@theme inline {
+  --container-hero: var(--hero-measure);
+}

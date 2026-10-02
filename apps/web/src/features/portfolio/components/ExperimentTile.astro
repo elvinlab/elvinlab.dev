@@ -19,7 +19,7 @@ const Tag = experiment.url ? 'a' : 'div';
   </div>
   <div class="flex items-center justify-between gap-2">
     <h3 class="font-display text-lg font-bold transition-colors duration-150 group-hover:text-primary">{experiment.title}</h3>
-    <span class="inline-flex items-center gap-1.5 rounded-pill bg-chip px-2 py-0.5 font-mono text-xs text-text-secondary">
+    <span class="inline-flex items-center gap-1.5 rounded-pill bg-chip px-2 py-0.5 font-mono text-meta text-text-secondary">
       <span class:list={['size-2 rounded-pill', experiment.status === 'running' ? 'bg-ok' : 'bg-primary']} aria-hidden="true"></span>
       {t(locale, `exp.status.${experiment.status}`)}
     </span>

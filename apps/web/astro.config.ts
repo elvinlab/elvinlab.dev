@@ -37,6 +37,11 @@ export default defineConfig({
   // enough (well under the JS budget) that one extra render-blocking request costs more than the
   // duplication of inlining it per page (Lighthouse's "render-blocking requests" audit).
   build: { inlineStylesheets: 'always' },
+  // Hover/focus (keyboard) intent prefetches the target page after 80 ms: navigation then feels
+  // instant without spending mobile data on links nobody shows interest in. Not `viewport` or
+  // `load`: those prefetch pages eagerly. Astro skips hover prefetch on `saveData`/2g connections
+  // and falls back to prefetching on tap there.
+  prefetch: { prefetchAll: true, defaultStrategy: 'hover' },
   security: { checkOrigin: true, actionBodySizeLimit: CONTACT_POLICY.requestMaxBytes },
   i18n: {
     defaultLocale: site.locales.default,
@@ -69,7 +74,7 @@ export default defineConfig({
       }),
     }),
     noindexHeaders(),
-    ogImages(contentDir, { publicDir: fileURLToPath(new URL('./public', import.meta.url)) }),
+    ogImages(contentDir, { assetsDir: fileURLToPath(new URL('./src/assets', import.meta.url)) }),
   ],
   adapter: cloudflare({
     // Pages are prerendered, so images are optimized at build time with Sharp and served as

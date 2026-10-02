@@ -67,7 +67,16 @@ Las descripciones vienen del esquema (`.describe()`), por eso están en inglés.
 | `identity.bio` | `{ <locale>: string }` | yes |  | Short bio per locale (also the description of the /me page). |
 | `identity.location` | `string` | no |  | City or country shown on /me and share cards. |
 | `identity.startedYear` | `integer (min 1970)` | yes |  | First year of professional work; years of experience are derived from it. |
-| `identity.avatar` | `string` | no |  | Site-relative path to a profile photo in `public/` (for example `/avatar.png`). Omit to show initials. |
+| `identity.avatar` | `string` | no |  | File name of a profile photo placed in `apps/web/src/assets/` (for example `avatar.png`); it is optimized at build time. Omit to show initials. |
+| `appearance` | `'minimal' \| 'full'` | no | `full` | Visual preset. `minimal` is the calm look (smaller type, fewer home sections); `full` is the original look. Defaults to `full` so a config written before the preset existed does not change. |
+| `home` | `object` | no | `{}` | Show or hide each home section; a key you set wins over the `appearance` preset, a key you omit follows it. `minimal` hides `heroPills`, `labLog` and `pillars`; `full` shows everything. A hidden section renders nothing. |
+| `home.heroPills` | `boolean` | no |  | The three keyword pills under the hero intro (desktop only). |
+| `home.authorCard` | `boolean` | no |  | The sidebar author card: photo, name, bio and social buttons. |
+| `home.hiringCard` | `boolean` | no |  | The sidebar "Hiring?" recruiter card: availability and links to /me and the CV. |
+| `home.labLog` | `boolean` | no |  | The sidebar "Lab log" box: since when, cadence and languages. |
+| `home.pillars` | `boolean` | no |  | The four pillars strip at the bottom of the home (desktop only). |
+| `home.notebookIndex` | `boolean` | no |  | The notebook index: compact rows for the notes after the latest one. |
+| `home.experiments` | `boolean` | no |  | The experiments section of the home. Also needs `features.experiments`: with that flag off it never shows. |
 | `socials` | `object[]` | yes |  | Social profile links shown in the footer and used as `sameAs` in structured data. |
 | `socials[].label` | `string` | yes |  | Link text and accessible name. |
 | `socials[].url` | `URL` | yes |  | Profile URL (https only: an email address never belongs in public config). |
@@ -305,6 +314,22 @@ Cada bandera de `features` apaga la función completa: no se genera la ruta, des
 | `me` | Página `/me` (portafolio) | |
 | `readingMode` | Modo lectura en las notas | Apagada: no se envía botón, script, CSS ni se guarda nada en el navegador |
 
+#### Apariencia y secciones de la portada
+
+`appearance` elige el preset visual: `minimal` (el de este sitio) oculta en la portada los chips del hero (`heroPills`), la caja «Bitácora» (`labLog`) y la franja de pilares (`pillars`); `full` es el aspecto original y lo muestra todo. Si omites `appearance`, vale `full`, así que una config escrita antes del preset no cambia.
+
+**Escala tipográfica.** `appearance` también fija el tamaño del texto: queda en `<html data-appearance>` y `apps/web/src/styles/type-scale.css` define la escala una sola vez (variables `--type-*`), así que cambiarla en un fork es editar ese archivo. `minimal`: hero 32/44 px (móvil/`md`), títulos de sección 20, título de nota 30/40, tarjeta destacada 20/22, cuerpo y párrafo de intro 17. `full` conserva los tamaños originales (hero 36/60 px, secciones 24, título de nota 36/48, tarjeta destacada 30/36, cuerpo 18). El modo lectura tiene su propia escala y no cambia.
+
+**Banners y notas.** El mismo preset baja la altura de los banners (en `minimal`: 240 px en las páginas, portada expandida entre 360 y 460 px), hace que todos los banners se fundan con la página mediante un degradado de 120 px y, en las notas, deja en la cabecera solo la fecha y el tiempo de lectura (el idioma y el autor pasan al pie) con un registro de decisión más compacto. `full` conserva las alturas y la cabecera originales. Esos valores viven en `apps/web/src/styles/calm-layout.css`.
+
+`home` ajusta cada sección por separado y **siempre gana sobre el preset**: una clave que pones manda, una que omites sigue al preset. Claves: `heroPills`, `authorCard`, `hiringCard`, `labLog`, `pillars`, `notebookIndex` y `experiments` (esta además necesita `features.experiments`). Una sección apagada no renderiza nada (ni título ni hueco), y si se apagan las tres tarjetas de la barra lateral (`authorCard`, `hiringCard`, `labLog`) la columna lateral desaparece.
+
+```ts
+// Aspecto calmado, pero con la Bitácora visible y sin la tarjeta de contratación.
+appearance: 'minimal',
+home: { labLog: true, hiringCard: false },
+```
+
 ### 6.3 Experiencia, certificados y experimentos
 
 Añade una entrada al JSON correspondiente (sección 4) con una clave nueva. Para quitar una, bórrala. Compila (`pnpm --filter web build`) para validar: un campo inválido rompe el build con el nombre del campo.
@@ -343,10 +368,10 @@ El texto vive en `apps/web/src/features/privacy/content.ts` y `apps/web/src/feat
 ### 6.9 Colores, tipografía, foto e imágenes
 
 - **Tema**: `packages/core/src/tokens/tokens.json` y luego `mise exec -- pnpm --filter @elvinlab/core tokens` (regenera `tokens.css`). Los componentes leen variables semánticas, nunca un color directo.
-- **Foto de perfil**: pon el archivo en `apps/web/public/` y apunta `identity.avatar` a él. Se usa en la home, en `/me` y en la tarjeta de `/me`.
+- **Foto de perfil**: pon el archivo en `apps/web/src/assets/` y escribe solo su nombre en `identity.avatar` (por ejemplo `avatar.png`; png, jpg, webp o avif). Se optimiza en el build (webp con dimensiones explícitas) y se usa en la home, en `/me` y en la tarjeta de `/me`. Si el archivo no existe, el build falla.
 - **Favicon**: `apps/web/public/favicon.svg`.
 - **Imagen por defecto al compartir**: `apps/web/public/og-image.png` (1200 × 630). Es un archivo estático con el nombre de la persona dibujado: **reemplázalo** si usas el sitio para otra persona. Las notas y `/me` generan su propia tarjeta al compilar.
-- **Tipografías**: se autoalojan (Fontsource); nunca se cargan desde un CDN.
+- **Tipografías**: se autoalojan (Fontsource); nunca se cargan desde un CDN. La cara pixelada de display (Pixelify Sans) es el token de fuente `pixel` en `tokens.json`; un tema puede reemplazarla.
 
 ### 6.10 Textos de la interfaz y un idioma nuevo
 

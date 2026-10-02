@@ -14,7 +14,7 @@ const { entries, locale } = Astro.props;
   {entries.map((entry) => (
     <li class="border-b border-dashed border-divider pb-6 last:border-b-0">
       <div class="flex flex-wrap items-center gap-2">
-        <span class="rounded-pill bg-chip px-2 py-0.5 font-mono text-xs uppercase text-primary">
+        <span class="rounded-pill bg-chip px-2 py-0.5 font-mono text-meta uppercase text-primary">
           {entry.category}
         </span>
         <time datetime={entry.date.toISOString()} class="text-sm text-muted">

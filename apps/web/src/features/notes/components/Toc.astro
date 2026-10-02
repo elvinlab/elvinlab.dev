@@ -18,7 +18,7 @@ const { locale, headings } = Astro.props;
       >
         <span>{t(locale, 'note.toc')}</span>
         <span class="flex items-center gap-2">
-          <span data-toc-progress class="font-mono text-xs text-muted">0%</span>
+          <span data-toc-progress class="font-mono text-meta text-muted">0%</span>
           <svg class="transition-transform duration-150 lg:hidden" data-toc-chevron viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="m6 9 6 6 6-6"></path></svg>
         </span>
       </button>
@@ -31,7 +31,7 @@ const { locale, headings } = Astro.props;
             data-toc-link={heading.slug}
             class="flex gap-2 rounded-inner py-1.5 text-sm text-text-secondary transition-colors duration-150 hover:text-primary aria-[current=true]:text-primary"
           >
-            <span class="font-mono text-xs text-muted">{String(index + 1).padStart(2, '0')}</span>
+            <span class="font-mono text-meta text-muted">{String(index + 1).padStart(2, '0')}</span>
             <span>{heading.text}</span>
           </a>
         </li>

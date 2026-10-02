@@ -17,7 +17,7 @@ const { locale, notes } = Astro.props;
       {notes.map((note) => (
         <li>
           <a href={localizePath(`/notes/${note.slug}/`, note.data.lang, LOCALES)} class="flex flex-col gap-0.5 transition-colors duration-150 hover:text-primary">
-            <span class="font-mono text-xs text-muted">{t(locale, 'notes.entry', { number: noteNumber(note.data.number) })}</span>
+            <span class="font-mono text-meta text-muted">{t(locale, 'notes.entry', { number: noteNumber(note.data.number) })}</span>
             <span class="text-sm font-medium leading-snug">{note.data.title}</span>
           </a>
         </li>

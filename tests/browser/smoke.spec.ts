@@ -25,7 +25,9 @@ for (const { locale, prefix, slug } of [
         await expect(page.getByRole('heading', { level: 1 })).toHaveText(
           `Synthetic smoke note ${locale.toUpperCase()}`,
         );
-        await expect(page.locator('article pre')).toContainText("const fixture = 'isolated'");
+        await expect(page.locator('article pre').first()).toContainText(
+          "const fixture = 'isolated'",
+        );
         if (locale === 'en') {
           await expect(page.getByRole('link', { name: 'Lab Notes' })).toHaveAttribute(
             'href',
@@ -58,9 +60,9 @@ for (const { locale, path } of [
     await expect(navbarBrand).toContainText('elvinlab');
     await expect(navbarBrand).toHaveClass(/font-retro/);
     await expect(navbarBrand.locator('.animate-blink')).toHaveCount(0);
-    await expect(page.locator('[data-home-fade]')).toHaveCSS('height', '120px');
+    await expect(page.locator('[data-banner-fade]')).toHaveCSS('height', '120px');
 
-    await expect(page.locator('img[src="/avatar.png"][alt="Elvin González"]')).toBeVisible();
+    await expect(page.locator('img[alt="Elvin González"][src$=".webp"]')).toBeVisible();
 
     const hiringCard = page.locator('section', {
       has: page.getByRole('heading', { name: locale === 'es' ? '¿Contratando?' : 'Hiring?' }),
@@ -157,7 +159,7 @@ test('the locale suggestion is a quiet line of text, not a card', async ({ page 
   const hint = page.locator('[data-language-hint="en"]');
   await expect(hint).toBeVisible();
   await expect(hint).toHaveCSS('background-color', 'rgba(0, 0, 0, 0)');
-  await expect(hint).toHaveCSS('font-size', '12px');
+  await expect(hint).toHaveCSS('font-size', '13px');
   await expect(hint.locator('a')).not.toHaveCSS('background-color', /rgb\(124, 58, 237\)/);
 });
 

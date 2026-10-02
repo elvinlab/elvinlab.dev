@@ -115,26 +115,26 @@ describe('ogImages integration: /me cards', () => {
       role: { es: 'Ingeniera', en: 'Engineer' },
       location: 'Lisboa',
       startedYear: 2020,
-      avatar: '/avatar.png',
+      avatar: 'avatar.png',
     },
     recruiter: { available: true, openToWork: true, status: { es: 'Disponible', en: 'Available' } },
     features: { me: true },
   };
 
   async function run(options: { photo: boolean; me?: boolean }): Promise<string> {
-    const publicDir = mkdtempSync(join(tmpdir(), 'og-public-'));
+    const assetsDir = mkdtempSync(join(tmpdir(), 'og-assets-'));
     const out = mkdtempSync(join(tmpdir(), 'og-out-'));
-    temporary.push(publicDir, out);
+    temporary.push(assetsDir, out);
     if (options.photo) {
       const photo = await sharp({
         create: { width: 400, height: 500, channels: 3, background: '#8b5cf6' },
       })
         .png()
         .toBuffer();
-      writeFileSync(join(publicDir, 'avatar.png'), photo);
+      writeFileSync(join(assetsDir, 'avatar.png'), photo);
     }
     const config = { ...site, features: { me: options.me ?? true } };
-    const hook = ogImages(contentDir({}), { publicDir, site: config }).hooks[
+    const hook = ogImages(contentDir({}), { assetsDir, site: config }).hooks[
       'astro:build:done'
     ] as (arg: unknown) => Promise<void>;
     await hook({ dir: pathToFileURL(`${out}/`), logger: { info: () => undefined } });
@@ -147,6 +147,12 @@ describe('ogImages integration: /me cards', () => {
       const meta = await sharp(readFileSync(join(out, 'og', `me-${locale}.png`))).metadata();
       expect([meta.format, meta.width, meta.height]).toEqual(['png', 1200, 630]);
     }
+  });
+
+  it('reads the photo from the assets folder (the card differs from the photo-less one)', async () => {
+    const withPhoto = readFileSync(join(await run({ photo: true }), 'og', 'me-es.png'));
+    const withoutPhoto = readFileSync(join(await run({ photo: false }), 'og', 'me-es.png'));
+    expect(withPhoto.equals(withoutPhoto)).toBe(false);
   });
 
   it('still writes the cards when the photo file is missing', async () => {

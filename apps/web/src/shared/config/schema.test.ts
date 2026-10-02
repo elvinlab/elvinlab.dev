@@ -93,6 +93,45 @@ describe('parseSiteConfig', () => {
     expect(() => parseSiteConfig(broken)).toThrow(/default locale "es"/);
   });
 
+  describe('appearance and home', () => {
+    it("defaults to the full appearance so existing configs keep today's look", () => {
+      const config = parseSiteConfig(valid);
+      expect(config.appearance).toBe('full');
+      expect(config.home).toEqual({});
+    });
+
+    it('accepts both presets', () => {
+      expect(parseSiteConfig({ ...valid, appearance: 'minimal' }).appearance).toBe('minimal');
+      expect(parseSiteConfig({ ...valid, appearance: 'full' }).appearance).toBe('full');
+    });
+
+    it('rejects an unknown preset and lists the allowed ones', () => {
+      expect(() => parseSiteConfig({ ...valid, appearance: 'x' })).toThrow(/appearance/);
+      expect(() => parseSiteConfig({ ...valid, appearance: 'x' })).toThrow(/minimal/);
+    });
+
+    it('accepts boolean overrides for every home section', () => {
+      const home = {
+        heroPills: true,
+        authorCard: false,
+        hiringCard: true,
+        labLog: true,
+        pillars: false,
+        notebookIndex: true,
+        experiments: false,
+      };
+      expect(parseSiteConfig({ ...valid, home }).home).toEqual(home);
+    });
+
+    it('rejects an unknown home section instead of ignoring a typo', () => {
+      expect(() => parseSiteConfig({ ...valid, home: { pillar: false } })).toThrow(/pillar/);
+    });
+
+    it('rejects a non-boolean override', () => {
+      expect(() => parseSiteConfig({ ...valid, home: { labLog: 'off' } })).toThrow(/labLog/);
+    });
+  });
+
   describe('recruiter.openToWork', () => {
     it('defaults to true so existing configs keep the green status dot', () => {
       expect(parseSiteConfig(valid).recruiter.openToWork).toBe(true);
@@ -107,6 +146,26 @@ describe('parseSiteConfig', () => {
       const broken = { ...valid, recruiter: { ...valid.recruiter, openToWork: 'no' } };
       expect(() => parseSiteConfig(broken)).toThrow(/openToWork/);
     });
+  });
+
+  describe('identity.avatar', () => {
+    const withAvatar = (avatar: unknown) => ({ ...valid, identity: { ...valid.identity, avatar } });
+
+    it('is optional (initials are shown without it)', () => {
+      expect(parseSiteConfig(valid).identity.avatar).toBeUndefined();
+    });
+
+    it('accepts the file name of an image placed in src/assets', () => {
+      expect(parseSiteConfig(withAvatar('avatar.png')).identity.avatar).toBe('avatar.png');
+      expect(parseSiteConfig(withAvatar('me.JPG')).identity.avatar).toBe('me.JPG');
+    });
+
+    it.each(['/avatar.png', '../avatar.png', 'photos/avatar.png', 'avatar.gif', 'avatar'])(
+      'rejects %s (only a bare png, jpg, webp or avif file name is allowed)',
+      (avatar) => {
+        expect(() => parseSiteConfig(withAvatar(avatar))).toThrow(/avatar/);
+      },
+    );
   });
 
   it('rejects a recruiter cvUrl that is not https', () => {

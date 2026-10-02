@@ -3,7 +3,7 @@
 type Props = { href?: string; class?: string };
 
 const { href, class: className } = Astro.props;
-const base = 'inline-flex items-center rounded-pill bg-chip px-2.5 py-1 font-mono text-xs text-text-secondary';
+const base = 'inline-flex items-center rounded-pill bg-chip px-2.5 py-1 font-mono text-meta text-text-secondary';
 const Tag = href ? 'a' : 'span';
 ---
 

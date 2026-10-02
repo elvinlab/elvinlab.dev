@@ -22,10 +22,8 @@ const siteKey = integrations.turnstileSiteKey;
   <article class="max-w-xl">
     <header class="mb-8">
       <h1 class="text-3xl font-bold tracking-tight">{content.pageTitle}</h1>
-      <p class="mt-2 text-muted">{content.pageDescription}</p>
+      <p class="mt-2 text-text-secondary">{content.pageDescription}</p>
     </header>
-
-    <p class="mb-8 text-text-secondary">{content.intro}</p>
 
     <ContactForm client:visible siteKey={siteKey} strings={content.form} />
 

@@ -101,12 +101,13 @@ export type OgSite = ProfileSite & {
   identity: { avatar?: string | undefined };
   features: { me: boolean };
 };
-export type OgOptions = { publicDir?: string; site?: OgSite };
+/** `assetsDir` is `apps/web/src/assets`, where `identity.avatar` names a file. */
+export type OgOptions = { assetsDir?: string; site?: OgSite };
 
 /** The profile photo as a square `data:` URI, or undefined when it is not configured or missing. */
-async function loadAvatar(publicDir: string | undefined, avatar: string | undefined) {
-  if (!publicDir || !avatar) return undefined;
-  const file = join(publicDir, avatar.replace(/^\//, ''));
+async function loadAvatar(assetsDir: string | undefined, avatar: string | undefined) {
+  if (!assetsDir || !avatar) return undefined;
+  const file = join(assetsDir, avatar);
   if (!existsSync(file)) return undefined;
   const png = await sharp(file).resize(300, 300, { fit: 'cover' }).png().toBuffer();
   return `data:image/png;base64,${png.toString('base64')}`;
@@ -138,7 +139,7 @@ export function ogImages(contentDir: string, options: OgOptions = {}): AstroInte
 
         if (config.features.me) {
           mkdirSync(root, { recursive: true });
-          const avatar = await loadAvatar(options.publicDir, config.identity.avatar);
+          const avatar = await loadAvatar(options.assetsDir, config.identity.avatar);
           for (const locale of LOCALES.locales) {
             const png = await renderProfileCardPng({
               ...profileCardContentFor(config, locale),
