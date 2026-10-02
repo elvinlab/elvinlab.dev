@@ -1,13 +1,12 @@
 ---
 /** Home notebook index: heading, an "all notes" link and compact rows for older notes. */
-import { localizePath } from '@elvinlab/core';
-
 import { NoteIndexRow, type NoteLike } from '@/features/notes/index.ts';
-import { LOCALES, type Locale, t } from '@/shared/i18n/index.ts';
+import { type Locale, t } from '@/shared/i18n/index.ts';
 
 type Props = { locale: Locale; notes: NoteLike[] };
 
 const { locale, notes } = Astro.props;
+// The notes index exists only at `/notes/` (one index, no `/en/notes/`), so the link is not localized.
 ---
 
 {notes.length > 0 && (
@@ -16,7 +15,7 @@ const { locale, notes } = Astro.props;
       <h2 class="flex items-center gap-3 font-pixel text-section font-semibold">
         <span class="h-5 w-1 rounded-pill bg-primary" aria-hidden="true"></span>{t(locale, 'home.notebook')}
       </h2>
-      <a href={localizePath('/notes/', locale, LOCALES)} class="relative text-sm text-primary underline decoration-dashed underline-offset-4 after:absolute after:-inset-x-2 after:-inset-y-3">
+      <a href="/notes/" class="relative text-sm text-primary underline decoration-dashed underline-offset-4 after:absolute after:-inset-x-2 after:-inset-y-3">
         {t(locale, 'home.allNotes')}
       </a>
     </div>
