@@ -101,23 +101,27 @@ const linkClass =
       toggle?.focus();
     }
   });
-</script>
 
-<script>
-  // Auto-hide the navbar on scroll down, reveal on scroll up (past a small threshold).
+  // Auto-hide the navbar on scroll down, reveal on scroll up (past a small threshold). It never
+  // hides under keyboard focus, closes an open menu when it does hide (the menu hangs from the
+  // navbar and would be left floating behind it), and reveals itself when focus enters it, so a
+  // control is never focused off screen.
   const header = document.querySelector<HTMLElement>('[data-navbar]');
   if (header) {
+    const HIDDEN = '-translate-y-full';
     let last = window.scrollY;
     let ticking = false;
     const onScroll = (): void => {
       const y = window.scrollY;
       if (Math.abs(y - last) > 6) {
-        const hide = y > last && y > 120;
-        header.classList.toggle('-translate-y-full', hide);
+        const hide = y > last && y > 120 && !header.querySelector(':focus-visible');
+        header.classList.toggle(HIDDEN, hide);
+        if (hide) setOpen(false);
         last = y;
       }
       ticking = false;
     };
+    header.addEventListener('focusin', () => header.classList.remove(HIDDEN));
     document.addEventListener('scroll', () => {
       if (!ticking) {
         ticking = true;

@@ -19,6 +19,12 @@
   backdrop-filter: blur(8px);
   cursor: pointer;
 }
+/* Invisible expansion: the pill stays 36 px tall, the hit area reaches 44 px. */
+.reading-exit::before {
+  content: "";
+  position: absolute;
+  inset: -0.25rem 0;
+}
 html[data-reading] .reading-exit {
   display: inline-flex;
 }

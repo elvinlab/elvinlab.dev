@@ -8,7 +8,6 @@ const flatten = (page: ContactContent): string =>
   [
     page.pageTitle,
     page.pageDescription,
-    page.intro,
     page.noscript,
     page.form.labels.name,
     page.form.labels.email,
@@ -50,6 +49,12 @@ describe('buildContactContent', () => {
         expect(typeof text).toBe('string');
         expect(text.length).toBeGreaterThan(0);
       }
+    }
+  });
+
+  it('says "reply by email" once on the page: no separate intro repeating the description', () => {
+    for (const locale of ['es', 'en'] as const) {
+      expect(content[locale]).not.toHaveProperty('intro');
     }
   });
 
@@ -103,7 +108,6 @@ describe('buildContactContent', () => {
     const forbiddenStrings = [
       content.es.pageTitle,
       content.es.pageDescription,
-      content.es.intro,
       content.es.noscript,
       content.es.form.labels.name,
       content.es.form.labels.email,
@@ -128,7 +132,6 @@ describe('buildContactContent', () => {
       content.es.form.unavailable,
       content.en.pageTitle,
       content.en.pageDescription,
-      content.en.intro,
       content.en.noscript,
       content.en.form.labels.name,
       content.en.form.labels.email,
@@ -241,8 +244,7 @@ describe('buildContactContent', () => {
 
   it('ES copy matches the exact specification', () => {
     expect(content.es.pageTitle).toBe('Contacto');
-    expect(content.es.pageDescription).toBe('Escríbeme un mensaje y te respondo por correo.');
-    expect(content.es.intro).toBe(
+    expect(content.es.pageDescription).toBe(
       '¿Una idea, una oferta o una pregunta? Escríbeme y te respondo por correo.',
     );
     expect(content.es.noscript).toBe('Este formulario necesita JavaScript para funcionar.');
@@ -286,8 +288,7 @@ describe('buildContactContent', () => {
 
   it('EN copy matches the exact specification', () => {
     expect(content.en.pageTitle).toBe('Contact');
-    expect(content.en.pageDescription).toBe("Send me a message and I'll reply by email.");
-    expect(content.en.intro).toBe(
+    expect(content.en.pageDescription).toBe(
       "An idea, an offer or a question? Write to me and I'll reply by email.",
     );
     expect(content.en.noscript).toBe('This form needs JavaScript to work.');

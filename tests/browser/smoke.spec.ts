@@ -25,7 +25,9 @@ for (const { locale, prefix, slug } of [
         await expect(page.getByRole('heading', { level: 1 })).toHaveText(
           `Synthetic smoke note ${locale.toUpperCase()}`,
         );
-        await expect(page.locator('article pre')).toContainText("const fixture = 'isolated'");
+        await expect(page.locator('article pre').first()).toContainText(
+          "const fixture = 'isolated'",
+        );
         if (locale === 'en') {
           await expect(page.getByRole('link', { name: 'Lab Notes' })).toHaveAttribute(
             'href',

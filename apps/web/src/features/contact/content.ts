@@ -3,7 +3,6 @@ import type { ContactFormStrings } from './client/form.ts';
 export type ContactContent = {
   pageTitle: string;
   pageDescription: string;
-  intro: string;
   noscript: string;
   form: ContactFormStrings;
 };
@@ -12,8 +11,7 @@ export function buildContactContent(): Record<'es' | 'en', ContactContent> {
   return {
     es: {
       pageTitle: 'Contacto',
-      pageDescription: 'Escríbeme un mensaje y te respondo por correo.',
-      intro: '¿Una idea, una oferta o una pregunta? Escríbeme y te respondo por correo.',
+      pageDescription: '¿Una idea, una oferta o una pregunta? Escríbeme y te respondo por correo.',
       noscript: 'Este formulario necesita JavaScript para funcionar.',
       form: {
         labels: {
@@ -62,8 +60,7 @@ export function buildContactContent(): Record<'es' | 'en', ContactContent> {
     },
     en: {
       pageTitle: 'Contact',
-      pageDescription: "Send me a message and I'll reply by email.",
-      intro: "An idea, an offer or a question? Write to me and I'll reply by email.",
+      pageDescription: "An idea, an offer or a question? Write to me and I'll reply by email.",
       noscript: 'This form needs JavaScript to work.',
       form: {
         labels: {

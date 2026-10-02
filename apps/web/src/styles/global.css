@@ -103,6 +103,19 @@
 .prose .expressive-code {
   margin-top: 1.5em;
 }
+/* Touch screens (no hover): Expressive Code keeps the copy button always visible over the first
+   lines of code, so long lines ran underneath it. Make it a 44 px target and give it its own
+   strip above the first line instead of overlaying text. Mouse devices keep the upstream
+   hover-only 32 px button untouched. */
+@media (hover: none) {
+  .prose .expressive-code .copy button {
+    width: 2.75rem;
+    height: 2.75rem;
+  }
+  .prose .expressive-code pre > code {
+    padding-block-start: 3.5rem;
+  }
+}
 
 /* Print stylesheet for pages that opt in with `printable` (the /me recruiter page prints as a CV).
    Hides interactive chrome, drops the decorative banner, and forces the light palette so output is
