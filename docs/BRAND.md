@@ -32,7 +32,7 @@ La línea de posicionamiento es una sola y se usa igual en todas partes: **Full-
 
 - Primera persona, directa y concreta. Números y nombres, no adjetivos.
 - El blog documenta decisiones y su razonamiento, no tutoriales genéricos.
-- Atemporal: nada que dependa de "en qué estoy trabajando este mes".
+- Atemporal: nada que dependa de "en qué estoy trabajando este mes". Única excepción: la sección **Ahora** del inicio (decidida 2026-10-02, a pedido del dueño). Es la única superficie con actividad fechada: muestra siempre su fecha real de actualización, lleva como máximo tres entradas y se oculta entera si no hay contenido vigente. Identidad, bio, notas y proyectos siguen siendo atemporales.
 - Sin frameworks como identidad: se nombran como herramientas, no como etiqueta profesional.
 - Humor con medida: el abanico y el footer retro son la firma; no compiten con el contenido.
 - Nunca anunciar proyectos que no existen todavía.
