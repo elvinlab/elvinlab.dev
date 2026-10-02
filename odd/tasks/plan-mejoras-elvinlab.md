@@ -20,12 +20,12 @@ Execute the plan incrementally on `develop`, starting with what needs no new con
 - `recruiter.cvUrl` exists in the schema and `MeHero.astro`; not set in `site.config.ts`.
 - `credentials.json` has two entries with issuer "Plataforma sin confirmar" (placeholder in production today).
 - The plan's "No disponible" hiring-card item was already addressed on 2026-10-02 (`408f22b`, released in `8c7968a`).
-- Not reproduced from source: the `/en/notes/` links the plan saw on the live site.
+- Confirmed live (not just in source): `https://elvinlab.dev/en/` links "All notes" to `/en/notes/`, which returns 404; the cause is `NotebookIndex.astro:19` and `MePage.astro:78` using `localizePath('/notes/', locale)` while the notes index is single-locale. Tracked in #58.
 
 ## Tasks
 - [x] **T1** (EL-01a) Fix the stale delivery docs: CONVENTIONS git/delivery rows, TESTING line 53, CONFIGURATION line 455 (ES and EN). Check: `pnpm lint`; no remaining mention of staging or PR previews outside ADRs and history. Route: inline (a few lines per file, mechanical).
 - [x] **T2** (EL-01b) `docs/BRAND.md`: let the "atemporal" voice rule admit a dated "Ahora" section, as the plan requires, without opening the door to time-dependent copy elsewhere. Route: inline (one decision, one file).
-- [ ] **T3** (16.5) Reproduce the "All notes" link issue in the English UI in a real browser; if confirmed, fix the generator and add a regression test. Route: decide after reproducing.
+- [ ] **T3** (16.5) "All notes" link in the English UI. Reproduced and confirmed live (see Verified facts); the fix and its regression test are tracked in #58 and not done yet. Route: Tier 2, small.
 - [ ] **T4** (16.5) Investigate the late or faint block appearance when navigating: `fade-in-up` (300 ms from opacity 0) is the candidate, not a conclusion; measure before changing. Route: decide after measuring.
 - [ ] **T5** (16.5) Language selector without translation: improve the label so it does not promise an English version that does not exist. Needs the owner's wording if it is user-facing copy.
 
@@ -44,7 +44,7 @@ Added after a second pass over the plan (gaps in the first issue set): #68 T44 c
 - **Ahora placement tension:** plan 18.3 designs Ahora as one wide card with three columns in the main column. The owner decided Ahora replaces the sidebar "Bitácora" (a narrow column). Three columns do not fit there; use stacked rows with shorter entries (about 20 to 25 words, not 35 to 45) or move it under the hero. Owner to choose when T41 starts.
 - **Naming:** `/experiments/` was never live (flag off, no page), so renaming the public route to `/projects/` breaks nothing. The internal collection can stay `experiments` for now; the UI label and URL become Projects.
 - **First measurable baseline (plan Phase 0):** production Lighthouse mobile on 2026-10-02 is in "Status 2026-10-02" above.
-- **Stale after switching to `full`:** BRAND, CONFIGURATION (ES and EN), DESIGN and the `appearance.ts` comment said this site uses `minimal`; fixed. Nine e2e specs assumed `minimal`; being made preset-aware by a delegated writer.
+- **Stale after switching to `full`:** BRAND, CONFIGURATION (ES and EN), DESIGN and the `appearance.ts` comment said this site uses `minimal`; fixed. Nine e2e specs assumed `minimal`; made preset-aware (T6, `df10396`).
 
 ### Blocked on the owner (not started, no content invented)
 - EL-02 profile, credentials and CV: real issuer for the two "Plataforma sin confirmar" entries (or remove them), CV URL, English experience text.
