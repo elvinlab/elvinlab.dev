@@ -68,6 +68,7 @@ The descriptions come from the schema (`.describe()`), which is why they are in 
 | `identity.location` | `string` | no |  | City or country shown on /me and share cards. |
 | `identity.startedYear` | `integer (min 1970)` | yes |  | First year of professional work; years of experience are derived from it. |
 | `identity.avatar` | `string` | no |  | File name of a profile photo placed in `apps/web/src/assets/` (for example `avatar.png`); it is optimized at build time. Omit to show initials. |
+| `identity.photo` | `string` | no |  | Portrait shown only on /me (and in the /me share card); `avatar` is used elsewhere. Falls back to `avatar` when omitted. |
 | `appearance` | `'minimal' \| 'full'` | no | `full` | Visual preset. `minimal` is the calm look (smaller type, fewer home sections); `full` is the original look. Defaults to `full` so a config written before the preset existed does not change. |
 | `home` | `object` | no | `{}` | Show or hide each home section; a key you set wins over the `appearance` preset, a key you omit follows it. `minimal` hides `heroPills` and `pillars`; `full` shows everything. A hidden section renders nothing. |
 | `home.heroPills` | `boolean` | no |  | The three keyword pills under the hero intro (desktop only). |

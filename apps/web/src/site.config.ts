@@ -30,6 +30,7 @@ export const siteConfig = {
     location: 'Costa Rica',
     startedYear: 2020,
     avatar: 'avatar.png',
+    photo: 'photo.jpg',
   },
   // Calm look: smaller type and fewer home sections. Use 'full' for the original look, and `home`
   // to switch single sections on or off (see docs/CONFIGURATION.md, "Appearance and home sections").

@@ -165,3 +165,89 @@ describe('ogImages integration: /me cards', () => {
     expect(existsSync(join(out, 'og', 'me-es.png'))).toBe(false);
   });
 });
+
+describe('ogImages integration: /me card portrait', () => {
+  type Identity = { avatar?: string; photo?: string };
+  type Raster = {
+    width: number;
+    height: number;
+    color: string;
+    /** Rows from `splitAt` down are painted `bottomColor`. */
+    bottomColor?: string;
+    splitAt?: number;
+  };
+
+  /** Writes the given images into a fresh assets folder, builds the cards and returns the es card. */
+  async function card(identity: Identity, images: Record<string, Raster>): Promise<Buffer> {
+    const assetsDir = mkdtempSync(join(tmpdir(), 'og-assets-'));
+    const out = mkdtempSync(join(tmpdir(), 'og-out-'));
+    temporary.push(assetsDir, out);
+    for (const [name, { width, height, color, bottomColor, splitAt = width }] of Object.entries(
+      images,
+    )) {
+      let image = sharp({ create: { width, height, channels: 3, background: color } });
+      if (bottomColor) {
+        const band = await sharp({
+          create: { width, height: height - splitAt, channels: 3, background: bottomColor },
+        })
+          .png()
+          .toBuffer();
+        image = image.composite([{ input: band, top: splitAt, left: 0 }]);
+      }
+      writeFileSync(join(assetsDir, name), await image.png().toBuffer());
+    }
+    const config = {
+      url: 'https://example.dev',
+      identity: {
+        name: 'Jane Doe',
+        role: { es: 'Ingeniera', en: 'Engineer' },
+        startedYear: 2020,
+        ...identity,
+      },
+      recruiter: { available: false, openToWork: false, status: {} },
+      features: { me: true },
+    };
+    const hook = ogImages(contentDir({}), { assetsDir, site: config }).hooks[
+      'astro:build:done'
+    ] as (arg: unknown) => Promise<void>;
+    await hook({ dir: pathToFileURL(`${out}/`), logger: { info: () => undefined } });
+    return readFileSync(join(out, 'og', 'me-es.png'));
+  }
+
+  const red = { width: 400, height: 400, color: '#ff0000' };
+  const blue = { width: 400, height: 400, color: '#0000ff' };
+
+  it('uses identity.photo when present, not the avatar', async () => {
+    const withPhoto = await card(
+      { avatar: 'avatar.png', photo: 'photo.png' },
+      { 'avatar.png': red, 'photo.png': blue },
+    );
+    const photoAsAvatar = await card({ avatar: 'avatar.png' }, { 'avatar.png': blue });
+    const avatarOnly = await card({ avatar: 'avatar.png' }, { 'avatar.png': red });
+    expect(withPhoto.equals(photoAsAvatar)).toBe(true);
+    expect(withPhoto.equals(avatarOnly)).toBe(false);
+  });
+
+  it('falls back to the avatar when no photo is configured', async () => {
+    const withoutPhoto = await card({ avatar: 'avatar.png' }, { 'avatar.png': red });
+    const sameAvatar = await card(
+      { avatar: 'avatar.png' },
+      { 'avatar.png': red, 'photo.png': blue },
+    );
+    expect(withoutPhoto.equals(sameAvatar)).toBe(true);
+  });
+
+  it('crops a portrait photo from the top instead of the centre', async () => {
+    // 400x800 scales to 300x600; the square crop keeps 300 rows. From the top those rows come from
+    // the red 500 rows only; from the centre they would reach the blue band below.
+    const portrait = { width: 400, height: 800, color: '#ff0000' };
+    const cropped = await card(
+      { photo: 'photo.png' },
+      { 'photo.png': { ...portrait, bottomColor: '#0000ff', splitAt: 500 } },
+    );
+    const allRed = await card({ photo: 'photo.png' }, { 'photo.png': portrait });
+    const noImage = await card({}, {});
+    expect(cropped.equals(noImage)).toBe(false);
+    expect(cropped.equals(allRed)).toBe(true);
+  });
+});

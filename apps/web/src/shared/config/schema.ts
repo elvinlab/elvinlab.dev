@@ -72,6 +72,14 @@ export const siteConfigSchema = z
           .describe(
             'File name of a profile photo placed in `apps/web/src/assets/` (for example `avatar.png`); it is optimized at build time. Omit to show initials.',
           ),
+        photo: z
+          .string()
+          .trim()
+          .regex(AVATAR_FILE, 'must be a bare file name (png, jpg, webp or avif) in src/assets')
+          .optional()
+          .describe(
+            'Portrait shown only on /me (and in the /me share card); `avatar` is used elsewhere. Falls back to `avatar` when omitted.',
+          ),
       })
       .describe('Who the site is about.'),
     appearance: z

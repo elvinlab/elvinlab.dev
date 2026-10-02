@@ -81,6 +81,12 @@ try {
   if (/data-now-card/.test(rawHtml) || NOW_FOCUS.some((text) => rawHtml.includes(text))) {
     fail('the Now card rendered although the config has no `now` block');
   }
+  // The owner's images live in `src/assets` and are named by `identity.avatar` / `identity.photo`.
+  // The alternative config names none, so no page may reference them (the raw files still reach
+  // `_astro/` because the eager asset glob emits every image of the folder; a fork replaces them).
+  if (/_astro\/(?:photo|avatar)\./.test(rawHtml)) {
+    fail('a page of the alternative-identity build references an owner image (photo or avatar)');
+  }
   const html = DESIGN_SYSTEM.reduce((acc, token) => acc.replace(token, ''), rawHtml);
   const leaked = OWNER.filter((token) => token.test(html));
   if (leaked.length > 0) fail(`owner strings leaked into the build: ${leaked.join(', ')}`);
