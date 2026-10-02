@@ -116,7 +116,7 @@ From the mobile and performance audit (Lighthouse mobile, screenshots, source re
 - **Pixel display face:** adopted by the owner after a trial on screen (see Type).
 - **Not done on purpose:** the hiring card shows "not available" next to its primary CTA; that is a content decision owned by the owner (`recruiter.openToWork`), not a defect.
 - **Minimal preset (done, 2026-10-01):** the minimalist preset, the theme-driven type scale and the calmer note pages from this list shipped; see Appearance presets and Type.
-- **Faster local test loop (done, 2026-10-02):** measured first (unit 2.2 s; e2e fixed cost about 9 s; 426 e2e tests, about 3 min at 2 workers). Shipped `workers: '50%'` (72 s on 12 cores) and `pnpm test:e2e:quick` (1280 px only). Not done: reusing the fixture build across runs, and running `a11y` (27% of test time) at one viewport for the daily loop. See `docs/TESTING.md`.
+- **Faster local test loop (done, 2026-10-02):** measured first (unit 2.2 s; e2e fixed cost about 9 s; 426 e2e tests, 107 s measured at 2 workers). Shipped `workers: '50%'` (73 s on 12 cores, about 30% faster locally; on a 4-core CI runner it resolves to 2 workers, so no gain there) and `pnpm test:e2e:quick` (1280 px only). Not done: reusing the fixture build across runs, and running `a11y` (27% of test time) at one viewport for the daily loop. See `docs/TESTING.md`.
 
 Implementation and check evidence: [home refinement](../odd/tasks/home-visual-refinement.md), [sitewide polish](../odd/tasks/sitewide-ui-polish.md), [mobile, UX and performance pass](../odd/tasks/mobile-ux-performance-pass.md), [pixel display font](../odd/tasks/pixel-display-font-experiment.md) and [minimal appearance preset](../odd/tasks/minimal-appearance-preset.md).
 

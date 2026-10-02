@@ -15,7 +15,7 @@ For a faster loop while iterating, `mise exec -- pnpm test:e2e:quick` runs the s
 pixels only, and a spec path narrows it further (`pnpm test:e2e:quick tests/browser/smoke.spec.ts`).
 Each run pays about 9 seconds of fixed cost (workspace copy, build, preview). Run the full
 `pnpm test:e2e` (all three viewports) once before closing a change. Workers default to half of the
-available cores, so the full suite takes about 70 seconds on a 12-core machine.
+available cores, so the full suite takes about 73 seconds on a 12-core machine (107 seconds at 2 workers).
 
 Fixtures live in `tests/fixtures/notes`, outside publishable content. Drafts, secrets and existing
 build output are excluded from the temporary copy; source configuration and tokens are never edited.
