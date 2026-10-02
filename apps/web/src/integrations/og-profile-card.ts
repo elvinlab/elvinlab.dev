@@ -79,8 +79,16 @@ function photo(avatar: string): CardNode {
   };
 }
 
+/**
+ * Colour of the status dot, the same rule as the home hiring card: green when open to work, the
+ * brand accent otherwise. Never the danger red: it sits next to texts like "open to chat".
+ */
+export function statusDotColor(open: boolean, colors: Record<string, string>): string {
+  return open ? (colors['ok'] ?? '#34d399') : (colors['primary'] ?? '#a78bfa');
+}
+
 function statusPill(status: NonNullable<ProfileCardContent['status']>): CardNode {
-  const dot = status.open ? (palette['ok'] ?? '#34d399') : (palette['danger'] ?? '#fb7185');
+  const dot = statusDotColor(status.open, palette);
   return {
     type: 'div',
     props: {

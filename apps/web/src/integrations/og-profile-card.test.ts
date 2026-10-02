@@ -7,6 +7,7 @@ import {
   type ProfileCardContent,
   profileCardContentFor,
   renderProfileCardPng,
+  statusDotColor,
 } from './og-profile-card.ts';
 
 const site = {
@@ -139,5 +140,23 @@ describe('renderProfileCardPng', () => {
     const { status: _status, ...bare } = content;
     const png = await renderProfileCardPng(bare);
     expect((await sharp(png).metadata()).height).toBe(630);
+  });
+});
+
+describe('statusDotColor', () => {
+  const palette = { ok: '#00aa00', primary: '#7744ff', danger: '#cc0000' };
+
+  it('is the available green when the owner is open to work', () => {
+    expect(statusDotColor(true, palette)).toBe('#00aa00');
+  });
+
+  it('is the brand accent, never the alarming red, when the owner is not open to work', () => {
+    expect(statusDotColor(false, palette)).toBe('#7744ff');
+    expect(statusDotColor(false, palette)).not.toBe(palette.danger);
+  });
+
+  it('falls back to built-in colours when the palette has none', () => {
+    expect(statusDotColor(true, {})).toBe('#34d399');
+    expect(statusDotColor(false, {})).toBe('#a78bfa');
   });
 });
