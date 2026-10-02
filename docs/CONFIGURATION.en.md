@@ -257,6 +257,7 @@ Four scopes: **build** (read while building), **Worker** (in production, at runt
 | `CLOUDFLARE_API_TOKEN` | CI | yes | yes | Cloudflare API token with permission to deploy the Worker; used only by the deploy job. | GitHub environment secret (`production`) |
 | `CLOUDFLARE_ACCOUNT_ID` | CI | no | yes | Cloudflare account id the deploy job targets. Not a secret, but not needed anywhere else. | GitHub repository variable |
 | `DEV_CHECK_STRIP_DEPS` | local tooling | no | no | Set to `1` to run `pnpm check:dev-cold-start` as its own negative control: it removes the pre-optimized dependencies first and must then fail. | the shell, only when running that check |
+| `FIXTURE_APPEARANCE` | local tooling | no | no | Set to `minimal` or `full` to build the browser-test fixture with that appearance preset instead of the one in `site.config.ts` (only the temporary copy changes). Any other value fails the run. | the shell, only when running `pnpm test:e2e` (for example to verify the `minimal` preset) |
 <!-- docs:end env-vars -->
 
 ### Example files
@@ -316,7 +317,7 @@ Each `features` flag switches the whole feature off: the route is not generated,
 
 #### Appearance and home sections
 
-`appearance` picks the visual preset: `minimal` (this site's choice) hides the hero pills (`heroPills`), the "Lab log" box (`labLog`) and the pillars strip (`pillars`) on the home page; `full` is the original look and shows everything. If you omit `appearance` it is `full`, so a config written before the preset existed does not change.
+`appearance` picks the visual preset: `minimal` hides the hero pills (`heroPills`), the "Lab log" box (`labLog`) and the pillars strip (`pillars`) on the home page; `full` (this site's choice since 2026-10-02) is the original look and shows everything. If you omit `appearance` it is `full`, so a config written before the preset existed does not change.
 
 **Type scale.** `appearance` also sets the text size: it lands on `<html data-appearance>` and `apps/web/src/styles/type-scale.css` defines the scale once (`--type-*` variables), so a fork changes it by editing that file. `minimal`: hero 32/44 px (phone/`md`), section titles 20, note title 30/40, featured card 20/22, body and intro paragraph 17. `full` keeps the original sizes (hero 36/60 px, sections 24, note title 36/48, featured card 30/36, body 18). Reading mode has its own scale and does not change.
 

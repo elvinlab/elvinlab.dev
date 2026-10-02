@@ -113,4 +113,14 @@ export const ENV_VARS: readonly EnvVar[] = [
       'Set to `1` to run `pnpm check:dev-cold-start` as its own negative control: it removes the pre-optimized dependencies first and must then fail.',
     setIn: 'the shell, only when running that check',
   },
+  {
+    name: 'FIXTURE_APPEARANCE',
+    scope: 'local',
+    secret: false,
+    required: false,
+    description:
+      'Set to `minimal` or `full` to build the browser-test fixture with that appearance preset instead of the one in `site.config.ts` (only the temporary copy changes). Any other value fails the run.',
+    setIn:
+      'the shell, only when running `pnpm test:e2e` (for example to verify the `minimal` preset)',
+  },
 ];

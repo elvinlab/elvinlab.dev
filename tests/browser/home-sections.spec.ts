@@ -1,10 +1,29 @@
-import { expect, test } from '@playwright/test';
+import { expect, type Page, test } from '@playwright/test';
 
 /**
- * The fixture build copies the real `site.config.ts`, which uses `appearance: 'minimal'`: the home
- * drops the hero pills, the lab log and the pillars, and keeps the author card, the recruiter
- * card and the notebook index. A section that is off must leave no heading or wrapper behind.
+ * The fixture build copies the real `site.config.ts` (`FIXTURE_APPEARANCE` overrides the preset of
+ * the copy). Under `minimal` the home drops the hero pills, the lab log and the pillars; under
+ * `full` it shows them. Both presets keep the author card, the recruiter card and the notebook
+ * index. A section that is off must leave no heading or wrapper behind. The expectations follow
+ * `html[data-appearance]`, mirroring `HOME_PRESETS` in `shared/config/appearance.ts`.
  */
+type Preset = 'minimal' | 'full';
+
+/** Whether each preset-driven section is on (`HOME_PRESETS` in `shared/config/appearance.ts`). */
+const PRESET_SECTIONS: Record<Preset, { heroPills: boolean; labLog: boolean; pillars: boolean }> = {
+  minimal: { heroPills: false, labLog: false, pillars: false },
+  full: { heroPills: true, labLog: true, pillars: true },
+};
+
+const presetOf = async (page: Page): Promise<Preset> => {
+  const value = await page.evaluate(() => document.documentElement.dataset['appearance']);
+  if (value !== 'minimal' && value !== 'full') throw new Error(`unknown appearance: ${value}`);
+  return value;
+};
+
+/** `toHaveCount` target: one element when the section is on, none when it is off. */
+const countFor = (on: boolean) => (on ? 1 : 0);
+
 test.beforeEach(({ browserName: _browserName }, testInfo) => {
   test.skip(testInfo.project.name !== 'chromium-1280', 'section switches are viewport independent');
 });
@@ -27,16 +46,19 @@ const HOMES = [
 ];
 
 for (const { path, labLog, pillars, notebook, hiring } of HOMES) {
-  test.describe(`minimal home at ${path}`, () => {
-    test('hides the hero pills, the lab log and the pillars without leaving anything behind', async ({
+  test.describe(`home sections at ${path}`, () => {
+    test('shows or hides the hero pills, the lab log and the pillars to match the preset, leaving nothing behind', async ({
       page,
     }) => {
       await page.goto(path);
+      const on = PRESET_SECTIONS[await presetOf(page)];
       await expect(page.locator('[data-home-hero] h1')).toBeVisible();
-      await expect(page.locator('[data-home-hero] ul')).toHaveCount(0);
-      await expect(page.getByRole('heading', { name: labLog })).toHaveCount(0);
-      await expect(page.locator(`section[aria-label="${pillars}"]`)).toHaveCount(0);
-      await expect(page.getByText('Clean architecture')).toHaveCount(0);
+      await expect(page.locator('[data-home-hero] ul')).toHaveCount(countFor(on.heroPills));
+      await expect(page.getByText('Clean architecture')).toHaveCount(countFor(on.heroPills));
+      await expect(page.getByRole('heading', { name: labLog })).toHaveCount(countFor(on.labLog));
+      await expect(page.locator(`section[aria-label="${pillars}"]`)).toHaveCount(
+        countFor(on.pillars),
+      );
     });
 
     test('keeps the author card, the recruiter card and the notebook index', async ({ page }) => {

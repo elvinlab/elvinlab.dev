@@ -56,6 +56,25 @@ export function neutralizeFixtureIntegrations(web: string): void {
   );
 }
 
+/**
+ * Lets a verification run pick the visual preset of the fixture build (`FIXTURE_APPEARANCE`), so
+ * the browser tests can prove both presets without touching the real config. Only the copy in the
+ * temporary workspace is rewritten; an unset or empty value keeps the real config as it is.
+ */
+export function overrideFixtureAppearance(web: string, requested: string | undefined): void {
+  if (requested === undefined || requested === '') return;
+  if (requested !== 'minimal' && requested !== 'full') {
+    throw new Error(`fixture: FIXTURE_APPEARANCE must be 'minimal' or 'full', got '${requested}'`);
+  }
+  const configPath = join(web, 'src/site.config.ts');
+  const config = readFileSync(configPath, 'utf8');
+  const patched = config.replace(/appearance: '(?:minimal|full)'/, `appearance: '${requested}'`);
+  if (patched === config && !config.includes(`appearance: '${requested}'`)) {
+    throw new Error('fixture: could not find the appearance line to override');
+  }
+  writeFileSync(configPath, patched);
+}
+
 /** Copies only build inputs; fixture builds never write into publishable content or local drafts. */
 export function createFixtureWorkspace(source: string, fixtures: string) {
   const root = mkdtempSync(join(tmpdir(), 'elvinlab-verification-'));

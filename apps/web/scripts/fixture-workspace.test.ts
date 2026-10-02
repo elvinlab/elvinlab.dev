@@ -17,6 +17,7 @@ import {
   enableFixtureComments,
   enableFixtureNotice,
   neutralizeFixtureIntegrations,
+  overrideFixtureAppearance,
 } from './fixture-workspace.ts';
 
 const temporary: string[] = [];
@@ -171,4 +172,34 @@ it('does nothing to a config without integrations', () => {
   const web = webWithConfig(original);
   neutralizeFixtureIntegrations(web);
   expect(readFileSync(join(web, 'src/site.config.ts'), 'utf8')).toBe(original);
+});
+
+const APPEARANCE_CONFIG =
+  "export const siteConfig = {\n  appearance: 'full',\n  features: {},\n};\n";
+
+it.each(['minimal', 'full'])('rewrites the fixture appearance to %s when asked', (requested) => {
+  const web = webWithConfig(
+    APPEARANCE_CONFIG.replace("'full'", requested === 'full' ? "'minimal'" : "'full'"),
+  );
+  overrideFixtureAppearance(web, requested);
+  const config = readFileSync(join(web, 'src/site.config.ts'), 'utf8');
+  expect(config).toContain(`appearance: '${requested}',`);
+  expect(config.match(/appearance:/g)).toHaveLength(1);
+});
+
+it.each([undefined, ''])('keeps the real appearance when the override is %j', (requested) => {
+  const web = webWithConfig(APPEARANCE_CONFIG);
+  overrideFixtureAppearance(web, requested);
+  expect(readFileSync(join(web, 'src/site.config.ts'), 'utf8')).toBe(APPEARANCE_CONFIG);
+});
+
+it('rejects an unknown appearance instead of silently ignoring a typo', () => {
+  const web = webWithConfig(APPEARANCE_CONFIG);
+  expect(() => overrideFixtureAppearance(web, 'minimall')).toThrow(/FIXTURE_APPEARANCE/);
+  expect(readFileSync(join(web, 'src/site.config.ts'), 'utf8')).toBe(APPEARANCE_CONFIG);
+});
+
+it('fails loudly when the config has no appearance line to rewrite', () => {
+  const web = webWithConfig('export const siteConfig = {};\n');
+  expect(() => overrideFixtureAppearance(web, 'minimal')).toThrow(/appearance/);
 });
