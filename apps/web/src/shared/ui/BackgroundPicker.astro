@@ -3,7 +3,9 @@
  * Cycles the banner background effect (galaxy -> cursor-waves -> off) and remembers the choice,
  * the same way `ThemeToggle` works. The galaxy icon is a sparkle so it never reads as the theme
  * toggle's sun. Dispatches `background-change` so `BackgroundCanvas` swaps the
- * running effect in place, without a page reload.
+ * running effect in place, without a page reload. Hidden (CSS only) under a coarse pointer and
+ * under prefers-reduced-motion, the two conditions where `BackgroundCanvas` never runs an effect,
+ * so the button never promises a change the visitor cannot see. Width never hides it.
  */
 import { site } from '@/shared/config/index.ts';
 import { BACKGROUND_STORAGE_KEY } from '@/shared/lib/background-preference.ts';
@@ -15,7 +17,7 @@ const { label } = Astro.props;
 
 <button
   type="button"
-  class="grid size-11 shrink-0 place-items-center rounded-control text-text transition-colors duration-150 hover:bg-card-hover active:scale-96"
+  class="grid size-11 shrink-0 place-items-center rounded-control text-text transition-colors duration-150 hover:bg-card-hover active:scale-96 motion-reduce:hidden pointer-coarse:hidden"
   aria-label={label}
   data-background-toggle
   data-storage-key={BACKGROUND_STORAGE_KEY}

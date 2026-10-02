@@ -1,5 +1,9 @@
 ---
-/** One entry row in the notes index: number, title, excerpt, category and tag chips, meta column. */
+/**
+ * One entry row in the notes index: number, title, excerpt, category and tag chips, meta column.
+ * The title is the row's only link; its `::after` stretches over the row so the whole row opens the
+ * note (no script, no nested links).
+ */
 import { localizePath } from '@elvinlab/core';
 
 import { secondaryMetaSlot } from '@/features/notes/lib/note-meta.ts';
@@ -18,15 +22,16 @@ const href = localizePath(`/notes/${note.slug}/`, data.lang, LOCALES);
 
 <article
   data-note-row
+  data-card-link
   data-lang={data.lang}
   data-search={searchText(note)}
-  class="grid grid-cols-[64px_1fr] gap-x-4 gap-y-2 border-t border-dashed border-divider py-5 transition-colors duration-150 hover:bg-card-hover md:grid-cols-[88px_1fr_auto] md:rounded-inner md:px-3"
+  class="relative grid grid-cols-[64px_1fr] gap-x-4 gap-y-2 border-t border-dashed border-divider py-5 transition-colors duration-150 hover:bg-card-hover md:grid-cols-[88px_1fr_auto] md:rounded-inner md:px-3"
 >
   <span class="pt-1 font-mono text-sm text-muted">{noteNumber(data.number)}</span>
 
   <div class="flex flex-col gap-2">
     <h3 class="text-lg font-bold leading-snug">
-      <a href={href} class="transition-colors duration-150 hover:text-primary">{data.title}</a>
+      <a href={href} class="transition-colors duration-150 after:absolute after:inset-0 hover:text-primary">{data.title}</a>
     </h3>
     <p class="text-sm leading-relaxed text-text-secondary">{data.description}</p>
     <div class="flex flex-wrap items-center gap-1.5">

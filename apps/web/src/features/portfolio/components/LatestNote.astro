@@ -1,5 +1,9 @@
 ---
-/** Home hero card for the most recent note: meta, title, decision record and a read CTA. */
+/**
+ * Home hero card for the most recent note: meta, title, decision record and a read CTA. The title
+ * is the card's only link; its `::after` stretches over the card so the whole card opens the note,
+ * and the CTA is a decorative twin of that link (a second link to the same page would be announced twice).
+ */
 import { localizePath } from '@elvinlab/core';
 
 import {
@@ -20,7 +24,7 @@ const href = localizePath(`/notes/${slug}/`, data.lang, LOCALES);
 const readingLabel = t(locale, 'notes.readingTime', { min: readingMinutes(body) });
 ---
 
-<section class="flex flex-col gap-5 rounded-card bg-card p-6 md:p-8">
+<section data-card-link class="relative flex flex-col gap-5 rounded-card bg-card p-6 transition-colors duration-150 hover:bg-card-hover md:p-8">
   <div class="flex flex-wrap items-center justify-between gap-2">
     <span class="flex items-center gap-2 font-mono text-sm">
       <span class="text-pink">{t(locale, 'notes.entry', { number: noteNumber(data.number) })}</span>
@@ -34,15 +38,15 @@ const readingLabel = t(locale, 'notes.readingTime', { min: readingMinutes(body) 
   </div>
 
   <h2 class="font-display text-card-title font-bold leading-tight">
-    <a href={href} class="transition-colors duration-150 hover:text-primary">{data.title}</a>
+    <a href={href} class="transition-colors duration-150 after:absolute after:inset-0 hover:text-primary">{data.title}</a>
   </h2>
 
   <DecisionRecord locale={locale} decision={data.decision} />
 
   <div class="flex items-center gap-3">
-    <a href={href} class="flex h-11 w-fit items-center rounded-control bg-button px-5 font-medium text-white active:scale-96">
+    <span aria-hidden="true" class="flex h-11 w-fit items-center rounded-control bg-button px-5 font-medium text-white">
       {t(locale, 'home.readNote')}
-    </a>
+    </span>
     {secondaryMetaSlot === 'foot' && <LangBadge lang={data.lang} />}
   </div>
 </section>

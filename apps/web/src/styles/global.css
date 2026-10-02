@@ -30,9 +30,15 @@
 }
 
 @layer base {
-  :focus-visible {
+  :focus-visible,
+  [data-card-link]:has(:focus-visible) {
     outline: 2px solid var(--color-primary);
     outline-offset: 2px;
+  }
+
+  /* A card whose title link is stretched over it shows one ring, on the card, not on the text. */
+  [data-card-link] :focus-visible {
+    outline: none;
   }
 }
 
