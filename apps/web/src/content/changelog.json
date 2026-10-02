@@ -262,5 +262,11 @@
     "category": "changed",
     "title": "Pages are about 4 KB lighter",
     "description": "The self-hosted fonts now ship only the Latin alphabets that Spanish and English use, which keeps the notes pages within their loading budget."
+  },
+  "external-links-new-tab": {
+    "date": "2026-10-02",
+    "category": "changed",
+    "title": "Links to other sites open in a new tab",
+    "description": "Links that leave the site open in a new tab so you do not lose your place in the blog; links inside the site stay in the same tab."
   }
 }

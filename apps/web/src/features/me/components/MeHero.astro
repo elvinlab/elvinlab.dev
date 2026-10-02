@@ -7,6 +7,8 @@ import { localizePath } from '@elvinlab/core';
 import { isEnabled, resolveCvUrl, site } from '@/shared/config/index.ts';
 import { LOCALES, type Locale, t } from '@/shared/i18n/index.ts';
 import { resolvePhoto } from '@/shared/lib/avatar.ts';
+import { externalLinkAttrs } from '@/shared/lib/external-link.ts';
+import ExternalHint from '@/shared/ui/ExternalHint.astro';
 import SocialIcon from '@/shared/ui/SocialIcon.astro';
 
 type Props = { locale: Locale };
@@ -42,8 +44,8 @@ const contactHref = localizePath('/contact/', locale, LOCALES);
     <p class="text-xl text-text-secondary md:text-2xl">{site.identity.role[locale]}</p>
     <div class="mt-1 flex flex-wrap gap-2.5 print:hidden">
       {cvUrl && (
-        <a href={cvUrl} class="flex h-12 items-center gap-2 rounded-control bg-button px-5 font-medium text-white active:scale-96">
-          <SocialIcon name="download" />{t(locale, 'me.cv')}
+        <a href={cvUrl} {...externalLinkAttrs(cvUrl, site.url)} class="flex h-12 items-center gap-2 rounded-control bg-button px-5 font-medium text-white active:scale-96">
+          <SocialIcon name="download" />{t(locale, 'me.cv')}<ExternalHint href={cvUrl} locale={locale} />
         </a>
       )}
       {isEnabled('contact') && (
@@ -52,8 +54,8 @@ const contactHref = localizePath('/contact/', locale, LOCALES);
         </a>
       )}
       {site.socials.map((social) => (
-        <a href={social.url} rel="me noopener" class="grid size-12 place-items-center rounded-control bg-chip transition-colors duration-150 hover:bg-card-hover">
-          <span class="sr-only">{social.label}</span><SocialIcon name={social.icon} />
+        <a href={social.url} {...externalLinkAttrs(social.url, site.url, 'me')} class="grid size-12 place-items-center rounded-control bg-chip transition-colors duration-150 hover:bg-card-hover">
+          <span class="sr-only">{social.label}</span><ExternalHint href={social.url} locale={locale} /><SocialIcon name={social.icon} />
         </a>
       ))}
     </div>

@@ -6,6 +6,8 @@ import '@fontsource/press-start-2p/latin-400.css';
 
 import { site } from '@/shared/config/index.ts';
 import { type Locale, t } from '@/shared/i18n/index.ts';
+import { externalLinkAttrs } from '@/shared/lib/external-link.ts';
+import ExternalHint from '@/shared/ui/ExternalHint.astro';
 
 type Props = { locale: Locale };
 
@@ -51,10 +53,10 @@ const footerLink =
             <li>
               <a
                 href={social.url}
-                rel="me noopener"
+                {...externalLinkAttrs(social.url, site.url, 'me')}
                 class="flex h-11 items-center rounded-control px-3 text-sm text-text-secondary transition-colors duration-150 hover:bg-card-hover hover:text-text"
               >
-                {social.label}
+                {social.label}<ExternalHint href={social.url} locale={locale} />
               </a>
             </li>
           ))}

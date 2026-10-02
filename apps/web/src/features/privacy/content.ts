@@ -3,6 +3,8 @@
  * This is NOT the UI dictionary; long text lives here, not in shared/i18n.
  * Owner, domain and contact paths come from the caller (site config) so the page stays white-label.
  */
+import type { Locale } from '@/shared/i18n/index.ts';
+import { externalAnchorHtml } from '@/shared/lib/external-anchor.ts';
 
 export type PrivacySection = {
   id: string;
@@ -39,22 +41,20 @@ const GISCUS_PRIVACY = 'https://github.com/giscus/giscus/blob/main/PRIVACY-POLIC
 const GITHUB_PRIVACY =
   'https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement';
 
-const external = (href: string, label: string): string =>
-  `<a href="${href}" target="_blank" rel="noopener">${label}</a>`;
-
 const commentsSection = (repo: string): Record<'es' | 'en', PrivacySection> => {
-  const discussions = external(`https://github.com/${repo}/discussions`, 'GitHub Discussions');
-  const giscus = external('https://giscus.app', 'giscus');
+  const discussions = (locale: Locale) =>
+    externalAnchorHtml(locale, `https://github.com/${repo}/discussions`, 'GitHub Discussions');
+  const giscus = (locale: Locale) => externalAnchorHtml(locale, 'https://giscus.app', 'giscus');
   return {
     es: {
       id: 'comments',
       title: 'Comentarios (giscus)',
-      body: `<p>Los comentarios y reacciones de las notas los provee ${giscus}: al llegar a esa sección, tu navegador se conecta a giscus.app para cargarla. Se guardan como ${discussions} del repositorio público, por lo que son visibles para cualquiera.</p><p>Para comentar o reaccionar debes autorizar la aplicación giscus con el flujo OAuth de GitHub. Según su ${external(GISCUS_PRIVACY, 'política de privacidad')}, giscus guarda en el <code>localStorage</code> de tu navegador un token cifrado por su servidor para mantener tu sesión, y no recoge datos por su cuenta. El tratamiento por parte de GitHub se rige por su ${external(GITHUB_PRIVACY, 'declaración de privacidad')}.</p>`,
+      body: `<p>Los comentarios y reacciones de las notas los provee ${giscus('es')}: al llegar a esa sección, tu navegador se conecta a giscus.app para cargarla. Se guardan como ${discussions('es')} del repositorio público, por lo que son visibles para cualquiera.</p><p>Para comentar o reaccionar debes autorizar la aplicación giscus con el flujo OAuth de GitHub. Según su ${externalAnchorHtml('es', GISCUS_PRIVACY, 'política de privacidad')}, giscus guarda en el <code>localStorage</code> de tu navegador un token cifrado por su servidor para mantener tu sesión, y no recoge datos por su cuenta. El tratamiento por parte de GitHub se rige por su ${externalAnchorHtml('es', GITHUB_PRIVACY, 'declaración de privacidad')}.</p>`,
     },
     en: {
       id: 'comments',
       title: 'Comments (giscus)',
-      body: `<p>Comments and reactions on notes are provided by ${giscus}: when you scroll to that section, your browser connects to giscus.app to load it. They are stored as ${discussions} in the public repository, so anyone can see them.</p><p>To comment or react you must authorize the giscus app through GitHub's OAuth flow. According to its ${external(GISCUS_PRIVACY, 'privacy policy')}, giscus keeps a server-encrypted token in your browser's <code>localStorage</code> to keep you signed in, and does not collect data on its own. GitHub's handling is covered by its ${external(GITHUB_PRIVACY, 'privacy statement')}.</p>`,
+      body: `<p>Comments and reactions on notes are provided by ${giscus('en')}: when you scroll to that section, your browser connects to giscus.app to load it. They are stored as ${discussions('en')} in the public repository, so anyone can see them.</p><p>To comment or react you must authorize the giscus app through GitHub's OAuth flow. According to its ${externalAnchorHtml('en', GISCUS_PRIVACY, 'privacy policy')}, giscus keeps a server-encrypted token in your browser's <code>localStorage</code> to keep you signed in, and does not collect data on its own. GitHub's handling is covered by its ${externalAnchorHtml('en', GITHUB_PRIVACY, 'privacy statement')}.</p>`,
     },
   };
 };
@@ -96,12 +96,12 @@ function buildBaseContent({
         {
           id: 'analytics',
           title: 'Cloudflare Web Analytics',
-          body: `<p>Este sitio puede usar ${external('https://www.cloudflare.com/web-analytics/', 'Cloudflare Web Analytics')} para medir el tráfico de forma agregada: vistas de página, tiempos de carga y Core Web Vitals. Los parámetros de consulta (query strings) no se registran ${external(CLOUDFLARE_FAQ, '[fuente]')}. El detalle de los datos que Cloudflare recoge está en su ${external(CLOUDFLARE_DATA, 'documentación')}. Cloudflare indica que no rastrea a usuarios individuales entre las propiedades de sus clientes ${external(CLOUDFLARE_COLLECTION, '[fuente]')}. El tratamiento se basa en el interés legítimo de entender el uso del sitio.</p>`,
+          body: `<p>Este sitio puede usar ${externalAnchorHtml('es', 'https://www.cloudflare.com/web-analytics/', 'Cloudflare Web Analytics')} para medir el tráfico de forma agregada: vistas de página, tiempos de carga y Core Web Vitals. Los parámetros de consulta (query strings) no se registran ${externalAnchorHtml('es', CLOUDFLARE_FAQ, '[fuente]')}. El detalle de los datos que Cloudflare recoge está en su ${externalAnchorHtml('es', CLOUDFLARE_DATA, 'documentación')}. Cloudflare indica que no rastrea a usuarios individuales entre las propiedades de sus clientes ${externalAnchorHtml('es', CLOUDFLARE_COLLECTION, '[fuente]')}. El tratamiento se basa en el interés legítimo de entender el uso del sitio.</p>`,
         },
         {
           id: 'contact-form',
           title: 'Formulario de contacto',
-          body: `<p>Al enviar el formulario se transmiten tu nombre, tu correo electrónico, el mensaje y la hora de envío. El único propósito es poder responderte. Intervienen estos proveedores:</p><ul><li><strong>Resend</strong>: entrega del correo de notificación.</li><li><strong>Cloudflare Turnstile</strong>: verificación anti-bot (${external(TURNSTILE_PRIVACY, 'política de privacidad')}).</li><li>Limitador de tasa de Cloudflare, que usa la IP del visitante para prevenir abusos.</li></ul><p>Los mensajes se conservan solo el tiempo necesario para responderlos; no se definen plazos fijos.</p>`,
+          body: `<p>Al enviar el formulario se transmiten tu nombre, tu correo electrónico, el mensaje y la hora de envío. El único propósito es poder responderte. Intervienen estos proveedores:</p><ul><li><strong>Resend</strong>: entrega del correo de notificación.</li><li><strong>Cloudflare Turnstile</strong>: verificación anti-bot (${externalAnchorHtml('es', TURNSTILE_PRIVACY, 'política de privacidad')}).</li><li>Limitador de tasa de Cloudflare, que usa la IP del visitante para prevenir abusos.</li></ul><p>Los mensajes se conservan solo el tiempo necesario para responderlos; no se definen plazos fijos.</p>`,
         },
         {
           id: 'hosting-logs',
@@ -139,12 +139,12 @@ function buildBaseContent({
         {
           id: 'analytics',
           title: 'Cloudflare Web Analytics',
-          body: `<p>This site may use ${external('https://www.cloudflare.com/web-analytics/', 'Cloudflare Web Analytics')} to measure traffic in aggregate: page views, load times and Core Web Vitals. Query strings are not logged ${external(CLOUDFLARE_FAQ, '[source]')}. The details of the data Cloudflare collects are in its ${external(CLOUDFLARE_DATA, 'documentation')}. Cloudflare states that it does not track individual end users across its customers' Internet properties ${external(CLOUDFLARE_COLLECTION, '[source]')}. Processing relies on the legitimate interest of understanding site usage.</p>`,
+          body: `<p>This site may use ${externalAnchorHtml('en', 'https://www.cloudflare.com/web-analytics/', 'Cloudflare Web Analytics')} to measure traffic in aggregate: page views, load times and Core Web Vitals. Query strings are not logged ${externalAnchorHtml('en', CLOUDFLARE_FAQ, '[source]')}. The details of the data Cloudflare collects are in its ${externalAnchorHtml('en', CLOUDFLARE_DATA, 'documentation')}. Cloudflare states that it does not track individual end users across its customers' Internet properties ${externalAnchorHtml('en', CLOUDFLARE_COLLECTION, '[source]')}. Processing relies on the legitimate interest of understanding site usage.</p>`,
         },
         {
           id: 'contact-form',
           title: 'Contact form',
-          body: `<p>Submitting the form sends your name, email address, message and submission time. The only purpose is to be able to reply to you. These providers are involved:</p><ul><li><strong>Resend</strong>: delivery of the notification email.</li><li><strong>Cloudflare Turnstile</strong>: bot check (${external(TURNSTILE_PRIVACY, 'privacy policy')}).</li><li>Cloudflare rate limiter, which uses the visitor IP to prevent abuse.</li></ul><p>Messages are kept only as long as needed to answer them; no fixed retention periods are defined.</p>`,
+          body: `<p>Submitting the form sends your name, email address, message and submission time. The only purpose is to be able to reply to you. These providers are involved:</p><ul><li><strong>Resend</strong>: delivery of the notification email.</li><li><strong>Cloudflare Turnstile</strong>: bot check (${externalAnchorHtml('en', TURNSTILE_PRIVACY, 'privacy policy')}).</li><li>Cloudflare rate limiter, which uses the visitor IP to prevent abuse.</li></ul><p>Messages are kept only as long as needed to answer them; no fixed retention periods are defined.</p>`,
         },
         {
           id: 'hosting-logs',
