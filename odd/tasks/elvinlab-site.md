@@ -292,3 +292,9 @@ Candidate ADRs (format and index in `docs/adr/README.md`, 0006 onward):
 - Contact security and observability: lazy Turnstile, per-environment public site key, Worker secrets only, honeypot sent as typed, fail closed; diagnostics log stage and provider codes only (never values, secrets or tokens); `redirect: 'manual'` because Workers fetch rejects `'error'`.
 Next step when picked up: write them as one short batch (each <= 40 lines), together with the changelog decision.
 
+
+## Status 2026-10-01 (night): what shipped after the first release
+Supersedes the Spanish-only note under "Notes" above (English notes and `/en/notes` exist now) and any "NOT started" marker for these items. Each has its own tracker or Engram entry.
+- Released to `main`: giscus comments with reactions, first two Lab Notes, per-note and `/me` share cards, reading mode (config toggle plus visitor toggle), terms and privacy pages, discreet language hint, UX fixes (`e76560e`, `d6e7139`).
+- Released `3ee44c4`: bilingual README (`README.md`, `README.en.md`), single settings file `site.config.ts` with generated docs (`docs/CONFIGURATION*.md`, `docs/NOTES*.md`, `pnpm docs:config`), and working `translationOf` (hreflang, `x-default`, language switch lands on the translation; invalid links fail the build). `cover` removed from the note schema. See `odd/tasks/note-translations.md`.
+- Pending: LICENSE (user decision, MIT suggested), refresh social caches, close issue #51, drop the now redundant GitHub `production` variables `PUBLIC_CF_ANALYTICS_TOKEN` and `PUBLIC_TURNSTILE_SITE_KEY`. Confirm the `3ee44c4` CI deploy finished green.
