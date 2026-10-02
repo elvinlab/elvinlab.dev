@@ -86,6 +86,13 @@ the previous release (`8c7968a`) had only about 64 ms of margin. What to do:
 - The first run after a checkout can fail with "Chrome prevented page load with an interstitial" when
   the fixture server is slow to start; run it again before trusting a number.
 
+Headroom added on 2026-10-02: the three variable fonts are now declared in `apps/web/src/styles/fonts.css`
+with the latin and latin-ext subsets only. The `@fontsource-variable` packages declare every alphabet
+(Cyrillic, Greek, Vietnamese), about 4.4 KB of `@font-face` rules per page, one of them inlined as base64.
+The note page went from 98 667 to 94 286 bytes of HTML (48 379 of inline CSS) and its worst LCP in the
+gate is 2436 ms, with about 4 KB of room before the next round-trip boundary. Keep that room for real
+features: check the page size before and after any change to shared CSS or markup.
+
 Follow-up: the margin is thin, so the next additions to shared CSS can break the gate again. Cutting the
 inline stylesheet is the durable fix (tracked as a GitHub issue).
 
