@@ -154,5 +154,11 @@
     "category": "added",
     "title": "Notes can link to their translation",
     "description": "A note can point to its translation in the other language, with a language switch on the page and hreflang tags for search engines."
+  },
+  "hiring-card-wording": {
+    "date": "2026-10-02",
+    "category": "changed",
+    "title": "Hiring card reads more openly",
+    "description": "The card now says I am working at Buo and open to chat, instead of simply not being available. The profile share card carries the same wording."
   }
 }
