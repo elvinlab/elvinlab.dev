@@ -174,7 +174,7 @@ El sitio está pensado para que otra persona lo adopte reemplazando `site.config
 
 En producción en [elvinlab.dev](https://elvinlab.dev) desde el 1 de octubre de 2026. El avance está en el [GitHub Project](https://github.com/users/elvinlab/projects/2) y el historial de cambios visibles, en el [changelog](https://elvinlab.dev/changelog/).
 
-Este repositorio **aún no declara una licencia**. Las notas se publican bajo [CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/deed.es).
+El código se publica bajo la [licencia MIT](LICENSE). Las notas (el contenido de `content/notes`) se publican bajo [CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/deed.es).
 
 ## Autor
 
