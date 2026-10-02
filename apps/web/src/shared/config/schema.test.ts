@@ -246,6 +246,26 @@ describe('parseSiteConfig', () => {
     );
   });
 
+  describe('identity.photo', () => {
+    const withPhoto = (photo: unknown) => ({ ...valid, identity: { ...valid.identity, photo } });
+
+    it('is optional (the avatar is used on /me without it)', () => {
+      expect(parseSiteConfig(valid).identity.photo).toBeUndefined();
+    });
+
+    it('accepts the file name of an image placed in src/assets', () => {
+      expect(parseSiteConfig(withPhoto('photo.jpg')).identity.photo).toBe('photo.jpg');
+      expect(parseSiteConfig(withPhoto('me.JPG')).identity.photo).toBe('me.JPG');
+    });
+
+    it.each(['/photo.jpg', '../photo.jpg', 'photos/photo.jpg', 'photo.gif', 'photo'])(
+      'rejects %s (only a bare png, jpg, webp or avif file name is allowed)',
+      (photo) => {
+        expect(() => parseSiteConfig(withPhoto(photo))).toThrow(/photo/);
+      },
+    );
+  });
+
   it('rejects a recruiter cvUrl that is not https', () => {
     const broken = { ...valid, recruiter: { ...valid.recruiter, cvUrl: 'http://x.dev/cv.pdf' } };
     expect(() => parseSiteConfig(broken)).toThrow();

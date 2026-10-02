@@ -98,18 +98,24 @@ export function cardContentFor(
 }
 
 export type OgSite = ProfileSite & {
-  identity: { avatar?: string | undefined };
+  identity: { avatar?: string | undefined; photo?: string | undefined };
   features: { me: boolean };
 };
-/** `assetsDir` is `apps/web/src/assets`, where `identity.avatar` names a file. */
+/** `assetsDir` is `apps/web/src/assets`, where `identity.photo` and `identity.avatar` name files. */
 export type OgOptions = { assetsDir?: string; site?: OgSite };
 
-/** The profile photo as a square `data:` URI, or undefined when it is not configured or missing. */
+/**
+ * The profile image as a square `data:` URI, or undefined when it is not configured or missing.
+ * A portrait is cover-cropped from the top, like `object-top` on the `/me` hero, to keep the face.
+ */
 async function loadAvatar(assetsDir: string | undefined, avatar: string | undefined) {
   if (!assetsDir || !avatar) return undefined;
   const file = join(assetsDir, avatar);
   if (!existsSync(file)) return undefined;
-  const png = await sharp(file).resize(300, 300, { fit: 'cover' }).png().toBuffer();
+  const png = await sharp(file)
+    .resize(300, 300, { fit: 'cover', position: 'top' })
+    .png()
+    .toBuffer();
   return `data:image/png;base64,${png.toString('base64')}`;
 }
 
@@ -139,7 +145,11 @@ export function ogImages(contentDir: string, options: OgOptions = {}): AstroInte
 
         if (config.features.me) {
           mkdirSync(root, { recursive: true });
-          const avatar = await loadAvatar(options.assetsDir, config.identity.avatar);
+          // The card represents /me, so it shows the portrait; the home keeps the avatar.
+          const avatar = await loadAvatar(
+            options.assetsDir,
+            config.identity.photo ?? config.identity.avatar,
+          );
           for (const locale of LOCALES.locales) {
             const png = await renderProfileCardPng({
               ...profileCardContentFor(config, locale),

@@ -1,18 +1,18 @@
 ---
-/** /me hero: photo placeholder, greeting, name, role and the recruiter call-to-action buttons. */
+/** /me hero: portrait (`identity.photo`, else the avatar) or initials, greeting, name, role and the recruiter call-to-action buttons. */
 
 import { Image } from 'astro:assets';
 import { localizePath } from '@elvinlab/core';
 
 import { isEnabled, resolveCvUrl, site } from '@/shared/config/index.ts';
 import { LOCALES, type Locale, t } from '@/shared/i18n/index.ts';
-import { resolveAvatar } from '@/shared/lib/avatar.ts';
+import { resolvePhoto } from '@/shared/lib/avatar.ts';
 import SocialIcon from '@/shared/ui/SocialIcon.astro';
 
 type Props = { locale: Locale };
 
 const { locale } = Astro.props;
-const avatar = resolveAvatar(site.identity.avatar);
+const photo = resolvePhoto(site.identity);
 const cvUrl = resolveCvUrl(site.recruiter.cvUrl, locale, LOCALES.defaultLocale);
 const initials = site.identity.name.split(' ').slice(0, 2).map((p) => p[0]).join('');
 const contactHref = localizePath('/contact/', locale, LOCALES);
@@ -20,15 +20,15 @@ const contactHref = localizePath('/contact/', locale, LOCALES);
 
 <section class="grid gap-8 md:grid-cols-[232px_1fr] md:items-center">
   <div class="grid aspect-square w-40 place-items-center justify-self-start rounded-card bg-card p-2 md:w-[232px]">
-    {avatar ? (
-      // Eager: the photo is in the first viewport of /me.
+    {photo ? (
+      // Eager: the portrait is in the first viewport of /me.
       <Image
-        src={avatar}
+        src={photo}
         alt={site.identity.name}
         format="webp"
         quality={80}
         loading="eager"
-        class="size-full rounded-inner object-cover outline outline-1 -outline-offset-1 outline-divider"
+        class="size-full rounded-inner object-cover object-top outline outline-1 -outline-offset-1 outline-divider"
       />
     ) : (
       <div class="grid size-full place-items-center rounded-inner bg-chip font-display text-5xl font-bold text-primary outline outline-1 -outline-offset-1 outline-divider" aria-hidden="true">{initials}</div>
