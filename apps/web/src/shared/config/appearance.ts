@@ -1,6 +1,6 @@
 import type { SiteConfig } from './schema.ts';
 
-/** Visual preset of the site: `minimal` is the calm default of this site, `full` the original look. */
+/** Visual preset of the site: `minimal` is the calm look, `full` the original look (the default). */
 export type Appearance = SiteConfig['appearance'];
 
 /** The per-section overrides of `home` in the site config (each key is optional). */

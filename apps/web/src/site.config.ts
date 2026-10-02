@@ -33,7 +33,7 @@ export const siteConfig = {
   },
   // Calm look: smaller type and fewer home sections. Use 'full' for the original look, and `home`
   // to switch single sections on or off (see docs/CONFIGURATION.md, "Appearance and home sections").
-  appearance: 'minimal',
+  appearance: 'full',
   socials: [
     { label: 'GitHub', url: 'https://github.com/elvinlab', icon: 'github' },
     { label: 'LinkedIn', url: 'https://www.linkedin.com/in/elvinlab', icon: 'linkedin' },

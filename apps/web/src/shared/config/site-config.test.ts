@@ -20,8 +20,8 @@ describe('site.config.ts', () => {
     });
   });
 
-  it('uses the minimal appearance for this site', () => {
-    expect(parseSiteConfig(siteConfig).appearance).toBe('minimal');
+  it('uses the full appearance for this site', () => {
+    expect(parseSiteConfig(siteConfig).appearance).toBe('full');
   });
 
   it('shows no "under construction" notice now that the site is live', () => {

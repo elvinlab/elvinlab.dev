@@ -13,7 +13,7 @@ Source of truth for how elvinlab.dev looks and moves (design v3, "lab notebook")
 
 ## Appearance presets
 
-`appearance: 'minimal' | 'full'` in `site.config.ts` picks how loud the site is. `minimal` is the calm look and the choice of this site; `full` is the original look. The schema default is `full`, so a fork written before the preset existed does not change; this repo sets `minimal` explicitly. The preset reaches the document as `html[data-appearance]` (`BaseLayout`) and changes three things, each in one CSS file or resolver so components never test the preset:
+`appearance: 'minimal' | 'full'` in `site.config.ts` picks how loud the site is. `minimal` is the calm look; `full` is the original look and the choice of this site since 2026-10-02 (it ran `minimal` from 2026-10-01 to 2026-10-02). The schema default is `full`, so a fork written before the preset existed does not change; this repo sets `full` explicitly. The preset reaches the document as `html[data-appearance]` (`BaseLayout`) and changes three things, each in one CSS file or resolver so components never test the preset:
 
 - **Type scale:** `apps/web/src/styles/type-scale.css` (see Type).
 - **Banner and note layout:** `apps/web/src/styles/calm-layout.css` (banner heights and padding, hero measure, decision record) and `note-meta.ts` (where the language badge and author go).
