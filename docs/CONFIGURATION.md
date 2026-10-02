@@ -139,7 +139,7 @@ Los cuatro archivos JSON son **objetos con una clave por entrada**; la clave es 
 
 ### Experiencia — `experience.json`
 
-Aparece en la línea de tiempo de `/me`. Si omites `end`, es el puesto actual.
+Aparece en la línea de tiempo de `/me`. Si omites `end`, es el puesto actual. `role`, `summary` y `location` pueden ser un texto simple (se muestra en todos los idiomas) o un objeto por idioma que incluya el idioma por defecto.
 
 ```json
 {
@@ -147,7 +147,10 @@ Aparece en la línea de tiempo de `/me`. Si omites `end`, es el puesto actual.
     "role": "Full Stack Developer",
     "company": "Mi empresa",
     "start": 2024,
-    "summary": "Una línea honesta de lo que haces.",
+    "summary": {
+      "es": "Una línea honesta de lo que haces.",
+      "en": "One honest line about what you do."
+    },
     "tags": ["typescript", "cloudflare"]
   }
 }
@@ -156,12 +159,12 @@ Aparece en la línea de tiempo de `/me`. Si omites `end`, es el puesto actual.
 <!-- docs:start experience -->
 | Key | Type | Required | Default | Description |
 | --- | --- | --- | --- | --- |
-| `role` | `string (max 80)` | yes |  | Job title (max 80 characters). |
+| `role` | `string \| { <locale>: string }` | yes |  | Job title: one string, or one text per locale such as `{ "es": "...", "en": "..." }` (max 80 characters each). |
 | `company` | `string (max 80)` | yes |  | Company or client (max 80 characters). |
 | `start` | `integer (min 1970)` | yes |  | Year the role started. |
 | `end` | `integer (min 1970)` | no |  | Year the role ended. Omit for the current role (drawn with a solid dot). |
-| `location` | `string (max 80)` | no |  | Where the role was based (max 80 characters). |
-| `summary` | `string (max 280)` | yes |  | One truthful summary line, no bullets (max 280 characters). |
+| `location` | `string \| { <locale>: string }` | no |  | Where the role was based: one string, or one text per locale (max 80 characters each). |
+| `summary` | `string \| { <locale>: string }` | yes |  | One truthful summary, no bullets: one string, or one text per locale (max 280 characters each). |
 | `tags` | `string[] (max 5)` | no | `[]` | Up to five kebab-case tags. |
 <!-- docs:end experience -->
 
