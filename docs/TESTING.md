@@ -50,7 +50,7 @@ aggregated pessimistically so one bad run cannot be hidden by a better one.
 
 Lighthouse reports are written locally to `.lighthouseci/` (ignored by Git); the configuration
 does not upload them. CI runs every browser, white-label and performance gate in the `checks` job,
-which both PR previews and branch deploys require.
+which the deploy job requires.
 
 ## Playwright contact form island
 

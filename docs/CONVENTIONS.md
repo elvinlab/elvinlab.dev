@@ -80,10 +80,10 @@ Only where infrastructure exists (`contact`). No premature abstraction.
 
 | Aspect | Convention |
 |--------|------------|
-| Branches | `main` (production), `develop` (staging); routine work is committed directly on `develop` (auto-deploys staging). |
+| Branches | `main` (production), `develop` (work branch, no CI attached); routine work is committed directly on `develop`. |
 | Commits | Conventional Commits; **no AI attribution**. |
-| Integration | Releases are PRs `develop` → `main` (merge commit); `develop` gets direct commits. |
-| Release cadence | One release per phase with one review. |
+| Integration | A release is a direct push to `main`, with no PR (ADR 0012). Because the two histories diverged, the release commit is built from `develop`'s tree and fast-forwarded onto `main`; see the release section of `CONFIGURATION.md`. |
+| Release cadence | When the owner decides; the full local gate battery runs first. |
 
 ---
 
@@ -94,8 +94,8 @@ Only where infrastructure exists (`contact`). No premature abstraction.
 | Issues | Each task is a GitHub issue written as a delegation brief with a Tier (see `.github/ISSUE_TEMPLATE/task.yml`). |
 | Tier 1/2 | Delegated to OpenCode via herdr. |
 | Tier 3 | Done by Claude Code, which reviews every delegated diff. |
-| CI | Required checks on `main` and `develop`. |
-| Previews | Every PR gets a preview at `https://pr-<N>-elvinlab-staging.lab-previews.workers.dev`. |
+| CI | Gates run once, on each push to `main`, and the same run deploys to production (ADR 0011). Nothing runs on `develop`. |
+| Environments | Production only: no staging and no per-PR previews (ADR 0011, ADR 0012). |
 
 ---
 

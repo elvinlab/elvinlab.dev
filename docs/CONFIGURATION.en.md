@@ -452,7 +452,7 @@ The first time, for the browser tests: `mise exec -- pnpm exec playwright instal
 | The form says "unavailable" | Some Worker secret is missing or invalid (the log names which); see 6.7 |
 | Comments do not show up | Check `features.comments`, the `giscus` block, that Discussions is on and the app installed (6.5) |
 | The shared link shows the old card | It is the social network's cache: refresh it with its debugger (section 7) |
-| The site is not indexed | Only production builds carry `SITE_INDEXABLE=true`; it is intentional on previews and locally |
+| The site is not indexed | Only production builds carry `SITE_INDEXABLE=true`; its absence is intentional in local builds |
 | A CI job fails and there is no deploy | That is the design: the deploy requires everything to pass. Fix and release again |
 
 ## 10. Using this site as a base for someone else (white-label)

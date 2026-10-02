@@ -452,7 +452,7 @@ La primera vez, para los tests de navegador: `mise exec -- pnpm exec playwright 
 | El formulario dice «no disponible» | Falta o es inválido algún secreto del Worker (el log nombra cuál); ver 6.7 |
 | No aparecen los comentarios | Revisa `features.comments`, el bloque `giscus`, que Discussions esté activo y la app instalada (6.5) |
 | El enlace compartido muestra la tarjeta vieja | Es la caché de la red social: refresca con su depurador (sección 7) |
-| El sitio no se indexa | Solo las compilaciones de producción llevan `SITE_INDEXABLE=true`; es intencional en previews y local |
+| El sitio no se indexa | Solo las compilaciones de producción llevan `SITE_INDEXABLE=true`; su ausencia es intencional en las compilaciones locales |
 | Un job del CI falla y no hay deploy | Es el diseño: el deploy exige que todo pase. Arregla y vuelve a publicar |
 
 ## 10. Usar este sitio como base para otra persona (white-label)
