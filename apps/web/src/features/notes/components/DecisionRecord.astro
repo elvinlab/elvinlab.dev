@@ -1,5 +1,6 @@
 ---
-/** The context / decision / outcome summary shown before a note's body. */
+/** The context / decision / outcome summary shown before a note's body. Its type and spacing
+ * come from the `--record-*` variables of `calm-layout.css`, so the preset makes it compact. */
 import { type Locale, t } from '@/shared/i18n/index.ts';
 
 type Props = {
@@ -11,13 +12,13 @@ const { locale, decision } = Astro.props;
 const fields = ['context', 'decision', 'outcome'] as const;
 ---
 
-<section class="rounded-inner bg-banner p-5" aria-label={t(locale, 'note.decision.title')}>
-  <h2 class="mb-4 font-mono text-sm uppercase tracking-wide text-cyan">{t(locale, 'note.decision.title')}</h2>
-  <div class="grid gap-5 md:grid-cols-3 md:gap-0">
+<section class="rounded-inner bg-banner p-(--record-pad)" aria-label={t(locale, 'note.decision.title')}>
+  <h2 class="mb-(--record-title-gap) font-mono text-(length:--record-title) uppercase tracking-wide text-cyan">{t(locale, 'note.decision.title')}</h2>
+  <div class="grid gap-(--record-gap) md:grid-cols-3 md:gap-0">
     {fields.map((field, index) => (
-      <div class:list={['flex flex-col gap-1.5 md:px-5', index > 0 && 'border-t border-dashed border-divider pt-5 md:border-t-0 md:border-l md:pt-0', index === 0 && 'md:pl-0']}>
-        <span class="font-mono text-meta uppercase text-muted">{t(locale, `note.decision.${field}`)}</span>
-        <p class="text-sm leading-relaxed text-text-secondary">{decision[field]}</p>
+      <div class:list={['flex flex-col gap-1.5 md:px-(--record-col-pad)', index > 0 && 'border-t border-dashed border-divider pt-(--record-gap) md:border-t-0 md:border-l md:pt-0', index === 0 && 'md:pl-0']}>
+        <span class="font-mono text-(length:--record-label) uppercase text-muted">{t(locale, `note.decision.${field}`)}</span>
+        <p class="text-(length:--record-body) leading-relaxed text-text-secondary">{decision[field]}</p>
       </div>
     ))}
   </div>

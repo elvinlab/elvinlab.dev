@@ -9,6 +9,7 @@ import {
   type NoteData,
   noteNumber,
   readingMinutes,
+  secondaryMetaSlot,
 } from '@/features/notes/index.ts';
 import { LOCALES, type Locale, t } from '@/shared/i18n/index.ts';
 
@@ -28,7 +29,7 @@ const readingLabel = t(locale, 'notes.readingTime', { min: readingMinutes(body) 
     <span class="flex items-center gap-2 font-mono text-sm text-muted">
       <time datetime={data.pubDate.toISOString()} class="hidden sm:inline">{formatDate(data.pubDate, locale)}</time>
       <span class="whitespace-nowrap">{readingLabel}</span>
-      <LangBadge lang={data.lang} />
+      {secondaryMetaSlot === 'header' && <LangBadge lang={data.lang} />}
     </span>
   </div>
 
@@ -38,7 +39,10 @@ const readingLabel = t(locale, 'notes.readingTime', { min: readingMinutes(body) 
 
   <DecisionRecord locale={locale} decision={data.decision} />
 
-  <a href={href} class="flex h-11 w-fit items-center rounded-control bg-button px-5 font-medium text-white active:scale-96">
-    {t(locale, 'home.readNote')}
-  </a>
+  <div class="flex items-center gap-3">
+    <a href={href} class="flex h-11 w-fit items-center rounded-control bg-button px-5 font-medium text-white active:scale-96">
+      {t(locale, 'home.readNote')}
+    </a>
+    {secondaryMetaSlot === 'foot' && <LangBadge lang={data.lang} />}
+  </div>
 </section>

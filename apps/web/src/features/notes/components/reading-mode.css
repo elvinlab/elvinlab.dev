@@ -33,6 +33,7 @@ html[data-reading] [data-banner] .banner-grid,
 html[data-reading] [data-banner] .banner-stars,
 html[data-reading] [data-banner] .banner-glow,
 html[data-reading] [data-banner] canvas,
+html[data-reading] [data-banner] [data-banner-fade],
 html[data-reading] [data-banner-toggle],
 html[data-reading] main aside {
   display: none;

@@ -60,7 +60,7 @@ for (const { locale, path } of [
     await expect(navbarBrand).toContainText('elvinlab');
     await expect(navbarBrand).toHaveClass(/font-retro/);
     await expect(navbarBrand.locator('.animate-blink')).toHaveCount(0);
-    await expect(page.locator('[data-home-fade]')).toHaveCSS('height', '120px');
+    await expect(page.locator('[data-banner-fade]')).toHaveCSS('height', '120px');
 
     await expect(page.locator('img[alt="Elvin González"][src$=".webp"]')).toBeVisible();
 

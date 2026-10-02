@@ -2,6 +2,7 @@
 /** One entry row in the notes index: number, title, excerpt, category and tag chips, meta column. */
 import { localizePath } from '@elvinlab/core';
 
+import { secondaryMetaSlot } from '@/features/notes/lib/note-meta.ts';
 import { formatDate, type NoteLike, noteNumber, searchText } from '@/features/notes/lib/notes.ts';
 import { LOCALES, type Locale, t } from '@/shared/i18n/index.ts';
 import Chip from '@/shared/ui/Chip.astro';
@@ -29,6 +30,7 @@ const href = localizePath(`/notes/${note.slug}/`, data.lang, LOCALES);
     </h3>
     <p class="text-sm leading-relaxed text-text-secondary">{data.description}</p>
     <div class="flex flex-wrap items-center gap-1.5">
+      {secondaryMetaSlot === 'foot' && <LangBadge lang={data.lang} />}
       <Chip>{data.category}</Chip>
       {data.tags.map((tag) => <Chip>#{tag}</Chip>)}
     </div>
@@ -38,6 +40,6 @@ const href = localizePath(`/notes/${note.slug}/`, data.lang, LOCALES);
     <time datetime={data.pubDate.toISOString()}>{formatDate(data.pubDate, locale)}</time>
     <span aria-hidden="true" class="md:hidden">·</span>
     <span class="whitespace-nowrap">{t(locale, 'notes.readingTime', { min: note.readingMinutes })}</span>
-    <LangBadge lang={data.lang} />
+    {secondaryMetaSlot === 'header' && <LangBadge lang={data.lang} />}
   </div>
 </article>

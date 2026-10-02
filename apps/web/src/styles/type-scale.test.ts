@@ -2,28 +2,12 @@ import { readFileSync } from 'node:fs';
 
 import { describe, expect, it } from 'vitest';
 
+import { type Declarations, parseRules } from './css-rules.ts';
+
 const read = (path: string): string => readFileSync(new URL(path, import.meta.url), 'utf8');
 const scaleCss = read('./type-scale.css');
 const globalCss = read('./global.css');
 const readingCss = read('../features/notes/components/reading-mode.css');
-
-type Declarations = Record<string, string>;
-
-/** Splits a CSS source into `selector -> declarations`, at one nesting level (no comments). */
-function parseRules(css: string): Map<string, Declarations> {
-  const rules = new Map<string, Declarations>();
-  const rule = /([^{}]+)\{([^{}]*)\}/g;
-  for (const match of css.replaceAll(/\/\*[\s\S]*?\*\//g, '').matchAll(rule)) {
-    const selector = (match[1] ?? '').trim().replaceAll(/\s+/g, ' ');
-    const declarations: Declarations = {};
-    for (const line of (match[2] ?? '').split(';')) {
-      const [name, ...value] = line.split(':');
-      if (name?.trim()) declarations[name.trim()] = value.join(':').trim();
-    }
-    rules.set(selector, declarations);
-  }
-  return rules;
-}
 
 /** Splits the source into the rules outside any media query and those inside the `md` one. */
 function split(css: string): { base: Map<string, Declarations>; md: Map<string, Declarations> } {

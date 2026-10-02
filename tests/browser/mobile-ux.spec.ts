@@ -134,8 +134,9 @@ test.describe('desktop pointer', () => {
 
   test('the expanded home banner keeps its desktop geometry', async ({ page }) => {
     await page.goto('/');
-    // clamp(520px, 66vh, 620px) at 900 px of viewport height.
-    expect((await boxOf(page.locator('[data-banner]'))).height).toBe(594);
+    // The minimal preset caps it at clamp(360px, 48vh, 460px): 432 px at 900 px of viewport
+    // height (`full` keeps clamp(520px, 66vh, 620px), proven in `calm-layout.test.ts`).
+    expect((await boxOf(page.locator('[data-banner]'))).height).toBe(432);
   });
 });
 
