@@ -298,3 +298,8 @@ Supersedes the Spanish-only note under "Notes" above (English notes and `/en/not
 - Released to `main`: giscus comments with reactions, first two Lab Notes, per-note and `/me` share cards, reading mode (config toggle plus visitor toggle), terms and privacy pages, discreet language hint, UX fixes (`e76560e`, `d6e7139`).
 - Released `3ee44c4`: bilingual README (`README.md`, `README.en.md`), single settings file `site.config.ts` with generated docs (`docs/CONFIGURATION*.md`, `docs/NOTES*.md`, `pnpm docs:config`), and working `translationOf` (hreflang, `x-default`, language switch lands on the translation; invalid links fail the build). `cover` removed from the note schema. See `odd/tasks/note-translations.md`.
 - Pending: LICENSE (user decision, MIT suggested), refresh social caches, close issue #51, drop the now redundant GitHub `production` variables `PUBLIC_CF_ANALYTICS_TOKEN` and `PUBLIC_TURNSTILE_SITE_KEY`. Confirm the `3ee44c4` CI deploy finished green.
+
+## Next session start (2026-10-01, late)
+- MIT LICENSE added on `develop` (`23f3cd2`, code MIT, notes CC BY-NC-SA); NOT yet on `main`. Release it once the `3ee44c4` CI run (deploy) is confirmed green: `gh run list --branch main --limit 1`.
+- Open issues: #24 (giscus, live in prod: verify and close), #51 (BlogPosting image/author.url, posts exist now: verify and close or finish), #27/#28 (notes 001/002: check against published notes, close), #29 (note 003 pending), #49 (Search Console, user does it in Google), #50 (HSTS after a week of stable HTTPS).
+- User-only: refresh Facebook/LinkedIn share caches; delete GitHub `production` variables `PUBLIC_CF_ANALYTICS_TOKEN` and `PUBLIC_TURNSTILE_SITE_KEY` (redundant, now in `site.config.ts`).
