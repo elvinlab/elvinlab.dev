@@ -180,6 +180,33 @@ export const siteConfigSchema = z
       .describe(
         'Default animated banner background (each visitor can change it). All effects read the theme palette.',
       ),
+    marks: z
+      .object({
+        animation: z
+          .enum(['stamp', 'burst', 'pulse', 'none'])
+          .default('stamp')
+          .describe(
+            'Animation played when a reader leaves a footprint: `stamp` an ink stamp pressed on the page, `burst` a burst of pixel squares, `pulse` a soft ring, `none` no animation. All obey `prefers-reduced-motion`.',
+          ),
+        maxPerVisitor: z
+          .int()
+          .min(1)
+          .max(200)
+          .default(50)
+          .describe('Footprints one browser can leave on one note; after that taps add nothing.'),
+        showCountFrom: z
+          .int()
+          .min(0)
+          .max(1000)
+          .default(5)
+          .describe(
+            'The counter is hidden until a note has this many footprints; before that the button invites the reader to be among the first.',
+          ),
+      })
+      .prefault({})
+      .describe(
+        'Settings of the footprint button (`features.marks`). Every key is optional and falls back to its default.',
+      ),
     recruiter: z
       .object({
         available: z
@@ -272,6 +299,11 @@ export const siteConfigSchema = z
           .boolean()
           .describe(
             'Reading mode on notes: off renders no toggle, loads no script or CSS and stores nothing in the browser.',
+          ),
+        marks: z
+          .boolean()
+          .describe(
+            'The anonymous "I was here" footprint button on notes. Needs the `SITE_DB` D1 binding (the site database, table `note_footprints`) and the `MARKS_RATE_LIMITER` binding, otherwise the buttons never render.',
           ),
       })
       .describe(

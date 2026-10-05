@@ -13,6 +13,9 @@ export const site: SiteConfig = parseSiteConfig(siteConfig);
 /** The visual preset of the site (`minimal` or `full`). */
 export const appearance: Appearance = site.appearance;
 
+/** The footprint button settings (animation and limits), defaults applied. */
+export const marksConfig: SiteConfig['marks'] = site.marks;
+
 /** Which home sections render: the preset plus the `home` overrides, resolved once. */
 export const homeSections = resolveHome(site);
 

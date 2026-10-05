@@ -1,0 +1,22 @@
+# 0013. Footprints on notes: an anonymous counter in Cloudflare D1
+
+Status: Accepted
+
+## Context
+The owner wants readers to be able to leave a mark without commenting: a one-tap "I was here" on each note, visible from the first screen on phone and desktop, with an animation chosen from the central config and on from day one on elvinlab.dev. Giscus reactions already exist, but they need a GitHub account and sit below the comments. The site is static; the only server code is the contact Action, and there is no storage binding.
+
+## Decision
+- **Feature:** `features.marks` (on) and a `marks` block `{ animation: 'stamp' | 'burst' | 'pulse' | 'none', maxPerVisitor: 50, showCountFrom: 5 }` in `site.config.ts`. One button in the note header and one invitation at the end of the article, sharing one counter and one state. Inline, never floating: a fixed element covers text and the reading-mode exit and can hide keyboard focus.
+- **Storage: Cloudflare D1** behind a `MarkStore` port (`features/marks/ports.ts`), one table `note_footprints(slug, total)` in the site-wide database `elvinlab-dev-db` (binding `SITE_DB`), one atomic statement per write (`INSERT ... ON CONFLICT DO UPDATE ... RETURNING`). Free plan limits checked on 2026-10-05: 5 million rows read and 100,000 rows written per day, 5 GB.
+- **Why D1 and not Turso** (free plan: 100 databases, 5 GB, 500 million reads and 10 million writes per month): the quotas are enormous for both; D1 is the same Cloudflare account and the same processor already named in the privacy page, needs no extra secret and no network hop, and the commercial template plan supports Cloudflare only. Turso stays possible: it is another adapter for `MarkStore`.
+- **No IP is stored or hashed.** An IP is personal data. The abuse brake is the Workers rate limiter binding `MARKS_RATE_LIMITER` (30 requests per minute per IP), which uses the IP only as its key, the way the contact form already does.
+- **As many taps as a reader wants**, in the style of claps: taps are batched (about 700 ms) into one request of at most 10; a soft cap per browser and note (`maxPerVisitor`) lives in `localStorage`; after the cap the stamp still animates but adds nothing. The server accepts only slugs of published notes, so nobody can create rows with made-up names.
+- **One database for the whole site (revised the same day, before any release):** a first database named `elvinlab-marks` was created and then replaced, because the owner plans more features on the same site. `elvinlab-dev-db` hosts every feature; each owns its tables, named after it (`note_footprints`), reads and writes them through its own adapter, and migrations are one shared numbered sequence `NNNN_<feature>_<change>.sql`. A feature that outgrows the shared database gets its own database and binding. Only the database is shared: feature-specific bindings (`MARKS_RATE_LIMITER`) keep the feature's name.
+- **Fail closed:** with no `SITE_DB` binding the actions answer `SERVICE_UNAVAILABLE` and no button renders. The count is shown only from `showCountFrom` footprints, so a young note does not display "2".
+- **Delivery, measured:** a first version as Preact islands made a note page 9.6 KB heavier (83.0 to 92.4 KB in the Lighthouse fixture) and its worst LCP 2265 to 2413 ms, and its CSS leaked into every page (the contact page went from 1813 to 1967 ms) because Astro collects component CSS from the module graph and the notes barrel is reachable from every page. The button is therefore a plain server-rendered component with one external script (like the share panel) and its CSS is inlined once, only on pages that render it.
+
+## Consequences
+- A new dependency on a Cloudflare resource: the database must exist and be bound (`docs/CONFIGURATION.md` recipe 6.13) before the buttons appear. Creating it is an operation in the owner's account.
+- A counter is a warm signal, not a metric: a script can inflate it up to about 300 per minute from one IP, because the per-browser cap is client side by design (nothing identifying is stored). Real audience numbers stay in Cloudflare Web Analytics.
+- Reads go through a POST Action, so they are not edge cacheable; a cached GET route is a later optimization if traffic ever needs it.
+- The privacy page gains a conditional section and one `localStorage` note, and its "last updated" date moves.

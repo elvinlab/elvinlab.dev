@@ -91,6 +91,10 @@ The descriptions come from the schema (`.describe()`), which is why they are in 
 | `background` | `object` | no | `{"galaxy":true,"cursorWaves":false}` | Default animated banner background (each visitor can change it). All effects read the theme palette. |
 | `background.galaxy` | `boolean` | yes |  | Nebula clouds and a twinkling star field. |
 | `background.cursorWaves` | `boolean` | yes |  | Slow colour waves with a ripple that follows the pointer. |
+| `marks` | `object` | no | `{}` | Settings of the footprint button (`features.marks`). Every key is optional and falls back to its default. |
+| `marks.animation` | `'stamp' \| 'burst' \| 'pulse' \| 'none'` | no | `stamp` | Animation played when a reader leaves a footprint: `stamp` an ink stamp pressed on the page, `burst` a burst of pixel squares, `pulse` a soft ring, `none` no animation. All obey `prefers-reduced-motion`. |
+| `marks.maxPerVisitor` | `integer (min 1, max 200)` | no | `50` | Footprints one browser can leave on one note; after that taps add nothing. |
+| `marks.showCountFrom` | `integer (min 0, max 1000)` | no | `5` | The counter is hidden until a note has this many footprints; before that the button invites the reader to be among the first. |
 | `recruiter` | `object` | yes |  | Recruiter card on the home page and /me. |
 | `recruiter.available` | `boolean` | yes |  | Show or hide the whole availability line (not whether you are open to work). |
 | `recruiter.openToWork` | `boolean` | no | `true` | Whether you are open to work: green status dot when true, the brand accent colour when false. |
@@ -120,6 +124,7 @@ The descriptions come from the schema (`.describe()`), which is why they are in 
 | `features.changelog` | `boolean` | yes |  | Visitor-facing /changelog page: off hides the footer link, marks it noindex and keeps it out of the sitemap. |
 | `features.me` | `boolean` | yes |  | The /me recruiter page: off hides it from the nav, marks it noindex and keeps it out of the sitemap. |
 | `features.readingMode` | `boolean` | yes |  | Reading mode on notes: off renders no toggle, loads no script or CSS and stores nothing in the browser. |
+| `features.marks` | `boolean` | yes |  | The anonymous "I was here" footprint button on notes. Needs the `SITE_DB` D1 binding (the site database, table `note_footprints`) and the `MARKS_RATE_LIMITER` binding, otherwise the buttons never render. |
 | `integrations` | `object` | no | `{}` | Public ids of third-party services. They ship in the HTML by design, so they live here and not in secrets. |
 | `integrations.cloudflareAnalyticsToken` | `string` | no |  | Cloudflare Web Analytics beacon token (public). Omit to turn analytics off. Env `PUBLIC_CF_ANALYTICS_TOKEN` overrides it. |
 | `integrations.turnstileSiteKey` | `string` | no |  | Cloudflare Turnstile public site key for the contact form, bound to the domain. Env `PUBLIC_TURNSTILE_SITE_KEY` overrides it (use a test key locally). |
@@ -405,12 +410,39 @@ UI texts are in `apps/web/src/shared/i18n/index.ts`. Adding a third language mea
 - JavaScript per page (30 KiB gzip): `apps/web/scripts/performance-budget.ts`.
 - A budget is never raised to "make a change pass": the change gets fixed.
 
+### 6.13 Footprints on notes (`marks`) and the site database
+
+A one-tap, anonymous "I was here" button on every note (header and end of the article), with a per-note counter in Cloudflare D1. The settings are in `site.config.ts`: `features.marks` (on or off) and the `marks` block (`animation`: `stamp`, `burst`, `pulse` or `none`; `maxPerVisitor`; `showCountFrom`; the generated table in section 3 lists the defaults). Every animation stops under `prefers-reduced-motion`. Decision record: [ADR 0013](adr/0013-footprints-on-notes-d1.md).
+
+**One database for the whole site.** The database is `elvinlab-dev-db`, bound as `SITE_DB`, and it is meant to host future features too. The rules that keep it scalable:
+
+- **One table per feature, named after it** (`note_footprints`; a future feature would add for example `page_views`). A feature reads and writes only its own tables, through its own adapter behind its own port (`features/<x>/adapters/d1.ts`); it never touches another feature's table.
+- **Migrations are one shared, numbered sequence** in `apps/web/migrations/`, named `NNNN_<feature>_<change>.sql` (today `0001_note_footprints.sql`). Wrangler records what was applied in the `d1_migrations` table of that database.
+- **Limits:** the free plan gives 5 GB per account. If a feature ever outgrows the shared database, give it its own database and its own binding.
+- Bindings that are specific to a feature (the rate limiter `MARKS_RATE_LIMITER`) keep the feature's name; only the database is shared.
+
+**Until the database exists and is bound the buttons do not appear** (the Actions answer "unavailable" and the page renders nothing): turning the flag on without the steps below is safe, it just shows nothing. These steps run in **your Cloudflare account**. *On elvinlab.dev steps 1 to 3 were done on 2026-10-05: database `elvinlab-dev-db` in region ENAM, its id and the `SITE_DB` binding are in `wrangler.jsonc` and the `note_footprints` table exists. (A first database named `elvinlab-marks` was created and deleted the same day, empty, to give the site one database that can grow.) Only the release (step 4) and the check (step 5) remain.*
+
+1. Create the database (needs `wrangler login`): `cd apps/web && mise exec -- pnpm exec wrangler d1 create elvinlab-dev-db`. It prints a `database_id`.
+2. Add the binding to `apps/web/wrangler.jsonc`:
+   ```jsonc
+   "d1_databases": [
+     { "binding": "SITE_DB", "database_name": "elvinlab-dev-db", "database_id": "<the id from step 1>", "migrations_dir": "migrations" }
+   ]
+   ```
+   (`MARKS_RATE_LIMITER`, the per-IP limit, is already declared under `ratelimits`.)
+3. Create the tables in the real database: `mise exec -- pnpm exec wrangler d1 migrations apply elvinlab-dev-db --remote` (today it applies `apps/web/migrations/0001_note_footprints.sql`).
+4. Release as usual (section 7). If the deploy fails with an authorization error, the API token of the GitHub `production` environment may lack permission to deploy a Worker with a D1 binding: add the D1 edit permission to the token. *This was not verified.*
+5. Check it: open a note, press the button and reload (the count is kept), or `curl -s -X POST https://YOUR-DOMAIN/_actions/marks.get/ -H 'content-type: application/json' -H 'origin: https://YOUR-DOMAIN' -d '{"slug":"<a published note slug>"}'`, which answers with the total.
+
+To turn it off, set `features.marks: false`: no markup, no CSS and no script reach the page. To use another database (for example Turso), write an adapter for the `MarkStore` port in `apps/web/src/features/marks/ports.ts` next to `adapters/d1.ts`.
+
 ## 7. Releasing and rolling back
 
 The full flow is decided in ADRs [0011](adr/0011-ci-gate-once-at-main-pr-no-staging.md) and [0012](adr/0012-direct-push-to-main-no-pr-gate.md). In short:
 
 - **Day to day**: work on `develop` and push freely; no CI runs.
-- **Before releasing**: run the local gates (`typecheck`, `lint`, `test`, `depcruise`, the web build, `check:js-budget`, `test:white-label`, `check:dev-cold-start`, `test:e2e` and `test:lighthouse`) and bring `changelog.json` up to date (`CLAUDE.md` explains how to find the commits that are missing).
+- **Before releasing**: run the local gates that the [verification ledger](../odd/verification-ledger.md) shows as stale (`typecheck`, `lint`, `test`, `depcruise`, the web build, `check:js-budget`, `test:white-label`, `check:dev-cold-start`, `test:e2e`, `test:lighthouse`), following the touch-scoped rule in [`TESTING.md`](TESTING.md); a gate whose files did not change since its last green entry is not repeated, because the CI on `main` runs everything once more before the deploy. Bring `changelog.json` up to date (`CLAUDE.md` explains how to find the commits that are missing).
 - **Release**: what is on `develop` goes to `main`. That push is the **only** thing that triggers the CI (`static`, `e2e` and `lighthouse` in parallel → `checks` → `deploy`). The deploy goes straight to production and is checked with `.github/scripts/smoke-check.sh`, with an automatic rollback if it fails.
 
 ```bash

@@ -144,7 +144,20 @@ export const t = createTranslator({
       'comments.loading': 'Los comentarios se cargan cuando llegas hasta aquí.',
       'comments.error': 'No se pudieron cargar los comentarios. Inténtalo más tarde.',
       'comments.noscript': 'Activa JavaScript para ver los comentarios o participa directamente en',
+      // One small line of reassurance next to the places that touch a visitor's data; it links the privacy section.
+      'privacy.note.comments':
+        'Tu inicio de sesión de GitHub y tus datos no se usan para nada más en este sitio.',
+      'privacy.note.link': 'Ver privacidad',
       'note.anchor': 'Enlace a esta sección',
+      // Footprint button ("huellas") of a note. Wording pending the owner's approval.
+      'marks.button': 'Dejé mi huella',
+      'marks.hint': 'Sé de los primeros en dejar tu huella',
+      'marks.count.one': '1 huella',
+      'marks.count.many': '{n} huellas',
+      'marks.thanks': '¡Gracias por pasar!',
+      'marks.cap': 'Ya dejaste todas las huellas que caben aquí. ¡Gracias!',
+      'marks.invite': '¿Te gustó? Deja tu huella',
+      'marks.privacy': 'Anónimo: no guardamos tu IP ni datos tuyos.',
     },
     en: {
       'placeholder.title': 'Coming soon',
@@ -278,7 +291,19 @@ export const t = createTranslator({
       'comments.loading': 'Comments load when you scroll down to here.',
       'comments.error': 'Comments could not be loaded. Please try again later.',
       'comments.noscript': 'Enable JavaScript to see the comments, or join the conversation on',
+      'privacy.note.comments':
+        'Your GitHub login and data are not used for anything else on this site.',
+      'privacy.note.link': 'See privacy',
       'note.anchor': 'Link to this section',
+      // Footprint button ("marks") of a note. Wording pending the owner's approval.
+      'marks.button': 'I was here',
+      'marks.hint': 'Be among the first to leave your mark',
+      'marks.count.one': '1 mark',
+      'marks.count.many': '{n} marks',
+      'marks.thanks': 'Thanks for stopping by!',
+      'marks.cap': 'You have left all the marks that fit here. Thank you!',
+      'marks.invite': 'Enjoyed it? Leave your mark',
+      'marks.privacy': 'Anonymous: your IP and personal data are not stored.',
     },
   },
 });

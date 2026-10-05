@@ -334,5 +334,29 @@
     "category": "added",
     "title": "New Lab Note 003: vibe coding or specify first",
     "description": "Why I define intent, scope and decisions in writing before asking an AI for code, what it gives me, what it costs to keep up to date and where I still experiment. Written from a rollback at work and from this site's own documents."
+  },
+  "note-images-and-share-titles": {
+    "date": "2026-10-05",
+    "category": "changed",
+    "title": "Framed images in notes and shorter link-preview titles",
+    "description": "Images inside a note get the same rounded corners and hairline as the site cards. A note's link preview (LinkedIn, X, WhatsApp, Facebook) now uses the note title alone, so it is cut off later; the browser tab keeps the site name."
+  },
+  "note-share-x": {
+    "date": "2026-10-05",
+    "category": "added",
+    "title": "Share a note on X and WhatsApp",
+    "description": "The share panel of each note now has X and WhatsApp buttons next to LinkedIn. Both open a new message with the note title and its link, and they are plain links: no third-party script is loaded."
+  },
+  "footprints-on-notes": {
+    "date": "2026-10-05",
+    "category": "added",
+    "title": "Leave a footprint on a note",
+    "description": "Every note now has an anonymous \"I was here\" button, under the title and again at the end, with a small animation. One tap leaves a footprint, no account and no comment needed. Nothing that identifies you is stored: only a counter per note. Forks get a features.marks flag and a marks block (animation and limits), and need one Cloudflare D1 database for the counters: see the configuration guide, recipe 6.13."
+  },
+  "privacy-reassurance": {
+    "date": "2026-10-05",
+    "category": "added",
+    "title": "A small privacy note where it matters",
+    "description": "Next to the comments, a one-line reminder that your GitHub login and data are not used for anything else on this site; on the footprint button, a discreet hover or focus note that nothing identifying is stored. Both link to the matching section of the privacy page."
   }
 }

@@ -25,6 +25,7 @@ const valid = {
     me: true,
     changelog: true,
     readingMode: true,
+    marks: true,
   },
   legal: { privacyUpdated: '2026-10-01', termsUpdated: '2026-10-01' },
   background: { galaxy: true, cursorWaves: false },
@@ -373,6 +374,54 @@ describe('parseSiteConfig', () => {
   it('rejects config missing the readingMode feature', () => {
     const { readingMode: _omitted, ...features } = valid.features;
     expect(() => parseSiteConfig({ ...valid, features })).toThrow(/readingMode/);
+  });
+
+  it('rejects config missing the marks feature', () => {
+    const { marks: _omitted, ...features } = valid.features;
+    expect(() => parseSiteConfig({ ...valid, features })).toThrow(/marks/);
+  });
+
+  describe('marks block', () => {
+    it('applies the defaults when the block is omitted', () => {
+      expect(parseSiteConfig(valid).marks).toEqual({
+        animation: 'stamp',
+        maxPerVisitor: 50,
+        showCountFrom: 5,
+      });
+    });
+
+    it('accepts a complete block', () => {
+      const marks = { animation: 'pulse', maxPerVisitor: 10, showCountFrom: 0 };
+      expect(parseSiteConfig({ ...valid, marks }).marks).toEqual(marks);
+    });
+
+    it('fills the omitted keys of a partial block', () => {
+      expect(parseSiteConfig({ ...valid, marks: { animation: 'none' } }).marks).toEqual({
+        animation: 'none',
+        maxPerVisitor: 50,
+        showCountFrom: 5,
+      });
+    });
+
+    it.each(['stamp', 'burst', 'pulse', 'none'])('accepts the %s animation', (animation) => {
+      expect(parseSiteConfig({ ...valid, marks: { animation } }).marks.animation).toBe(animation);
+    });
+
+    it('rejects an unknown animation', () => {
+      expect(() => parseSiteConfig({ ...valid, marks: { animation: 'confetti' } })).toThrow(
+        /animation/,
+      );
+    });
+
+    it.each([
+      ['maxPerVisitor', 0],
+      ['maxPerVisitor', 201],
+      ['maxPerVisitor', 1.5],
+      ['showCountFrom', -1],
+      ['showCountFrom', 1001],
+    ])('rejects %s = %s', (key, value) => {
+      expect(() => parseSiteConfig({ ...valid, marks: { [key]: value } })).toThrow(new RegExp(key));
+    });
   });
 
   describe('integrations', () => {

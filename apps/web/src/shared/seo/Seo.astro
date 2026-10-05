@@ -37,6 +37,9 @@ type Props = {
 const { locale, path, title, description, translated = true, noindex = false, article, alternates, ogImage: ogImagePath, ogImageAlt: ogImageAltProp } = Astro.props;
 const siteIndexable = buildEnv.siteIndexable;
 const fullTitle = title ? `${title} — ${site.title}` : site.title;
+// Link previews cut long titles (about 70 characters), so an article's preview title drops the site
+// suffix: `og:site_name` carries it and the share card draws the domain.
+const socialTitle = article && title ? title : fullTitle;
 const summary = description ?? site.description[locale] ?? site.description[LOCALES.defaultLocale] ?? site.title;
 const noteEntries = await getCollection('notes');
 const notes = noteEntries.map((entry) => ({ slug: entry.id, data: entry.data }));
@@ -68,7 +71,7 @@ const themeColors = ['dark', 'light'].flatMap((scheme) => {
 {themeColors.map(({ scheme, color }) => <meta name="theme-color" media={`(prefers-color-scheme: ${scheme})`} content={color} />)}
 <meta property="og:type" content={article ? 'article' : 'website'} />
 <meta property="og:site_name" content={site.title} />
-<meta property="og:title" content={fullTitle} />
+<meta property="og:title" content={socialTitle} />
 <meta property="og:description" content={summary} />
 <meta property="og:url" content={links.canonical} />
 <meta property="og:image" content={ogImage} />

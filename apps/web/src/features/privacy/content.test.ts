@@ -91,6 +91,61 @@ describe('buildPrivacyContent', () => {
   });
 });
 
+describe('buildPrivacyContent with marks', () => {
+  const withMarks = buildPrivacyContent({ ...input, marks: true });
+  const ids = (page: PrivacyContent): string[] => page.sections.map((section) => section.id);
+  const markBody = (page: PrivacyContent): string =>
+    page.sections.find((section) => section.id === 'marks')?.body ?? '';
+  const storageBody = (page: PrivacyContent): string =>
+    page.sections.find((section) => section.id === 'local-storage')?.body ?? '';
+
+  it('has no marks section and no footprint wording unless the feature is on', () => {
+    expect(ids(content.es)).not.toContain('marks');
+    expect(ids(content.en)).not.toContain('marks');
+    expect(everyText(content)).not.toMatch(/huella|footprint|\bD1\b/i);
+  });
+
+  it('adds the same marks section id to both locales, after the contact form', () => {
+    for (const locale of ['es', 'en'] as const) {
+      const sectionIds = ids(withMarks[locale]);
+      expect(sectionIds.indexOf('marks')).toBe(sectionIds.indexOf('contact-form') + 1);
+    }
+  });
+
+  it('keeps the marks section after the comments section when both are on', () => {
+    const both = buildPrivacyContent({ ...input, marks: true, comments: { repo: 'ada/site' } });
+    for (const locale of ['es', 'en'] as const) {
+      const sectionIds = ids(both[locale]);
+      expect(sectionIds.indexOf('comments')).toBe(sectionIds.indexOf('contact-form') + 1);
+      expect(sectionIds.indexOf('marks')).toBe(sectionIds.indexOf('comments') + 1);
+    }
+  });
+
+  it('says what is stored: a counter per note in D1, no IP address, a per-note number in localStorage', () => {
+    for (const locale of ['es', 'en'] as const) {
+      const body = markBody(withMarks[locale]);
+      expect(body).toMatch(/D1/);
+      expect(body).toMatch(/IP/);
+      expect(body).toMatch(/localStorage/);
+      expect(body).toContain('marks:');
+    }
+    expect(markBody(withMarks.es)).toMatch(/no (se )?guarda/i);
+    expect(markBody(withMarks.en)).toMatch(/does not store|is not stored/i);
+  });
+
+  it('adds the per-note number to the local storage section only when the feature is on', () => {
+    for (const locale of ['es', 'en'] as const) {
+      expect(storageBody(withMarks[locale])).toMatch(/marks:/);
+      expect(storageBody(content[locale])).not.toMatch(/marks:/);
+    }
+  });
+
+  it('localizes the section and keeps the page free of email addresses', () => {
+    expect(markBody(withMarks.es)).not.toBe(markBody(withMarks.en));
+    expect(everyText(withMarks)).not.toMatch(/[\w.+-]+@[\w-]+\.[\w.]+/);
+  });
+});
+
 describe('buildPrivacyContent with comments', () => {
   const withComments = buildPrivacyContent({ ...input, comments: { repo: 'ada/example.org' } });
   const ids = (page: PrivacyContent): string[] => page.sections.map((section) => section.id);

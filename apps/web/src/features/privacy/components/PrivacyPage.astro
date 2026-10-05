@@ -21,6 +21,7 @@ const content = buildPrivacyContent({
   updated: site.legal.privacyUpdated,
   ...(isEnabled('comments') && site.giscus && { comments: { repo: site.giscus.repo } }),
   readingMode: isEnabled('readingMode'),
+  marks: isEnabled('marks'),
 })[locale];
 ---
 

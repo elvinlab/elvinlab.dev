@@ -114,6 +114,12 @@ html {
   font-family: var(--font-mono);
   font-size: 0.9em;
 }
+/* Images in a note: framed like the site cards (the same inner radius and hairline as the /me portrait). */
+.prose img {
+  border-radius: var(--radius-inner);
+  outline: 1px solid var(--color-divider);
+  outline-offset: -1px;
+}
 .prose blockquote {
   border-left: 3px solid var(--color-pink);
   padding-left: 1.25rem;

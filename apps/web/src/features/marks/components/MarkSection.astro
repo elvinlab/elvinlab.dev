@@ -1,0 +1,136 @@
+---
+/** The footprint button of a note, server-rendered as plain markup with one script and no island.
+ * `header` sits under the title on the first screen and also emits the stylesheet, the icon sprite
+ * and the strings; `end` closes the article. Both share one counter per note (`client/store.ts`).
+ * Renders nothing, CSS included, when `features.marks` is off. The script reveals the buttons once
+ * the count is read and removes them when the store is unavailable. */
+import { localizePath } from '@elvinlab/core';
+
+import { isEnabled, marksConfig } from '@/shared/config/index.ts';
+import { LOCALES, type Locale, t } from '@/shared/i18n/index.ts';
+
+import { MARKS_CSS } from './mark-styles.ts';
+
+type Props = { slug: string; locale: Locale; variant: 'header' | 'end' };
+
+const { slug, locale, variant } = Astro.props;
+const enabled = isEnabled('marks');
+const { animation, maxPerVisitor, showCountFrom } = marksConfig;
+const privacyHref = `${localizePath('/privacy/', locale, LOCALES)}#marks`;
+---
+
+{enabled && variant === 'header' && (
+  <>
+    <style is:inline set:html={MARKS_CSS} />
+    <svg width="0" height="0" style="position:absolute" aria-hidden="true"><symbol id="marks-footprint" viewBox="0 0 7 11"><path d="M1 0h2v2H1zM4 1h1v1H4zM6 2h1v1H6zM0 3h7v3H0zM1 6h4v2H1zM1 9h4v2H1z"></path></symbol></svg>
+    <div class="mk" data-marks data-v="h" data-a={animation} data-slug={slug} data-max={maxPerVisitor} data-from={showCountFrom} data-one={t(locale, 'marks.count.one')} data-many={t(locale, 'marks.count.many')} data-thanks={t(locale, 'marks.thanks')} data-cap={t(locale, 'marks.cap')} data-hint={t(locale, 'marks.hint')}><span class="mt"><button type="button" class="mb" aria-describedby="mx-h" hidden><svg class="mi" aria-hidden="true"><use href="#marks-footprint"></use></svg><span>{t(locale, 'marks.button')}</span></button><span role="tooltip" id="mx-h" class="mx">{t(locale, 'marks.privacy')} <a href={privacyHref}>{t(locale, 'privacy.note.link')}</a></span></span><span class="mn" hidden></span><p class="sr-only" role="status" aria-live="polite"></p></div>
+  </>
+)}
+
+{enabled && variant === 'end' && (
+  <div class="mk" data-marks data-v="e" data-a={animation}><p class="mv" hidden>{t(locale, 'marks.invite')}</p><span class="mt"><button type="button" class="mb" aria-describedby="mx-e" hidden><svg class="mi" aria-hidden="true"><use href="#marks-footprint"></use></svg><span>{t(locale, 'marks.button')}</span></button><span role="tooltip" id="mx-e" class="mx">{t(locale, 'marks.privacy')} <a href={privacyHref}>{t(locale, 'privacy.note.link')}</a></span></span><span class="mn" hidden></span></div>
+)}
+
+<script>
+  import { createActionClient } from '@/features/marks/client/action-client.ts';
+  import { describeMarks, formatCount } from '@/features/marks/client/format.ts';
+  import { createMarksStore } from '@/features/marks/client/store.ts';
+
+  const roots = [...document.querySelectorAll<HTMLElement>('[data-marks]')];
+  const config = roots.find((root) => root.dataset['slug']);
+  const data = config?.dataset;
+
+  if (config && data) {
+    const slug = data['slug'] ?? '';
+    const max = Number(data['max']);
+    const from = Number(data['from']);
+    const animation = data['a'];
+    let storage: Storage | null = null;
+    try {
+      storage = window.localStorage;
+    } catch {
+      // Blocked storage: the cap holds for this session only.
+    }
+    const store = createMarksStore({ slug, client: createActionClient(), storage, maxPerVisitor: max });
+    const status = config.querySelector<HTMLElement>('[role=status]');
+    const strings = {
+      button: '',
+      hint: data['hint'] ?? '',
+      countOne: data['one'] ?? '',
+      countMany: data['many'] ?? '',
+      thanks: data['thanks'] ?? '',
+      cap: data['cap'] ?? '',
+      invite: '',
+    };
+    const views = roots.map((root) => {
+      const button = root.querySelector('button') as HTMLButtonElement;
+      const label = button.querySelector('span') as HTMLElement;
+      return { root, button, label, original: label.textContent ?? '', note: root.querySelector('.mn') as HTMLElement };
+    });
+
+    /** Restarts the animation of one instance: the icon class and a fresh effects box. */
+    const play = (button: HTMLElement) => {
+      const icon = button.querySelector('.mi');
+      icon?.classList.remove('go');
+      void icon?.getBoundingClientRect();
+      icon?.classList.add('go');
+      button.querySelector('.mf')?.remove();
+      if (animation === 'none') return;
+      const box = document.createElement('span');
+      box.className = 'mf';
+      box.setAttribute('aria-hidden', 'true');
+      if (animation === 'burst') {
+        for (let i = 0; i < 8; i++) {
+          const pixel = document.createElement('i');
+          pixel.className = 'mp';
+          const angle = (i * Math.PI) / 4;
+          pixel.style.cssText = `--x:${Math.round(Math.cos(angle) * 28)}px;--y:${Math.round(Math.sin(angle) * 28)}px`;
+          box.append(pixel);
+        }
+      } else {
+        box.innerHTML = '<i class="mr"></i>';
+      }
+      button.append(box);
+    };
+
+    let revealed = false;
+    let announced = 0;
+    const render = () => {
+      const state = store.getState();
+      if (state.status === 'hidden') {
+        for (const { root } of views) root.remove();
+        return;
+      }
+      if (state.status !== 'ready') return;
+      if (!revealed) {
+        revealed = true;
+        for (const { root } of views) {
+          for (const el of root.querySelectorAll('[hidden]')) el.removeAttribute('hidden');
+          root.setAttribute('data-r', '');
+        }
+        if (state.mine === 0) config.setAttribute('data-n', '');
+      }
+      for (const { button, label, original, note } of views) {
+        const text = describeMarks(state, from, { ...strings, button: original });
+        label.textContent = text.label;
+        note.textContent = text.note;
+        button.setAttribute('aria-label', `${text.label}, ${text.note}`);
+      }
+      if (status && state.flushes !== announced) {
+        announced = state.flushes;
+        status.textContent = `${strings.thanks} ${formatCount(state.total, strings)}`;
+      }
+    };
+
+    for (const { button } of views) {
+      button.addEventListener('click', () => {
+        if (store.tap() === 'ignored') return;
+        config.removeAttribute('data-n');
+        play(button);
+      });
+      button.addEventListener('animationend', () => config.removeAttribute('data-n'));
+    }
+    store.subscribe(render);
+    void store.load();
+  }
+</script>

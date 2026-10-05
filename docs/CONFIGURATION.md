@@ -91,6 +91,10 @@ Las descripciones vienen del esquema (`.describe()`), por eso están en inglés.
 | `background` | `object` | no | `{"galaxy":true,"cursorWaves":false}` | Default animated banner background (each visitor can change it). All effects read the theme palette. |
 | `background.galaxy` | `boolean` | yes |  | Nebula clouds and a twinkling star field. |
 | `background.cursorWaves` | `boolean` | yes |  | Slow colour waves with a ripple that follows the pointer. |
+| `marks` | `object` | no | `{}` | Settings of the footprint button (`features.marks`). Every key is optional and falls back to its default. |
+| `marks.animation` | `'stamp' \| 'burst' \| 'pulse' \| 'none'` | no | `stamp` | Animation played when a reader leaves a footprint: `stamp` an ink stamp pressed on the page, `burst` a burst of pixel squares, `pulse` a soft ring, `none` no animation. All obey `prefers-reduced-motion`. |
+| `marks.maxPerVisitor` | `integer (min 1, max 200)` | no | `50` | Footprints one browser can leave on one note; after that taps add nothing. |
+| `marks.showCountFrom` | `integer (min 0, max 1000)` | no | `5` | The counter is hidden until a note has this many footprints; before that the button invites the reader to be among the first. |
 | `recruiter` | `object` | yes |  | Recruiter card on the home page and /me. |
 | `recruiter.available` | `boolean` | yes |  | Show or hide the whole availability line (not whether you are open to work). |
 | `recruiter.openToWork` | `boolean` | no | `true` | Whether you are open to work: green status dot when true, the brand accent colour when false. |
@@ -120,6 +124,7 @@ Las descripciones vienen del esquema (`.describe()`), por eso están en inglés.
 | `features.changelog` | `boolean` | yes |  | Visitor-facing /changelog page: off hides the footer link, marks it noindex and keeps it out of the sitemap. |
 | `features.me` | `boolean` | yes |  | The /me recruiter page: off hides it from the nav, marks it noindex and keeps it out of the sitemap. |
 | `features.readingMode` | `boolean` | yes |  | Reading mode on notes: off renders no toggle, loads no script or CSS and stores nothing in the browser. |
+| `features.marks` | `boolean` | yes |  | The anonymous "I was here" footprint button on notes. Needs the `SITE_DB` D1 binding (the site database, table `note_footprints`) and the `MARKS_RATE_LIMITER` binding, otherwise the buttons never render. |
 | `integrations` | `object` | no | `{}` | Public ids of third-party services. They ship in the HTML by design, so they live here and not in secrets. |
 | `integrations.cloudflareAnalyticsToken` | `string` | no |  | Cloudflare Web Analytics beacon token (public). Omit to turn analytics off. Env `PUBLIC_CF_ANALYTICS_TOKEN` overrides it. |
 | `integrations.turnstileSiteKey` | `string` | no |  | Cloudflare Turnstile public site key for the contact form, bound to the domain. Env `PUBLIC_TURNSTILE_SITE_KEY` overrides it (use a test key locally). |
@@ -405,12 +410,39 @@ Los textos de la interfaz están en `apps/web/src/shared/i18n/index.ts`. Añadir
 - JavaScript por página (30 KiB gzip): `apps/web/scripts/performance-budget.ts`.
 - Un presupuesto no se sube para «hacer pasar» un cambio: se arregla el cambio.
 
+### 6.13 Huellas en las notas (`marks`) y la base de datos del sitio
+
+Un botón anónimo de «estuve aquí» en cada nota (cabecera y final del artículo), con un contador por nota en Cloudflare D1. Los ajustes están en `site.config.ts`: `features.marks` (encendido o apagado) y el bloque `marks` (`animation`: `stamp`, `burst`, `pulse` o `none`; `maxPerVisitor`; `showCountFrom`; la tabla generada de la sección 3 lista los valores por defecto). Toda animación se detiene con `prefers-reduced-motion`. Registro de la decisión: [ADR 0013](adr/0013-footprints-on-notes-d1.md).
+
+**Una sola base de datos para todo el sitio.** La base es `elvinlab-dev-db`, enlazada como `SITE_DB`, y está pensada para alojar también funcionalidades futuras. Las reglas que la mantienen escalable:
+
+- **Una tabla por funcionalidad, con su nombre** (`note_footprints`; una funcionalidad futura añadiría, por ejemplo, `page_views`). Cada funcionalidad lee y escribe solo sus propias tablas, a través de su propio adaptador detrás de su propio puerto (`features/<x>/adapters/d1.ts`); nunca toca la tabla de otra.
+- **Las migraciones son una única secuencia numerada** en `apps/web/migrations/`, con nombre `NNNN_<funcionalidad>_<cambio>.sql` (hoy `0001_note_footprints.sql`). Wrangler anota lo aplicado en la tabla `d1_migrations` de esa base.
+- **Límites:** el plan gratuito da 5 GB por cuenta. Si una funcionalidad llegara a desbordar la base compartida, dale su propia base y su propio binding.
+- Los bindings propios de una funcionalidad (el limitador `MARKS_RATE_LIMITER`) conservan el nombre de la funcionalidad; solo la base se comparte.
+
+**Mientras la base no exista y no esté enlazada, los botones no aparecen** (las Actions responden «no disponible» y la página no pinta nada): encender el flag sin los pasos de abajo es seguro, solo no muestra nada. Estos pasos se hacen en **tu cuenta de Cloudflare**. *En elvinlab.dev los pasos 1 a 3 se hicieron el 2026-10-05: base `elvinlab-dev-db` en la región ENAM, su id y el binding `SITE_DB` están en `wrangler.jsonc` y la tabla `note_footprints` existe. (Una primera base llamada `elvinlab-marks` se creó y se borró el mismo día, vacía, para que el sitio tenga una base que pueda crecer.) Solo faltan el release (paso 4) y la comprobación (paso 5).*
+
+1. Creá la base (necesita `wrangler login`): `cd apps/web && mise exec -- pnpm exec wrangler d1 create elvinlab-dev-db`. Imprime un `database_id`.
+2. Agregá el binding en `apps/web/wrangler.jsonc`:
+   ```jsonc
+   "d1_databases": [
+     { "binding": "SITE_DB", "database_name": "elvinlab-dev-db", "database_id": "<el id del paso 1>", "migrations_dir": "migrations" }
+   ]
+   ```
+   (`MARKS_RATE_LIMITER`, el límite por IP, ya está declarado en `ratelimits`.)
+3. Creá las tablas en la base real: `mise exec -- pnpm exec wrangler d1 migrations apply elvinlab-dev-db --remote` (hoy aplica `apps/web/migrations/0001_note_footprints.sql`).
+4. Liberá como siempre (sección 7). Si el deploy falla con un error de autorización, puede que el token de API del entorno `production` de GitHub no tenga permiso para desplegar un Worker con un binding D1: agregale el permiso de edición de D1. *Esto no se verificó.*
+5. Comprobalo: abrí una nota, pulsá el botón y recargá (el contador se mantiene), o `curl -s -X POST https://TU-DOMINIO/_actions/marks.get/ -H 'content-type: application/json' -H 'origin: https://TU-DOMINIO' -d '{"slug":"<slug de una nota publicada>"}'`, que responde con el total.
+
+Para apagarlo, poné `features.marks: false`: no llega a la página ni HTML, ni CSS ni script. Para usar otra base (por ejemplo Turso), escribí un adaptador para el puerto `MarkStore` de `apps/web/src/features/marks/ports.ts`, junto a `adapters/d1.ts`.
+
 ## 7. Publicar (release) y revertir
 
 El flujo completo está decidido en los ADR [0011](adr/0011-ci-gate-once-at-main-pr-no-staging.md) y [0012](adr/0012-direct-push-to-main-no-pr-gate.md). En corto:
 
 - **Día a día**: se trabaja en `develop` y se hace push libre; no corre ningún CI.
-- **Antes de liberar**: corré las compuertas locales (`typecheck`, `lint`, `test`, `depcruise`, el build web, `check:js-budget`, `test:white-label`, `check:dev-cold-start`, `test:e2e` y `test:lighthouse`) y poné al día `changelog.json` (`CLAUDE.md` explica cómo encontrar los commits que faltan).
+- **Antes de liberar**: corré las compuertas locales que el [registro de verificación](../odd/verification-ledger.md) marque como obsoletas (`typecheck`, `lint`, `test`, `depcruise`, el build web, `check:js-budget`, `test:white-label`, `check:dev-cold-start`, `test:e2e`, `test:lighthouse`), siguiendo la regla de verificación acotada de [`TESTING.md`](TESTING.md); una compuerta cuyos archivos no cambiaron desde su último resultado verde no se repite, porque el CI de `main` vuelve a correr todo antes del deploy. Poné al día `changelog.json` (`CLAUDE.md` explica cómo encontrar los commits que faltan).
 - **Release**: lo que está en `develop` pasa a `main`. Ese push es lo **único** que dispara el CI (`static`, `e2e` y `lighthouse` en paralelo → `checks` → `deploy`). El despliegue va directo a producción y se comprueba con `.github/scripts/smoke-check.sh`, con rollback automático si falla.
 
 ```bash

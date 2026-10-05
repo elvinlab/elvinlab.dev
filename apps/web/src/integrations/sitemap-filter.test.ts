@@ -11,6 +11,7 @@ const allOn = {
   me: true,
   changelog: true,
   readingMode: true,
+  marks: true,
 };
 
 describe('isHiddenFromSitemap', () => {
