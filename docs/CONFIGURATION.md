@@ -415,7 +415,7 @@ Los textos de la interfaz están en `apps/web/src/shared/i18n/index.ts`. Añadir
 El flujo completo está decidido en los ADR [0011](adr/0011-ci-gate-once-at-main-pr-no-staging.md) y [0012](adr/0012-direct-push-to-main-no-pr-gate.md). En corto:
 
 - **Día a día**: se trabaja en `develop` y se hace push libre; no corre ningún CI.
-- **Antes de liberar**: corré las compuertas locales (`typecheck`, `lint`, `test`, `depcruise`, el build web, `check:js-budget`, `test:white-label`, `check:dev-cold-start`, `test:e2e` y `test:lighthouse`) y poné al día `changelog.json` (`CLAUDE.md` explica cómo encontrar los commits que faltan).
+- **Antes de liberar**: corré las compuertas locales que el [registro de verificación](../odd/verification-ledger.md) marque como obsoletas (`typecheck`, `lint`, `test`, `depcruise`, el build web, `check:js-budget`, `test:white-label`, `check:dev-cold-start`, `test:e2e`, `test:lighthouse`), siguiendo la regla de verificación acotada de [`TESTING.md`](TESTING.md); una compuerta cuyos archivos no cambiaron desde su último resultado verde no se repite, porque el CI de `main` vuelve a correr todo antes del deploy. Poné al día `changelog.json` (`CLAUDE.md` explica cómo encontrar los commits que faltan).
 - **Release**: lo que está en `develop` pasa a `main`. Ese push es lo **único** que dispara el CI (`static`, `e2e` y `lighthouse` en paralelo → `checks` → `deploy`). El despliegue va directo a producción y se comprueba con `.github/scripts/smoke-check.sh`, con rollback automático si falla.
 
 ```bash

@@ -30,6 +30,48 @@ A negative control removes a heading in the browser and verifies that the smoke 
 the damaged document. Source files are not changed. Astro preview uses `--ignore-lock` to remain
 in the foreground under coding agents, so Playwright owns its lifetime.
 
+## Touch-scoped verification (repository rule)
+
+Verify what a change touches, and record it. Do not run the whole stack after every change. "Test" here means every kind of check: unit tests, types, lint, build, dependency boundaries, generated docs, e2e, accessibility, size budgets, Lighthouse, white-label and dev cold start.
+
+1. **List the blast radius first.** Name the files you touched and what depends on them, before running anything.
+2. **Run what covers the change or something that depends on it.** A check that already passed and whose scope you did not touch is **not** re-run. A check whose scope you did touch **is** re-run: never trust an older result for changed code.
+3. **Wide changes run the whole stack once**, then go back to scoped runs. Wide means: dependencies or the lockfile, toolchain versions, Astro, Vite, Tailwind, Wrangler, tsconfig or Biome configuration, global CSS and design tokens, `BaseLayout`, the shape of the i18n dictionary, and `fixture-workspace.ts`.
+4. **Record every run and every skip** in the task tracker and in the [verification ledger](../odd/verification-ledger.md): what ran, the result and the commit; for a skipped check, why it was safe to skip.
+5. **Never report a skipped check as verified.** Say "not re-run: untouched since `<sha>`".
+6. **Delegated writers run only the checks the parent lists** under `## Verify` in the brief, taken from the map below. A writer does not run the full suite by default, and the parent does not repeat it.
+7. **Release:** run what the ledger shows as stale, then push. CI on `main` runs the whole stack once more (`static`, `e2e`, `lighthouse`, `checks`) before it deploys, so it is the full backstop; the local run before a release is not.
+
+### How to find what a change touches
+
+- **Unit tests:** `mise exec -- pnpm --filter web exec vitest related <files> --run` (Vitest follows the import graph; `--changed [ref]` does the same for everything changed since a ref). `codegraph affected <files> -q` lists affected test files too.
+- **The import graph does not see page-level specs.** `codegraph affected` returned nothing for `styles/global.css` and for `ContactForm.tsx` although `contact.spec.ts` exercises both, because the spec loads a page and imports neither. For e2e, Lighthouse and budgets use the map below.
+- **Lint:** `mise exec -- pnpm exec biome check --changed` (or `--staged`, or `--since=<ref>`).
+- **e2e:** pick specs by area (map below) and run them with `mise exec -- pnpm test:e2e:quick <spec>` (one viewport); use `pnpm test:e2e` (three viewports) only when the change is width dependent. `playwright --only-changed` only follows test files, not application code.
+- **Types** (`pnpm typecheck`) cannot be scoped to files: run it when TypeScript, Astro, schema, config or type files changed, skip it for documentation or content-only changes.
+
+### Impact map
+
+| You touched | Run | Skip, if untouched |
+| --- | --- | --- |
+| Documentation, trackers, `odd/` | `lint` on the files | everything else |
+| `changelog.json` | the changelog unit test, `lint` | build, e2e |
+| A note (`content/notes/**`) | `build` (it validates the frontmatter), `lint` | e2e, Lighthouse (the gate measures fixtures, not real notes) |
+| Schema, `site.config.ts`, `env-vars.ts`, fixtures | `docs:config`, the config unit tests, `typecheck`, `test:white-label`, `build` | e2e, Lighthouse |
+| Unit-tested logic (`lib/`, `ports`, `adapters`, `actions`) | the related unit tests, `typecheck`, `lint` | e2e (unless the page behavior changed), Lighthouse |
+| Added, moved or removed files, or edited imports | `depcruise` | |
+| A feature's UI (`features/<x>/components`) | its unit tests, the e2e specs of that area, `a11y.spec.ts` for its page, `typecheck` | specs of other areas |
+| Client JavaScript, islands, scripts, client dependencies | `build` then `check:js-budget`, the area's e2e, `check:dev-cold-start` if a dependency was added | |
+| Anything that changes the HTML or CSS bytes of a gated URL (styles, layout, head or SEO tags, fonts, note or home or contact markup) | `test:lighthouse` and the area's e2e; compare the document size and the worst LCP with the ledger | Lighthouse if no page the gate loads changed |
+| Notes pages and what they render (`NotePage`, share panel, marks, prose styles) | the notes specs (`notes-layout`, `note-share`, `link-previews`, `note-translations`, `reading-mode`, `calm-pages`, `card-links`, `focus-not-obscured`, `marks`) and `a11y.spec.ts` | contact, home and `/me` specs |
+| Contact (`features/contact`, `ContactForm`) | `contact.spec.ts`, the contact unit tests, `check:js-budget` | notes specs |
+| Header, navbar, footer, `BaseLayout`, global CSS | a wide change: the whole stack once | |
+| `tests/**` only | the changed specs | the application checks |
+
+### The verification ledger
+
+[`odd/verification-ledger.md`](../odd/verification-ledger.md) keeps two things: the last commit on which each check family was green, and one row per verified change. A check is **stale** when files in its scope changed after its last green commit: `git diff --name-only <sha>..HEAD -- <scope>` prints something. Update the ledger in the same commit as the change it records.
+
 ## Quality budgets and CI
 
 Run the same gates as CI from the repository root:
