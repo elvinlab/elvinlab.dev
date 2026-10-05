@@ -351,7 +351,7 @@
     "date": "2026-10-05",
     "category": "added",
     "title": "Leave a footprint on a note",
-    "description": "Every note now has an anonymous \"I was here\" button, under the title and again at the end, with a small animation. One tap leaves a footprint, no account and no comment needed. Nothing that identifies you is stored: only a counter per note."
+    "description": "Every note now has an anonymous \"I was here\" button, under the title and again at the end, with a small animation. One tap leaves a footprint, no account and no comment needed. Nothing that identifies you is stored: only a counter per note. Forks get a features.marks flag and a marks block (animation and limits), and need one Cloudflare D1 database for the counters: see the configuration guide, recipe 6.13."
   },
   "privacy-reassurance": {
     "date": "2026-10-05",

@@ -8,14 +8,14 @@ A check is **stale** when files in its scope changed after its last green commit
 
 | Check | Last green | Result | Scope (a change here makes it stale) |
 | --- | --- | --- | --- |
-| `typecheck` | `addc4ac` | 0 errors | `**/*.ts`, `**/*.tsx`, `**/*.astro`, `tsconfig*.json`, `package.json`, `pnpm-lock.yaml` |
-| `lint` | `addc4ac` | clean | any file Biome checks (`*.ts`, `*.tsx`, `*.astro`, `*.json`, `*.css`) |
-| `unit` (`pnpm test`) | `addc4ac` | 37 + 780 passed | the files each test imports (`vitest related`) |
-| `depcruise` | `addc4ac` | 0 violations (196 modules) | added, moved or removed source files and edited imports |
-| `docs:config` | `addc4ac` | no drift | `shared/config/schema.ts`, `env-vars.ts`, the notes frontmatter schema |
-| `build` | `addc4ac` | complete | source, content (`content/**`), config of Astro, Vite, Tailwind, Wrangler |
+| `typecheck` | `9cc53c1` | 0 errors | `**/*.ts`, `**/*.tsx`, `**/*.astro`, `tsconfig*.json`, `package.json`, `pnpm-lock.yaml` |
+| `lint` | `9cc53c1` | clean | any file Biome checks (`*.ts`, `*.tsx`, `*.astro`, `*.json`, `*.css`) |
+| `unit` (`pnpm test`) | `9cc53c1` | 37 + 780 passed | the files each test imports (`vitest related`) |
+| `depcruise` | `9cc53c1` | 0 violations (196 modules) | added, moved or removed source files and edited imports |
+| `docs:config` | `9cc53c1` | no drift | `shared/config/schema.ts`, `env-vars.ts`, the notes frontmatter schema |
+| `build` | `9cc53c1` | complete | source, content (`content/**`), config of Astro, Vite, Tailwind, Wrangler |
 | `check:js-budget` | `addc4ac` | 17 pages PASS; note pages 12.84 KiB (22.56 with the Preact island, before the rework) | client JavaScript, islands, scripts, client dependencies |
-| `test:white-label` | `addc4ac` | passed (with the new no-marks-markup assertion) | schema, `site.config.ts`, fixtures, identity text in templates |
+| `test:white-label` | `9cc53c1` | passed (with the no-marks-markup assertion) | schema, `site.config.ts`, fixtures, identity text in templates |
 | `check:dev-cold-start` | `07ae27d` | 7 routes | dev dependencies, Vite configuration |
 | `test:e2e` (whole suite, 3 viewports) | `61ae176` | 548 passed, 247 skipped by annotation | the area each spec covers (see the impact map). Since then only the notes area and the privacy page were re-run, see the rows below |
 | `test:lighthouse` | `addc4ac` | worst LCP `/notes/smoke-es/` 2268 ms, performance 97 to 99 | HTML or CSS bytes of a gated URL |
@@ -32,3 +32,5 @@ Lighthouse baseline at `addc4ac`, with the footprint button (document size, wors
 | 2026-10-05 | `744a833`, `61ae176` | X and WhatsApp share links, two-row panel | lint, typecheck, unit, depcruise, full e2e 548, Lighthouse (note document 80.8 to 83.0 KB, worst LCP 2265 ms) | js-budget: the share script did not change; white-label, cold start |
 | 2026-10-05 | `7ab9c9c`, `ae87ccd` | `features.marks` flag and block; marks server, D1 adapter, actions | typecheck, lint, unit 729, depcruise, `docs:config`, build, white-label | e2e and Lighthouse: no page markup, CSS or JavaScript changed yet (the flag renders nothing until the UI exists) |
 | 2026-10-05 | `f78a087`, `addc4ac` | marks UI (plain script component, no island, CSS inlined once; privacy tooltip), privacy reassurance next to the comments, privacy page section, ADR 0013 | typecheck, lint, unit 780, depcruise, `docs:config`, build, js-budget (17 pages), white-label; e2e at 1280: notes-layout, note-share, link-previews, note-translations, reading-mode, calm-pages, card-links, focus-not-obscured, a11y, comments, legal, internal-links, smoke, mobile-ux, external-links (174 passed); marks spec at 3 viewports (130 passed, 32 skipped by annotation); Lighthouse once (table above) | contact, home and `/me` e2e specs: their code did not change (their pages only grew about 100 bytes of global CSS, covered by Lighthouse); the whole 3-viewport suite; cold start: no dependency added |
+| 2026-10-05 | `dcc82c7`, `9cc53c1` | marks table, binding and migration renamed for the site-wide database `elvinlab-dev-db` (`SITE_DB`, `note_footprints`); D1 database created and migrated in the owner's Cloudflare account | typecheck, lint, 249 related unit tests, `docs:config`; remote: tables and row counts of the new and the old database before deleting the old one | e2e and Lighthouse: no page markup, CSS or JavaScript changed; build and white-label were re-run in the release preparation below |
+| 2026-10-05 | release preparation on `9cc53c1` plus the changelog text | what the ledger showed stale since the last release (`079674b`): typecheck, lint, the whole unit suite (37 + 780), depcruise, `docs:config`, build, white-label; changelog audit of the `feat` commits since `2412177` (all covered, one entry extended for forks) | none of the fixture-visible checks | js-budget, Lighthouse, cold start: scope untouched since `addc4ac` and `07ae27d` (no client JavaScript, page bytes or dependency changed); the e2e specs of unrelated areas; the CI on `main` runs the whole stack before it deploys |
