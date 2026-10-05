@@ -384,7 +384,7 @@ The text lives in `apps/web/src/features/privacy/content.ts` and `apps/web/src/f
 
 - **Theme**: `packages/core/src/tokens/tokens.json`, then `mise exec -- pnpm --filter @elvinlab/core tokens` (regenerates `tokens.css`). Components read semantic variables, never a raw color.
 - **Profile photo**: put the file in `apps/web/src/assets/` and write only its file name in `identity.avatar` (for example `avatar.png`; png, jpg, webp or avif). It is optimized at build time (webp with explicit dimensions) and used on the home page, on `/me` and on the `/me` card. A missing file fails the build.
-- **Favicon**: `apps/web/public/favicon.svg`.
+- **Favicon**: `apps/web/public/favicon.svg` (the icon the page declares) and `apps/web/public/favicon.ico` (16 and 32 px, what browsers, crawlers and link unfurlers request by default; without it `/favicon.ico` is a 404). Replace both together; regenerate the `.ico` from your SVG with `rsvg-convert -w 16 -h 16 favicon.svg -o f16.png`, the same at 32, then `magick f16.png f32.png favicon.ico`. `tests/browser/favicon.spec.ts` checks the file.
 - **Default share image**: `apps/web/public/og-image.png` (1200 × 630). It is a static file with the person's name drawn on it: **replace it** if you use the site for someone else. Notes and `/me` generate their own card at build time.
 - **Fonts**: self-hosted (Fontsource); never loaded from a CDN. The pixel display face (Pixelify Sans) is the `pixel` font token in `tokens.json`; a theme can replace it.
 

@@ -310,5 +310,11 @@
     "category": "fixed",
     "title": "The contact form keeps keyboard focus after a failed send",
     "description": "When sending a message fails, focus returns to the send button instead of being lost, so keyboard and screen reader users can retry right away without tabbing from the top of the page."
+  },
+  "favicon-ico": {
+    "date": "2026-10-05",
+    "category": "fixed",
+    "title": "/favicon.ico no longer answers 404",
+    "description": "Browsers, crawlers and link previews ask for /favicon.ico by default. The site now serves a small real icon there (5 KB) next to the SVG one, so those requests succeed. Forks should replace both files."
   }
 }
