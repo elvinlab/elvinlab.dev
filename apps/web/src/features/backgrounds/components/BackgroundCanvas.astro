@@ -23,6 +23,7 @@ import { site } from '@/shared/config/index.ts';
   import { createCursorWaves } from '@/features/backgrounds/lib/cursor-waves.ts';
   import { createGalaxy } from '@/features/backgrounds/lib/galaxy.ts';
   import { createGlContext } from '@/features/backgrounds/lib/gl-runner.ts';
+  import { createPageLifecycle } from '@/features/backgrounds/lib/page-lifecycle.ts';
   import type { BackgroundChoice } from '@/shared/lib/background-preference.ts';
   import {
     BACKGROUND_STORAGE_KEY,
@@ -73,11 +74,20 @@ import { site } from '@/shared/config/index.ts';
       if (choice === 'off') return;
       if (!gl) {
         gl = createGlContext(canvas);
-        canvas.addEventListener('webglcontextlost', () => {
-          gl = null;
+        // preventDefault lets the browser restore the context later. Meanwhile the canvas stays
+        // hidden so a lost context never paints the browser's broken-canvas icon; the restored
+        // event rebuilds the program (`run` stops the old handle first, then the factory recompiles).
+        canvas.addEventListener('webglcontextlost', (event) => {
+          event.preventDefault();
+          canvas.style.display = 'none';
         });
+        canvas.addEventListener('webglcontextrestored', () => run(current()));
       }
-      if (!gl || gl.isContextLost()) return;
+      if (!gl) return;
+      if (gl.isContextLost()) {
+        canvas.style.display = 'none';
+        return;
+      }
       handle = factories[choice](gl, canvas, readPalette());
     };
 
@@ -90,7 +100,8 @@ import { site } from '@/shared/config/index.ts';
     // Reading mode stops the effect without touching the visitor's saved choice.
     let choice = resolveBackgroundChoice(stored, ownerDefault);
     const reading = (): boolean => document.documentElement.hasAttribute('data-reading');
-    run(reading() ? 'off' : choice);
+    const current = (): BackgroundChoice => (reading() ? 'off' : choice);
+    run(current());
 
     // Recolor the running effect in place on theme change — rebuilding a GL context would lose it.
     const themeObserver = new MutationObserver(() => {
@@ -100,9 +111,9 @@ import { site } from '@/shared/config/index.ts';
 
     document.addEventListener('background-change', (event) => {
       choice = (event as CustomEvent<BackgroundChoice>).detail;
-      run(reading() ? 'off' : choice);
+      run(current());
     });
-    document.addEventListener('reading-mode-change', () => run(reading() ? 'off' : choice));
+    document.addEventListener('reading-mode-change', () => run(current()));
 
     const dispose = (): void => {
       stop();
@@ -111,7 +122,11 @@ import { site } from '@/shared/config/index.ts';
       if (gl && !gl.isContextLost()) gl.getExtension('WEBGL_lose_context')?.loseContext();
     };
     document.addEventListener('astro:before-swap', dispose, { once: true });
-    window.addEventListener('pagehide', dispose, { once: true });
+    // Entering the back/forward cache only pauses (the context must survive a Back restore);
+    // coming back re-runs the effect, or leaves the canvas hidden if the browser lost the context.
+    const lifecycle = createPageLifecycle({ pause: stop, resume: () => run(current()), dispose });
+    window.addEventListener('pagehide', lifecycle.onPageHide);
+    window.addEventListener('pageshow', lifecycle.onPageShow);
   }
 </script>
 
