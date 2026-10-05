@@ -9,6 +9,9 @@ export function isHiddenFromSitemap(pathname: string, features?: typeof site.fea
   // Strip locale prefix if present (e.g. `/en/me/` -> `/me/`)
   const withoutLocale = pathname.replace(/^\/[a-z]{2}\//, '/');
 
+  if (!flags.blog && (withoutLocale === '/notes/' || withoutLocale.startsWith('/notes/'))) {
+    return true;
+  }
   if (!flags.me && (withoutLocale === '/me/' || pathname === '/me/' || pathname === '/en/me/')) {
     return true;
   }

@@ -316,7 +316,7 @@ Each `features` flag switches the whole feature off: the route is not generated,
 
 | Flag | What it controls | Notes |
 | --- | --- | --- |
-| `blog` | Notes index, notes and RSS | With no published notes, the menu hides "Notes" and the feed |
+| `blog` | Notes index, notes and RSS | With no published notes, the menu hides "Notes" and the feed. With `blog: false` no notes route, RSS feed or sitemap entry is built (the routes in `src/blog-routes/` are injected only when the flag is on, by `integrations/blog-routes.ts`) |
 | `comments` | Comments and reactions (Giscus) | Needs the `giscus` block; see 6.5 |
 | `contact` | The `/contact` form | Needs the Worker secrets; without them it fails closed |
 | `credentials` | Certificates on `/me` | |

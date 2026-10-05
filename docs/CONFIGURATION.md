@@ -316,7 +316,7 @@ Cada bandera de `features` apaga la función completa: no se genera la ruta, des
 
 | Bandera | Qué controla | Notas |
 | --- | --- | --- |
-| `blog` | Índice de notas, notas y RSS | Sin notas publicadas, el menú oculta «Notas» y el feed |
+| `blog` | Índice de notas, notas y RSS | Sin notas publicadas, el menú oculta «Notas» y el feed. Con `blog: false` no se genera ninguna ruta de notas, ni el feed RSS, ni entradas en el sitemap (las rutas de `src/blog-routes/` se inyectan solo con el flag activo, desde `integrations/blog-routes.ts`) |
 | `comments` | Comentarios y reacciones (Giscus) | Necesita el bloque `giscus`; ver 6.5 |
 | `contact` | Formulario `/contact` | Necesita los secretos del Worker; sin ellos falla cerrado |
 | `credentials` | Certificados en `/me` | |

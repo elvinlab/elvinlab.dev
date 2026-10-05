@@ -363,3 +363,6 @@ Method: the repo's `createFixtureWorkspace` with `tests/fixtures/site.config.alt
 - Baseline noise, same in all three variants, not caused by the flags: links to `/experiments/` and `/en/404/` have no built page (the fixture empties `experiments.json`).
 - Not tested: home content with `blog` off beyond links, the `home.*` flags, `credentials`/`experiments` off, a runtime check on workerd, and the real production config.
 - Next (not started, owner decides): make `blog: false` skip the notes routes, RSS and sitemap entries, and add a fixture test for both variants.
+
+### Done 2026-10-05: `blog: false` now really turns the blog off
+Tracker: `odd/tasks/blog-feature-flag.md`. Routes moved to `apps/web/src/blog-routes/` and injected by `integrations/blog-routes.ts` only when the flag is on; sitemap filter also hides notes URLs. Verified: production-config build file list (49 files) and sitemap (16 URLs) identical before and after; blog-off fixture has 13 pages, no notes routes, no `rss.xml`, no notes in the sitemap; me-off unchanged; typecheck, lint, depcruise clean, 10 focused tests green. Not run: full unit, e2e, Lighthouse, js-budget. Not pushed.
