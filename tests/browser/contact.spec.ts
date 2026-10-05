@@ -173,7 +173,7 @@ test('the honeypot is hidden from assistive technology and skipped by the keyboa
   await expect(honeypot.locator('xpath=ancestor::*[@aria-hidden="true"][1]')).toBeAttached();
 });
 
-test('a failed send keeps the typed text and announces sending, then the error', async ({
+test('a failed send keeps the typed text, announces sending then the error and returns focus to the submit button', async ({
   page,
 }) => {
   test.setTimeout(30_000);
@@ -207,4 +207,6 @@ test('a failed send keeps the typed text and announces sending, then the error',
     'aria-busy',
     'false',
   );
+  // The button and fields were disabled while sending, which drops focus to the page: it comes back.
+  await expect(page.getByRole('button', { name: copy.submit })).toBeFocused();
 });

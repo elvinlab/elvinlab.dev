@@ -120,6 +120,7 @@ export function ContactForm({ siteKey, strings }: Props) {
   const startedAtRef = useRef<number>(Date.now());
   const widgetContainerRef = useRef<HTMLDivElement>(null);
   const formRef = useRef<HTMLFormElement>(null);
+  const submitRef = useRef<HTMLButtonElement>(null);
   const loaderInitialized = useRef(false);
 
   useEffect(() => {
@@ -256,6 +257,14 @@ export function ContactForm({ siteKey, strings }: Props) {
   const isError = state.status === 'error';
   const disabled = isSubmitting || !siteKey || turnstileLoadError || !ready;
 
+  // The button and the fields are disabled while sending, so the browser drops focus to the page.
+  // When the send fails, give it back to the submit button (unless the visitor already moved it).
+  useEffect(() => {
+    if (!isError) return;
+    const active = document.activeElement;
+    if (!active || active === document.body) submitRef.current?.focus();
+  }, [isError]);
+
   if (state.status === 'success') {
     return (
       <div role="status" class="space-y-2 text-center">
@@ -355,6 +364,7 @@ export function ContactForm({ siteKey, strings }: Props) {
       )}
 
       <button
+        ref={submitRef}
         type="submit"
         disabled={disabled}
         class={`w-full h-11 rounded-control bg-button text-white font-medium ${
