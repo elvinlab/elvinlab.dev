@@ -69,6 +69,10 @@ try {
   if (/<section[^>]*data-comments/.test(rawHtml)) {
     fail('comments rendered although the config has no giscus block');
   }
+  // `features.marks` is off in the alternative config: no footprint markup, icon sprite or inline CSS.
+  if (/data-marks|marks-footprint|@keyframes marks-/.test(rawHtml)) {
+    fail('the footprint button (markup, icon or CSS) rendered although features.marks is off');
+  }
   // The reading mode is off in the alternative config: no toggle, exit button or stored key.
   if (
     /data-reading-(?:toggle|exit)|html\[data-reading\]|localStorage\.\w+Item\(['"]reading-mode['"]/.test(
