@@ -25,8 +25,17 @@
       "simple": { "limit": 30, "period": 60 }
     }
   ],
-  // The D1 binding named MARKS_DB (footprints on notes) is added after the database is created;
-  // until then the marks Actions answer SERVICE_UNAVAILABLE and no button renders (docs, task M4).
+  // Footprints on notes (docs/CONFIGURATION.md recipe 6.13). Created on 2026-10-05 with
+  // `wrangler d1 create elvinlab-marks`; the table comes from migrations/0001_marks.sql. Without this
+  // binding the marks Actions answer SERVICE_UNAVAILABLE and no button renders.
+  "d1_databases": [
+    {
+      "binding": "MARKS_DB",
+      "database_name": "elvinlab-marks",
+      "database_id": "edd72441-6202-4d84-92af-8c3756020a83",
+      "migrations_dir": "migrations"
+    }
+  ],
   "observability": {
     "enabled": true
   }

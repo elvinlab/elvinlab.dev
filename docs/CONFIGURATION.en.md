@@ -414,7 +414,7 @@ UI texts are in `apps/web/src/shared/i18n/index.ts`. Adding a third language mea
 
 A one-tap, anonymous "I was here" button on every note (header and end of the article), with a per-note counter in Cloudflare D1. The settings are in `site.config.ts`: `features.marks` (on or off) and the `marks` block (`animation`: `stamp`, `burst`, `pulse` or `none`; `maxPerVisitor`; `showCountFrom`; the generated table in section 3 lists the defaults). Every animation stops under `prefers-reduced-motion`. Decision record: [ADR 0013](adr/0013-footprints-on-notes-d1.md).
 
-**Until the database exists the buttons do not appear** (the Actions answer "unavailable" and the page renders nothing): turning the flag on without the steps below is safe, it just shows nothing. These steps run in **your Cloudflare account**:
+**Until the database exists the buttons do not appear** (the Actions answer "unavailable" and the page renders nothing): turning the flag on without the steps below is safe, it just shows nothing. These steps run in **your Cloudflare account**. *On elvinlab.dev steps 1 to 3 were done on 2026-10-05: database `elvinlab-marks` in region ENAM, its id and binding are already in `wrangler.jsonc`, and the table exists. Only the release (step 4) and the check (step 5) remain.*
 
 1. Create the database (needs `wrangler login`): `cd apps/web && mise exec -- pnpm exec wrangler d1 create elvinlab-marks`. It prints a `database_id`.
 2. Add the binding to `apps/web/wrangler.jsonc`:

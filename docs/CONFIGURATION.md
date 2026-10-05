@@ -414,7 +414,7 @@ Los textos de la interfaz están en `apps/web/src/shared/i18n/index.ts`. Añadir
 
 Un botón anónimo de «estuve aquí» en cada nota (cabecera y final del artículo), con un contador por nota en Cloudflare D1. Los ajustes están en `site.config.ts`: `features.marks` (encendido o apagado) y el bloque `marks` (`animation`: `stamp`, `burst`, `pulse` o `none`; `maxPerVisitor`; `showCountFrom`; la tabla generada de la sección 3 lista los valores por defecto). Toda animación se detiene con `prefers-reduced-motion`. Registro de la decisión: [ADR 0013](adr/0013-footprints-on-notes-d1.md).
 
-**Mientras la base de datos no exista, los botones no aparecen** (las Actions responden «no disponible» y la página no pinta nada): encender el flag sin los pasos de abajo es seguro, solo no muestra nada. Estos pasos se hacen en **tu cuenta de Cloudflare**:
+**Mientras la base de datos no exista, los botones no aparecen** (las Actions responden «no disponible» y la página no pinta nada): encender el flag sin los pasos de abajo es seguro, solo no muestra nada. Estos pasos se hacen en **tu cuenta de Cloudflare**. *En elvinlab.dev los pasos 1 a 3 se hicieron el 2026-10-05: base `elvinlab-marks` en la región ENAM, su id y su binding ya están en `wrangler.jsonc` y la tabla existe. Solo faltan el release (paso 4) y la comprobación (paso 5).*
 
 1. Creá la base (necesita `wrangler login`): `cd apps/web && mise exec -- pnpm exec wrangler d1 create elvinlab-marks`. Imprime un `database_id`.
 2. Agregá el binding en `apps/web/wrangler.jsonc`:
