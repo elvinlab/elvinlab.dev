@@ -344,7 +344,7 @@
   "note-share-x": {
     "date": "2026-10-05",
     "category": "added",
-    "title": "Share a note on X",
-    "description": "The share panel of each note now has an X button next to LinkedIn. It opens a new post with the note title and its link, and it is a plain link: no third-party script is loaded."
+    "title": "Share a note on X and WhatsApp",
+    "description": "The share panel of each note now has X and WhatsApp buttons next to LinkedIn. Both open a new message with the note title and its link, and they are plain links: no third-party script is loaded."
   }
 }

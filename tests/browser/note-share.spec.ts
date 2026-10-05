@@ -42,6 +42,20 @@ for (const { path, heading, title } of NOTES) {
       await expect(link).toHaveAttribute('rel', /noopener/);
     });
 
+    test('shares to WhatsApp with the note title and its canonical URL in one message', async ({
+      page,
+    }) => {
+      await page.goto(path);
+      const link = panel(page).getByRole('link', { name: /^WhatsApp\b/ });
+      await expect(link).toHaveCount(1);
+      await expect(link).toHaveAttribute(
+        'href',
+        `https://wa.me/?text=${encodeURIComponent(`${title} ${canonical}`)}`,
+      );
+      await expect(link).toHaveAttribute('target', '_blank');
+      await expect(link).toHaveAttribute('rel', /noopener/);
+    });
+
     test('every share control keeps a 44 px hit area and the copy label stays on one line', async ({
       page,
     }) => {
