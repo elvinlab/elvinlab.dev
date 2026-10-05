@@ -21,6 +21,9 @@ Owner, 2026-10-05: "pruebas e2e, lighthouse etc solo prueben lo que afecten". To
 - Drift guards (unit tests): every spec under `tests/browser/` is referenced by at least one area or declared `always` or `manual`; every referenced spec and every Lighthouse URL exists (URLs must be in `lighthouserc.json`); no glob matches nothing.
 - Docs: `docs/TESTING.md` explains the command and points to the map as the source of truth; `CLAUDE.md` rule mentions `pnpm verify`.
 
+## Known limit to refine in V1
+The i18n dictionary is one file, so any edit would make every text-rendering spec stale. The planner treats a diff that only ADDS keys to the dictionary as not affecting existing pages (it only affects the specs of the area that uses the new keys); a modified or removed key is a real change. The hand-written map can miss a dependency and skip a check that mattered: the drift guards catch the structural gaps, and CI on `main` is the backstop for the rest.
+
 ## Authorized scope
 Local implementation on `develop`. No push, no release, no remote operation. One writer at a time: starts after the marks UI task (M3 of `odd/tasks/marks.md`) is committed, because both would edit the working tree.
 
@@ -32,6 +35,7 @@ Local implementation on `develop`. No push, no release, no remote operation. One
 - [ ] V5 Validation on real changes: replay three past commits (a docs-only one, a note-page one, a contact one) and compare the plan with what was really needed.
 
 ## Acceptance
+Owner's example (2026-10-05): running the whole battery for the footer when it was not touched "desde hace rato" is not worth it. What counts is the content of a check's scope, never the time: if the files a check depends on are byte-identical to what they were when it last passed, it is fresh and is not planned, however many other areas changed since. Concretely: with `Footer.astro` and its dependencies unchanged, no footer-related spec or check is planned even when notes code changed; touching `Footer.astro` plans the specs that render the footer and nothing unrelated. A page-level spec has the sources of everything its page renders in its scope, so it goes stale when any of them changes.
 A docs-only change plans lint only. A change to `ContactForm.tsx` plans the contact spec and the contact unit tests, no notes specs and no Lighthouse unless page bytes changed. A change to `global.css` is wide. The planner never schedules less than the manual impact map in `docs/TESTING.md` for the replayed commits.
 
 ## Progress
