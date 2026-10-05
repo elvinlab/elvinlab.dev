@@ -5,29 +5,32 @@
  * navbar always offers the switch) and never redirects: crawlers must reach every locale. It stays
  * in document flow after the site chrome so it never covers reading content or keyboard focus.
  */
-import { localizePath, switchLocale } from '@elvinlab/core';
-
 import { LOCALES, type Locale, t } from '@/shared/i18n/index.ts';
-import { isSingleLocaleRoute } from '@/shared/layout/nav.ts';
+import { resolveLocaleTarget } from '@/shared/layout/locale-target.ts';
 
 type Props = { locale: Locale; translations?: Record<string, string> | undefined };
 
 const { locale, translations } = Astro.props;
-// The notes index is Spanish-only; note translations are optional, so suggest the other locale's home.
-const routePath = switchLocale(Astro.url.pathname, LOCALES.defaultLocale, LOCALES);
+// Notes are Spanish-only unless translated: without a translation the link goes to the other home.
 const alternates = LOCALES.locales
   .filter((other) => other !== locale)
-  .map((other) => ({
-    locale: other,
-    href:
-      translations?.[other] ??
-      (isSingleLocaleRoute(routePath)
-        ? localizePath('/', other, LOCALES)
-        : switchLocale(Astro.url.pathname, other, LOCALES)),
-    text: t(other, 'language.hint'),
-    action: t(other, 'language.hint.action'),
-    dismiss: t(other, 'language.hint.dismiss'),
-  }));
+  .map((other) => {
+    const { href, kind } = resolveLocaleTarget({
+      pathname: Astro.url.pathname,
+      current: locale,
+      target: other,
+      translations,
+      locales: LOCALES,
+    });
+    const home = kind === 'home-fallback';
+    return {
+      locale: other,
+      href,
+      text: t(other, home ? 'language.hint.home' : 'language.hint'),
+      action: t(other, home ? 'language.hint.home.action' : 'language.hint.action'),
+      dismiss: t(other, 'language.hint.dismiss'),
+    };
+  });
 ---
 
 {

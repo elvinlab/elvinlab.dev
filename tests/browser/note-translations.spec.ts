@@ -39,6 +39,14 @@ test.describe('a note and its translation', () => {
     await expect(page.locator('header a[lang="es"]')).toHaveAttribute('href', '/notes/smoke-es/');
   });
 
+  test('keep the normal switch label, without announcing a home page', async ({ page }) => {
+    await page.goto('/notes/smoke-es/');
+    await expect(page.locator('header a[lang="en"]')).toHaveAttribute(
+      'aria-label',
+      'Read in English',
+    );
+  });
+
   test('are also what the language suggestion links to', async ({ page }) => {
     await page.addInitScript(() => {
       Object.defineProperty(navigator, 'languages', { configurable: true, get: () => ['en'] });
@@ -55,6 +63,8 @@ test.describe('a note without a translation', () => {
   test('has no hreflang alternates and its switch goes to the other home', async ({ page }) => {
     await page.goto('/notes/smoke-es-next/');
     expect(await alternates(page)).toEqual([]);
-    await expect(page.locator('header a[lang="en"]')).toHaveAttribute('href', '/en/');
+    const link = page.locator('header a[lang="en"]');
+    await expect(link).toHaveAttribute('href', '/en/');
+    await expect(link).toHaveAttribute('aria-label', 'Go to the English home page');
   });
 });

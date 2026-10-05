@@ -286,5 +286,11 @@
     "category": "added",
     "title": "LinkedIn next to the contact form, and a spoken \"sending\" state",
     "description": "The contact page now offers LinkedIn right under the form as an alternative, and screen readers hear a status message while a message is being sent. A failed send keeps what you typed."
+  },
+  "language-switch-home-label": {
+    "date": "2026-10-05",
+    "category": "changed",
+    "title": "The language switch says when it goes to the home page",
+    "description": "On a note that has no translation, the language switch and the language hint now say they lead to the home page in the other language instead of implying a translated page."
   }
 }

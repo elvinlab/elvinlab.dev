@@ -96,3 +96,11 @@ Done locally on `develop`, not released. A first delegation to opencode (`omniro
 - RED observed first: vitest 2 failed, e2e 3 failed. GREEN: 649 unit tests, `contact.spec.ts` 12 passed (re-run by the parent), typecheck, lint, depcruise clean, `/contact/` 18.42 KiB gzip of 30.
 - NOT run: full e2e, Lighthouse, white-label (light loop; run once before the release).
 - Left as a follow-up: fields are disabled while sending, so focus is lost after a failed send.
+
+## T35 (#59) language switcher fallback made explicit and shared (2026-10-05)
+Done locally on `develop`, not released, and NOT releasable until the owner approves the wording below (the issue requires it).
+- Changed: new pure helper `shared/layout/locale-target.ts` (`resolveLocaleTarget` returns `{ href, kind }`, kind is `translation`, `equivalent` or `home-fallback`); `Navbar.astro` and `LanguageHint.astro` both use it and the duplicated logic is gone; hrefs are unchanged. On `home-fallback` the switcher `aria-label` and the language hint say they go to the other home page. Changelog entry `language-switch-home-label`.
+- Strings pending owner approval (comment "Owner approval pending" in `shared/i18n/index.ts`, remove it once approved): switch label, written in the destination language like `language.switch`: ES page "Go to the English home page", EN page "Ir a la página de inicio en español"; hint text: ES-page hint "The home page is also available in English", reverse "La página de inicio también está en español"; hint action: "Go to the English home page" and "Ir al inicio en español".
+- RED observed first (2 files, 3 tests failed), then GREEN: 656 unit tests, `note-translations.spec.ts` 6 passed (re-run by the parent), typecheck, lint, depcruise clean, js-budget pass (only the tail was read by the writer).
+- Note: the English hint variant never shows today because the hint only renders on Spanish pages.
+- NOT run: full e2e, Lighthouse, white-label (run once before the release).
