@@ -20,8 +20,8 @@ Local implementation on `develop`: code, tests, docs, changelog. NOT authorized:
 - Config: `features.marks` required boolean like the other flags (so `site.config.ts`, `tests/fixtures/site.config.alt.ts`, `schema.test.ts`, `nav.test.ts`, `sitemap-filter.test.ts` and the generated docs change) plus `marks: z.object({...}).default({})` and a resolved export from `shared/config/index.ts`.
 
 ## Tasks (each closes with a commit; route: delegated direct, one writer at a time)
-- [ ] M1 Config: schema, `site.config.ts` (marks on, animation stamp), white-label fixture (off), tests, `pnpm docs:config`.
-- [ ] M2 Domain and server: ports, rules, bindings, D1 adapter with a real-SQL test (`node:sqlite`), migration, runtime, actions, `MARKS_RATE_LIMITER` in `wrangler.jsonc` (no D1 binding yet).
+- [x] M1 Config: schema, `site.config.ts` (marks on, animation stamp), white-label fixture (off), tests, `pnpm docs:config`.
+- [x] M2 Domain and server: ports, rules, bindings, D1 adapter with a real-SQL test (`node:sqlite`), migration, runtime, actions, `MARKS_RATE_LIMITER` in `wrangler.jsonc` (no D1 binding yet).
 - [ ] M3 UI: store, island, animations, i18n ES/EN, NotePage integration (header and end), e2e with mocked actions (visible without scrolling at 360, 768 and 1280 px, tap, batch, cap, two buttons in sync, reduced motion, axe), js-budget.
 - [ ] M4 Privacy page (ES and EN, conditional on the flag), ADR 0013, `docs/CONFIGURATION*.md` recipe (create D1, binding, migration), `docs/DESIGN.md`, changelog, white-label check.
 - [ ] M5 Closing battery (typecheck, lint, unit, depcruise, docs:config, build, js-budget, white-label, cold start, full e2e, Lighthouse); report; ask for the Cloudflare authorization.
@@ -30,4 +30,7 @@ Local implementation on `develop`: code, tests, docs, changelog. NOT authorized:
 Both buttons visible on the first screen of a note at 360, 768 and 1280 px; a tap animates and increments; batching, cap and fail-closed behavior covered by tests; no IP stored; privacy page truthful; every check green; the owner's D1 step documented.
 
 ## Progress
-Created 2026-10-05 after mapping (explorer): patterns for flags, actions, bindings, privacy, tests and dependency-cruiser read. Nothing implemented yet.
+Created 2026-10-05 after mapping (explorer): patterns for flags, actions, bindings, privacy, tests and dependency-cruiser read.
+- M1 and M2 done by one delegated writer (Claude, brief with the mapped facts), reviewed by the parent (core files read, checks re-run). RED then GREEN per module: schema 14 of 87 tests failed first; four new marks test files failed for missing modules, 45 tests; actions suite failed to load first, 37 pass. The adapter test applies the real `0001_marks.sql` to an in-memory SQLite (`node:sqlite` resolves under Vitest on Node 24). Re-run by the parent: typecheck 0 errors, lint, 37 + 729 unit tests, depcruise clean, docs:config no extra drift.
+- Deviations accepted: the `marks` block uses `.prefault({})` (Zod 4 `.default({})` skips inner defaults); `leaveMarks` takes `ip: string | undefined` and treats a missing IP as invalid; store failures are caught in `actions/index.ts` and become SERVICE_UNAVAILABLE.
+- Known limits recorded: reads go through a POST action, so they are not edge-cacheable (a cached GET route is a possible later optimization); `leave` allows 10 taps per request and 30 requests per minute per IP, so a script can add up to about 300 per minute from one IP (the per-browser cap is client side by design: no IP is stored).

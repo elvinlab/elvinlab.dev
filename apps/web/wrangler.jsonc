@@ -18,8 +18,15 @@
       "name": "CONTACT_RATE_LIMITER",
       "namespace_id": "1001",
       "simple": { "limit": 3, "period": 60 }
+    },
+    {
+      "name": "MARKS_RATE_LIMITER",
+      "namespace_id": "1002",
+      "simple": { "limit": 30, "period": 60 }
     }
   ],
+  // The D1 binding named MARKS_DB (footprints on notes) is added after the database is created;
+  // until then the marks Actions answer SERVICE_UNAVAILABLE and no button renders (docs, task M4).
   "observability": {
     "enabled": true
   }
