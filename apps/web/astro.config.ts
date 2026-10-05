@@ -15,6 +15,7 @@ import { defineConfig } from 'astro/config';
 import expressiveCode from 'astro-expressive-code';
 
 import { CONTACT_POLICY } from './src/features/contact/config.ts';
+import { blogRoutesIntegration } from './src/integrations/blog-routes.ts';
 import { externalLinks } from './src/integrations/external-links.ts';
 import { noindexHeaders } from './src/integrations/noindex-headers.ts';
 import { readNoteDatesFromDisk } from './src/integrations/note-dates.ts';
@@ -72,6 +73,8 @@ export default defineConfig({
           'link.newTab',
         ),
     }),
+    // Notes pages and RSS feed exist only when `features.blog` is on.
+    blogRoutesIntegration(site.features.blog),
     mdx(),
     preact(),
     sitemap({

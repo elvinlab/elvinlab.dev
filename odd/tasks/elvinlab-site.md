@@ -336,3 +336,51 @@ State: `appearance: 'minimal' | 'full'` shipped on `feat/minimal-appearance-pres
 
 ## Status 2026-10-02 (end of day): where to look
 The work after the first launch is tracked in `odd/tasks/plan-mejoras-elvinlab.md` (the owner's improvement plan: issues #58 to #72, the three releases of the day, measurements, the Lighthouse LCP lesson and the next step). Production serves the third release of 2026-10-02; the release method and the changelog audit baseline are in `CLAUDE.md` and `docs/CONFIGURATION.md` section 7. Open owner tasks: #49 Search Console, #50 HSTS (after about a week of stable HTTPS), #66 projects with evidence, #67 and #71 writing.
+
+## Status 2026-10-05: commercial template plan (planning only, nothing implemented)
+- Source: planning interview of 2026-10-03, exported to `~/Downloads/commercial-template-plan.md` (outside the repo) on 2026-10-05; Engram topics `planning/commercial-site-*` (#314 to #343). Decisions are recorded in `docs/PLAN.md` ("Decisiones 2026-10-03: plantilla comercial").
+- Summary: separate private repo consuming a public `@elvinlab/core` as a versioned dependency; fixed layout with browser editing of text, images, posts, colors and section toggles; Cloudflare only; one purchase per site; no mandatory subscription; manual pilot with 3 buyers at a tentative USD 9.99 (ceiling 16 h per client, 48 h total).
+- Evidence: no browser editor exists in this repo (`docs/NOTES.md:21-31`); no CMS is chosen or tested (Decap, Keystatic and Tina were compared from docs only).
+- Proposed phases, none started: (1) prove browser editing end to end here, (2) extract and release core, (3) private template, (4) prove buyer installation, (5) three-buyer pilot.
+- Risk: it can displace the success criterion (3 notes; 2 live) and the pre-launch freeze. Starting phase 1 is the owner's decision.
+- Next step: owner decides if and when to open phase 1. Tracking issue: #77 (T49).
+
+### Correction 2026-10-05: the real requirement is blog-only or portfolio-only by config
+The owner clarified: no split of this site is wanted. A recipient of the repo (another person or a template buyer) must be able to keep only the blog or only the portfolio through config and core, without a rewrite. Feature flags `features.blog`, `features.me`, `features.credentials`, `features.experiments` already exist (`shared/config/schema.ts:248-260`) and are honored in code (`MePage.astro:30-34`, `Home.astro:29`). NOT verified: that the site builds and renders correctly with `blog` off or with `me` off. Next check (not started, owner decides): build two fixtures (blog off, me off) and compare, reusing the white-label test approach. The audit below is only useful if pieces are later moved to core.
+
+### Audit 2026-10-05: what blocks splitting `/me` from the blog (read-only, no build run)
+Spot-checked: `features/me/components/MePage.astro:14,34`, `shared/layout/Navbar.astro:20`, `shared/seo/Seo.astro:41`. `Chip`, `Card`, `SectionHeading`, `SocialIcon` were classified from imports only.
+- Boundaries hold: dependency-cruiser enforces features-via-`index.ts`, `shared/` never imports `features/`, core never imports `apps/`. No cross-feature import bypasses an `index.ts`.
+- Blockers, most critical first: (1) `notes` is imported by `me`, `portfolio`, the layout (`Navbar`), `Seo`, `astro.config` and `rss`; (2) one `site.config.ts` and one Zod schema mix blog, me and recruiter fields (`shared/config/schema.ts:21`); (3) `shared/i18n/index.ts` is one es/en dictionary with `me.*` and `notes.*` keys; (4) `BaseLayout`, `Navbar`, `Footer`, `Seo` read app config and collections, so they cannot move to core as-is; (5) `content.config.ts` and the integrations (`published-notes`, `note-dates`, `og-images`) are app-local; (6) `BackgroundPicker` writes localStorage, so persistence must be injected if it moves to core.
+- Ready or nearly ready for core: `seo/links.ts`, `lib/external-link.ts`, `ui/ThemeToggle` (strings as props), `seo/og.ts`, `robots.ts`, `isIndexable.ts`.
+- Most critical first step (proposed, not started): remove the `notes` dependency from `me`, `portfolio` and the shared layout; `MePage`, `Home`, `Navbar` and `Seo` receive `hasNotes`, `notesHref` and the notes data as props from the page instead of calling `getCollection('notes')`. Frozen until the owner authorizes it (pre-launch freeze and 3-notes criterion).
+
+### Result 2026-10-05: blog-off and me-off fixtures (observed, scratch script outside the repo)
+Method: the repo's `createFixtureWorkspace` with `tests/fixtures/site.config.alt.ts` (neutral identity, `experiments.json` emptied as in the white-label check), flags `blog` and `me` toggled, `astro build`, then page list, links, `noindex`, RSS and sitemap read from `dist/client`. Three variants: base, `blog` off, `me` off. All three builds succeeded.
+- Works: the flags remove the links. With `blog` off the home no longer links to notes; with `me` off it no longer links to `/me/`.
+- `me` off is clean enough: `/me/` and `/en/me/` are still emitted but carry `noindex` and are out of the sitemap (`MePage.astro:49`).
+- `blog` off is NOT really off: `/notes/`, the note pages and `/en/notes/...` are still built, still indexable (no `noindex`), still in the sitemap (6 of 17 entries are notes or me pages), and `rss.xml` is still generated. A portfolio-only site would still publish a blog.
+- Baseline noise, same in all three variants, not caused by the flags: links to `/experiments/` and `/en/404/` have no built page (the fixture empties `experiments.json`).
+- Not tested: home content with `blog` off beyond links, the `home.*` flags, `credentials`/`experiments` off, a runtime check on workerd, and the real production config.
+- Next (not started, owner decides): make `blog: false` skip the notes routes, RSS and sitemap entries, and add a fixture test for both variants.
+
+### Done 2026-10-05: `blog: false` now really turns the blog off
+Tracker: `odd/tasks/blog-feature-flag.md`. Routes moved to `apps/web/src/blog-routes/` and injected by `integrations/blog-routes.ts` only when the flag is on; sitemap filter also hides notes URLs. Verified: production-config build file list (49 files) and sitemap (16 URLs) identical before and after; blog-off fixture has 13 pages, no notes routes, no `rss.xml`, no notes in the sitemap; me-off unchanged; typecheck, lint, depcruise clean, 10 focused tests green. Not run: full unit, e2e, Lighthouse, js-budget. Not pushed.
+
+### Result 2026-10-05: credentials-off and experiments-off fixtures (observed, scratch script outside the repo)
+Same method as the blog-off run, but with this site's real `experiments.json` (not emptied). Variants: base, `credentials` off, `experiments` off. All three build.
+- `credentials: false` works: `/me/` no longer renders certificates; nothing else changes.
+- `experiments: false` works: the nav and home links to `/experiments/` and the experiments block on `/me/` disappear (broken internal links 18 to 1).
+- Finding: with `experiments: true` the nav, home and `/me/` link to `/experiments/`, but no `/experiments/` page is built in any variant (no route in `src/pages`; the projects routes are issue #64, T40, still open). Today only `experiments: false` is safe. This site already has it off. The `docs/CONFIGURATION` row says "Experiments section and pages", which is ahead of the code.
+- Baseline noise in every variant: `/404.html` links to `/en/404/`, which is not built.
+- Not tested: `home.*` flags, workerd runtime, the real production config.
+
+### Result 2026-10-05: `home.*` flags fixtures (observed, scratch script outside the repo)
+Same fixture method, `appearance: 'full'` with a `now` block injected, home HTML read for one string that only each section renders. 10 builds, all succeeded.
+- All seven flags (`heroPills`, `authorCard`, `hiringCard`, `now`, `pillars`, `notebookIndex`, `experiments`) are present when on and absent when set to `false`, one at a time, with every other section untouched.
+- `appearance: 'minimal'` with no `home` keys hides `heroPills` and `pillars` only; `minimal` plus `home.heroPills: true` shows the pills again (a set key wins over the preset), as documented.
+- Method note: a first marker for `experiments` matched the nav label and looked like a failure; a section-only marker fixed it. `home.experiments` also needs `features.experiments` by design (`resolveHome`), so the home never links to missing pages.
+- Not tested: workerd runtime, the real production config, `/me/` reacting to the preset.
+
+### Fix 2026-10-05: animated background broke on browser Back (bfcache)
+Owner report on production: `/me`, click "Contacto", press Back, the banner shows blank with a broken-canvas icon (console in Firefox: "WebGL context was lost"). Cause (read from code, consistent with the log, not reproduced in a browser): `pagehide` ran the full dispose, including `loseContext()`, also when the page entered the back/forward cache (`persisted`), and nothing re-ran the effect on restore. Fix: `lib/page-lifecycle.ts` (pure, tested first: RED then GREEN) pauses on a persisted `pagehide`, disposes on a real one, resumes on a persisted `pageshow`; `BackgroundCanvas.astro` also calls `preventDefault()` on `webglcontextlost`, keeps the canvas hidden while lost and re-runs on `webglcontextrestored`. Checks: 15 background unit tests, typecheck, lint, depcruise, build, js-budget (`/me` 7.39 KiB of 30), `background.spec.ts` 11 passed. NOT verified: the real bfcache restore in Chrome and Firefox (headless Playwright cannot reproduce it): the owner must try `/me`, Contacto, Back after the next release. Production (`main`) still has the bug until then.

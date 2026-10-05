@@ -268,5 +268,17 @@
     "category": "changed",
     "title": "Links to other sites open in a new tab",
     "description": "Links that leave the site open in a new tab so you do not lose your place in the blog; links inside the site stay in the same tab."
+  },
+  "blog-feature-flag": {
+    "date": "2026-10-05",
+    "category": "changed",
+    "title": "Turning the blog off now removes it",
+    "description": "With `features.blog` off, the notes pages, the RSS feed and the notes entries in the sitemap are no longer built, so a fork can keep only the portfolio. This site keeps the blog on and its output is unchanged."
+  },
+  "background-back-button": {
+    "date": "2026-10-05",
+    "category": "fixed",
+    "title": "The animated background survives the Back button",
+    "description": "Going to another page and pressing Back no longer leaves a blank banner with a broken-image icon: the background pauses instead of being destroyed and starts again when the page comes back."
   }
 }

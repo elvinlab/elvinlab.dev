@@ -48,4 +48,16 @@ describe('isHiddenFromSitemap', () => {
     expect(isHiddenFromSitemap('/contact/', features)).toBe(false);
     expect(isHiddenFromSitemap('/', features)).toBe(false);
   });
+
+  it('hides the notes index, note pages and English note pages when blog is off', () => {
+    const features = { ...allOn, blog: false };
+    expect(isHiddenFromSitemap('/notes/', features)).toBe(true);
+    expect(isHiddenFromSitemap('/notes/x/', features)).toBe(true);
+    expect(isHiddenFromSitemap('/en/notes/x/', features)).toBe(true);
+  });
+
+  it('keeps notes URLs when blog is on', () => {
+    expect(isHiddenFromSitemap('/notes/x/', allOn)).toBe(false);
+    expect(isHiddenFromSitemap('/en/notes/x/', allOn)).toBe(false);
+  });
 });
