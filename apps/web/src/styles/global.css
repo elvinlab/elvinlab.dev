@@ -71,6 +71,12 @@
   }
 }
 
+/* The header is sticky (72 px): without this offset, moving focus up the page or following an anchor
+   scrolls the target under it. Matches the 6rem of `.prose h2`. */
+html {
+  scroll-padding-top: 6rem;
+}
+
 /* Article body (design v3): 68ch measure, generous line height, dashed dividers, pink quote bar. */
 .prose {
   max-width: 68ch;

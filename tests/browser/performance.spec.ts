@@ -80,6 +80,24 @@ test('the /me profile photo is optimized and sized', async ({ page }) => {
   expect(Number(await avatar.getAttribute('height'))).toBeGreaterThan(0);
 });
 
+/** The portrait is the LCP element of /me: the slot is 160 to 232 CSS px, so 2x of the widest slot is plenty. */
+const ME_PORTRAIT_MAX_WIDTH = 480;
+const ME_PORTRAIT_MAX_BYTES = 60_000;
+
+test('the /me portrait is not larger than its slot needs and is prioritized', async ({ page }) => {
+  await page.goto('/me/');
+  const portrait = page.locator('img[alt="Elvin González"]');
+  await expect(portrait).toBeVisible();
+
+  expect(Number(await portrait.getAttribute('width'))).toBeLessThanOrEqual(ME_PORTRAIT_MAX_WIDTH);
+  await expect(portrait).toHaveAttribute('fetchpriority', 'high');
+
+  const src = await portrait.evaluate((img: HTMLImageElement) => img.currentSrc);
+  const response = await page.request.get(src);
+  expect(response.status()).toBe(200);
+  expect((await response.body()).byteLength).toBeLessThan(ME_PORTRAIT_MAX_BYTES);
+});
+
 test.describe('prefetch', () => {
   const prefetchLinks = (page: import('@playwright/test').Page) =>
     page.locator('head link[rel="prefetch"]');

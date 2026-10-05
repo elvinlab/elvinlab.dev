@@ -54,6 +54,9 @@ which the deploy job requires.
 
 ### The note-page LCP gate is sensitive to a few bytes
 
+> **Correction and fix (2026-10-05).** The sizes in this section (about 98 KB of HTML and 52 KB of inline CSS, later 94 KB and 48 KB) are from `wc -c` on the **real** build (`apps/web/dist`). The Lighthouse gate did not measure that page: its fixture (`fixture-preview.ts`, built through `createFixtureWorkspace`) inlined the layout stylesheet **twice** because the workspace did not copy the root `.gitignore` (the gate's own report showed a 126,930 byte note document against about 94 KB in production, and 14 `@font-face` rules against 7). `createFixtureWorkspace` now copies `.gitignore` (test in `fixture-workspace.test.ts`). Re-measured with `pnpm test:lighthouse` after the fix, worst of three runs: `/notes/smoke-es/` document 123.5 to 80.6 KB and LCP 2414 to **2264 ms** (margin to the 2500 ms budget about 86 to about 236 ms); `/` 2368 to 2216 ms; `/contact/` 2259 to 1810 ms; performance score 97 to 99 on all six URLs. The LCP numbers and byte boundaries in the table and the headroom paragraph below were measured on the doubled fixture, so they are **outdated**: the one-round-trip boundary now sits at different byte counts and has to be re-measured before relying on "a few hundred bytes". Why a missing `.gitignore` doubles the sheet is not traced (the build tooling reads it); the cause was found by changing one file of the workspace at a time.
+
+
 Lighthouse measures a fixture served by `astro preview`, which does **not** compress responses, under
 simulated slow 4G (about 1.6 Mbps, 150 ms round trip). The note page is about 98 KB of HTML, of which
 about 52 KB is inline CSS (the whole site stylesheet is inlined in every page), and it sits right at a

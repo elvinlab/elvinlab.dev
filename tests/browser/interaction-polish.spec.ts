@@ -164,9 +164,12 @@ for (const { path, intro } of [
     await page.goto(path);
     const article = page.locator('main article');
     await expect(article.getByText(intro)).toHaveCount(1);
-    // Header subtitle and the old second paragraph are one sentence now: only h1, the intro and
-    // the form (plus the noscript fallback, which is not rendered with scripts on) remain.
-    await expect(article.locator(':scope > p, :scope > header > p')).toHaveCount(1);
+    // Header subtitle and the old second paragraph are one sentence now: one intro in the header.
+    await expect(article.locator(':scope > header > p')).toHaveCount(1);
+    // The only other direct paragraph is the LinkedIn alternative under the form (the noscript
+    // fallback is not rendered with scripts on).
+    await expect(article.locator(':scope > p')).toHaveCount(1);
+    await expect(article.locator(':scope > p a[href*="linkedin.com"]')).toHaveCount(1);
   });
 }
 

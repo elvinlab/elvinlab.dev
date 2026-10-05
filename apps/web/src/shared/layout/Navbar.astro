@@ -9,7 +9,8 @@ import { localizePath, switchLocale } from '@elvinlab/core';
 
 import { site } from '@/shared/config/index.ts';
 import { LOCALES, type Locale, t } from '@/shared/i18n/index.ts';
-import { isCurrent, isSingleLocaleRoute, navItems } from '@/shared/layout/nav.ts';
+import { resolveLocaleTarget } from '@/shared/layout/locale-target.ts';
+import { isCurrent, navItems } from '@/shared/layout/nav.ts';
 import { hasPublishedNotes } from '@/shared/lib/notes-helpers.ts';
 import BackgroundPicker from '@/shared/ui/BackgroundPicker.astro';
 import ThemeToggle from '@/shared/ui/ThemeToggle.astro';
@@ -28,13 +29,15 @@ const items = navItems(site.features, locale, hasPublishedNotes(notes)).map((ite
   hreflang: item.hreflang,
 }));
 const otherLocale: Locale = locale === 'es' ? 'en' : 'es';
-// Notes exist in Spanish only: the switcher goes to the other locale's home, never to a missing URL.
-// A note that has a translation switches to it; other notes go to the other locale's home.
-const otherHref =
-  translations?.[otherLocale] ??
-  (isSingleLocaleRoute(routePath)
-    ? localizePath('/', otherLocale, LOCALES)
-    : switchLocale(Astro.url.pathname, otherLocale, LOCALES));
+// Notes exist in Spanish only: without a translation the switch lands on the other locale's home.
+const { href: otherHref, kind: otherKind } = resolveLocaleTarget({
+  pathname: Astro.url.pathname,
+  current: locale,
+  target: otherLocale,
+  translations,
+  locales: LOCALES,
+});
+const switchLabel = t(locale, otherKind === 'home-fallback' ? 'language.switch.home' : 'language.switch');
 const linkClass =
   'flex h-11 items-center rounded-control px-3 font-medium transition-colors duration-150 hover:bg-card-hover aria-[current=page]:text-primary';
 ---
@@ -59,7 +62,7 @@ const linkClass =
       hreflang={otherLocale}
       lang={otherLocale}
       class="grid h-11 min-w-11 shrink-0 place-items-center rounded-control px-2 font-mono text-sm uppercase transition-colors duration-150 hover:bg-card-hover"
-      aria-label={t(locale, 'language.switch')}
+      aria-label={switchLabel}
     >
       {otherLocale}
     </a>

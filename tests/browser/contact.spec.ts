@@ -26,6 +26,8 @@ const COPY = {
     required: ['Escribe tu nombre.', 'Escribe tu correo.', 'Escribe un mensaje.'],
     invalidEmail: 'Revisa el formato del correo.',
     unavailable: 'El formulario no está disponible por ahora. Inténtalo más tarde.',
+    linkedin: 'Búscame allí.',
+    placeholder: 'nombre@ejemplo.com',
   },
   en: {
     path: '/en/contact/',
@@ -36,6 +38,8 @@ const COPY = {
     required: ['Enter your name.', 'Enter your email.', 'Write a message.'],
     invalidEmail: 'Check the email format.',
     unavailable: 'The form is not available right now. Please try again later.',
+    linkedin: 'Find me there.',
+    placeholder: 'name@example.com',
   },
 } as const;
 
@@ -62,6 +66,9 @@ async function fillValid(page: Page, copy: Copy): Promise<void> {
   await page.getByLabel(copy.message).fill('Hello world');
 }
 
+const LINKEDIN_URL = 'https://www.linkedin.com/in/elvinlab';
+const EMAIL_PATTERN = /[\w.+-]+@[\w-]+\.[\w.-]+/g;
+
 const isContactAction = (url: string, method: string): boolean =>
   url.includes('/_actions/contact/') && method === 'POST';
 
@@ -80,6 +87,26 @@ for (const [locale, copy] of Object.entries(COPY)) {
         await expect(page.getByLabel(label)).toHaveAttribute('aria-invalid', 'true');
       }
       await expect(page.getByLabel(copy.name)).toBeFocused();
+    });
+
+    test('shows the LinkedIn link, opening in a new tab with the shared hint', async ({ page }) => {
+      await page.goto(copy.path);
+      const aside = page.locator('article').getByText(copy.linkedin);
+      await expect(aside).toBeVisible();
+      const link = page.locator('article').getByRole('link', { name: /LinkedIn/ });
+      await expect(link).toBeVisible();
+      await expect(link).toHaveAttribute('href', LINKEDIN_URL);
+      await expect(link).toHaveAttribute('target', '_blank');
+      await expect(link).toHaveAttribute('rel', /noopener/);
+      await expect(link.locator('.sr-only')).toHaveCount(1);
+    });
+
+    test('the page exposes no email address or mailto link', async ({ page }) => {
+      await page.goto(copy.path);
+      const html = await page.content();
+      expect(html).not.toContain('mailto:');
+      const found = (html.match(EMAIL_PATTERN) ?? []).filter((m) => m !== copy.placeholder);
+      expect(found).toEqual([]);
     });
 
     test('invalid email is rejected before sending', async ({ page }) => {
@@ -144,4 +171,42 @@ test('the honeypot is hidden from assistive technology and skipped by the keyboa
   const honeypot = page.locator('input[name="website"]');
   await expect(honeypot).toHaveAttribute('tabindex', '-1');
   await expect(honeypot.locator('xpath=ancestor::*[@aria-hidden="true"][1]')).toBeAttached();
+});
+
+test('a failed send keeps the typed text, announces sending then the error and returns focus to the submit button', async ({
+  page,
+}) => {
+  test.setTimeout(30_000);
+  const copy = COPY.es;
+  await page.route(
+    (url) => url.pathname.includes('/_actions/contact/'),
+    async (route) => {
+      await new Promise((resolve) => setTimeout(resolve, 600));
+      await route.fulfill({
+        status: 503,
+        contentType: 'application/json',
+        body: JSON.stringify({ type: 'AstroActionError', code: 'SERVICE_UNAVAILABLE' }),
+      });
+    },
+  );
+  await openForm(page, copy);
+  await fillValid(page, copy);
+  await page.getByRole('button', { name: copy.submit }).click();
+
+  await expect(page.getByRole('button', { name: 'Enviando…' })).toHaveAttribute(
+    'aria-busy',
+    'true',
+  );
+  await expect(page.getByRole('status').filter({ hasText: 'Enviando…' })).toBeAttached();
+  await expect(page.getByRole('alert').filter({ hasText: copy.unavailable })).toBeVisible();
+
+  await expect(page.getByLabel(copy.name)).toHaveValue('Test User');
+  await expect(page.getByLabel(copy.email)).toHaveValue('test@example.com');
+  await expect(page.getByLabel(copy.message)).toHaveValue('Hello world');
+  await expect(page.getByRole('button', { name: copy.submit })).toHaveAttribute(
+    'aria-busy',
+    'false',
+  );
+  // The button and fields were disabled while sending, which drops focus to the page: it comes back.
+  await expect(page.getByRole('button', { name: copy.submit })).toBeFocused();
 });

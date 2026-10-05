@@ -39,24 +39,9 @@ const turnstileLoader = createTurnstileLoader({
   getApi: () => (window as Window & { turnstile?: TurnstileApi }).turnstile,
 });
 
-function Field({
-  id,
-  label,
-  type = 'text',
-  value,
-  onInput,
-  placeholder,
-  maxLength,
-  autoComplete,
-  error,
-  errorMessages,
-  disabled,
-  rows,
-  as = 'input',
-}: {
+type FieldBaseProps = {
   id: string;
   label: string;
-  type?: string;
   value: string;
   onInput: (value: string) => void;
   placeholder: string;
@@ -65,37 +50,47 @@ function Field({
   error: string | undefined;
   errorMessages: Record<string, string>;
   disabled: boolean;
-  rows?: number;
-  as?: 'input' | 'textarea';
-}) {
-  const isTextarea = as === 'textarea';
-  const Tag = isTextarea ? 'textarea' : 'input';
+};
+
+/** A one-line text input or a multi-line textarea; the two never share a polymorphic tag. */
+type FieldProps =
+  | (FieldBaseProps & { as?: 'input'; type?: 'text' | 'email' })
+  | (FieldBaseProps & { as: 'textarea'; rows: number });
+
+function Field(props: FieldProps) {
+  const { id, label, value, onInput, placeholder, maxLength, autoComplete, error, errorMessages } =
+    props;
   const className = `w-full rounded-control border bg-card px-3 py-2 text-text placeholder:text-muted ${
-    isTextarea ? 'min-h-[120px] resize-y' : 'h-11'
+    props.as === 'textarea' ? 'min-h-[120px] resize-y' : 'h-11'
   } ${error ? 'border-danger' : 'border-divider'}`;
+  const common = {
+    id,
+    name: id,
+    value,
+    placeholder,
+    maxLength,
+    autoComplete,
+    class: className,
+    'aria-invalid': error ? ('true' as const) : ('false' as const),
+    disabled: props.disabled,
+    // Spread only when there is an error: optional attributes must be absent, not `undefined`.
+    ...(error ? { 'aria-describedby': `${id}-error` } : {}),
+    onInput: (e: Event) =>
+      onInput((e.currentTarget as HTMLInputElement | HTMLTextAreaElement).value),
+  };
 
   return (
     <div>
       <label htmlFor={id} class="block text-sm font-medium text-text mb-1">
         {label}
       </label>
-      <Tag
-        id={id}
-        type={isTextarea ? undefined : type}
-        name={id}
-        value={value}
-        onInput={(e: Event) =>
-          onInput((e.currentTarget as HTMLInputElement | HTMLTextAreaElement).value)
-        }
-        placeholder={placeholder}
-        maxLength={maxLength}
-        autoComplete={autoComplete}
-        class={className}
-        aria-invalid={error ? 'true' : 'false'}
-        aria-describedby={error ? `${id}-error` : undefined}
-        disabled={disabled}
-        rows={rows}
-      />
+      {props.as === 'textarea' ? (
+        <textarea {...common} rows={props.rows} />
+      ) : props.type === 'email' ? (
+        <input {...common} type="email" />
+      ) : (
+        <input {...common} type="text" />
+      )}
       {error && (
         <p id={`${id}-error`} class="mt-1 text-sm text-danger" role="alert">
           {errorMessages[error]}
@@ -120,6 +115,7 @@ export function ContactForm({ siteKey, strings }: Props) {
   const startedAtRef = useRef<number>(Date.now());
   const widgetContainerRef = useRef<HTMLDivElement>(null);
   const formRef = useRef<HTMLFormElement>(null);
+  const submitRef = useRef<HTMLButtonElement>(null);
   const loaderInitialized = useRef(false);
 
   useEffect(() => {
@@ -256,6 +252,14 @@ export function ContactForm({ siteKey, strings }: Props) {
   const isError = state.status === 'error';
   const disabled = isSubmitting || !siteKey || turnstileLoadError || !ready;
 
+  // The button and the fields are disabled while sending, so the browser drops focus to the page.
+  // When the send fails, give it back to the submit button (unless the visitor already moved it).
+  useEffect(() => {
+    if (!isError) return;
+    const active = document.activeElement;
+    if (!active || active === document.body) submitRef.current?.focus();
+  }, [isError]);
+
   if (state.status === 'success') {
     return (
       <div role="status" class="space-y-2 text-center">
@@ -339,6 +343,12 @@ export function ContactForm({ siteKey, strings }: Props) {
         </p>
       )}
 
+      {isSubmitting && (
+        <p class="sr-only" role="status" aria-live="polite">
+          {strings.sending}
+        </p>
+      )}
+
       {isError && (
         <div
           class="rounded-control bg-danger/10 border border-danger/20 p-3 text-sm text-danger"
@@ -349,6 +359,7 @@ export function ContactForm({ siteKey, strings }: Props) {
       )}
 
       <button
+        ref={submitRef}
         type="submit"
         disabled={disabled}
         class={`w-full h-11 rounded-control bg-button text-white font-medium ${

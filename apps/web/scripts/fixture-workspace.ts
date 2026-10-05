@@ -83,6 +83,9 @@ export function createFixtureWorkspace(source: string, fixtures: string) {
   const cleanup = (): void => rmSync(root, { recursive: true, force: true });
   try {
     for (const path of [
+      // Without the root `.gitignore` the build inlines the site stylesheet twice (the fixture home
+      // grew from 75 KB to 119 KB of HTML and the Lighthouse gate measured a page production never serves).
+      '.gitignore',
       'package.json',
       'tsconfig.base.json',
       'apps/web/package.json',

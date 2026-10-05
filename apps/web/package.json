@@ -15,8 +15,8 @@
     "@tailwindcss/vite": "4.3.3",
     "astro": "7.3.5",
     "astro-expressive-code": "0.44.2",
-    "preact": "10.29.8",
-    "sharp": "0.35.4",
+    "preact": "11.0.0",
+    "sharp": "0.35.5",
     "tailwindcss": "4.3.3",
     "zod": "4.6.5"
   },
@@ -34,7 +34,7 @@
     "@fontsource/jetbrains-mono": "5.3.0",
     "@types/node": "24.19.0",
     "satori": "0.33.5",
-    "vitest": "5.0.2",
-    "wrangler": "4.141.0"
+    "vitest": "5.0.3",
+    "wrangler": "4.146.0"
   }
 }

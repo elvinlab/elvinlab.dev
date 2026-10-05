@@ -280,5 +280,53 @@
     "category": "fixed",
     "title": "The animated background survives the Back button",
     "description": "Going to another page and pressing Back no longer leaves a blank banner with a broken-image icon: the background pauses instead of being destroyed and starts again when the page comes back."
+  },
+  "contact-linkedin-and-sending": {
+    "date": "2026-10-05",
+    "category": "added",
+    "title": "LinkedIn next to the contact form, and a spoken \"sending\" state",
+    "description": "The contact page now offers LinkedIn right under the form as an alternative, and screen readers hear a status message while a message is being sent. A failed send keeps what you typed."
+  },
+  "language-switch-home-label": {
+    "date": "2026-10-05",
+    "category": "changed",
+    "title": "The language switch says when it goes to the home page",
+    "description": "On a note that has no translation, the language switch and the language hint now say they lead to the home page in the other language instead of implying a translated page."
+  },
+  "me-portrait-size": {
+    "date": "2026-10-05",
+    "category": "changed",
+    "title": "The /me portrait loads about 20 times lighter",
+    "description": "The portrait on /me was a 231 KB image shown in a slot a few hundred pixels wide. It is now resized to what the slot needs (about 12 KB on a phone) and loaded with high priority, which in a simulated slow-phone test brought the largest paint of the page from about 2.5 s to about 1.4 s."
+  },
+  "focus-not-hidden-by-header": {
+    "date": "2026-10-05",
+    "category": "fixed",
+    "title": "Keyboard focus no longer hides under the fixed header",
+    "description": "Moving focus up the page with Shift+Tab, or following an in-page link, no longer leaves the focused link or field covered by the sticky header."
+  },
+  "contact-focus-after-error": {
+    "date": "2026-10-05",
+    "category": "fixed",
+    "title": "The contact form keeps keyboard focus after a failed send",
+    "description": "When sending a message fails, focus returns to the send button instead of being lost, so keyboard and screen reader users can retry right away without tabbing from the top of the page."
+  },
+  "favicon-ico": {
+    "date": "2026-10-05",
+    "category": "fixed",
+    "title": "/favicon.ico no longer answers 404",
+    "description": "Browsers, crawlers and link previews ask for /favicon.ico by default. The site now serves a small real icon there (5 KB) next to the SVG one, so those requests succeed. Forks should replace both files."
+  },
+  "lighthouse-fixture-fix": {
+    "date": "2026-10-05",
+    "category": "fixed",
+    "title": "The performance gate measures the page production serves",
+    "description": "The test build used by the Lighthouse gate was inlining the site stylesheet twice, so it measured a page about 43 KB heavier than the real one. It now matches the real build, and the gate's slowest simulated paint on the note page improved from about 2.4 s to 2.3 s with a wider margin to the budget."
+  },
+  "preact-11": {
+    "date": "2026-10-05",
+    "category": "changed",
+    "title": "Preact 11 and routine tooling updates",
+    "description": "The interactive parts of the site now run on Preact 11 (the contact form field was rewritten to satisfy its stricter input types, with no visible change), and the build tools (sharp, vitest, wrangler, Biome, dependency-cruiser) and the CI mise action were updated. Forks should expect the same."
   }
 }

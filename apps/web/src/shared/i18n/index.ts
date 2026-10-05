@@ -19,6 +19,10 @@ export const t = createTranslator({
       'language.hint': 'También disponible en español',
       'language.hint.action': 'Ver en español',
       'language.hint.dismiss': 'Cerrar',
+      // Shown when the page has no translation and the link goes to the other home; the switch label is written in the target language.
+      'language.switch.home': 'Go to the English home page',
+      'language.hint.home': 'La página de inicio también está en español',
+      'language.hint.home.action': 'Ir al inicio en español',
       'theme.switch': 'Cambiar tema',
       'background.switch': 'Cambiar fondo',
       'skip.content': 'Saltar al contenido',
@@ -149,6 +153,10 @@ export const t = createTranslator({
       'language.hint': 'Also available in English',
       'language.hint.action': 'Read in English',
       'language.hint.dismiss': 'Dismiss',
+      // Shown when the page has no translation and the link goes to the other home; the switch label is written in the target language.
+      'language.switch.home': 'Ir a la página de inicio en español',
+      'language.hint.home': 'The home page is also available in English',
+      'language.hint.home.action': 'Go to the English home page',
       'theme.switch': 'Switch theme',
       'background.switch': 'Change background',
       'skip.content': 'Skip to content',

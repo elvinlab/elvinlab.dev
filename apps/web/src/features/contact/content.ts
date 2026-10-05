@@ -4,6 +4,7 @@ export type ContactContent = {
   pageTitle: string;
   pageDescription: string;
   noscript: string;
+  linkedin: string;
   form: ContactFormStrings;
 };
 
@@ -13,6 +14,7 @@ export function buildContactContent(): Record<'es' | 'en', ContactContent> {
       pageTitle: 'Contacto',
       pageDescription: '¿Una idea, una oferta o una pregunta? Escríbeme y te respondo por correo.',
       noscript: 'Este formulario necesita JavaScript para funcionar.',
+      linkedin: '¿Prefieres LinkedIn? Búscame allí.',
       form: {
         labels: {
           name: 'Nombre',
@@ -62,6 +64,7 @@ export function buildContactContent(): Record<'es' | 'en', ContactContent> {
       pageTitle: 'Contact',
       pageDescription: "An idea, an offer or a question? Write to me and I'll reply by email.",
       noscript: 'This form needs JavaScript to work.',
+      linkedin: 'Prefer LinkedIn? Find me there.',
       form: {
         labels: {
           name: 'Name',
