@@ -322,5 +322,11 @@
     "category": "fixed",
     "title": "The performance gate measures the page production serves",
     "description": "The test build used by the Lighthouse gate was inlining the site stylesheet twice, so it measured a page about 43 KB heavier than the real one. It now matches the real build, and the gate's slowest simulated paint on the note page improved from about 2.4 s to 2.3 s with a wider margin to the budget."
+  },
+  "preact-11": {
+    "date": "2026-10-05",
+    "category": "changed",
+    "title": "Preact 11 and routine tooling updates",
+    "description": "The interactive parts of the site now run on Preact 11 (the contact form field was rewritten to satisfy its stricter input types, with no visible change), and the build tools (sharp, vitest, wrangler, Biome, dependency-cruiser) and the CI mise action were updated. Forks should expect the same."
   }
 }
