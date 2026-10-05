@@ -25,6 +25,16 @@ for (const { path, slug, title, locale } of NOTES) {
       await expect(meta(page, 'property', 'article:tag')).toHaveAttribute('content', 'testing');
       await expect(meta(page, 'property', 'og:locale')).toHaveAttribute('content', locale);
 
+      // Link previews cut long titles (about 70 characters on LinkedIn and X), so the preview title is
+      // the note title alone: the domain is already `og:site_name` and is drawn on the card. The
+      // browser tab keeps the suffix.
+      await expect(meta(page, 'property', 'og:title')).toHaveAttribute('content', title);
+      await expect(meta(page, 'property', 'og:site_name')).toHaveAttribute(
+        'content',
+        'elvinlab.dev',
+      );
+      await expect(page).toHaveTitle(`${title} — elvinlab.dev`);
+
       const image = `https://elvinlab.dev/og/notes/${slug}.png`;
       await expect(meta(page, 'property', 'og:image')).toHaveAttribute('content', image);
       await expect(meta(page, 'name', 'twitter:image')).toHaveAttribute('content', image);
