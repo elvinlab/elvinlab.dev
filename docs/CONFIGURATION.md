@@ -410,6 +410,26 @@ Los textos de la interfaz están en `apps/web/src/shared/i18n/index.ts`. Añadir
 - JavaScript por página (30 KiB gzip): `apps/web/scripts/performance-budget.ts`.
 - Un presupuesto no se sube para «hacer pasar» un cambio: se arregla el cambio.
 
+### 6.13 Huellas en las notas (`marks`)
+
+Un botón anónimo de «estuve aquí» en cada nota (cabecera y final del artículo), con un contador por nota en Cloudflare D1. Los ajustes están en `site.config.ts`: `features.marks` (encendido o apagado) y el bloque `marks` (`animation`: `stamp`, `burst`, `pulse` o `none`; `maxPerVisitor`; `showCountFrom`; la tabla generada de la sección 3 lista los valores por defecto). Toda animación se detiene con `prefers-reduced-motion`. Registro de la decisión: [ADR 0013](adr/0013-footprints-on-notes-d1.md).
+
+**Mientras la base de datos no exista, los botones no aparecen** (las Actions responden «no disponible» y la página no pinta nada): encender el flag sin los pasos de abajo es seguro, solo no muestra nada. Estos pasos se hacen en **tu cuenta de Cloudflare**:
+
+1. Creá la base (necesita `wrangler login`): `cd apps/web && mise exec -- pnpm exec wrangler d1 create elvinlab-marks`. Imprime un `database_id`.
+2. Agregá el binding en `apps/web/wrangler.jsonc`:
+   ```jsonc
+   "d1_databases": [
+     { "binding": "MARKS_DB", "database_name": "elvinlab-marks", "database_id": "<el id del paso 1>", "migrations_dir": "migrations" }
+   ]
+   ```
+   (`MARKS_RATE_LIMITER`, el límite por IP, ya está declarado en `ratelimits`.)
+3. Creá la tabla en la base real: `mise exec -- pnpm exec wrangler d1 migrations apply elvinlab-marks --remote` (la migración es `apps/web/migrations/0001_marks.sql`).
+4. Liberá como siempre (sección 7). Si el deploy falla con un error de autorización, puede que el token de API del entorno `production` de GitHub no tenga permiso para desplegar un Worker con un binding D1: agregale el permiso de edición de D1. *Esto no se verificó.*
+5. Comprobalo: abrí una nota, pulsá el botón y recargá (el contador se mantiene), o `curl -s -X POST https://TU-DOMINIO/_actions/marks.get/ -H 'content-type: application/json' -H 'origin: https://TU-DOMINIO' -d '{"slug":"<slug de una nota publicada>"}'`, que responde con el total.
+
+Para apagarlo, poné `features.marks: false`: no llega a la página ni HTML, ni CSS ni script. Para usar otra base (por ejemplo Turso), escribí un adaptador para el puerto `MarkStore` de `apps/web/src/features/marks/ports.ts`, junto a `adapters/d1.ts`.
+
 ## 7. Publicar (release) y revertir
 
 El flujo completo está decidido en los ADR [0011](adr/0011-ci-gate-once-at-main-pr-no-staging.md) y [0012](adr/0012-direct-push-to-main-no-pr-gate.md). En corto:

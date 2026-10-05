@@ -346,5 +346,11 @@
     "category": "added",
     "title": "Share a note on X and WhatsApp",
     "description": "The share panel of each note now has X and WhatsApp buttons next to LinkedIn. Both open a new message with the note title and its link, and they are plain links: no third-party script is loaded."
+  },
+  "footprints-on-notes": {
+    "date": "2026-10-05",
+    "category": "added",
+    "title": "Leave a footprint on a note",
+    "description": "Every note now has an anonymous \"I was here\" button, under the title and again at the end, with a small animation. One tap leaves a footprint, no account and no comment needed. Nothing that identifies you is stored: only a counter per note."
   }
 }

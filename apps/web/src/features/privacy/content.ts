@@ -30,6 +30,8 @@ export type PrivacyInput = {
   comments?: { repo: string };
   /** True when the reading mode feature is on, which stores one more preference in the browser. */
   readingMode?: boolean;
+  /** True when the footprint button is on: adds the marks section and one more local storage note. */
+  marks?: boolean;
 };
 
 const CLOUDFLARE_FAQ = 'https://developers.cloudflare.com/web-analytics/faq/';
@@ -59,19 +61,35 @@ const commentsSection = (repo: string): Record<'es' | 'en', PrivacySection> => {
   };
 };
 
+const marksSection: Record<'es' | 'en', PrivacySection> = {
+  es: {
+    id: 'marks',
+    title: 'Huellas en las notas',
+    body: '<p>Cada nota tiene un botón para dejar una huella (un «estuve aquí» anónimo). Al pulsarlo, tu navegador envía a este sitio el identificador de la nota y cuántas huellas dejaste. Ese número se suma a un contador por nota guardado en una base de datos <strong>D1</strong> de Cloudflare, el mismo proveedor que aloja el sitio. El contador no guarda quién lo sumó: no se guarda tu dirección IP ni ningún otro dato tuyo.</p><p>Para frenar el abuso, este sitio usa el limitador de peticiones de Cloudflare, que cuenta las peticiones por dirección IP en el momento de cada petición; la IP se usa solo para ese límite y este sitio no la almacena.</p><p>En tu navegador se guarda, en <code>localStorage</code> y con la clave <code>marks:&lt;nota&gt;</code>, cuántas huellas dejaste en cada nota; sirve para respetar el tope por persona y no se envía como identificador.</p>',
+  },
+  en: {
+    id: 'marks',
+    title: 'Footprints on notes',
+    body: '<p>Every note has a button to leave a footprint (an anonymous “I was here”). When you press it, your browser sends this site the note identifier and how many footprints you left. That number is added to a per-note counter kept in a Cloudflare <strong>D1</strong> database, the same provider that hosts the site. The counter does not record who added to it: your IP address and any other personal data are not stored.</p><p>To limit abuse, this site uses Cloudflare’s request rate limiter, which counts requests per IP address at the time of each request; the IP address is used only for that limit and this site does not store it.</p><p>Your browser keeps, in <code>localStorage</code> under the key <code>marks:&lt;note&gt;</code>, how many footprints you left on each note; it is used to respect the per-person cap and is not sent as an identifier.</p>',
+  },
+};
+
 export function buildPrivacyContent(input: PrivacyInput): Record<'es' | 'en', PrivacyContent> {
   const content = buildBaseContent(input);
-  if (!input.comments) return content;
-  const section = commentsSection(input.comments.repo);
-  const withSection = (locale: 'es' | 'en'): PrivacyContent => {
+  const comments = input.comments ? commentsSection(input.comments.repo) : null;
+  const extra = (locale: 'es' | 'en'): PrivacySection[] => [
+    ...(comments ? [comments[locale]] : []),
+    ...(input.marks ? [marksSection[locale]] : []),
+  ];
+  const withSections = (locale: 'es' | 'en'): PrivacyContent => {
     const { sections } = content[locale];
     const at = sections.findIndex((item) => item.id === 'contact-form') + 1;
     return {
       ...content[locale],
-      sections: [...sections.slice(0, at), section[locale], ...sections.slice(at)],
+      sections: [...sections.slice(0, at), ...extra(locale), ...sections.slice(at)],
     };
   };
-  return { es: withSection('es'), en: withSection('en') };
+  return { es: withSections('es'), en: withSections('en') };
 }
 
 function buildBaseContent({
@@ -80,6 +98,7 @@ function buildBaseContent({
   contact,
   updated,
   readingMode = false,
+  marks = false,
 }: PrivacyInput): Record<'es' | 'en', PrivacyContent> {
   return {
     es: {
@@ -111,7 +130,7 @@ function buildBaseContent({
         {
           id: 'local-storage',
           title: 'Almacenamiento local',
-          body: `<p>Este sitio solo guarda en <code>localStorage</code> ${readingMode ? 'cinco' : 'cuatro'} preferencias de interfaz: el tema, el efecto de fondo que elijas, si el banner está expandido, ${readingMode ? 'el descarte del aviso de idioma y si activaste el modo lectura' : 'y el descarte del aviso de idioma'}. No se usan para identificarte ni para seguimiento.</p>`,
+          body: `<p>Este sitio solo guarda en <code>localStorage</code> ${readingMode ? 'cinco' : 'cuatro'} preferencias de interfaz: el tema, el efecto de fondo que elijas, si el banner está expandido, ${readingMode ? 'el descarte del aviso de idioma y si activaste el modo lectura' : 'y el descarte del aviso de idioma'}. No se usan para identificarte ni para seguimiento.${marks ? ' Si dejas huellas en una nota, también se guarda en <code>localStorage</code> cuántas dejaste en esa nota (<code>marks:&lt;nota&gt;</code>), solo para respetar el tope por persona.' : ''}</p>`,
         },
         {
           id: 'cookies',
@@ -154,7 +173,7 @@ function buildBaseContent({
         {
           id: 'local-storage',
           title: 'Local storage',
-          body: `<p>This site only keeps ${readingMode ? 'five' : 'four'} interface preferences in <code>localStorage</code>: the theme, the background effect you pick, whether the banner is expanded, ${readingMode ? 'the language hint dismissal, and whether you turned on reading mode' : 'and the language hint dismissal'}. They are not used to identify you or for tracking.</p>`,
+          body: `<p>This site only keeps ${readingMode ? 'five' : 'four'} interface preferences in <code>localStorage</code>: the theme, the background effect you pick, whether the banner is expanded, ${readingMode ? 'the language hint dismissal, and whether you turned on reading mode' : 'and the language hint dismissal'}. They are not used to identify you or for tracking.${marks ? ' If you leave footprints on a note, <code>localStorage</code> also keeps how many you left on that note (<code>marks:&lt;note&gt;</code>), only to respect the per-person cap.' : ''}</p>`,
         },
         {
           id: 'cookies',

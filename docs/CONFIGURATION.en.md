@@ -410,6 +410,26 @@ UI texts are in `apps/web/src/shared/i18n/index.ts`. Adding a third language mea
 - JavaScript per page (30 KiB gzip): `apps/web/scripts/performance-budget.ts`.
 - A budget is never raised to "make a change pass": the change gets fixed.
 
+### 6.13 Footprints on notes (`marks`)
+
+A one-tap, anonymous "I was here" button on every note (header and end of the article), with a per-note counter in Cloudflare D1. The settings are in `site.config.ts`: `features.marks` (on or off) and the `marks` block (`animation`: `stamp`, `burst`, `pulse` or `none`; `maxPerVisitor`; `showCountFrom`; the generated table in section 3 lists the defaults). Every animation stops under `prefers-reduced-motion`. Decision record: [ADR 0013](adr/0013-footprints-on-notes-d1.md).
+
+**Until the database exists the buttons do not appear** (the Actions answer "unavailable" and the page renders nothing): turning the flag on without the steps below is safe, it just shows nothing. These steps run in **your Cloudflare account**:
+
+1. Create the database (needs `wrangler login`): `cd apps/web && mise exec -- pnpm exec wrangler d1 create elvinlab-marks`. It prints a `database_id`.
+2. Add the binding to `apps/web/wrangler.jsonc`:
+   ```jsonc
+   "d1_databases": [
+     { "binding": "MARKS_DB", "database_name": "elvinlab-marks", "database_id": "<the id from step 1>", "migrations_dir": "migrations" }
+   ]
+   ```
+   (`MARKS_RATE_LIMITER`, the per-IP limit, is already declared under `ratelimits`.)
+3. Create the table in the real database: `mise exec -- pnpm exec wrangler d1 migrations apply elvinlab-marks --remote` (the migration is `apps/web/migrations/0001_marks.sql`).
+4. Release as usual (section 7). If the deploy fails with an authorization error, the API token of the GitHub `production` environment may lack permission to deploy a Worker with a D1 binding: add the D1 edit permission to the token. *This was not verified.*
+5. Check it: open a note, press the button and reload (the count is kept), or `curl -s -X POST https://YOUR-DOMAIN/_actions/marks.get/ -H 'content-type: application/json' -H 'origin: https://YOUR-DOMAIN' -d '{"slug":"<a published note slug>"}'`, which answers with the total.
+
+To turn it off, set `features.marks: false`: no markup, no CSS and no script reach the page. To use another database (for example Turso), write an adapter for the `MarkStore` port in `apps/web/src/features/marks/ports.ts` next to `adapters/d1.ts`.
+
 ## 7. Releasing and rolling back
 
 The full flow is decided in ADRs [0011](adr/0011-ci-gate-once-at-main-pr-no-staging.md) and [0012](adr/0012-direct-push-to-main-no-pr-gate.md). In short:
