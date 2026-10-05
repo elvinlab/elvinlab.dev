@@ -104,3 +104,5 @@ Done locally on `develop`, not released, and NOT releasable until the owner appr
 - RED observed first (2 files, 3 tests failed), then GREEN: 656 unit tests, `note-translations.spec.ts` 6 passed (re-run by the parent), typecheck, lint, depcruise clean, js-budget pass (only the tail was read by the writer).
 - Note: the English hint variant never shows today because the hint only renders on Spanish pages.
 - NOT run: full e2e, Lighthouse, white-label (run once before the release).
+
+- T35 wording approved by the owner on 2026-10-05 (all six strings as listed above, unchanged). The "Owner approval pending" comments were removed from `shared/i18n/index.ts`. T35 is now releasable; still to run before the release: the full battery.
