@@ -432,7 +432,7 @@ Un botón anónimo de «estuve aquí» en cada nota (cabecera y final del artíc
    ```
    (`MARKS_RATE_LIMITER`, el límite por IP, ya está declarado en `ratelimits`.)
 3. Creá las tablas en la base real: `mise exec -- pnpm exec wrangler d1 migrations apply elvinlab-dev-db --remote` (hoy aplica `apps/web/migrations/0001_note_footprints.sql`).
-4. Liberá como siempre (sección 7). Si el deploy falla con un error de autorización, puede que el token de API del entorno `production` de GitHub no tenga permiso para desplegar un Worker con un binding D1: agregale el permiso de edición de D1. *Esto no se verificó.*
+4. Liberá como siempre (sección 7). Si el deploy falla con un error de autorización, puede que el token de API del entorno `production` de GitHub no tenga permiso para desplegar un Worker con un binding D1: agregale el permiso de edición de D1. *Comprobado en elvinlab.dev el 2026-10-05: el token de despliegue existente desplegó el Worker con el binding D1 sin ningún permiso adicional.*
 5. Comprobalo: abrí una nota, pulsá el botón y recargá (el contador se mantiene), o `curl -s -X POST https://TU-DOMINIO/_actions/marks.get/ -H 'content-type: application/json' -H 'origin: https://TU-DOMINIO' -d '{"slug":"<slug de una nota publicada>"}'`, que responde con el total.
 
 Para apagarlo, poné `features.marks: false`: no llega a la página ni HTML, ni CSS ni script. Para usar otra base (por ejemplo Turso), escribí un adaptador para el puerto `MarkStore` de `apps/web/src/features/marks/ports.ts`, junto a `adapters/d1.ts`.

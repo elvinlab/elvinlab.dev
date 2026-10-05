@@ -432,7 +432,7 @@ A one-tap, anonymous "I was here" button on every note (header and end of the ar
    ```
    (`MARKS_RATE_LIMITER`, the per-IP limit, is already declared under `ratelimits`.)
 3. Create the tables in the real database: `mise exec -- pnpm exec wrangler d1 migrations apply elvinlab-dev-db --remote` (today it applies `apps/web/migrations/0001_note_footprints.sql`).
-4. Release as usual (section 7). If the deploy fails with an authorization error, the API token of the GitHub `production` environment may lack permission to deploy a Worker with a D1 binding: add the D1 edit permission to the token. *This was not verified.*
+4. Release as usual (section 7). If the deploy fails with an authorization error, the API token of the GitHub `production` environment may lack permission to deploy a Worker with a D1 binding: add the D1 edit permission to the token. *Checked on elvinlab.dev on 2026-10-05: the existing deploy token deployed the Worker with the D1 binding with no extra permission.*
 5. Check it: open a note, press the button and reload (the count is kept), or `curl -s -X POST https://YOUR-DOMAIN/_actions/marks.get/ -H 'content-type: application/json' -H 'origin: https://YOUR-DOMAIN' -d '{"slug":"<a published note slug>"}'`, which answers with the total.
 
 To turn it off, set `features.marks: false`: no markup, no CSS and no script reach the page. To use another database (for example Turso), write an adapter for the `MarkStore` port in `apps/web/src/features/marks/ports.ts` next to `adapters/d1.ts`.
