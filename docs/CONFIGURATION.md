@@ -320,7 +320,7 @@ Cada bandera de `features` apaga la función completa: no se genera la ruta, des
 | `comments` | Comentarios y reacciones (Giscus) | Necesita el bloque `giscus`; ver 6.5 |
 | `contact` | Formulario `/contact` | Necesita los secretos del Worker; sin ellos falla cerrado |
 | `credentials` | Certificados en `/me` | |
-| `experiments` | Sección y páginas de experimentos | |
+| `experiments` | Sección y páginas de experimentos | Las páginas `/experiments/` aún no se generan (issue #64): déjalo en `false` hasta que existan, o los enlaces apuntan a nada |
 | `changelog` | Página `/changelog` y su enlace | |
 | `me` | Página `/me` (portafolio) | |
 | `readingMode` | Modo lectura en las notas | Apagada: no se envía botón, script, CSS ni se guarda nada en el navegador |

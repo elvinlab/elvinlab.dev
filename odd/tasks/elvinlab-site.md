@@ -366,3 +366,11 @@ Method: the repo's `createFixtureWorkspace` with `tests/fixtures/site.config.alt
 
 ### Done 2026-10-05: `blog: false` now really turns the blog off
 Tracker: `odd/tasks/blog-feature-flag.md`. Routes moved to `apps/web/src/blog-routes/` and injected by `integrations/blog-routes.ts` only when the flag is on; sitemap filter also hides notes URLs. Verified: production-config build file list (49 files) and sitemap (16 URLs) identical before and after; blog-off fixture has 13 pages, no notes routes, no `rss.xml`, no notes in the sitemap; me-off unchanged; typecheck, lint, depcruise clean, 10 focused tests green. Not run: full unit, e2e, Lighthouse, js-budget. Not pushed.
+
+### Result 2026-10-05: credentials-off and experiments-off fixtures (observed, scratch script outside the repo)
+Same method as the blog-off run, but with this site's real `experiments.json` (not emptied). Variants: base, `credentials` off, `experiments` off. All three build.
+- `credentials: false` works: `/me/` no longer renders certificates; nothing else changes.
+- `experiments: false` works: the nav and home links to `/experiments/` and the experiments block on `/me/` disappear (broken internal links 18 to 1).
+- Finding: with `experiments: true` the nav, home and `/me/` link to `/experiments/`, but no `/experiments/` page is built in any variant (no route in `src/pages`; the projects routes are issue #64, T40, still open). Today only `experiments: false` is safe. This site already has it off. The `docs/CONFIGURATION` row says "Experiments section and pages", which is ahead of the code.
+- Baseline noise in every variant: `/404.html` links to `/en/404/`, which is not built.
+- Not tested: `home.*` flags, workerd runtime, the real production config.

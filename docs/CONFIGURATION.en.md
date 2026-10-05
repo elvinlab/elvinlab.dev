@@ -320,7 +320,7 @@ Each `features` flag switches the whole feature off: the route is not generated,
 | `comments` | Comments and reactions (Giscus) | Needs the `giscus` block; see 6.5 |
 | `contact` | The `/contact` form | Needs the Worker secrets; without them it fails closed |
 | `credentials` | Certificates on `/me` | |
-| `experiments` | Experiments section and pages | |
+| `experiments` | Experiments section and pages | The `/experiments/` pages are not built yet (issue #64): keep it `false` until they exist, or the links point nowhere |
 | `changelog` | The `/changelog` page and its link | |
 | `me` | The `/me` page (portfolio) | |
 | `readingMode` | Reading mode on notes | Off: no button, script or CSS ships and nothing is stored in the browser |
