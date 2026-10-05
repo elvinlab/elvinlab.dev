@@ -88,6 +88,25 @@ for (const { locale, path } of NOTES) {
       }
     });
 
+    test('tells readers, in one small line, that their login is not used for anything else and links the privacy section', async ({
+      page,
+    }) => {
+      await page.goto(path);
+      const note = page.locator('[data-comments] [data-privacy-note]');
+      await expect(note).toBeVisible();
+      await expect(note).toContainText(
+        locale === 'es' ? 'no se usan para nada más' : 'not used for anything else',
+      );
+      const link = note.getByRole('link');
+      await expect(link).toHaveAttribute(
+        'href',
+        locale === 'es' ? '/privacy/#comments' : '/en/privacy/#comments',
+      );
+      // Small on purpose: reassurance, not a notice.
+      const size = await note.evaluate((el) => Number.parseFloat(getComputedStyle(el).fontSize));
+      expect(size).toBeLessThanOrEqual(14);
+    });
+
     test('labels the section and keeps the heading', async ({ page }) => {
       await page.goto(path);
       const section = page.locator('[data-comments]');
