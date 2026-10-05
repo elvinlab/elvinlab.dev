@@ -345,6 +345,9 @@ The work after the first launch is tracked in `odd/tasks/plan-mejoras-elvinlab.m
 - Risk: it can displace the success criterion (3 notes; 2 live) and the pre-launch freeze. Starting phase 1 is the owner's decision.
 - Next step: owner decides if and when to open phase 1. Tracking issue: #77 (T49).
 
+### Correction 2026-10-05: the real requirement is blog-only or portfolio-only by config
+The owner clarified: no split of this site is wanted. A recipient of the repo (another person or a template buyer) must be able to keep only the blog or only the portfolio through config and core, without a rewrite. Feature flags `features.blog`, `features.me`, `features.credentials`, `features.experiments` already exist (`shared/config/schema.ts:248-260`) and are honored in code (`MePage.astro:30-34`, `Home.astro:29`). NOT verified: that the site builds and renders correctly with `blog` off or with `me` off. Next check (not started, owner decides): build two fixtures (blog off, me off) and compare, reusing the white-label test approach. The audit below is only useful if pieces are later moved to core.
+
 ### Audit 2026-10-05: what blocks splitting `/me` from the blog (read-only, no build run)
 Spot-checked: `features/me/components/MePage.astro:14,34`, `shared/layout/Navbar.astro:20`, `shared/seo/Seo.astro:41`. `Chip`, `Card`, `SectionHeading`, `SocialIcon` were classified from imports only.
 - Boundaries hold: dependency-cruiser enforces features-via-`index.ts`, `shared/` never imports `features/`, core never imports `apps/`. No cross-feature import bypasses an `index.ts`.
