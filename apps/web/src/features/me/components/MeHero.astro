@@ -23,13 +23,20 @@ const contactHref = localizePath('/contact/', locale, LOCALES);
 <section class="grid gap-8 md:grid-cols-[232px_1fr] md:items-center">
   <div class="grid aspect-square w-40 place-items-center justify-self-start rounded-card bg-card p-2 md:w-[232px]">
     {photo ? (
-      // Eager: the portrait is in the first viewport of /me.
+      // Eager and high priority: the portrait is in the first viewport of /me and is its LCP element.
+      // The slot is 160 px (phone) to 232 px (desktop) wide, so the source is resized to 2x of the
+      // widest slot (2:3 portrait) instead of shipping the full-size photo.
       <Image
         src={photo}
         alt={site.identity.name}
         format="webp"
         quality={80}
+        width={464}
+        height={696}
+        widths={[320, 464]}
+        sizes="(min-width: 768px) 232px, 160px"
         loading="eager"
+        fetchpriority="high"
         class="size-full rounded-inner object-cover object-top outline outline-1 -outline-offset-1 outline-divider"
       />
     ) : (

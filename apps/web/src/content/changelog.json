@@ -292,5 +292,11 @@
     "category": "changed",
     "title": "The language switch says when it goes to the home page",
     "description": "On a note that has no translation, the language switch and the language hint now say they lead to the home page in the other language instead of implying a translated page."
+  },
+  "me-portrait-size": {
+    "date": "2026-10-05",
+    "category": "changed",
+    "title": "The /me portrait loads about 20 times lighter",
+    "description": "The portrait on /me was a 231 KB image shown in a slot a few hundred pixels wide. It is now resized to what the slot needs (about 12 KB on a phone) and loaded with high priority, which in a simulated slow-phone test brought the largest paint of the page from about 2.5 s to about 1.4 s."
   }
 }
