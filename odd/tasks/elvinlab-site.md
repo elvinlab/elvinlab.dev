@@ -344,3 +344,10 @@ The work after the first launch is tracked in `odd/tasks/plan-mejoras-elvinlab.m
 - Proposed phases, none started: (1) prove browser editing end to end here, (2) extract and release core, (3) private template, (4) prove buyer installation, (5) three-buyer pilot.
 - Risk: it can displace the success criterion (3 notes; 2 live) and the pre-launch freeze. Starting phase 1 is the owner's decision.
 - Next step: owner decides if and when to open phase 1. Tracking issue: #77 (T49).
+
+### Audit 2026-10-05: what blocks splitting `/me` from the blog (read-only, no build run)
+Spot-checked: `features/me/components/MePage.astro:14,34`, `shared/layout/Navbar.astro:20`, `shared/seo/Seo.astro:41`. `Chip`, `Card`, `SectionHeading`, `SocialIcon` were classified from imports only.
+- Boundaries hold: dependency-cruiser enforces features-via-`index.ts`, `shared/` never imports `features/`, core never imports `apps/`. No cross-feature import bypasses an `index.ts`.
+- Blockers, most critical first: (1) `notes` is imported by `me`, `portfolio`, the layout (`Navbar`), `Seo`, `astro.config` and `rss`; (2) one `site.config.ts` and one Zod schema mix blog, me and recruiter fields (`shared/config/schema.ts:21`); (3) `shared/i18n/index.ts` is one es/en dictionary with `me.*` and `notes.*` keys; (4) `BaseLayout`, `Navbar`, `Footer`, `Seo` read app config and collections, so they cannot move to core as-is; (5) `content.config.ts` and the integrations (`published-notes`, `note-dates`, `og-images`) are app-local; (6) `BackgroundPicker` writes localStorage, so persistence must be injected if it moves to core.
+- Ready or nearly ready for core: `seo/links.ts`, `lib/external-link.ts`, `ui/ThemeToggle` (strings as props), `seo/og.ts`, `robots.ts`, `isIndexable.ts`.
+- Most critical first step (proposed, not started): remove the `notes` dependency from `me`, `portfolio` and the shared layout; `MePage`, `Home`, `Navbar` and `Seo` receive `hasNotes`, `notesHref` and the notes data as props from the page instead of calling `getCollection('notes')`. Frozen until the owner authorizes it (pre-launch freeze and 3-notes criterion).
