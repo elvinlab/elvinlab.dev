@@ -298,5 +298,11 @@
     "category": "changed",
     "title": "The /me portrait loads about 20 times lighter",
     "description": "The portrait on /me was a 231 KB image shown in a slot a few hundred pixels wide. It is now resized to what the slot needs (about 12 KB on a phone) and loaded with high priority, which in a simulated slow-phone test brought the largest paint of the page from about 2.5 s to about 1.4 s."
+  },
+  "focus-not-hidden-by-header": {
+    "date": "2026-10-05",
+    "category": "fixed",
+    "title": "Keyboard focus no longer hides under the fixed header",
+    "description": "Moving focus up the page with Shift+Tab, or following an in-page link, no longer leaves the focused link or field covered by the sticky header."
   }
 }
