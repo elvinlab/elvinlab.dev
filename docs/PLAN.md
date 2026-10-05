@@ -61,7 +61,7 @@ Los primeros posts son el propio proceso de decisión de qué construir: por qu�
 
 **Sitio en producción en `elvinlab.dev`** (revisado el 2026-09-30; ver "Decisiones 2026-09-30"). Los posts se escriben después del lanzamiento.
 
-> Histórico: el criterio original era "blog publicado con 3 posts en 6 semanas".
+> Histórico: el criterio original era "blog publicado con 3 posts en 6 semanas". **Cumplido el 2026-10-05** con la nota 003 (`vibe-coding-o-especificar-primero`): hay 3 notas publicadas.
 
 Señal de alerta: si se sigue puliendo `core`, los fondos o el tooling sin lanzar, o si pasan 4 semanas desde el lanzamiento sin un post publicado, es exactamente el riesgo que se identificó — quedarse atrapado en la arquitectura en vez de publicar.
 
