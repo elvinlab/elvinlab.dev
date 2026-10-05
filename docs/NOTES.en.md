@@ -23,7 +23,7 @@ This guide explains, step by step and in detail, how to write and publish a **La
 1. Create the draft: `mise exec -- pnpm new-post "Note title"`.
 2. Start the site: `mise exec -- pnpm --filter web dev` and open `http://localhost:4321/notes/<slug>/` (drafts only exist in development).
 3. Fill in the frontmatter and the **decision record** (sections 3 and 4).
-4. Write about 500 words on **one** concrete decision, starting with the problem.
+4. Write on **one** concrete decision, starting with the problem. There is no word limit: the draft suggests about 500 words, but a longer note is fine when the decision needs it (note 003 has about 1,500).
 5. Check the result on desktop and phone, in light and dark theme, and in reading mode.
 6. Move the folder to `apps/web/src/content/notes/<slug>/` and put today's date in `pubDate`.
 7. Verify: tests, typecheck, lint and build.
@@ -130,7 +130,7 @@ The body is **Markdown with MDX**. The site defines no custom components, so sta
 
 - **Do not add a `#` title**: the title comes from the frontmatter.
 - Use `##` for the main sections: they form the **side table of contents with progress** and get an automatic anchor. Use `###` for subsections (they do not appear in the table of contents).
-- One idea per section. A typical note is 500 to 1,000 words; the draft's guide asks you to start with the problem.
+- One idea per section. Notes run from about 500 to 1,500 words and the length is the author's call, not a limit; the draft's guide asks you to start with the problem.
 
 **Available formatting** (verified with a test note):
 

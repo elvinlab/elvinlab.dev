@@ -32,3 +32,10 @@ T1-T3 done (2026-10-01). Notes written from verified sources and fact-checked li
 Next step: user reviews the text; release to `main` on request.
 
 Engram mirror: `odd/first-notes/tasks`.
+
+## Note 003 published (2026-10-05)
+The owner brought a finished post written outside this repo (`index.mdx`, a Claude web project fed with the repo's docs and Engram): "Vibe coding o especificar primero: por qué defino antes de pedirle código a la IA", `number: 3`, category `agentes-ia`, about 1,470 words. Slug chosen by the owner: the short one, `vibe-coding-o-especificar-primero` (the title-derived slug would have been about 80 characters).
+- Review before publishing, no text changed: frontmatter inside the schema limits (title 81 of 90, description 139 of 160, decision fields 162 to 187 of 280, 5 kebab-case tags); every factual claim traced to the repo: 12 ADRs, ADR 0005 (about 69 KiB with React 19 against about 7.3 KiB with Preact, 30 KiB budget), tokens RED then GREEN 8/8 (T06, 2026-09-28), `tokens.json` values, the `task.yml` Files field, the T21 agent that added "Privacy" to the main nav (reverted; 768 px overflow, 3 smoke failures, circular import, hardcoded owner data, two unverified privacy claims) and the stale tracker line about `/contact/` that the T19 UI had already made false on 2026-09-30. No email address, no private repository, no unannounced project, no em dashes.
+- Isolated build (fixture workspace with the two real notes plus this one): compiles, h1 and decision record render, 4 titled code blocks, `BlogPosting` JSON-LD, share card, RSS and sitemap entries, listed on `/notes/`, link to note 002 resolves.
+- Owner's stance recorded in the docs: posts are complete and not limited in words, so `docs/NOTES*.md` now say there is no word limit (the scaffold's draft sentence still suggests about 500; left as is, it is a suggestion).
+- Success criterion of the repo (3 published notes) met: `docs/PLAN.md`.

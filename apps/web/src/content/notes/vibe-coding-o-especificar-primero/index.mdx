@@ -1,0 +1,136 @@
+---
+number: 3
+title: "Vibe coding o especificar primero: por qué defino antes de pedirle código a la IA"
+description: "Un rollback en el trabajo me enseñó a entender antes de delegar. Qué me da escribir la intención primero y qué me cuesta mantenerla al día."
+pubDate: 2026-10-05
+lang: es
+category: agentes-ia
+tags: [agentes-ia, sdd, vibe-coding, documentacion, tdd]
+decision:
+  context: "Le pedí a la IA un feature de backend sobre código que yo no entendía, sin requisitos ni plan. Todo lo generado terminó en un rollback y tuve que empezar de cero."
+  decision: "Definir intención, alcance y decisiones por escrito antes de delegar código. Descarté pedir código sin plan, pero no la experimentación: experimento sobre un proyecto ya documentado."
+  outcome: "En este sitio: 12 ADR, tokens probados (8/8) antes del layout y un cambio fuera de alcance revertido en revisión. El costo: un seguimiento desactualizado casi me hace rehacer el contacto."
+---
+
+## El problema: pedirle código a la IA sin plan
+
+En mi trabajo me tocó un feature de backend sobre algo que ya existía. El código era complicado, yo no lo entendía y, en lugar de sentarme a entenderlo, hice lo cómodo: empecé a pedirle a la IA que lo resolviera.
+
+Me perdí. No tenía cómo juzgar lo que la IA me devolvía, porque no sabía cómo funcionaba lo que estaba tocando. Confié a ciegas. Al final, todo lo que se gastó en tokens no sirvió: hice rollback y empecé otra vez desde cero.
+
+La segunda vez no hubo atajos. Revisé archivo por archivo, depuré, corrí pruebas locales, escribí tests primero (TDD), planifiqué y revisé el enfoque con los compañeros que habían trabajado en ese feature. Hasta que lo entendí. Y entonces sí lo saqué.
+
+> La IA no falló porque escribiera mal código. Falló porque yo le delegué algo que no entendía, y no tenía cómo saber si lo que me devolvía estaba bien.
+
+Esa experiencia es la razón por la que hoy trabajo como trabajo. Esta nota cuenta esa decisión: qué me da definir antes de pedir código, qué me cuesta y dónde sigo experimentando.
+
+## Qué llamo vibe coding y qué llamo SDD
+
+Para no pelear con caricaturas, primero las definiciones que uso.
+
+**Vibe coding**, en mi caso, es pedirle código a la IA sin haber definido antes requisitos ni un plan. Describo lo que quiero en una frase, acepto lo que sale, pido correcciones sobre la marcha y voy viendo. Funciona para un script desechable o para explorar una idea. El problema aparece cuando lo que sale tiene que convivir con código que ya existe y con reglas que nadie le explicó al modelo.
+
+**Spec-Driven Development (SDD)** es lo contrario en el orden, no en la herramienta: primero escribo qué quiero construir y por qué, qué entra y qué no, cómo voy a comprobar que funciona; después le pido a la IA que implemente contra eso. La IA sigue escribiendo mucho código. Lo que cambia es que hay algo escrito contra lo que puedo revisar su trabajo.
+
+No lo domino. Lo uso en este repositorio y en mi trabajo diario, y lo prefiero a empezar de cero con la IA, pero todavía estoy aprendiendo cuánto definir y cuándo parar.
+
+## De una idea a documentos que guían el trabajo
+
+Este sitio empezó como una idea: reconstruir mi portafolio y abrir un blog. Esa idea se fue convirtiendo en documentos, cada uno con una pregunta distinta:
+
+```txt title="de dónde sale cada tarea"
+idea
+ └─ docs/PLAN.md          ¿qué construyo, para qué y qué queda fuera?
+     ├─ docs/BRAND.md     ¿cómo se ve y cómo suena?
+     ├─ docs/adr/         ¿qué decidí entre alternativas, y qué cuesta?
+     └─ issue (brief)     ¿qué archivos toca, cómo sé que está listo?
+         └─ código + tests
+             └─ odd/tasks/  ¿qué pasó, qué se corrigió, qué se midió?
+```
+
+`PLAN.md` no describe cómo se ve el sitio; describe qué quiero construir, por qué, cuál es la condición de éxito y qué queda explícitamente fuera de alcance. Los ADR guardan cada decisión con sus alternativas: hoy son 12. Y cada tarea es un issue escrito como un brief de delegación, con un campo que ya me salvó al menos una vez (lo cuento más abajo):
+
+```yaml title=".github/ISSUE_TEMPLATE/task.yml (extracto)"
+- type: textarea
+  id: files
+  attributes:
+    label: Files
+    description: Exact files to create or modify. Everything else is read-only.
+```
+
+Ese es el punto donde la documentación deja de ser un documento y se vuelve una herramienta: un agente recibe la tarea, y yo reviso su diff contra lo que la tarea dice. El cómo se reparte ese trabajo entre modelos lo conté en la [nota 002](/notes/agentic-dev-setup/); aquí me interesa el qué.
+
+El recorrido no fue lineal. No escribí todo y después programé: definí, construí, medí y corregí, y la documentación fue cambiando junto con el código. Pero cada tarea delegada tuvo un brief escrito antes de que un agente escribiera código.
+
+## Lo que la especificación me dio
+
+### Tokens antes que componentes
+
+Una de las primeras decisiones fue que los colores no se escribirían a mano en los componentes. Antes de construir el layout, definí los tokens de diseño en un solo archivo, con una regla: todos los temas comparten los mismos nombres semánticos.
+
+```json title="packages/core/src/tokens/tokens.json (extracto)"
+{
+  "defaultTheme": "elvinlab-dark",
+  "themes": {
+    "elvinlab-dark": {
+      "scheme": "dark",
+      "colors": {
+        "page": "#07070f",
+        "text": "#eceff4",
+        "primary": "#a78bfa"
+      }
+    }
+  }
+}
+```
+
+Esa intención no se quedó en el papel. Se volvió una validación (un tema que no comparta los colores del tema por defecto no pasa), un generador de CSS y un test que falla si el CSS generado se desvía del JSON. El seguimiento de la tarea registra el ciclo completo: RED con el módulo inexistente y GREEN con 8 de 8 tests. Todo lo que vino después, desde la barra de navegación hasta el blog, lee esas variables y nunca un hexadecimal.
+
+### Un agente que se salió del alcance
+
+La analítica y la página de privacidad fueron una tarea delegada a un agente. El agente hizo lo pedido y algo más: agregó "Privacy" al menú principal, que no estaba en el alcance.
+
+Parece inofensivo. No lo era: ese enlace extra desbordó la navegación a 768 px y rompió 3 pruebas de humo. La revisión lo atrapó, porque el diff se podía comparar contra un brief que decía exactamente qué archivos tocar, y se revirtió. En la misma revisión salieron otras cosas: un import circular, datos míos escritos a mano en una página que debía salir de la configuración, y dos afirmaciones sobre privacidad que el agente dio por ciertas y que la documentación de Cloudflare no respaldaba.
+
+Sin un alcance escrito, ese enlace en el menú habría sido "una mejora". Con alcance escrito, fue un cambio que nadie pidió.
+
+## Documentar no es volver intocable una decisión
+
+El ADR 0001 eligió React para las islas interactivas. Cuando llegó la primera isla real, el formulario de contacto, medí su costo: una isla de un solo botón costaba unos 69 KiB comprimidos con React 19 y unos 7,3 KiB con Preact. El sitio tiene un presupuesto de 30 KiB de JavaScript por página.
+
+Con esos números, React no cabía. Escribí el ADR 0005, que reemplaza solo la línea de React del 0001 y deja el resto en pie, y dice también lo que pierdo: las funciones concurrentes de React, parte de su ecosistema y menos código compartido con otro sitio que también usa React.
+
+> Una decisión documentada no es una decisión congelada. Es una decisión que, cuando cambia, deja rastro de por qué.
+
+Escribir una decisión no me obligó a sostenerla. Como la decisión original estaba escrita con su razón, cambiarla fue cuestión de mostrar que la razón ya no aplicaba.
+
+## Lo que me cuesta
+
+Me cuestan las dos puntas.
+
+La primera es **definir antes de implementar**. Escribir qué quiero, qué queda fuera y cómo sé que está listo exige pensar antes de ver resultados, y eso es más lento que abrir el chat y pedir código.
+
+La segunda es **mantener la documentación alineada cuando el proyecto cambia**, y esa ya me cobró. El 30 de septiembre terminé la interfaz del formulario de contacto, pero el seguimiento del proyecto siguió diciendo que estaba pendiente. Al día siguiente pedí "empezar" la interfaz de contacto. El agente leyó un documento que mentía por omisión y estuvo a punto de reconstruir algo que ya existía. Lo salvó una exploración del código hecha antes de tocar un solo archivo, no la documentación.
+
+```txt title="lo que decía el seguimiento vs. lo que había en develop"
+odd/tasks/elvinlab-site.md   → "/contact/ is still a 404 until T19 UI"
+develop (desde el 30-09)     → ContactPage.astro + isla del formulario, listos
+```
+
+La corrección quedó escrita en el mismo seguimiento, con una nota para que la próxima sesión no repita el error. Pero la lección es incómoda: una documentación desactualizada es peor que no tener documentación, porque se lee con la misma confianza que una correcta.
+
+## Dónde sí experimento
+
+Nada de esto significa que experimentar con IA esté mal. Lo que cambió es dónde lo hago.
+
+Mi postura es una **experimentación acotada**: probar con IA sobre features de un proyecto que ya está bien documentado. El plan, la marca y los ADR marcan el borde; dentro de ese borde, puedo dejar que el agente proponga, equivocarse rápido y descartar sin miedo, porque sé contra qué estoy comparando.
+
+Lo que evito son los dos extremos. Generar código sin plan, como en el feature que terminó en rollback, porque pierdo el alcance y no tengo con qué juzgar el resultado. Y una especificación tan rígida que cada idea nueva necesite un documento antes de poder probarla, porque entonces la documentación se vuelve el trabajo en sí.
+
+## Lo que me llevo
+
+Aquel rollback no me enseñó que la IA sea mala programando. Me enseñó que delegar no reemplaza entender. Especificar primero es, para mí, la forma de obligarme a entender antes de delegar: si no puedo escribir qué quiero y cómo sé que está bien, todavía no estoy listo para pedírselo a nadie, humano o modelo.
+
+Esta nota se quedó a propósito en el porqué. El cómo, es decir, cómo escribo una especificación, qué pongo en un brief y qué parte del proceso todavía no me convence, lo iré contando con más detalle en próximas notas, a medida que lo vaya aprendiendo.
+
+Me queda una pregunta abierta: ¿cómo mantienen ustedes la documentación al día cuando el código avanza más rápido que ella? Si tienen un truco que les funcione, o una historia de un documento desactualizado que les costó caro, cuéntenmela en los comentarios.

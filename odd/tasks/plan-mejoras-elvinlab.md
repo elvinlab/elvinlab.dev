@@ -7,7 +7,7 @@ Execute the plan incrementally on `develop`, starting with what needs no new con
 
 ## Constraints
 - Owner decides content: credentials, projects, CV, "Ahora" text, the "eternal junior" wording. Nothing is invented to fill cards.
-- Brand changes go to `docs/BRAND.md` first (CLAUDE.md). Email never in tracked files. Success criterion of the repo stays 3 published notes (2 live): flag if this work crowds out writing.
+- Brand changes go to `docs/BRAND.md` first (CLAUDE.md). Email never in tracked files. Success criterion of the repo stays 3 published notes (met on 2026-10-05: 3 live): flag if this work crowds out writing.
 - Work on `develop`; commit and push only when the owner says so (each remote operation is authorized explicitly).
 
 ## Settings

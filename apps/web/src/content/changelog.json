@@ -328,5 +328,11 @@
     "category": "changed",
     "title": "Preact 11 and routine tooling updates",
     "description": "The interactive parts of the site now run on Preact 11 (the contact form field was rewritten to satisfy its stricter input types, with no visible change), and the build tools (sharp, vitest, wrangler, Biome, dependency-cruiser) and the CI mise action were updated. Forks should expect the same."
+  },
+  "note-003-vibe-coding": {
+    "date": "2026-10-05",
+    "category": "added",
+    "title": "New Lab Note 003: vibe coding or specify first",
+    "description": "Why I define intent, scope and decisions in writing before asking an AI for code, what it gives me, what it costs to keep up to date and where I still experiment. Written from a rollback at work and from this site's own documents."
   }
 }

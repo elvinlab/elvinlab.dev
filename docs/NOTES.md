@@ -23,7 +23,7 @@ Esta guía explica, paso a paso y con todos los detalles, cómo escribir y publi
 1. Crea el borrador: `mise exec -- pnpm new-post "Título de la nota"`.
 2. Arranca el sitio: `mise exec -- pnpm --filter web dev` y abre `http://localhost:4321/notes/<slug>/` (los borradores solo existen en desarrollo).
 3. Completa el frontmatter y el **registro de decisión** (sección 3 y 4).
-4. Escribe unas 500 palabras sobre **una** decisión concreta, empezando por el problema.
+4. Escribe sobre **una** decisión concreta, empezando por el problema. No hay límite de palabras: el borrador sugiere unas 500, pero una nota más larga está bien cuando la decisión lo pide (la nota 003 tiene unas 1.500).
 5. Revisa el resultado en escritorio y móvil, en tema claro y oscuro, y en modo lectura.
 6. Mueve la carpeta a `apps/web/src/content/notes/<slug>/` y pon la fecha de hoy en `pubDate`.
 7. Verifica: tests, typecheck, lint y build.
@@ -130,7 +130,7 @@ El cuerpo es **Markdown con MDX**. El sitio no define componentes propios, así 
 
 - **No pongas un título `#`**: el título sale del frontmatter.
 - Usa `##` para las secciones principales: son las que forman el **índice lateral con progreso** y reciben un ancla automática. Usa `###` para subsecciones (no aparecen en el índice).
-- Una idea por sección. Una nota típica son 500 a 1.000 palabras; la guía del borrador pide empezar por el problema.
+- Una idea por sección. Las notas van de unas 500 a 1.500 palabras y la extensión la decide quien escribe, no es un límite; la guía del borrador pide empezar por el problema.
 
 **Formato disponible** (verificado con una nota de prueba):
 
