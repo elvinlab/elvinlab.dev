@@ -203,7 +203,7 @@ When you publish a note **you do not have to do anything else** for this:
 
 - It shows up in the **index** (grouped by year) with its language badge, and the "Notes" menu entry appears with the first published note.
 - **Reading time** (at 220 words per minute) and **date** in the header.
-- **Side table of contents** with the `##` sections, **share buttons** (copy link and LinkedIn) and **related notes**: those in the same language sharing tags (weighted double) or category; up to three show.
+- **Side table of contents** with the `##` sections, **share buttons** (copy link, LinkedIn and X: plain links with no third-party script; the X link pre-fills the post with the note title) and **related notes**: those in the same language sharing tags (weighted double) or category; up to three show.
 - **Previous / Next** between notes of the same language.
 - If the note has a translation: **`hreflang`** between both and a direct **language switch** (section 8).
 - **Comments and reactions** (if Giscus is configured): the thread is tied to the note's path.

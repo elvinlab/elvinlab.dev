@@ -340,5 +340,11 @@
     "category": "changed",
     "title": "Framed images in notes and shorter link-preview titles",
     "description": "Images inside a note get the same rounded corners and hairline as the site cards. A note's link preview (LinkedIn, X, WhatsApp, Facebook) now uses the note title alone, so it is cut off later; the browser tab keeps the site name."
+  },
+  "note-share-x": {
+    "date": "2026-10-05",
+    "category": "added",
+    "title": "Share a note on X",
+    "description": "The share panel of each note now has an X button next to LinkedIn. It opens a new post with the note title and its link, and it is a plain link: no third-party script is loaded."
   }
 }

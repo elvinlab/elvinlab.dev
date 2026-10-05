@@ -1,14 +1,16 @@
 ---
-/** Copy-link and LinkedIn share buttons for a note. */
+/** Copy-link, LinkedIn and X share buttons for a note: plain links, no third-party script. */
 import { site } from '@/shared/config/index.ts';
 import { type Locale, t } from '@/shared/i18n/index.ts';
 import { externalLinkAttrs } from '@/shared/lib/external-link.ts';
 import ExternalHint from '@/shared/ui/ExternalHint.astro';
 
-type Props = { locale: Locale; url: string };
+type Props = { locale: Locale; url: string; title: string };
 
-const { locale, url } = Astro.props;
+const { locale, url, title } = Astro.props;
 const linkedin = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(url)}`;
+// X pre-fills the post with the note title; the link card comes from the page's Open Graph tags.
+const x = `https://x.com/intent/post?url=${encodeURIComponent(url)}&text=${encodeURIComponent(title)}`;
 ---
 
 <section class="flex flex-col gap-3 rounded-card bg-card p-5">
@@ -20,12 +22,15 @@ const linkedin = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeUR
       data-url={url}
       data-label-copy={t(locale, 'note.share.copy')}
       data-label-copied={t(locale, 'note.share.copied')}
-      class="flex h-11 grow items-center justify-center gap-2 rounded-control bg-chip px-3 text-sm transition-colors duration-150 hover:bg-card-hover"
+      class="flex h-11 grow items-center justify-center gap-2 whitespace-nowrap rounded-control bg-chip px-2 text-sm transition-colors duration-150 hover:bg-card-hover"
     >
       <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7 0l3-3a5 5 0 0 0-7-7l-1 1"></path><path d="M14 11a5 5 0 0 0-7 0l-3 3a5 5 0 0 0 7 7l1-1"></path></svg>
       <span data-copy-label>{t(locale, 'note.share.copy')}</span>
     </button>
-    <a href={linkedin} {...externalLinkAttrs(linkedin, site.url)} class="grid size-11 place-items-center rounded-control bg-chip transition-colors duration-150 hover:bg-card-hover"><span class="sr-only">LinkedIn</span><ExternalHint href={linkedin} locale={locale} />
+    <a href={x} {...externalLinkAttrs(x, site.url)} class="grid size-11 shrink-0 place-items-center rounded-control bg-chip transition-colors duration-150 hover:bg-card-hover"><span class="sr-only">X</span><ExternalHint href={x} locale={locale} />
+      <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"></path></svg>
+    </a>
+    <a href={linkedin} {...externalLinkAttrs(linkedin, site.url)} class="grid size-11 shrink-0 place-items-center rounded-control bg-chip transition-colors duration-150 hover:bg-card-hover"><span class="sr-only">LinkedIn</span><ExternalHint href={linkedin} locale={locale} />
       <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor" aria-hidden="true"><path d="M4.98 3.5A2.5 2.5 0 1 1 0 3.5a2.5 2.5 0 0 1 4.98 0ZM.5 8h4V24h-4V8Zm7.5 0h3.8v2.2h.05c.53-1 1.83-2.2 3.77-2.2 4.03 0 4.78 2.65 4.78 6.1V24h-4v-7.1c0-1.7-.03-3.9-2.37-3.9-2.38 0-2.74 1.85-2.74 3.77V24H8V8Z"></path></svg>
     </a>
   </div>

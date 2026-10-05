@@ -203,7 +203,7 @@ Al publicar una nota **no tienes que hacer nada más** para esto:
 
 - Aparece en el **índice** (agrupada por año) con su insignia de idioma, y la entrada «Notas» del menú aparece con la primera nota publicada.
 - **Tiempo de lectura** (a 220 palabras por minuto) y **fecha** en el encabezado.
-- **Índice lateral** con las secciones `##`, **botones de compartir** (copiar enlace y LinkedIn) y **notas relacionadas**: las del mismo idioma que comparten etiquetas (pesan el doble) o categoría; salen hasta tres.
+- **Índice lateral** con las secciones `##`, **botones de compartir** (copiar enlace, LinkedIn y X: enlaces simples sin ningún script de terceros; el de X rellena la publicación con el título de la nota) y **notas relacionadas**: las del mismo idioma que comparten etiquetas (pesan el doble) o categoría; salen hasta tres.
 - **Anterior / Siguiente** entre notas del mismo idioma.
 - Si la nota tiene traducción: **`hreflang`** entre ambas y el **cambio de idioma** directo (sección 8).
 - **Comentarios y reacciones** (si Giscus está configurado): el hilo se asocia a la ruta de la nota.

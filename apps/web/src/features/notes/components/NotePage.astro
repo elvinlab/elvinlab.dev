@@ -104,7 +104,7 @@ const readingLabel = t(locale, 'notes.readingTime', { min: readingMinutes(entry.
   <Fragment slot="aside">
     <div class="flex flex-col gap-4 lg:sticky lg:top-24">
       <Toc locale={locale} headings={tocHeadings} />
-      <ShareCard locale={locale} url={canonical} />
+      <ShareCard locale={locale} url={canonical} title={entry.data.title} />
       <RelatedNotes locale={locale} notes={related} />
     </div>
   </Fragment>
