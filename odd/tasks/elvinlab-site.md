@@ -336,3 +336,11 @@ State: `appearance: 'minimal' | 'full'` shipped on `feat/minimal-appearance-pres
 
 ## Status 2026-10-02 (end of day): where to look
 The work after the first launch is tracked in `odd/tasks/plan-mejoras-elvinlab.md` (the owner's improvement plan: issues #58 to #72, the three releases of the day, measurements, the Lighthouse LCP lesson and the next step). Production serves the third release of 2026-10-02; the release method and the changelog audit baseline are in `CLAUDE.md` and `docs/CONFIGURATION.md` section 7. Open owner tasks: #49 Search Console, #50 HSTS (after about a week of stable HTTPS), #66 projects with evidence, #67 and #71 writing.
+
+## Status 2026-10-05: commercial template plan (planning only, nothing implemented)
+- Source: planning interview of 2026-10-03, exported to `~/Downloads/commercial-template-plan.md` (outside the repo) on 2026-10-05; Engram topics `planning/commercial-site-*` (#314 to #343). Decisions are recorded in `docs/PLAN.md` ("Decisiones 2026-10-03: plantilla comercial").
+- Summary: separate private repo consuming a public `@elvinlab/core` as a versioned dependency; fixed layout with browser editing of text, images, posts, colors and section toggles; Cloudflare only; one purchase per site; no mandatory subscription; manual pilot with 3 buyers at a tentative USD 9.99 (ceiling 16 h per client, 48 h total).
+- Evidence: no browser editor exists in this repo (`docs/NOTES.md:21-31`); no CMS is chosen or tested (Decap, Keystatic and Tina were compared from docs only).
+- Proposed phases, none started: (1) prove browser editing end to end here, (2) extract and release core, (3) private template, (4) prove buyer installation, (5) three-buyer pilot.
+- Risk: it can displace the success criterion (3 notes; 2 live) and the pre-launch freeze. Starting phase 1 is the owner's decision.
+- Next step: owner decides if and when to open phase 1. Tracking issue: #77 (T49).
