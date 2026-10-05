@@ -54,6 +54,9 @@ which the deploy job requires.
 
 ### The note-page LCP gate is sensitive to a few bytes
 
+> **Correction (2026-10-05).** The sizes in this section (about 98 KB of HTML and 52 KB of inline CSS, later 94 KB and 48 KB) are from `wc -c` on the **real** build (`apps/web/dist`). The Lighthouse gate does not measure that page: its fixture (`fixture-preview.ts`, built through `createFixtureWorkspace`) inlines the layout stylesheet **twice**. The gate's own report for `/notes/smoke-es/` shows a 126,930 byte document (the real production note page is about 94 KB) and the fixture home has 14 `@font-face` rules against 7 in production. The LCP numbers below (2434, 2586, 2413 ms) are the gate's, so they carry that extra weight: the gate is stricter than production, which measured 1.0 to 2.2 s on real Lighthouse runs. Not yet known why the fixture duplicates the sheet: with `inlineStylesheets: 'never'` it emits a single 44 KB file, and the duplication does not depend on the temporary directory, the notes, or `SITE_INDEXABLE`. See `odd/tasks/plan-mejoras-elvinlab.md` ("T48").
+
+
 Lighthouse measures a fixture served by `astro preview`, which does **not** compress responses, under
 simulated slow 4G (about 1.6 Mbps, 150 ms round trip). The note page is about 98 KB of HTML, of which
 about 52 KB is inline CSS (the whole site stylesheet is inlined in every page), and it sits right at a
