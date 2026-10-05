@@ -374,3 +374,10 @@ Same method as the blog-off run, but with this site's real `experiments.json` (n
 - Finding: with `experiments: true` the nav, home and `/me/` link to `/experiments/`, but no `/experiments/` page is built in any variant (no route in `src/pages`; the projects routes are issue #64, T40, still open). Today only `experiments: false` is safe. This site already has it off. The `docs/CONFIGURATION` row says "Experiments section and pages", which is ahead of the code.
 - Baseline noise in every variant: `/404.html` links to `/en/404/`, which is not built.
 - Not tested: `home.*` flags, workerd runtime, the real production config.
+
+### Result 2026-10-05: `home.*` flags fixtures (observed, scratch script outside the repo)
+Same fixture method, `appearance: 'full'` with a `now` block injected, home HTML read for one string that only each section renders. 10 builds, all succeeded.
+- All seven flags (`heroPills`, `authorCard`, `hiringCard`, `now`, `pillars`, `notebookIndex`, `experiments`) are present when on and absent when set to `false`, one at a time, with every other section untouched.
+- `appearance: 'minimal'` with no `home` keys hides `heroPills` and `pillars` only; `minimal` plus `home.heroPills: true` shows the pills again (a set key wins over the preset), as documented.
+- Method note: a first marker for `experiments` matched the nav label and looked like a failure; a section-only marker fixed it. `home.experiments` also needs `features.experiments` by design (`resolveHome`), so the home never links to missing pages.
+- Not tested: workerd runtime, the real production config, `/me/` reacting to the preset.
