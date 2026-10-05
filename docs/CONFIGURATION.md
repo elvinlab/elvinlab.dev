@@ -421,7 +421,7 @@ Un botón anónimo de «estuve aquí» en cada nota (cabecera y final del artíc
 - **Límites:** el plan gratuito da 5 GB por cuenta. Si una funcionalidad llegara a desbordar la base compartida, dale su propia base y su propio binding.
 - Los bindings propios de una funcionalidad (el limitador `MARKS_RATE_LIMITER`) conservan el nombre de la funcionalidad; solo la base se comparte.
 
-**Mientras la base no exista y no esté enlazada, los botones no aparecen** (las Actions responden «no disponible» y la página no pinta nada): encender el flag sin los pasos de abajo es seguro, solo no muestra nada. Estos pasos se hacen en **tu cuenta de Cloudflare**. *En elvinlab.dev se creó y enlazó una primera base llamada `elvinlab-marks` el 2026-10-05, y se está reemplazando por `elvinlab-dev-db` para que la base crezca con el sitio; hasta repetir los pasos 1 a 3 con la base nueva, los botones siguen ocultos.*
+**Mientras la base no exista y no esté enlazada, los botones no aparecen** (las Actions responden «no disponible» y la página no pinta nada): encender el flag sin los pasos de abajo es seguro, solo no muestra nada. Estos pasos se hacen en **tu cuenta de Cloudflare**. *En elvinlab.dev los pasos 1 a 3 se hicieron el 2026-10-05: base `elvinlab-dev-db` en la región ENAM, su id y el binding `SITE_DB` están en `wrangler.jsonc` y la tabla `note_footprints` existe. (Una primera base llamada `elvinlab-marks` se creó y se borró el mismo día, vacía, para que el sitio tenga una base que pueda crecer.) Solo faltan el release (paso 4) y la comprobación (paso 5).*
 
 1. Creá la base (necesita `wrangler login`): `cd apps/web && mise exec -- pnpm exec wrangler d1 create elvinlab-dev-db`. Imprime un `database_id`.
 2. Agregá el binding en `apps/web/wrangler.jsonc`:

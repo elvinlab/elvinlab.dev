@@ -421,7 +421,7 @@ A one-tap, anonymous "I was here" button on every note (header and end of the ar
 - **Limits:** the free plan gives 5 GB per account. If a feature ever outgrows the shared database, give it its own database and its own binding.
 - Bindings that are specific to a feature (the rate limiter `MARKS_RATE_LIMITER`) keep the feature's name; only the database is shared.
 
-**Until the database exists and is bound the buttons do not appear** (the Actions answer "unavailable" and the page renders nothing): turning the flag on without the steps below is safe, it just shows nothing. These steps run in **your Cloudflare account**. *On elvinlab.dev a first database named `elvinlab-marks` was created and bound on 2026-10-05 and is being replaced by `elvinlab-dev-db` so the database can grow with the site; until steps 1 to 3 are repeated for the new database the buttons stay hidden.*
+**Until the database exists and is bound the buttons do not appear** (the Actions answer "unavailable" and the page renders nothing): turning the flag on without the steps below is safe, it just shows nothing. These steps run in **your Cloudflare account**. *On elvinlab.dev steps 1 to 3 were done on 2026-10-05: database `elvinlab-dev-db` in region ENAM, its id and the `SITE_DB` binding are in `wrangler.jsonc` and the `note_footprints` table exists. (A first database named `elvinlab-marks` was created and deleted the same day, empty, to give the site one database that can grow.) Only the release (step 4) and the check (step 5) remain.*
 
 1. Create the database (needs `wrangler login`): `cd apps/web && mise exec -- pnpm exec wrangler d1 create elvinlab-dev-db`. It prints a `database_id`.
 2. Add the binding to `apps/web/wrangler.jsonc`:

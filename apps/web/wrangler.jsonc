@@ -25,16 +25,15 @@
       "simple": { "limit": 30, "period": 60 }
     }
   ],
-  // PENDING (2026-10-05): the code now reads the binding `SITE_DB` (site-wide database `elvinlab-dev-db`,
-  // table `note_footprints`). This first database and binding name are replaced once the new database exists;
-  // until then the buttons stay hidden. Footprints on notes (docs/CONFIGURATION.md recipe 6.13). Created on 2026-10-05 with
-  // `wrangler d1 create elvinlab-marks`; the table comes from migrations/0001_marks.sql. Without this
-  // binding the marks Actions answer SERVICE_UNAVAILABLE and no button renders.
+  // Site-wide D1 database `elvinlab-dev-db` (created 2026-10-05), shared by every feature: each one owns
+  // its tables (today `note_footprints` for the footprints on notes) and migrations are one numbered
+  // sequence in migrations/. See docs/CONFIGURATION.md recipe 6.13. Without this binding the marks
+  // Actions answer SERVICE_UNAVAILABLE and no button renders.
   "d1_databases": [
     {
-      "binding": "MARKS_DB",
-      "database_name": "elvinlab-marks",
-      "database_id": "edd72441-6202-4d84-92af-8c3756020a83",
+      "binding": "SITE_DB",
+      "database_name": "elvinlab-dev-db",
+      "database_id": "540b8a2f-c637-419c-9f85-c49a38a72b7a",
       "migrations_dir": "migrations"
     }
   ],
