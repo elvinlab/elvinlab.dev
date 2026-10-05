@@ -11,10 +11,10 @@ export interface D1Like {
 
 const rowSchema = z.object({ total: z.int().nonnegative() });
 
-const TOTAL_SQL = 'SELECT total FROM marks WHERE slug = ?1';
+const TOTAL_SQL = 'SELECT total FROM note_footprints WHERE slug = ?1';
 // One statement, so concurrent taps cannot lose updates.
 const ADD_SQL =
-  'INSERT INTO marks (slug, total) VALUES (?1, ?2) ON CONFLICT(slug) DO UPDATE SET total = total + excluded.total RETURNING total';
+  'INSERT INTO note_footprints (slug, total) VALUES (?1, ?2) ON CONFLICT(slug) DO UPDATE SET total = total + excluded.total RETURNING total';
 
 export function createD1MarkStore(db: D1Like): MarkStore {
   return {

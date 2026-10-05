@@ -78,14 +78,14 @@ const request = (origin: string | null = 'https://example.test') => {
 function configure(options: { success?: boolean; row?: unknown } = {}) {
   const { success = true, row = { total: 8 } } = options;
   const first = vi.fn(async () => row);
-  mocks.env['MARKS_DB'] = { prepare: () => ({ bind: () => ({ first }) }) };
+  mocks.env['SITE_DB'] = { prepare: () => ({ bind: () => ({ first }) }) };
   mocks.env['MARKS_RATE_LIMITER'] = { limit: async () => ({ success }) };
   return first;
 }
 
 describe('marks Actions boundary', () => {
   afterEach(() => {
-    delete mocks.env['MARKS_DB'];
+    delete mocks.env['SITE_DB'];
     delete mocks.env['MARKS_RATE_LIMITER'];
   });
 

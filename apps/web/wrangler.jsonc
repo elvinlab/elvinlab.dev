@@ -25,7 +25,9 @@
       "simple": { "limit": 30, "period": 60 }
     }
   ],
-  // Footprints on notes (docs/CONFIGURATION.md recipe 6.13). Created on 2026-10-05 with
+  // PENDING (2026-10-05): the code now reads the binding `SITE_DB` (site-wide database `elvinlab-dev-db`,
+  // table `note_footprints`). This first database and binding name are replaced once the new database exists;
+  // until then the buttons stay hidden. Footprints on notes (docs/CONFIGURATION.md recipe 6.13). Created on 2026-10-05 with
   // `wrangler d1 create elvinlab-marks`; the table comes from migrations/0001_marks.sql. Without this
   // binding the marks Actions answer SERVICE_UNAVAILABLE and no button renders.
   "d1_databases": [

@@ -124,7 +124,7 @@ Las descripciones vienen del esquema (`.describe()`), por eso están en inglés.
 | `features.changelog` | `boolean` | yes |  | Visitor-facing /changelog page: off hides the footer link, marks it noindex and keeps it out of the sitemap. |
 | `features.me` | `boolean` | yes |  | The /me recruiter page: off hides it from the nav, marks it noindex and keeps it out of the sitemap. |
 | `features.readingMode` | `boolean` | yes |  | Reading mode on notes: off renders no toggle, loads no script or CSS and stores nothing in the browser. |
-| `features.marks` | `boolean` | yes |  | The anonymous "I was here" footprint button on notes. Needs the `MARKS_DB` D1 binding and the `MARKS_RATE_LIMITER` binding, otherwise the buttons never render. |
+| `features.marks` | `boolean` | yes |  | The anonymous "I was here" footprint button on notes. Needs the `SITE_DB` D1 binding (the site database, table `note_footprints`) and the `MARKS_RATE_LIMITER` binding, otherwise the buttons never render. |
 | `integrations` | `object` | no | `{}` | Public ids of third-party services. They ship in the HTML by design, so they live here and not in secrets. |
 | `integrations.cloudflareAnalyticsToken` | `string` | no |  | Cloudflare Web Analytics beacon token (public). Omit to turn analytics off. Env `PUBLIC_CF_ANALYTICS_TOKEN` overrides it. |
 | `integrations.turnstileSiteKey` | `string` | no |  | Cloudflare Turnstile public site key for the contact form, bound to the domain. Env `PUBLIC_TURNSTILE_SITE_KEY` overrides it (use a test key locally). |
@@ -410,21 +410,28 @@ Los textos de la interfaz están en `apps/web/src/shared/i18n/index.ts`. Añadir
 - JavaScript por página (30 KiB gzip): `apps/web/scripts/performance-budget.ts`.
 - Un presupuesto no se sube para «hacer pasar» un cambio: se arregla el cambio.
 
-### 6.13 Huellas en las notas (`marks`)
+### 6.13 Huellas en las notas (`marks`) y la base de datos del sitio
 
 Un botón anónimo de «estuve aquí» en cada nota (cabecera y final del artículo), con un contador por nota en Cloudflare D1. Los ajustes están en `site.config.ts`: `features.marks` (encendido o apagado) y el bloque `marks` (`animation`: `stamp`, `burst`, `pulse` o `none`; `maxPerVisitor`; `showCountFrom`; la tabla generada de la sección 3 lista los valores por defecto). Toda animación se detiene con `prefers-reduced-motion`. Registro de la decisión: [ADR 0013](adr/0013-footprints-on-notes-d1.md).
 
-**Mientras la base de datos no exista, los botones no aparecen** (las Actions responden «no disponible» y la página no pinta nada): encender el flag sin los pasos de abajo es seguro, solo no muestra nada. Estos pasos se hacen en **tu cuenta de Cloudflare**. *En elvinlab.dev los pasos 1 a 3 se hicieron el 2026-10-05: base `elvinlab-marks` en la región ENAM, su id y su binding ya están en `wrangler.jsonc` y la tabla existe. Solo faltan el release (paso 4) y la comprobación (paso 5).*
+**Una sola base de datos para todo el sitio.** La base es `elvinlab-dev-db`, enlazada como `SITE_DB`, y está pensada para alojar también funcionalidades futuras. Las reglas que la mantienen escalable:
 
-1. Creá la base (necesita `wrangler login`): `cd apps/web && mise exec -- pnpm exec wrangler d1 create elvinlab-marks`. Imprime un `database_id`.
+- **Una tabla por funcionalidad, con su nombre** (`note_footprints`; una funcionalidad futura añadiría, por ejemplo, `page_views`). Cada funcionalidad lee y escribe solo sus propias tablas, a través de su propio adaptador detrás de su propio puerto (`features/<x>/adapters/d1.ts`); nunca toca la tabla de otra.
+- **Las migraciones son una única secuencia numerada** en `apps/web/migrations/`, con nombre `NNNN_<funcionalidad>_<cambio>.sql` (hoy `0001_note_footprints.sql`). Wrangler anota lo aplicado en la tabla `d1_migrations` de esa base.
+- **Límites:** el plan gratuito da 5 GB por cuenta. Si una funcionalidad llegara a desbordar la base compartida, dale su propia base y su propio binding.
+- Los bindings propios de una funcionalidad (el limitador `MARKS_RATE_LIMITER`) conservan el nombre de la funcionalidad; solo la base se comparte.
+
+**Mientras la base no exista y no esté enlazada, los botones no aparecen** (las Actions responden «no disponible» y la página no pinta nada): encender el flag sin los pasos de abajo es seguro, solo no muestra nada. Estos pasos se hacen en **tu cuenta de Cloudflare**. *En elvinlab.dev se creó y enlazó una primera base llamada `elvinlab-marks` el 2026-10-05, y se está reemplazando por `elvinlab-dev-db` para que la base crezca con el sitio; hasta repetir los pasos 1 a 3 con la base nueva, los botones siguen ocultos.*
+
+1. Creá la base (necesita `wrangler login`): `cd apps/web && mise exec -- pnpm exec wrangler d1 create elvinlab-dev-db`. Imprime un `database_id`.
 2. Agregá el binding en `apps/web/wrangler.jsonc`:
    ```jsonc
    "d1_databases": [
-     { "binding": "MARKS_DB", "database_name": "elvinlab-marks", "database_id": "<el id del paso 1>", "migrations_dir": "migrations" }
+     { "binding": "SITE_DB", "database_name": "elvinlab-dev-db", "database_id": "<el id del paso 1>", "migrations_dir": "migrations" }
    ]
    ```
    (`MARKS_RATE_LIMITER`, el límite por IP, ya está declarado en `ratelimits`.)
-3. Creá la tabla en la base real: `mise exec -- pnpm exec wrangler d1 migrations apply elvinlab-marks --remote` (la migración es `apps/web/migrations/0001_marks.sql`).
+3. Creá las tablas en la base real: `mise exec -- pnpm exec wrangler d1 migrations apply elvinlab-dev-db --remote` (hoy aplica `apps/web/migrations/0001_note_footprints.sql`).
 4. Liberá como siempre (sección 7). Si el deploy falla con un error de autorización, puede que el token de API del entorno `production` de GitHub no tenga permiso para desplegar un Worker con un binding D1: agregale el permiso de edición de D1. *Esto no se verificó.*
 5. Comprobalo: abrí una nota, pulsá el botón y recargá (el contador se mantiene), o `curl -s -X POST https://TU-DOMINIO/_actions/marks.get/ -H 'content-type: application/json' -H 'origin: https://TU-DOMINIO' -d '{"slug":"<slug de una nota publicada>"}'`, que responde con el total.
 

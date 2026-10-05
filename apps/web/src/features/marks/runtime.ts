@@ -20,10 +20,10 @@ function buildPorts(
     log(`marks unavailable, bindings rejected: ${[...names].join(', ')}`);
     return null;
   }
-  const { MARKS_DB, MARKS_RATE_LIMITER } = parsed.data;
+  const { SITE_DB, MARKS_RATE_LIMITER } = parsed.data;
   return {
     catalog,
-    store: createD1MarkStore(MARKS_DB as D1Like),
+    store: createD1MarkStore(SITE_DB as D1Like),
     limiter: {
       async allow(ip) {
         const result = await MARKS_RATE_LIMITER.limit({ key: `marks:${ip}` });

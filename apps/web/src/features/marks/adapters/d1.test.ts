@@ -6,7 +6,7 @@ import { beforeEach, describe, expect, it } from 'vitest';
 import { createD1MarkStore, type D1Like } from './d1.ts';
 
 const migration = readFileSync(
-  new URL('../../../../migrations/0001_marks.sql', import.meta.url),
+  new URL('../../../../migrations/0001_note_footprints.sql', import.meta.url),
   'utf8',
 );
 

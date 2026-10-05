@@ -14,11 +14,15 @@ const hasFunction = (value: unknown, name: string): boolean =>
   name in value &&
   typeof (value as Record<string, unknown>)[name] === 'function';
 
-/** What the marks Actions need from the Worker environment; anything missing disables the feature. */
+/** What the marks Actions need from the Worker environment; anything missing disables the feature.
+ * `SITE_DB` is shared by every feature of the site (one database, one table per feature); the rate
+ * limiter is specific to this one. */
 export const marksBindingsSchema = z.object({
-  MARKS_DB: z
+  SITE_DB: z
     .custom<D1Binding>((value) => hasFunction(value, 'prepare'))
-    .describe('Cloudflare D1 database binding that stores the footprint totals.'),
+    .describe(
+      'The site-wide Cloudflare D1 database (`elvinlab-dev-db`). Every feature keeps its own tables in it; this one reads and writes `note_footprints`.',
+    ),
   MARKS_RATE_LIMITER: z
     .custom<RateLimitBinding>((value) => hasFunction(value, 'limit'))
     .describe('Cloudflare rate-limit binding declared in wrangler.jsonc.'),

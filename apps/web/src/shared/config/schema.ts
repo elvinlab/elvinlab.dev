@@ -303,7 +303,7 @@ export const siteConfigSchema = z
         marks: z
           .boolean()
           .describe(
-            'The anonymous "I was here" footprint button on notes. Needs the `MARKS_DB` D1 binding and the `MARKS_RATE_LIMITER` binding, otherwise the buttons never render.',
+            'The anonymous "I was here" footprint button on notes. Needs the `SITE_DB` D1 binding (the site database, table `note_footprints`) and the `MARKS_RATE_LIMITER` binding, otherwise the buttons never render.',
           ),
       })
       .describe(

@@ -8,7 +8,7 @@ function makeEnv(overrides: Record<string, unknown> = {}) {
   const prepare = vi.fn(() => ({ bind }));
   const limit = vi.fn(async (_options: { key: string }) => ({ success: true }));
   return {
-    env: { MARKS_DB: { prepare }, MARKS_RATE_LIMITER: { limit }, ...overrides },
+    env: { SITE_DB: { prepare }, MARKS_RATE_LIMITER: { limit }, ...overrides },
     prepare,
     bind,
     limit,
@@ -29,10 +29,10 @@ describe('readConfiguredMarks', () => {
   it('returns null and logs only key names when bindings are missing', async () => {
     const log = vi.fn();
     await expect(
-      readConfiguredMarks({ slug: 'first-note' }, { MARKS_DB: 'secret-value' }, catalog, log),
+      readConfiguredMarks({ slug: 'first-note' }, { SITE_DB: 'secret-value' }, catalog, log),
     ).resolves.toBeNull();
     const message = String(log.mock.calls[0]?.[0]);
-    expect(message).toContain('MARKS_DB');
+    expect(message).toContain('SITE_DB');
     expect(message).toContain('MARKS_RATE_LIMITER');
     expect(message).not.toContain('secret-value');
   });
