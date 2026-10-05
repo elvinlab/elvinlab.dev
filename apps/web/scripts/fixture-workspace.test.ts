@@ -35,6 +35,7 @@ function sourceWorkspace(): string {
   const root = mkdtempSync(join(tmpdir(), 'fixture-source-'));
   temporary.push(root);
   for (const path of [
+    '.gitignore',
     'package.json',
     'tsconfig.base.json',
     'apps/web/package.json',
@@ -90,6 +91,15 @@ it('builds with only the fixture notes, never the published ones', () => {
   temporary.push(workspace.root);
   expect(existsSync(join(workspace.web, 'src/content/notes/smoke-es/index.mdx'))).toBe(true);
   expect(existsSync(join(workspace.web, 'src/content/notes/real-note'))).toBe(false);
+  workspace.cleanup();
+});
+
+it('copies the root .gitignore: without it the build inlines the site stylesheet twice', () => {
+  const source = sourceWorkspace();
+  write(source, '.gitignore', 'node_modules/\ndist/\n');
+  const workspace = createFixtureWorkspace(source, join(source, 'fixtures'));
+  temporary.push(workspace.root);
+  expect(readFileSync(join(workspace.root, '.gitignore'), 'utf8')).toBe('node_modules/\ndist/\n');
   workspace.cleanup();
 });
 

@@ -316,5 +316,11 @@
     "category": "fixed",
     "title": "/favicon.ico no longer answers 404",
     "description": "Browsers, crawlers and link previews ask for /favicon.ico by default. The site now serves a small real icon there (5 KB) next to the SVG one, so those requests succeed. Forks should replace both files."
+  },
+  "lighthouse-fixture-fix": {
+    "date": "2026-10-05",
+    "category": "fixed",
+    "title": "The performance gate measures the page production serves",
+    "description": "The test build used by the Lighthouse gate was inlining the site stylesheet twice, so it measured a page about 43 KB heavier than the real one. It now matches the real build, and the gate's slowest simulated paint on the note page improved from about 2.4 s to 2.3 s with a wider margin to the budget."
   }
 }
