@@ -164,7 +164,15 @@ Put the file next to `index.mdx` and reference it with a relative path:
 ![Description of what the image shows](./screenshot.png)
 ```
 
-The site optimizes it on its own (converts it to WebP, sets width and height and loads it lazily). **Always write the alt text.**
+The site optimizes it on its own (converts it to WebP, sets width and height and loads it lazily) and frames it with the same rounded corners and hairline as its cards. **Always write the alt text.**
+
+Tips, measured on a test note:
+
+- A 1,600 px wide screenshot is enough: a 61 KB PNG became a 21.5 KB WebP, and the text column shows it at about 750 px (about 320 px on a phone). Do not upload originals of several MB.
+- Images load lazily and carry their dimensions, so they do not move the text or slow the first paint. Keep the first screen text-only: put images below the first section, never before the title.
+- A dark-theme screenshot sits fine in both themes because of the hairline frame; avoid screenshots with a transparent background.
+- **Check before publishing that the image shows no email address, token, private repository or personal data.**
+- The share card is generated from the title, not from the images of the note.
 
 **Links**
 
@@ -242,7 +250,7 @@ mise exec -- pnpm new-post "Why I rebuilt my site from scratch" --lang en --numb
 - [ ] `category` and `tags` lowercase and hyphenated, consistent with your other notes.
 - [ ] `pubDate` with the real date, in `YYYY-MM-DD` format.
 - [ ] No `#` title; sections with `##`.
-- [ ] Every image has alt text.
+- [ ] Every image has alt text, is about 1,600 px wide at most and shows no private data.
 - [ ] No private repository, no email, no project that does not exist yet.
 - [ ] If it has a translation, `translationOf` points to a note that is published too.
 - [ ] It reads well at 360 px, in light and dark theme and in reading mode.

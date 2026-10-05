@@ -164,7 +164,15 @@ Pon el archivo junto a `index.mdx` y refiérelo con ruta relativa:
 ![Descripción de lo que muestra la imagen](./captura.png)
 ```
 
-El sitio la optimiza solo (la convierte a WebP, fija ancho y alto y la carga de forma diferida). **Escribe siempre el texto alternativo.**
+El sitio la optimiza solo (la convierte a WebP, fija ancho y alto y la carga de forma diferida) y la enmarca con las mismas esquinas redondeadas y el mismo borde fino que sus tarjetas. **Escribe siempre el texto alternativo.**
+
+Consejos, medidos con una nota de prueba:
+
+- Con una captura de 1.600 px de ancho basta: un PNG de 61 KB pasó a un WebP de 21,5 KB, y la columna de texto lo muestra a unos 750 px (unos 320 px en el móvil). No subas originales de varios MB.
+- Las imágenes cargan de forma diferida y llevan sus dimensiones, así que no mueven el texto ni retrasan el primer pintado. Deja la primera pantalla solo con texto: pon las imágenes después de la primera sección, nunca antes del título.
+- Una captura con tema oscuro se ve bien en los dos temas gracias al borde fino; evita capturas con fondo transparente.
+- **Antes de publicar, comprueba que la imagen no muestre ningún correo, token, repositorio privado ni dato personal.**
+- La tarjeta para compartir se genera a partir del título, no de las imágenes de la nota.
 
 **Enlaces**
 
@@ -242,7 +250,7 @@ mise exec -- pnpm new-post "Why I rebuilt my site from scratch" --lang en --numb
 - [ ] `category` y `tags` en minúsculas con guiones y coherentes con tus otras notas.
 - [ ] `pubDate` con la fecha real, en formato `AAAA-MM-DD`.
 - [ ] Sin título `#`; secciones con `##`.
-- [ ] Todas las imágenes tienen texto alternativo.
+- [ ] Todas las imágenes tienen texto alternativo, miden unos 1.600 px de ancho como máximo y no muestran datos privados.
 - [ ] Ningún repositorio privado, ningún correo, ningún proyecto que aún no exista.
 - [ ] Si tiene traducción, `translationOf` apunta a una nota que también se publica.
 - [ ] Se lee bien en 360 px, en tema claro y oscuro y en modo lectura.

@@ -334,5 +334,11 @@
     "category": "added",
     "title": "New Lab Note 003: vibe coding or specify first",
     "description": "Why I define intent, scope and decisions in writing before asking an AI for code, what it gives me, what it costs to keep up to date and where I still experiment. Written from a rollback at work and from this site's own documents."
+  },
+  "note-images-and-share-titles": {
+    "date": "2026-10-05",
+    "category": "changed",
+    "title": "Framed images in notes and shorter link-preview titles",
+    "description": "Images inside a note get the same rounded corners and hairline as the site cards. A note's link preview (LinkedIn, X, WhatsApp, Facebook) now uses the note title alone, so it is cut off later; the browser tab keeps the site name."
   }
 }
