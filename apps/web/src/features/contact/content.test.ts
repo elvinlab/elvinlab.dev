@@ -33,6 +33,7 @@ const flatten = (page: ContactContent): string =>
     page.form.error.network,
     page.form.verifying,
     page.form.unavailable,
+    page.linkedin,
   ].join('\n');
 
 describe('buildContactContent', () => {
@@ -326,5 +327,12 @@ describe('buildContactContent', () => {
     expect(content.en.form.unavailable).toBe(
       'The form is not available yet. Please check back soon.',
     );
+  });
+
+  it('has a LinkedIn invitation in both locales, without an email address', () => {
+    expect(content.es.linkedin).toBe('¿Prefieres LinkedIn? Búscame allí.');
+    expect(content.en.linkedin).toBe('Prefer LinkedIn? Find me there.');
+    expect(content.es.linkedin).not.toContain('@');
+    expect(content.en.linkedin).not.toContain('@');
   });
 });

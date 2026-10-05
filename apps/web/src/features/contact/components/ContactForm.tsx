@@ -339,6 +339,12 @@ export function ContactForm({ siteKey, strings }: Props) {
         </p>
       )}
 
+      {isSubmitting && (
+        <p class="sr-only" role="status" aria-live="polite">
+          {strings.sending}
+        </p>
+      )}
+
       {isError && (
         <div
           class="rounded-control bg-danger/10 border border-danger/20 p-3 text-sm text-danger"

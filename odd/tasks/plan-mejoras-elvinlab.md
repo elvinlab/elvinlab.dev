@@ -87,3 +87,12 @@ Added after a second pass over the plan (gaps in the first issue set): #68 T44 c
 
 ## Next step
 Fresh start after the third release of 2026-10-02. Recommended next: Projects (#63, then #64) from the CV projects `elvinlab.dev` and `agentic-dev-setup`; it needs the owner's two projects with problem, role, screenshots and what is publishable (#66). Alternatives: #61 (credential titles in English), #68 (LinkedIn beside the contact form), #72 (cut the inline CSS, which also protects the Lighthouse margin). Rules to keep: the changelog gets an entry in the same unit as the change (baseline for the audit: the develop SHA in the last release commit message); check the note-page HTML size before and after any shared CSS or markup change; `full` was reduced on 2026-10-02, a separate `balanced` preset stays an option for forks; the owner authorizes every push and release.
+
+## T44 (#68) contact: LinkedIn alternative and sending state (2026-10-05)
+Done locally on `develop`, not released. A first delegation to opencode (`omniroute/elvinlabCode`) looped on one edit and left broken code (missing imports, wrong dictionary shape, no tests); it was interrupted, its partial work discarded with `git checkout` (tree was clean) and the task re-delegated to a Claude writer with a sharper brief.
+- Changed: a LinkedIn link under the form in ES and EN (read from `site.socials`, shared external-link helpers, 44 px hit area, renders nothing if the entry is missing); a `role="status"` `aria-live="polite"` `sr-only` line while sending (the sending state was only a button text change before); changelog entry `contact-linkedin-and-sending`.
+- Audit: field errors, success, verifying, error banner, values kept after a failed send and the disabled `aria-busy` button already worked; a test now locks the keep-text and announce behavior.
+- Anti-bot: no layer weakened (honeypot, minimum fill time client and server, per-IP rate limiter, Turnstile with hostname and action untouched). New e2e guard in both locales: no `mailto:` and no email address in the built `/contact/` HTML (only the form placeholder is allowed).
+- RED observed first: vitest 2 failed, e2e 3 failed. GREEN: 649 unit tests, `contact.spec.ts` 12 passed (re-run by the parent), typecheck, lint, depcruise clean, `/contact/` 18.42 KiB gzip of 30.
+- NOT run: full e2e, Lighthouse, white-label (light loop; run once before the release).
+- Left as a follow-up: fields are disabled while sending, so focus is lost after a failed send.

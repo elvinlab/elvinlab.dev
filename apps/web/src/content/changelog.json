@@ -280,5 +280,11 @@
     "category": "fixed",
     "title": "The animated background survives the Back button",
     "description": "Going to another page and pressing Back no longer leaves a blank banner with a broken-image icon: the background pauses instead of being destroyed and starts again when the page comes back."
+  },
+  "contact-linkedin-and-sending": {
+    "date": "2026-10-05",
+    "category": "added",
+    "title": "LinkedIn next to the contact form, and a spoken \"sending\" state",
+    "description": "The contact page now offers LinkedIn right under the form as an alternative, and screen readers hear a status message while a message is being sent. A failed send keeps what you typed."
   }
 }
