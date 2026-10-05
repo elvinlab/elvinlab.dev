@@ -10,6 +10,7 @@ const allOn = {
   experiments: true,
   changelog: true,
   readingMode: true,
+  marks: true,
   me: true,
 };
 

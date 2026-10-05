@@ -69,6 +69,7 @@ export const siteConfig = {
     me: true,
     changelog: true,
     readingMode: true,
+    marks: true,
   },
   // Public ids of third-party services. They ship in the HTML by design. An environment variable
   // with the same purpose overrides each one (PUBLIC_CF_ANALYTICS_TOKEN, PUBLIC_TURNSTILE_SITE_KEY).
@@ -86,6 +87,8 @@ export const siteConfig = {
     categoryId: 'DIC_kwDOUvCLAM4DG1yT',
   },
   background: { galaxy: true, cursorWaves: false },
+  // Footprint button on notes (animation, per-browser cap, counter threshold): docs/CONFIGURATION.md.
+  marks: { animation: 'stamp', maxPerVisitor: 50, showCountFrom: 5 },
   recruiter: {
     available: true,
     openToWork: false,

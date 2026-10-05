@@ -22,6 +22,7 @@ export const siteConfig = {
     me: true,
     changelog: true,
     readingMode: false,
+    marks: false,
   },
   legal: { privacyUpdated: '2026-01-01', termsUpdated: '2026-01-01' },
   background: { galaxy: true, cursorWaves: false },

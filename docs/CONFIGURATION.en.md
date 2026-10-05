@@ -91,6 +91,10 @@ The descriptions come from the schema (`.describe()`), which is why they are in 
 | `background` | `object` | no | `{"galaxy":true,"cursorWaves":false}` | Default animated banner background (each visitor can change it). All effects read the theme palette. |
 | `background.galaxy` | `boolean` | yes |  | Nebula clouds and a twinkling star field. |
 | `background.cursorWaves` | `boolean` | yes |  | Slow colour waves with a ripple that follows the pointer. |
+| `marks` | `object` | no | `{}` | Settings of the footprint button (`features.marks`). Every key is optional and falls back to its default. |
+| `marks.animation` | `'stamp' \| 'burst' \| 'pulse' \| 'none'` | no | `stamp` | Animation played when a reader leaves a footprint: `stamp` an ink stamp pressed on the page, `burst` a burst of pixel squares, `pulse` a soft ring, `none` no animation. All obey `prefers-reduced-motion`. |
+| `marks.maxPerVisitor` | `integer (min 1, max 200)` | no | `50` | Footprints one browser can leave on one note; after that taps add nothing. |
+| `marks.showCountFrom` | `integer (min 0, max 1000)` | no | `5` | The counter is hidden until a note has this many footprints; before that the button invites the reader to be among the first. |
 | `recruiter` | `object` | yes |  | Recruiter card on the home page and /me. |
 | `recruiter.available` | `boolean` | yes |  | Show or hide the whole availability line (not whether you are open to work). |
 | `recruiter.openToWork` | `boolean` | no | `true` | Whether you are open to work: green status dot when true, the brand accent colour when false. |
@@ -120,6 +124,7 @@ The descriptions come from the schema (`.describe()`), which is why they are in 
 | `features.changelog` | `boolean` | yes |  | Visitor-facing /changelog page: off hides the footer link, marks it noindex and keeps it out of the sitemap. |
 | `features.me` | `boolean` | yes |  | The /me recruiter page: off hides it from the nav, marks it noindex and keeps it out of the sitemap. |
 | `features.readingMode` | `boolean` | yes |  | Reading mode on notes: off renders no toggle, loads no script or CSS and stores nothing in the browser. |
+| `features.marks` | `boolean` | yes |  | The anonymous "I was here" footprint button on notes. Needs the `MARKS_DB` D1 binding and the `MARKS_RATE_LIMITER` binding, otherwise the buttons never render. |
 | `integrations` | `object` | no | `{}` | Public ids of third-party services. They ship in the HTML by design, so they live here and not in secrets. |
 | `integrations.cloudflareAnalyticsToken` | `string` | no |  | Cloudflare Web Analytics beacon token (public). Omit to turn analytics off. Env `PUBLIC_CF_ANALYTICS_TOKEN` overrides it. |
 | `integrations.turnstileSiteKey` | `string` | no |  | Cloudflare Turnstile public site key for the contact form, bound to the domain. Env `PUBLIC_TURNSTILE_SITE_KEY` overrides it (use a test key locally). |
