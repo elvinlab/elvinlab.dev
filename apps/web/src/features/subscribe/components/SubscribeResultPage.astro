@@ -16,7 +16,7 @@ const notesHref = localizePath('/notes/', locale, LOCALES);
 
 <BaseLayout locale={locale} path={`/subscribe/${kind}/`} title={title} noindex>
   <article
-    class="max-w-[68ch]"
+    class="max-w-[68ch] pt-10 md:pt-14"
     data-subscribe-page
     data-kind={kind}
     data-working={t(locale, 'subscribe.working')}
@@ -31,7 +31,7 @@ const notesHref = localizePath('/notes/', locale, LOCALES);
     </button>
     <noscript><p class="mt-6 text-text-secondary">{t(locale, 'subscribe.unavailable')}</p></noscript>
     <p role="status" aria-live="polite" class="mt-6 text-text-secondary empty:hidden" data-status></p>
-    <a href={notesHref} class="mt-6 inline-flex h-11 items-center text-primary underline decoration-dashed underline-offset-4">{t(locale, 'subscribe.back')}</a>
+    <a href={notesHref} class="mt-2 flex h-11 w-fit items-center text-primary underline decoration-dashed underline-offset-4 sm:ml-5 sm:mt-6 sm:inline-flex">{t(locale, 'subscribe.back')}</a>
   </article>
 </BaseLayout>
 
