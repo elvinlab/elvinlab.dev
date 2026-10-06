@@ -8,7 +8,7 @@ import { createHash } from 'node:crypto';
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname } from 'node:path';
 
-import { type CheckDef, inScope } from './verification-map.ts';
+import { type CheckDef, inScope, matchesAny } from './verification-map.ts';
 
 export interface FingerprintIo {
   /** Every non-ignored file of the repository, relative to the root (deleted files excluded). */
@@ -30,14 +30,23 @@ export interface Registry {
 
 export const EMPTY_REGISTRY: Registry = { version: 1, checks: {} };
 
-/** Fingerprints of several checks, hashing each file once. */
+/**
+ * Fingerprints of several checks, hashing each file once. The optional `wide` globs name the
+ * FULL-wide files (dependencies, toolchain, this tool): they belong to no check's scope, but a change
+ * to any of them invalidates every check, so they are part of every fingerprint.
+ */
 export function computeFingerprints(
   checks: readonly CheckDef[],
   io: FingerprintIo,
+  wide: readonly string[] = [],
 ): Record<string, string> {
   const files = io.list();
+  const wideFiles = wide.length > 0 ? files.filter((f) => matchesAny(f, wide)) : [];
   const perCheck = new Map(
-    checks.map((check) => [check.id, files.filter((f) => inScope(check, f))]),
+    checks.map((check) => [
+      check.id,
+      [...new Set([...files.filter((f) => inScope(check, f)), ...wideFiles])],
+    ]),
   );
   const needed = [...new Set([...perCheck.values()].flat())].sort();
   const hashes = io.hash(needed);

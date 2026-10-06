@@ -2,13 +2,13 @@
   "version": 1,
   "checks": {
     "lint": {
-      "fingerprint": "42ade4cddbbda7368f0c102422e90171f235b796",
-      "recordedAt": "2026-10-06T16:28:25.298Z",
+      "fingerprint": "34156e446979d69a2033be914bf2ab5b53b69ef9",
+      "recordedAt": "2026-10-06T16:32:36.686Z",
       "result": "pass"
     },
     "typecheck": {
-      "fingerprint": "6a4890e6953f5e114725d332e03b600ad3c133c2",
-      "recordedAt": "2026-10-06T16:28:25.298Z",
+      "fingerprint": "a5f7609d9c0e72e90ae5cacb7c7eb1036b20ea37",
+      "recordedAt": "2026-10-06T16:32:36.686Z",
       "result": "pass"
     },
     "depcruise": {
@@ -22,23 +22,23 @@
       "result": "pass"
     },
     "unit": {
-      "fingerprint": "c43e94699545eda8321a02b8ee0ed4d8dbcc7a8d",
-      "recordedAt": "2026-10-06T16:28:25.298Z",
+      "fingerprint": "8f7103b496b0ca6d9d3dc6da9ab1d2f691ac4ba8",
+      "recordedAt": "2026-10-06T16:32:36.686Z",
       "result": "pass"
     },
     "build": {
-      "fingerprint": "d53fc5d4556551dd76d4c33a2fd577810587d77f",
-      "recordedAt": "2026-10-06T16:28:25.298Z",
+      "fingerprint": "c9c31abb21d04cffa0e48b16533175fd8e4b4835",
+      "recordedAt": "2026-10-06T16:32:36.686Z",
       "result": "pass"
     },
     "js-budget": {
-      "fingerprint": "a3cd196f6a5f428b99c618fd6561cb635c87f3b7",
-      "recordedAt": "2026-10-06T16:28:25.298Z",
+      "fingerprint": "ced42e7e1427bd7175944c535a2307a1c2aad852",
+      "recordedAt": "2026-10-06T16:32:36.686Z",
       "result": "pass"
     },
     "white-label": {
-      "fingerprint": "c3a2749745523cdb67519e2f392e77264f17ac44",
-      "recordedAt": "2026-10-06T16:28:25.298Z",
+      "fingerprint": "fd3277ec662ab3b5ac2e1c17c725cd59acd10e9d",
+      "recordedAt": "2026-10-06T16:32:36.686Z",
       "result": "pass"
     },
     "cold-start": {
@@ -47,8 +47,8 @@
       "result": "pass"
     },
     "e2e:a11y.spec.ts": {
-      "fingerprint": "cef4880def832e913cdb7f0ddf19b3556f537c42",
-      "recordedAt": "2026-10-06T16:28:25.298Z",
+      "fingerprint": "47d9249403a2424c1eb85cd6089b6488d96ac2e6",
+      "recordedAt": "2026-10-06T16:32:36.686Z",
       "result": "pass"
     },
     "e2e:background.spec.ts": {
@@ -57,8 +57,8 @@
       "result": "pass"
     },
     "e2e:card-links.spec.ts": {
-      "fingerprint": "97c6d0fe059162ca306ecaa50207f7bd985b81bb",
-      "recordedAt": "2026-10-06T16:28:25.298Z",
+      "fingerprint": "7e5a5ff63d6a7b55eefefec8da72a0294a700718",
+      "recordedAt": "2026-10-06T16:32:36.686Z",
       "result": "pass"
     },
     "e2e:comments.spec.ts": {
@@ -72,8 +72,8 @@
       "result": "pass"
     },
     "e2e:cookies.spec.ts": {
-      "fingerprint": "085223c615203b739ea5ac7d1b159bcd181e9098",
-      "recordedAt": "2026-10-06T16:28:25.298Z",
+      "fingerprint": "294f937772dc82af3d4890e5894bfaf6bbd79613",
+      "recordedAt": "2026-10-06T16:32:36.686Z",
       "result": "pass"
     },
     "e2e:cv-and-credentials.spec.ts": {
@@ -82,13 +82,13 @@
       "result": "pass"
     },
     "e2e:external-links.spec.ts": {
-      "fingerprint": "2107aaa0dc342bd6197ca03cb1b4ab5e2212723d",
-      "recordedAt": "2026-10-06T16:28:25.298Z",
+      "fingerprint": "d2243414a6257804d20303f345e511b3bf33a41a",
+      "recordedAt": "2026-10-06T16:32:36.686Z",
       "result": "pass"
     },
     "e2e:favicon.spec.ts": {
-      "fingerprint": "f1ebd5100fc9b5f30ee43631cfb96a1489ba1517",
-      "recordedAt": "2026-10-06T16:28:25.298Z",
+      "fingerprint": "caf5c7c500ddaee25784fc6a029d4cdc01099b0d",
+      "recordedAt": "2026-10-06T16:32:36.686Z",
       "result": "pass"
     },
     "e2e:home-sections.spec.ts": {
@@ -97,8 +97,8 @@
       "result": "pass"
     },
     "e2e:internal-links.spec.ts": {
-      "fingerprint": "9e945a57996817d1e4336e8c59f5e933e09ab53a",
-      "recordedAt": "2026-10-06T16:28:25.298Z",
+      "fingerprint": "3f9f0d007c0b7c43ecd7b0d0e56fc3b2bb0be63a",
+      "recordedAt": "2026-10-06T16:32:36.686Z",
       "result": "pass"
     },
     "e2e:legal.spec.ts": {
@@ -107,8 +107,8 @@
       "result": "pass"
     },
     "e2e:link-previews.spec.ts": {
-      "fingerprint": "c0417b16b753337c14468f790a6e5a751fdef9e9",
-      "recordedAt": "2026-10-06T16:28:25.298Z",
+      "fingerprint": "21878accef6a059394f6ce6361c727304e429500",
+      "recordedAt": "2026-10-06T16:32:36.686Z",
       "result": "pass"
     },
     "e2e:me-experience-locale.spec.ts": {
@@ -132,18 +132,18 @@
       "result": "pass"
     },
     "e2e:performance.spec.ts": {
-      "fingerprint": "7614852c2e676b1b0746b21d8cb0e07659b57e2e",
-      "recordedAt": "2026-10-06T16:28:25.298Z",
+      "fingerprint": "1f0042052beb61f4dc9ccd27be56d77c588a4baf",
+      "recordedAt": "2026-10-06T16:32:36.686Z",
       "result": "pass"
     },
     "e2e:smoke.spec.ts": {
-      "fingerprint": "52785928bc50aba11b944dc3e5c2961ebbb855c8",
-      "recordedAt": "2026-10-06T16:28:25.298Z",
+      "fingerprint": "03f63f351aed94ff629ff0c02cf7442c4e42060a",
+      "recordedAt": "2026-10-06T16:32:36.686Z",
       "result": "pass"
     },
     "e2e:theme.spec.ts": {
-      "fingerprint": "7b98600eb469adc5b12c67a5fc72f09979a451d8",
-      "recordedAt": "2026-10-06T16:28:25.298Z",
+      "fingerprint": "df6c1a8d00c4c23b59bacb56d4ccdc3a4ea2ef23",
+      "recordedAt": "2026-10-06T16:32:36.686Z",
       "result": "pass"
     },
     "e2e:calm-pages.spec.ts": {
@@ -152,13 +152,13 @@
       "result": "pass"
     },
     "e2e:brand-mark.spec.ts": {
-      "fingerprint": "53aaec6bc4c29d1dabf8e95f4a4789c11f172354",
-      "recordedAt": "2026-10-06T16:28:25.298Z",
+      "fingerprint": "86e536d4455df1ae99ba17141d765483b0917209",
+      "recordedAt": "2026-10-06T16:32:36.686Z",
       "result": "pass"
     },
     "e2e:focus-not-obscured.spec.ts": {
-      "fingerprint": "c1a81acfc8b314b798b820df5150a8d66988df88",
-      "recordedAt": "2026-10-06T16:28:25.298Z",
+      "fingerprint": "2fa4e62fed67d737045ba581e5e3824bc97242fe",
+      "recordedAt": "2026-10-06T16:32:36.686Z",
       "result": "pass"
     },
     "e2e:interaction-polish.spec.ts": {
@@ -177,8 +177,8 @@
       "result": "pass"
     },
     "e2e:mobile-ux.spec.ts": {
-      "fingerprint": "8619e6e1a002f1cbecb9238e81238e9deeb24d92",
-      "recordedAt": "2026-10-06T16:28:25.298Z",
+      "fingerprint": "50a1a62cff539f551b9c9b1f1adf92f4847b6977",
+      "recordedAt": "2026-10-06T16:32:36.686Z",
       "result": "pass"
     },
     "e2e:notes-layout.spec.ts": {
@@ -237,8 +237,8 @@
       "result": "pass"
     },
     "e2e:back-to-top.spec.ts": {
-      "fingerprint": "f51af7bf31f20d658817ae50ae202021430baca4",
-      "recordedAt": "2026-10-06T16:28:25.298Z",
+      "fingerprint": "bce90e4a7df0114d62450e345dc1198e9b9e641d",
+      "recordedAt": "2026-10-06T16:32:36.686Z",
       "result": "pass"
     }
   }

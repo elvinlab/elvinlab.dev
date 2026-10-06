@@ -447,6 +447,6 @@
     "date": "2026-10-06",
     "category": "fixed",
     "title": "pnpm verify no longer skips checks after a toolchain change",
-    "description": "A change to the toolchain or the verification scripts selects every check again; before, the registry's freshness could hide all of them except lint."
+    "description": "A change to the toolchain, dependencies or the verification scripts now selects every check, in both the uncommitted-work plan and --stale; before, the registry's freshness could hide all of them except lint."
   }
 }

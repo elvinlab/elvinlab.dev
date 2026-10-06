@@ -36,6 +36,18 @@ afterEach(() => {
 });
 
 describe('computeFingerprints', () => {
+  it('makes every fingerprint depend on the FULL-wide files when they are given', () => {
+    const base = { 'src/a/x.ts': '1', 'src/b/y.ts': '1', 'tsconfig.json': '1' };
+    const wide = ['tsconfig*.json'];
+    const one = computeFingerprints(checks, io(base), wide);
+    const edited = computeFingerprints(checks, io({ ...base, 'tsconfig.json': '2' }), wide);
+    expect(edited['a']).not.toBe(one['a']);
+    expect(edited['b']).not.toBe(one['b']);
+    // Without the list a toolchain file belongs to no scope and changes nothing.
+    const plain = computeFingerprints(checks, io(base));
+    expect(computeFingerprints(checks, io({ ...base, 'tsconfig.json': '2' }))).toEqual(plain);
+  });
+
   const base = { 'src/a/x.ts': '1', 'src/b/y.ts': '2', 'docs/z.md': '3' };
 
   it('gives the same fingerprint for the same content, whatever the order', () => {
