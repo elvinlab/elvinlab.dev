@@ -28,10 +28,10 @@ The i18n dictionary is one file, so any edit would make every text-rendering spe
 Local implementation on `develop`. No push, no release, no remote operation. One writer at a time: starts after the marks UI task (M3 of `odd/tasks/marks.md`) is committed, because both would edit the working tree.
 
 ## Tasks
-- [ ] V1 Map and planner: `verification-map.ts`, pure planning functions (change detection input in, plan out), unit tests including the drift guards; dry-run CLI.
-- [ ] V2 Runner: execute the plan (unit, lint, types, depcruise, docs:config, build, budgets, white-label, cold start, e2e specs, Lighthouse URL filter), exit code and summary table; `--run`.
-- [ ] V3 Registry: fingerprints, `--record`, `--stale`, `odd/verification-state.json` seeded by one real full run.
-- [ ] V4 Docs and rule: `docs/TESTING.md`, `CLAUDE.md`, ledger note, changelog (tooling).
+- [x] V1 Map and planner: `verification-map.ts`, pure planning functions (change detection input in, plan out), unit tests including the drift guards; dry-run CLI.
+- [x] V2 Runner: execute the plan (unit, lint, types, depcruise, docs:config, build, budgets, white-label, cold start, e2e specs, Lighthouse URL filter), exit code and summary table; `--run`.
+- [x] V3 Registry: fingerprints, `--record`, `--stale`, `odd/verification-state.json` seeded by one real full run.
+- [x] V4 Docs and rule: `docs/TESTING.md`, `CLAUDE.md`, ledger note, changelog (tooling).
 - [ ] V5 Validation on real changes: replay three past commits (a docs-only one, a note-page one, a contact one) and compare the plan with what was really needed.
 
 ## Acceptance
@@ -39,4 +39,6 @@ Owner's example (2026-10-05): running the whole battery for the footer when it w
 A docs-only change plans lint only. A change to `ContactForm.tsx` plans the contact spec and the contact unit tests, no notes specs and no Lighthouse unless page bytes changed. A change to `global.css` is wide. The planner never schedules less than the manual impact map in `docs/TESTING.md` for the replayed commits.
 
 ## Progress
-Designed 2026-10-05. Waiting for M3 of the marks feature to be committed.
+Designed 2026-10-05, built the same day. V1 to V3 by one delegated writer with a 15 minute time box and scoped verification only; reviewed by the parent (its tests re-run: 30 passed, typecheck, lint, dry runs). 30 unit tests include the drift guards (all 29 specs mapped, every Lighthouse path in `lighthouserc.json`, no empty scope). Dry runs reported by the writer in a scratch copy: a docs-only file plans lint only; a `ContactForm.tsx` edit plans 22 checks (contact and shared specs, contact Lighthouse URLs only, no notes specs); the full `--stale` pass with a registry costs about 0.26 s. The tool's own files are a wide change, so the runner itself was proven in a scratch copy (a lint-only run, `--record` writes the registry, the next dry run reports "fresh").
+- Known limits: Biome cannot check Markdown, so a docs-only change plans `lint` and runs nothing; the e2e map is conservative (about 10 specs have narrow scopes, the rest map to every page, so a footer change selects nearly all of them); the width-dependent spec set was guessed (calm-pages, focus-not-obscured, interaction-polish, marks, mobile-ux, notes-layout, pixel-display, reading-mode, type-scale).
+- Left: V5 (replay three past commits against the plan) and the first real `--all --run --record` that seeds `odd/verification-state.json` (about a full battery of time; best done once after the current design changes).

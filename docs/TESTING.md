@@ -42,6 +42,29 @@ Verify what a change touches, and record it. Do not run the whole stack after ev
 6. **Delegated writers run only the checks the parent lists** under `## Verify` in the brief, taken from the map below. A writer does not run the full suite by default, and the parent does not repeat it.
 7. **Release:** run what the ledger shows as stale, then push. CI on `main` runs the whole stack once more (`static`, `e2e`, `lighthouse`, `checks`) before it deploys, so it is the full backstop; the local run before a release is not.
 
+### `pnpm verify`: the rule as a command
+
+`mise exec -- pnpm verify` reads what changed and prints which checks cover it and why; it runs nothing unless you ask.
+
+| Command | What it does |
+| --- | --- |
+| `pnpm verify` | plan for the uncommitted work (dry run) |
+| `pnpm verify --since <ref>` | plan for everything changed since a ref (for example the last release) |
+| `pnpm verify --stale` | plan every check whose scope differs from its last green run in `odd/verification-state.json` (a missing registry means everything is stale) |
+| `pnpm verify --all` | plan everything |
+| `pnpm verify --run` | execute the plan: cheap static checks first, then build, budgets, white-label, cold start, e2e, then Lighthouse; it keeps going after a failure and ends with one table; exit code is non-zero if anything failed |
+| `pnpm verify --run --record` | after a fully green run, store a fingerprint of each passing check's scope in `odd/verification-state.json` |
+| `--viewports all` | e2e at the three viewports instead of 1280 px (width-dependent areas always use three) |
+
+The single source of truth is [`apps/web/scripts/verification-map.ts`](../apps/web/scripts/verification-map.ts): every check with the globs it depends on (the impact map below is its human version). Unit tests guard it against drift: every spec under `tests/browser/` must be mapped, every Lighthouse path must exist in `lighthouserc.json`, and no scope may match zero files. A **fingerprint** is a hash of the path and content of every non-ignored file in the check's scope, so a check is fresh exactly when its files are byte-identical to the last green run, whatever the commit history. Details worth knowing:
+
+- Touching the tool itself (`apps/web/scripts/verif*`), `package.json`, the lockfile, the Astro, Vite, Tailwind, tsconfig or Biome configuration, `apps/web/src/styles/**`, the design tokens, `BaseLayout.astro` or `fixture-workspace.ts` is a **wide change**: every check is selected.
+- A diff in `apps/web/src/shared/i18n/index.ts` that only adds keys is ignored; a changed or removed key counts.
+- `pnpm verify --run` with Lighthouse runs only the affected URLs (`run-lighthouse-ci.ts --url <path>`, repeatable); with no flag it measures all six as before.
+- Biome does not read Markdown, so a docs-only change plans `lint` and runs nothing.
+- Most e2e specs are mapped to every page, so a change in a shared component such as the footer still selects nearly all of them; narrowing a spec's scope means checking what its pages render.
+- Seed the registry once with `pnpm verify --all --run --record`, then use `--stale` before a release.
+
 ### How to find what a change touches
 
 - **Unit tests:** `mise exec -- pnpm --filter web exec vitest related <files> --run` (Vitest follows the import graph; `--changed [ref]` does the same for everything changed since a ref). `codegraph affected <files> -q` lists affected test files too.
