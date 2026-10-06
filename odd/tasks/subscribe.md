@@ -91,3 +91,7 @@ The owner subscribed from the footer, confirmed, and received the note email. Dr
 
 ## Progress 2026-10-06: 8-bit landing pages (bounded writer, not committed)
 - [x] `/subscribe/confirm/` and `/subscribe/unsubscribe/` restyled as the band's dashed card with a pixel icon (envelope, check, exclamation) switched by `data-state`; BRAND row added, changelog `subscribe-pages-8bit`, e2e extended. Checks: see the coordinator handoff.
+
+## Dark mode check, 2026-10-06
+The owner confirmed the note email in dark mode in their own client and says it looks good. Still not checked: Outlook rendering and the unsubscribe click-through (it removes the owner from the list).
+
