@@ -159,6 +159,9 @@ Los comandos exactos están en la [receta 6.14](CONFIGURATION.md#614-suscripció
 - **Vista previa local sin enviar nada:** `mise exec -- node --import ./apps/web/scripts/register-alias.mjs apps/web/scripts/preview-email.ts` escribe los HTML y textos con datos de ejemplo en la carpeta `.email-preview/` (ignorada por git). Detalle en [`TESTING.md`](TESTING.md#email-previews).
 - **Revisa en clientes reales** con una dirección tuya de prueba: Gmail ignora el modo oscuro y cada cliente se ve distinto.
 
+> **Promociones:** Gmail suele clasificar los boletines en la pestaña Promociones, aunque no sean spam. El correo de confirmación y la página de «suscripción confirmada» lo avisan y piden arrastrar el correo a Principal; eso es lo que enseña a Gmail a entregar las notas siguientes en la bandeja principal.
+
+
 ## 9. Cómo se verificó y cómo probarlo tú
 
 - **Tests unitarios con fakes** (`features/subscribe/*.test.ts`, `shared/subscribe/*.test.ts`): reglas del dominio, adaptadores, plantillas y el comando del dueño. El test del adaptador D1 aplica la migración real sobre SQLite en memoria.

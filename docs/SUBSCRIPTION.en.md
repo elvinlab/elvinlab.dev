@@ -159,6 +159,9 @@ The exact commands are in [recipe 6.14](CONFIGURATION.en.md#614-email-subscripti
 - **Local preview without sending anything:** `mise exec -- node --import ./apps/web/scripts/register-alias.mjs apps/web/scripts/preview-email.ts` writes the HTML and text files with sample data into the git-ignored `.email-preview/` folder. Details in [`TESTING.md`](TESTING.md#email-previews).
 - **Check real clients** with a throwaway address you own: Gmail ignores dark mode and every client renders differently.
 
+> **Promotions:** Gmail often files newsletters in the Promotions tab even when they are not spam. The confirmation email and the "subscription confirmed" page say so and ask the reader to drag the email to Primary; that is what teaches Gmail to deliver the next notes to the main inbox.
+
+
 ## 9. How it was verified and how to test it yourself
 
 - **Unit tests with fakes** (`features/subscribe/*.test.ts`, `shared/subscribe/*.test.ts`): domain rules, adapters, templates and the owner command. The D1 adapter test applies the real migration to in-memory SQLite.

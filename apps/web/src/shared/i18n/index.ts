@@ -145,7 +145,8 @@ export const t = createTranslator({
       'subscribe.confirm.body':
         'Pulsa el botón para confirmar que quieres recibir por correo las notas nuevas y avisos de mis proyectos.',
       'subscribe.confirm.button': 'Confirmar suscripción',
-      'subscribe.confirm.done': 'Listo: tu suscripción está confirmada.',
+      'subscribe.confirm.done':
+        'Listo: tu suscripción está confirmada. Si las notas no llegan a tu bandeja principal, revisa la pestaña Promociones y arrastra el correo a Principal.',
       'subscribe.confirm.invalid':
         'Este enlace no es válido o ya venció. Puedes volver a suscribirte desde las notas.',
       'subscribe.unsubscribe.title': 'Darme de baja',
@@ -322,7 +323,8 @@ export const t = createTranslator({
       'subscribe.confirm.body':
         'Press the button to confirm you want to get new notes and announcements of my projects by email.',
       'subscribe.confirm.button': 'Confirm subscription',
-      'subscribe.confirm.done': 'Done: your subscription is confirmed.',
+      'subscribe.confirm.done':
+        'Done: your subscription is confirmed. If the notes do not reach your main inbox, check the Promotions tab and drag the email to Primary.',
       'subscribe.confirm.invalid':
         'This link is not valid or has expired. You can subscribe again from the notes.',
       'subscribe.unsubscribe.title': 'Unsubscribe',

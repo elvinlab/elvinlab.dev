@@ -106,6 +106,13 @@ describe.each(locales)('emails in %s', (locale) => {
     }
   });
 
+  it('tells the reader where to look if the notes land in Promotions, in html and text', () => {
+    const hint = locale === 'es' ? 'Promociones' : 'Promotions';
+    const email = renderConfirmationEmail(confirmation(locale));
+    expect(email.html).toContain(hint);
+    expect(email.text).toContain(hint);
+  });
+
   it('escapes dynamic values in html and keeps them literal in text', () => {
     const { html, subject, text } = mails.note;
     expect(html).not.toContain('<b>bold</b>');
