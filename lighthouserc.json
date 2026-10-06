@@ -10,7 +10,8 @@
         "http://127.0.0.1:4323/notes/",
         "http://127.0.0.1:4323/notes/smoke-es/",
         "http://127.0.0.1:4323/contact/",
-        "http://127.0.0.1:4323/en/contact/"
+        "http://127.0.0.1:4323/en/contact/",
+        "http://127.0.0.1:4323/subscribe/"
       ],
       "numberOfRuns": 3,
       "settings": {

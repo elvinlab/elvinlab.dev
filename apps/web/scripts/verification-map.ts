@@ -317,6 +317,7 @@ export const CHECKS: readonly CheckDef[] = [
   lighthouse('/notes/smoke-es/', NOTE_PAGE),
   lighthouse('/contact/', CONTACT),
   lighthouse('/en/contact/', CONTACT),
+  lighthouse('/subscribe/', SUBSCRIBE),
 ];
 
 /** True when `path` matches any glob. */

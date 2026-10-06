@@ -454,5 +454,11 @@
     "category": "fixed",
     "title": "A note can no longer be emailed twice to the same subscriber",
     "description": "The list now records every note sent to each subscriber, so sending notes out of order or re-running a send never duplicates one. Forks that already ran the subscription migration must apply 0003."
+  },
+  "subscribe-landing": {
+    "date": "2026-10-06",
+    "category": "added",
+    "title": "A page to share for subscribing",
+    "description": "/subscribe/ and /en/subscribe/ explain what the notes are, hold the same form as the footer and show the latest note. It is indexed and in the sitemap; confirm and unsubscribe stay hidden."
   }
 }

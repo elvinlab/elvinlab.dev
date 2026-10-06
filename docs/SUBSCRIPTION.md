@@ -22,6 +22,11 @@ Quien lee deja su correo en la banda del footer y recibe las notas nuevas y, de 
 
 Dónde se muestra la banda: en el footer de todas las páginas cuando están encendidos `features.blog`, `features.subscribe` y hay clave pública de Turnstile. **No** aparece en `/me` (se imprime como CV) ni en las páginas `/subscribe/*`. Las páginas de confirmación y baja existen en español e inglés (`/en/subscribe/...`).
 
+### Enlace para compartir
+
+`elvinlab.dev/subscribe` es el enlace que se manda a alguien (en inglés, `elvinlab.dev/en/subscribe`). Explica qué son las notas, trae el mismo formulario del footer, la última nota publicada en ese idioma y no muestra la banda del footer. Es indexable y está en el sitemap; las páginas de confirmación y baja siguen ocultas.
+
+
 ## 3. Arquitectura en un dibujo
 
 ```

@@ -22,6 +22,11 @@ A reader leaves an email in the footer band and gets the new notes and, now and 
 
 Where the band shows: in the footer of every page while `features.blog` and `features.subscribe` are on and a Turnstile site key exists. It does **not** show on `/me` (it prints as a CV) or on the `/subscribe/*` pages. The confirmation and unsubscribe pages exist in Spanish and English (`/en/subscribe/...`).
 
+### Link to share
+
+`elvinlab.dev/subscribe` is the link to send to someone (`elvinlab.dev/en/subscribe` in English). It explains what the notes are, carries the same form as the footer and the latest note in that language, and does not show the footer band. It is indexed and in the sitemap; the confirmation and unsubscribe pages stay hidden.
+
+
 ## 3. Architecture in one picture
 
 ```

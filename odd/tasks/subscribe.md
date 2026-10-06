@@ -121,3 +121,8 @@ Dry run first (4 confirmed Spanish subscribers had never received a note; pool 9
 - [ ] Owner step 2: after 0003, run once (records that note 3 also reached the four confirmed subscribers and the one who later unsubscribed; the backfill only knows note 1):
   `INSERT OR IGNORE INTO subscriber_notes (subscriber_id, slug, sent_at) SELECT id, 'vibe-coding-o-especificar-primero', COALESCE(confirmed_at, created_at, 0) FROM subscribers WHERE status IN ('confirmed','unsubscribed');`
 - [ ] Owner step 3: release (the code that reads the new table must not run before 0003 exists), then a dry run for note 3 must say 0 recipients.
+
+## Progress 2026-10-06: shareable subscription page (bounded writer, not committed)
+- Added `/subscribe/` and `/en/subscribe/` (`features/subscribe/components/SubscribeLanding.astro`, routes `subscribe-routes/index.astro` and `en-index.astro`, registered in `integrations/subscribe-routes.ts`, so they exist only with the blog and `features.subscribe` on). The band was split: `shared/subscribe/SubscribeForm.astro` (form, stub script, privacy link; `variant` band or page), `PixelEnvelope.astro` and `subscribe-root.ts` (the `data-*` root attributes); the footer band keeps every selector and text key.
+- Sitemap filter now hides only `/subscribe/confirm/` and `/subscribe/unsubscribe/` (and `/en` twins); `showSubscribeCta` test covers `/subscribe/`. Copy in `subscribe.page.*` (ES and EN). BRAND row, DESIGN line, SUBSCRIPTION es/en "link to share" section, changelog `subscribe-landing`.
+- Evidence: see the handoff (biome, typecheck, vitest, depcruise, docs:config, build, js-budget, white-label, one e2e run of `subscribe.spec.ts` at 1280 px, one Lighthouse run of `/subscribe/`).

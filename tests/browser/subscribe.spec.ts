@@ -308,6 +308,8 @@ test.describe('form in the footer', () => {
     const band = page.locator(FIELD);
     await band.getByLabel(FORM.email).fill('reader@example.test');
     await band.getByRole('button', { name: FORM.submit }).click();
+    // The wait only starts once the form is pending: do not fast-forward before that.
+    await expect(band.getByRole('status').filter({ hasText: FORM.verifying })).toBeVisible();
     await page.clock.fastForward(26_000);
     await expect(band.getByRole('status').filter({ hasText: FORM.timeout })).toBeVisible();
     await page.clock.fastForward(2_000);
@@ -522,4 +524,152 @@ test('the email field keeps a 44 px tap height on a phone', async ({ page }) => 
   await page.goto('/');
   const box = await page.locator('#subscribe-email').boundingBox();
   expect(box?.height).toBeGreaterThanOrEqual(44);
+});
+
+const PAGE = {
+  es: {
+    path: '/subscribe/',
+    lang: 'es',
+    h1: 'Lo que construyo, en tu correo.',
+    submit: FORM.submit,
+    label: FORM.email,
+    reassurance: 'Sin spam. Tu correo se usa solo para esto. Te das de baja en un clic.',
+    privacy: ['Cómo se usa tu correo', '/privacy/#subscribe'],
+    points: [
+      'Una nota, un correo.',
+      'Decisiones, no tutoriales.',
+      'De vez en cuando, un proyecto.',
+    ],
+    latest: 'La última nota',
+    alternates: { es: '/subscribe/', en: '/en/subscribe/' },
+  },
+  en: {
+    path: '/en/subscribe/',
+    lang: 'en',
+    h1: 'What I build, in your inbox.',
+    submit: 'Subscribe',
+    label: 'Where to send the notes',
+    reassurance: 'No spam. Your address is used for this only. Unsubscribe in one click.',
+    privacy: ['How your email is used', '/en/privacy/#subscribe'],
+    points: ['One note, one email.', 'Decisions, not tutorials.', 'Now and then, a project.'],
+    latest: 'The latest note',
+    alternates: { es: '/subscribe/', en: '/en/subscribe/' },
+  },
+} as const;
+
+for (const locale of ['es', 'en'] as const) {
+  const copy = PAGE[locale];
+  const form = '[data-subscribe-landing] [data-subscribe]';
+
+  test.describe(`the subscription page ${copy.path}`, () => {
+    test('is indexable, canonical, linked to its twin and has no footer band', async ({ page }) => {
+      await page.goto(copy.path);
+      await expect(page.locator('html')).toHaveAttribute('lang', copy.lang);
+      await expect(page.locator('meta[name="robots"]')).toHaveCount(0);
+      await expect(page.locator('link[rel="canonical"]')).toHaveAttribute(
+        'href',
+        new RegExp(`${copy.path}$`),
+      );
+      await expect(page.locator('link[rel="alternate"][hreflang="es"]')).toHaveAttribute(
+        'href',
+        new RegExp(`${copy.alternates.es}$`),
+      );
+      await expect(page.locator('link[rel="alternate"][hreflang="en"]')).toHaveAttribute(
+        'href',
+        new RegExp(`${copy.alternates.en}$`),
+      );
+      await expect(page.locator('[data-subscribe]')).toHaveCount(1);
+      await expect(page.locator('footer [data-subscribe]')).toHaveCount(0);
+      await expect(page.locator('[data-subscribe-cta]')).toHaveCount(0);
+    });
+
+    test('shows the headline and the form without scrolling at 390x844', async ({ page }) => {
+      await page.setViewportSize({ width: 390, height: 844 });
+      await page.goto(copy.path);
+      await expect(page.getByRole('heading', { level: 1, name: copy.h1 })).toBeVisible();
+      const submit = page.locator(form).getByRole('button', { name: copy.submit });
+      await expect(submit).toBeVisible();
+      const box = await submit.boundingBox();
+      expect((box?.y ?? 9999) + (box?.height ?? 0)).toBeLessThanOrEqual(844);
+      await expect(page.locator(form).getByLabel(copy.label)).toBeVisible();
+      await expect(page.locator(form)).toContainText(copy.reassurance);
+      await expect(page.locator(form).getByRole('link', { name: copy.privacy[0] })).toHaveAttribute(
+        'href',
+        copy.privacy[1],
+      );
+      for (const point of copy.points) await expect(page.getByText(point)).toBeVisible();
+    });
+
+    test('has no horizontal overflow at 360 px', async ({ page }) => {
+      await page.setViewportSize({ width: 360, height: 780 });
+      await page.goto(copy.path);
+      await expect(page.locator(form)).toBeVisible();
+      expect(
+        await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth),
+      ).toBe(true);
+    });
+
+    test('the latest note card links to a real note', async ({ page }) => {
+      await page.goto(copy.path);
+      const card = page.locator('[data-latest-note]');
+      // The fixture has Spanish notes only: the English page omits the card, never shows a stranger's language.
+      if (locale === 'en' && (await card.count()) === 0) return;
+      await expect(card).toContainText(copy.latest);
+      const link = card.getByRole('link');
+      const href = (await link.getAttribute('href')) ?? '';
+      expect(href).toMatch(/\/notes\/[^/]+\/$/);
+      const response = await page.request.get(href);
+      expect(response.status()).toBe(200);
+    });
+
+    test('a successful submit sends the page language', async ({ page }) => {
+      await stubTurnstile(page);
+      const calls = await mockAction(page, 'request', { status: 200, body: ok });
+      await page.goto(copy.path);
+      await page.locator(form).getByLabel(copy.label).fill('reader@example.test');
+      await page.locator(form).getByRole('button', { name: copy.submit }).click();
+      await expect(page.locator(form).getByRole('status').filter({ hasText: /\S/ })).toBeVisible();
+      expect(calls.bodies).toHaveLength(1);
+      expect(JSON.parse(calls.bodies[0] ?? '{}')).toMatchObject({
+        email: 'reader@example.test',
+        locale: copy.lang,
+        token: 'stub-token',
+      });
+    });
+
+    test('the envelope hops on hover only with motion allowed', async ({ page }) => {
+      const envelope = page.locator('[data-subscribe-landing] header svg');
+      await page.goto(copy.path);
+      await envelope.hover();
+      await page.waitForTimeout(400);
+      expect(await envelope.evaluate((el) => getComputedStyle(el).translate)).toBe('none');
+      await page.emulateMedia({ reducedMotion: 'no-preference' });
+      await page.mouse.move(0, 0);
+      await envelope.hover();
+      await expect
+        .poll(() => envelope.evaluate((el) => getComputedStyle(el).translate))
+        .not.toBe('none');
+    });
+
+    for (const theme of THEMES) {
+      test(`has no axe violations (${theme})`, async ({ page }) => {
+        await stubThirdParties(page);
+        await page.addInitScript((value) => localStorage.setItem('theme', value), theme);
+        await page.goto(copy.path);
+        await expect(page.locator('html')).toHaveAttribute('data-theme', theme);
+        await expect(page.locator(form).getByLabel(copy.label)).toBeVisible();
+        const { violations } = await scan(page);
+        expect(describeViolations(violations)).toEqual([]);
+      });
+    }
+  });
+}
+
+test('confirm and unsubscribe stay noindex while the subscription page is indexable', async ({
+  page,
+}) => {
+  for (const path of ['/subscribe/confirm/', '/subscribe/unsubscribe/', '/en/subscribe/confirm/']) {
+    await page.goto(path);
+    await expect(page.locator('meta[name="robots"]'), path).toHaveAttribute('content', /noindex/);
+  }
 });

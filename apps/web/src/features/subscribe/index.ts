@@ -3,6 +3,7 @@
  */
 
 export { isSubscribeActive } from './availability.ts';
+export { default as SubscribeLanding } from './components/SubscribeLanding.astro';
 export { default as SubscribeResultPage } from './components/SubscribeResultPage.astro';
 export { SUBSCRIBE_PATHS, SUBSCRIBE_POLICY } from './config.ts';
 export { noteToSend } from './note-to-send.ts';

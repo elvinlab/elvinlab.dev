@@ -68,8 +68,14 @@ describe('isHiddenFromSitemap', () => {
       '/subscribe/confirm/',
       '/subscribe/unsubscribe/',
       '/en/subscribe/confirm/',
+      '/en/subscribe/unsubscribe/',
     ]) {
       expect(isHiddenFromSitemap(path, allOn)).toBe(true);
     }
+  });
+
+  it('keeps the indexable subscription page and its English twin', () => {
+    expect(isHiddenFromSitemap('/subscribe/', allOn)).toBe(false);
+    expect(isHiddenFromSitemap('/en/subscribe/', allOn)).toBe(false);
   });
 });

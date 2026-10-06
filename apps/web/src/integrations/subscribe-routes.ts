@@ -11,12 +11,14 @@ const entry = (file: string): string =>
   fileURLToPath(new URL(`../subscribe-routes/${file}`, import.meta.url));
 
 /**
- * The confirmation and unsubscribe pages and the owner's notify endpoint. Like the blog routes they live
+ * The subscription page, the confirmation and unsubscribe pages and the owner's notify endpoint. Like the blog routes they live
  * outside `src/pages` so they can be left out: with the flag off they do not exist at all.
  */
 export function subscribeRoutes(enabled: boolean): SubscribeRoute[] {
   if (!enabled) return [];
   return [
+    { pattern: '/subscribe', entrypoint: entry('index.astro') },
+    { pattern: '/en/subscribe', entrypoint: entry('en-index.astro') },
     { pattern: '/subscribe/confirm', entrypoint: entry('confirm.astro') },
     { pattern: '/subscribe/unsubscribe', entrypoint: entry('unsubscribe.astro') },
     { pattern: '/en/subscribe/confirm', entrypoint: entry('en-confirm.astro') },

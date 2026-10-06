@@ -13,7 +13,9 @@ describe('showSubscribeCta', () => {
   });
 
   it('hides on the subscription pages and the printable CV', () => {
-    expect(showSubscribeCta({ ...base, path: '/subscribe/confirm/' })).toBe(false);
+    for (const path of ['/subscribe/', '/subscribe/confirm/', '/subscribe/unsubscribe/']) {
+      expect(showSubscribeCta({ ...base, path })).toBe(false);
+    }
     expect(showSubscribeCta({ ...base, path: '/me/', printable: true })).toBe(false);
   });
 
