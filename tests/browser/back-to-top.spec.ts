@@ -251,6 +251,8 @@ test.describe('back to top', () => {
         await page.setViewportSize(viewport);
         await page.goto(path);
         await settle(page);
+        // This test inspects the shown button for a while: the idle auto-hide must not race it.
+        await setIdle(page, 600_000);
         const max = await page.evaluate(
           () => document.documentElement.scrollHeight - window.innerHeight,
         );
