@@ -45,9 +45,9 @@ export interface SubscriberRepository {
   confirmByHash(confirmHash: string, now: number): Promise<boolean>;
   /** Idempotent: an already unsubscribed row stays as it is. */
   markUnsubscribed(id: string, now: number): Promise<void>;
-  /** Confirmed subscribers whose `lastNote` differs from the slug, ordered by id. */
-  listUnnotified(slug: string, limit: number): Promise<Subscriber[]>;
-  countUnnotified(slug: string): Promise<number>;
+  /** Confirmed subscribers of the locale whose `lastNote` differs from the slug, ordered by id. */
+  listUnnotified(slug: string, locale: SubscribeLocale, limit: number): Promise<Subscriber[]>;
+  countUnnotified(slug: string, locale: SubscribeLocale): Promise<number>;
   markNotified(ids: readonly string[], slug: string): Promise<void>;
   /** Deletes pending rows created before the cutoff; returns how many. */
   purgePendingBefore(cutoff: number): Promise<number>;

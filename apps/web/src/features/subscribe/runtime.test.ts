@@ -7,6 +7,7 @@ import { asD1 } from './adapters/sqlite-d1.ts';
 import {
   confirmConfiguredSubscription,
   createLinks,
+  notifyConfigured,
   sendNoteConfigured,
   submitConfiguredSubscribe,
   unsubscribeConfigured,
@@ -99,7 +100,12 @@ describe('configured subscribe runtime', () => {
       'invalid_or_expired',
     );
 
-    const note = { slug: 'a-note', title: 'A note', url: 'https://site.test/notes/a-note/' };
+    const note = {
+      slug: 'a-note',
+      title: 'A note',
+      url: 'https://site.test/notes/a-note/',
+      locale: 'en' as const,
+    };
     await expect(sendNoteConfigured(note, bindings, SITE, {}, request, log)).resolves.toEqual({
       sent: 1,
       remaining: 0,
@@ -149,5 +155,56 @@ describe('createLinks', () => {
     expect(links.unsubscribe('id.sig', 'en')).toBe(
       'https://site.test/en/subscribe/unsubscribe/?token=id.sig',
     );
+  });
+});
+
+describe('notifyConfigured', () => {
+  const ADMIN = 'a'.repeat(48);
+  const body = JSON.stringify({ slug: 'a-note', dryRun: true });
+  const call = (extra: Record<string, unknown>, authorization = `Bearer ${ADMIN}`) => {
+    const { bindings, limiter } = setup();
+    const log = vi.fn();
+    const findNote = vi.fn(async () => ({
+      slug: 'a-note',
+      title: 'A note',
+      url: 'https://site.test/notes/a-note/',
+      locale: 'es' as const,
+    }));
+    const result = notifyConfigured(
+      { authorization, contentType: 'application/json', ip: '192.0.2.9', body },
+      { ...bindings, ...extra },
+      SITE,
+      findNote,
+      vi.fn<typeof fetch>(),
+      log,
+    );
+    return { result, limiter, log };
+  };
+
+  it('answers 503 without the owner secret, whatever else is configured', async () => {
+    const { result, log } = call({});
+    await expect(result).resolves.toEqual({ status: 503 });
+    expect(log).toHaveBeenCalledWith(expect.stringContaining('SUBSCRIBE_ADMIN_TOKEN'));
+    expect(JSON.stringify(log.mock.calls)).not.toContain(ADMIN);
+  });
+
+  it('answers 503 for a short secret and never logs its value', async () => {
+    const { result, log } = call({ SUBSCRIBE_ADMIN_TOKEN: 'short-secret' });
+    await expect(result).resolves.toEqual({ status: 503 });
+    expect(JSON.stringify(log.mock.calls)).not.toContain('short-secret');
+  });
+
+  it('throttles with its own limiter key and answers a dry run with counts', async () => {
+    const { result, limiter } = call({ SUBSCRIBE_ADMIN_TOKEN: ADMIN });
+    await expect(result).resolves.toEqual({
+      status: 200,
+      body: { recipients: 0, wouldSend: 0, remainingPool: 100 },
+    });
+    expect(limiter.limit).toHaveBeenCalledWith({ key: 'notify:192.0.2.9' });
+  });
+
+  it('answers a bare 401 for a wrong token', async () => {
+    const { result } = call({ SUBSCRIBE_ADMIN_TOKEN: ADMIN }, 'Bearer nope');
+    await expect(result).resolves.toEqual({ status: 401 });
   });
 });

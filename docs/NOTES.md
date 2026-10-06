@@ -235,6 +235,7 @@ mise exec -- pnpm new-post "Why I rebuilt my site from scratch" --lang en --numb
 4. Revisa la tarjeta: `apps/web/dist/client/og/notes/<slug>.png`.
 5. Commit, con mensaje convencional: `feat(notes): publish "Título"`. Si quieres avisar a los visitantes, añade una entrada al `changelog.json` (guía de configuración, receta 6.4).
 6. Push a `develop` y release a `main` ([guía de configuración, sección 7](CONFIGURATION.md#7-publicar-release-y-revertir)).
+   Si la suscripción está encendida, una vez liberada avisa a la lista con `SUBSCRIBE_ADMIN_TOKEN=... pnpm notify:note <slug>` (prueba en seco) y luego con `--send` (receta 6.14).
 7. Ya en producción: abre la nota, comprueba que la tarjeta se ve bien al compartir el enlace (refresca la caché con el [Facebook Sharing Debugger](https://developers.facebook.com/tools/debug/) o el [LinkedIn Post Inspector](https://www.linkedin.com/post-inspector/)) y que los comentarios cargan.
 
 ## 10. Editar o retirar una nota publicada

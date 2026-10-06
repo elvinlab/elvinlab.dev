@@ -105,6 +105,15 @@ export const ENV_VARS: readonly EnvVar[] = [
     setIn: 'Cloudflare Worker secret; `.dev.vars` locally',
   },
   {
+    name: 'SUBSCRIBE_ADMIN_TOKEN',
+    scope: 'worker',
+    secret: true,
+    required: false,
+    description:
+      'Random secret (at least 32 characters) the owner sends as a Bearer token to `POST /api/subscribe/notify`, the trigger that emails a published note to the list (`pnpm notify:note`). Required only to send notes; without it the endpoint answers 503. Keep it in a password manager, never in the repository.',
+    setIn: 'Cloudflare Worker secret; `.dev.vars` locally',
+  },
+  {
     name: 'CLOUDFLARE_API_TOKEN',
     scope: 'ci',
     secret: true,

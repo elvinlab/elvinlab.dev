@@ -118,20 +118,30 @@ describe('D1 subscriber repository', () => {
     for (const id of ['c', 'a', 'b']) await confirm(id);
     await repo.insertPending(row('p'));
     await repo.markUnsubscribed('b', 3_000);
-    expect((await repo.listUnnotified('n1', 10)).map((s) => s.id)).toEqual(['a', 'c']);
-    expect((await repo.listUnnotified('n1', 1)).map((s) => s.id)).toEqual(['a']);
+    expect((await repo.listUnnotified('n1', 'es', 10)).map((s) => s.id)).toEqual(['a', 'c']);
+    expect((await repo.listUnnotified('n1', 'es', 1)).map((s) => s.id)).toEqual(['a']);
     await repo.markNotified(['a'], 'n1');
-    expect((await repo.listUnnotified('n1', 10)).map((s) => s.id)).toEqual(['c']);
-    await expect(repo.countUnnotified('n1')).resolves.toBe(1);
-    await expect(repo.countUnnotified('n2')).resolves.toBe(2);
+    expect((await repo.listUnnotified('n1', 'es', 10)).map((s) => s.id)).toEqual(['c']);
+    await expect(repo.countUnnotified('n1', 'es')).resolves.toBe(1);
+    await expect(repo.countUnnotified('n2', 'es')).resolves.toBe(2);
     await repo.markNotified([], 'n1');
+  });
+
+  it('lists and counts only the subscribers of the requested locale', async () => {
+    await repo.insertPending(row('e', { locale: 'en' }));
+    await repo.confirmByHash('hash-e', 2_000);
+    await confirm('s');
+    expect((await repo.listUnnotified('n1', 'en', 10)).map((s) => s.id)).toEqual(['e']);
+    expect((await repo.listUnnotified('n1', 'es', 10)).map((s) => s.id)).toEqual(['s']);
+    await expect(repo.countUnnotified('n1', 'en')).resolves.toBe(1);
+    await expect(repo.countUnnotified("n1'; DROP TABLE subscribers;--", 'es')).resolves.toBe(1);
   });
 
   it('marks a hundred ids at once', async () => {
     const ids = Array.from({ length: 150 }, (_, index) => `s${String(index).padStart(3, '0')}`);
     for (const id of ids) await confirm(id);
     await repo.markNotified(ids.slice(0, 120), 'n1');
-    await expect(repo.countUnnotified('n1')).resolves.toBe(30);
+    await expect(repo.countUnnotified('n1', 'es')).resolves.toBe(30);
   });
 
   it('purges only old pending rows', async () => {

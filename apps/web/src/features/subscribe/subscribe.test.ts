@@ -316,6 +316,7 @@ describe('sendNote', () => {
     title: 'A note',
     url: 'https://site.test/notes/a-note/',
     summary: 'About something',
+    locale: 'es' as const,
   };
 
   async function withConfirmed(count: number) {
@@ -345,6 +346,24 @@ describe('sendNote', () => {
       summary: note.summary,
     });
     expect(batch?.key).toBe(`note:a-note:${[...ids].sort()[0]}`);
+  });
+
+  it('sends a note only to the confirmed subscribers of its language', async () => {
+    const { ports, batches } = await withConfirmed(2);
+    await subscribe(
+      input({ email: ['lector', 'example.test'].join('@'), locale: 'en' }),
+      IP,
+      ports,
+    );
+    await confirmSubscription('token3', ports);
+    await expect(sendNote(note, ports)).resolves.toEqual({ sent: 2, remaining: 0, failed: false });
+    expect(batches[0]?.messages.map((message) => message.locale)).toEqual(['es', 'es']);
+    await expect(sendNote({ ...note, locale: 'en' }, ports)).resolves.toEqual({
+      sent: 1,
+      remaining: 0,
+      failed: false,
+    });
+    expect(batches[1]?.messages.map((message) => message.locale)).toEqual(['en']);
   });
 
   it('marks last_note only after the mailer succeeded', async () => {
@@ -426,7 +445,12 @@ describe('the mail provider is behind a port', () => {
     expect(outbox).toEqual([`confirm|${EMAIL}|https://site.test/es/confirm/?token=token1`]);
     await expect(confirmSubscription('token1', ports)).resolves.toBe('confirmed');
     const result = await sendNote(
-      { slug: 'a-note', title: 'A note', url: 'https://site.test/notes/a-note/' },
+      {
+        slug: 'a-note',
+        title: 'A note',
+        url: 'https://site.test/notes/a-note/',
+        locale: 'es',
+      },
       ports,
     );
     expect(result).toEqual({ sent: 1, remaining: 0, failed: false });

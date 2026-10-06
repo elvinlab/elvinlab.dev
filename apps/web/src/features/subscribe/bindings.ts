@@ -69,3 +69,20 @@ export const sendBindingsSchema = subscribeBindingsSchema.pick({
   RESEND_API_KEY: true,
   SUBSCRIBE_FROM: true,
 });
+
+/**
+ * The owner trigger. Its secret is checked here and not in `subscribeBindingsSchema`: a site that
+ * has not created `SUBSCRIBE_ADMIN_TOKEN` yet keeps its public subscription working and only the
+ * endpoint answers 503.
+ */
+export const notifyBindingsSchema = sendBindingsSchema.extend({
+  SUBSCRIBE_RATE_LIMITER: subscribeBindingsSchema.shape.SUBSCRIBE_RATE_LIMITER,
+  SUBSCRIBE_ADMIN_TOKEN: z
+    .string()
+    .min(32)
+    .max(4_096)
+    .regex(/^\S+$/)
+    .describe(
+      'Secret the owner sends as a Bearer token to trigger a note email (at least 32 characters).',
+    ),
+});

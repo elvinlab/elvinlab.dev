@@ -44,6 +44,16 @@ function collectHtml(dir: string): string {
   return html;
 }
 
+function collectServerText(dir: string): string {
+  let text = '';
+  for (const entry of readdirSync(dir, { withFileTypes: true })) {
+    const path = join(dir, entry.name);
+    if (entry.isDirectory()) text += collectServerText(path);
+    else if (/\.(?:mjs|js|json)$/.test(entry.name)) text += readFileSync(path, 'utf8');
+  }
+  return text;
+}
+
 const workspace = createFixtureWorkspace(source, join(source, 'tests/fixtures/notes'));
 try {
   // Swap identity (config) and identity-bearing content (experiments) for neutral fixtures.
@@ -60,6 +70,11 @@ try {
     env: { ...process.env, SITE_INDEXABLE: 'true' },
   });
   if (build.status !== 0) fail('the alternative-identity build failed');
+
+  // The owner's notify endpoint is a server route: with `features.subscribe` off it must not exist.
+  if (collectServerText(join(workspace.web, 'dist/server')).includes('/api/subscribe/')) {
+    fail('the /api/subscribe/ endpoint exists although features.subscribe is off');
+  }
 
   const rawHtml = collectHtml(join(workspace.web, 'dist/client'));
   if (!rawHtml.includes('Jane Doe') || !rawHtml.includes('janedoe')) {

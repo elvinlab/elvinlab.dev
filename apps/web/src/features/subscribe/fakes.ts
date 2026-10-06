@@ -63,16 +63,19 @@ export function createFakeRepository() {
       if (row)
         Object.assign(row, { status: 'unsubscribed', confirmHash: null, confirmExpires: null });
     },
-    async listUnnotified(slug, limit) {
+    async listUnnotified(slug, locale, limit) {
       return [...rows.values()]
-        .filter((row) => row.status === 'confirmed' && row.lastNote !== slug)
+        .filter(
+          (row) => row.status === 'confirmed' && row.locale === locale && row.lastNote !== slug,
+        )
         .sort((a, b) => a.id.localeCompare(b.id))
         .slice(0, limit)
         .map(publicView);
     },
-    async countUnnotified(slug) {
-      return [...rows.values()].filter((row) => row.status === 'confirmed' && row.lastNote !== slug)
-        .length;
+    async countUnnotified(slug, locale) {
+      return [...rows.values()].filter(
+        (row) => row.status === 'confirmed' && row.locale === locale && row.lastNote !== slug,
+      ).length;
     },
     async markNotified(ids, slug) {
       for (const id of ids) {

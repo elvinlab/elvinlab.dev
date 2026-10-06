@@ -56,9 +56,9 @@ const SQL = {
   unsubscribe: `UPDATE subscribers SET status = 'unsubscribed', confirm_hash = NULL, confirm_expires = NULL, unsubscribed_at = ?2
     WHERE id = ?1 AND status <> 'unsubscribed'`,
   unnotified: `SELECT ${COLUMNS} FROM subscribers
-    WHERE status = 'confirmed' AND (last_note IS NULL OR last_note <> ?1) ORDER BY id LIMIT ?2`,
+    WHERE status = 'confirmed' AND locale = ?2 AND (last_note IS NULL OR last_note <> ?1) ORDER BY id LIMIT ?3`,
   countUnnotified: `SELECT COUNT(*) AS total FROM subscribers
-    WHERE status = 'confirmed' AND (last_note IS NULL OR last_note <> ?1)`,
+    WHERE status = 'confirmed' AND locale = ?2 AND (last_note IS NULL OR last_note <> ?1)`,
   // The ids travel as one JSON array parameter: D1 caps bound parameters per statement at 100.
   markNotified: `UPDATE subscribers SET last_note = ?2 WHERE status = 'confirmed' AND id IN (SELECT value FROM json_each(?1))`,
   // One statement: the increment is refused (no row returned) once the day reached the cap.
@@ -120,12 +120,12 @@ export function createD1SubscriberRepository(db: D1Like): SubscriberRepository {
     async markUnsubscribed(id, now) {
       await run(SQL.unsubscribe, id, now);
     },
-    async listUnnotified(slug, limit) {
-      const { results } = await db.prepare(SQL.unnotified).bind(slug, limit).all();
+    async listUnnotified(slug, locale, limit) {
+      const { results } = await db.prepare(SQL.unnotified).bind(slug, locale, limit).all();
       return results.map(toSubscriber);
     },
-    async countUnnotified(slug) {
-      return countSchema.parse(await one(SQL.countUnnotified, slug)).total;
+    async countUnnotified(slug, locale) {
+      return countSchema.parse(await one(SQL.countUnnotified, slug, locale)).total;
     },
     async markNotified(ids, slug) {
       if (ids.length === 0) return;

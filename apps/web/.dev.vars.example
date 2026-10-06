@@ -22,3 +22,6 @@ SUBSCRIBE_FROM=
 
 # Random secret (at least 32 characters) that signs the unsubscribe link of every email. Required only when `features.subscribe` is on. Changing it invalidates the unsubscribe links already sent.
 SUBSCRIBE_TOKEN_SECRET=
+
+# Random secret (at least 32 characters) the owner sends as a Bearer token to `POST /api/subscribe/notify`, the trigger that emails a published note to the list (`pnpm notify:note`). Required only to send notes; without it the endpoint answers 503. Keep it in a password manager, never in the repository.
+SUBSCRIBE_ADMIN_TOKEN=
