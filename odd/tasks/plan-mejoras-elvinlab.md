@@ -195,3 +195,9 @@ Supersedes the "#76 left open" note above. #76 itself had started to conflict wi
 - Verified on both versions. On Preact 10 (current `develop`): typecheck 0 errors, lint, 657 unit tests, quick e2e 256 passed. On Preact 11 (worktree, whole battery): lint, unit 37 + 657, depcruise, build, js-budget (`/contact/` 18.59 KiB of 30), white-label, dev cold start, full e2e 537 passed and 231 skipped by annotation; then again in the main checkout after the bump: typecheck 0 errors, lint, unit, build, quick e2e 256 passed.
 - Bump commit: `chore(deps): bump preact from 10.29.8 to 11.0.0`. Only `ContactForm` is a Preact island, so the runtime surface is that one form.
 - Not run: Lighthouse (no CSS or markup change, JS size unchanged); the contact form exercised by hand in a browser: only the e2e covers it (honest limit: Turnstile and the real send cannot run locally).
+
+### Owner decisions of 2026-10-06
+- **Type scale and text density: no change for now.** The owner reviewed it on their own devices and the text size is fine across the site; the footprint button text was the only thing to shrink (done on 2026-10-05).
+- **T37 (#61) credentials "in-progress" status and applied-learning text: deferred.** The "Plataforma sin confirmar" placeholders are already gone (checked live on `/me/` and `/en/me/`; `credentials.json` has 3 real entries). The remaining half of the issue (status plus learning summary) will be designed together with the release of Experiments and a separate certificates and degrees page, so it is not built now. Nothing in production depends on it.
+- Navbar with six links (#69) stays for later, waiting for Learning and Projects.
+
