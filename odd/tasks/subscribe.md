@@ -104,3 +104,9 @@ The owner unsubscribed one address from a note email in production: the page ans
 ## Outlook check, 2026-10-06
 The owner opened the note email in Outlook and says it looks good. Email clients checked by the owner: Gmail (light and dark) and Outlook. The only open item of the subscription is the DMARC report address, an owner DNS step.
 
+## Email Routing and the new sender, 2026-10-06 (owner-authorized, exact operations, the machine's wrangler login)
+- DMARC: the owner activated Cloudflare DMARC Management in the dashboard; DNS now has ONE `_dmarc` record, `p=none` with Cloudflare's report address (not recorded here). The dashboard's "DKIM: No" and "SPF: N/A" are the scan of the root domain, not the real state: DKIM `resend._domainkey` and the Resend SPF on `send.elvinlab.dev` are published.
+- Email Routing for the zone was unconfigured and the root had no MX, so a reader's reply to a note email bounced. With `wrangler email routing`: the owner's personal address registered as a destination (the owner verified it by clicking Cloudflare's email), routing enabled (status ready; MX `route1/2/3.mx.cloudflare.net` and root SPF `include:_spf.mx.cloudflare.net` added; DMARC and the Resend SPF untouched), two forward rules (`notes@` and, for the first note email that already went out, `notas@`), catch-all left disabled (drop).
+- `SUBSCRIBE_FROM` set to the English sender `Lab Notes <notes@elvinlab.dev>` (was the Spanish `notas@`); no release needed, new emails use it at once. Resend needs nothing new: the whole domain is verified.
+- Not verified: that a message sent to `notes@` really reaches the owner's inbox (to be tested by the owner from another account) and the SPF/DKIM/DMARC PASS lines of a received note email (Gmail "Show original").
+

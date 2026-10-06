@@ -427,4 +427,5 @@ Contents: terminal icon next to the wordmark and as the favicon (pixel, softer c
 - 2026-10-06: the friend who got stuck on "Verificando…" retried after `e3dedd6` and subscribed and confirmed fine (D1: 3 confirmed, 0 pending). The Turnstile report is closed.
 - 2026-10-06: the owner ran the unsubscribe click-through in production and D1 shows it (2 confirmed, 1 unsubscribed).
 - 2026-10-06: the owner confirmed the email looks good in Outlook. Subscription tested end to end in Gmail (light and dark) and Outlook; only the DMARC report address (owner DNS step) is open.
+- 2026-10-06 evening (owner-authorized): Cloudflare DMARC Management on (one `_dmarc` record, p=none plus Cloudflare's rua); Email Routing enabled for the zone with forward rules `notes@` and `notas@` to the owner's inbox; `SUBSCRIBE_FROM` now `Lab Notes <notes@elvinlab.dev>`. To test: send a mail to `notes@` from another account; check SPF/DKIM/DMARC PASS in Gmail's Show original.
 
