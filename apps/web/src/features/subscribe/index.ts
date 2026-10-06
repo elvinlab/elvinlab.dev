@@ -2,8 +2,7 @@
  * Public API of the subscribe feature (server side). Client code must not import this barrel.
  */
 
-export { isSubscribeActive, isSubscribeFormShown } from './availability.ts';
-export { default as SubscribeForm } from './components/SubscribeForm.astro';
+export { isSubscribeActive } from './availability.ts';
 export { default as SubscribeResultPage } from './components/SubscribeResultPage.astro';
 export { SUBSCRIBE_PATHS, SUBSCRIBE_POLICY } from './config.ts';
 export {

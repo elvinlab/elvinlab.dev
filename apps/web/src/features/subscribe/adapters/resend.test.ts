@@ -39,6 +39,7 @@ describe('Resend mailer', () => {
     expect(body).toMatchObject({ from: config.from, to: [RECIPIENT] });
     expect(body.subject).toContain('Confirma');
     expect(body.text).toContain('https://site.test/es/confirm/?token=T');
+    expect(body.text).toContain('aviso de algún proyecto');
     expect(body.html).toBeUndefined();
   });
 
@@ -52,6 +53,7 @@ describe('Resend mailer', () => {
     const body = JSON.parse(String(request.mock.calls[0]?.[1]?.body));
     expect(body.subject).toContain('Confirm');
     expect(body.text).toContain('expires in 48 hours');
+    expect(body.text).toContain('announcement of one of the author');
   });
 
   it('sends a batch with per-message unsubscribe headers and the idempotency key', async () => {

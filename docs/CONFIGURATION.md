@@ -449,7 +449,7 @@ Para apagarlo, poné `features.marks: false`: no llega a la página ni HTML, ni 
 
 ### 6.14 Suscripción por correo a las notas nuevas (`subscribe`)
 
-Quien visita deja su correo en `/notes` y recibe un correo con cada nota nueva. La lista vive en la base D1 compartida (tabla `subscribers`), alta con confirmación por enlace (doble opt-in), cada correo trae el enlace de baja (también en la cabecera `List-Unsubscribe`; sin POST de un clic, ver ADR 0014), y Resend solo envía (está detrás de un puerto). El flag es `features.subscribe` (sale **apagado**); las rutas `/subscribe/confirm/`, `/subscribe/unsubscribe/` (y sus gemelas `/en`) y el endpoint POST `/subscribe/one-click/` existen solo mientras él y `features.blog` estén encendidos. El formulario también necesita una clave pública de Turnstile (receta 6.6). Registro de la decisión: [ADR 0014](adr/0014-email-subscription-d1-list-resend-port.md); la página de privacidad suma su sección `subscribe` cuando el flag está encendido.
+Quien visita deja su correo en el formulario del footer (la banda de suscripción, el único sitio de la suscripción; carga su código y Turnstile solo al primer foco) y recibe un correo con cada nota nueva y, de vez en cuando, un aviso de un proyecto del autor. La lista vive en la base D1 compartida (tabla `subscribers`), alta con confirmación por enlace (doble opt-in), cada correo trae el enlace de baja (también en la cabecera `List-Unsubscribe`; sin POST de un clic, ver ADR 0014), y Resend solo envía (está detrás de un puerto). El flag es `features.subscribe` (sale **apagado**); las rutas `/subscribe/confirm/`, `/subscribe/unsubscribe/` (y sus gemelas `/en`) y el endpoint POST `/subscribe/one-click/` existen solo mientras él y `features.blog` estén encendidos. El formulario también necesita una clave pública de Turnstile (receta 6.6). Registro de la decisión: [ADR 0014](adr/0014-email-subscription-d1-list-resend-port.md); la página de privacidad suma su sección `subscribe` cuando el flag está encendido.
 
 Hasta completar todos los pasos el formulario no sirve de nada (las Actions responden «no disponible»), así que hacelos **en este orden**, en tus propias cuentas, antes de encender el flag:
 
@@ -458,7 +458,7 @@ Hasta completar todos los pasos el formulario no sirve de nada (las Actions resp
 3. **Enlazá el limitador**: `SUBSCRIBE_RATE_LIMITER` ya está declarado en `ratelimits` de `wrangler.jsonc` (con un `namespace_id` único); se activa con el próximo deploy. No hay que crear nada a mano.
 4. **Verificá el dominio de envío en Resend** (registros DNS SPF y DKIM en la zona de Cloudflare) para que `SUBSCRIBE_FROM` sea aceptado. El plan gratuito permite 100 correos al día y 3000 al mes; el envío se topa en 100 por ejecución.
 5. **Encendé el flag**: poné `features.subscribe: true` en `site.config.ts`, corré `pnpm docs:config` si cambiaste algo generado y liberá (sección 7).
-6. **Comprobalo** con una dirección tuya de prueba: suscribite en `/notes`, abrí el enlace del correo, pulsá el botón y luego dáte de baja desde un correo de nota. Nunca pruebes con la dirección de otra persona.
+6. **Comprobalo** con una dirección tuya de prueba: suscribite desde el footer de cualquier página, abrí el enlace del correo, pulsá el botón y luego dáte de baja desde un correo de nota. Nunca pruebes con la dirección de otra persona.
 
 Para apagarlo, poné `features.subscribe: false`: el formulario y las páginas desaparecen en el próximo build y la sección de privacidad se va con ellos (la lista queda en D1).
 

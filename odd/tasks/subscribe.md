@@ -36,3 +36,6 @@ Whole battery green with `pnpm verify --all --run --record` (247 s, 47 checks): 
 - The one-click `List-Unsubscribe-Post` is dropped (ADR 0014); revisit if bulk-sender rules ever require it.
 - A command or protected endpoint for the owner to send a new note (the sending core exists and is tested with fakes).
 - Owner steps before flipping `features.subscribe`: apply `migrations/0002_subscribers.sql` to the remote D1 (same database `elvinlab-dev-db`, one new table), create the secrets `SUBSCRIBE_FROM` and `SUBSCRIBE_TOKEN_SECRET`, bind `SUBSCRIBE_RATE_LIMITER`, verify the sending domain in Resend (recipe 6.14 in `docs/CONFIGURATION.md`).
+
+## Progress 2026-10-05: single footer form
+Owner decision: the subscription lives only in the global footer band. Done: band is the form (`shared/subscribe/`, lazy stub plus `form-client.ts`, Turnstile `interaction-only`); sidebar card, note-foot link and `subscribe.note` removed; `showSubscribeCta` no longer excludes `/notes/`; copy and privacy now cover project announcements; ADR 0014, BRAND, CONFIGURATION, changelog updated. Evidence: vitest 917 passed before final count, typecheck 0 errors, depcruise clean, white-label green, `subscribe.spec.ts` 34 passed at 1280 px, Lighthouse LCP `/` 2290 ms (baseline 2284), `/notes/smoke-es/` 2293 ms (baseline 2262).

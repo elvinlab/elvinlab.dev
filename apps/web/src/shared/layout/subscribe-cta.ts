@@ -1,3 +1,5 @@
+import { isSubscribeFormShown } from '@/shared/subscribe/availability.ts';
+
 type Input = {
   features: { readonly blog: boolean; readonly subscribe: boolean };
   turnstileSiteKey: string | undefined;
@@ -8,12 +10,11 @@ type Input = {
 };
 
 /**
- * Whether the footer shows the "get the notes by email" band. It only links to the form on `/notes/`
- * (no script, no Turnstile on other pages), so it is shown wherever the form is reachable and the
- * page is not the one that already holds the form, a subscription page, or the printable CV.
+ * Whether the footer shows the subscription form band. The form lives only there, so it is shown on
+ * every page except the subscription pages themselves (confirm and unsubscribe) and the printable
+ * CV, and only when the blog, the flag and a Turnstile key are all present.
  */
 export function showSubscribeCta({ features, turnstileSiteKey, path, printable }: Input): boolean {
-  if (printable || !features.blog || !features.subscribe) return false;
-  if ((turnstileSiteKey?.trim() ?? '') === '') return false;
-  return path !== '/notes/' && !path.startsWith('/subscribe/');
+  if (printable || path.startsWith('/subscribe/')) return false;
+  return isSubscribeFormShown(features, turnstileSiteKey);
 }

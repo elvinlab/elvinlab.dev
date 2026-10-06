@@ -7,6 +7,8 @@ export type TurnstileOptions = {
   action: string;
   theme: 'auto';
   size: 'flexible';
+  /** Hidden unless Cloudflare needs a visible interaction, so the widget never shifts the layout. */
+  appearance: 'interaction-only';
   callback: (token: string) => void;
   'expired-callback': () => void;
   'error-callback': () => void;

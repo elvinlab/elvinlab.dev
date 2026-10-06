@@ -36,7 +36,7 @@ const notesHref = localizePath('/notes/', locale, LOCALES);
 </BaseLayout>
 
 <script>
-  import { callSubscribeAction } from '@/features/subscribe/client/action-client.ts';
+  import { callSubscribeAction } from '@/shared/subscribe/action-client.ts';
 
   const root = document.querySelector<HTMLElement>('[data-subscribe-page]');
   const button = root?.querySelector<HTMLButtonElement>('[data-go]');

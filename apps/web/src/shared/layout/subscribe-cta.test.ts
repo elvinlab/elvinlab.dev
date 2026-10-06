@@ -7,13 +7,12 @@ const base = { features: on, turnstileSiteKey: 'key', path: '/', printable: fals
 
 describe('showSubscribeCta', () => {
   it('shows on ordinary pages when the subscription is reachable', () => {
-    for (const path of ['/', '/contact/', '/privacy/', '/notes/smoke-es/']) {
+    for (const path of ['/', '/contact/', '/privacy/', '/notes/', '/notes/smoke-es/']) {
       expect(showSubscribeCta({ ...base, path })).toBe(true);
     }
   });
 
-  it('hides on the notes index, the subscription pages and the printable CV', () => {
-    expect(showSubscribeCta({ ...base, path: '/notes/' })).toBe(false);
+  it('hides on the subscription pages and the printable CV', () => {
     expect(showSubscribeCta({ ...base, path: '/subscribe/confirm/' })).toBe(false);
     expect(showSubscribeCta({ ...base, path: '/me/', printable: true })).toBe(false);
   });

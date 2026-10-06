@@ -1,17 +1,18 @@
 import { PROVIDER_RESPONSE_MAX_BYTES, PROVIDER_TIMEOUT_MS } from '@/shared/lib/provider-json.ts';
+import { SUBSCRIBE_CLIENT_POLICY } from '@/shared/subscribe/client-policy.ts';
 
 const HOUR_MS = 60 * 60 * 1_000;
 const MINUTE_MS = 60 * 1_000;
 
 /** Public subscription policy only; addresses and provider secrets belong to runtime bindings. */
 export const SUBSCRIBE_POLICY = {
-  emailMaxLength: 254,
+  emailMaxLength: SUBSCRIBE_CLIENT_POLICY.emailMaxLength,
   tokenMaxLength: 2_048,
   minFillTimeMs: 3_000,
   providerTimeoutMs: PROVIDER_TIMEOUT_MS,
   providerResponseMaxBytes: PROVIDER_RESPONSE_MAX_BYTES,
   requestMaxBytes: 8_192,
-  turnstileAction: 'subscribe',
+  turnstileAction: SUBSCRIBE_CLIENT_POLICY.turnstileAction,
   /** A confirmation link stops working after this long. */
   confirmExpiryMs: 48 * HOUR_MS,
   /** A second subscribe of a pending address re-sends the link only after this long. */

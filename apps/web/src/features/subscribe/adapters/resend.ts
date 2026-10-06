@@ -22,18 +22,18 @@ const COPY = {
   es: {
     confirmSubject: 'Confirma tu suscripción a Lab Notes',
     confirmBody: (url: string) =>
-      `Hola,\n\nAlguien (esperamos que tú) pidió recibir un aviso por correo con cada nueva nota de Lab Notes. Para confirmarlo, abre este enlace:\n\n${url}\n\nEl enlace vence en 48 horas. Si no fuiste tú, ignora este mensaje y no recibirás nada más.`,
+      `Hola,\n\nAlguien (esperamos que tú) pidió recibir por correo las notas nuevas de Lab Notes y, de vez en cuando, un aviso de algún proyecto de su autor. Para confirmarlo, abre este enlace:\n\n${url}\n\nEl enlace vence en 48 horas. Si no fuiste tú, ignora este mensaje y no recibirás nada más.`,
     noteSubject: (title: string) => `Nueva nota: ${title}`,
     noteBody: (mail: NoteMail) =>
-      `${mail.title}\n\n${mail.summary ? `${mail.summary}\n\n` : ''}Léela aquí: ${mail.url}\n\n--\nRecibes este correo porque te suscribiste a Lab Notes. Para dejar de recibirlo: ${mail.unsubscribeUrl}`,
+      `${mail.title}\n\n${mail.summary ? `${mail.summary}\n\n` : ''}Léela aquí: ${mail.url}\n\n--\nRecibes este correo porque te suscribiste a Lab Notes (notas nuevas y avisos de proyectos). Para dejar de recibirlo: ${mail.unsubscribeUrl}`,
   },
   en: {
     confirmSubject: 'Confirm your subscription to Lab Notes',
     confirmBody: (url: string) =>
-      `Hello,\n\nSomeone (we hope you) asked to get an email about each new Lab Notes post. To confirm, open this link:\n\n${url}\n\nThe link expires in 48 hours. If it was not you, ignore this message and you will receive nothing else.`,
+      `Hello,\n\nSomeone (we hope you) asked to get new Lab Notes posts by email and, now and then, an announcement of one of the author's projects. To confirm, open this link:\n\n${url}\n\nThe link expires in 48 hours. If it was not you, ignore this message and you will receive nothing else.`,
     noteSubject: (title: string) => `New note: ${title}`,
     noteBody: (mail: NoteMail) =>
-      `${mail.title}\n\n${mail.summary ? `${mail.summary}\n\n` : ''}Read it here: ${mail.url}\n\n--\nYou get this email because you subscribed to Lab Notes. To stop receiving it: ${mail.unsubscribeUrl}`,
+      `${mail.title}\n\n${mail.summary ? `${mail.summary}\n\n` : ''}Read it here: ${mail.url}\n\n--\nYou get this email because you subscribed to Lab Notes (new notes and project announcements). To stop receiving it: ${mail.unsubscribeUrl}`,
   },
 } satisfies Record<SubscribeLocale, unknown>;
 

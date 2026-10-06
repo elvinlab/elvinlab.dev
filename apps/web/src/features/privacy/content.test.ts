@@ -237,20 +237,22 @@ describe('buildPrivacyContent with subscribe', () => {
     }
   });
 
-  it('says what is stored, why, who processes it, and how to leave or erase', () => {
+  it('says what is stored, why, who is involved, and how to leave or erase', () => {
     const es = body(withSubscribe.es);
-    expect(es).toMatch(/correo/i);
+    expect(es).toMatch(/aviso de algún proyecto/);
+    expect(es).toMatch(/7 días/);
+    expect(es).toMatch(/baja con un clic/);
+    expect(es).toMatch(/Cloudflare/);
     expect(es).toMatch(/Resend/);
-    expect(es).toMatch(/confirm/i);
-    expect(es).toMatch(/hash/i);
-    expect(es).toMatch(/baja/i);
+    expect(es).toMatch(/no guardo tu IP/);
     expect(es).toContain('/contact/');
     const en = body(withSubscribe.en);
-    expect(en).toMatch(/email/i);
+    expect(en).toMatch(/heads-up about one of my projects/);
+    expect(en).toMatch(/7 days/);
+    expect(en).toMatch(/one-click unsubscribe link/);
+    expect(en).toMatch(/Cloudflare/);
     expect(en).toMatch(/Resend/);
-    expect(en).toMatch(/confirm/i);
-    expect(en).toMatch(/hash/i);
-    expect(en).toMatch(/unsubscribe/i);
+    expect(en).toMatch(/do not store your IP/);
     expect(en).toContain('/en/contact/');
   });
 });

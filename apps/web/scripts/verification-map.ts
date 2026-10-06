@@ -109,7 +109,11 @@ const GLOBAL = area(
   'packages/core/src/**',
 );
 const NOTES = area(`${SRC}/features/notes/**`, `${SRC}/blog-routes/**`, 'tests/fixtures/**');
-const SUBSCRIBE = area(`${SRC}/features/subscribe/**`, `${SRC}/subscribe-routes/**`);
+const SUBSCRIBE = area(
+  `${SRC}/features/subscribe/**`,
+  `${SRC}/shared/subscribe/**`,
+  `${SRC}/subscribe-routes/**`,
+);
 const MARKS = area(`${SRC}/features/marks/**`, `${SRC}/actions/**`, 'apps/web/migrations/**');
 const COMMENTS = area(`${SRC}/features/comments/**`);
 const NOTE_PAGE = [...NOTES, ...MARKS, ...COMMENTS, ...SUBSCRIBE];

@@ -125,7 +125,8 @@ export const t = createTranslator({
       'notes.sidebar.rss.body': 'Seguí las notas por RSS.',
       'notes.sidebar.about': 'Sobre mí',
       'subscribe.title': 'Recibe las notas por correo',
-      'subscribe.body': 'Un correo con cada nota nueva. Sin spam; te das de baja cuando quieras.',
+      'subscribe.body':
+        'Un correo con cada nota nueva y, de vez en cuando, un aviso de algún proyecto mío. Sin spam; te das de baja cuando quieras.',
       'subscribe.email': 'Correo electrónico',
       'subscribe.submit': 'Suscribirme',
       'subscribe.sending': 'Enviando…',
@@ -135,21 +136,21 @@ export const t = createTranslator({
       'subscribe.noscript':
         'Activa JavaScript para suscribirte por correo, o sigue las notas por RSS.',
       'subscribe.privacy': 'Cómo se usa tu correo',
-      'subscribe.note': 'Recibe las notas nuevas por correo',
       'subscribe.working': 'Procesando…',
       'subscribe.unavailable': 'No está disponible por ahora. Inténtalo más tarde.',
       'subscribe.back': 'Volver a las notas',
       'subscribe.confirm.title': 'Confirmar suscripción',
       'subscribe.confirm.body':
-        'Pulsa el botón para confirmar que quieres recibir las notas por correo.',
+        'Pulsa el botón para confirmar que quieres recibir por correo las notas nuevas y avisos de mis proyectos.',
       'subscribe.confirm.button': 'Confirmar suscripción',
       'subscribe.confirm.done': 'Listo: tu suscripción está confirmada.',
       'subscribe.confirm.invalid':
         'Este enlace no es válido o ya venció. Puedes volver a suscribirte desde las notas.',
       'subscribe.unsubscribe.title': 'Darme de baja',
-      'subscribe.unsubscribe.body': 'Pulsa el botón para dejar de recibir las notas por correo.',
+      'subscribe.unsubscribe.body':
+        'Pulsa el botón para dejar de recibir correos de las notas y de mis proyectos.',
       'subscribe.unsubscribe.button': 'Darme de baja',
-      'subscribe.unsubscribe.done': 'Listo: no recibirás más correos de las notas.',
+      'subscribe.unsubscribe.done': 'Listo: no recibirás más correos.',
       'subscribe.unsubscribe.invalid': 'Este enlace no es válido.',
       'note.breadcrumb': 'Lab Notes',
       'note.decision.title': 'Registro de decisión',
@@ -299,7 +300,8 @@ export const t = createTranslator({
       'notes.sidebar.rss.body': 'Follow the notes via RSS.',
       'notes.sidebar.about': 'About me',
       'subscribe.title': 'Get the notes by email',
-      'subscribe.body': 'One email for each new note. No spam; unsubscribe any time.',
+      'subscribe.body':
+        'An email for each new note and, now and then, an announcement of a project of mine. No spam; unsubscribe any time.',
       'subscribe.email': 'Email',
       'subscribe.submit': 'Subscribe',
       'subscribe.sending': 'Sending…',
@@ -309,20 +311,21 @@ export const t = createTranslator({
       'subscribe.noscript':
         'Turn on JavaScript to subscribe by email, or follow the notes via RSS.',
       'subscribe.privacy': 'How your email is used',
-      'subscribe.note': 'Get new notes by email',
       'subscribe.working': 'Working…',
       'subscribe.unavailable': 'Not available right now. Please try again later.',
       'subscribe.back': 'Back to the notes',
       'subscribe.confirm.title': 'Confirm subscription',
-      'subscribe.confirm.body': 'Press the button to confirm you want to get the notes by email.',
+      'subscribe.confirm.body':
+        'Press the button to confirm you want to get new notes and announcements of my projects by email.',
       'subscribe.confirm.button': 'Confirm subscription',
       'subscribe.confirm.done': 'Done: your subscription is confirmed.',
       'subscribe.confirm.invalid':
         'This link is not valid or has expired. You can subscribe again from the notes.',
       'subscribe.unsubscribe.title': 'Unsubscribe',
-      'subscribe.unsubscribe.body': 'Press the button to stop getting the notes by email.',
+      'subscribe.unsubscribe.body':
+        'Press the button to stop getting emails about the notes and my projects.',
       'subscribe.unsubscribe.button': 'Unsubscribe',
-      'subscribe.unsubscribe.done': 'Done: you will not get more emails about the notes.',
+      'subscribe.unsubscribe.done': 'Done: you will not get more emails.',
       'subscribe.unsubscribe.invalid': 'This link is not valid.',
       'note.breadcrumb': 'Lab Notes',
       'note.decision.title': 'Decision record',

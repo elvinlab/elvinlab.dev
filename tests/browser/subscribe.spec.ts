@@ -4,11 +4,10 @@ import { describeViolations, scan } from './helpers/axe';
 import { stubThirdParties } from './helpers/third-party';
 
 /**
- * The email subscription: the form on `/notes/` and the two landing pages of the emailed links.
+ * The email subscription: the form in the global footer band and the two landing pages of the emailed links.
  * The fixture build has the flag on and a Turnstile key but no Cloudflare bindings, so the Actions
  * are mocked with `page.route` (answering the way Astro does) and the Turnstile script is a stub.
- * The English notes index does not exist (only the notes themselves are translated).
- */
+ *  */
 const TURNSTILE_URL = 'https://challenges.cloudflare.com/turnstile/v0/api.js*';
 const TURNSTILE_STUB = `
   window.turnstile = {
@@ -39,7 +38,7 @@ const LANDING = {
     unsubscribe: {
       path: '/subscribe/unsubscribe/',
       button: 'Darme de baja',
-      done: 'Listo: no recibirás más correos de las notas.',
+      done: 'Listo: no recibirás más correos.',
       invalid: 'Este enlace no es válido.',
     },
     unavailable: 'No está disponible por ahora. Inténtalo más tarde.',
@@ -54,7 +53,7 @@ const LANDING = {
     unsubscribe: {
       path: '/en/subscribe/unsubscribe/',
       button: 'Unsubscribe',
-      done: 'Done: you will not get more emails about the notes.',
+      done: 'Done: you will not get more emails.',
       invalid: 'This link is not valid.',
     },
     unavailable: 'Not available right now. Please try again later.',
@@ -108,41 +107,88 @@ const ok = '[{"ok":1},true]';
 const unavailable = JSON.stringify({ type: 'AstroActionError', code: 'SERVICE_UNAVAILABLE' });
 const result = (value: string) => `[{"result":1},"${value}"]`;
 
-test.describe('form on the notes index', () => {
-  test('is visible without horizontal overflow, and the note footer links to it', async ({
-    page,
-  }) => {
+const FORM_PAGES = ['/', '/en/', '/contact/', '/privacy/', '/notes/', '/notes/smoke-es/'];
+const NO_FORM_PAGES = ['/me/', '/subscribe/confirm/', '/subscribe/unsubscribe/'];
+const FIELD = 'footer [data-subscribe]';
+
+test.describe('form in the footer', () => {
+  test('is on every ordinary page, once, and on no other', async ({ page }) => {
+    for (const path of FORM_PAGES) {
+      await page.goto(path);
+      await expect(page.locator(FIELD), path).toHaveCount(1);
+      await expect(page.locator('[data-subscribe]'), path).toHaveCount(1);
+    }
+    for (const path of NO_FORM_PAGES) {
+      await page.goto(path);
+      await expect(page.locator('[data-subscribe]'), path).toHaveCount(0);
+    }
+  });
+
+  test('is gone from the notes sidebar and from the foot of a note', async ({ page }) => {
     await page.goto('/notes/');
-    await expect(page.getByRole('heading', { name: 'Recibe las notas por correo' })).toBeVisible();
-    await expect(page.getByLabel(FORM.email)).toBeVisible();
-    await expect(page.getByRole('button', { name: FORM.submit })).toBeVisible();
+    await expect(page.locator('aside [data-subscribe]')).toHaveCount(0);
+    await page.goto('/notes/smoke-es/');
+    await expect(page.locator('article a[href$="#subscribe"]')).toHaveCount(0);
+  });
+
+  test('is visible in Spanish and English without horizontal overflow', async ({ page }) => {
+    await page.goto('/');
+    const band = page.locator(FIELD);
+    await expect(band.getByRole('heading', { name: 'Recibe las notas por correo' })).toBeVisible();
+    await expect(band.getByLabel(FORM.email)).toBeVisible();
+    await expect(band.getByRole('button', { name: FORM.submit })).toBeVisible();
+    await expect(band).toContainText('aviso de algún proyecto');
+    await expect(band.getByRole('link', { name: 'Cómo se usa tu correo' })).toHaveAttribute(
+      'href',
+      '/privacy/#subscribe',
+    );
     expect(
       await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth),
     ).toBe(true);
-
-    await page.goto('/notes/smoke-es/');
-    await expect(
-      page.getByRole('link', { name: 'Recibe las notas nuevas por correo' }),
-    ).toHaveAttribute('href', '/notes/#subscribe');
+    await page.goto('/en/');
+    const en = page.locator(FIELD);
+    await expect(en.getByRole('button', { name: 'Subscribe' })).toBeVisible();
+    await expect(en.getByRole('link', { name: 'How your email is used' })).toHaveAttribute(
+      'href',
+      '/en/privacy/#subscribe',
+    );
   });
 
-  test('requests Turnstile only after the first focus', async ({ page }) => {
+  test('has no horizontal overflow at 360 px', async ({ page }) => {
+    await page.setViewportSize({ width: 360, height: 800 });
+    await page.goto('/');
+    await expect(page.locator(FIELD)).toBeVisible();
+    expect(
+      await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth),
+    ).toBe(true);
+  });
+
+  test('loads no form logic and no Turnstile until the first focus, then one request', async ({
+    page,
+  }) => {
     const turnstile = await stubTurnstile(page);
-    await page.goto('/notes/');
-    await expect(page.getByLabel(FORM.email)).toBeVisible();
+    const scripts: string[] = [];
+    page.on('request', (request) => {
+      if (request.resourceType() === 'script') scripts.push(request.url());
+    });
+    await page.goto('/');
+    await expect(page.locator(FIELD)).toBeVisible();
     await page.waitForLoadState('load');
     expect(turnstile).toEqual([]);
-    await page.getByLabel(FORM.email).focus();
+    const before = scripts.length;
+    await page.locator(FIELD).getByLabel(FORM.email).focus();
     await expect.poll(() => turnstile.length).toBeGreaterThan(0);
+    expect(scripts.length).toBeGreaterThan(before);
   });
 
   test('a successful submit shows the generic confirmation message', async ({ page }) => {
     await stubTurnstile(page);
     const calls = await mockAction(page, 'request', { status: 200, body: ok });
-    await page.goto('/notes/');
-    await page.getByLabel(FORM.email).fill('reader@example.test');
-    await page.getByRole('button', { name: FORM.submit }).click();
-    await expect(page.getByRole('status').filter({ hasText: FORM.success })).toBeVisible();
+    await page.goto('/');
+    const band = page.locator(FIELD);
+    await band.getByLabel(FORM.email).fill('reader@example.test');
+    await band.getByRole('button', { name: FORM.submit }).click();
+    await expect(band.getByRole('status').filter({ hasText: FORM.success })).toBeVisible();
     expect(calls.bodies).toHaveLength(1);
     expect(JSON.parse(calls.bodies[0] ?? '{}')).toMatchObject({
       email: 'reader@example.test',
@@ -155,22 +201,23 @@ test.describe('form on the notes index', () => {
   test('a 503 shows the fixed error and keeps the form', async ({ page }) => {
     await stubTurnstile(page);
     await mockAction(page, 'request', { status: 503, body: unavailable });
-    await page.goto('/notes/');
-    await page.getByLabel(FORM.email).fill('reader@example.test');
-    await page.getByRole('button', { name: FORM.submit }).click();
-    await expect(page.getByRole('status').filter({ hasText: FORM.error })).toBeVisible();
-    await expect(page.getByLabel(FORM.email)).toBeVisible();
+    await page.goto('/notes/smoke-es/');
+    const band = page.locator(FIELD);
+    await band.getByLabel(FORM.email).fill('reader@example.test');
+    await band.getByRole('button', { name: FORM.submit }).click();
+    await expect(band.getByRole('status').filter({ hasText: FORM.error })).toBeVisible();
+    await expect(band.getByLabel(FORM.email)).toBeVisible();
   });
 
   test('the honeypot is hidden from assistive tech and unreachable by keyboard', async ({
     page,
   }) => {
     await stubTurnstile(page);
-    await page.goto('/notes/');
+    await page.goto('/');
     const honeypot = page.locator('input[name="website"]');
     await expect(honeypot).toHaveAttribute('tabindex', '-1');
     await expect(honeypot.locator('xpath=..')).toHaveAttribute('aria-hidden', 'true');
-    await page.getByLabel(FORM.email).focus();
+    await page.locator(FIELD).getByLabel(FORM.email).focus();
     const visited: string[] = [];
     for (let step = 0; step < 4; step++) {
       await page.keyboard.press('Tab');
@@ -180,12 +227,12 @@ test.describe('form on the notes index', () => {
   });
 
   for (const theme of THEMES) {
-    test(`has no axe violations with the form (${theme})`, async ({ page }) => {
+    test(`has no axe violations with the band (${theme})`, async ({ page }) => {
       await stubThirdParties(page);
       await page.addInitScript((value) => localStorage.setItem('theme', value), theme);
-      await page.goto('/notes/');
+      await page.goto('/');
       await expect(page.locator('html')).toHaveAttribute('data-theme', theme);
-      await expect(page.getByLabel(FORM.email)).toBeVisible();
+      await expect(page.locator(FIELD).getByLabel(FORM.email)).toBeVisible();
       const { violations } = await scan(page);
       expect(describeViolations(violations)).toEqual([]);
     });
@@ -254,30 +301,3 @@ for (const locale of ['es', 'en'] as const) {
     });
   }
 }
-
-test.describe('footer call to action', () => {
-  test('shows a band that links to the form on ordinary pages, and nowhere it should not', async ({
-    page,
-  }) => {
-    for (const path of ['/', '/en/', '/contact/', '/privacy/', '/notes/smoke-es/']) {
-      await page.goto(path);
-      const band = page.locator('[data-subscribe-cta]');
-      await expect(band, path).toHaveCount(1);
-      await expect(band.getByRole('link')).toHaveAttribute('href', '/notes/#subscribe');
-    }
-    for (const path of ['/notes/', '/me/', '/subscribe/confirm/', '/subscribe/unsubscribe/']) {
-      await page.goto(path);
-      await expect(page.locator('[data-subscribe-cta]'), path).toHaveCount(0);
-    }
-  });
-
-  test('loads no subscription script or Turnstile on a page that only shows the band', async ({
-    page,
-  }) => {
-    const requests: string[] = [];
-    page.on('request', (request) => requests.push(request.url()));
-    await page.goto('/');
-    await expect(page.locator('[data-subscribe-cta]')).toBeVisible();
-    expect(requests.filter((url) => /turnstile|challenges\.cloudflare/.test(url))).toEqual([]);
-  });
-});

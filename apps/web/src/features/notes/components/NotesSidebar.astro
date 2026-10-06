@@ -2,7 +2,6 @@
 /** Notes index sidebar: author card, category and tag lists, RSS callout. */
 import { localizePath } from '@elvinlab/core';
 
-import { SubscribeForm } from '@/features/subscribe/index.ts';
 import { isEnabled, site } from '@/shared/config/index.ts';
 import { LOCALES, type Locale, t } from '@/shared/i18n/index.ts';
 import Chip from '@/shared/ui/Chip.astro';
@@ -55,6 +54,4 @@ const aboutHref = localizePath('/me/', locale, LOCALES);
     <p class="text-sm text-text-secondary">{t(locale, 'notes.sidebar.rss.body')}</p>
     <a href="/rss.xml" class="text-sm text-primary underline decoration-dashed underline-offset-4">RSS</a>
   </section>
-
-  <SubscribeForm locale={locale} />
 </div>
