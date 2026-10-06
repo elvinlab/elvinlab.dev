@@ -50,6 +50,8 @@ export function enableFixtureNotice(web: string): void {
 export function enableFixtureSubscribe(web: string): void {
   const configPath = join(web, 'src/site.config.ts');
   const config = readFileSync(configPath, 'utf8');
+  // The real site may already ship the flag on: that is what the fixture wants, so it stays as is.
+  if (/subscribe: true,/.test(config)) return;
   const patched = config.replace(/subscribe: false,/, 'subscribe: true,');
   if (patched === config) throw new Error('fixture: could not enable the subscribe flag');
   writeFileSync(configPath, patched);

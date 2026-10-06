@@ -175,6 +175,14 @@ it('turns the subscribe flag on in the fixture config', () => {
   expect(readFileSync(join(web, 'src/site.config.ts'), 'utf8')).toContain('subscribe: true,');
 });
 
+it('keeps the subscribe flag on when the real config already has it on', () => {
+  const web = webWithConfig(
+    'export const siteConfig = {\n  features: { subscribe: true, blog: true },\n};\n',
+  );
+  expect(() => enableFixtureSubscribe(web)).not.toThrow();
+  expect(readFileSync(join(web, 'src/site.config.ts'), 'utf8')).toContain('subscribe: true,');
+});
+
 it('fails loudly when the config has no subscribe flag to turn on', () => {
   const web = webWithConfig('export const siteConfig = {};\n');
   expect(() => enableFixtureSubscribe(web)).toThrow(/subscribe/);
