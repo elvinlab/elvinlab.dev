@@ -442,5 +442,11 @@
     "category": "fixed",
     "title": "Clearer message for a used confirmation link",
     "description": "The confirm page now says a link was already used, replaced by a newer one or expired, and that nothing else is needed if the reader already confirmed."
+  },
+  "verify-wide-fix": {
+    "date": "2026-10-06",
+    "category": "fixed",
+    "title": "pnpm verify no longer skips checks after a toolchain change",
+    "description": "A change to the toolchain or the verification scripts selects every check again; before, the registry's freshness could hide all of them except lint."
   }
 }

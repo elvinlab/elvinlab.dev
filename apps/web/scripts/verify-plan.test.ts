@@ -184,6 +184,23 @@ describe('planChecks', () => {
     expect(plan.skippedFresh).toContain('e2e:contact.spec.ts');
   });
 
+  it('does not let registry freshness hide a FULL-wide change: it belongs to no check scope', () => {
+    // A fingerprint only covers the files of a check's own scope, so a toolchain file (the Lighthouse
+    // script, the Playwright config) leaves every fingerprint unchanged. The wide class must win.
+    const wideFile = 'apps/web/scripts/run-lighthouse-ci.ts';
+    const plan = planChecks({
+      mode: 'changed',
+      changed: [wideFile],
+      staleIds: new Set(['lint']),
+    });
+    const planned = plan.items.map((item) => item.id);
+    expect(plan.wide).toBe(true);
+    expect(plan.skippedFresh).toEqual([]);
+    expect(planned).toContain('lighthouse:/');
+    expect(planned).toContain('e2e:smoke.spec.ts');
+    expect(planned).toContain('typecheck');
+  });
+
   it('plans everything with --all', () => {
     const plan = planChecks({ mode: 'all', changed: [] });
     expect(plan.items.length).toBeGreaterThan(30);
