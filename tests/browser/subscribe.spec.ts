@@ -410,6 +410,49 @@ for (const locale of ['es', 'en'] as const) {
         await expect(page.getByRole('button', { name: copy.button })).toBeEnabled();
       });
 
+      test('card shows the envelope, then the check after a successful click', async ({ page }) => {
+        await mockAction(page, kind, answerFor(ok_));
+        await page.goto(`${copy.path}?token=abc.def`);
+        const card = page.locator('[data-subscribe-page]');
+        await expect(card).toHaveAttribute('data-state', 'idle');
+        await expect(card.locator('svg:visible')).toHaveCount(1);
+        expect(
+          await card
+            .locator('svg')
+            .evaluateAll((els) => els.every((e) => e.getAttribute('aria-hidden') === 'true')),
+        ).toBe(true);
+        await page.getByRole('button', { name: copy.button }).click();
+        await expect(card).toHaveAttribute('data-state', 'done');
+        await expect(card.locator('svg:visible')).toHaveCount(1);
+      });
+
+      test('card shows the exclamation for a rejected link and for a missing token', async ({
+        page,
+      }) => {
+        await mockAction(page, kind, answerFor(bad));
+        await page.goto(`${copy.path}?token=abc.def`);
+        await page.getByRole('button', { name: copy.button }).click();
+        await expect(page.locator('[data-subscribe-page]')).toHaveAttribute(
+          'data-state',
+          'invalid',
+        );
+        await page.goto(copy.path);
+        await expect(page.locator('[data-subscribe-page]')).toHaveAttribute(
+          'data-state',
+          'invalid',
+        );
+      });
+
+      test('has no horizontal overflow at 360 px', async ({ page }) => {
+        await page.setViewportSize({ width: 360, height: 780 });
+        await page.goto(`${copy.path}?token=abc.def`);
+        await expect(page.getByRole('button', { name: copy.button })).toBeVisible();
+        const overflow = await page.evaluate(
+          () => document.documentElement.scrollWidth - document.documentElement.clientWidth,
+        );
+        expect(overflow).toBeLessThanOrEqual(0);
+      });
+
       for (const theme of THEMES) {
         test(`has no axe violations (${theme})`, async ({ page }) => {
           await page.addInitScript((value) => localStorage.setItem('theme', value), theme);

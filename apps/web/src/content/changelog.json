@@ -430,5 +430,11 @@
     "category": "fixed",
     "title": "Subscription form no longer waits forever",
     "description": "The footer form now says when to tick the Turnstile box, times out after 25 s with a clear retry message, shows the error code, tells the per-minute limit from the daily one, and accepts a form filled after 1.5 s."
+  },
+  "subscribe-pages-8bit": {
+    "date": "2026-10-06",
+    "category": "changed",
+    "title": "Subscription link pages in the 8-bit look",
+    "description": "The confirm and unsubscribe pages now use the footer band's look: a dashed card with a pixel envelope, check or exclamation icon."
   }
 }

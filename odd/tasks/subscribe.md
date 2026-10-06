@@ -87,3 +87,7 @@ The owner subscribed from the footer, confirmed, and received the note email. Dr
 - [x] `minFillTimeMs` 3 s to 1.5 s (now defined in `client-policy.ts`); docs updated.
 - [x] Rate limiter reported as `rate_limited`, mapped to `TOO_MANY_REQUESTS` with its own fixed message (`subscribe.rateLimited`); the Action client now keeps the error message so the form tells it from `subscribe.capped`.
 - Checks: see the coordinator handoff.
+
+
+## Progress 2026-10-06: 8-bit landing pages (bounded writer, not committed)
+- [x] `/subscribe/confirm/` and `/subscribe/unsubscribe/` restyled as the band's dashed card with a pixel icon (envelope, check, exclamation) switched by `data-state`; BRAND row added, changelog `subscribe-pages-8bit`, e2e extended. Checks: see the coordinator handoff.
