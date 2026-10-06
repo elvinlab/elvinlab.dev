@@ -40,7 +40,7 @@ const LANDING = {
       path: '/subscribe/confirm/',
       button: 'Confirmar suscripción',
       done: /Listo: tu suscripción está confirmada\./,
-      invalid: /Este enlace no es válido o ya venció/,
+      invalid: /Este enlace ya se usó, lo reemplazó uno más nuevo o venció/,
     },
     unsubscribe: {
       path: '/subscribe/unsubscribe/',
@@ -55,7 +55,7 @@ const LANDING = {
       path: '/en/subscribe/confirm/',
       button: 'Confirm subscription',
       done: /Done: your subscription is confirmed\./,
-      invalid: /This link is not valid or has expired/,
+      invalid: /This link was already used, was replaced by a newer one, or has expired/,
     },
     unsubscribe: {
       path: '/en/subscribe/unsubscribe/',
