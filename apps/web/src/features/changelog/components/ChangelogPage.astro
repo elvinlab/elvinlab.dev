@@ -1,9 +1,8 @@
 ---
-/** /changelog page: lists every entry, newest first. Hidden (noindex) when the feature flag is off. */
+/** /changelog page: lists every entry, newest first. The route exists only while `features.changelog` is on. */
 import { getCollection } from 'astro:content';
 
 import { sortChangelog } from '@/features/changelog/lib/changelog.ts';
-import { site } from '@/shared/config/index.ts';
 import type { Locale } from '@/shared/i18n/index.ts';
 import BaseLayout from '@/shared/layout/BaseLayout.astro';
 
@@ -20,7 +19,7 @@ const description =
 const entries = sortChangelog(await getCollection('changelog')).map((entry) => entry.data);
 ---
 
-<BaseLayout locale={locale} path={path} title={title} description={description} noindex={!site.features.changelog}>
+<BaseLayout locale={locale} path={path} title={title} description={description}>
   <article class="max-w-none">
     <header class="mb-8">
       <h1 class="text-3xl font-bold tracking-tight">{title}</h1>

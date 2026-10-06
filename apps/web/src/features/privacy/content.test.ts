@@ -260,3 +260,23 @@ describe('buildPrivacyContent with subscribe', () => {
     expect(en).toContain('/en/contact/');
   });
 });
+
+describe('buildPrivacyContent without a contact page', () => {
+  const { contact: _contact, ...rest } = input;
+  const without = buildPrivacyContent({ ...rest, subscribe: true });
+
+  it('links to no contact page and drops the contact form section', () => {
+    const text = everyText(without);
+    expect(text).not.toContain('/contact/');
+    for (const locale of ['es', 'en'] as const) {
+      expect(without[locale].sections.map((section) => section.id)).not.toContain('contact-form');
+    }
+  });
+
+  it('keeps the same section ids in both locales and the subscribe section', () => {
+    expect(without.en.sections.map((section) => section.id)).toEqual(
+      without.es.sections.map((section) => section.id),
+    );
+    expect(without.en.sections.map((section) => section.id)).toContain('subscribe');
+  });
+});

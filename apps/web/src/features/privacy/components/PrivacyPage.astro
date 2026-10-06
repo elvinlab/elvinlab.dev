@@ -18,7 +18,7 @@ const { locale } = Astro.props;
 const content = buildPrivacyContent({
   owner: site.identity.name,
   domain: new URL(site.url).host,
-  contact: { es: '/contact/', en: '/en/contact/' },
+  ...(isEnabled('contact') && { contact: { es: '/contact/', en: '/en/contact/' } }),
   updated: site.legal.privacyUpdated,
   ...(isEnabled('comments') && site.giscus && { comments: { repo: site.giscus.repo } }),
   readingMode: isEnabled('readingMode'),

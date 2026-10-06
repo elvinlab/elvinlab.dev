@@ -14,6 +14,7 @@ import { site } from '@/shared/config/index.ts';
   data-background
   data-owner-galaxy={site.background.galaxy}
   data-owner-waves={site.background.cursorWaves}
+  data-picker={site.features.backgroundPicker}
   class="absolute inset-0 -z-10 size-full motion-reduce:hidden"
 ></canvas>
 
@@ -93,7 +94,8 @@ import { site } from '@/shared/config/index.ts';
 
     let stored: string | null = null;
     try {
-      stored = localStorage.getItem(BACKGROUND_STORAGE_KEY);
+      // Without the picker nobody can choose: a choice saved earlier is ignored, the owner default rules.
+      if (canvas.dataset['picker'] !== 'false') stored = localStorage.getItem(BACKGROUND_STORAGE_KEY);
     } catch {
       // Storage can be blocked (privacy modes); fall back to the owner default for this view.
     }

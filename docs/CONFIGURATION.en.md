@@ -116,17 +116,21 @@ The descriptions come from the schema (`.describe()`), which is why they are in 
 | `me.stack` | `object[]` | yes |  | Tech stack groups. |
 | `me.stack[].label` | `{ <locale>: string }` | yes |  | Group name (Languages, Frontend, ...). |
 | `me.stack[].items` | `string[]` | yes |  | Tools in the group. |
-| `features` | `object` | yes |  | Feature flags: off means the routes are not generated and the nav entry is hidden. |
+| `features` | `object` | yes |  | Feature flags: off means the routes are not generated and the nav entry is hidden. The four interface switches (`backToTop`, `languageHint`, `themeToggle`, `backgroundPicker`) default to on and render nothing when off. |
 | `features.blog` | `boolean` | yes |  | Lab Notes: the notes index, note pages, RSS and the nav entry. |
 | `features.comments` | `boolean` | yes |  | Giscus comments on notes. Needs the `giscus` block below, otherwise nothing renders. |
-| `features.contact` | `boolean` | yes |  | The /contact form and its nav entry. |
+| `features.contact` | `boolean` | yes |  | The /contact form: off removes the route and the contact Action, hides the nav entry and every link to it (the legal pages and the subscription messages then name no Contact page), and keeps it out of the sitemap. |
 | `features.credentials` | `boolean` | yes |  | Certificates and degrees on /me. |
 | `features.experiments` | `boolean` | yes |  | The experiments (projects) section and its pages. |
-| `features.changelog` | `boolean` | yes |  | Visitor-facing /changelog page: off hides the footer link, marks it noindex and keeps it out of the sitemap. |
+| `features.changelog` | `boolean` | yes |  | Visitor-facing /changelog page: off removes the route, the footer link and the sitemap entry. |
 | `features.me` | `boolean` | yes |  | The /me recruiter page: off hides it from the nav, marks it noindex and keeps it out of the sitemap. |
 | `features.readingMode` | `boolean` | yes |  | Reading mode on notes: off renders no toggle, loads no script or CSS and stores nothing in the browser. |
 | `features.marks` | `boolean` | yes |  | The anonymous "I was here" footprint button on notes. Needs the `SITE_DB` D1 binding (the site database, table `note_footprints`) and the `MARKS_RATE_LIMITER` binding, otherwise the buttons never render. |
 | `features.subscribe` | `boolean` | yes |  | Email subscription to new notes (double opt-in, list in D1, mail through Resend). Needs the `SITE_DB` D1 binding (table `subscribers`), the `SUBSCRIBE_RATE_LIMITER` binding and the `SUBSCRIBE_FROM` and `SUBSCRIBE_TOKEN_SECRET` secrets, otherwise nothing renders. |
+| `features.backToTop` | `boolean` | no | `true` | The floating "back to top" button. Off renders neither the button nor its script. |
+| `features.languageHint` | `boolean` | no | `true` | The banner that suggests the other language to visitors whose browser prefers it. Off renders neither the banner nor its script. |
+| `features.themeToggle` | `boolean` | no | `true` | The theme button in the navbar. Off renders no button and no script: the theme still resolves from the visitor's system preference (or the default theme) on every page. |
+| `features.backgroundPicker` | `boolean` | no | `true` | The navbar button that cycles the banner background effect. Off renders no button and no script: the effect follows the owner default from `background`. |
 | `integrations` | `object` | no | `{}` | Public ids of third-party services. They ship in the HTML by design, so they live here and not in secrets. |
 | `integrations.cloudflareAnalyticsToken` | `string` | no |  | Cloudflare Web Analytics beacon token (public). Omit to turn analytics off. Env `PUBLIC_CF_ANALYTICS_TOKEN` overrides it. |
 | `integrations.turnstileSiteKey` | `string` | no |  | Cloudflare Turnstile public site key for the contact form, bound to the domain. Env `PUBLIC_TURNSTILE_SITE_KEY` overrides it (use a test key locally). |
@@ -340,9 +344,32 @@ Each `features` flag switches the whole feature off: the route is not generated,
 | `contact` | The `/contact` form | Needs the Worker secrets; without them it fails closed |
 | `credentials` | Certificates on `/me` | |
 | `experiments` | Experiments section and pages | The `/experiments/` pages are not built yet (issue #64): keep it `false` until they exist, or the links point nowhere |
-| `changelog` | The `/changelog` page and its link | |
+| `changelog` | The `/changelog` page and its link | When off the route is not generated (see "What each switch does") |
 | `me` | The `/me` page (portfolio) | |
 | `readingMode` | Reading mode on notes | Off: no button, script or CSS ships and nothing is stored in the browser |
+
+#### What each switch does
+
+All flags live under `features` in `site.config.ts`. The last four (interface) default to `true` when omitted. Checked against the code.
+
+| Flag | What it controls | What disappears when it is off | Dependencies |
+| --- | --- | --- | --- |
+| `blog` | Lab Notes: `/notes` index, notes and the `/rss.xml` feed | The routes (`integrations/blog-routes.ts`), the "Notes" menu entry, the feed and the sitemap entries; the home and `/me` stop reading notes | With no published notes the menu also hides "Notes". `subscribe` requires `blog` |
+| `comments` | Comments and reactions (Giscus) on notes | The component and its mention in the privacy and terms pages | Needs the `giscus` block; without it nothing renders |
+| `contact` | The `/contact` page (and `/en/contact`) and the `contact` Action | The routes (`integrations/contact-routes.ts`), the Action (answers "unavailable" without reaching any provider), the menu entry, the author card and `/me` buttons, and the sitemap entry. The privacy and terms pages stop linking to contact (they point to "the channels published on this site") and privacy loses its "Contact form" section. The subscription error messages stop mentioning the Contact page | When on, needs the Worker secrets (`CONTACT_*`) and the Turnstile key; without them it fails closed |
+| `credentials` | Certificates and degrees on `/me` | The certificates section of `/me` | |
+| `experiments` | Experiments section | The menu entry, the home section and the `/me` section, and its sitemap entry | The `/experiments/` pages do not exist yet (issue #64); `home.experiments` also needs it |
+| `me` | The `/me` page | The "About" menu entry, the home hiring card, the notes sidebar link and the `/me` share card; the page is marked `noindex` and kept out of the sitemap | |
+| `changelog` | The `/changelog` page (and `/en/changelog`) | The routes (`integrations/changelog-routes.ts`), the footer link and the sitemap entry | |
+| `readingMode` | Reading mode on notes | Button, script and CSS; nothing is stored in the browser | |
+| `marks` | Footprint button on notes and the home | The button and its counter, and the privacy section | Needs `SITE_DB` (D1) and `MARKS_RATE_LIMITER` |
+| `subscribe` | Email subscription | The `/subscribe/**` routes, the `/api/subscribe/notify` endpoint, the footer link and form, and the privacy section | Needs `blog` and a Turnstile key to show the form; also `SITE_DB`, `SUBSCRIBE_RATE_LIMITER`, `SUBSCRIBE_FROM` and `SUBSCRIBE_TOKEN_SECRET` (see 6.14) |
+| `backToTop` | Floating "back to top" button | The button and its script (nothing else depends on it) | |
+| `languageHint` | Banner suggesting the other language from the browser settings | The banner and its script | |
+| `themeToggle` | Navbar theme button | The button and its script. The theme still resolves on every page through the pre-paint script: system preference or default theme, and a choice saved earlier is forgotten | |
+| `backgroundPicker` | Navbar button that cycles the banner effect | The button and its script; the background follows the `background` default and ignores a choice saved earlier | |
+
+With `contact` off, the Action and routes do not exist, so the subscription error message simply asks the visitor to try again later.
 
 #### Appearance and home sections
 

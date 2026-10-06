@@ -460,5 +460,11 @@
     "category": "added",
     "title": "A page to share for subscribing",
     "description": "/subscribe/ and /en/subscribe/ explain what the notes are, hold the same form as the footer and show the latest note. It is indexed and in the sitemap; confirm and unsubscribe stay hidden."
+  },
+  "feature-switches": {
+    "date": "2026-10-06",
+    "category": "added",
+    "title": "More on/off switches for forks",
+    "description": "Four interface switches (backToTop, languageHint, themeToggle, backgroundPicker) join features, all on by default and rendering nothing when off. Turning contact or changelog off now removes their routes, links and sitemap entries, and the legal pages and subscription errors stop pointing to a Contact page."
   }
 }

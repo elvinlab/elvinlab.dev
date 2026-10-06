@@ -7,7 +7,8 @@
 import '@/styles/fonts.css';
 import '@/styles/global.css';
 
-import { DEFAULT_THEME, THEME_BOOT_SCRIPT } from '@elvinlab/core';
+
+import { DEFAULT_THEME } from '@elvinlab/core';
 import jetbrainsMonoLatin from '@fontsource-variable/jetbrains-mono/files/jetbrains-mono-latin-wght-normal.woff2?url';
 import spaceGroteskLatin from '@fontsource-variable/space-grotesk/files/space-grotesk-latin-wght-normal.woff2?url';
 
@@ -17,6 +18,7 @@ import Footer from '@/shared/layout/Footer.astro';
 import Navbar from '@/shared/layout/Navbar.astro';
 import SiteNotice from '@/shared/layout/SiteNotice.astro';
 import { showSubscribeCta, showSubscribeLink } from '@/shared/layout/subscribe-cta.ts';
+import { themeBootScript } from '@/shared/layout/theme-boot.ts';
 import Seo from '@/shared/seo/Seo.astro';
 import BackToTop from '@/shared/ui/BackToTop.astro';
 import LanguageHint from '@/shared/ui/LanguageHint.astro';
@@ -73,7 +75,7 @@ const preloadedFonts = [spaceGroteskLatin, jetbrainsMonoLatin];
     {preloadedFonts.map((href) => (
       <link rel="preload" as="font" type="font/woff2" href={href} crossorigin />
     ))}
-    <script is:inline set:html={THEME_BOOT_SCRIPT} />
+    <script is:inline set:html={themeBootScript(site.features.themeToggle)} />
     <Seo locale={locale} {...seo} />
     <slot name="head" />
     {beaconToken && (
@@ -114,10 +116,12 @@ const preloadedFonts = [spaceGroteskLatin, jetbrainsMonoLatin];
     <div class="mx-auto max-w-[1200px] px-3 md:px-4" data-site-chrome>
       <Footer locale={locale} subscribeCta={subscribeCta} subscribeLink={subscribeLink} />
     </div>
-    <div class="mx-auto max-w-[1200px] px-3 md:px-4">
-      <LanguageHint locale={locale} translations={translations} />
-    </div>
-    <BackToTop locale={locale} />
+    {site.features.languageHint && (
+      <div class="mx-auto max-w-[1200px] px-3 md:px-4">
+        <LanguageHint locale={locale} translations={translations} />
+      </div>
+    )}
+    {site.features.backToTop && <BackToTop locale={locale} />}
     <slot name="floating" />
   </body>
 </html>

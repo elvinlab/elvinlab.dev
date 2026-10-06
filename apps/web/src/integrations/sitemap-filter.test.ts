@@ -13,6 +13,10 @@ const allOn = {
   readingMode: true,
   marks: true,
   subscribe: false,
+  backToTop: true,
+  languageHint: true,
+  themeToggle: true,
+  backgroundPicker: true,
 };
 
 describe('isHiddenFromSitemap', () => {
@@ -77,5 +81,16 @@ describe('isHiddenFromSitemap', () => {
   it('keeps the indexable subscription page and its English twin', () => {
     expect(isHiddenFromSitemap('/subscribe/', allOn)).toBe(false);
     expect(isHiddenFromSitemap('/en/subscribe/', allOn)).toBe(false);
+  });
+
+  it('returns true for /contact/ when the contact feature is off', () => {
+    const features = { ...allOn, contact: false };
+    expect(isHiddenFromSitemap('/contact/', features)).toBe(true);
+    expect(isHiddenFromSitemap('/en/contact/', features)).toBe(true);
+  });
+
+  it('keeps /contact/ when the contact feature is on', () => {
+    expect(isHiddenFromSitemap('/contact/', allOn)).toBe(false);
+    expect(isHiddenFromSitemap('/en/contact/', allOn)).toBe(false);
   });
 });

@@ -13,6 +13,10 @@ const allOn = {
   marks: true,
   subscribe: false,
   me: true,
+  backToTop: true,
+  languageHint: true,
+  themeToggle: true,
+  backgroundPicker: true,
 };
 
 describe('navItems', () => {

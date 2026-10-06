@@ -158,3 +158,33 @@ describe('marks Actions boundary', () => {
     expect(String((error as Error).message)).not.toMatch(/total|zod|broken/i);
   });
 });
+
+describe('contact Action with the feature off', () => {
+  it('is unavailable and never reaches a provider', async () => {
+    vi.resetModules();
+    vi.doMock('@/shared/config/index.ts', async (importOriginal) => {
+      const original = await importOriginal<typeof import('@/shared/config/index.ts')>();
+      return {
+        ...original,
+        site: { ...original.site, features: { ...original.site.features, contact: false } },
+      };
+    });
+    const fetch = vi.fn();
+    vi.stubGlobal('fetch', fetch);
+    const { server: off } = await import('./index.ts');
+    const offHandler = (
+      off.contact as unknown as {
+        handler: (input: unknown, context: { request: Request }) => Promise<unknown>;
+      }
+    ).handler;
+    const request = new Request('https://example.test/_actions/contact', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Origin: 'https://example.test' },
+    });
+    await expect(offHandler({}, { request })).rejects.toMatchObject({
+      code: 'SERVICE_UNAVAILABLE',
+    });
+    expect(fetch).not.toHaveBeenCalled();
+    vi.doUnmock('@/shared/config/index.ts');
+  });
+});
