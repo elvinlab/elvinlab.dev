@@ -370,5 +370,11 @@
     "category": "added",
     "title": "Footprint card on the home page",
     "description": "The home page has its own anonymous footprint button and counter in the sidebar, switchable with the `home.marks` flag; the privacy page now says footprints cover each note and the home page."
+  },
+  "footprint-heartbeat": {
+    "date": "2026-10-05",
+    "category": "added",
+    "title": "Footprint heart beats on hover, focus and first view",
+    "description": "The pixel heart beats twice in two steps on hover or keyboard focus and once when the button first scrolls into view; it never loops and stays still under reduced motion."
   }
 }

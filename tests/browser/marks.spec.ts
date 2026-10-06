@@ -438,3 +438,35 @@ test.describe('privacy tooltip dismissal', () => {
     });
   });
 });
+
+test.describe('heartbeat', () => {
+  const beat = (icon: Locator) => icon.evaluate((el) => getComputedStyle(el).animationName);
+
+  test('beats once when the button first scrolls into view and never loops', async ({ page }) => {
+    await page.emulateMedia({ reducedMotion: 'no-preference' });
+    await mockMarks(page);
+    await page.goto(NOTES[0]?.path ?? '/');
+    const icon = page.locator('.mb:visible .mi').first();
+    await expect.poll(() => beat(icon)).toBe('marks-beat');
+    // The class is removed after the beat: it plays once, not on a loop.
+    await expect.poll(() => beat(icon), { timeout: 3000 }).toBe('none');
+  });
+
+  test('beats on hover and on keyboard focus', async ({ page }) => {
+    await page.emulateMedia({ reducedMotion: 'no-preference' });
+    await mockMarks(page);
+    await page.goto(NOTES[0]?.path ?? '/');
+    const button = page.locator('.mb:visible').first();
+    const icon = button.locator('.mi');
+    await expect.poll(() => beat(icon), { timeout: 3000 }).toBe('none');
+    await button.hover();
+    await expect.poll(() => beat(icon)).toBe('marks-beat');
+    await page.mouse.move(0, 0);
+    await expect.poll(() => beat(icon), { timeout: 3000 }).toBe('none');
+    await page.keyboard.press('Tab');
+    await button.focus();
+    await page.keyboard.press('Shift+Tab');
+    await page.keyboard.press('Tab');
+    await expect.poll(() => beat(icon)).toBe('marks-beat');
+  });
+});

@@ -124,13 +124,29 @@ const privacyHref = `${localizePath('/privacy/', locale, LOCALES)}#marks`;
       }
     };
 
+    // One heartbeat the first time each button scrolls into view; never a loop.
+    if ('IntersectionObserver' in window) {
+      const beat = new IntersectionObserver((entries) => {
+        for (const entry of entries) {
+          if (!entry.isIntersecting) continue;
+          beat.unobserve(entry.target);
+          const icon = entry.target.querySelector('.mi');
+          icon?.classList.add('bt');
+          setTimeout(() => icon?.classList.remove('bt'), 700);
+        }
+      });
+      for (const { button } of views) beat.observe(button);
+    }
     for (const { button } of views) {
       button.addEventListener('click', () => {
         if (store.tap() === 'ignored') return;
         config.removeAttribute('data-n');
         play(button);
       });
-      button.addEventListener('animationend', () => config.removeAttribute('data-n'));
+      button.addEventListener('animationend', (event) => {
+        // Only the nudge ring (on the button itself); the heart's own animations bubble up too.
+        if (event.target === button) config.removeAttribute('data-n');
+      });
     }
     // Escape dismisses it wherever the focus is: a hover-opened tooltip has no focus inside it.
     document.addEventListener('keydown', (event) => {

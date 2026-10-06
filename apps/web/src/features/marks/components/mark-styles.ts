@@ -24,6 +24,8 @@
  * - The tooltip link has no transition (`!important` beats the global reduced-motion rule, which
  *   makes every element `transition: all 0.01ms`): its visibility must follow its parent in the same
  *   frame, or a quick Tab would skip it.
+ * - The heart beats twice in two steps on hover or keyboard focus and once when the button first
+ *   scrolls into view (`.bt`, set by the script); it never loops, and it is off under reduced motion.
  * - Every animation is off under prefers-reduced-motion.
  */
 export const MARKS_CSS =
@@ -52,11 +54,14 @@ export const MARKS_CSS =
   '.mp{position:absolute;width:4px;height:4px;margin:-2px 0 0 -2px;background:var(--color-primary);opacity:0}' +
   '.mp:nth-child(3n+2){background:var(--color-cyan)}' +
   '.mp:nth-child(3n){background:var(--color-pink)}' +
+  '.mb:hover .mi,.mb:focus-visible .mi,.mi.bt{animation:marks-beat .6s steps(1,end)}' +
   '[data-a=stamp] .mi.go{animation:marks-stamp .36s steps(4,end)}' +
   '[data-a=stamp] .mr{animation:marks-pulse .35s steps(5,end) .1s backwards}' +
   '[data-a=pulse] .mr{animation:marks-pulse .5s steps(6,end)}' +
   '[data-a=burst] .mp{animation:marks-burst .45s steps(5,end)}' +
   '.mk[data-n] .mb:after{content:"";position:absolute;inset:-3px;border:2px solid var(--color-pink);border-radius:inherit;opacity:0;pointer-events:none;animation:marks-nudge 1.1s cubic-bezier(0,0,.2,1) .8s 2}' +
+  '[data-a=none] .mi{animation:none!important}' +
+  '@keyframes marks-beat{20%,60%{transform:scale(1.2)}40%,80%{transform:none}}' +
   '@keyframes marks-stamp{from{opacity:.4;transform:scale(1.8) rotate(-14deg)}to{opacity:1;transform:none}}' +
   '@keyframes marks-pulse{from{opacity:.9;transform:scale(.6)}to{opacity:0;transform:scale(2.6)}}' +
   '@keyframes marks-burst{to{opacity:0;transform:translate(var(--x),var(--y))}}' +
