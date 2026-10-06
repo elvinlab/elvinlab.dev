@@ -101,3 +101,6 @@ After the release `e3dedd6` the friend who got stuck on "Verificando…" retried
 ## Unsubscribe click-through, 2026-10-06
 The owner unsubscribed one address from a note email in production: the page answered fast and said all fine. Server side right after: 2 confirmed, 1 unsubscribed (unsubscribed_at set), no confirmation hash left. The remaining open checks of the subscription are Outlook rendering and the DMARC report address (owner DNS step).
 
+## Outlook check, 2026-10-06
+The owner opened the note email in Outlook and says it looks good. Email clients checked by the owner: Gmail (light and dark) and Outlook. The only open item of the subscription is the DMARC report address, an owner DNS step.
+
