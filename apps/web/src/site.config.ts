@@ -70,7 +70,7 @@ export const siteConfig = {
     changelog: true,
     readingMode: true,
     marks: true,
-    subscribe: false,
+    subscribe: true,
   },
   // Public ids of third-party services. They ship in the HTML by design. An environment variable
   // with the same purpose overrides each one (PUBLIC_CF_ANALYTICS_TOKEN, PUBLIC_TURNSTILE_SITE_KEY).
