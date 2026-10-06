@@ -412,5 +412,11 @@
     "category": "added",
     "title": "Email subscription guide",
     "description": "A consolidated guide, in Spanish and English, for the email subscription: how it works, stored data and privacy, limits, the manual owner flow to send a note, setup for forks and troubleshooting."
+  },
+  "ci-faster-shards": {
+    "date": "2026-10-06",
+    "category": "changed",
+    "title": "Faster CI: more parallel shards",
+    "description": "CI now runs Lighthouse in two shards and the browser tests in four. Every URL still runs three times and no threshold or assertion changed; locally, --shard 1/2 reproduces a CI shard."
   }
 }

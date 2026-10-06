@@ -33,6 +33,7 @@ Local implementation on `develop`. No push, no release, no remote operation. One
 - [x] V3 Registry: fingerprints, `--record`, `--stale`, `odd/verification-state.json` seeded by one real full run.
 - [x] V4 Docs and rule: `docs/TESTING.md`, `CLAUDE.md`, ledger note, changelog (tooling).
 - [x] V6 Faster verification (2026-10-05): local Lighthouse 1 run (`--runs`, CI keeps 3), wide list split into FULL-wide and LAYOUT-wide, one Playwright invocation (`E2E_WIDE_SPECS`), `workers: '100%'`, `--files` simulation, `elapsed` line; CI: pnpm store and Playwright browser caches, e2e job sharded in 3, per-job duration in the step summary. No threshold, budget or assertion changed. Evidence: `odd/verification-timings.md`.
+- [x] V7 CI sharding (2026-10-06): `run-lighthouse-ci.ts` gained `--shard N/M` (`--shard=N/M` too; `--url` wins; pure `parseShard`/`selectShard` with 15 unit tests); CI `lighthouse` is a matrix of 2 shards (3 runs per URL, assertions untouched) and `e2e` goes from 3 to 4 shards; `checks` still needs both matrices. Baseline run 37482889047 and expected effect (about 100 s off the 328 s pipeline, unmeasured) in `odd/verification-timings.md`; after-numbers pending the first CI run.
 - [ ] V5 Validation on real changes: replay three past commits (a docs-only one, a note-page one, a contact one) and compare the plan with what was really needed.
 
 ## Acceptance
