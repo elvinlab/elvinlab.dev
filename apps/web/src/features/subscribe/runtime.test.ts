@@ -13,16 +13,15 @@ import {
   unsubscribeConfigured,
 } from './runtime.ts';
 
-const migration = readFileSync(
-  new URL('../../../migrations/0002_subscribers.sql', import.meta.url),
-  'utf8',
+const migrations = ['0002_subscribers.sql', '0003_subscriber_notes.sql'].map((name) =>
+  readFileSync(new URL(`../../../migrations/${name}`, import.meta.url), 'utf8'),
 );
 const EMAIL = ['reader', 'example.test'].join('@');
 const SITE = 'https://site.test/';
 
 function setup(limit = { success: true }) {
   const sqlite = new DatabaseSync(':memory:');
-  sqlite.exec(migration);
+  for (const migration of migrations) sqlite.exec(migration);
   const limiter = { limit: vi.fn(async (_options: { key: string }) => limit) };
   const bindings = {
     SITE_DB: asD1(sqlite),

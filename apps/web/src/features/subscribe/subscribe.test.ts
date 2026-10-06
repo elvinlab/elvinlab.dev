@@ -409,6 +409,94 @@ describe('sendNote', () => {
     expect(batches).toHaveLength(1);
   });
 
+  describe('delivery records', () => {
+    const noteB = { ...note, slug: 'b-note', title: 'B', url: 'https://site.test/notes/b-note/' };
+    const noteC = { ...note, slug: 'c-note', title: 'C', url: 'https://site.test/notes/c-note/' };
+    const sentTo = (batches: { messages: { to: string }[] }[], index: number) =>
+      batches[index]?.messages.map((message) => message.to).sort() ?? [];
+
+    it('sends note A, then B, then A again: A reaches each subscriber only once', async () => {
+      const { ports, batches } = await withConfirmed(3);
+      await expect(sendNote(note, ports)).resolves.toMatchObject({ sent: 3 });
+      await expect(sendNote(noteB, ports)).resolves.toMatchObject({ sent: 3 });
+      await expect(sendNote(note, ports)).resolves.toEqual({
+        sent: 0,
+        remaining: 0,
+        failed: false,
+      });
+      expect(batches).toHaveLength(2);
+    });
+
+    it('delivers each note once to each subscriber whatever the order (3, 1, 2)', async () => {
+      const { ports, batches, notes } = await withConfirmed(2);
+      const notesInOrder = [noteC, note, noteB];
+      for (const next of notesInOrder) await sendNote(next, ports);
+      for (const next of notesInOrder)
+        await expect(sendNote(next, ports)).resolves.toMatchObject({ sent: 0 });
+      expect(batches).toHaveLength(3);
+      for (const batch of batches) expect(batch.messages).toHaveLength(2);
+      for (const delivered of notes.values())
+        expect([...delivered.keys()].sort()).toEqual(['a-note', 'b-note', 'c-note']);
+    });
+
+    it('sends each note only to the subscribers of its language', async () => {
+      const { ports, batches } = await withConfirmed(2);
+      await subscribe(
+        input({ email: ['lector', 'example.test'].join('@'), locale: 'en' }),
+        IP,
+        ports,
+      );
+      await confirmSubscription('token3', ports);
+      await sendNote({ ...noteB, locale: 'en' }, ports);
+      await sendNote(note, ports);
+      await sendNote({ ...noteB, locale: 'en' }, ports);
+      await sendNote(note, ports);
+      expect(batches.map((batch) => batch.messages.length)).toEqual([1, 2]);
+    });
+
+    it('gives a note to someone who confirmed after it went out, and to nobody else again', async () => {
+      const { ports, batches } = await withConfirmed(2);
+      await sendNote(note, ports);
+      await subscribe(input({ email: ['late', 'example.test'].join('@') }), IP, ports);
+      await confirmSubscription('token3', ports);
+      await expect(sendNote(note, ports)).resolves.toEqual({
+        sent: 1,
+        remaining: 0,
+        failed: false,
+      });
+      expect(sentTo(batches, 1)).toEqual([['late', 'example.test'].join('@')]);
+      await expect(sendNote(note, ports)).resolves.toMatchObject({ sent: 0 });
+    });
+
+    it('resumes a run cut by the daily cap without a duplicate, in any later order', async () => {
+      const { ports, batches } = await withConfirmed(5);
+      await sendNote(note, ports, { dailyCap: 2, batchSize: 2 });
+      await sendNote(noteB, ports, { dailyCap: 5 });
+      await sendNote(note, ports, { dailyCap: 2, batchSize: 2 });
+      await sendNote(note, ports, { dailyCap: 5 });
+      const toA = batches
+        .filter((batch) => batch.key.startsWith('note:a-note'))
+        .flatMap((batch) => batch.messages.map((message) => message.to));
+      expect(toA).toHaveLength(5);
+      expect(new Set(toA).size).toBe(5);
+      await expect(sendNote(note, ports)).resolves.toMatchObject({ sent: 0, remaining: 0 });
+    });
+
+    it('never mails nor records pending and unsubscribed subscribers', async () => {
+      const { ports, rows, notes, batches } = await withConfirmed(2);
+      await subscribe(input({ email: ['pending', 'example.test'].join('@') }), IP, ports);
+      const gone = [...rows.keys()][0] ?? '';
+      await unsubscribe(await createUnsubscribeToken(gone, ports), ports);
+      await sendNote(note, ports);
+      expect(batches[0]?.messages).toHaveLength(1);
+      const recorded = [...notes.keys()];
+      expect(recorded).toHaveLength(1);
+      expect(recorded).not.toContain(gone);
+      const pending = [...rows.values()].find((row) => row.status === 'pending');
+      expect(recorded).not.toContain(pending?.id);
+    });
+  });
+
   it('caps batches at the provider limit by default', async () => {
     expect(SUBSCRIBE_POLICY.batchSize).toBe(100);
     expect(SUBSCRIBE_POLICY.dailyCap).toBe(100);

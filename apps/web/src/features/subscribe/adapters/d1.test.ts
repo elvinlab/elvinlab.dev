@@ -8,10 +8,10 @@ import type { NewPendingSubscriber, SubscriberRepository } from '@/features/subs
 import { createD1SubscribeQuota, createD1SubscriberRepository, type D1Like } from './d1.ts';
 import { asD1 } from './sqlite-d1.ts';
 
-const migration = readFileSync(
-  new URL('../../../../migrations/0002_subscribers.sql', import.meta.url),
-  'utf8',
-);
+// The real migration files, applied in order, exactly as `wrangler d1 migrations apply` does.
+const migrationFile = (name: string) =>
+  readFileSync(new URL(`../../../../migrations/${name}`, import.meta.url), 'utf8');
+const migrations = ['0002_subscribers.sql', '0003_subscriber_notes.sql'].map(migrationFile);
 
 const row = (id: string, change: Partial<NewPendingSubscriber> = {}): NewPendingSubscriber => ({
   id,
@@ -29,7 +29,9 @@ let repo: SubscriberRepository;
 let statements: string[];
 beforeEach(() => {
   sqlite = new DatabaseSync(':memory:');
-  sqlite.exec(migration);
+  // D1 enforces foreign keys; node:sqlite enables them by default, stated here so it never silently differs.
+  sqlite.exec('PRAGMA foreign_keys = ON');
+  for (const migration of migrations) sqlite.exec(migration);
   statements = [];
   repo = createD1SubscriberRepository(asD1(sqlite, statements));
 });
@@ -120,11 +122,11 @@ describe('D1 subscriber repository', () => {
     await repo.markUnsubscribed('b', 3_000);
     expect((await repo.listUnnotified('n1', 'es', 10)).map((s) => s.id)).toEqual(['a', 'c']);
     expect((await repo.listUnnotified('n1', 'es', 1)).map((s) => s.id)).toEqual(['a']);
-    await repo.markNotified(['a'], 'n1');
+    await repo.markNotified(['a'], 'n1', 5_000);
     expect((await repo.listUnnotified('n1', 'es', 10)).map((s) => s.id)).toEqual(['c']);
     await expect(repo.countUnnotified('n1', 'es')).resolves.toBe(1);
     await expect(repo.countUnnotified('n2', 'es')).resolves.toBe(2);
-    await repo.markNotified([], 'n1');
+    await repo.markNotified([], 'n1', 5_000);
   });
 
   it('lists and counts only the subscribers of the requested locale', async () => {
@@ -140,8 +142,57 @@ describe('D1 subscriber repository', () => {
   it('marks a hundred ids at once', async () => {
     const ids = Array.from({ length: 150 }, (_, index) => `s${String(index).padStart(3, '0')}`);
     for (const id of ids) await confirm(id);
-    await repo.markNotified(ids.slice(0, 120), 'n1');
+    await repo.markNotified(ids.slice(0, 120), 'n1', 5_000);
     await expect(repo.countUnnotified('n1', 'es')).resolves.toBe(30);
+  });
+
+  it('remembers every note: listing is by delivery record, not by last_note', async () => {
+    await confirm('a');
+    await repo.markNotified(['a'], 'n1', 5_000);
+    await repo.markNotified(['a'], 'n3', 6_000);
+    await repo.markNotified(['a'], 'n1', 7_000);
+    await expect(repo.findById('a')).resolves.toMatchObject({ lastNote: 'n1' });
+    await expect(repo.countUnnotified('n1', 'es')).resolves.toBe(0);
+    await expect(repo.countUnnotified('n3', 'es')).resolves.toBe(0);
+    await expect(repo.countUnnotified('n2', 'es')).resolves.toBe(1);
+    expect(
+      sqlite.prepare('SELECT slug, sent_at FROM subscriber_notes ORDER BY slug').all(),
+    ).toEqual([
+      { slug: 'n1', sent_at: 5_000 },
+      { slug: 'n3', sent_at: 6_000 },
+    ]);
+  });
+
+  it('records nothing for a subscriber that does not exist', async () => {
+    await repo.markNotified(['ghost'], 'n1', 5_000).catch(() => undefined);
+    expect(sqlite.prepare('SELECT COUNT(*) AS n FROM subscriber_notes').get()).toEqual({ n: 0 });
+  });
+
+  it('removes the delivery rows with their subscriber (ON DELETE CASCADE)', async () => {
+    await confirm('a');
+    await confirm('b');
+    await repo.markNotified(['a', 'b'], 'n1', 5_000);
+    sqlite.prepare("DELETE FROM subscribers WHERE id = 'a'").run();
+    expect(sqlite.prepare('SELECT subscriber_id FROM subscriber_notes').all()).toEqual([
+      { subscriber_id: 'b' },
+    ]);
+  });
+
+  it('backfills the last note of each existing subscriber when 0003 runs', () => {
+    const old = new DatabaseSync(':memory:');
+    old.exec(migrations[0] ?? '');
+    old.exec(`INSERT INTO subscribers (id, email, status, locale, last_note, created_at, confirmed_at)
+      VALUES ('a', 'a@x.test', 'confirmed', 'es', 'n1', 100, 200),
+             ('b', 'b@x.test', 'confirmed', 'es', NULL, 100, 200),
+             ('c', 'c@x.test', 'unsubscribed', 'es', 'n1', 100, NULL)`);
+    old.exec(migrations[1] ?? '');
+    old.exec(migrations[1] ?? '');
+    expect(
+      old.prepare('SELECT subscriber_id, slug, sent_at FROM subscriber_notes ORDER BY 1').all(),
+    ).toEqual([
+      { subscriber_id: 'a', slug: 'n1', sent_at: 200 },
+      { subscriber_id: 'c', slug: 'n1', sent_at: 100 },
+    ]);
   });
 
   it('purges only old pending rows', async () => {
@@ -159,7 +210,7 @@ describe('D1 subscriber repository', () => {
     const hostile = "x'); DROP TABLE subscribers; --";
     await repo.insertPending(row('a', { email: hostile }));
     await expect(repo.findByEmail(hostile)).resolves.toMatchObject({ email: hostile });
-    await repo.markNotified(['a'], hostile);
+    await repo.markNotified(['a'], hostile, 5_000);
     expect(sqlite.prepare('SELECT COUNT(*) AS n FROM subscribers').get()).toEqual({ n: 1 });
     for (const sql of statements) expect(sql).not.toContain('DROP');
   });

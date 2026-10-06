@@ -21,6 +21,9 @@ type Row = Subscriber & {
 /** In-memory list that follows the contract documented on `SubscriberRepository`. */
 export function createFakeRepository() {
   const rows = new Map<string, Row>();
+  /** Delivery records: `subscriberId -> (slug -> sentAt)`, like the `subscriber_notes` table. */
+  const notes = new Map<string, Map<string, number>>();
+  const received = (id: string, slug: string) => notes.get(id)?.has(slug) === true;
   const publicView = ({ id, email, status, locale, confirmSentAt, lastNote }: Row): Subscriber => ({
     id,
     email,
@@ -66,7 +69,7 @@ export function createFakeRepository() {
     async listUnnotified(slug, locale, limit) {
       return [...rows.values()]
         .filter(
-          (row) => row.status === 'confirmed' && row.locale === locale && row.lastNote !== slug,
+          (row) => row.status === 'confirmed' && row.locale === locale && !received(row.id, slug),
         )
         .sort((a, b) => a.id.localeCompare(b.id))
         .slice(0, limit)
@@ -74,13 +77,17 @@ export function createFakeRepository() {
     },
     async countUnnotified(slug, locale) {
       return [...rows.values()].filter(
-        (row) => row.status === 'confirmed' && row.locale === locale && row.lastNote !== slug,
+        (row) => row.status === 'confirmed' && row.locale === locale && !received(row.id, slug),
       ).length;
     },
-    async markNotified(ids, slug) {
+    async markNotified(ids, slug, now) {
       for (const id of ids) {
         const row = rows.get(id);
-        if (row) row.lastNote = slug;
+        if (!row) continue;
+        const delivered = notes.get(id) ?? new Map<string, number>();
+        if (!delivered.has(slug)) delivered.set(slug, now);
+        notes.set(id, delivered);
+        if (row.status === 'confirmed') row.lastNote = slug;
       }
     },
     async purgePendingBefore(cutoff) {
@@ -88,13 +95,14 @@ export function createFakeRepository() {
       for (const [id, row] of rows) {
         if (row.status === 'pending' && row.createdAt < cutoff) {
           rows.delete(id);
+          notes.delete(id);
           removed += 1;
         }
       }
       return removed;
     },
   };
-  return { repository, rows };
+  return { repository, rows, notes };
 }
 
 /** In-memory daily counter with the same contract as the D1 quota. */
@@ -191,5 +199,5 @@ export function createFakePorts(overrides: Partial<SubscribePorts> = {}) {
     report: (detail) => reports.push(detail),
     ...overrides,
   };
-  return { ports, rows: repo.rows, days: quota.days, reports, ...mail };
+  return { ports, rows: repo.rows, notes: repo.notes, days: quota.days, reports, ...mail };
 }

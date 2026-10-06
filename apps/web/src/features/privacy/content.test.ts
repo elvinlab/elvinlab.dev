@@ -241,6 +241,7 @@ describe('buildPrivacyContent with subscribe', () => {
     const es = body(withSubscribe.es);
     expect(es).toMatch(/aviso de algún proyecto/);
     expect(es).toMatch(/7 días/);
+    expect(es).toMatch(/qué notas ya te envié, solo para no mandarte la misma dos veces/);
     expect(es).toMatch(/baja con un clic/);
     expect(es).toMatch(/Cloudflare/);
     expect(es).toMatch(/Resend/);
@@ -249,6 +250,9 @@ describe('buildPrivacyContent with subscribe', () => {
     const en = body(withSubscribe.en);
     expect(en).toMatch(/heads-up about one of my projects/);
     expect(en).toMatch(/7 days/);
+    expect(en).toMatch(
+      /which notes I already sent you, only so I never send you the same one twice/,
+    );
     expect(en).toMatch(/one-click unsubscribe link/);
     expect(en).toMatch(/Cloudflare/);
     expect(en).toMatch(/Resend/);

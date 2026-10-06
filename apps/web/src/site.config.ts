@@ -79,7 +79,7 @@ export const siteConfig = {
     turnstileSiteKey: '0x4AAAAAAFKtcGkx9Mt92EHt',
   },
   // "Last updated" dates of the legal pages: bump the one whose text you change (YYYY-MM-DD).
-  legal: { privacyUpdated: '2026-10-05', termsUpdated: '2026-10-01' },
+  legal: { privacyUpdated: '2026-10-06', termsUpdated: '2026-10-01' },
   // Comments (https://giscus.app): GitHub Discussions of this repo, "Announcements" category.
   giscus: {
     repo: 'elvinlab/elvinlab.dev',

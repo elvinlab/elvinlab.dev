@@ -113,3 +113,11 @@ The owner opened the note email in Outlook and says it looks good. Email clients
 ## Note 3 sent to the whole list, 2026-10-06 (owner-requested)
 Dry run first (4 confirmed Spanish subscribers had never received a note; pool 94), then `pnpm notify:note vibe-coding-o-especificar-primero --send`: sent to 4, 0 waiting. Counts only in the tracker, no addresses. This was the first send with the English sender `Lab Notes <notes@elvinlab.dev>`.
 
+
+## Progress 2026-10-06: delivery ledger so a note can never be sent twice (bounded writer, not committed)
+- Found in production: `last_note` remembers one slug, so after note 1 went out, note 3 would have been re-sent to the same people. Fix: migration `0003_subscriber_notes.sql` (table `subscriber_notes`, PK `(subscriber_id, slug)`, `ON DELETE CASCADE`, backfill from `last_note`); `listUnnotified` and `countUnnotified` use `NOT EXISTS` on it; `markNotified(ids, slug, now)` inserts the rows and still writes `last_note`. ADR 0014 section, `/privacy` sentence (ES and EN, `privacyUpdated` 2026-10-06), SUBSCRIPTION and CONFIGURATION docs (es/en), changelog `subscriber-notes-ledger`.
+- Tests: domain (A,B,A once; order 3,1,2; late confirmer; daily-cap resume; pending and unsubscribed never recorded) and D1 adapter tests over the real migrations 0002 then 0003 (backfill, cascade with `PRAGMA foreign_keys = ON`, bound parameters). Checks: see the coordinator handoff.
+- [ ] Owner step 1: apply 0003 to the remote database: `cd apps/web && mise exec -- pnpm exec wrangler d1 migrations apply elvinlab-dev-db --remote` (applies the pending ones only).
+- [ ] Owner step 2: after 0003, run once (records that note 3 also reached the four confirmed subscribers and the one who later unsubscribed; the backfill only knows note 1):
+  `INSERT OR IGNORE INTO subscriber_notes (subscriber_id, slug, sent_at) SELECT id, 'vibe-coding-o-especificar-primero', COALESCE(confirmed_at, created_at, 0) FROM subscribers WHERE status IN ('confirmed','unsubscribed');`
+- [ ] Owner step 3: release (the code that reads the new table must not run before 0003 exists), then a dry run for note 3 must say 0 recipients.

@@ -448,5 +448,11 @@
     "category": "fixed",
     "title": "pnpm verify no longer skips checks after a toolchain change",
     "description": "A change to the toolchain, dependencies or the verification scripts now selects every check, in both the uncommitted-work plan and --stale; before, the registry's freshness could hide all of them except lint."
+  },
+  "subscriber-notes-ledger": {
+    "date": "2026-10-06",
+    "category": "fixed",
+    "title": "A note can no longer be emailed twice to the same subscriber",
+    "description": "The list now records every note sent to each subscriber, so sending notes out of order or re-running a send never duplicates one. Forks that already ran the subscription migration must apply 0003."
   }
 }
