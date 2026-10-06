@@ -112,7 +112,7 @@ Inconsistencia a resolver: en modo claro el banner usa `#c9c3ee` como borde y la
 | Texto | Space Grotesk | 400, 500 | 16–18 px |
 | Mono (números de nota, prompts, código) | JetBrains Mono | 400, 600, 700 | 12–16 px; en el sitio no se usa para etiquetas en mayúsculas |
 | Display pixelado (titular del hero, títulos de sección) | Pixelify Sans | 600 (variable) | Según el preset `appearance`: `minimal` hero 32 px en teléfono y 44 px desde `md`, títulos de sección 20 px; `full` (el de este sitio desde 2026-10-02, escala reducida y aprobada ese día) hero 32 px en teléfono y 52 px desde `md`, títulos de sección 22 px |
-| Favicon | Consola portátil pixelada (cuerpo gris azulado, pantalla verde oscuro con un corazón rosa, cruceta y dos botones), 16×16 píxeles, sin el violeta saturado | Pestaña del navegador (`favicon.svg` y `favicon.ico`) |
+| Favicon | Terminal de Linux pixelada (ventana gris azulado con tres puntos, prompt `>` cian y cursor rosa), 16×16 píxeles, sin el violeta saturado | Pestaña del navegador (`favicon.svg` y `favicon.ico`) |
 | Firma retro | Press Start 2P | 400 | Wordmark del navbar, firma del footer y página 404 |
 
 Todas desde [Fontsource](https://fontsource.org), autoalojadas; nunca desde un CDN en tiempo de ejecución.
