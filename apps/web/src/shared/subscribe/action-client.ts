@@ -8,7 +8,7 @@ export type SubscribeActionName = 'request' | 'confirm' | 'unsubscribe';
 
 export type ActionOutcome =
   | { ok: true; data: Record<string, unknown> }
-  | { ok: false; code: string };
+  | { ok: false; code: string; message?: string };
 
 type Fetch = (input: string, init: RequestInit) => Promise<Response>;
 
@@ -44,8 +44,11 @@ export async function callSubscribeAction(
       const data = readFlat(text);
       return data ? { ok: true, data } : UNKNOWN;
     }
-    const error = JSON.parse(text) as { code?: unknown };
-    return typeof error.code === 'string' ? { ok: false, code: error.code } : UNKNOWN;
+    const error = JSON.parse(text) as { code?: unknown; message?: unknown };
+    if (typeof error.code !== 'string') return UNKNOWN;
+    return typeof error.message === 'string'
+      ? { ok: false, code: error.code, message: error.message }
+      : { ok: false, code: error.code };
   } catch {
     return UNKNOWN;
   }

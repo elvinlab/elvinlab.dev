@@ -273,6 +273,7 @@ export const CHECKS: readonly CheckDef[] = [
   ]),
 
   e2e({ file: 'a11y.spec.ts', covers: EVERY_PAGE, helpers: true }),
+  e2e({ file: 'back-to-top.spec.ts', covers: EVERY_PAGE, helpers: true }),
   e2e({ file: 'background.spec.ts', covers: HOME }),
   e2e({ file: 'calm-pages.spec.ts', covers: [...NOTE_PAGE, ...HOME], responsive: true }),
   e2e({ file: 'card-links.spec.ts', covers: EVERY_PAGE }),

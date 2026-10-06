@@ -140,7 +140,7 @@ describe('subscribe', () => {
         },
       },
     });
-    expect((await subscribe(input(), IP, ports)).ok).toBe(false);
+    expect(await subscribe(input(), IP, ports)).toEqual({ ok: false, error: 'rate_limited' });
     expect(reports).toEqual(['rate_limit']);
     expect(verified).toBe(false);
   });

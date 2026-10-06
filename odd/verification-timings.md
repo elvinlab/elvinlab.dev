@@ -34,7 +34,7 @@ Run `37390786594` on `main`, read with `gh`. Critical path: e2e, then `checks`, 
 2. The wide list is split. Full-wide (dependencies, toolchain and config, the verification scripts) still selects everything. Layout-wide (global CSS, tokens, `shared/layout/**`, i18n structure) selects the cheap families, every e2e spec at 1280 px and Lighthouse for `/` and `/notes/smoke-es/` only: no three-viewport reruns, no dev cold start. `--all` and `--viewports all` remain the explicit way to run everything.
 3. One Playwright invocation per plan instead of two (`E2E_WIDE_SPECS` narrows the 360 and 768 px projects to the width-dependent specs; unset, nothing is narrowed). `workers` went from `'50%'` to `'100%'`; two consecutive runs of 4 spec files stayed green (253 passed each, 57 s and 55 s).
 4. `pnpm verify --run` prints `elapsed <n>s (full stack baseline 340 s: saved <p>%)`; `--files <paths>` simulates a change set.
-5. CI: pnpm store cache (key: `pnpm-lock.yaml`), Playwright browser cache (key: Playwright version), the e2e job sharded in 3 with `--shard=N/3` (white-label, `version.txt` and the image check run in shard 1 only; `checks` still needs the whole matrix), and each job appends its duration to the run summary.
+5. CI: pnpm store cache (key: `pnpm-lock.yaml`), Playwright browser cache (key: Playwright version), the e2e job sharded with `--shard=N/3` (since 2026-10-06: 4 shards, see below) (white-label, `version.txt` and the image check run in shard 1 only; `checks` still needs the whole matrix), and each job appends its duration to the run summary.
 
 ## Measured after
 
@@ -49,3 +49,15 @@ Run `37390786594` on `main`, read with `gh`. Critical path: e2e, then `checks`, 
 ## CI durations
 
 Each job writes `<job>: <n>s` (the e2e shards one line each) to its run's step summary, so every run on `main` records its own timings. The CI baseline above is the only CI number so far; the first after-numbers are above; compare the next run, when the caches are warm, the first run with the caches warm (the first run populates them and will not show the saving). No CI figure here is estimated.
+
+## CI baseline of 2026-10-06 and sharding (V7)
+
+Baseline, run 37482889047: `lighthouse` 265 s (about 70 s setup, about 195 s for 6 URLs x 3 runs), `e2e` shards 143, 143 and 222 s, `static` 65 s, `deploy` 59 s; whole pipeline 328 s.
+
+Change: Lighthouse runs as 2 shards (`--shard N/2`, every 2nd URL of `lighthouserc.json`; still 3 runs per URL, no threshold or assertion touched) and `e2e` goes from 3 to 4 shards. Local `pnpm test:lighthouse` and `pnpm verify` are unchanged.
+
+Expected effect (not measured): Lighthouse about 170 s per shard (setup plus half the URLs). The e2e total is about 530 shard-seconds; divided by 4 plus setup, the critical path should be about 150 to 170 s. Playwright shards by test, but if its assignment is by file the balance may again be uneven. Whole release expected to gain roughly 100 s over the 328 s pipeline once both changes are measured.
+
+| Scenario | Seconds | Notes |
+| --- | ---: | --- |
+| CI after (Lighthouse 2 shards, e2e 4 shards) | pending | first CI run on `main` after this change; the 4-shard timings are pending |

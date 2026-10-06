@@ -2,43 +2,43 @@
   "version": 1,
   "checks": {
     "lint": {
-      "fingerprint": "8d86b1ca456ce1129eb8c82422b2899fbd2db8b9",
-      "recordedAt": "2026-10-06T14:53:37.790Z",
+      "fingerprint": "b2b8758cc0145a4d95f8dd421f664d75d1aa1873",
+      "recordedAt": "2026-10-06T16:11:10.308Z",
       "result": "pass"
     },
     "typecheck": {
-      "fingerprint": "bfdb7750c5b1f24d44a1044e1a7d1c8bfaab287c",
-      "recordedAt": "2026-10-06T14:53:37.790Z",
+      "fingerprint": "98f7af37dc4a1189e0cdc8b88be9f873c422a91e",
+      "recordedAt": "2026-10-06T16:11:10.308Z",
       "result": "pass"
     },
     "depcruise": {
-      "fingerprint": "eb5cbe37a8b1652b2a4b135c10139a31168f125e",
-      "recordedAt": "2026-10-06T14:53:37.790Z",
+      "fingerprint": "841211e5476ca2ef0e11a119f70fc1300ad56697",
+      "recordedAt": "2026-10-06T16:11:10.308Z",
       "result": "pass"
     },
     "docs-config": {
-      "fingerprint": "97a44c7105e26d156703ce35140b69407386d6fa",
-      "recordedAt": "2026-10-06T14:39:32.314Z",
+      "fingerprint": "cb6da989c1eec44362340967ba1f9be4b976e958",
+      "recordedAt": "2026-10-06T15:52:33.207Z",
       "result": "pass"
     },
     "unit": {
-      "fingerprint": "25af1e4eb0c80b669575c4355f5712c4329bf12b",
-      "recordedAt": "2026-10-06T14:53:37.790Z",
+      "fingerprint": "7897fd1eb20bd84125286c57ec9d5912b62a1e75",
+      "recordedAt": "2026-10-06T16:11:10.308Z",
       "result": "pass"
     },
     "build": {
-      "fingerprint": "3dec563552a033a292ad3945d8d2b8196857e889",
-      "recordedAt": "2026-10-06T14:53:37.790Z",
+      "fingerprint": "380acf3e214dc88f7fcce52cede44232c780fe5e",
+      "recordedAt": "2026-10-06T16:11:10.308Z",
       "result": "pass"
     },
     "js-budget": {
-      "fingerprint": "ec4f4d0027dc67bd4fabc19a78ac45931e67e46c",
-      "recordedAt": "2026-10-06T14:53:37.790Z",
+      "fingerprint": "cdbb66834b06c481cc11b33ccc8620d33eca5fef",
+      "recordedAt": "2026-10-06T16:11:10.308Z",
       "result": "pass"
     },
     "white-label": {
-      "fingerprint": "407bed0621df61c6811b56030dc317a813d4f91d",
-      "recordedAt": "2026-10-06T14:53:37.790Z",
+      "fingerprint": "6e51c2955f22dda497c731b24cb1e75812151fb7",
+      "recordedAt": "2026-10-06T16:11:10.308Z",
       "result": "pass"
     },
     "cold-start": {
@@ -47,193 +47,198 @@
       "result": "pass"
     },
     "e2e:a11y.spec.ts": {
-      "fingerprint": "eb0eda9912203b1fa730f76e7e46771e07689799",
-      "recordedAt": "2026-10-06T14:53:37.790Z",
+      "fingerprint": "04a12d817750a1c9835d53bddccd24e69ed17043",
+      "recordedAt": "2026-10-06T16:11:10.308Z",
       "result": "pass"
     },
     "e2e:background.spec.ts": {
-      "fingerprint": "8164eb2ddd45d30ce7d325a2543076d99789ffb5",
-      "recordedAt": "2026-10-06T14:53:37.790Z",
+      "fingerprint": "2d848976377a73f25fbd0d1530cbc6d1e5dccc89",
+      "recordedAt": "2026-10-06T16:11:10.308Z",
       "result": "pass"
     },
     "e2e:card-links.spec.ts": {
-      "fingerprint": "19d708381bd13eed9d25639fdf05b86f0a55a1f3",
-      "recordedAt": "2026-10-06T14:53:37.790Z",
+      "fingerprint": "3fbd40e2ed4172ba674501337700107b17384b3c",
+      "recordedAt": "2026-10-06T16:11:10.308Z",
       "result": "pass"
     },
     "e2e:comments.spec.ts": {
-      "fingerprint": "7f037055233c3787bbabce9873a6dccf7d7501d0",
-      "recordedAt": "2026-10-06T14:53:37.790Z",
+      "fingerprint": "f58265223eb751dea5473d77c82266ca0686d1f4",
+      "recordedAt": "2026-10-06T16:11:10.308Z",
       "result": "pass"
     },
     "e2e:contact.spec.ts": {
-      "fingerprint": "64abc9bd68d9bebfc974117e00269929a91ca10b",
-      "recordedAt": "2026-10-06T14:53:37.790Z",
+      "fingerprint": "9f52f907d351937188c75957d1a40fdf798d2295",
+      "recordedAt": "2026-10-06T16:11:10.308Z",
       "result": "pass"
     },
     "e2e:cookies.spec.ts": {
-      "fingerprint": "a96b6fb6d6191e32b58abff4fd56ec5950ddf844",
-      "recordedAt": "2026-10-06T14:53:37.790Z",
+      "fingerprint": "a50e17f9494b5ba2f8eb44aaebbfc0caf947f099",
+      "recordedAt": "2026-10-06T16:11:10.308Z",
       "result": "pass"
     },
     "e2e:cv-and-credentials.spec.ts": {
-      "fingerprint": "0656dc59abc5910879a8e222d7343af354be93f9",
-      "recordedAt": "2026-10-06T14:53:37.790Z",
+      "fingerprint": "a27f461fedfdb909db57e1096b10545bd09704ad",
+      "recordedAt": "2026-10-06T16:11:10.308Z",
       "result": "pass"
     },
     "e2e:external-links.spec.ts": {
-      "fingerprint": "fd0f66d7da48efe8a9fa556f234703e375d182c9",
-      "recordedAt": "2026-10-06T14:53:37.790Z",
+      "fingerprint": "df9b95378fd9bb7836281ab41a54b98e7067ef8c",
+      "recordedAt": "2026-10-06T16:11:10.308Z",
       "result": "pass"
     },
     "e2e:favicon.spec.ts": {
-      "fingerprint": "88cce625a531fa6eb49a6bd563132b73758b4699",
-      "recordedAt": "2026-10-06T14:53:37.790Z",
+      "fingerprint": "34e929a82464e4549af78b26fdc3ecd3481faf04",
+      "recordedAt": "2026-10-06T16:11:10.308Z",
       "result": "pass"
     },
     "e2e:home-sections.spec.ts": {
-      "fingerprint": "a72c29a89328493e8ce902f5af82a0f03b280b31",
-      "recordedAt": "2026-10-06T14:53:37.790Z",
+      "fingerprint": "74b5afa35155b4b6845c789358c6e805f1a6fa23",
+      "recordedAt": "2026-10-06T16:11:10.308Z",
       "result": "pass"
     },
     "e2e:internal-links.spec.ts": {
-      "fingerprint": "86c208f297e97168b713e44ca7b843dd65ee5e26",
-      "recordedAt": "2026-10-06T14:53:37.790Z",
+      "fingerprint": "fe02732d7666de3c261c227f67a43154ea4cb527",
+      "recordedAt": "2026-10-06T16:11:10.308Z",
       "result": "pass"
     },
     "e2e:legal.spec.ts": {
-      "fingerprint": "da83c84ebc1047205a41d31a03994d6b7407800a",
-      "recordedAt": "2026-10-06T14:53:37.790Z",
+      "fingerprint": "7cae3de7cc3e5941e424de95c27058814d24c3f2",
+      "recordedAt": "2026-10-06T16:11:10.308Z",
       "result": "pass"
     },
     "e2e:link-previews.spec.ts": {
-      "fingerprint": "059fbd6b5ef8264d3d47fdfa5e243429f447b31a",
-      "recordedAt": "2026-10-06T14:53:37.790Z",
+      "fingerprint": "ee6106f333f7f9baf5500fd12c66321cbcab9324",
+      "recordedAt": "2026-10-06T16:11:10.308Z",
       "result": "pass"
     },
     "e2e:me-experience-locale.spec.ts": {
-      "fingerprint": "573c0d06fd3d70d26a6a0a37832dead19d97ea7b",
-      "recordedAt": "2026-10-06T14:53:37.790Z",
+      "fingerprint": "09937e1c8c51209579ada889c2acdb8e0b436262",
+      "recordedAt": "2026-10-06T16:11:10.308Z",
       "result": "pass"
     },
     "e2e:me-photo.spec.ts": {
-      "fingerprint": "88dff8e6729fa6119e9ed9d68a533654095a6fbb",
-      "recordedAt": "2026-10-06T14:53:37.790Z",
+      "fingerprint": "1112a9eaf45c6b9c5d8a310cebac2f0840951473",
+      "recordedAt": "2026-10-06T16:11:10.308Z",
       "result": "pass"
     },
     "e2e:note-share.spec.ts": {
-      "fingerprint": "1580c45a0dfae8b633f4dd65739ca64f988c96b8",
-      "recordedAt": "2026-10-06T14:53:37.790Z",
+      "fingerprint": "5375ef1df7197778ffa027b8da0bbb9ce118f127",
+      "recordedAt": "2026-10-06T16:11:10.308Z",
       "result": "pass"
     },
     "e2e:note-translations.spec.ts": {
-      "fingerprint": "39347cb89d0f009d881f2943844d88d604284c53",
-      "recordedAt": "2026-10-06T14:53:37.790Z",
+      "fingerprint": "e55513f9f67f7f6bbfff7658f794be7e5273eb2d",
+      "recordedAt": "2026-10-06T16:11:10.308Z",
       "result": "pass"
     },
     "e2e:performance.spec.ts": {
-      "fingerprint": "0d6d220b8e1d4d606fcdd8590645468180e59911",
-      "recordedAt": "2026-10-06T14:53:37.790Z",
+      "fingerprint": "78a42f9772551b8d701cab28ee2b6567589c9f81",
+      "recordedAt": "2026-10-06T16:11:10.308Z",
       "result": "pass"
     },
     "e2e:smoke.spec.ts": {
-      "fingerprint": "6bea84e7368414fcfe62afba9ba971c783a1c632",
-      "recordedAt": "2026-10-06T14:53:37.790Z",
+      "fingerprint": "19736eb51fd0502a783f5f20b4a0354cd62b3dfb",
+      "recordedAt": "2026-10-06T16:11:10.308Z",
       "result": "pass"
     },
     "e2e:theme.spec.ts": {
-      "fingerprint": "1bb191a26108445a4d13f87cc8841c2d058acfb8",
-      "recordedAt": "2026-10-06T14:53:37.790Z",
+      "fingerprint": "a0eca25d3b4e542d00460c6758dbf1d7a096825a",
+      "recordedAt": "2026-10-06T16:11:10.308Z",
       "result": "pass"
     },
     "e2e:calm-pages.spec.ts": {
-      "fingerprint": "540a3b39ff24088078e274570695d12c223ef52b",
-      "recordedAt": "2026-10-06T14:53:37.790Z",
+      "fingerprint": "01cf74a23b4fec0469af4f564acaa63effd674fb",
+      "recordedAt": "2026-10-06T16:11:10.308Z",
       "result": "pass"
     },
     "e2e:brand-mark.spec.ts": {
-      "fingerprint": "01b36677c6bf2e85e060ae67d2fa2abfba23d1fd",
-      "recordedAt": "2026-10-06T14:53:37.790Z",
+      "fingerprint": "b0de0d5eb310d8cf71a5bb4893fdcac9badff852",
+      "recordedAt": "2026-10-06T16:11:10.308Z",
       "result": "pass"
     },
     "e2e:focus-not-obscured.spec.ts": {
-      "fingerprint": "8fad5c7663b207e5f2a36846768c5806bfa5098e",
-      "recordedAt": "2026-10-06T14:53:37.790Z",
+      "fingerprint": "2f6c6f505e21766ec8a279902b4f62132199b31e",
+      "recordedAt": "2026-10-06T16:11:10.308Z",
       "result": "pass"
     },
     "e2e:interaction-polish.spec.ts": {
-      "fingerprint": "0a7f0985a18e593d8a84ca9179f0a86f7de62bc8",
-      "recordedAt": "2026-10-06T14:53:37.790Z",
+      "fingerprint": "89536848d26e3c279feae1eaf361e89a97df9431",
+      "recordedAt": "2026-10-06T16:11:10.308Z",
       "result": "pass"
     },
     "e2e:home-marks.spec.ts": {
-      "fingerprint": "f3fd14d7ad7334f0aa5650f538a334bdb51d9175",
-      "recordedAt": "2026-10-06T14:53:37.790Z",
+      "fingerprint": "fbfa3d578b8f1621204816a73cfb46f6ce60eec5",
+      "recordedAt": "2026-10-06T16:11:10.308Z",
       "result": "pass"
     },
     "e2e:marks.spec.ts": {
-      "fingerprint": "f08beb248ea4078b86544dc49d12ff2193db173f",
-      "recordedAt": "2026-10-06T14:53:37.790Z",
+      "fingerprint": "62ac36dac31ed944741cd870d82494870e622c41",
+      "recordedAt": "2026-10-06T16:11:10.308Z",
       "result": "pass"
     },
     "e2e:mobile-ux.spec.ts": {
-      "fingerprint": "cb5393fe612550f901f6496e73167c74fbb7d53d",
-      "recordedAt": "2026-10-06T14:53:37.790Z",
+      "fingerprint": "2b512511bcc8411ec4b9d63a7379e55dfa786a55",
+      "recordedAt": "2026-10-06T16:11:10.308Z",
       "result": "pass"
     },
     "e2e:notes-layout.spec.ts": {
-      "fingerprint": "030cb5dc3f0783df94eff6151c986fb711a14a15",
-      "recordedAt": "2026-10-06T14:53:37.790Z",
+      "fingerprint": "8f1f0d1fcde753426f36782e4961f4ed972ca17e",
+      "recordedAt": "2026-10-06T16:11:10.308Z",
       "result": "pass"
     },
     "e2e:pixel-display.spec.ts": {
-      "fingerprint": "8411dff3afcf4fe2b3f276c6fab776eec854e6d3",
-      "recordedAt": "2026-10-06T14:53:37.790Z",
+      "fingerprint": "07ef6b5b36fd4704dee40eaf6667c18d06dcd7cd",
+      "recordedAt": "2026-10-06T16:11:10.308Z",
       "result": "pass"
     },
     "e2e:reading-mode.spec.ts": {
-      "fingerprint": "3bf1f4b997b273e1651bfb2a93ed678d72bf769c",
-      "recordedAt": "2026-10-06T14:53:37.790Z",
+      "fingerprint": "26f5af865037b3ac3673ad09aa014530420d7869",
+      "recordedAt": "2026-10-06T16:11:10.308Z",
       "result": "pass"
     },
     "e2e:type-scale.spec.ts": {
-      "fingerprint": "941e0ee80db438d4b66540dc8c274ee84a6f31dc",
-      "recordedAt": "2026-10-06T14:53:37.790Z",
+      "fingerprint": "fe1684468e3a2c77b198dc1fbd71dd8e4a1c0fd0",
+      "recordedAt": "2026-10-06T16:11:10.308Z",
       "result": "pass"
     },
     "lighthouse:/": {
-      "fingerprint": "7606a3c5f60d32dcba7f6043c52c85de936d2c9d",
-      "recordedAt": "2026-10-06T14:53:37.790Z",
+      "fingerprint": "036d29c598b7c0b9b324be216c50901388848e32",
+      "recordedAt": "2026-10-06T16:11:10.308Z",
       "result": "pass"
     },
     "lighthouse:/en/": {
-      "fingerprint": "7606a3c5f60d32dcba7f6043c52c85de936d2c9d",
-      "recordedAt": "2026-10-06T14:53:37.790Z",
+      "fingerprint": "036d29c598b7c0b9b324be216c50901388848e32",
+      "recordedAt": "2026-10-06T16:11:10.308Z",
       "result": "pass"
     },
     "lighthouse:/notes/": {
-      "fingerprint": "5a59910ac771fdd4c2ce5bed81f02687e4a10297",
-      "recordedAt": "2026-10-06T14:53:37.790Z",
+      "fingerprint": "ee45a1a81f065780aaa3120adbee6c133a22c8cc",
+      "recordedAt": "2026-10-06T16:11:10.308Z",
       "result": "pass"
     },
     "lighthouse:/notes/smoke-es/": {
-      "fingerprint": "4d0f5d6c3e7f4fcece34921f68e2c084834e84a1",
-      "recordedAt": "2026-10-06T14:53:37.790Z",
+      "fingerprint": "7734e0c329779ab442739f55f51b64f8b81a72ea",
+      "recordedAt": "2026-10-06T16:11:10.308Z",
       "result": "pass"
     },
     "lighthouse:/contact/": {
-      "fingerprint": "b6901fba350529e167114f911cfc91d4fc7bcabb",
-      "recordedAt": "2026-10-06T14:53:37.790Z",
+      "fingerprint": "2f0fa3a0f4179d31fdd5fb071ba44c1910238c72",
+      "recordedAt": "2026-10-06T16:11:10.308Z",
       "result": "pass"
     },
     "lighthouse:/en/contact/": {
-      "fingerprint": "b6901fba350529e167114f911cfc91d4fc7bcabb",
-      "recordedAt": "2026-10-06T14:53:37.790Z",
+      "fingerprint": "2f0fa3a0f4179d31fdd5fb071ba44c1910238c72",
+      "recordedAt": "2026-10-06T16:11:10.308Z",
       "result": "pass"
     },
     "e2e:subscribe.spec.ts": {
-      "fingerprint": "a1d89d6cdf8d6048d9e6977f9b8e64f64fa26869",
-      "recordedAt": "2026-10-06T14:53:37.790Z",
+      "fingerprint": "ae6b158082602807b4cf19abf8691905236ede28",
+      "recordedAt": "2026-10-06T16:11:10.308Z",
+      "result": "pass"
+    },
+    "e2e:back-to-top.spec.ts": {
+      "fingerprint": "115ea47e3aecfd91b4e6496a5b37deb3d529ba01",
+      "recordedAt": "2026-10-06T16:11:10.308Z",
       "result": "pass"
     }
   }

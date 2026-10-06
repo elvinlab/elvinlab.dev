@@ -1,0 +1,109 @@
+---
+/**
+ * Discreet pixel "back to top" button, rendered once by the layout. Hidden (inert, so neither
+ * focusable nor announced) until the reader has scrolled deep and then scrolls up; it lifts above
+ * the footer instead of covering it, steps in and out, and stays still under reduced motion.
+ */
+import { type Locale, t } from '@/shared/i18n/index.ts';
+import { IDLE_HIDE_MS } from '@/shared/layout/back-to-top.ts';
+
+type Props = { locale: Locale };
+
+const { locale } = Astro.props;
+const label = t(locale, 'backtotop.label');
+---
+
+<button
+  type="button"
+  data-back-to-top
+  data-idle-ms={IDLE_HIDE_MS}
+  inert
+  aria-label={label}
+  title={label}
+  class="group invisible fixed right-4 bottom-[calc(var(--btt-base)+env(safe-area-inset-bottom)+var(--btt-lift,0px))] z-30 grid size-11 place-items-center rounded-control border border-dashed border-divider bg-card text-pink opacity-0 [--btt-base:1rem] hover:bg-card-hover data-[shown]:visible data-[shown]:opacity-100 motion-safe:transition-[opacity,visibility] motion-safe:duration-200 motion-safe:[transition-timing-function:steps(4,end)] print:hidden"
+>
+  <svg
+    aria-hidden="true"
+    focusable="false"
+    width="18"
+    height="18"
+    viewBox="0 0 9 9"
+    fill="currentColor"
+    class="[shape-rendering:crispEdges] motion-safe:transition-transform motion-safe:duration-150 motion-safe:[transition-timing-function:steps(2,end)] motion-safe:group-hover:-translate-y-1 motion-safe:group-focus-visible:-translate-y-1"
+  >
+    <rect x="4" y="0" width="1" height="1"></rect>
+    <rect x="3" y="1" width="3" height="1"></rect>
+    <rect x="2" y="2" width="5" height="1"></rect>
+    <rect x="1" y="3" width="7" height="1"></rect>
+    <rect x="3" y="4" width="3" height="5"></rect>
+  </svg>
+</button>
+
+<script>
+  import {
+    IDLE_HIDE_MS,
+    liftAboveFooter,
+    nextVisibility,
+    SCROLL_STEP_PX,
+    shouldAutoHide,
+  } from '@/shared/layout/back-to-top.ts';
+
+  const button = document.querySelector<HTMLButtonElement>('[data-back-to-top]');
+  const footer = document.querySelector<HTMLElement>('[data-site-footer]');
+  if (button) {
+    let shown = false;
+    let last = window.scrollY;
+    let ticking = false;
+    let returning = false;
+    let idle: number | undefined;
+    let lift = 0;
+    // After the reader stops scrolling the button gets out of the way (unless it is being used or it
+    // sits above the footer at the bottom of the page).
+    const armIdle = (): void => {
+      window.clearTimeout(idle);
+      if (!shown) return;
+      idle = window.setTimeout(() => {
+        const focused = document.activeElement === button;
+        if (shouldAutoHide({ lift, focused, hovered: button.matches(':hover') })) show(false);
+        else armIdle();
+      }, Number(button.dataset['idleMs'] ?? IDLE_HIDE_MS));
+    };
+    const show = (next: boolean): void => {
+      shown = next;
+      button.toggleAttribute('data-shown', next);
+      button.toggleAttribute('inert', !next);
+      button.setAttribute('aria-hidden', String(!next));
+      armIdle();
+    };
+    show(false);
+    const onScroll = (): void => {
+      const y = window.scrollY;
+      if (returning) returning = y > SCROLL_STEP_PX;
+      else if (Math.abs(y - last) > SCROLL_STEP_PX) {
+        show(nextVisibility({ y, previousY: last, shown }) || document.activeElement === button);
+        last = y;
+        armIdle();
+      }
+      const box = footer?.getBoundingClientRect();
+      lift = box && box.height > 0 ? liftAboveFooter({ viewportHeight: window.innerHeight, footerTop: box.top }) : 0;
+      button.style.setProperty('--btt-lift', `${lift}px`);
+      // Reading mode pins its exit pill at the same corner: sit above it.
+      button.style.setProperty('--btt-base', document.documentElement.hasAttribute('data-reading') ? '4rem' : '1rem');
+      ticking = false;
+    };
+    document.addEventListener('scroll', () => {
+      if (!ticking) {
+        ticking = true;
+        requestAnimationFrame(onScroll);
+      }
+    }, { passive: true });
+    button.addEventListener('click', () => {
+      const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      document.querySelector<HTMLElement>('[data-navbar] a')?.focus({ preventScroll: true });
+      show(false);
+      returning = window.scrollY > 0;
+      last = window.scrollY;
+      window.scrollTo({ top: 0, behavior: reduce ? 'auto' : 'smooth' });
+    });
+  }
+</script>

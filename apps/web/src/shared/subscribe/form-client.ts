@@ -1,5 +1,7 @@
 import { callSubscribeAction } from '@/shared/subscribe/action-client.ts';
+import { SUBSCRIBE_RATE_LIMITED_MESSAGE } from '@/shared/subscribe/client-policy.ts';
 import { createTurnstileLoader, type TurnstileApi } from '@/shared/subscribe/turnstile.ts';
+import { createVerifyTimeout, withErrorCode } from '@/shared/subscribe/verify-wait.ts';
 
 /**
  * Form logic of the footer subscription band. It is imported on the first focus or pointer
@@ -39,6 +41,21 @@ export function initSubscribeForm(root: HTMLElement): void {
     status.textContent = message;
   };
 
+  // Without a token after the wait, say so and let the reader press the button again.
+  const verifyWait = createVerifyTimeout(() => {
+    if (!pending) return;
+    pending = false;
+    if (api && widgetId !== undefined) api.reset(widgetId);
+    say(text['timeout'] ?? text['error'] ?? '');
+  });
+
+  const showWidget = () => {
+    const { top, bottom } = box.getBoundingClientRect();
+    if (top >= 0 && bottom <= window.innerHeight) return;
+    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    box.scrollIntoView({ block: 'center', behavior: reduced ? 'auto' : 'smooth' });
+  };
+
   const send = async () => {
     sending = true;
     submit.disabled = true;
@@ -59,7 +76,9 @@ export function initSubscribeForm(root: HTMLElement): void {
       form.hidden = true;
       say(text['success'] ?? '');
     } else if (outcome.code === 'TOO_MANY_REQUESTS') {
-      say(text['capped'] ?? text['error'] ?? '');
+      // Two limits share the status; only the fixed message tells them apart.
+      const rateLimited = outcome.message === SUBSCRIBE_RATE_LIMITED_MESSAGE;
+      say((rateLimited ? text['rateLimited'] : text['capped']) ?? text['error'] ?? '');
     } else {
       say(text['error'] ?? '');
     }
@@ -79,6 +98,7 @@ export function initSubscribeForm(root: HTMLElement): void {
           appearance: 'interaction-only',
           callback: (value) => {
             token = value;
+            verifyWait.clear();
             if (pending) {
               pending = false;
               form.requestSubmit();
@@ -87,16 +107,27 @@ export function initSubscribeForm(root: HTMLElement): void {
           'expired-callback': () => {
             token = '';
           },
-          'error-callback': () => {
+          'before-interactive-callback': () => {
+            say(text['interactive'] ?? '');
+            showWidget();
+          },
+          'after-interactive-callback': () => {
+            say(pending ? (text['verifying'] ?? '') : '');
+          },
+          'error-callback': (code) => {
             token = '';
             pending = false;
-            say(text['error'] ?? '');
+            verifyWait.clear();
+            // Only the short Cloudflare code is shown and logged, never the address.
+            console.warn('subscribe: turnstile error', code);
+            say(withErrorCode(text['error'] ?? '', text['codeLabel'] ?? 'code', code));
           },
         });
       })
       .catch(() => {
         rendering = false;
         pending = false;
+        verifyWait.clear();
         say(text['error'] ?? '');
       });
   };
@@ -115,6 +146,7 @@ export function initSubscribeForm(root: HTMLElement): void {
     if (!token) {
       pending = true;
       say(text['verifying'] ?? '');
+      verifyWait.start();
       return;
     }
     void send();

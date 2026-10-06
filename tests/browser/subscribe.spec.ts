@@ -24,8 +24,14 @@ const FORM = {
   email: 'Dónde enviarte las notas',
   submit: 'Suscribirme',
   success: 'Revisa tu bandeja de entrada para confirmar la suscripción.',
-  error: 'No se pudo suscribir. Inténtalo más tarde.',
+  error:
+    'No se pudo suscribir. Inténtalo más tarde o escríbeme desde la página de Contacto y te agrego a mano.',
   capped: 'Hoy llegaron muchas solicitudes. Inténtalo de nuevo mañana.',
+  rateLimited: 'Demasiados intentos seguidos. Espera un minuto y vuelve a intentarlo.',
+  interactive: 'Marca la casilla de abajo para verificar que eres una persona.',
+  timeout:
+    'No pudimos verificar que eres una persona. Revisa tu conexión o desactiva bloqueadores y vuelve a intentarlo, o escríbeme desde la página de Contacto y te agrego a mano.',
+  verifying: 'Verificando…',
 };
 
 const LANDING = {
@@ -61,8 +67,8 @@ const LANDING = {
   },
 } as const;
 
-/** Stubs Turnstile and counts the requests to it. */
-async function stubTurnstile(page: Page): Promise<string[]> {
+/** Stubs Turnstile and counts the requests to it; `script` replaces the default instant-token stub. */
+async function stubTurnstile(page: Page, script: string = TURNSTILE_STUB): Promise<string[]> {
   const requests: string[] = [];
   page.on('request', (request) => {
     if (request.url().startsWith('https://challenges.cloudflare.com/')) {
@@ -70,7 +76,7 @@ async function stubTurnstile(page: Page): Promise<string[]> {
     }
   });
   await page.route(TURNSTILE_URL, (route) =>
-    route.fulfill({ contentType: 'application/javascript', body: TURNSTILE_STUB }),
+    route.fulfill({ contentType: 'application/javascript', body: script }),
   );
   return requests;
 }
@@ -229,6 +235,103 @@ test.describe('form in the footer', () => {
     await expect(band.getByLabel(FORM.email)).toBeVisible();
   });
 
+  test('an interactive challenge is announced and the widget is scrolled into view', async ({
+    page,
+  }) => {
+    await stubTurnstile(
+      page,
+      `window.turnstile = {
+        render(el, opts) {
+          el.style.height = '72px';
+          el.textContent = 'challenge';
+          setTimeout(() => opts['before-interactive-callback'](), 1_500);
+          return 'w1';
+        },
+        reset() {},
+      };`,
+    );
+    await page.setViewportSize({ width: 1280, height: 500 });
+    await page.goto('/notes/smoke-es/');
+    const band = page.locator(FIELD);
+    await band.getByLabel(FORM.email).fill('reader@example.test');
+    await band.getByRole('button', { name: FORM.submit }).click();
+    await expect(band.getByRole('status').filter({ hasText: FORM.interactive })).toBeVisible();
+    await expect
+      .poll(() =>
+        page.locator('[data-subscribe] [data-widget]').evaluate((node) => {
+          const { top, bottom } = node.getBoundingClientRect();
+          return top >= 0 && bottom <= window.innerHeight;
+        }),
+      )
+      .toBe(true);
+  });
+
+  test('a challenge that never answers times out after 25 s and can be retried', async ({
+    page,
+  }) => {
+    await stubTurnstile(page, 'window.turnstile = { render() { return "w1"; }, reset() {} };');
+    await page.clock.install();
+    await page.goto('/notes/smoke-es/');
+    const band = page.locator(FIELD);
+    await band.getByLabel(FORM.email).fill('reader@example.test');
+    const press = band.getByRole('button', { name: FORM.submit });
+    await press.click();
+    await expect(band.getByRole('status').filter({ hasText: FORM.verifying })).toBeVisible();
+    await page.clock.fastForward(24_000);
+    await expect(band.getByRole('status').filter({ hasText: FORM.timeout })).toBeHidden();
+    await page.clock.fastForward(2_000);
+    await expect(band.getByRole('status').filter({ hasText: FORM.timeout })).toBeVisible();
+    await press.click();
+    await expect(band.getByRole('status').filter({ hasText: FORM.verifying })).toBeVisible();
+    await expect(press).toBeEnabled();
+  });
+
+  test('a Turnstile error shows the generic message with its code', async ({ page }) => {
+    await stubTurnstile(
+      page,
+      `window.turnstile = {
+        render(_el, opts) {
+          // Late enough that the reader has already pressed the button and is waiting.
+          setTimeout(() => opts['error-callback']('600010'), 1_500);
+          return 'w1';
+        },
+        reset() {},
+      };`,
+    );
+    const warnings: string[] = [];
+    page.on('console', (message) => {
+      if (message.type() === 'warning') warnings.push(message.text());
+    });
+    await page.goto('/notes/smoke-es/');
+    const band = page.locator(FIELD);
+    await band.getByLabel(FORM.email).fill('reader@example.test');
+    await band.getByRole('button', { name: FORM.submit }).click();
+    await expect(
+      band.getByRole('status').filter({ hasText: `${FORM.error} (código 600010)` }),
+    ).toBeVisible();
+    expect(warnings.some((text) => text.includes('600010'))).toBe(true);
+    expect(warnings.join(' ')).not.toContain('reader@example.test');
+  });
+
+  test('the rate limiter shows its own message, not the daily cap one', async ({ page }) => {
+    await stubTurnstile(page);
+    await mockAction(page, 'request', {
+      status: 429,
+      body: JSON.stringify({
+        type: 'AstroActionError',
+        code: 'TOO_MANY_REQUESTS',
+        status: 429,
+        message: 'Too many attempts in a row. Please wait a minute and try again.',
+      }),
+    });
+    await page.goto('/notes/smoke-es/');
+    const band = page.locator(FIELD);
+    await band.getByLabel(FORM.email).fill('reader@example.test');
+    await band.getByRole('button', { name: FORM.submit }).click();
+    await expect(band.getByRole('status').filter({ hasText: FORM.rateLimited })).toBeVisible();
+    await expect(band.getByRole('status').filter({ hasText: FORM.capped })).toBeHidden();
+  });
+
   test('the honeypot is hidden from assistive tech and unreachable by keyboard', async ({
     page,
   }) => {
@@ -306,6 +409,49 @@ for (const locale of ['es', 'en'] as const) {
           page.getByRole('status').filter({ hasText: LANDING[locale].unavailable }),
         ).toBeVisible();
         await expect(page.getByRole('button', { name: copy.button })).toBeEnabled();
+      });
+
+      test('card shows the envelope, then the check after a successful click', async ({ page }) => {
+        await mockAction(page, kind, answerFor(ok_));
+        await page.goto(`${copy.path}?token=abc.def`);
+        const card = page.locator('[data-subscribe-page]');
+        await expect(card).toHaveAttribute('data-state', 'idle');
+        await expect(card.locator('svg:visible')).toHaveCount(1);
+        expect(
+          await card
+            .locator('svg')
+            .evaluateAll((els) => els.every((e) => e.getAttribute('aria-hidden') === 'true')),
+        ).toBe(true);
+        await page.getByRole('button', { name: copy.button }).click();
+        await expect(card).toHaveAttribute('data-state', 'done');
+        await expect(card.locator('svg:visible')).toHaveCount(1);
+      });
+
+      test('card shows the exclamation for a rejected link and for a missing token', async ({
+        page,
+      }) => {
+        await mockAction(page, kind, answerFor(bad));
+        await page.goto(`${copy.path}?token=abc.def`);
+        await page.getByRole('button', { name: copy.button }).click();
+        await expect(page.locator('[data-subscribe-page]')).toHaveAttribute(
+          'data-state',
+          'invalid',
+        );
+        await page.goto(copy.path);
+        await expect(page.locator('[data-subscribe-page]')).toHaveAttribute(
+          'data-state',
+          'invalid',
+        );
+      });
+
+      test('has no horizontal overflow at 360 px', async ({ page }) => {
+        await page.setViewportSize({ width: 360, height: 780 });
+        await page.goto(`${copy.path}?token=abc.def`);
+        await expect(page.getByRole('button', { name: copy.button })).toBeVisible();
+        const overflow = await page.evaluate(
+          () => document.documentElement.scrollWidth - document.documentElement.clientWidth,
+        );
+        expect(overflow).toBeLessThanOrEqual(0);
       });
 
       for (const theme of THEMES) {

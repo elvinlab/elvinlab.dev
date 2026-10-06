@@ -412,5 +412,29 @@
     "category": "added",
     "title": "Email subscription guide",
     "description": "A consolidated guide, in Spanish and English, for the email subscription: how it works, stored data and privacy, limits, the manual owner flow to send a note, setup for forks and troubleshooting."
+  },
+  "ci-faster-shards": {
+    "date": "2026-10-06",
+    "category": "changed",
+    "title": "Faster CI: more parallel shards",
+    "description": "CI now runs Lighthouse in two shards and the browser tests in four. Every URL still runs three times and no threshold or assertion changed; locally, --shard 1/2 reproduces a CI shard."
+  },
+  "back-to-top": {
+    "date": "2026-10-06",
+    "category": "added",
+    "title": "Back to top button",
+    "description": "A small pixel arrow appears at the bottom right when you scroll up a long page and takes you back to the top. It never covers the footer controls and stays still with reduced motion. It hides itself a few seconds after scrolling stops."
+  },
+  "subscribe-turnstile-ux": {
+    "date": "2026-10-06",
+    "category": "fixed",
+    "title": "Subscription form no longer waits forever",
+    "description": "The footer form now says when to tick the Turnstile box, times out after 25 s with a clear retry message, shows the error code, tells the per-minute limit from the daily one, and accepts a form filled after 1.5 s. If it still fails, the message points to the Contact page."
+  },
+  "subscribe-pages-8bit": {
+    "date": "2026-10-06",
+    "category": "changed",
+    "title": "Subscription link pages in the 8-bit look",
+    "description": "The confirm and unsubscribe pages now use the footer band's look: a dashed card with a pixel envelope, check or exclamation icon."
   }
 }

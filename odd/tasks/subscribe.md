@@ -78,3 +78,16 @@ Follow-up for the coordinator: `apps/web/src/actions/index.ts` still passes `sit
 ## First real cycle, 2026-10-06 (owner test with their own address)
 The owner subscribed from the footer, confirmed, and received the note email. Dry run through production first (1 recipient, pool 99), then the real send of note 3 (`vibe-coding-o-especificar-primero`) to that one subscriber: `Sent ... to 1 subscriber; 0 still waiting`. The owner confirms the email arrived and looks good in the light theme ("muy bonito"). This also proves the Resend sending domain is verified (the earlier assumption). Still not checked: dark mode in a client that honors it, Outlook and Gmail rendering, and the unsubscribe click-through from a note email (it removes the owner from the list).
 
+
+## Progress 2026-10-06: Turnstile UX fixes (bounded writer, not committed)
+- Reproduced in production: with `appearance: 'interaction-only'`, Cloudflare showed the visible checkbox (about 72 px) below the submit button while the status said "Verificando…"; a real phone user did not notice it and waited forever, and on failure saw only the generic error. The live logs showed that no failed attempt reached the server, so both problems were client-side.
+- [x] `before-interactive-callback` announces the checkbox and scrolls the widget into view (reduced motion: `auto`); `after-interactive-callback` restores "Verificando…".
+- [x] 25 s wait timer (`VERIFY_TIMEOUT_MS`, `verify-wait.ts`): on timeout it resets the widget and shows a retry message.
+- [x] Turnstile error code shown in parentheses and `console.warn`ed (code only, never the address).
+- [x] `minFillTimeMs` 3 s to 1.5 s (now defined in `client-policy.ts`); docs updated.
+- [x] Rate limiter reported as `rate_limited`, mapped to `TOO_MANY_REQUESTS` with its own fixed message (`subscribe.rateLimited`); the Action client now keeps the error message so the form tells it from `subscribe.capped`.
+- Checks: see the coordinator handoff.
+
+
+## Progress 2026-10-06: 8-bit landing pages (bounded writer, not committed)
+- [x] `/subscribe/confirm/` and `/subscribe/unsubscribe/` restyled as the band's dashed card with a pixel icon (envelope, check, exclamation) switched by `data-state`; BRAND row added, changelog `subscribe-pages-8bit`, e2e extended. Checks: see the coordinator handoff.

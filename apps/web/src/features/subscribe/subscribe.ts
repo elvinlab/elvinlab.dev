@@ -38,7 +38,8 @@ const noteSchema = z.strictObject({
 export type SubscribeResult =
   | { ok: true }
   | { ok: false; error: 'Unable to subscribe. Please try again later.' }
-  | { ok: false; error: 'daily_cap' };
+  | { ok: false; error: 'daily_cap' }
+  | { ok: false; error: 'rate_limited' };
 export type ConfirmResult = 'confirmed' | 'invalid_or_expired';
 export type UnsubscribeResult = 'unsubscribed' | 'invalid';
 export type NoteToSend = z.input<typeof noteSchema>;
@@ -50,6 +51,7 @@ const REJECTED: SubscribeResult = {
 };
 
 const CAPPED: SubscribeResult = { ok: false, error: 'daily_cap' };
+const RATE_LIMITED: SubscribeResult = { ok: false, error: 'rate_limited' };
 
 /** The UTC day (`YYYY-MM-DD`) that a quota counter belongs to. */
 const utcDay = (time: number): string => new Date(time).toISOString().slice(0, 10);
@@ -74,7 +76,8 @@ export async function subscribe(
 ): Promise<SubscribeResult> {
   const reject = (stage: string): SubscribeResult => {
     ports.report?.(stage);
-    return stage === 'daily_cap' ? CAPPED : REJECTED;
+    if (stage === 'daily_cap') return CAPPED;
+    return stage === 'rate_limit' ? RATE_LIMITED : REJECTED;
   };
   const parsed = inputSchema.safeParse(input);
   if (!parsed.success || !ip || !ipSchema.safeParse(ip).success) return reject('invalid_input');

@@ -10,7 +10,7 @@ const MINUTE_MS = 60 * 1_000;
 export const SUBSCRIBE_POLICY = {
   emailMaxLength: SUBSCRIBE_CLIENT_POLICY.emailMaxLength,
   tokenMaxLength: 2_048,
-  minFillTimeMs: 3_000,
+  minFillTimeMs: SUBSCRIBE_CLIENT_POLICY.minFillTimeMs,
   providerTimeoutMs: PROVIDER_TIMEOUT_MS,
   providerResponseMaxBytes: PROVIDER_RESPONSE_MAX_BYTES,
   requestMaxBytes: 8_192,

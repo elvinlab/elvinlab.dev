@@ -16,22 +16,26 @@ const notesHref = localizePath('/notes/', locale, LOCALES);
 
 <BaseLayout locale={locale} path={`/subscribe/${kind}/`} title={title} noindex>
   <article
-    class="max-w-[68ch] pt-10 md:pt-14"
+    class="group/card mx-auto mt-10 flex w-full max-w-lg flex-col items-center gap-4 rounded-control border border-dashed border-divider bg-card p-6 text-center md:mt-14 md:p-8"
     data-subscribe-page
+    data-state="idle"
     data-kind={kind}
     data-working={t(locale, 'subscribe.working')}
     data-done={t(locale, `subscribe.${kind}.done`)}
     data-invalid={t(locale, `subscribe.${kind}.invalid`)}
     data-unavailable={t(locale, 'subscribe.unavailable')}
   >
-    <h1 class="text-3xl font-bold tracking-tight">{title}</h1>
-    <p class="mt-3 text-text-secondary" data-explain>{t(locale, `subscribe.${kind}.body`)}</p>
-    <button type="button" data-go class="mt-6 h-11 rounded-control bg-button px-5 font-medium text-white hover:bg-button/90 disabled:cursor-not-allowed disabled:opacity-50">
+    <svg aria-hidden="true" focusable="false" width="54" height="42" viewBox="0 0 9 7" class="hidden [shape-rendering:crispEdges] group-data-[state=idle]/card:block motion-safe:transition-transform motion-safe:duration-200 motion-safe:[transition-timing-function:steps(2,end)] motion-safe:group-hover/card:-translate-y-1 motion-safe:group-focus-within/card:-translate-y-1"><path class="fill-pink" d="M0 0h9v1H0zM0 1h1v1H0zM8 1h1v1H8zM0 2h1v1H0zM8 2h1v1H8zM0 3h1v1H0zM8 3h1v1H8zM0 4h1v1H0zM8 4h1v1H8zM0 5h1v1H0zM8 5h1v1H8zM0 6h9v1H0z"></path><path class="fill-pink" d="M1 1h1v1H1zM7 1h1v1H7zM2 2h1v1H2zM6 2h1v1H6zM3 3h1v1H3zM5 3h1v1H5zM4 4h1v1H4z"></path><path class="fill-chip" d="M2 1h5v1H2zM1 2h1v1H1zM3 2h3v1H3zM7 2h1v1H7zM1 3h2v1H1zM4 3h1v1H4zM6 3h2v1H6zM1 4h3v1H1zM5 4h3v1H5zM1 5h7v1H1z"></path></svg>
+    <svg aria-hidden="true" focusable="false" width="54" height="42" viewBox="0 0 9 7" class="hidden [shape-rendering:crispEdges] group-data-[state=done]/card:block"><path class="fill-pink" d="M7 1h1v1H7zM6 2h1v1H6zM1 3h1v1H1zM5 3h1v1H5zM2 4h1v1H2zM4 4h1v1H4zM3 5h1v1H3z"></path></svg>
+    <svg aria-hidden="true" focusable="false" width="54" height="42" viewBox="0 0 9 7" class="hidden [shape-rendering:crispEdges] group-data-[state=invalid]/card:block"><path class="fill-pink" d="M4 0h1v4H4zM4 6h1v1H4z"></path></svg>
+    <h1 class="font-display text-2xl font-bold tracking-tight">{title}</h1>
+    <p class="text-text-secondary" data-explain>{t(locale, `subscribe.${kind}.body`)}</p>
+    <button type="button" data-go class="h-11 rounded-control bg-button px-5 font-medium text-white hover:bg-button/90 hover:translate-y-px active:translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-50 motion-reduce:transition-none">
       {t(locale, `subscribe.${kind}.button`)}
     </button>
-    <noscript><p class="mt-6 text-text-secondary">{t(locale, 'subscribe.unavailable')}</p></noscript>
-    <p role="status" aria-live="polite" class="mt-6 text-text-secondary empty:hidden" data-status></p>
-    <a href={notesHref} class="mt-2 flex h-11 w-fit items-center text-primary underline decoration-dashed underline-offset-4 sm:ml-5 sm:mt-6 sm:inline-flex">{t(locale, 'subscribe.back')}</a>
+    <p role="status" aria-live="polite" class="text-sm text-text-secondary empty:sr-only" data-status></p>
+    <noscript><p class="text-sm text-text-secondary">{t(locale, 'subscribe.unavailable')}</p></noscript>
+    <a href={notesHref} class="inline-flex h-11 items-center text-sm text-primary underline decoration-dashed underline-offset-4">{t(locale, 'subscribe.back')}</a>
   </article>
 </BaseLayout>
 
@@ -47,14 +51,15 @@ const notesHref = localizePath('/notes/', locale, LOCALES);
     const text = root.dataset;
     const kind = text['kind'] === 'unsubscribe' ? 'unsubscribe' : 'confirm';
     const token = new URLSearchParams(location.search).get('token') ?? '';
-    const finish = (message: string) => {
+    const finish = (message: string, state: 'done' | 'invalid') => {
+      root.dataset['state'] = state;
       button.hidden = true;
       explain.hidden = true;
       status.textContent = message;
     };
 
     if (!token) {
-      finish(text['invalid'] ?? '');
+      finish(text['invalid'] ?? '', 'invalid');
     } else {
       button.addEventListener('click', async () => {
         button.disabled = true;
@@ -63,11 +68,12 @@ const notesHref = localizePath('/notes/', locale, LOCALES);
         if (!outcome.ok) {
           // Unavailable or unreachable: the link may still be good, so the button stays.
           button.disabled = false;
+          root.dataset['state'] = 'invalid';
           status.textContent = text['unavailable'] ?? '';
         } else if (outcome.data['result'] === 'confirmed' || outcome.data['result'] === 'unsubscribed') {
-          finish(text['done'] ?? '');
+          finish(text['done'] ?? '', 'done');
         } else {
-          finish(text['invalid'] ?? '');
+          finish(text['invalid'] ?? '', 'invalid');
         }
       });
     }

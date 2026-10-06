@@ -18,6 +18,7 @@ import Navbar from '@/shared/layout/Navbar.astro';
 import SiteNotice from '@/shared/layout/SiteNotice.astro';
 import { showSubscribeCta } from '@/shared/layout/subscribe-cta.ts';
 import Seo from '@/shared/seo/Seo.astro';
+import BackToTop from '@/shared/ui/BackToTop.astro';
 import LanguageHint from '@/shared/ui/LanguageHint.astro';
 
 type Props = {
@@ -110,6 +111,7 @@ const preloadedFonts = [spaceGroteskLatin, jetbrainsMonoLatin];
     <div class="mx-auto max-w-[1200px] px-3 md:px-4">
       <LanguageHint locale={locale} translations={translations} />
     </div>
+    <BackToTop locale={locale} />
     <slot name="floating" />
   </body>
 </html>

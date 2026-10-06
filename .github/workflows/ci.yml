@@ -51,8 +51,8 @@ jobs:
         run: |
           echo "static: $(( $(date +%s) - JOB_START ))s" >> "$GITHUB_STEP_SUMMARY"
 
-  # Sharded: Playwright splits the tests across 3 runners (`--shard=N/3`), so the slowest gate is a
-  # third of the suite. Every shard builds and checks the JS budget (cheap); the steps that only
+  # Sharded: Playwright splits the tests across 4 runners (`--shard=N/4`), so the slowest gate is a
+  # quarter of the suite. Every shard builds and checks the JS budget (cheap); the steps that only
   # inspect the build (white-label, version.txt, image optimization) run in shard 1 only. `checks`
   # needs this whole matrix, so it still passes only if every shard does.
   e2e:
@@ -61,7 +61,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        shard: [1, 2, 3]
+        shard: [1, 2, 3, 4]
     steps:
       - name: Record job start
         run: echo "JOB_START=$(date +%s)" >> "$GITHUB_ENV"
@@ -90,7 +90,7 @@ jobs:
         run: pnpm check:js-budget
       - name: Install Chromium for browser checks
         run: pnpm exec playwright install --with-deps chromium
-      - run: pnpm test:e2e --shard=${{ matrix.shard }}/3
+      - run: pnpm test:e2e --shard=${{ matrix.shard }}/4
       - name: White-label build (once)
         if: matrix.shard == 1
         run: pnpm test:white-label
@@ -108,11 +108,18 @@ jobs:
       - name: Job duration
         if: always()
         run: |
-          echo "e2e (shard ${{ matrix.shard }}/3): $(( $(date +%s) - JOB_START ))s" >> "$GITHUB_STEP_SUMMARY"
+          echo "e2e (shard ${{ matrix.shard }}/4): $(( $(date +%s) - JOB_START ))s" >> "$GITHUB_STEP_SUMMARY"
 
+  # Sharded: the 6 URLs of lighthouserc.json split across 2 runners (`--shard=N/2`, every 2nd URL),
+  # still 3 runs per URL and the same assertions. `checks` needs this whole matrix, so it passes only
+  # if both shards do (a matrix job's result is `failure` when any shard failed).
   lighthouse:
     name: lighthouse
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: [1, 2]
     steps:
       - name: Record job start
         run: echo "JOB_START=$(date +%s)" >> "$GITHUB_ENV"
@@ -139,12 +146,11 @@ jobs:
       - name: Install Chromium for Lighthouse
         run: pnpm exec playwright install --with-deps chromium
       - name: Check mobile Lighthouse budgets
-        run: pnpm test:lighthouse
-
+        run: pnpm test:lighthouse --shard=${{ matrix.shard }}/2
       - name: Job duration
         if: always()
         run: |
-          echo "lighthouse: $(( $(date +%s) - JOB_START ))s" >> "$GITHUB_STEP_SUMMARY"
+          echo "lighthouse (shard ${{ matrix.shard }}/2): $(( $(date +%s) - JOB_START ))s" >> "$GITHUB_STEP_SUMMARY"
 
   # Stable aggregate: the ruleset requires a status named `checks`, so the name is kept.
   checks:
