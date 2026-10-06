@@ -11,11 +11,12 @@ import { DEFAULT_THEME, THEME_BOOT_SCRIPT } from '@elvinlab/core';
 import jetbrainsMonoLatin from '@fontsource-variable/jetbrains-mono/files/jetbrains-mono-latin-wght-normal.woff2?url';
 import spaceGroteskLatin from '@fontsource-variable/space-grotesk/files/space-grotesk-latin-wght-normal.woff2?url';
 
-import { appearance, integrations } from '@/shared/config/index.ts';
+import { appearance, integrations, site } from '@/shared/config/index.ts';
 import { type Locale, t } from '@/shared/i18n/index.ts';
 import Footer from '@/shared/layout/Footer.astro';
 import Navbar from '@/shared/layout/Navbar.astro';
 import SiteNotice from '@/shared/layout/SiteNotice.astro';
+import { showSubscribeCta } from '@/shared/layout/subscribe-cta.ts';
 import Seo from '@/shared/seo/Seo.astro';
 import LanguageHint from '@/shared/ui/LanguageHint.astro';
 
@@ -40,6 +41,12 @@ type Props = {
 };
 
 const { locale, printable = false, translations, ...seo } = Astro.props;
+const subscribeCta = showSubscribeCta({
+  features: site.features,
+  turnstileSiteKey: integrations.turnstileSiteKey,
+  path: seo.path,
+  printable,
+});
 // `Astro.slots.has` is true even when the slot's content is a conditional that rendered nothing,
 // which would leave an empty sidebar column. Render the slot once and keep it only if it has content.
 const asideHtml = Astro.slots.has('aside') ? (await Astro.slots.render('aside')).trim() : '';
@@ -98,7 +105,7 @@ const preloadedFonts = [spaceGroteskLatin, jetbrainsMonoLatin];
       </div>
     </main>
     <div class="mx-auto max-w-[1200px] px-3 md:px-4" data-site-chrome>
-      <Footer locale={locale} />
+      <Footer locale={locale} subscribeCta={subscribeCta} />
     </div>
     <div class="mx-auto max-w-[1200px] px-3 md:px-4">
       <LanguageHint locale={locale} translations={translations} />

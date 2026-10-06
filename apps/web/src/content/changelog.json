@@ -405,6 +405,6 @@
     "date": "2026-10-05",
     "category": "added",
     "title": "Email subscription to new notes",
-    "description": "Readers can subscribe by email to each new note, with double opt-in, an unsubscribe link in every email, and a privacy section. It ships off until the owner applies the migration, sets the secrets and enables the flag."
+    "description": "Readers can subscribe by email to each new note, with double opt-in, an unsubscribe link in every email, and a privacy section. It ships off until the owner applies the migration, sets the secrets and enables the flag. A pixel-style band in the footer of every page (except the notes index, the subscription pages and /me) leads to the form."
   }
 }

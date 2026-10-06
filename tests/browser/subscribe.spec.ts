@@ -254,3 +254,30 @@ for (const locale of ['es', 'en'] as const) {
     });
   }
 }
+
+test.describe('footer call to action', () => {
+  test('shows a band that links to the form on ordinary pages, and nowhere it should not', async ({
+    page,
+  }) => {
+    for (const path of ['/', '/en/', '/contact/', '/privacy/', '/notes/smoke-es/']) {
+      await page.goto(path);
+      const band = page.locator('[data-subscribe-cta]');
+      await expect(band, path).toHaveCount(1);
+      await expect(band.getByRole('link')).toHaveAttribute('href', '/notes/#subscribe');
+    }
+    for (const path of ['/notes/', '/me/', '/subscribe/confirm/', '/subscribe/unsubscribe/']) {
+      await page.goto(path);
+      await expect(page.locator('[data-subscribe-cta]'), path).toHaveCount(0);
+    }
+  });
+
+  test('loads no subscription script or Turnstile on a page that only shows the band', async ({
+    page,
+  }) => {
+    const requests: string[] = [];
+    page.on('request', (request) => requests.push(request.url()));
+    await page.goto('/');
+    await expect(page.locator('[data-subscribe-cta]')).toBeVisible();
+    expect(requests.filter((url) => /turnstile|challenges\.cloudflare/.test(url))).toEqual([]);
+  });
+});

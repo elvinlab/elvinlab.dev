@@ -10,9 +10,9 @@ import { externalLinkAttrs } from '@/shared/lib/external-link.ts';
 import BrandMark from '@/shared/ui/BrandMark.astro';
 import ExternalHint from '@/shared/ui/ExternalHint.astro';
 
-type Props = { locale: Locale };
+type Props = { locale: Locale; subscribeCta?: boolean };
 
-const { locale } = Astro.props;
+const { locale, subscribeCta = false } = Astro.props;
 const year = new Date().getFullYear();
 // 44 px tall hit area; -mx-3 cancels the px-3 so the text keeps its column alignment under md.
 const footerLink =
@@ -20,6 +20,25 @@ const footerLink =
 ---
 
 <footer class="mt-16 animate-fade-in-up border-t border-dashed border-divider py-8 [animation-delay:250ms]">
+  {subscribeCta && (
+    <section
+      data-subscribe-cta
+      aria-labelledby="subscribe-cta-title"
+      class="group/cta mb-8 flex flex-col gap-4 rounded-control border-2 border-pink bg-card p-5 shadow-[4px_4px_0_0_var(--color-primary)] md:flex-row md:items-center md:justify-between md:gap-6"
+    >
+      <div class="flex items-center gap-4">
+        <svg aria-hidden="true" focusable="false" width="36" height="28" viewBox="0 0 9 7" class="shrink-0 [shape-rendering:crispEdges] motion-safe:transition-transform motion-safe:duration-200 motion-safe:[transition-timing-function:steps(2,end)] motion-safe:group-hover/cta:-translate-y-1 motion-safe:group-focus-within/cta:-translate-y-1"><path class="fill-pink" d="M0 0h9v1H0zM0 1h1v1H0zM8 1h1v1H8zM0 2h1v1H0zM8 2h1v1H8zM0 3h1v1H0zM8 3h1v1H8zM0 4h1v1H0zM8 4h1v1H8zM0 5h1v1H0zM8 5h1v1H8zM0 6h9v1H0z"></path><path class="fill-cyan" d="M1 1h1v1H1zM7 1h1v1H7zM2 2h1v1H2zM6 2h1v1H6zM3 3h1v1H3zM5 3h1v1H5zM4 4h1v1H4z"></path><path class="fill-chip" d="M2 1h5v1H2zM1 2h1v1H1zM3 2h3v1H3zM7 2h1v1H7zM1 3h2v1H1zM4 3h1v1H4zM6 3h2v1H6zM1 4h3v1H1zM5 4h3v1H5zM1 5h7v1H1z"></path></svg>
+        <div class="flex flex-col gap-1">
+          <h2 id="subscribe-cta-title" class="font-display text-lg font-bold">{t(locale, 'subscribe.title')}</h2>
+          <p class="text-sm text-text-secondary">{t(locale, 'subscribe.body')}</p>
+        </div>
+      </div>
+      <a
+        href="/notes/#subscribe"
+        class="inline-flex h-11 shrink-0 items-center justify-center rounded-control bg-button px-5 font-medium text-white shadow-[3px_3px_0_0_var(--color-pink)] hover:translate-x-px hover:translate-y-px hover:shadow-[2px_2px_0_0_var(--color-pink)] active:translate-x-[3px] active:translate-y-[3px] active:shadow-none motion-reduce:transition-none"
+      >{t(locale, 'subscribe.submit')}</a>
+    </section>
+  )}
   <div class="flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
     <div class="flex flex-col gap-3">
       <p class="flex items-center gap-2 font-retro text-xs leading-relaxed text-text-secondary">
