@@ -36,6 +36,10 @@ export function initSubscribeForm(root: HTMLElement): void {
   let rendering = false;
   let pending = false;
   let sending = false;
+  // Cloudflare asked for a visible click, and the reader has not been told otherwise since.
+  let interactive = false;
+  // The wait ran out: keep the fallback message until the reader tries again.
+  let timedOut = false;
 
   const say = (message: string) => {
     status.textContent = message;
@@ -45,8 +49,10 @@ export function initSubscribeForm(root: HTMLElement): void {
   const verifyWait = createVerifyTimeout(() => {
     if (!pending) return;
     pending = false;
-    if (api && widgetId !== undefined) api.reset(widgetId);
+    interactive = false;
+    timedOut = true;
     say(text['timeout'] ?? text['error'] ?? '');
+    if (api && widgetId !== undefined) api.reset(widgetId);
   });
 
   const showWidget = () => {
@@ -98,6 +104,7 @@ export function initSubscribeForm(root: HTMLElement): void {
           appearance: 'interaction-only',
           callback: (value) => {
             token = value;
+            interactive = false;
             verifyWait.clear();
             if (pending) {
               pending = false;
@@ -108,10 +115,14 @@ export function initSubscribeForm(root: HTMLElement): void {
             token = '';
           },
           'before-interactive-callback': () => {
+            if (timedOut) return;
+            interactive = true;
             say(text['interactive'] ?? '');
             showWidget();
           },
           'after-interactive-callback': () => {
+            interactive = false;
+            if (timedOut) return;
             say(pending ? (text['verifying'] ?? '') : '');
           },
           'error-callback': (code) => {
@@ -145,7 +156,9 @@ export function initSubscribeForm(root: HTMLElement): void {
     begin();
     if (!token) {
       pending = true;
-      say(text['verifying'] ?? '');
+      timedOut = false;
+      // If the box was already asked for, keep telling the reader to tick it.
+      say((interactive ? text['interactive'] : text['verifying']) ?? '');
       verifyWait.start();
       return;
     }

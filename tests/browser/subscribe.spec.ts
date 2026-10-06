@@ -266,6 +266,55 @@ test.describe('form in the footer', () => {
       .toBe(true);
   });
 
+  test('pressing the button after the box was asked keeps the instruction, not "Verifying…"', async ({
+    page,
+  }) => {
+    await stubTurnstile(
+      page,
+      `window.turnstile = {
+        render(el, opts) {
+          el.style.height = '72px';
+          setTimeout(() => opts['before-interactive-callback'](), 300);
+          return 'w1';
+        },
+        reset() {},
+      };`,
+    );
+    await page.goto('/notes/smoke-es/');
+    const band = page.locator(FIELD);
+    await band.getByLabel(FORM.email).fill('reader@example.test');
+    const status = band.getByRole('status');
+    await expect(status.filter({ hasText: FORM.interactive })).toBeVisible();
+    await band.getByRole('button', { name: FORM.submit }).click();
+    await expect(status.filter({ hasText: FORM.interactive })).toBeVisible();
+    await expect(status.filter({ hasText: FORM.verifying })).toBeHidden();
+  });
+
+  test('after the time-out a later challenge request does not hide the fallback message', async ({
+    page,
+  }) => {
+    await stubTurnstile(
+      page,
+      `window.turnstile = {
+        render(el, opts) {
+          window.__opts = opts;
+          return 'w1';
+        },
+        reset() { setTimeout(() => window.__opts['before-interactive-callback'](), 200); },
+      };`,
+    );
+    await page.clock.install();
+    await page.goto('/notes/smoke-es/');
+    const band = page.locator(FIELD);
+    await band.getByLabel(FORM.email).fill('reader@example.test');
+    await band.getByRole('button', { name: FORM.submit }).click();
+    await page.clock.fastForward(26_000);
+    await expect(band.getByRole('status').filter({ hasText: FORM.timeout })).toBeVisible();
+    await page.clock.fastForward(2_000);
+    await expect(band.getByRole('status').filter({ hasText: FORM.timeout })).toBeVisible();
+    await expect(band.getByRole('status').filter({ hasText: FORM.interactive })).toBeHidden();
+  });
+
   test('a challenge that never answers times out after 25 s and can be retried', async ({
     page,
   }) => {
