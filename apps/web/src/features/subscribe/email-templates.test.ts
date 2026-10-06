@@ -93,6 +93,26 @@ describe.each(locales)('emails in %s', (locale) => {
     expect(html).toContain('Ada Example');
   });
 
+  it('shows the site domain in the footer as an explicit violet link, so no client turns it into a default blue one', () => {
+    for (const email of [
+      renderConfirmationEmail(confirmation(locale)),
+      renderNoteEmail(note(locale)),
+    ]) {
+      const link = /<a [^>]*href="https:\/\/example\.test"[^>]*>example\.test<\/a>/.exec(
+        email.html,
+      );
+      expect(link?.[0]).toContain('color:#');
+      expect(email.text).toContain('example.test');
+    }
+  });
+
+  it('tells the reader where to look if the notes land in Promotions, in html and text', () => {
+    const hint = locale === 'es' ? 'Promociones' : 'Promotions';
+    const email = renderConfirmationEmail(confirmation(locale));
+    expect(email.html).toContain(hint);
+    expect(email.text).toContain(hint);
+  });
+
   it('escapes dynamic values in html and keeps them literal in text', () => {
     const { html, subject, text } = mails.note;
     expect(html).not.toContain('<b>bold</b>');

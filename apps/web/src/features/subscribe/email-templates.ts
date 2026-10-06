@@ -47,6 +47,8 @@ const COPY = {
     confirmButton: 'Confirmar suscripción',
     copyLink: 'O copia este enlace en tu navegador:',
     expiry: 'El enlace vence en 48 horas.',
+    inboxHint:
+      'Si las notas no llegan a tu bandeja principal, revisa la pestaña Promociones y arrastra el correo a Principal.',
     confirmFooter: (domain: string) =>
       `Recibes este correo porque alguien pidió suscribirse en ${domain}. Si no fuiste tú, ignora este mensaje: no se enviará nada más.`,
     noteSubject: (title: string) => `Nueva nota: ${title}`,
@@ -73,6 +75,8 @@ const COPY = {
     confirmButton: 'Confirm subscription',
     copyLink: 'Or copy this link into your browser:',
     expiry: 'The link expires in 48 hours.',
+    inboxHint:
+      'If the notes do not reach your main inbox, check the Promotions tab and drag the email to Primary.',
     confirmFooter: (domain: string) =>
       `You receive this because someone asked to subscribe on ${domain}. If it was not you, ignore this message: nothing else will be sent.`,
     noteSubject: (title: string) => `New note: ${title}`,
@@ -179,6 +183,11 @@ function layout(input: Layout): string {
 `;
 }
 
+/** Escapes a footer sentence and turns its domain into an explicit link in the template's violet. */
+function withDomainLink(sentence: string, domain: string, siteUrl: string): string {
+  return escapeHtml(sentence).replace(escapeHtml(domain), link(siteUrl, domain));
+}
+
 function footerParagraph(html: string): string {
   return `<p class="em-muted" style="margin:0 0 8px;font-family:${SANS};font-size:12px;line-height:18px;color:${COLOR.muted}">${html}</p>`;
 }
@@ -191,11 +200,12 @@ export function renderConfirmationEmail(input: ConfirmationEmailInput): Rendered
     paragraph(escapeHtml(copy.confirmIntro)),
     button(input.confirmUrl, copy.confirmButton),
     paragraph(escapeHtml(copy.expiry), 'margin-top:16px'),
+    paragraph(escapeHtml(copy.inboxHint), 'margin-top:8px'),
     `<p class="em-muted" style="margin:0 0 4px;font-family:${SANS};font-size:13px;line-height:20px;color:${COLOR.muted}">${escapeHtml(copy.copyLink)}</p>`,
     `<p class="em-muted" style="margin:0;font-family:${MONO};font-size:12px;line-height:18px;color:${COLOR.muted};word-break:break-all">${escapeHtml(input.confirmUrl)}</p>`,
   ].join('\n');
   const footer = [
-    footerParagraph(escapeHtml(copy.confirmFooter(domain))),
+    footerParagraph(withDomainLink(copy.confirmFooter(domain), domain, input.siteUrl)),
     footerParagraph(
       `${link(input.privacyUrl, copy.privacy)} &middot; ${escapeHtml(copy.sentBy)} ${escapeHtml(input.ownerName)}`,
     ),
@@ -208,6 +218,8 @@ export function renderConfirmationEmail(input: ConfirmationEmailInput): Rendered
     input.confirmUrl,
     '',
     copy.expiry,
+    '',
+    copy.inboxHint,
     '',
     '--',
     copy.confirmFooter(domain),
@@ -244,7 +256,7 @@ export function renderNoteEmail(input: NoteEmailInput): RenderedEmail {
     .filter(Boolean)
     .join('\n');
   const footer = [
-    footerParagraph(escapeHtml(copy.noteFooter(domain))),
+    footerParagraph(withDomainLink(copy.noteFooter(domain), domain, input.siteUrl)),
     footerParagraph(
       `${link(input.unsubscribeUrl, copy.unsubscribe)} &middot; ${link(input.privacyUrl, copy.privacy)} &middot; ${escapeHtml(copy.sentBy)} ${escapeHtml(input.ownerName)}`,
     ),

@@ -94,6 +94,7 @@ This is how work goes here: every task is an *issue* written as a delegation bri
 - Own **share cards** for each note and for `/me`, generated at build time.
 - **`/me`**: a portfolio with experience, certificates and experiments; it prints cleanly to PDF.
 - A safe **contact form**: Turnstile, a send limit and it fails closed when configuration is missing.
+- **Email subscription**: readers get new notes (and, now and then, an announcement of a project) with double opt-in and a one-page unsubscribe; I trigger each send by hand. Guide: [`docs/SUBSCRIPTION.en.md`](docs/SUBSCRIPTION.en.md).
 - A **public changelog**, **privacy and terms pages** and a **light/dark theme** with selectable animated backgrounds.
 - **Configurable appearance**: the `appearance` preset (`minimal` or `full`) sets the type scale, the banner heights and the note detail, and `home` switches each home section on or off.
 - **Bilingual** (ES/EN) with no language redirects.
@@ -156,6 +157,7 @@ odd/tasks/       → tracking of each feature
 | --- | --- |
 | [Configuration and update guide](docs/CONFIGURATION.en.md) | **Where each thing is configured and how everything is updated**: settings, content, secrets, dependencies and releases |
 | [How to create a note](docs/NOTES.en.md) | Detailed step by step, from draft to production |
+| [`docs/SUBSCRIPTION.en.md`](docs/SUBSCRIPTION.en.md) | Email subscription: how it works, data and privacy, limits, how to send a note and common problems (also in [Spanish](docs/SUBSCRIPTION.md)) |
 | [`docs/PLAN.md`](docs/PLAN.md) | Vision, scope and rules (in Spanish) |
 | [`docs/BRAND.md`](docs/BRAND.md) | Narrative, voice and brand tokens (in Spanish) |
 | [`docs/DESIGN.md`](docs/DESIGN.md) | Visual direction, pages and accessibility |

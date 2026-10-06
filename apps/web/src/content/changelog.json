@@ -405,6 +405,12 @@
     "date": "2026-10-06",
     "category": "added",
     "title": "Email subscription to new notes",
-    "description": "Readers can subscribe by email to new notes and project announcements, with double opt-in and an unsubscribe link in every email. The form lives in a pixel-style band in the footer and loads its script on first focus. Both emails are designed HTML with a plain-text fallback. A daily cap keeps part of the provider's pool for notes. The owner can email a published note from a command, dry run first, to subscribers of its language only."
+    "description": "Readers can subscribe by email to new notes and project announcements, with double opt-in and an unsubscribe link in every email. The form lives in a pixel-style band in the footer and loads its script on first focus. Both emails are designed HTML with a plain-text fallback. A daily cap keeps part of the provider's pool for notes. The owner can email a published note from a command, dry run first, to subscribers of its language only. The confirmation tells readers to check Promotions."
+  },
+  "subscription-guide": {
+    "date": "2026-10-06",
+    "category": "added",
+    "title": "Email subscription guide",
+    "description": "A consolidated guide, in Spanish and English, for the email subscription: how it works, stored data and privacy, limits, the manual owner flow to send a note, setup for forks and troubleshooting."
   }
 }

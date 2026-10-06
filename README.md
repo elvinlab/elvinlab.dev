@@ -96,6 +96,7 @@ Así se trabaja aquí: cada tarea es un *issue* escrito como un brief de delegac
 - **Formulario de contacto** seguro: Turnstile, límite de envíos y falla cerrado si falta configuración.
 - **Changelog público**, **páginas de privacidad y términos** y **tema claro/oscuro** con fondos animados elegibles.
 - **Aspecto configurable**: el preset `appearance` (`minimal` o `full`) fija la escala tipográfica, la altura de los banners y el detalle de las notas, y `home` activa o apaga cada sección de la portada.
+- **Suscripción por correo**: quien lee recibe las notas nuevas (y, de vez en cuando, un aviso de un proyecto) con doble confirmación y baja en una página; el envío lo disparo yo a mano. Guía: [`docs/SUBSCRIPTION.md`](docs/SUBSCRIPTION.md).
 - **Bilingüe** (ES/EN) sin redirecciones por idioma.
 
 ## Calidad medida
@@ -156,6 +157,7 @@ odd/tasks/       → seguimiento de cada funcionalidad
 | --- | --- |
 | [Guía de configuración y actualización](docs/CONFIGURATION.md) | **Dónde se configura cada cosa y cómo se actualiza todo**: ajustes, contenido, secretos, dependencias y releases |
 | [Cómo crear una nota](docs/NOTES.md) | Paso a paso detallado, del borrador a producción |
+| [`docs/SUBSCRIPTION.md`](docs/SUBSCRIPTION.md) | Suscripción por correo: cómo funciona, datos y privacidad, límites, cómo enviar una nota y problemas comunes (también en [inglés](docs/SUBSCRIPTION.en.md)) |
 | [`docs/PLAN.md`](docs/PLAN.md) | Visión, alcance y reglas (en español) |
 | [`docs/BRAND.md`](docs/BRAND.md) | Narrativa, voz y tokens de marca (en español) |
 | [`docs/DESIGN.md`](docs/DESIGN.md) | Dirección visual, páginas y accesibilidad |
