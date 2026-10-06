@@ -1,0 +1,25 @@
+---
+/**
+ * The 8-bit pink heart, the pixel language of the footprint, as the brand icon. Decorative: the
+ * link next to it carries the name. Static at rest; it tilts only when an ancestor with the `group`
+ * class is hovered or focused, and never under reduced motion.
+ */
+interface Props {
+  size?: number;
+}
+
+const { size = 21 } = Astro.props;
+---
+
+<svg
+  aria-hidden="true"
+  focusable="false"
+  data-brand-mark
+  width={size}
+  height={(size / 7) * 6}
+  viewBox="0 0 7 6"
+  class="shrink-0 [shape-rendering:crispEdges] motion-safe:transition-transform motion-safe:duration-200 motion-safe:group-hover:-rotate-6 motion-safe:group-hover:scale-110 motion-safe:group-focus-visible:-rotate-6 motion-safe:group-focus-visible:scale-110"
+>
+  <path d="M1 0h2v1H1zM4 0h2v1H4zM0 1h7v2H0zM1 3h5v1H1zM2 4h3v1H2zM3 5h1v1H3z" class="fill-pink"></path>
+  <path d="M1 1h1v1H1z" class="fill-white/60"></path>
+</svg>

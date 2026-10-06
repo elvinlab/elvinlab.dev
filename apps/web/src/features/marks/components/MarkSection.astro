@@ -22,7 +22,7 @@ const privacyHref = `${localizePath('/privacy/', locale, LOCALES)}#marks`;
 {enabled && variant === 'header' && (
   <>
     <style is:inline set:html={MARKS_CSS} />
-    <svg width="0" height="0" style="position:absolute" aria-hidden="true"><symbol id="marks-footprint" viewBox="0 0 7 11"><path d="M1 0h2v2H1zM4 1h1v1H4zM6 2h1v1H6zM0 3h7v3H0zM1 6h4v2H1zM1 9h4v2H1z"></path></symbol></svg>
+    <svg width="0" height="0" style="position:absolute" aria-hidden="true"><symbol id="marks-footprint" viewBox="0 0 7 6"><path d="M1 0h2v1H1zM4 0h2v1H4zM0 1h7v2H0zM1 3h5v1H1zM2 4h3v1H2zM3 5h1v1H3z"></path></symbol></svg>
     <div class="mk" data-marks data-v="h" data-a={animation} data-slug={slug} data-max={maxPerVisitor} data-from={showCountFrom} data-one={t(locale, 'marks.count.one')} data-many={t(locale, 'marks.count.many')} data-thanks={t(locale, 'marks.thanks')} data-cap={t(locale, 'marks.cap')} data-hint={t(locale, 'marks.hint')}><span class="mt"><button type="button" class="mb" aria-describedby="mx-h" hidden><svg class="mi" aria-hidden="true"><use href="#marks-footprint"></use></svg><span>{t(locale, 'marks.button')}</span></button><span role="tooltip" id="mx-h" class="mx">{t(locale, 'marks.privacy')} <a href={privacyHref}>{t(locale, 'privacy.note.link')}</a></span></span><span class="mn" hidden></span><p class="sr-only" role="status" aria-live="polite"></p></div>
   </>
 )}
