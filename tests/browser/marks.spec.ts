@@ -382,19 +382,6 @@ for (const theme of ['elvinlab-dark', 'elvinlab-light']) {
     await expect(page.locator('html')).toHaveAttribute('data-theme', theme);
     await headerButton(page).hover();
     await expect(tooltipOf(header(page))).toBeVisible();
-    // Axe samples colors: let the button's hover transition and the heartbeat finish first, or a
-    // loaded machine can scan a half-faded background. Looping decorations are left alone.
-    await page.evaluate(() =>
-      Promise.all(
-        document
-          .getAnimations()
-          .filter(
-            (animation) =>
-              animation.effect?.getComputedTiming().iterations !== Number.POSITIVE_INFINITY,
-          )
-          .map((animation) => animation.finished),
-      ),
-    );
     const { violations } = await scan(page);
     expect(describeViolations(violations)).toEqual([]);
   });

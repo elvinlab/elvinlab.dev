@@ -4,7 +4,9 @@ import type { Page } from '@playwright/test';
 /**
  * Runs axe (WCAG 2 A, AA and 2.1 AA) once the page has settled. Entrance animations fade content in
  * from a lower opacity, and axe computes contrast from the blended color, so scanning mid-animation
- * reports false `color-contrast` violations that depend on how fast the machine is.
+ * reports false `color-contrast` violations that depend on how fast the machine is. Expressive Code
+ * makes a horizontally scrollable code block keyboard-focusable from a script that runs after load,
+ * so wait for that too, or a loaded machine scans a block that is about to get its `tabindex`.
  */
 export async function scan(page: Page) {
   await page.evaluate(async () => {
@@ -14,6 +16,11 @@ export async function scan(page: Page) {
       .filter((animation) => animation.effect?.getTiming().iterations !== Infinity);
     await Promise.all(entranceAnimations.map((animation) => animation.finished));
   });
+  await page.waitForFunction(() =>
+    [...document.querySelectorAll('pre')].every(
+      (block) => block.scrollWidth <= block.clientWidth || block.hasAttribute('tabindex'),
+    ),
+  );
   return new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa', 'wcag21aa']).analyze();
 }
 
