@@ -25,7 +25,8 @@ import {
   sortNotes,
 } from '@/features/notes/lib/notes.ts';
 import { translationAlternates, translationsOf } from '@/features/notes/lib/translations.ts';
-import { site } from '@/shared/config/index.ts';
+import { isSubscribeFormShown } from '@/features/subscribe/index.ts';
+import { integrations, site } from '@/shared/config/index.ts';
 import { LOCALES, type Locale, t } from '@/shared/i18n/index.ts';
 import Banner from '@/shared/layout/Banner.astro';
 import BaseLayout from '@/shared/layout/BaseLayout.astro';
@@ -59,6 +60,9 @@ const translations = Object.fromEntries(
 
 const path = `/notes/${entry.id}/`;
 const canonical = new URL(localizePath(path, data.lang, LOCALES), site.url).href;
+const subscribeHref = isSubscribeFormShown(site.features, integrations.turnstileSiteKey)
+  ? `${localizePath('/notes/', 'es', LOCALES)}#subscribe`
+  : null;
 const readingLabel = t(locale, 'notes.readingTime', { min: readingMinutes(entry.body ?? '') });
 ---
 
@@ -95,6 +99,9 @@ const readingLabel = t(locale, 'notes.readingTime', { min: readingMinutes(entry.
       <p class="font-mono text-meta text-muted">
         {secondaryMetaSlot === 'foot' && <><span class="whitespace-nowrap">{site.identity.name}</span> · </>}{data.updatedDate && <><span class="whitespace-nowrap">{t(locale, 'note.updated', { date: formatDate(data.updatedDate, locale) })}</span> · </>}<span class="whitespace-nowrap">{t(locale, 'note.license')}</span>
       </p>
+      {subscribeHref && (
+        <p class="text-sm"><a href={subscribeHref} class="inline-flex h-11 items-center text-primary underline decoration-dashed underline-offset-4">{t(locale, 'subscribe.note')}</a></p>
+      )}
     </div>
     <MarkSection slug={entry.id} locale={locale} variant="end" />
   </article>

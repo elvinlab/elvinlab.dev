@@ -32,6 +32,8 @@ export type PrivacyInput = {
   readingMode?: boolean;
   /** True when the footprint button is on: adds the marks section and one more local storage note. */
   marks?: boolean;
+  /** True when the email subscription is on: adds the subscribe section. */
+  subscribe?: boolean;
 };
 
 const CLOUDFLARE_FAQ = 'https://developers.cloudflare.com/web-analytics/faq/';
@@ -74,12 +76,29 @@ const marksSection: Record<'es' | 'en', PrivacySection> = {
   },
 };
 
+const subscribeSection = (contact: {
+  es: string;
+  en: string;
+}): Record<'es' | 'en', PrivacySection> => ({
+  es: {
+    id: 'subscribe',
+    title: 'Suscripción por correo',
+    body: `<p>Si te suscribes a las notas, este sitio guarda tu <strong>correo electrónico</strong>, el estado de la suscripción (pendiente, confirmada o dada de baja), el idioma, las fechas de alta y de confirmación y un <em>hash</em> del enlace de confirmación (el enlace en sí no se guarda). El único fin es enviarte las notas que pediste. La lista está en una base de datos <strong>D1</strong> de Cloudflare y el envío lo hace <strong>Resend</strong>, que actúa como encargado del tratamiento; la verificación anti-bot es Cloudflare Turnstile (${externalAnchorHtml('es', TURNSTILE_PRIVACY, 'política de privacidad')}).</p><p>La suscripción tiene doble confirmación: no recibirás notas hasta abrir el enlace del primer correo, y si no lo haces la solicitud se borra a los pocos días. Cada correo incluye un enlace para darte de baja, también disponible desde tu cliente de correo. Una dirección dada de baja se conserva como entrada de supresión para no volver a escribirle, hasta que pidas borrarla.</p><p>Para que se borre tu dirección, escríbeme desde la página de <a href="${contact.es}">contacto</a>.</p>`,
+  },
+  en: {
+    id: 'subscribe',
+    title: 'Email subscription',
+    body: `<p>If you subscribe to the notes, this site stores your <strong>email address</strong>, the subscription status (pending, confirmed or unsubscribed), the language, the sign-up and confirmation dates and a <em>hash</em> of the confirmation link (the link itself is not stored). The only purpose is to send you the notes you asked for. The list lives in a Cloudflare <strong>D1</strong> database and <strong>Resend</strong> sends the emails as a processor; the bot check is Cloudflare Turnstile (${externalAnchorHtml('en', TURNSTILE_PRIVACY, 'privacy policy')}).</p><p>The subscription uses double opt-in: you get no notes until you open the link in the first email, and if you never do, the request is deleted after a few days. Every email carries an unsubscribe link, also offered by your mail client. An unsubscribed address is kept as a suppression entry so it is not emailed again, until you ask for it to be deleted.</p><p>To have your address deleted, write to me through the <a href="${contact.en}">contact</a> page.</p>`,
+  },
+});
+
 export function buildPrivacyContent(input: PrivacyInput): Record<'es' | 'en', PrivacyContent> {
   const content = buildBaseContent(input);
   const comments = input.comments ? commentsSection(input.comments.repo) : null;
   const extra = (locale: 'es' | 'en'): PrivacySection[] => [
     ...(comments ? [comments[locale]] : []),
     ...(input.marks ? [marksSection[locale]] : []),
+    ...(input.subscribe ? [subscribeSection(input.contact)[locale]] : []),
   ];
   const withSections = (locale: 'es' | 'en'): PrivacyContent => {
     const { sections } = content[locale];

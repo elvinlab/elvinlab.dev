@@ -70,7 +70,6 @@ describe('Resend mailer', () => {
     expect(body).toHaveLength(2);
     expect(body[0].headers).toEqual({
       'List-Unsubscribe': '<https://site.test/subscribe/unsubscribe/?token=abc.def>',
-      'List-Unsubscribe-Post': 'List-Unsubscribe=One-Click',
     });
     expect(body[0].subject).toBe('Nueva nota: A note');
     expect(body[1].subject).toBe('New note: A note');

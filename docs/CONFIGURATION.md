@@ -447,6 +447,21 @@ Un botón anónimo de «estuve aquí» en cada nota (cabecera y final del artíc
 
 Para apagarlo, poné `features.marks: false`: no llega a la página ni HTML, ni CSS ni script. Para usar otra base (por ejemplo Turso), escribí un adaptador para el puerto `MarkStore` de `apps/web/src/features/marks/ports.ts`, junto a `adapters/d1.ts`.
 
+### 6.14 Suscripción por correo a las notas nuevas (`subscribe`)
+
+Quien visita deja su correo en `/notes` y recibe un correo con cada nota nueva. La lista vive en la base D1 compartida (tabla `subscribers`), alta con confirmación por enlace (doble opt-in), cada correo trae el enlace de baja (también en la cabecera `List-Unsubscribe`; sin POST de un clic, ver ADR 0014), y Resend solo envía (está detrás de un puerto). El flag es `features.subscribe` (sale **apagado**); las rutas `/subscribe/confirm/`, `/subscribe/unsubscribe/` (y sus gemelas `/en`) y el endpoint POST `/subscribe/one-click/` existen solo mientras él y `features.blog` estén encendidos. El formulario también necesita una clave pública de Turnstile (receta 6.6). Registro de la decisión: [ADR 0014](adr/0014-email-subscription-d1-list-resend-port.md); la página de privacidad suma su sección `subscribe` cuando el flag está encendido.
+
+Hasta completar todos los pasos el formulario no sirve de nada (las Actions responden «no disponible»), así que hacelos **en este orden**, en tus propias cuentas, antes de encender el flag:
+
+1. **Aplicá la migración a la base real** (necesita `wrangler login`): `cd apps/web && mise exec -- pnpm exec wrangler d1 migrations apply elvinlab-dev-db --remote` (aplica `migrations/0002_subscribers.sql`).
+2. **Creá los dos secretos** del Worker (nunca en archivos versionados): `SUBSCRIBE_FROM`, el remitente (`Nombre <dirección>`) en un dominio verificado en Resend, y `SUBSCRIBE_TOKEN_SECRET`, de al menos 32 caracteres aleatorios. Generá el segundo con `openssl rand -base64 48`, luego `mise exec -- pnpm exec wrangler secret put SUBSCRIBE_TOKEN_SECRET` y lo mismo con `SUBSCRIBE_FROM`. En local ponelos en `apps/web/.dev.vars` (ignorado por git). `RESEND_API_KEY` y `TURNSTILE_SECRET_KEY` son los que ya usa el formulario de contacto. Cambiar `SUBSCRIBE_TOKEN_SECRET` más adelante invalida los enlaces de baja ya enviados.
+3. **Enlazá el limitador**: `SUBSCRIBE_RATE_LIMITER` ya está declarado en `ratelimits` de `wrangler.jsonc` (con un `namespace_id` único); se activa con el próximo deploy. No hay que crear nada a mano.
+4. **Verificá el dominio de envío en Resend** (registros DNS SPF y DKIM en la zona de Cloudflare) para que `SUBSCRIBE_FROM` sea aceptado. El plan gratuito permite 100 correos al día y 3000 al mes; el envío se topa en 100 por ejecución.
+5. **Encendé el flag**: poné `features.subscribe: true` en `site.config.ts`, corré `pnpm docs:config` si cambiaste algo generado y liberá (sección 7).
+6. **Comprobalo** con una dirección tuya de prueba: suscribite en `/notes`, abrí el enlace del correo, pulsá el botón y luego dáte de baja desde un correo de nota. Nunca pruebes con la dirección de otra persona.
+
+Para apagarlo, poné `features.subscribe: false`: el formulario y las páginas desaparecen en el próximo build y la sección de privacidad se va con ellos (la lista queda en D1).
+
 ## 7. Publicar (release) y revertir
 
 El flujo completo está decidido en los ADR [0011](adr/0011-ci-gate-once-at-main-pr-no-staging.md) y [0012](adr/0012-direct-push-to-main-no-pr-gate.md). En corto:

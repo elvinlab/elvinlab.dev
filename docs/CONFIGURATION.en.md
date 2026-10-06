@@ -447,6 +447,21 @@ A one-tap, anonymous "I was here" button on every note (header and end of the ar
 
 To turn it off, set `features.marks: false`: no markup, no CSS and no script reach the page. To use another database (for example Turso), write an adapter for the `MarkStore` port in `apps/web/src/features/marks/ports.ts` next to `adapters/d1.ts`.
 
+### 6.14 Email subscription to new notes (`subscribe`)
+
+Visitors leave an email on `/notes` and get one email for each new note. The list lives in the shared D1 database (table `subscribers`), signing up needs a confirmation click (double opt-in), every email carries an unsubscribe link (also in the `List-Unsubscribe` header; no one-click POST, see ADR 0014), and Resend only sends (it sits behind a port). The flag is `features.subscribe` (ships **off**); the routes `/subscribe/confirm/`, `/subscribe/unsubscribe/` (and their `/en` twins) exist only while it and `features.blog` are on. The form also needs a Turnstile site key (recipe 6.6). Decision record: [ADR 0014](adr/0014-email-subscription-d1-list-resend-port.md); the privacy page gets its `subscribe` section when the flag is on.
+
+Until every step below is done the form shows nothing useful (the Actions answer "unavailable"), so do them **in this order**, in your own accounts, before flipping the flag:
+
+1. **Apply the migration to the real database** (needs `wrangler login`): `cd apps/web && mise exec -- pnpm exec wrangler d1 migrations apply elvinlab-dev-db --remote` (it applies `migrations/0002_subscribers.sql`).
+2. **Create the two secrets** on the Worker (never in tracked files): `SUBSCRIBE_FROM`, the sender (`Name <address>`) on a domain verified in Resend, and `SUBSCRIBE_TOKEN_SECRET`, at least 32 random characters. Generate the second with `openssl rand -base64 48`, then `mise exec -- pnpm exec wrangler secret put SUBSCRIBE_TOKEN_SECRET` and the same for `SUBSCRIBE_FROM`. Locally put both in `apps/web/.dev.vars` (git-ignored). `RESEND_API_KEY` and `TURNSTILE_SECRET_KEY` are the ones the contact form already uses. Changing `SUBSCRIBE_TOKEN_SECRET` later invalidates the unsubscribe links already sent.
+3. **Bind the rate limiter**: `SUBSCRIBE_RATE_LIMITER` is already declared under `ratelimits` in `wrangler.jsonc` (a unique `namespace_id`); it becomes active with the next deploy. Nothing to create by hand.
+4. **Verify the sending domain in Resend** (DNS records SPF and DKIM in the Cloudflare zone) so `SUBSCRIBE_FROM` is accepted. The free plan allows 100 emails a day and 3,000 a month; the sender caps each run at 100.
+5. **Flip the flag**: set `features.subscribe: true` in `site.config.ts`, run `pnpm docs:config` if you changed anything generated, and release (section 7).
+6. **Check it** with a throwaway address you own: subscribe on `/notes`, open the link in the email, press the button, then unsubscribe from a note email. Never test with someone else's address.
+
+To switch it off, set `features.subscribe: false`: the form and the pages disappear from the next build and the privacy section goes with them (the list stays in D1).
+
 ## 7. Releasing and rolling back
 
 The full flow is decided in ADRs [0011](adr/0011-ci-gate-once-at-main-pr-no-staging.md) and [0012](adr/0012-direct-push-to-main-no-pr-gate.md). In short:

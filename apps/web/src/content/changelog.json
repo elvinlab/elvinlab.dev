@@ -400,5 +400,11 @@
     "category": "fixed",
     "title": "Hero text clear of the expand button, shorter footprint copy",
     "description": "On phones the last hero line no longer sits under the expand button, and the footprint cap message and privacy tooltip are shorter."
+  },
+  "email-subscription": {
+    "date": "2026-10-05",
+    "category": "added",
+    "title": "Email subscription to new notes",
+    "description": "Readers can subscribe by email to each new note, with double opt-in, an unsubscribe link in every email, and a privacy section. It ships off until the owner applies the migration, sets the secrets and enables the flag."
   }
 }

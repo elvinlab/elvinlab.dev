@@ -66,6 +66,7 @@ export type NoteMail = {
   title: string;
   summary?: string;
   url: string;
+  /** The human page, linked in the email body and in the `List-Unsubscribe` header. */
   unsubscribeUrl: string;
 };
 

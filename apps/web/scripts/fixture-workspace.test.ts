@@ -16,6 +16,7 @@ import {
   createFixtureWorkspace,
   enableFixtureComments,
   enableFixtureNotice,
+  enableFixtureSubscribe,
   neutralizeFixtureIntegrations,
   overrideFixtureAppearance,
 } from './fixture-workspace.ts';
@@ -164,6 +165,19 @@ it('replaces a real notice instead of duplicating it', () => {
 it('fails loudly when the config has no features block to anchor the notice on', () => {
   const web = webWithConfig('export const siteConfig = {};\n');
   expect(() => enableFixtureNotice(web)).toThrow(/notice/);
+});
+
+it('turns the subscribe flag on in the fixture config', () => {
+  const web = webWithConfig(
+    'export const siteConfig = {\n  features: { subscribe: false, blog: true },\n};\n',
+  );
+  enableFixtureSubscribe(web);
+  expect(readFileSync(join(web, 'src/site.config.ts'), 'utf8')).toContain('subscribe: true,');
+});
+
+it('fails loudly when the config has no subscribe flag to turn on', () => {
+  const web = webWithConfig('export const siteConfig = {};\n');
+  expect(() => enableFixtureSubscribe(web)).toThrow(/subscribe/);
 });
 
 it('removes the real third-party ids from the fixture config', () => {

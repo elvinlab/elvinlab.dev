@@ -198,17 +198,17 @@ export async function sendNote(
     const first = batch[0];
     if (!first) break;
     const messages: NoteMail[] = await Promise.all(
-      batch.map(async (subscriber) => ({
-        to: subscriber.email,
-        locale: subscriber.locale,
-        title,
-        url,
-        ...(summary === undefined ? {} : { summary }),
-        unsubscribeUrl: ports.links.unsubscribe(
-          await createUnsubscribeToken(subscriber.id, ports),
-          subscriber.locale,
-        ),
-      })),
+      batch.map(async (subscriber) => {
+        const unsubscribeToken = await createUnsubscribeToken(subscriber.id, ports);
+        return {
+          to: subscriber.email,
+          locale: subscriber.locale,
+          title,
+          url,
+          ...(summary === undefined ? {} : { summary }),
+          unsubscribeUrl: ports.links.unsubscribe(unsubscribeToken, subscriber.locale),
+        };
+      }),
     );
     try {
       await ports.mailer.sendNote(messages, `note:${slug}:${first.id}`);

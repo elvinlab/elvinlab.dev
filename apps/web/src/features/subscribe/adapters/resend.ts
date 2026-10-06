@@ -89,7 +89,6 @@ export function createResendMailer(
             text: copy.noteBody({ ...mail, title: oneLine(mail.title) }),
             headers: {
               'List-Unsubscribe': `<${mail.unsubscribeUrl}>`,
-              'List-Unsubscribe-Post': 'List-Unsubscribe=One-Click',
             },
           };
         });

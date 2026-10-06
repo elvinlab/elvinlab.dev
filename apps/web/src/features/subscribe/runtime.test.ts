@@ -108,7 +108,10 @@ describe('configured subscribe runtime', () => {
     const batch = sent[1]?.body as { text: string; headers: Record<string, string> }[];
     const unsubscribeUrl =
       /<(https:[^>]+)>/.exec(batch[0]?.headers['List-Unsubscribe'] ?? '')?.[1] ?? '';
+    // The header and the body both carry the human page; there is no one-click POST.
     expect(unsubscribeUrl).toContain('https://site.test/en/subscribe/unsubscribe/?token=');
+    expect(batch[0]?.text).toContain(unsubscribeUrl);
+    expect(batch[0]?.headers['List-Unsubscribe-Post']).toBeUndefined();
     const token = decodeURIComponent(new URL(unsubscribeUrl).searchParams.get('token') ?? '');
     await expect(unsubscribeConfigured(token, bindings, log)).resolves.toBe('unsubscribed');
     await expect(unsubscribeConfigured(`${token}x`, bindings, log)).resolves.toBe('invalid');
