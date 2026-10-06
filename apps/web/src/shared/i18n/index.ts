@@ -39,6 +39,7 @@ export const t = createTranslator({
       'footer.terms': 'Términos',
       'footer.changelog': 'Changelog',
       'aside.label': 'Barra lateral',
+      'backtotop.label': 'Volver arriba',
       'banner.expand': 'Expandir el fondo',
       'banner.collapse': 'Achicar el fondo',
       'home.intro':
@@ -217,6 +218,7 @@ export const t = createTranslator({
       'footer.terms': 'Terms',
       'footer.changelog': 'Changelog',
       'aside.label': 'Sidebar',
+      'backtotop.label': 'Back to top',
       'banner.expand': 'Expand the background',
       'banner.collapse': 'Collapse the background',
       'home.intro':

@@ -35,5 +35,7 @@ Created 2026-10-05. Done the same day:
 - Lighthouse LCP after the heartbeat: home 2265-2295 ms, note 2263-2286 ms (budget 2500; margin about 215 ms).
 - MARKS_CSS is about 3330 bytes; its guard is `< 3350`.
 
+- Back to top button (2026-10-06, uncommitted): `BackToTop.astro` rendered by `BaseLayout`, pure logic in `shared/layout/back-to-top.ts` (unit tested, RED then GREEN), BRAND row first. Shown only after scrolling up past 800 px; lifts above the footer; sits above the reading mode exit pill. Evidence: `back-to-top.spec.ts` 24 passed at 1280 px (bottom overlap at 360/390/1280 on four pages, print, axe in both themes, smooth scroll request), web unit suite 1035 passed, typecheck, depcruise, white-label green, JS budget green (about +0.65 KiB gzip per page: home 10.70 -> 11.34).
+
 ## Not done (owner did not select them)
 Smaller type scale and less text on screen (collapsed decision record on mobile, shorter latest-note card on the home).

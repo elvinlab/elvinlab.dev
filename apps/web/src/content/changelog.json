@@ -418,5 +418,11 @@
     "category": "changed",
     "title": "Faster CI: more parallel shards",
     "description": "CI now runs Lighthouse in two shards and the browser tests in four. Every URL still runs three times and no threshold or assertion changed; locally, --shard 1/2 reproduces a CI shard."
+  },
+  "back-to-top": {
+    "date": "2026-10-06",
+    "category": "added",
+    "title": "Back to top button",
+    "description": "A small pixel arrow appears at the bottom right when you scroll up a long page and takes you back to the top. It never covers the footer controls and stays still with reduced motion."
   }
 }

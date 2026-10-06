@@ -2,13 +2,13 @@
   "version": 1,
   "checks": {
     "lint": {
-      "fingerprint": "8d86b1ca456ce1129eb8c82422b2899fbd2db8b9",
-      "recordedAt": "2026-10-06T14:53:37.790Z",
+      "fingerprint": "21a9357bb546db7292ac55ebe5e7af1712b50337",
+      "recordedAt": "2026-10-06T15:22:09.292Z",
       "result": "pass"
     },
     "typecheck": {
-      "fingerprint": "bfdb7750c5b1f24d44a1044e1a7d1c8bfaab287c",
-      "recordedAt": "2026-10-06T14:53:37.790Z",
+      "fingerprint": "dae01be8e386b1067e299d2b32eead4e9e90eb3b",
+      "recordedAt": "2026-10-06T15:22:09.293Z",
       "result": "pass"
     },
     "depcruise": {
@@ -22,23 +22,23 @@
       "result": "pass"
     },
     "unit": {
-      "fingerprint": "25af1e4eb0c80b669575c4355f5712c4329bf12b",
-      "recordedAt": "2026-10-06T14:53:37.790Z",
+      "fingerprint": "5b78c81299bce0d5979872d2e72e97eefefd5946",
+      "recordedAt": "2026-10-06T15:22:09.293Z",
       "result": "pass"
     },
     "build": {
-      "fingerprint": "3dec563552a033a292ad3945d8d2b8196857e889",
-      "recordedAt": "2026-10-06T14:53:37.790Z",
+      "fingerprint": "f30bbc80148b5e40ea614baada8221c7ba990e10",
+      "recordedAt": "2026-10-06T15:22:09.293Z",
       "result": "pass"
     },
     "js-budget": {
-      "fingerprint": "ec4f4d0027dc67bd4fabc19a78ac45931e67e46c",
-      "recordedAt": "2026-10-06T14:53:37.790Z",
+      "fingerprint": "32e5f2890655e02d7ed7ef7f263850064a70b355",
+      "recordedAt": "2026-10-06T15:22:09.293Z",
       "result": "pass"
     },
     "white-label": {
-      "fingerprint": "407bed0621df61c6811b56030dc317a813d4f91d",
-      "recordedAt": "2026-10-06T14:53:37.790Z",
+      "fingerprint": "3c7d0189ed376aa9a7df2905fd3b0c1d2392129f",
+      "recordedAt": "2026-10-06T15:22:09.293Z",
       "result": "pass"
     },
     "cold-start": {
@@ -47,8 +47,8 @@
       "result": "pass"
     },
     "e2e:a11y.spec.ts": {
-      "fingerprint": "eb0eda9912203b1fa730f76e7e46771e07689799",
-      "recordedAt": "2026-10-06T14:53:37.790Z",
+      "fingerprint": "e9ed425dd2548c102eac017fa6a91c64e04066e0",
+      "recordedAt": "2026-10-06T15:22:09.293Z",
       "result": "pass"
     },
     "e2e:background.spec.ts": {
@@ -57,8 +57,8 @@
       "result": "pass"
     },
     "e2e:card-links.spec.ts": {
-      "fingerprint": "19d708381bd13eed9d25639fdf05b86f0a55a1f3",
-      "recordedAt": "2026-10-06T14:53:37.790Z",
+      "fingerprint": "1335395396f3f60ff22f12a29014d8174c3e7118",
+      "recordedAt": "2026-10-06T15:22:09.293Z",
       "result": "pass"
     },
     "e2e:comments.spec.ts": {
@@ -72,8 +72,8 @@
       "result": "pass"
     },
     "e2e:cookies.spec.ts": {
-      "fingerprint": "a96b6fb6d6191e32b58abff4fd56ec5950ddf844",
-      "recordedAt": "2026-10-06T14:53:37.790Z",
+      "fingerprint": "172bfd843b5d33d1a0f5a956242ac60ddced2490",
+      "recordedAt": "2026-10-06T15:22:09.293Z",
       "result": "pass"
     },
     "e2e:cv-and-credentials.spec.ts": {
@@ -82,13 +82,13 @@
       "result": "pass"
     },
     "e2e:external-links.spec.ts": {
-      "fingerprint": "fd0f66d7da48efe8a9fa556f234703e375d182c9",
-      "recordedAt": "2026-10-06T14:53:37.790Z",
+      "fingerprint": "3b559d820ab708c3054c1b31fc2bfc8e8681e8ca",
+      "recordedAt": "2026-10-06T15:22:09.293Z",
       "result": "pass"
     },
     "e2e:favicon.spec.ts": {
-      "fingerprint": "88cce625a531fa6eb49a6bd563132b73758b4699",
-      "recordedAt": "2026-10-06T14:53:37.790Z",
+      "fingerprint": "9645d65d609c40121f0b11cd96f8a65f3bed2aed",
+      "recordedAt": "2026-10-06T15:22:09.293Z",
       "result": "pass"
     },
     "e2e:home-sections.spec.ts": {
@@ -97,8 +97,8 @@
       "result": "pass"
     },
     "e2e:internal-links.spec.ts": {
-      "fingerprint": "86c208f297e97168b713e44ca7b843dd65ee5e26",
-      "recordedAt": "2026-10-06T14:53:37.790Z",
+      "fingerprint": "f94117b7aa4a7923e0726eeb55b9a5afde5f6739",
+      "recordedAt": "2026-10-06T15:22:09.293Z",
       "result": "pass"
     },
     "e2e:legal.spec.ts": {
@@ -107,8 +107,8 @@
       "result": "pass"
     },
     "e2e:link-previews.spec.ts": {
-      "fingerprint": "059fbd6b5ef8264d3d47fdfa5e243429f447b31a",
-      "recordedAt": "2026-10-06T14:53:37.790Z",
+      "fingerprint": "18de376c1ebeb4540ad4a9d7e75fe7571bb637ef",
+      "recordedAt": "2026-10-06T15:22:09.293Z",
       "result": "pass"
     },
     "e2e:me-experience-locale.spec.ts": {
@@ -132,18 +132,18 @@
       "result": "pass"
     },
     "e2e:performance.spec.ts": {
-      "fingerprint": "0d6d220b8e1d4d606fcdd8590645468180e59911",
-      "recordedAt": "2026-10-06T14:53:37.790Z",
+      "fingerprint": "3527ce9110929e076f8e8e4685aee371b55a074a",
+      "recordedAt": "2026-10-06T15:22:09.293Z",
       "result": "pass"
     },
     "e2e:smoke.spec.ts": {
-      "fingerprint": "6bea84e7368414fcfe62afba9ba971c783a1c632",
-      "recordedAt": "2026-10-06T14:53:37.790Z",
+      "fingerprint": "8c79d8b688592339117a7a46247976b16ff84e71",
+      "recordedAt": "2026-10-06T15:22:09.293Z",
       "result": "pass"
     },
     "e2e:theme.spec.ts": {
-      "fingerprint": "1bb191a26108445a4d13f87cc8841c2d058acfb8",
-      "recordedAt": "2026-10-06T14:53:37.790Z",
+      "fingerprint": "ba550764ec43c5930a4f1f4283e05cfbd4632b70",
+      "recordedAt": "2026-10-06T15:22:09.293Z",
       "result": "pass"
     },
     "e2e:calm-pages.spec.ts": {
@@ -152,13 +152,13 @@
       "result": "pass"
     },
     "e2e:brand-mark.spec.ts": {
-      "fingerprint": "01b36677c6bf2e85e060ae67d2fa2abfba23d1fd",
-      "recordedAt": "2026-10-06T14:53:37.790Z",
+      "fingerprint": "5f5e6f7f2ce9b124e7d10ac4a245c655bcf4b5f5",
+      "recordedAt": "2026-10-06T15:22:09.293Z",
       "result": "pass"
     },
     "e2e:focus-not-obscured.spec.ts": {
-      "fingerprint": "8fad5c7663b207e5f2a36846768c5806bfa5098e",
-      "recordedAt": "2026-10-06T14:53:37.790Z",
+      "fingerprint": "d6c05de9cfa38dc3567ef72acd3f36fd38c95262",
+      "recordedAt": "2026-10-06T15:22:09.293Z",
       "result": "pass"
     },
     "e2e:interaction-polish.spec.ts": {
@@ -177,8 +177,8 @@
       "result": "pass"
     },
     "e2e:mobile-ux.spec.ts": {
-      "fingerprint": "cb5393fe612550f901f6496e73167c74fbb7d53d",
-      "recordedAt": "2026-10-06T14:53:37.790Z",
+      "fingerprint": "2eb4531f725a00ba054e0df1ab7fd1f6710d775e",
+      "recordedAt": "2026-10-06T15:22:09.293Z",
       "result": "pass"
     },
     "e2e:notes-layout.spec.ts": {
