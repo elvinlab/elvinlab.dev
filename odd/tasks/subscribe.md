@@ -71,3 +71,6 @@ Follow-up for the coordinator: `apps/web/src/actions/index.ts` still passes `sit
 - [x] New secret `SUBSCRIBE_ADMIN_TOKEN` in `ENV_VARS` (optional) with its own `notifyBindingsSchema` so the public subscription does not depend on it; docs (recipe 6.14 step 7, NOTES), changelog, white-label assertion that `/api/subscribe/` does not exist with the flag off.
 - Owner steps still open: create the secret on the Worker (`openssl rand -base64 48`, `wrangler secret put SUBSCRIBE_ADMIN_TOKEN`), release, then run the command (dry run first). Not run: e2e, Lighthouse, any remote command.
 
+
+## Progress 2026-10-06: consolidated guide (bounded writer, not committed)
+- [x] `docs/SUBSCRIPTION.md` and `docs/SUBSCRIPTION.en.md` written and linked from README, ADR 0014 and recipe 6.14 (es/en). Docs only; checks: relative links, Biome on the changelog, `docs:config`.

@@ -2,6 +2,8 @@
 
 Status: Accepted (issue #78, T50)
 
+See also: the consolidated guide [`docs/SUBSCRIPTION.md`](../SUBSCRIPTION.md) ([English](../SUBSCRIPTION.en.md)).
+
 ## Context
 RSS is the only way to follow the notes today. The owner wants visitors to subscribe by email and hear about each new note, with the list owned by the site so that changing the mail provider never means migrating subscribers. The site already has Cloudflare D1 (ADR 0013), the contact form with Turnstile, a rate limiter and a Resend adapter (ADR 0009).
 

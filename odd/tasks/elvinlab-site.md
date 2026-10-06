@@ -416,3 +416,7 @@ Contents: terminal icon next to the wordmark and as the favicon (pixel, softer c
 - NOT verified: a real subscribe, confirm and unsubscribe cycle with an address the owner owns, and the Resend sending domain (assumed verified because the contact form sends from it); the emails in Gmail, Outlook and Apple Mail.
 - Next: the owner tests the flow with their own address; a command or protected endpoint to send a new note; refresh the changelog audit before the next release.
 
+### Seventh release of 2026-10-06: owner trigger to send a note (owner-authorized)
+`main` = `83ee054` (commit-tree from `develop` at `f9d836e`, fast-forward, tree diff empty; `develop` pushed first). `POST /api/subscribe/notify` (bearer token, rate limited, constant-time comparison, only a slug in, content read from the published note, dry run by default) and `pnpm notify:note <slug> [--send]`. Sending is MANUAL by the owner's decision while the system is observed (no CI step). Secret `SUBSCRIBE_ADMIN_TOKEN` created on the Worker `elvinlab` (owner-authorized); the token file lives in `~/.config/elvinlab/subscribe-admin-token` on the owner's machine (mode 600, outside the repo).
+- NOT verified: a real send and a real subscribe cycle; the owner tests with an address they own.
+
