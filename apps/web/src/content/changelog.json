@@ -363,6 +363,6 @@
     "date": "2026-10-05",
     "category": "changed",
     "title": "8-bit look for the brand, footprint and favicon",
-    "description": "A pink pixel heart sits next to the wordmark and replaces the footprint icon, whose animations now advance in steps; the favicon is a pixel terminal window in softer colors."
+    "description": "The favicon is now a pixel terminal window in softer colors and also sits next to the wordmark; the footprint button gets a pink pixel heart whose animations advance in steps."
   }
 }

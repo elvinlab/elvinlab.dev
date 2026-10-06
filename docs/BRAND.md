@@ -166,7 +166,7 @@ La identidad es "laboratorio de IA sobre fondo oscuro": pocos elementos, siempre
 | Borde con luz | Un tramo de gradiente recorre el borde de la tarjeta | Tarjetas destacadas (máx. una fila por página) |
 | Resplandor | Gradiente radial en una esquina | Tarjetas y hero; nunca sombras duras |
 | Prompt de terminal | `// comentario`, `>` y cursor rosa estático | Saludo y títulos técnicos; el acento es discreto y no parpadea |
-| Icono de marca | Corazón 8-bit rosa (la misma pieza del botón de huella), 21 px en la barra y 14 px en el footer, junto al nombre | Barra de navegación, footer y botón de huella; estático en reposo (el parpadeo se descartó porque robaba el foco), y solo al pasar el cursor o enfocar se inclina unos grados; las animaciones del botón avanzan por pasos, como en un juego retro; sin movimiento con `prefers-reduced-motion` |
+| Icono de marca | La terminal pixelada del favicon, 32 px en la barra y 16 px en el footer (cada celda de la cuadrícula de 16 mide un número entero de píxeles), junto al nombre | Barra de navegación y footer; estático en reposo (el parpadeo se descartó porque robaba el foco), y solo al pasar el cursor o enfocar se inclina unos grados; sin movimiento con `prefers-reduced-motion`. El corazón 8-bit rosa queda solo en el botón de huella, cuyas animaciones avanzan por pasos |
 | Firma retro | Abanico arriba y GIFs de los 90 al pie | Solo README de GitHub y footer del sitio |
 
 ### Sí
