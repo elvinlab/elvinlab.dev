@@ -55,3 +55,9 @@ Follow-up for the coordinator: `apps/web/src/actions/index.ts` still passes `sit
 - [x] Actions pass `{ url, name: handle, ownerName }` to the mailer runtime.
 - [x] Header logo has `alt=""` (template test asserts the attribute is present).
 - Evidence: see the verification results recorded in the coordinator's handoff and `odd/verification-ledger.md`.
+
+## Owner steps done on 2026-10-06 (owner-authorized, exact operations, the machine's existing wrangler login)
+- Migration `0002_subscribers.sql` applied to the remote D1 `elvinlab-dev-db` (tables `subscribers` and `subscribe_quota` verified; no new database).
+- Secrets `SUBSCRIBE_TOKEN_SECRET` (generated on the spot, never displayed) and `SUBSCRIBE_FROM` created on the Worker `elvinlab`; `wrangler secret list` shows both next to the contact and Turnstile secrets.
+- Still open: the Resend sending domain was assumed verified because the contact form already sends from the same domain (not checked in Resend's panel); flip `features.subscribe: true` and release (needs explicit authorization); a real end-to-end test with an address the owner owns.
+
