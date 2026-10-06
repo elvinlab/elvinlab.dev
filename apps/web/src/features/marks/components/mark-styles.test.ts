@@ -22,6 +22,8 @@ describe('mark button stylesheet', () => {
     expect(MARKS_CSS).not.toMatch(/\/\*|\n/);
     // 2,270 bytes before the privacy tooltip (about 680 more, asked by the owner on 2026-10-05). The note
     // page is guarded by a Lighthouse LCP gate that is sensitive to a few hundred bytes.
-    expect(MARKS_CSS.length).toBeLessThan(3000);
+    // Plus about 100 bytes for the tooltip dismissal rules (hover only on real hover devices, keyboard
+    // focus only, a few seconds after a tap on touch, Escape).
+    expect(MARKS_CSS.length).toBeLessThan(3100);
   });
 });

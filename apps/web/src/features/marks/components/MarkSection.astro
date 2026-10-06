@@ -130,6 +130,32 @@ const privacyHref = `${localizePath('/privacy/', locale, LOCALES)}#marks`;
       });
       button.addEventListener('animationend', () => config.removeAttribute('data-n'));
     }
+    // Escape dismisses it wherever the focus is: a hover-opened tooltip has no focus inside it.
+    document.addEventListener('keydown', (event) => {
+      if (event.key !== 'Escape') return;
+      for (const tip of document.querySelectorAll('.mt')) {
+        if (!tip.matches(':hover, :focus-within, [data-t]')) continue;
+        tip.removeAttribute('data-t');
+        tip.setAttribute('data-x', '');
+      }
+    });
+    // Privacy tooltip: hover and keyboard focus are pure CSS; the script covers touch (a tap shows it
+    // for a few seconds, because `:hover` sticks on a touch screen) and Escape.
+    const touch = matchMedia('(hover: none)');
+    for (const { button } of views) {
+      const tip = button.closest('.mt');
+      if (!tip) continue;
+      let timer: ReturnType<typeof setTimeout> | undefined;
+      button.addEventListener('click', () => {
+        if (!touch.matches) return;
+        tip.setAttribute('data-t', '');
+        clearTimeout(timer);
+        timer = setTimeout(() => tip.removeAttribute('data-t'), 4000);
+      });
+      const allow = () => tip.removeAttribute('data-x');
+      tip.addEventListener('pointerleave', allow);
+      tip.addEventListener('focusout', allow);
+    }
     store.subscribe(render);
     void store.load();
   }

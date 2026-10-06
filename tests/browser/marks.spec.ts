@@ -386,3 +386,55 @@ for (const theme of ['elvinlab-dark', 'elvinlab-light']) {
     expect(describeViolations(violations)).toEqual([]);
   });
 }
+
+test.describe('privacy tooltip dismissal', () => {
+  test('a mouse click leaves the button focused but the tooltip closes once the pointer leaves', async ({
+    page,
+  }) => {
+    await mockMarks(page, { total: 12 });
+    await page.goto('/notes/smoke-es/');
+    await headerButton(page).click();
+    await expect(tooltipOf(header(page))).toBeVisible();
+    await page.mouse.move(0, 0);
+    await expect(headerButton(page)).toBeFocused();
+    await expect(tooltipOf(header(page))).toBeHidden();
+  });
+
+  test('Escape dismisses it and it comes back on the next hover', async ({ page }) => {
+    await mockMarks(page, { total: 12 });
+    await page.goto('/notes/smoke-es/');
+    await headerButton(page).hover();
+    await expect(tooltipOf(header(page))).toBeVisible();
+    await page.keyboard.press('Escape');
+    await expect(tooltipOf(header(page))).toBeHidden();
+    await page.mouse.move(0, 0);
+    await headerButton(page).hover();
+    await expect(tooltipOf(header(page))).toBeVisible();
+  });
+
+  test.describe('on a touch screen', () => {
+    test.use({ hasTouch: true, isMobile: true });
+
+    test('it shows after a tap and goes away by itself', async ({ page }) => {
+      await page.clock.install();
+      await mockMarks(page, { total: 12 });
+      await page.goto('/notes/smoke-es/');
+      await expect(headerButton(page)).toBeVisible();
+      await headerButton(page).tap();
+      await expect(tooltipOf(header(page))).toBeVisible();
+      await page.clock.fastForward(5000);
+      await expect(tooltipOf(header(page))).toBeHidden();
+    });
+
+    test('it is not shown just because the finger touched the button earlier', async ({ page }) => {
+      await page.clock.install();
+      await mockMarks(page, { total: 12 });
+      await page.goto('/notes/smoke-es/');
+      await headerButton(page).tap();
+      await page.clock.fastForward(5000);
+      await expect(tooltipOf(header(page))).toBeHidden();
+      await page.clock.fastForward(60_000);
+      await expect(tooltipOf(header(page))).toBeHidden();
+    });
+  });
+});

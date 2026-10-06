@@ -12,8 +12,11 @@
  * - `data-a` picks the animation: stamp (icon pressed from 1.8x with a ring), burst (8 pixels fly
  *   28 px with stepped easing), pulse (a soft ring). `.go` restarts the stamp on the icon.
  * - `data-n` is the first-visit nudge: two pink rings around the header button.
- * - `.mt` wraps a button and its privacy tooltip `.mx` (role=tooltip, `aria-describedby`), shown on hover
- *   and on focus within, with an invisible bridge so the pointer can reach the link inside. The
+ * - `.mt` wraps a button and its privacy tooltip `.mx` (role=tooltip, `aria-describedby`). It shows on
+ *   real hover (`hover:hover` only: on a touch screen `:hover` sticks after a tap), on keyboard focus
+ *   (`:focus-visible`, not the focus a mouse click leaves behind) and, on touch, for a few seconds
+ *   after a tap (`data-t`, cleared by the script); Escape hides it (`data-x`). An invisible bridge
+ *   lets the pointer reach the link inside. The
  *   header one opens upward: the banner is its own stacking context and the article paints over
  *   anything that hangs below it.
  * - The tooltip link has no transition (`!important` beats the global reduced-motion rule, which
@@ -36,7 +39,9 @@ export const MARKS_CSS =
   '.mk[data-v=h] .mx{top:auto;bottom:calc(100% + .5rem)}' +
   '.mk[data-v=h] .mx:before{inset:auto 0 -.6rem}' +
   '.mx a{color:var(--color-primary);border-bottom:1px dashed;transition:none!important}' +
-  '.mt:hover .mx,.mt:focus-within .mx{visibility:visible}' +
+  '@media(hover:hover){.mt:hover .mx{visibility:visible}}' +
+  '.mt:has(:focus-visible) .mx,.mt[data-t] .mx{visibility:visible}' +
+  '.mt[data-x] .mx{visibility:hidden}' +
   '.mi{width:14px;height:22px;color:var(--color-pink);fill:currentColor}' +
   '.mn{font:.75rem var(--font-mono);color:var(--color-text-secondary)}' +
   '.mf{position:absolute;top:50%;left:calc(1rem + 7px);width:0;height:0;pointer-events:none}' +
