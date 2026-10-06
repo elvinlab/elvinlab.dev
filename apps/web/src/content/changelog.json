@@ -429,7 +429,7 @@
     "date": "2026-10-06",
     "category": "fixed",
     "title": "Subscription form no longer waits forever",
-    "description": "The footer form now says when to tick the Turnstile box, times out after 25 s with a clear retry message, shows the error code, tells the per-minute limit from the daily one, and accepts a form filled after 1.5 s."
+    "description": "The footer form now says when to tick the Turnstile box, times out after 25 s with a clear retry message, shows the error code, tells the per-minute limit from the daily one, and accepts a form filled after 1.5 s. If it still fails, the message points to the Contact page."
   },
   "subscribe-pages-8bit": {
     "date": "2026-10-06",

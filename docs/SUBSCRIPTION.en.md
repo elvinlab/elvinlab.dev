@@ -178,7 +178,7 @@ The exact commands are in [recipe 6.14](CONFIGURATION.en.md#614-email-subscripti
 | No confirmation email | Resend domain not verified or wrong `SUBSCRIBE_FROM` | The Resend panel and the secret; also check spam |
 | The endpoint or command answers 401 | Wrong token | That the variable matches the Worker secret |
 | 429 | Rate limiter (3 per minute) | Wait a minute; the form shows "Too many attempts in a row" |
-| The form stays on "Verifying…" | An interactive Turnstile challenge the reader did not see, or an extension that blocks it | The form now says "Tick the box below" when the checkbox appears and, after 25 s without a token, asks to retry or turn off blockers |
+| The form stays on "Verifying…" | An interactive Turnstile challenge the reader did not see, or an extension that blocks it | The form now says "Tick the box below" when the checkbox appears and, after 25 s without a token, asks to retry or turn off blockers, and offers to write from the Contact page so the owner adds the person by hand |
 | An error with a code in parentheses, for example "(code 600010)" | The Turnstile error code | `110200`: domain not allowed for the site key (Turnstile widget settings). `600010`: the challenge failed or was blocked (extension, network, bot score) |
 | 503 on the endpoint | `SUBSCRIBE_ADMIN_TOKEN` is missing on the Worker, or a binding fails | `wrangler secret list` and the logs. With the flag off the route does not exist (404) |
 | 404 when sending | Draft or unpublished slug | Release the note and check the slug |

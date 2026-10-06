@@ -24,12 +24,13 @@ const FORM = {
   email: 'Dónde enviarte las notas',
   submit: 'Suscribirme',
   success: 'Revisa tu bandeja de entrada para confirmar la suscripción.',
-  error: 'No se pudo suscribir. Inténtalo más tarde.',
+  error:
+    'No se pudo suscribir. Inténtalo más tarde o escríbeme desde la página de Contacto y te agrego a mano.',
   capped: 'Hoy llegaron muchas solicitudes. Inténtalo de nuevo mañana.',
   rateLimited: 'Demasiados intentos seguidos. Espera un minuto y vuelve a intentarlo.',
   interactive: 'Marca la casilla de abajo para verificar que eres una persona.',
   timeout:
-    'No pudimos verificar que eres una persona. Revisa tu conexión o desactiva bloqueadores y vuelve a intentarlo.',
+    'No pudimos verificar que eres una persona. Revisa tu conexión o desactiva bloqueadores y vuelve a intentarlo, o escríbeme desde la página de Contacto y te agrego a mano.',
   verifying: 'Verificando…',
 };
 

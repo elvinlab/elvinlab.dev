@@ -134,13 +134,14 @@ export const t = createTranslator({
       'subscribe.sending': 'Enviando…',
       'subscribe.verifying': 'Verificando…',
       'subscribe.success': 'Revisa tu bandeja de entrada para confirmar la suscripción.',
-      'subscribe.error': 'No se pudo suscribir. Inténtalo más tarde.',
+      'subscribe.error':
+        'No se pudo suscribir. Inténtalo más tarde o escríbeme desde la página de Contacto y te agrego a mano.',
       'subscribe.capped': 'Hoy llegaron muchas solicitudes. Inténtalo de nuevo mañana.',
       'subscribe.rateLimited':
         'Demasiados intentos seguidos. Espera un minuto y vuelve a intentarlo.',
       'subscribe.interactive': 'Marca la casilla de abajo para verificar que eres una persona.',
       'subscribe.timeout':
-        'No pudimos verificar que eres una persona. Revisa tu conexión o desactiva bloqueadores y vuelve a intentarlo.',
+        'No pudimos verificar que eres una persona. Revisa tu conexión o desactiva bloqueadores y vuelve a intentarlo, o escríbeme desde la página de Contacto y te agrego a mano.',
       'subscribe.codeLabel': 'código',
       'subscribe.noscript':
         'Activa JavaScript para suscribirte por correo, o sigue las notas por RSS.',
@@ -319,12 +320,13 @@ export const t = createTranslator({
       'subscribe.sending': 'Sending…',
       'subscribe.verifying': 'Verifying…',
       'subscribe.success': 'Check your inbox to confirm your subscription.',
-      'subscribe.error': 'Unable to subscribe. Please try again later.',
+      'subscribe.error':
+        'Unable to subscribe. Please try again later, or write to me from the Contact page and I will add you by hand.',
       'subscribe.capped': 'Many requests came in today. Please try again tomorrow.',
       'subscribe.rateLimited': 'Too many attempts in a row. Wait a minute and try again.',
       'subscribe.interactive': 'Tick the box below to confirm you are a person.',
       'subscribe.timeout':
-        'We could not verify that you are a person. Check your connection or turn off blockers and try again.',
+        'We could not verify that you are a person. Check your connection or turn off blockers and try again, or write to me from the Contact page and I will add you by hand.',
       'subscribe.codeLabel': 'code',
       'subscribe.noscript':
         'Turn on JavaScript to subscribe by email, or follow the notes via RSS.',
