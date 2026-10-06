@@ -4,7 +4,9 @@
  * travels through the page CSS of other pages. Readable source of truth:
  *
  * - `.mk` is an instance: a wrapping row, 44 px tall at least. `data-v` is `h` (header, under the
- *   title) or `e` (end of the article, with a dashed divider once revealed). `data-r` means revealed.
+ *   title), `c` (the home sidebar card: like `h` without the top margin) or `e` (end of the article, with a dashed divider once revealed). `data-r` means revealed.
+ * - `[data-marks-card]` wraps a card instance (home): it stays out of the layout until the instance
+ *   is revealed, and the script removes the whole wrapper when the store is unavailable.
  * - `.mb` is the pill button: text color with a pink border and a pink icon (white on the dark-theme
  *   pink would miss AA). `.mi` is the 8-bit pink heart (an SVG `<use>`), `.mn` the count or hint.
  * - `.mf` is a zero-size effects box centered on the icon, `.mr` the ring, `.mp` one burst pixel;
@@ -36,8 +38,9 @@ export const MARKS_CSS =
   '.mt{position:relative;display:inline-flex}' +
   '.mx{position:absolute;left:0;top:calc(100% + .5rem);z-index:5;width:max-content;max-width:min(18rem,calc(100vw - 2rem));padding:.5rem .75rem;border:1px solid var(--color-divider);border-radius:var(--radius-inner);background:var(--color-card);color:var(--color-text-secondary);font:.8125rem/1.4 var(--font-mono);visibility:hidden}' +
   '.mx:before{content:"";position:absolute;inset:-.6rem 0 auto;height:.6rem}' +
-  '.mk[data-v=h] .mx{top:auto;bottom:calc(100% + .5rem)}' +
-  '.mk[data-v=h] .mx:before{inset:auto 0 -.6rem}' +
+  '[data-marks-card]:not(:has([data-r])){display:none}' +
+  '.mk[data-v=h] .mx,.mk[data-v=c] .mx{top:auto;bottom:calc(100% + .5rem)}' +
+  '.mk[data-v=h] .mx:before,.mk[data-v=c] .mx:before{inset:auto 0 -.6rem}' +
   '.mx a{color:var(--color-primary);border-bottom:1px dashed;transition:none!important}' +
   '@media(hover:hover){.mt:hover .mx{visibility:visible}}' +
   '.mt:has(:focus-visible) .mx,.mt[data-t] .mx{visibility:visible}' +

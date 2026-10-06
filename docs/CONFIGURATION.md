@@ -74,6 +74,7 @@ Las descripciones vienen del esquema (`.describe()`), por eso están en inglés.
 | `home.heroPills` | `boolean` | no |  | The three keyword pills under the hero intro (desktop only). |
 | `home.authorCard` | `boolean` | no |  | The sidebar author card: photo, name, bio and social buttons. |
 | `home.hiringCard` | `boolean` | no |  | The sidebar "Hiring?" recruiter card: availability and links to /me and the CV. |
+| `home.marks` | `boolean` | no |  | The sidebar footprint card (heart button with its own counter). It also needs the top-level `features.marks`: with that flag off it never shows. |
 | `home.now` | `boolean` | no |  | The sidebar "Now" card: what you are focused on, from the top-level `now` block. It also needs that block: without it the card never shows. |
 | `home.pillars` | `boolean` | no |  | The four pillars strip at the bottom of the home (desktop only). |
 | `home.notebookIndex` | `boolean` | no |  | The notebook index: compact rows for the notes after the latest one. |
@@ -338,7 +339,7 @@ Cada bandera de `features` apaga la función completa: no se genera la ruta, des
 
 **Banners y notas.** El mismo preset baja la altura de los banners (en `minimal`: 240 px en las páginas, portada expandida entre 360 y 460 px), hace que todos los banners se fundan con la página mediante un degradado de 120 px y, en las notas, deja en la cabecera solo la fecha y el tiempo de lectura (el idioma y el autor pasan al pie) con un registro de decisión más compacto. `full` conserva las alturas y la cabecera originales. Esos valores viven en `apps/web/src/styles/calm-layout.css`.
 
-`home` ajusta cada sección por separado y **siempre gana sobre el preset**: una clave que pones manda, una que omites sigue al preset. Claves: `heroPills`, `authorCard`, `hiringCard`, `now`, `pillars`, `notebookIndex` y `experiments` (esta además necesita `features.experiments`). Una sección apagada no renderiza nada (ni título ni hueco), y si se apagan las tres tarjetas de la barra lateral (`authorCard`, `hiringCard`, `now`) la columna lateral desaparece.
+`home` ajusta cada sección por separado y **siempre gana sobre el preset**: una clave que pones manda, una que omites sigue al preset. Claves: `heroPills`, `authorCard`, `hiringCard`, `marks`, `now`, `pillars`, `notebookIndex` y `experiments` (esta además necesita `features.experiments`). Una sección apagada no renderiza nada (ni título ni hueco), y si se apagan todas las tarjetas de la barra lateral (`authorCard`, `hiringCard`, `marks`, `now`) la columna lateral desaparece.
 
 ```ts
 // Aspecto calmado, sin la tarjeta de contratación y sin la tarjeta «Ahora».
@@ -412,7 +413,7 @@ Los textos de la interfaz están en `apps/web/src/shared/i18n/index.ts`. Añadir
 
 ### 6.13 Huellas en las notas (`marks`) y la base de datos del sitio
 
-Un botón anónimo de «estuve aquí» en cada nota (cabecera y final del artículo), con un contador por nota en Cloudflare D1. Los ajustes están en `site.config.ts`: `features.marks` (encendido o apagado) y el bloque `marks` (`animation`: `stamp`, `burst`, `pulse` o `none`; `maxPerVisitor`; `showCountFrom`; la tabla generada de la sección 3 lista los valores por defecto). Toda animación se detiene con `prefers-reduced-motion`. Registro de la decisión: [ADR 0013](adr/0013-footprints-on-notes-d1.md).
+Un botón anónimo de «estuve aquí» en cada nota (cabecera y final del artículo), con un contador por nota en Cloudflare D1. Los ajustes están en `site.config.ts`: `features.marks` (encendido o apagado) y el bloque `marks` (`animation`: `stamp`, `burst`, `pulse` o `none`; `maxPerVisitor`; `showCountFrom`; la tabla generada de la sección 3 lista los valores por defecto). Toda animación se detiene con `prefers-reduced-motion`. La página de inicio tiene su propia tarjeta de huella en la barra lateral, con su propio contador (la clave de página fija `home`, guardada en la misma tabla); el flag `home.marks` la enciende o apaga y además necesita `features.marks`. Registro de la decisión: [ADR 0013](adr/0013-footprints-on-notes-d1.md).
 
 **Una sola base de datos para todo el sitio.** La base es `elvinlab-dev-db`, enlazada como `SITE_DB`, y está pensada para alojar también funcionalidades futuras. Las reglas que la mantienen escalable:
 

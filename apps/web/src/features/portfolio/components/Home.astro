@@ -1,12 +1,13 @@
 ---
 /** The home page for one UI locale: hero banner, latest note, notebook index, experiments,
- * pillars, and a sidebar with the author card, the recruiter card and the Now card. Each of those
+ * pillars, and a sidebar with the author card, the recruiter card, the Now card and the footprint card. Each of those
  * sections follows `homeSections` (appearance preset plus `home` overrides) and renders nothing
  * when it is off; the sidebar column only exists while at least one of its cards is on. */
 import { getCollection } from 'astro:content';
 import pixelifySansLatin from '@fontsource-variable/pixelify-sans/files/pixelify-sans-latin-wght-normal.woff2?url';
 
 import { BackgroundCanvas } from '@/features/backgrounds/index.ts';
+import { MarkSection } from '@/features/marks/index.ts';
 import { hasPublishedNotes, sortNotes } from '@/features/notes/index.ts';
 import AuthorCard from '@/features/portfolio/components/AuthorCard.astro';
 import ExperimentsGrid from '@/features/portfolio/components/ExperimentsGrid.astro';
@@ -33,7 +34,8 @@ const hasNotes = hasPublishedNotes(notes);
 // The Now card needs both its switch and a `now` block in the config, so it can never leave an
 // empty sidebar column behind.
 const showNow = homeSections.now && site.now !== undefined;
-const hasSidebar = homeSections.authorCard || homeSections.hiringCard || showNow;
+const hasSidebar =
+  homeSections.authorCard || homeSections.hiringCard || showNow || homeSections.marks;
 
 const experiments = homeSections.experiments
   ? sortExperiments(await getCollection('experiments')).map((entry) => entry.data)
@@ -73,6 +75,11 @@ const experiments = homeSections.experiments
         {homeSections.authorCard && <AuthorCard locale={locale} />}
         {homeSections.hiringCard && <HiringCard locale={locale} />}
         {showNow && <NowCard locale={locale} />}
+        {homeSections.marks && (
+          <section data-marks-card class="rounded-card bg-card px-4 py-2">
+            <MarkSection slug="home" locale={locale} variant="card" />
+          </section>
+        )}
       </div>
     </Fragment>
   )}

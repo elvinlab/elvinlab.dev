@@ -364,5 +364,11 @@
     "category": "changed",
     "title": "8-bit look for the brand, footprint and favicon",
     "description": "The favicon is now a pixel terminal window in softer colors and also sits next to the wordmark; the footprint button gets a pink pixel heart whose animations advance in steps."
+  },
+  "home-footprint": {
+    "date": "2026-10-05",
+    "category": "added",
+    "title": "Footprint card on the home page",
+    "description": "The home page has its own anonymous footprint button and counter in the sidebar, switchable with the `home.marks` flag; the privacy page now says footprints cover each note and the home page."
   }
 }

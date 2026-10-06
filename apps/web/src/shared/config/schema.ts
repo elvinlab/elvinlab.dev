@@ -104,6 +104,12 @@ export const siteConfigSchema = z
           .describe(
             'The sidebar "Hiring?" recruiter card: availability and links to /me and the CV.',
           ),
+        marks: z
+          .boolean()
+          .optional()
+          .describe(
+            'The sidebar footprint card (heart button with its own counter). It also needs the top-level `features.marks`: with that flag off it never shows.',
+          ),
         now: z
           .boolean()
           .optional()

@@ -24,6 +24,7 @@ describe('mark button stylesheet', () => {
     // page is guarded by a Lighthouse LCP gate that is sensitive to a few hundred bytes.
     // Plus about 100 bytes for the tooltip dismissal rules (hover only on real hover devices, keyboard
     // focus only, a few seconds after a tap on touch, Escape).
-    expect(MARKS_CSS.length).toBeLessThan(3100);
+    // Plus about 100 bytes for the home card variant (`c`) and its wrapper rule.
+    expect(MARKS_CSS.length).toBeLessThan(3200);
   });
 });

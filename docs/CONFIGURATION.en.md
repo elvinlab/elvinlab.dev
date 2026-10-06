@@ -74,6 +74,7 @@ The descriptions come from the schema (`.describe()`), which is why they are in 
 | `home.heroPills` | `boolean` | no |  | The three keyword pills under the hero intro (desktop only). |
 | `home.authorCard` | `boolean` | no |  | The sidebar author card: photo, name, bio and social buttons. |
 | `home.hiringCard` | `boolean` | no |  | The sidebar "Hiring?" recruiter card: availability and links to /me and the CV. |
+| `home.marks` | `boolean` | no |  | The sidebar footprint card (heart button with its own counter). It also needs the top-level `features.marks`: with that flag off it never shows. |
 | `home.now` | `boolean` | no |  | The sidebar "Now" card: what you are focused on, from the top-level `now` block. It also needs that block: without it the card never shows. |
 | `home.pillars` | `boolean` | no |  | The four pillars strip at the bottom of the home (desktop only). |
 | `home.notebookIndex` | `boolean` | no |  | The notebook index: compact rows for the notes after the latest one. |
@@ -338,7 +339,7 @@ Each `features` flag switches the whole feature off: the route is not generated,
 
 **Banners and notes.** The same preset lowers the banner heights (in `minimal`: 240 px on pages, expanded home between 360 and 460 px), makes every banner blend into the page through a 120 px gradient and, on notes, keeps only the date and reading time in the header (language and author move to the foot) with a more compact decision record. `full` keeps the original heights and header. Those values live in `apps/web/src/styles/calm-layout.css`.
 
-`home` tunes each section on its own and **always wins over the preset**: a key you set rules, a key you omit follows the preset. Keys: `heroPills`, `authorCard`, `hiringCard`, `now`, `pillars`, `notebookIndex` and `experiments` (which also needs `features.experiments`). A section that is off renders nothing (no heading, no gap), and when all three sidebar cards (`authorCard`, `hiringCard`, `now`) are off the sidebar column disappears.
+`home` tunes each section on its own and **always wins over the preset**: a key you set rules, a key you omit follows the preset. Keys: `heroPills`, `authorCard`, `hiringCard`, `marks`, `now`, `pillars`, `notebookIndex` and `experiments` (which also needs `features.experiments`). A section that is off renders nothing (no heading, no gap), and when all the sidebar cards (`authorCard`, `hiringCard`, `marks`, `now`) are off the sidebar column disappears.
 
 ```ts
 // Calm look, without the hiring card and without the "Now" card.
@@ -412,7 +413,7 @@ UI texts are in `apps/web/src/shared/i18n/index.ts`. Adding a third language mea
 
 ### 6.13 Footprints on notes (`marks`) and the site database
 
-A one-tap, anonymous "I was here" button on every note (header and end of the article), with a per-note counter in Cloudflare D1. The settings are in `site.config.ts`: `features.marks` (on or off) and the `marks` block (`animation`: `stamp`, `burst`, `pulse` or `none`; `maxPerVisitor`; `showCountFrom`; the generated table in section 3 lists the defaults). Every animation stops under `prefers-reduced-motion`. Decision record: [ADR 0013](adr/0013-footprints-on-notes-d1.md).
+A one-tap, anonymous "I was here" button on every note (header and end of the article), with a per-note counter in Cloudflare D1. The settings are in `site.config.ts`: `features.marks` (on or off) and the `marks` block (`animation`: `stamp`, `burst`, `pulse` or `none`; `maxPerVisitor`; `showCountFrom`; the generated table in section 3 lists the defaults). Every animation stops under `prefers-reduced-motion`. The home page has its own footprint card in the sidebar, with its own counter (the fixed page key `home`, stored in the same table); the `home.marks` flag switches it on or off and it also needs `features.marks`. Decision record: [ADR 0013](adr/0013-footprints-on-notes-d1.md).
 
 **One database for the whole site.** The database is `elvinlab-dev-db`, bound as `SITE_DB`, and it is meant to host future features too. The rules that keep it scalable:
 

@@ -133,6 +133,11 @@ describe('buildPrivacyContent with marks', () => {
     expect(markBody(withMarks.en)).toMatch(/does not store|is not stored/i);
   });
 
+  it('says footprints cover each note and the home page', () => {
+    expect(markBody(withMarks.es)).toMatch(/cada nota y la página de inicio/i);
+    expect(markBody(withMarks.en)).toMatch(/each note and the home page/i);
+  });
+
   it('adds the per-note number to the local storage section only when the feature is on', () => {
     for (const locale of ['es', 'en'] as const) {
       expect(storageBody(withMarks[locale])).toMatch(/marks:/);

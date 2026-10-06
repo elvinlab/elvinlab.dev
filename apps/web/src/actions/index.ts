@@ -4,6 +4,7 @@ import { env } from 'cloudflare:workers';
 
 import { resolveClientIp, submitConfiguredContact } from '@/features/contact/index.ts';
 import {
+  buildCatalog,
   leaveConfiguredMarks,
   type MarksResult,
   type NoteCatalog,
@@ -20,10 +21,9 @@ function assertSameOrigin(request: Request, message: string): void {
   }
 }
 
-/** Only published notes may hold footprints, so nobody can create rows with made-up slugs. */
+/** Only published notes and the fixed page keys may hold footprints, so nobody can create rows with made-up slugs. */
 async function publishedNotes(): Promise<NoteCatalog> {
-  const ids = new Set((await getCollection('notes')).map((note) => note.id));
-  return { has: (slug) => ids.has(slug) };
+  return buildCatalog((await getCollection('notes')).map((note) => note.id));
 }
 
 /** Maps the outcome to Action errors; messages never carry internal details. */

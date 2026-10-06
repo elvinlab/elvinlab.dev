@@ -1,7 +1,8 @@
 ---
 /** The footprint button of a note, server-rendered as plain markup with one script and no island.
  * `header` sits under the title on the first screen and also emits the stylesheet, the icon sprite
- * and the strings; `end` closes the article. Both share one counter per note (`client/store.ts`).
+ * and the strings; `end` closes the article; `card` is the header markup without the top margin, for the home sidebar
+ * card (data-v `c`; its tooltip also opens upward). All share one counter per note (`client/store.ts`).
  * Renders nothing, CSS included, when `features.marks` is off. The script reveals the buttons once
  * the count is read and removes them when the store is unavailable. */
 import { localizePath } from '@elvinlab/core';
@@ -11,19 +12,20 @@ import { LOCALES, type Locale, t } from '@/shared/i18n/index.ts';
 
 import { MARKS_CSS } from './mark-styles.ts';
 
-type Props = { slug: string; locale: Locale; variant: 'header' | 'end' };
+type Props = { slug: string; locale: Locale; variant: 'header' | 'card' | 'end' };
 
 const { slug, locale, variant } = Astro.props;
 const enabled = isEnabled('marks');
+const tag = variant === 'card' ? 'c' : 'h';
 const { animation, maxPerVisitor, showCountFrom } = marksConfig;
 const privacyHref = `${localizePath('/privacy/', locale, LOCALES)}#marks`;
 ---
 
-{enabled && variant === 'header' && (
+{enabled && variant !== 'end' && (
   <>
     <style is:inline set:html={MARKS_CSS} />
     <svg width="0" height="0" style="position:absolute" aria-hidden="true"><symbol id="marks-footprint" viewBox="0 0 7 6"><path d="M1 0h2v1H1zM4 0h2v1H4zM0 1h7v2H0zM1 3h5v1H1zM2 4h3v1H2zM3 5h1v1H3z"></path></symbol></svg>
-    <div class="mk" data-marks data-v="h" data-a={animation} data-slug={slug} data-max={maxPerVisitor} data-from={showCountFrom} data-one={t(locale, 'marks.count.one')} data-many={t(locale, 'marks.count.many')} data-thanks={t(locale, 'marks.thanks')} data-cap={t(locale, 'marks.cap')} data-hint={t(locale, 'marks.hint')}><span class="mt"><button type="button" class="mb" aria-describedby="mx-h" hidden><svg class="mi" aria-hidden="true"><use href="#marks-footprint"></use></svg><span>{t(locale, 'marks.button')}</span></button><span role="tooltip" id="mx-h" class="mx">{t(locale, 'marks.privacy')} <a href={privacyHref}>{t(locale, 'privacy.note.link')}</a></span></span><span class="mn" hidden></span><p class="sr-only" role="status" aria-live="polite"></p></div>
+    <div class="mk" data-marks data-v={tag} data-a={animation} data-slug={slug} data-max={maxPerVisitor} data-from={showCountFrom} data-one={t(locale, 'marks.count.one')} data-many={t(locale, 'marks.count.many')} data-thanks={t(locale, 'marks.thanks')} data-cap={t(locale, 'marks.cap')} data-hint={t(locale, 'marks.hint')}><span class="mt"><button type="button" class="mb" aria-describedby={`mx-${tag}`} hidden><svg class="mi" aria-hidden="true"><use href="#marks-footprint"></use></svg><span>{t(locale, 'marks.button')}</span></button><span role="tooltip" id={`mx-${tag}`} class="mx">{t(locale, 'marks.privacy')} <a href={privacyHref}>{t(locale, 'privacy.note.link')}</a></span></span><span class="mn" hidden></span><p class="sr-only" role="status" aria-live="polite"></p></div>
   </>
 )}
 
@@ -98,7 +100,7 @@ const privacyHref = `${localizePath('/privacy/', locale, LOCALES)}#marks`;
     const render = () => {
       const state = store.getState();
       if (state.status === 'hidden') {
-        for (const { root } of views) root.remove();
+        for (const { root } of views) (root.closest('[data-marks-card]') ?? root).remove();
         return;
       }
       if (state.status !== 'ready') return;
