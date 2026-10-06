@@ -110,3 +110,6 @@ The owner opened the note email in Outlook and says it looks good. Email clients
 - `SUBSCRIBE_FROM` set to the English sender `Lab Notes <notes@elvinlab.dev>` (was the Spanish `notas@`); no release needed, new emails use it at once. Resend needs nothing new: the whole domain is verified.
 - Not verified: that a message sent to `notes@` really reaches the owner's inbox (to be tested by the owner from another account) and the SPF/DKIM/DMARC PASS lines of a received note email (Gmail "Show original").
 
+## Note 3 sent to the whole list, 2026-10-06 (owner-requested)
+Dry run first (4 confirmed Spanish subscribers had never received a note; pool 94), then `pnpm notify:note vibe-coding-o-especificar-primero --send`: sent to 4, 0 waiting. Counts only in the tracker, no addresses. This was the first send with the English sender `Lab Notes <notes@elvinlab.dev>`.
+
