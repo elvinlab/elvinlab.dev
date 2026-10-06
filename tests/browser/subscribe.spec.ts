@@ -301,3 +301,10 @@ for (const locale of ['es', 'en'] as const) {
     });
   }
 }
+
+test('the email field keeps a 44 px tap height on a phone', async ({ page }) => {
+  await page.setViewportSize({ width: 360, height: 780 });
+  await page.goto('/');
+  const box = await page.locator('#subscribe-email').boundingBox();
+  expect(box?.height).toBeGreaterThanOrEqual(44);
+});

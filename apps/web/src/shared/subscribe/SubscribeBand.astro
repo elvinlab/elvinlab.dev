@@ -39,15 +39,22 @@ const privacyHref = `${localizePath('/privacy/', locale, LOCALES)}#subscribe`;
     <form class="relative flex flex-col gap-2" novalidate>
       <label for="subscribe-email" class="text-sm font-medium text-text">{t(locale, 'subscribe.email')}</label>
       <div class="flex flex-col gap-3 sm:flex-row">
-        <input
-          id="subscribe-email"
-          name="email"
-          type="email"
-          required
-          autocomplete="email"
-          maxlength={SUBSCRIBE_CLIENT_POLICY.emailMaxLength}
-          class="h-11 min-w-0 flex-1 rounded-control border border-divider bg-bg px-3 text-text"
-        />
+        <div class="relative min-w-0 sm:flex-1">
+          <span aria-hidden="true" class="pointer-events-none absolute inset-y-0 left-3 grid place-items-center font-mono text-sm text-pink">&gt;</span>
+          <input
+            id="subscribe-email"
+            name="email"
+            type="email"
+            inputmode="email"
+            required
+            autocomplete="email"
+            autocapitalize="none"
+            spellcheck="false"
+            placeholder={t(locale, 'subscribe.placeholder')}
+            maxlength={SUBSCRIBE_CLIENT_POLICY.emailMaxLength}
+            class="h-11 w-full min-w-0 rounded-control border border-divider bg-page pr-3 pl-8 font-mono text-sm text-text placeholder:text-muted hover:border-primary/60 focus-visible:border-primary"
+          />
+        </div>
         <button type="submit" class="h-11 shrink-0 rounded-control bg-button px-5 font-medium text-white hover:bg-button/90 hover:translate-y-px active:translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-50 motion-reduce:transition-none">
           {t(locale, 'subscribe.submit')}
         </button>
