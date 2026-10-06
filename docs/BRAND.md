@@ -112,6 +112,7 @@ Inconsistencia a resolver: en modo claro el banner usa `#c9c3ee` como borde y la
 | Texto | Space Grotesk | 400, 500 | 16–18 px |
 | Mono (números de nota, prompts, código) | JetBrains Mono | 400, 600, 700 | 12–16 px; en el sitio no se usa para etiquetas en mayúsculas |
 | Display pixelado (titular del hero, títulos de sección) | Pixelify Sans | 600 (variable) | Según el preset `appearance`: `minimal` hero 32 px en teléfono y 44 px desde `md`, títulos de sección 20 px; `full` (el de este sitio desde 2026-10-02, escala reducida y aprobada ese día) hero 32 px en teléfono y 52 px desde `md`, títulos de sección 22 px |
+| Favicon | Terminal de Linux pixelada (ventana gris azulado con tres puntos, prompt `>` cian y cursor rosa), 16×16 píxeles, sin el violeta saturado | Pestaña del navegador (`favicon.svg` y `favicon.ico`) |
 | Firma retro | Press Start 2P | 400 | Wordmark del navbar, firma del footer y página 404 |
 
 Todas desde [Fontsource](https://fontsource.org), autoalojadas; nunca desde un CDN en tiempo de ejecución.
@@ -165,6 +166,7 @@ La identidad es "laboratorio de IA sobre fondo oscuro": pocos elementos, siempre
 | Borde con luz | Un tramo de gradiente recorre el borde de la tarjeta | Tarjetas destacadas (máx. una fila por página) |
 | Resplandor | Gradiente radial en una esquina | Tarjetas y hero; nunca sombras duras |
 | Prompt de terminal | `// comentario`, `>` y cursor rosa estático | Saludo y títulos técnicos; el acento es discreto y no parpadea |
+| Icono de marca | La terminal pixelada del favicon, 32 px en la barra y 16 px en el footer (cada celda de la cuadrícula de 16 mide un número entero de píxeles), junto al nombre | Barra de navegación y footer; estático en reposo (el parpadeo se descartó porque robaba el foco), y solo al pasar el cursor o enfocar se inclina unos grados; sin movimiento con `prefers-reduced-motion`. El corazón 8-bit rosa queda solo en el botón de huella, cuyas animaciones avanzan por pasos |
 | Firma retro | Abanico arriba y GIFs de los 90 al pie | Solo README de GitHub y footer del sitio |
 
 ### Sí

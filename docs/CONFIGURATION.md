@@ -74,6 +74,7 @@ Las descripciones vienen del esquema (`.describe()`), por eso están en inglés.
 | `home.heroPills` | `boolean` | no |  | The three keyword pills under the hero intro (desktop only). |
 | `home.authorCard` | `boolean` | no |  | The sidebar author card: photo, name, bio and social buttons. |
 | `home.hiringCard` | `boolean` | no |  | The sidebar "Hiring?" recruiter card: availability and links to /me and the CV. |
+| `home.marks` | `boolean` | no |  | The sidebar footprint card (heart button with its own counter). It also needs the top-level `features.marks`: with that flag off it never shows. |
 | `home.now` | `boolean` | no |  | The sidebar "Now" card: what you are focused on, from the top-level `now` block. It also needs that block: without it the card never shows. |
 | `home.pillars` | `boolean` | no |  | The four pillars strip at the bottom of the home (desktop only). |
 | `home.notebookIndex` | `boolean` | no |  | The notebook index: compact rows for the notes after the latest one. |
@@ -338,7 +339,7 @@ Cada bandera de `features` apaga la función completa: no se genera la ruta, des
 
 **Banners y notas.** El mismo preset baja la altura de los banners (en `minimal`: 240 px en las páginas, portada expandida entre 360 y 460 px), hace que todos los banners se fundan con la página mediante un degradado de 120 px y, en las notas, deja en la cabecera solo la fecha y el tiempo de lectura (el idioma y el autor pasan al pie) con un registro de decisión más compacto. `full` conserva las alturas y la cabecera originales. Esos valores viven en `apps/web/src/styles/calm-layout.css`.
 
-`home` ajusta cada sección por separado y **siempre gana sobre el preset**: una clave que pones manda, una que omites sigue al preset. Claves: `heroPills`, `authorCard`, `hiringCard`, `now`, `pillars`, `notebookIndex` y `experiments` (esta además necesita `features.experiments`). Una sección apagada no renderiza nada (ni título ni hueco), y si se apagan las tres tarjetas de la barra lateral (`authorCard`, `hiringCard`, `now`) la columna lateral desaparece.
+`home` ajusta cada sección por separado y **siempre gana sobre el preset**: una clave que pones manda, una que omites sigue al preset. Claves: `heroPills`, `authorCard`, `hiringCard`, `marks`, `now`, `pillars`, `notebookIndex` y `experiments` (esta además necesita `features.experiments`). Una sección apagada no renderiza nada (ni título ni hueco), y si se apagan todas las tarjetas de la barra lateral (`authorCard`, `hiringCard`, `marks`, `now`) la columna lateral desaparece.
 
 ```ts
 // Aspecto calmado, sin la tarjeta de contratación y sin la tarjeta «Ahora».
@@ -412,7 +413,7 @@ Los textos de la interfaz están en `apps/web/src/shared/i18n/index.ts`. Añadir
 
 ### 6.13 Huellas en las notas (`marks`) y la base de datos del sitio
 
-Un botón anónimo de «estuve aquí» en cada nota (cabecera y final del artículo), con un contador por nota en Cloudflare D1. Los ajustes están en `site.config.ts`: `features.marks` (encendido o apagado) y el bloque `marks` (`animation`: `stamp`, `burst`, `pulse` o `none`; `maxPerVisitor`; `showCountFrom`; la tabla generada de la sección 3 lista los valores por defecto). Toda animación se detiene con `prefers-reduced-motion`. Registro de la decisión: [ADR 0013](adr/0013-footprints-on-notes-d1.md).
+Un botón anónimo de «estuve aquí» en cada nota (cabecera y final del artículo), con un contador por nota en Cloudflare D1. Los ajustes están en `site.config.ts`: `features.marks` (encendido o apagado) y el bloque `marks` (`animation`: `stamp`, `burst`, `pulse` o `none`; `maxPerVisitor`; `showCountFrom`; la tabla generada de la sección 3 lista los valores por defecto). Toda animación se detiene con `prefers-reduced-motion`. La página de inicio tiene su propia tarjeta de huella en la barra lateral, con su propio contador (la clave de página fija `home`, guardada en la misma tabla); el flag `home.marks` la enciende o apaga y además necesita `features.marks`. Registro de la decisión: [ADR 0013](adr/0013-footprints-on-notes-d1.md).
 
 **Una sola base de datos para todo el sitio.** La base es `elvinlab-dev-db`, enlazada como `SITE_DB`, y está pensada para alojar también funcionalidades futuras. Las reglas que la mantienen escalable:
 
@@ -432,7 +433,7 @@ Un botón anónimo de «estuve aquí» en cada nota (cabecera y final del artíc
    ```
    (`MARKS_RATE_LIMITER`, el límite por IP, ya está declarado en `ratelimits`.)
 3. Creá las tablas en la base real: `mise exec -- pnpm exec wrangler d1 migrations apply elvinlab-dev-db --remote` (hoy aplica `apps/web/migrations/0001_note_footprints.sql`).
-4. Liberá como siempre (sección 7). Si el deploy falla con un error de autorización, puede que el token de API del entorno `production` de GitHub no tenga permiso para desplegar un Worker con un binding D1: agregale el permiso de edición de D1. *Esto no se verificó.*
+4. Liberá como siempre (sección 7). Si el deploy falla con un error de autorización, puede que el token de API del entorno `production` de GitHub no tenga permiso para desplegar un Worker con un binding D1: agregale el permiso de edición de D1. *Comprobado en elvinlab.dev el 2026-10-05: el token de despliegue existente desplegó el Worker con el binding D1 sin ningún permiso adicional.*
 5. Comprobalo: abrí una nota, pulsá el botón y recargá (el contador se mantiene), o `curl -s -X POST https://TU-DOMINIO/_actions/marks.get/ -H 'content-type: application/json' -H 'origin: https://TU-DOMINIO' -d '{"slug":"<slug de una nota publicada>"}'`, que responde con el total.
 
 Para apagarlo, poné `features.marks: false`: no llega a la página ni HTML, ni CSS ni script. Para usar otra base (por ejemplo Turso), escribí un adaptador para el puerto `MarkStore` de `apps/web/src/features/marks/ports.ts`, junto a `adapters/d1.ts`.

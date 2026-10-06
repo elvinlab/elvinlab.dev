@@ -2,9 +2,13 @@ import { describe, expect, it } from 'vitest';
 
 import { type HomeConfig, resolveHome } from './appearance.ts';
 
-const base = { features: { experiments: true } };
-const resolve = (appearance: 'minimal' | 'full', home: HomeConfig = {}, experiments = true) =>
-  resolveHome({ appearance, home, features: { experiments } });
+const base = { features: { experiments: true, marks: true } };
+const resolve = (
+  appearance: 'minimal' | 'full',
+  home: HomeConfig = {},
+  experiments = true,
+  marks = true,
+) => resolveHome({ appearance, home, features: { experiments, marks } });
 
 describe('resolveHome', () => {
   it('minimal turns the hero pills and the pillars off and keeps the rest (the Now card stays on)', () => {
@@ -12,6 +16,7 @@ describe('resolveHome', () => {
       heroPills: false,
       authorCard: true,
       hiringCard: true,
+      marks: true,
       now: true,
       pillars: false,
       notebookIndex: true,
@@ -24,6 +29,7 @@ describe('resolveHome', () => {
       heroPills: true,
       authorCard: true,
       hiringCard: true,
+      marks: true,
       now: true,
       pillars: true,
       notebookIndex: true,
@@ -35,6 +41,7 @@ describe('resolveHome', () => {
     'heroPills',
     'authorCard',
     'hiringCard',
+    'marks',
     'now',
     'pillars',
     'notebookIndex',
@@ -64,6 +71,12 @@ describe('resolveHome', () => {
     expect(resolve('full', {}, false).experiments).toBe(false);
     expect(resolve('minimal', { experiments: true }, false).experiments).toBe(false);
     expect(resolve('minimal', { experiments: true }, true).experiments).toBe(true);
+  });
+
+  it('marks also needs features.marks, even when the home asks for it', () => {
+    expect(resolve('full', {}, true, false).marks).toBe(false);
+    expect(resolve('minimal', { marks: true }, true, false).marks).toBe(false);
+    expect(resolve('minimal', { marks: true }, true, true).marks).toBe(true);
   });
 
   it('reads only the config it is given', () => {

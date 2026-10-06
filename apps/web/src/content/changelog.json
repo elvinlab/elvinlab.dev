@@ -358,5 +358,47 @@
     "category": "added",
     "title": "A small privacy note where it matters",
     "description": "Next to the comments, a one-line reminder that your GitHub login and data are not used for anything else on this site; on the footprint button, a discreet hover or focus note that nothing identifying is stored. Both link to the matching section of the privacy page."
+  },
+  "pixel-brand-icons": {
+    "date": "2026-10-05",
+    "category": "changed",
+    "title": "8-bit look for the brand, footprint and favicon",
+    "description": "The favicon is now a pixel terminal window in softer colors and also sits next to the wordmark; the footprint button gets a pink pixel heart whose animations advance in steps."
+  },
+  "home-footprint": {
+    "date": "2026-10-05",
+    "category": "added",
+    "title": "Footprint card on the home page",
+    "description": "The home page has its own anonymous footprint button and counter in the sidebar, switchable with the `home.marks` flag; the privacy page now says footprints cover each note and the home page."
+  },
+  "footprint-heartbeat": {
+    "date": "2026-10-05",
+    "category": "added",
+    "title": "Footprint heart beats on hover, focus and first view",
+    "description": "The pixel heart beats twice in two steps on hover or keyboard focus and once when the button first scrolls into view; it never loops and stays still under reduced motion."
+  },
+  "verification-faster": {
+    "date": "2026-10-05",
+    "category": "changed",
+    "title": "Faster verification, locally and in CI",
+    "description": "The local check runner audits Lighthouse once per page, narrows layout-only changes, and runs all browser specs in one pass; CI caches its downloads and splits the browser tests in three. No threshold or assertion changed."
+  },
+  "marks-tooltip-dismiss": {
+    "date": "2026-10-05",
+    "category": "fixed",
+    "title": "Privacy tooltip closes on its own",
+    "description": "The footprint privacy tooltip now hides when the mouse leaves, after a few seconds on touch screens, and with Escape."
+  },
+  "pnpm-verify": {
+    "date": "2026-10-05",
+    "category": "added",
+    "title": "pnpm verify plans only the checks a change touches",
+    "description": "A new command lists, runs and records just the checks affected by the uncommitted work, with a registry of what last passed."
+  },
+  "phone-hero-and-marks-copy": {
+    "date": "2026-10-05",
+    "category": "fixed",
+    "title": "Hero text clear of the expand button, shorter footprint copy",
+    "description": "On phones the last hero line no longer sits under the expand button, and the footprint cap message and privacy tooltip are shorter."
   }
 }

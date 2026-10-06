@@ -28,49 +28,123 @@ jobs:
     name: static
     runs-on: ubuntu-latest
     steps:
+      - name: Record job start
+        run: echo "JOB_START=$(date +%s)" >> "$GITHUB_ENV"
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - uses: jdx/mise-action@7a4e45a543138629540c9a1616d08632b893e492 # v5.0.1
+      - name: Resolve the pnpm store path
+        id: pnpm-store
+        run: echo "path=$(pnpm store path --silent)" >> "$GITHUB_OUTPUT"
+      - name: Cache the pnpm store
+        uses: actions/cache@caa296126883cff596d87d8935842f9db880ef25 # v5.1.0
+        with:
+          path: ${{ steps.pnpm-store.outputs.path }}
+          key: pnpm-store-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml') }}
+          restore-keys: pnpm-store-${{ runner.os }}-
       - run: pnpm install --frozen-lockfile
       - run: pnpm lint
       - run: pnpm depcruise
       - run: pnpm typecheck
       - run: pnpm test
+      - name: Job duration
+        if: always()
+        run: |
+          echo "static: $(( $(date +%s) - JOB_START ))s" >> "$GITHUB_STEP_SUMMARY"
 
+  # Sharded: Playwright splits the tests across 3 runners (`--shard=N/3`), so the slowest gate is a
+  # third of the suite. Every shard builds and checks the JS budget (cheap); the steps that only
+  # inspect the build (white-label, version.txt, image optimization) run in shard 1 only. `checks`
+  # needs this whole matrix, so it still passes only if every shard does.
   e2e:
     name: e2e
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: [1, 2, 3]
     steps:
+      - name: Record job start
+        run: echo "JOB_START=$(date +%s)" >> "$GITHUB_ENV"
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - uses: jdx/mise-action@7a4e45a543138629540c9a1616d08632b893e492 # v5.0.1
+      - name: Resolve the pnpm store path
+        id: pnpm-store
+        run: echo "path=$(pnpm store path --silent)" >> "$GITHUB_OUTPUT"
+      - name: Cache the pnpm store
+        uses: actions/cache@caa296126883cff596d87d8935842f9db880ef25 # v5.1.0
+        with:
+          path: ${{ steps.pnpm-store.outputs.path }}
+          key: pnpm-store-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml') }}
+          restore-keys: pnpm-store-${{ runner.os }}-
       - run: pnpm install --frozen-lockfile
+      - name: Resolve the Playwright version
+        id: playwright
+        run: echo "version=$(pnpm exec playwright --version | awk '{print $2}')" >> "$GITHUB_OUTPUT"
+      - name: Cache Playwright browsers
+        uses: actions/cache@caa296126883cff596d87d8935842f9db880ef25 # v5.1.0
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-${{ runner.os }}-${{ steps.playwright.outputs.version }}
       - run: pnpm --filter web build
       - name: Check production JavaScript gzip budget
         run: pnpm check:js-budget
       - name: Install Chromium for browser checks
         run: pnpm exec playwright install --with-deps chromium
-      - run: pnpm test:e2e
-      - run: pnpm test:white-label
+      - run: pnpm test:e2e --shard=${{ matrix.shard }}/3
+      - name: White-label build (once)
+        if: matrix.shard == 1
+        run: pnpm test:white-label
       - name: Write version.txt with commit SHA
+        if: matrix.shard == 1
         run: echo "${GITHUB_SHA}" > apps/web/dist/client/version.txt
       - name: Assert build-time image optimization
+        if: matrix.shard == 1
         run: |
           # Only meaningful once the site ships raster images (note covers, screenshots).
           sources="$(find apps/web/src -type f \( -iname '*.png' -o -iname '*.jpg' -o -iname '*.jpeg' \) | wc -l)"
           webp="$(find apps/web/dist/client/_astro -name '*.webp' | wc -l)"
           echo "source raster images: $sources | optimized WebP: $webp"
           if [ "$sources" -gt 0 ]; then test "$webp" -gt 0; else echo "No raster sources yet; skipping."; fi
+      - name: Job duration
+        if: always()
+        run: |
+          echo "e2e (shard ${{ matrix.shard }}/3): $(( $(date +%s) - JOB_START ))s" >> "$GITHUB_STEP_SUMMARY"
 
   lighthouse:
     name: lighthouse
     runs-on: ubuntu-latest
     steps:
+      - name: Record job start
+        run: echo "JOB_START=$(date +%s)" >> "$GITHUB_ENV"
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - uses: jdx/mise-action@7a4e45a543138629540c9a1616d08632b893e492 # v5.0.1
+      - name: Resolve the pnpm store path
+        id: pnpm-store
+        run: echo "path=$(pnpm store path --silent)" >> "$GITHUB_OUTPUT"
+      - name: Cache the pnpm store
+        uses: actions/cache@caa296126883cff596d87d8935842f9db880ef25 # v5.1.0
+        with:
+          path: ${{ steps.pnpm-store.outputs.path }}
+          key: pnpm-store-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml') }}
+          restore-keys: pnpm-store-${{ runner.os }}-
       - run: pnpm install --frozen-lockfile
+      - name: Resolve the Playwright version
+        id: playwright
+        run: echo "version=$(pnpm exec playwright --version | awk '{print $2}')" >> "$GITHUB_OUTPUT"
+      - name: Cache Playwright browsers
+        uses: actions/cache@caa296126883cff596d87d8935842f9db880ef25 # v5.1.0
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-${{ runner.os }}-${{ steps.playwright.outputs.version }}
       - name: Install Chromium for Lighthouse
         run: pnpm exec playwright install --with-deps chromium
       - name: Check mobile Lighthouse budgets
         run: pnpm test:lighthouse
+
+      - name: Job duration
+        if: always()
+        run: |
+          echo "lighthouse: $(( $(date +%s) - JOB_START ))s" >> "$GITHUB_STEP_SUMMARY"
 
   # Stable aggregate: the ruleset requires a status named `checks`, so the name is kept.
   checks:
@@ -79,6 +153,8 @@ jobs:
     if: always()
     runs-on: ubuntu-latest
     steps:
+      - name: Record job start
+        run: echo "JOB_START=$(date +%s)" >> "$GITHUB_ENV"
       - name: Every gate passed or was intentionally skipped
         env:
           RESULTS: ${{ join(needs.*.result, ' ') }}
@@ -87,6 +163,10 @@ jobs:
           case " $RESULTS " in
             *" failure "* | *" cancelled "*) exit 1 ;;
           esac
+      - name: Job duration
+        if: always()
+        run: |
+          echo "checks: $(( $(date +%s) - JOB_START ))s" >> "$GITHUB_STEP_SUMMARY"
 
   deploy:
     name: deploy
@@ -99,8 +179,19 @@ jobs:
       name: production
       url: https://${{ env.PRODUCTION_WORKER }}.${{ env.WORKERS_SUBDOMAIN }}.workers.dev
     steps:
+      - name: Record job start
+        run: echo "JOB_START=$(date +%s)" >> "$GITHUB_ENV"
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - uses: jdx/mise-action@7a4e45a543138629540c9a1616d08632b893e492 # v5.0.1
+      - name: Resolve the pnpm store path
+        id: pnpm-store
+        run: echo "path=$(pnpm store path --silent)" >> "$GITHUB_OUTPUT"
+      - name: Cache the pnpm store
+        uses: actions/cache@caa296126883cff596d87d8935842f9db880ef25 # v5.1.0
+        with:
+          path: ${{ steps.pnpm-store.outputs.path }}
+          key: pnpm-store-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml') }}
+          restore-keys: pnpm-store-${{ runner.os }}-
       - run: pnpm install --frozen-lockfile
       - run: pnpm --filter web build
         env:
@@ -128,3 +219,8 @@ jobs:
             pnpm exec wrangler rollback --name "$PRODUCTION_WORKER" --message "Automatic rollback: smoke check failed for ${GITHUB_SHA::7}"
             exit 1
           fi
+      - name: Job duration
+        if: always()
+        run: |
+          echo "deploy: $(( $(date +%s) - JOB_START ))s" >> "$GITHUB_STEP_SUMMARY"
+

@@ -15,7 +15,7 @@ const NOTES = [
     button: 'Dejé mi huella',
     many: (n: number) => `${n} huellas`,
     hint: 'Sé de los primeros en dejar tu huella',
-    cap: 'Ya dejaste todas las huellas que caben aquí. ¡Gracias!',
+    cap: '¡Gracias por tus huellas!',
     invite: '¿Te gustó? Deja tu huella',
   },
   {
@@ -24,7 +24,7 @@ const NOTES = [
     button: 'I was here',
     many: (n: number) => `${n} marks`,
     hint: 'Be among the first to leave your mark',
-    cap: 'You have left all the marks that fit here. Thank you!',
+    cap: 'Thanks for your marks!',
     invite: 'Enjoyed it? Leave your mark',
   },
 ] as const;
@@ -290,12 +290,12 @@ for (const theme of ['elvinlab-dark', 'elvinlab-light']) {
 const PRIVACY_TIPS = [
   {
     path: '/notes/smoke-es/',
-    text: 'Anónimo: no guardamos tu IP ni datos tuyos.',
+    text: 'Anónimo: sin guardar tu IP ni datos.',
     href: '/privacy/#marks',
   },
   {
     path: '/en/notes/smoke-en/',
-    text: 'Anonymous: your IP and personal data are not stored.',
+    text: 'Anonymous: no IP or data stored.',
     href: '/en/privacy/#marks',
   },
 ] as const;
@@ -386,3 +386,87 @@ for (const theme of ['elvinlab-dark', 'elvinlab-light']) {
     expect(describeViolations(violations)).toEqual([]);
   });
 }
+
+test.describe('privacy tooltip dismissal', () => {
+  test('a mouse click leaves the button focused but the tooltip closes once the pointer leaves', async ({
+    page,
+  }) => {
+    await mockMarks(page, { total: 12 });
+    await page.goto('/notes/smoke-es/');
+    await headerButton(page).click();
+    await expect(tooltipOf(header(page))).toBeVisible();
+    await page.mouse.move(0, 0);
+    await expect(headerButton(page)).toBeFocused();
+    await expect(tooltipOf(header(page))).toBeHidden();
+  });
+
+  test('Escape dismisses it and it comes back on the next hover', async ({ page }) => {
+    await mockMarks(page, { total: 12 });
+    await page.goto('/notes/smoke-es/');
+    await headerButton(page).hover();
+    await expect(tooltipOf(header(page))).toBeVisible();
+    await page.keyboard.press('Escape');
+    await expect(tooltipOf(header(page))).toBeHidden();
+    await page.mouse.move(0, 0);
+    await headerButton(page).hover();
+    await expect(tooltipOf(header(page))).toBeVisible();
+  });
+
+  test.describe('on a touch screen', () => {
+    test.use({ hasTouch: true, isMobile: true });
+
+    test('it shows after a tap and goes away by itself', async ({ page }) => {
+      await page.clock.install();
+      await mockMarks(page, { total: 12 });
+      await page.goto('/notes/smoke-es/');
+      await expect(headerButton(page)).toBeVisible();
+      await headerButton(page).tap();
+      await expect(tooltipOf(header(page))).toBeVisible();
+      await page.clock.fastForward(5000);
+      await expect(tooltipOf(header(page))).toBeHidden();
+    });
+
+    test('it is not shown just because the finger touched the button earlier', async ({ page }) => {
+      await page.clock.install();
+      await mockMarks(page, { total: 12 });
+      await page.goto('/notes/smoke-es/');
+      await headerButton(page).tap();
+      await page.clock.fastForward(5000);
+      await expect(tooltipOf(header(page))).toBeHidden();
+      await page.clock.fastForward(60_000);
+      await expect(tooltipOf(header(page))).toBeHidden();
+    });
+  });
+});
+
+test.describe('heartbeat', () => {
+  const beat = (icon: Locator) => icon.evaluate((el) => getComputedStyle(el).animationName);
+
+  test('beats once when the button first scrolls into view and never loops', async ({ page }) => {
+    await page.emulateMedia({ reducedMotion: 'no-preference' });
+    await mockMarks(page);
+    await page.goto(NOTES[0]?.path ?? '/');
+    const icon = page.locator('.mb:visible .mi').first();
+    await expect.poll(() => beat(icon)).toBe('marks-beat');
+    // The class is removed after the beat: it plays once, not on a loop.
+    await expect.poll(() => beat(icon), { timeout: 3000 }).toBe('none');
+  });
+
+  test('beats on hover and on keyboard focus', async ({ page }) => {
+    await page.emulateMedia({ reducedMotion: 'no-preference' });
+    await mockMarks(page);
+    await page.goto(NOTES[0]?.path ?? '/');
+    const button = page.locator('.mb:visible').first();
+    const icon = button.locator('.mi');
+    await expect.poll(() => beat(icon), { timeout: 3000 }).toBe('none');
+    await button.hover();
+    await expect.poll(() => beat(icon)).toBe('marks-beat');
+    await page.mouse.move(0, 0);
+    await expect.poll(() => beat(icon), { timeout: 3000 }).toBe('none');
+    await page.keyboard.press('Tab');
+    await button.focus();
+    await page.keyboard.press('Shift+Tab');
+    await page.keyboard.press('Tab');
+    await expect.poll(() => beat(icon)).toBe('marks-beat');
+  });
+});

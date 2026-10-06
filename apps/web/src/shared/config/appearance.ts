@@ -18,6 +18,7 @@ const HOME_PRESETS: Record<Appearance, ResolvedHome> = {
     heroPills: false,
     authorCard: true,
     hiringCard: true,
+    marks: true,
     now: true,
     pillars: false,
     notebookIndex: true,
@@ -27,6 +28,7 @@ const HOME_PRESETS: Record<Appearance, ResolvedHome> = {
     heroPills: true,
     authorCard: true,
     hiringCard: true,
+    marks: true,
     now: true,
     pillars: true,
     notebookIndex: true,
@@ -36,16 +38,19 @@ const HOME_PRESETS: Record<Appearance, ResolvedHome> = {
 
 /**
  * Resolves which home sections render: the preset picks the defaults and each `home` key wins over
- * it. The experiments section also needs the `experiments` feature flag, so a section whose pages
+ * it. The experiments and marks sections also need their feature flags, so a section whose pages
  * do not exist is never shown. Pages and components read this result and never test the preset.
  */
 export function resolveHome(
-  config: Pick<SiteConfig, 'appearance' | 'home'> & { features: { experiments: boolean } },
+  config: Pick<SiteConfig, 'appearance' | 'home'> & {
+    features: { experiments: boolean; marks: boolean };
+  },
 ): ResolvedHome {
   const resolved = { ...HOME_PRESETS[config.appearance] };
   for (const section of Object.keys(resolved) as HomeSection[]) {
     resolved[section] = config.home[section] ?? resolved[section];
   }
   resolved.experiments &&= config.features.experiments;
+  resolved.marks &&= config.features.marks;
   return resolved;
 }

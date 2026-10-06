@@ -53,6 +53,17 @@ test('regression: cycling many times never loses the WebGL context (one context 
   });
   page.on('pageerror', (error) => messages.push(error.message));
 
+  // The home footprint card reads its counter; the test fixture has no database, so answer it here
+  // and keep this test about the background only.
+  await page.route(
+    (url) => url.pathname.includes('/_actions/marks.'),
+    (route) =>
+      route.fulfill({
+        status: 200,
+        contentType: 'application/json+devalue',
+        body: JSON.stringify([{ total: 1 }, 0]),
+      }),
+  );
   await page.goto('/');
   const picker = page.getByRole('button', { name: /cambiar fondo|change background/i });
   for (let i = 0; i < 20; i++) {

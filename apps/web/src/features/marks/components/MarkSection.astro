@@ -1,7 +1,8 @@
 ---
 /** The footprint button of a note, server-rendered as plain markup with one script and no island.
  * `header` sits under the title on the first screen and also emits the stylesheet, the icon sprite
- * and the strings; `end` closes the article. Both share one counter per note (`client/store.ts`).
+ * and the strings; `end` closes the article; `card` is the header markup without the top margin, for the home sidebar
+ * card (data-v `c`; its tooltip also opens upward). All share one counter per note (`client/store.ts`).
  * Renders nothing, CSS included, when `features.marks` is off. The script reveals the buttons once
  * the count is read and removes them when the store is unavailable. */
 import { localizePath } from '@elvinlab/core';
@@ -11,19 +12,20 @@ import { LOCALES, type Locale, t } from '@/shared/i18n/index.ts';
 
 import { MARKS_CSS } from './mark-styles.ts';
 
-type Props = { slug: string; locale: Locale; variant: 'header' | 'end' };
+type Props = { slug: string; locale: Locale; variant: 'header' | 'card' | 'end' };
 
 const { slug, locale, variant } = Astro.props;
 const enabled = isEnabled('marks');
+const tag = variant === 'card' ? 'c' : 'h';
 const { animation, maxPerVisitor, showCountFrom } = marksConfig;
 const privacyHref = `${localizePath('/privacy/', locale, LOCALES)}#marks`;
 ---
 
-{enabled && variant === 'header' && (
+{enabled && variant !== 'end' && (
   <>
     <style is:inline set:html={MARKS_CSS} />
-    <svg width="0" height="0" style="position:absolute" aria-hidden="true"><symbol id="marks-footprint" viewBox="0 0 7 11"><path d="M1 0h2v2H1zM4 1h1v1H4zM6 2h1v1H6zM0 3h7v3H0zM1 6h4v2H1zM1 9h4v2H1z"></path></symbol></svg>
-    <div class="mk" data-marks data-v="h" data-a={animation} data-slug={slug} data-max={maxPerVisitor} data-from={showCountFrom} data-one={t(locale, 'marks.count.one')} data-many={t(locale, 'marks.count.many')} data-thanks={t(locale, 'marks.thanks')} data-cap={t(locale, 'marks.cap')} data-hint={t(locale, 'marks.hint')}><span class="mt"><button type="button" class="mb" aria-describedby="mx-h" hidden><svg class="mi" aria-hidden="true"><use href="#marks-footprint"></use></svg><span>{t(locale, 'marks.button')}</span></button><span role="tooltip" id="mx-h" class="mx">{t(locale, 'marks.privacy')} <a href={privacyHref}>{t(locale, 'privacy.note.link')}</a></span></span><span class="mn" hidden></span><p class="sr-only" role="status" aria-live="polite"></p></div>
+    <svg width="0" height="0" style="position:absolute" aria-hidden="true"><symbol id="marks-footprint" viewBox="0 0 7 6"><path d="M1 0h2v1H1zM4 0h2v1H4zM0 1h7v2H0zM1 3h5v1H1zM2 4h3v1H2zM3 5h1v1H3z"></path></symbol></svg>
+    <div class="mk" data-marks data-v={tag} data-a={animation} data-slug={slug} data-max={maxPerVisitor} data-from={showCountFrom} data-one={t(locale, 'marks.count.one')} data-many={t(locale, 'marks.count.many')} data-thanks={t(locale, 'marks.thanks')} data-cap={t(locale, 'marks.cap')} data-hint={t(locale, 'marks.hint')}><span class="mt"><button type="button" class="mb" aria-describedby={`mx-${tag}`} hidden><svg class="mi" aria-hidden="true"><use href="#marks-footprint"></use></svg><span>{t(locale, 'marks.button')}</span></button><span role="tooltip" id={`mx-${tag}`} class="mx">{t(locale, 'marks.privacy')} <a href={privacyHref}>{t(locale, 'privacy.note.link')}</a></span></span><span class="mn" hidden></span><p class="sr-only" role="status" aria-live="polite"></p></div>
   </>
 )}
 
@@ -98,7 +100,7 @@ const privacyHref = `${localizePath('/privacy/', locale, LOCALES)}#marks`;
     const render = () => {
       const state = store.getState();
       if (state.status === 'hidden') {
-        for (const { root } of views) root.remove();
+        for (const { root } of views) (root.closest('[data-marks-card]') ?? root).remove();
         return;
       }
       if (state.status !== 'ready') return;
@@ -122,13 +124,55 @@ const privacyHref = `${localizePath('/privacy/', locale, LOCALES)}#marks`;
       }
     };
 
+    // One heartbeat the first time each button scrolls into view; never a loop.
+    if ('IntersectionObserver' in window) {
+      const beat = new IntersectionObserver((entries) => {
+        for (const entry of entries) {
+          if (!entry.isIntersecting) continue;
+          beat.unobserve(entry.target);
+          const icon = entry.target.querySelector('.mi');
+          icon?.classList.add('bt');
+          setTimeout(() => icon?.classList.remove('bt'), 700);
+        }
+      });
+      for (const { button } of views) beat.observe(button);
+    }
     for (const { button } of views) {
       button.addEventListener('click', () => {
         if (store.tap() === 'ignored') return;
         config.removeAttribute('data-n');
         play(button);
       });
-      button.addEventListener('animationend', () => config.removeAttribute('data-n'));
+      button.addEventListener('animationend', (event) => {
+        // Only the nudge ring (on the button itself); the heart's own animations bubble up too.
+        if (event.target === button) config.removeAttribute('data-n');
+      });
+    }
+    // Escape dismisses it wherever the focus is: a hover-opened tooltip has no focus inside it.
+    document.addEventListener('keydown', (event) => {
+      if (event.key !== 'Escape') return;
+      for (const tip of document.querySelectorAll('.mt')) {
+        if (!tip.matches(':hover, :focus-within, [data-t]')) continue;
+        tip.removeAttribute('data-t');
+        tip.setAttribute('data-x', '');
+      }
+    });
+    // Privacy tooltip: hover and keyboard focus are pure CSS; the script covers touch (a tap shows it
+    // for a few seconds, because `:hover` sticks on a touch screen) and Escape.
+    const touch = matchMedia('(hover: none)');
+    for (const { button } of views) {
+      const tip = button.closest('.mt');
+      if (!tip) continue;
+      let timer: ReturnType<typeof setTimeout> | undefined;
+      button.addEventListener('click', () => {
+        if (!touch.matches) return;
+        tip.setAttribute('data-t', '');
+        clearTimeout(timer);
+        timer = setTimeout(() => tip.removeAttribute('data-t'), 4000);
+      });
+      const allow = () => tip.removeAttribute('data-x');
+      tip.addEventListener('pointerleave', allow);
+      tip.addEventListener('focusout', allow);
     }
     store.subscribe(render);
     void store.load();

@@ -116,6 +116,7 @@ describe('parseSiteConfig', () => {
         heroPills: true,
         authorCard: false,
         hiringCard: true,
+        marks: false,
         now: true,
         pillars: false,
         notebookIndex: true,

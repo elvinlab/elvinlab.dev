@@ -11,7 +11,7 @@ export interface MarkLimiter {
   allow(ip: string): Promise<boolean>;
 }
 
-/** The published notes: only these slugs may hold footprints. */
+/** The slugs that may hold footprints: published note ids and fixed page keys. */
 export interface NoteCatalog {
   has(slug: string): boolean;
 }

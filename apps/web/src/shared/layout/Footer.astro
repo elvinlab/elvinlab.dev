@@ -7,6 +7,7 @@ import '@fontsource/press-start-2p/latin-400.css';
 import { site } from '@/shared/config/index.ts';
 import { type Locale, t } from '@/shared/i18n/index.ts';
 import { externalLinkAttrs } from '@/shared/lib/external-link.ts';
+import BrandMark from '@/shared/ui/BrandMark.astro';
 import ExternalHint from '@/shared/ui/ExternalHint.astro';
 
 type Props = { locale: Locale };
@@ -21,8 +22,8 @@ const footerLink =
 <footer class="mt-16 animate-fade-in-up border-t border-dashed border-divider py-8 [animation-delay:250ms]">
   <div class="flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
     <div class="flex flex-col gap-3">
-      <p class="font-retro text-xs leading-relaxed text-text-secondary">
-        {site.identity.handle}<span aria-hidden="true" class="ml-1 inline-block h-3 w-2 bg-pink align-baseline"></span>
+      <p class="flex items-center gap-2 font-retro text-xs leading-relaxed text-text-secondary">
+        <BrandMark size={16} />{site.identity.handle}
       </p>
       <p class="text-sm text-muted">© {year} {site.identity.name}</p>
     </div>

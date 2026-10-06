@@ -3,6 +3,7 @@
  * client code (the island) must import only client/* and never this barrel.
  */
 
+export { buildCatalog, PAGE_KEYS } from './catalog.ts';
 export { default as MarkSection } from './components/MarkSection.astro';
 export type { MarksResult } from './marks.ts';
 export type { NoteCatalog } from './ports.ts';
