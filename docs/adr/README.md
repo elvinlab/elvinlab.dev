@@ -38,3 +38,4 @@ Short (≤40 lines each).
 | [0011](./0011-ci-gate-once-at-main-pr-no-staging.md) | CI gates once at the develop -> main PR; no staging environment | Accepted |
 | [0012](./0012-direct-push-to-main-no-pr-gate.md) | Direct push to main, no PR gate (scaling-back path documented) | Accepted |
 | [0013](./0013-footprints-on-notes-d1.md) | Footprints on notes: an anonymous counter in Cloudflare D1 | Accepted |
+| [0014](./0014-email-subscription-d1-list-resend-port.md) | Email subscription: the list lives in D1, the mail provider behind a port | Accepted |

@@ -1,0 +1,29 @@
+# 0014. Email subscription: the list lives in D1, the mail provider sits behind a port
+
+Status: Accepted (issue #78, T50)
+
+## Context
+RSS is the only way to follow the notes today. The owner wants visitors to subscribe by email and hear about each new note, with the list owned by the site so that changing the mail provider never means migrating subscribers. The site already has Cloudflare D1 (ADR 0013), the contact form with Turnstile, a rate limiter and a Resend adapter (ADR 0009).
+
+## Decision
+- **Source of truth: Cloudflare D1**, table `subscribers` in the site database (`SITE_DB`), migration `0002_subscribers.sql` (one numbered sequence for the whole database). Columns: `id` (random), `email` (unique, trimmed and lower-cased), `status` (`pending` | `confirmed` | `unsubscribed`), `locale`, `confirm_hash` and `confirm_expires` (single use, cleared on confirmation), `last_note` (slug of the last note sent to this subscriber), `created_at`, `confirmed_at`, `unsubscribed_at`.
+- **Provider behind a port:** `SubscriberRepository` (D1 adapter) and `SubscriptionMailer` (Resend adapter) in `features/subscribe/ports.ts`, plus the same `verifier`, `limiter` and `now` ports as the contact form. The domain never imports a provider; a fake mailer in the tests proves that swapping the adapter needs no change to the domain or the schema.
+- **Double opt-in:** subscribing stores `pending` and sends a confirmation link; only `confirmed` rows ever receive a note. The confirmation token is 32 random bytes, only its SHA-256 hash is stored, it expires in 48 hours and it is cleared on use (single use). The link opens a page with a button, and the button POSTs: a mail scanner that prefetches links must not confirm anyone.
+- **Unsubscribe is ours:** a stateless link `token = id.HMAC(SUBSCRIBE_TOKEN_SECRET, id)`. It needs no per-subscriber token in the database (a stored hash could not be put back into later emails), works without login, is idempotent and flips the D1 row, so D1 always knows who left whichever provider sends. Every note email carries it as a link and as `List-Unsubscribe` / `List-Unsubscribe-Post: List-Unsubscribe=One-Click` headers (RFC 8058). The page shows a button that POSTs, for the same prefetch reason; the one-click header POST goes to a small server endpoint.
+- **No leak, no duplicates:** subscribing the same address again answers the same generic success. A `pending` row gets a fresh confirmation after a cooldown, a `confirmed` row is left alone, an `unsubscribed` row goes back to `pending`. Stale `pending` rows (over 7 days) are purged lazily on each subscription.
+- **Abuse:** Turnstile (action `subscribe`), honeypot, minimum fill time and a rate limiter binding `SUBSCRIBE_RATE_LIMITER`, as in ADR 0009. Fail closed: with no bindings the Action answers `SERVICE_UNAVAILABLE` and no form renders. Logs carry stage names and codes only, never an address or a token.
+- **Behind a flag, off by default:** `features.subscribe`. The owner enables it after the human steps (apply the migration remotely, set the secrets `SUBSCRIBE_FROM` and `SUBSCRIBE_TOKEN_SECRET`, bind the rate limiter), listed in `docs/CONFIGURATION.md`.
+
+### Sending a new note: our own list through the normal API, not Resend broadcasts
+Options considered:
+- **(a) Sync confirmed rows into a Resend audience and send a Broadcast.** No daily cap on broadcasts as far as the pricing page says (free: 1,000 marketing contacts), but the list would live in two places. Resend's own unsubscribe would have to be mirrored back into D1 by a webhook, and the documentation I could read does not confirm that event; the free plan's inclusion of broadcasts is not stated either. A mismatch means mailing someone who unsubscribed, which is the failure this design exists to prevent.
+- **(b) Send from our own list with the batch API.** Resend sends up to 100 emails per batch call, accepts custom headers (the `List-Unsubscribe` pair) and an `Idempotency-Key`. The free plan allows 3,000 emails a month and 100 a day (https://resend.com/pricing.md, https://resend.com/docs/api-reference/emails/send-batch-emails, read 2026-10-05).
+
+**Chosen: (b).** D1 stays the only source of truth, the unsubscribe is ours and instant, and nothing depends on an unconfirmed webhook. The cost is the 100-a-day cap: a note reaches at most 100 subscribers per day on the free plan. The sender is therefore resumable: `last_note` records who already got which note, so a second run the next day continues where the first stopped, and an idempotency key per note, subscriber group and day prevents double sends. A paid Resend plan lifts the cap without changing the code.
+- **Manual trigger at first.** This task delivers the sending core (domain function, batch adapter, tests with a fake). Running it after publishing a note is an owner step; an owner-run command or a protected endpoint is a follow-up.
+
+## Consequences
+- The site now stores personal data (an email address, its status and dates). `/privacy` gains a section: what is kept, why, Resend as the processor, the unsubscribe link in every email, and deletion on request through `/contact`. A row marked `unsubscribed` is kept as a suppression entry until deletion is requested, so a re-import can never re-add the address.
+- A new D1 migration and two secrets are owner operations in Cloudflare; the code never touches them (`docs/CONFIGURATION.md`).
+- The 100-a-day free cap bounds how fast a note spreads; at the current audience it is not a constraint, and it is documented for when it is.
+- The contact feature's Turnstile adapter hard-codes the action `contact`; it becomes a parameter so both features share one verifier implementation.
