@@ -2,13 +2,13 @@
   "version": 1,
   "checks": {
     "lint": {
-      "fingerprint": "65087968839e818da2c9b501303a5e3c732ecefe",
-      "recordedAt": "2026-10-06T14:30:50.313Z",
+      "fingerprint": "f981545e6c1a97cd20a6a992562934f0202adc55",
+      "recordedAt": "2026-10-06T14:39:32.314Z",
       "result": "pass"
     },
     "typecheck": {
-      "fingerprint": "61137cc9e0513e5fe0c5d8ee9890b454f867a612",
-      "recordedAt": "2026-10-06T14:30:50.313Z",
+      "fingerprint": "5411a333f2360e6f0b09f8782bf071dc78a0d268",
+      "recordedAt": "2026-10-06T14:39:32.314Z",
       "result": "pass"
     },
     "depcruise": {
@@ -17,28 +17,28 @@
       "result": "pass"
     },
     "docs-config": {
-      "fingerprint": "ac6139bf43532cd41534f0fe1e56c937592abb69",
-      "recordedAt": "2026-10-06T14:30:50.313Z",
+      "fingerprint": "97a44c7105e26d156703ce35140b69407386d6fa",
+      "recordedAt": "2026-10-06T14:39:32.314Z",
       "result": "pass"
     },
     "unit": {
-      "fingerprint": "7c4bd60daf8243f679d4f76172b1fd8d53657a23",
-      "recordedAt": "2026-10-06T14:30:50.313Z",
+      "fingerprint": "6784326cc04def52eef50df6dfcd587199bb5948",
+      "recordedAt": "2026-10-06T14:39:32.314Z",
       "result": "pass"
     },
     "build": {
-      "fingerprint": "c393df1a61248c4b56310b00447c0012a36bf8f9",
-      "recordedAt": "2026-10-06T14:30:50.313Z",
+      "fingerprint": "35d94cc752cbf6ccca42cbd2497a244dba5887a6",
+      "recordedAt": "2026-10-06T14:39:32.314Z",
       "result": "pass"
     },
     "js-budget": {
-      "fingerprint": "906a73ec8300f96a9de73c7c6dfe421b4d2cd57e",
-      "recordedAt": "2026-10-06T14:30:50.313Z",
+      "fingerprint": "d842f45c2ee44d8f72b8ed489b28ce01e831a9e8",
+      "recordedAt": "2026-10-06T14:39:32.314Z",
       "result": "pass"
     },
     "white-label": {
-      "fingerprint": "7ea3e98fa2d55faaeb47613735dc4f1a523dc266",
-      "recordedAt": "2026-10-06T14:30:50.313Z",
+      "fingerprint": "c1902ea06b85d22711e4375ce73b06a6ee85cfd3",
+      "recordedAt": "2026-10-06T14:39:32.314Z",
       "result": "pass"
     },
     "cold-start": {
@@ -47,8 +47,8 @@
       "result": "pass"
     },
     "e2e:a11y.spec.ts": {
-      "fingerprint": "362520f3a7bde2df92e3d7db67189f9e21427f9c",
-      "recordedAt": "2026-10-06T14:30:50.313Z",
+      "fingerprint": "2129487d33d311a019aef4ea71c9cb110934a738",
+      "recordedAt": "2026-10-06T14:39:32.314Z",
       "result": "pass"
     },
     "e2e:background.spec.ts": {
@@ -57,8 +57,8 @@
       "result": "pass"
     },
     "e2e:card-links.spec.ts": {
-      "fingerprint": "6d01432044eb8f2e785134607b66dd50819a22a7",
-      "recordedAt": "2026-10-06T14:30:50.313Z",
+      "fingerprint": "0c7794153dda2a29bc1bdfa5b1f31593ccf53662",
+      "recordedAt": "2026-10-06T14:39:32.314Z",
       "result": "pass"
     },
     "e2e:comments.spec.ts": {
@@ -72,8 +72,8 @@
       "result": "pass"
     },
     "e2e:cookies.spec.ts": {
-      "fingerprint": "564ca1bd7745b4ca53676a041fc047da8fc8579b",
-      "recordedAt": "2026-10-06T14:30:50.313Z",
+      "fingerprint": "8abbe6827510ee37a791b5b4d4e08141b29eac72",
+      "recordedAt": "2026-10-06T14:39:32.314Z",
       "result": "pass"
     },
     "e2e:cv-and-credentials.spec.ts": {
@@ -82,13 +82,13 @@
       "result": "pass"
     },
     "e2e:external-links.spec.ts": {
-      "fingerprint": "0927725af337a685e91de75e7f27b66f989e06d6",
-      "recordedAt": "2026-10-06T14:30:50.313Z",
+      "fingerprint": "8daae08ca26bdc578837aca1a99cda73bdaac703",
+      "recordedAt": "2026-10-06T14:39:32.314Z",
       "result": "pass"
     },
     "e2e:favicon.spec.ts": {
-      "fingerprint": "9e5813cecd703139bfe0c3c83330a7b6c50929c2",
-      "recordedAt": "2026-10-06T14:30:50.313Z",
+      "fingerprint": "9e58bdc26dfa4d69e749cabb50cc7cd42bf9991c",
+      "recordedAt": "2026-10-06T14:39:32.314Z",
       "result": "pass"
     },
     "e2e:home-sections.spec.ts": {
@@ -97,8 +97,8 @@
       "result": "pass"
     },
     "e2e:internal-links.spec.ts": {
-      "fingerprint": "67ad2027d6b2276f92606ea0e20623d804bb0ce1",
-      "recordedAt": "2026-10-06T14:30:50.313Z",
+      "fingerprint": "388e74608c74e1ea58cab7dd4ed38db803aac378",
+      "recordedAt": "2026-10-06T14:39:32.314Z",
       "result": "pass"
     },
     "e2e:legal.spec.ts": {
@@ -107,8 +107,8 @@
       "result": "pass"
     },
     "e2e:link-previews.spec.ts": {
-      "fingerprint": "2998c5bf6241922c54725922d4d00d3b1ce601f1",
-      "recordedAt": "2026-10-06T14:30:50.313Z",
+      "fingerprint": "dd8f9be34de5a2772c75918278e8a8cc79abb95c",
+      "recordedAt": "2026-10-06T14:39:32.314Z",
       "result": "pass"
     },
     "e2e:me-experience-locale.spec.ts": {
@@ -132,18 +132,18 @@
       "result": "pass"
     },
     "e2e:performance.spec.ts": {
-      "fingerprint": "3cf4954560bc22cac32dc3d43f0c3462b4831eec",
-      "recordedAt": "2026-10-06T14:30:50.313Z",
+      "fingerprint": "1ed9923c781210d5bdc10edb7c380cd37b6f9110",
+      "recordedAt": "2026-10-06T14:39:32.314Z",
       "result": "pass"
     },
     "e2e:smoke.spec.ts": {
-      "fingerprint": "021cee6adc2947038117d53cc5b8a40ef9ed28b4",
-      "recordedAt": "2026-10-06T14:30:50.313Z",
+      "fingerprint": "9ac590c9d8f0c9fd2cd2d6a846422c57d0ddbe43",
+      "recordedAt": "2026-10-06T14:39:32.314Z",
       "result": "pass"
     },
     "e2e:theme.spec.ts": {
-      "fingerprint": "14a4712f97e58f13284707aa32d56191fd68e957",
-      "recordedAt": "2026-10-06T14:30:50.313Z",
+      "fingerprint": "d8ced342d432683e7868de9d3b99081e8275fc96",
+      "recordedAt": "2026-10-06T14:39:32.314Z",
       "result": "pass"
     },
     "e2e:calm-pages.spec.ts": {
@@ -152,13 +152,13 @@
       "result": "pass"
     },
     "e2e:brand-mark.spec.ts": {
-      "fingerprint": "20ca8884300c7dde0310b93b2c5e87879398e26c",
-      "recordedAt": "2026-10-06T14:30:50.313Z",
+      "fingerprint": "09e5b246020a93c4b24ae9039d210d462c5c7be2",
+      "recordedAt": "2026-10-06T14:39:32.314Z",
       "result": "pass"
     },
     "e2e:focus-not-obscured.spec.ts": {
-      "fingerprint": "a4a9a4edc88a0168c290091a3eeeb1f987489692",
-      "recordedAt": "2026-10-06T14:30:50.313Z",
+      "fingerprint": "456b42fca810e1b0d5dfae950365f443f5817763",
+      "recordedAt": "2026-10-06T14:39:32.314Z",
       "result": "pass"
     },
     "e2e:interaction-polish.spec.ts": {
@@ -177,8 +177,8 @@
       "result": "pass"
     },
     "e2e:mobile-ux.spec.ts": {
-      "fingerprint": "8deb49b3e03b26f4173f3291dfa311cc71fa8e97",
-      "recordedAt": "2026-10-06T14:30:50.313Z",
+      "fingerprint": "a02dc2ad7721fce415db69db81aeadea9e334a78",
+      "recordedAt": "2026-10-06T14:39:32.314Z",
       "result": "pass"
     },
     "e2e:notes-layout.spec.ts": {
