@@ -154,7 +154,9 @@ function select(input: PlanInput, checks: readonly CheckDef[]) {
     }
   }
   const skippedFresh: string[] = [];
-  if (input.mode === 'changed' && input.staleIds) {
+  // A FULL-wide change belongs to no check's scope, so every fingerprint is unchanged and would
+  // read as fresh: the wide class selects everything and freshness must not undo it.
+  if (input.mode === 'changed' && input.staleIds && !wide) {
     for (const id of [...reasons.keys()]) {
       if (!input.staleIds.has(id)) {
         reasons.delete(id);

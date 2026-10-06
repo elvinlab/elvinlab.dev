@@ -15,7 +15,7 @@
 import { execFileSync, spawnSync } from 'node:child_process';
 import { resolve } from 'node:path';
 
-import { CHECKS } from './verification-map.ts';
+import { CHECKS, FULL_WIDE } from './verification-map.ts';
 import { type Plan, type PlanMode, planChecks, refineChanged } from './verify-plan.ts';
 import {
   computeFingerprints,
@@ -176,7 +176,7 @@ function main(): number {
   let before: Record<string, string> | undefined;
   let stale: Set<string> | undefined;
   if (mode !== 'all' && recorded) {
-    before = computeFingerprints(CHECKS, io);
+    before = computeFingerprints(CHECKS, io, FULL_WIDE);
     stale = staleIds(CHECKS, before, registry);
   } else if (mode === 'stale') {
     stale = new Set(CHECKS.map((check) => check.id));
@@ -197,7 +197,7 @@ function main(): number {
   }
   if (plan.commands.length === 0) return 0;
 
-  if (record && !before) before = computeFingerprints(CHECKS, io);
+  if (record && !before) before = computeFingerprints(CHECKS, io, FULL_WIDE);
   const startedAt = Date.now();
   const outcomes = execute(plan);
   printTable(outcomes);
@@ -213,7 +213,7 @@ function main(): number {
       console.log('\nnot recorded: the run was not green');
     } else {
       try {
-        const after = computeFingerprints(CHECKS, io);
+        const after = computeFingerprints(CHECKS, io, FULL_WIDE);
         const checks = { ...registry.checks };
         const skipped: string[] = [];
         for (const id of outcomes.flatMap((outcome) => outcome.covers)) {

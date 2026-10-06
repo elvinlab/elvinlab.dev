@@ -61,3 +61,16 @@ Expected effect (not measured): Lighthouse about 170 s per shard (setup plus hal
 | Scenario | Seconds | Notes |
 | --- | ---: | --- |
 | CI after (Lighthouse 2 shards, e2e 4 shards) | pending | first CI run on `main` after this change; the 4-shard timings are pending |
+
+## Measured after sharding Lighthouse in 2 and e2e in 4 (2026-10-06, run 37493726013 on `bbeb672`)
+| Job | Seconds | Before (run 37482889047) |
+| --- | ---: | ---: |
+| static | 40 | 65 |
+| lighthouse (shard 1, shard 2) | 158, 160 | 265 (one job) |
+| e2e (shards 1 to 4) | 158, 130, 179, 178 | 143, 143, 222 (3 shards) |
+| checks | 5 | 4 |
+| deploy | 41 | 59 |
+| **Whole run** | **237** | **about 328** |
+
+The slowest gate went from 265 s to 179 s and the whole release from about 328 s to 237 s (about 28% less). The first run had cold caches; the shards are now close to balanced (130 to 179 s), so a fifth e2e shard would save little. Local `pnpm verify --all` is about 245 s; the change-scoped plans stay the way to avoid it.
+
