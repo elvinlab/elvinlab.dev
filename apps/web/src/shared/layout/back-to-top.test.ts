@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { liftAboveFooter, nextVisibility } from './back-to-top.ts';
+import { IDLE_HIDE_MS, liftAboveFooter, nextVisibility, shouldAutoHide } from './back-to-top.ts';
 
 describe('nextVisibility', () => {
   it('stays hidden near the top and while reading downwards', () => {
@@ -39,5 +39,25 @@ describe('liftAboveFooter', () => {
 
   it('lifts by the part of the footer that is on screen', () => {
     expect(liftAboveFooter({ viewportHeight: 800, footerTop: 500 })).toBe(300);
+  });
+});
+
+describe('shouldAutoHide', () => {
+  it('hides on idle only when nothing keeps the button useful', () => {
+    expect(shouldAutoHide({ lift: 0, focused: false, hovered: false })).toBe(true);
+  });
+
+  it('stays while the reader hovers or focuses it', () => {
+    expect(shouldAutoHide({ lift: 0, focused: true, hovered: false })).toBe(false);
+    expect(shouldAutoHide({ lift: 0, focused: false, hovered: true })).toBe(false);
+  });
+
+  it('stays at the bottom of the page, lifted above the footer, where it covers nothing', () => {
+    expect(shouldAutoHide({ lift: 120, focused: false, hovered: false })).toBe(false);
+  });
+
+  it('waits a couple of seconds after the last scroll', () => {
+    expect(IDLE_HIDE_MS).toBeGreaterThanOrEqual(2000);
+    expect(IDLE_HIDE_MS).toBeLessThanOrEqual(3000);
   });
 });

@@ -28,6 +28,11 @@ const settle = async (page: Page): Promise<void> => {
 
 const button = (page: Page) => page.locator('[data-back-to-top]');
 
+const setIdle = (page: Page, ms: number) =>
+  button(page).evaluate((el, value) => {
+    (el as HTMLElement).dataset['idleMs'] = String(value);
+  }, ms);
+
 const scrollTo = async (page: Page, top: number): Promise<void> => {
   await page.evaluate((y) => window.scrollTo({ top: y, behavior: 'instant' }), top);
   await page.evaluate(
@@ -37,6 +42,8 @@ const scrollTo = async (page: Page, top: number): Promise<void> => {
 
 /** Scrolls deep, then up a little: the only gesture that reveals the button. */
 const reveal = async (page: Page): Promise<void> => {
+  // Most tests look at the shown button for a while: switch the idle auto-hide off for them.
+  await setIdle(page, 600_000);
   await scrollTo(page, 1200);
   await scrollTo(page, 1100);
   await expect(button(page)).toHaveAttribute('data-shown', '');
@@ -100,6 +107,53 @@ test.describe('back to top', () => {
     await scrollTo(page, 600);
     await scrollTo(page, 500);
     await expect(button(page)).toBeHidden();
+  });
+
+  test('gets out of the way a couple of seconds after the reader stops scrolling', async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width: 390, height: 844 });
+    await page.goto('/notes/smoke-es/');
+    await settle(page);
+    await expect(button(page)).toHaveAttribute('data-idle-ms', '2500');
+    await setIdle(page, 700);
+    await scrollTo(page, 1200);
+    await scrollTo(page, 1100);
+    await expect(button(page)).toHaveAttribute('data-shown', '');
+    await expect(button(page)).not.toHaveAttribute('data-shown', '', { timeout: 4000 });
+    await expect(button(page)).toHaveAttribute('aria-hidden', 'true');
+    // Scrolling up again brings it back.
+    await scrollTo(page, 1300);
+    await scrollTo(page, 1200);
+    await expect(button(page)).toHaveAttribute('data-shown', '');
+  });
+
+  test('stays while the pointer is over it', async ({ page }) => {
+    await page.setViewportSize({ width: 1280, height: 720 });
+    await page.goto('/notes/smoke-es/');
+    await settle(page);
+    await setIdle(page, 600);
+    await scrollTo(page, 1200);
+    await scrollTo(page, 1100);
+    await expect(button(page)).toHaveAttribute('data-shown', '');
+    await button(page).hover();
+    await page.waitForTimeout(1600);
+    await expect(button(page)).toHaveAttribute('data-shown', '');
+  });
+
+  test('stays at the bottom of the page, lifted above the footer', async ({ page }) => {
+    await page.setViewportSize({ width: 390, height: 844 });
+    await page.goto('/notes/smoke-es/');
+    await settle(page);
+    await setIdle(page, 600);
+    const max = await page.evaluate(
+      () => document.documentElement.scrollHeight - window.innerHeight,
+    );
+    await scrollTo(page, max);
+    await scrollTo(page, max - 40);
+    await expect(button(page)).toHaveAttribute('data-shown', '');
+    await page.waitForTimeout(1600);
+    await expect(button(page)).toHaveAttribute('data-shown', '');
   });
 
   test('hides again when scrolling down and at the top', async ({ page }) => {

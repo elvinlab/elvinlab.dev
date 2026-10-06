@@ -423,7 +423,7 @@
     "date": "2026-10-06",
     "category": "added",
     "title": "Back to top button",
-    "description": "A small pixel arrow appears at the bottom right when you scroll up a long page and takes you back to the top. It never covers the footer controls and stays still with reduced motion."
+    "description": "A small pixel arrow appears at the bottom right when you scroll up a long page and takes you back to the top. It never covers the footer controls and stays still with reduced motion. It hides itself a few seconds after scrolling stops."
   },
   "subscribe-turnstile-ux": {
     "date": "2026-10-06",

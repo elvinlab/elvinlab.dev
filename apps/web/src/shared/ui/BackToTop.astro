@@ -5,6 +5,7 @@
  * the footer instead of covering it, steps in and out, and stays still under reduced motion.
  */
 import { type Locale, t } from '@/shared/i18n/index.ts';
+import { IDLE_HIDE_MS } from '@/shared/layout/back-to-top.ts';
 
 type Props = { locale: Locale };
 
@@ -15,6 +16,7 @@ const label = t(locale, 'backtotop.label');
 <button
   type="button"
   data-back-to-top
+  data-idle-ms={IDLE_HIDE_MS}
   inert
   aria-label={label}
   title={label}
@@ -38,7 +40,13 @@ const label = t(locale, 'backtotop.label');
 </button>
 
 <script>
-  import { liftAboveFooter, nextVisibility, SCROLL_STEP_PX } from '@/shared/layout/back-to-top.ts';
+  import {
+    IDLE_HIDE_MS,
+    liftAboveFooter,
+    nextVisibility,
+    SCROLL_STEP_PX,
+    shouldAutoHide,
+  } from '@/shared/layout/back-to-top.ts';
 
   const button = document.querySelector<HTMLButtonElement>('[data-back-to-top]');
   const footer = document.querySelector<HTMLElement>('[data-site-footer]');
@@ -47,11 +55,25 @@ const label = t(locale, 'backtotop.label');
     let last = window.scrollY;
     let ticking = false;
     let returning = false;
+    let idle: number | undefined;
+    let lift = 0;
+    // After the reader stops scrolling the button gets out of the way (unless it is being used or it
+    // sits above the footer at the bottom of the page).
+    const armIdle = (): void => {
+      window.clearTimeout(idle);
+      if (!shown) return;
+      idle = window.setTimeout(() => {
+        const focused = document.activeElement === button;
+        if (shouldAutoHide({ lift, focused, hovered: button.matches(':hover') })) show(false);
+        else armIdle();
+      }, Number(button.dataset['idleMs'] ?? IDLE_HIDE_MS));
+    };
     const show = (next: boolean): void => {
       shown = next;
       button.toggleAttribute('data-shown', next);
       button.toggleAttribute('inert', !next);
       button.setAttribute('aria-hidden', String(!next));
+      armIdle();
     };
     show(false);
     const onScroll = (): void => {
@@ -60,9 +82,10 @@ const label = t(locale, 'backtotop.label');
       else if (Math.abs(y - last) > SCROLL_STEP_PX) {
         show(nextVisibility({ y, previousY: last, shown }) || document.activeElement === button);
         last = y;
+        armIdle();
       }
       const box = footer?.getBoundingClientRect();
-      const lift = box && box.height > 0 ? liftAboveFooter({ viewportHeight: window.innerHeight, footerTop: box.top }) : 0;
+      lift = box && box.height > 0 ? liftAboveFooter({ viewportHeight: window.innerHeight, footerTop: box.top }) : 0;
       button.style.setProperty('--btt-lift', `${lift}px`);
       // Reading mode pins its exit pill at the same corner: sit above it.
       button.style.setProperty('--btt-base', document.documentElement.hasAttribute('data-reading') ? '4rem' : '1rem');
