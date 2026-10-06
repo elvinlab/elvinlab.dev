@@ -74,3 +74,7 @@ Follow-up for the coordinator: `apps/web/src/actions/index.ts` still passes `sit
 
 ## Progress 2026-10-06: consolidated guide (bounded writer, not committed)
 - [x] `docs/SUBSCRIPTION.md` and `docs/SUBSCRIPTION.en.md` written and linked from README, ADR 0014 and recipe 6.14 (es/en). Docs only; checks: relative links, Biome on the changelog, `docs:config`.
+
+## First real cycle, 2026-10-06 (owner test with their own address)
+The owner subscribed from the footer, confirmed, and received the note email. Dry run through production first (1 recipient, pool 99), then the real send of note 3 (`vibe-coding-o-especificar-primero`) to that one subscriber: `Sent ... to 1 subscriber; 0 still waiting`. The owner confirms the email arrived and looks good in the light theme ("muy bonito"). This also proves the Resend sending domain is verified (the earlier assumption). Still not checked: dark mode in a client that honors it, Outlook and Gmail rendering, and the unsubscribe click-through from a note email (it removes the owner from the list).
+

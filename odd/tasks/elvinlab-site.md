@@ -419,4 +419,5 @@ Contents: terminal icon next to the wordmark and as the favicon (pixel, softer c
 ### Seventh release of 2026-10-06: owner trigger to send a note (owner-authorized)
 `main` = `83ee054` (commit-tree from `develop` at `f9d836e`, fast-forward, tree diff empty; `develop` pushed first). `POST /api/subscribe/notify` (bearer token, rate limited, constant-time comparison, only a slug in, content read from the published note, dry run by default) and `pnpm notify:note <slug> [--send]`. Sending is MANUAL by the owner's decision while the system is observed (no CI step). Secret `SUBSCRIBE_ADMIN_TOKEN` created on the Worker `elvinlab` (owner-authorized); the token file lives in `~/.config/elvinlab/subscribe-admin-token` on the owner's machine (mode 600, outside the repo).
 - NOT verified: a real send and a real subscribe cycle; the owner tests with an address they own.
+- 2026-10-06: first real subscribe, confirm and send cycle done by the owner with their own address; the note email looked good in the light theme. The Resend domain assumption is now proven. Open: dark mode and other clients, the unsubscribe click-through.
 
