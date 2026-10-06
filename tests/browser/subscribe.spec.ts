@@ -629,7 +629,7 @@ for (const locale of ['es', 'en'] as const) {
       await page.locator(form).getByLabel(copy.label).fill('reader@example.test');
       await page.locator(form).getByRole('button', { name: copy.submit }).click();
       await expect(page.locator(form).getByRole('status').filter({ hasText: /\S/ })).toBeVisible();
-      expect(calls.bodies).toHaveLength(1);
+      await expect.poll(() => calls.bodies.length).toBe(1);
       expect(JSON.parse(calls.bodies[0] ?? '{}')).toMatchObject({
         email: 'reader@example.test',
         locale: copy.lang,
