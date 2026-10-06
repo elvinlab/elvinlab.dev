@@ -173,3 +173,7 @@ inline stylesheet is the durable fix (tracked as a GitHub issue).
 
 The e2e suite covers the contact form island with a stubbed Turnstile script and the real Action
 (no bindings, so it answers service unavailable). The fixture build sets a stub site key.
+
+## Email previews
+
+The subscription emails (confirmation and new note, Spanish and English) are pure functions in `apps/web/src/features/subscribe/email-templates.ts`. To look at them without sending anything, run `mise exec -- node --import ./apps/web/scripts/register-alias.mjs apps/web/scripts/preview-email.ts`: it writes the HTML and text versions with sample data (on `https://example.test`, with a hostile title to prove escaping) into the git-ignored `.email-preview/` folder. Open the `.html` files in a browser; email clients differ, so a real test send to your own address (needs a verified Resend domain) remains an owner step.

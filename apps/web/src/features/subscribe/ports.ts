@@ -105,6 +105,9 @@ export interface SubscribeLinks {
   unsubscribe(token: string, locale: SubscribeLocale): string;
 }
 
+/** What the emails need to know about the site; the owner values come from configuration. */
+export type EmailSite = { url: string; name: string; ownerName: string };
+
 /** Diagnostic sink: receives codes and names only, never addresses, secrets or tokens. */
 export type SubscribeReport = (detail: string) => void;
 

@@ -7,7 +7,7 @@ import { createResendMailer } from './adapters/resend.ts';
 import { createWebCryptoTokens } from './adapters/webcrypto.ts';
 import { listBindingsSchema, sendBindingsSchema, subscribeBindingsSchema } from './bindings.ts';
 import { SUBSCRIBE_PATHS, SUBSCRIBE_POLICY } from './config.ts';
-import type { SubscribeLinks, SubscribePorts } from './ports.ts';
+import type { EmailSite, SubscribeLinks, SubscribePorts } from './ports.ts';
 import {
   type ConfirmResult,
   confirmSubscription,
@@ -38,12 +38,36 @@ export function createLinks(siteUrl: string): SubscribeLinks {
   };
 }
 
+/**
+ * A bare URL is accepted for callers that only know the origin: the site name falls back to the
+ * hostname. Pass the full identity so the emails carry the site name and the owner's name.
+ */
+function emailSite(site: string | EmailSite): EmailSite {
+  if (typeof site !== 'string') return site;
+  const host = URL.canParse(site) ? new URL(site).hostname : site;
+  return { url: site, name: host, ownerName: host };
+}
+
+function mailerConfig(
+  config: { RESEND_API_KEY: string; SUBSCRIBE_FROM: string },
+  site: string | EmailSite,
+) {
+  const identity = emailSite(site);
+  return {
+    apiKey: config.RESEND_API_KEY,
+    from: config.SUBSCRIBE_FROM,
+    siteUrl: identity.url,
+    siteName: identity.name,
+    ownerName: identity.ownerName,
+  };
+}
+
 /** Public subscribe: null means unavailable (fail closed), never a partly configured provider. */
 export async function submitConfiguredSubscribe(
   input: unknown,
   ip: string | undefined,
   bindings: unknown,
-  siteUrl: string,
+  site: string | EmailSite,
   request: typeof fetch = fetch,
   log: (message: string) => void = console.error,
 ): Promise<SubscribeResult | null> {
@@ -59,7 +83,7 @@ export async function submitConfiguredSubscribe(
     report,
     repository: createD1SubscriberRepository(config.SITE_DB as D1Like),
     tokens: createWebCryptoTokens(config.SUBSCRIBE_TOKEN_SECRET),
-    links: createLinks(siteUrl),
+    links: createLinks(emailSite(site).url),
     limiter: {
       async allow(address) {
         const result = await config.SUBSCRIBE_RATE_LIMITER.limit({ key: `subscribe:${address}` });
@@ -75,11 +99,7 @@ export async function submitConfiguredSubscribe(
       request,
       report,
     ),
-    mailer: createResendMailer(
-      { apiKey: config.RESEND_API_KEY, from: config.SUBSCRIBE_FROM },
-      request,
-      report,
-    ),
+    mailer: createResendMailer(mailerConfig(config, site), request, report),
   };
   return subscribe(input, ip, ports);
 }
@@ -121,7 +141,7 @@ export async function unsubscribeConfigured(
 export async function sendNoteConfigured(
   note: NoteToSend,
   bindings: unknown,
-  siteUrl: string,
+  site: string | EmailSite,
   options: { dailyCap?: number } = {},
   request: typeof fetch = fetch,
   log: (message: string) => void = console.error,
@@ -139,12 +159,8 @@ export async function sendNoteConfigured(
       report,
       repository: createD1SubscriberRepository(config.SITE_DB as D1Like),
       tokens: createWebCryptoTokens(config.SUBSCRIBE_TOKEN_SECRET),
-      links: createLinks(siteUrl),
-      mailer: createResendMailer(
-        { apiKey: config.RESEND_API_KEY, from: config.SUBSCRIBE_FROM },
-        request,
-        report,
-      ),
+      links: createLinks(emailSite(site).url),
+      mailer: createResendMailer(mailerConfig(config, site), request, report),
     },
     options,
   );

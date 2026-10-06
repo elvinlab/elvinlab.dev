@@ -5,6 +5,7 @@
 export { isSubscribeActive } from './availability.ts';
 export { default as SubscribeResultPage } from './components/SubscribeResultPage.astro';
 export { SUBSCRIBE_PATHS, SUBSCRIBE_POLICY } from './config.ts';
+export type { EmailSite } from './ports.ts';
 export {
   confirmConfiguredSubscription,
   sendNoteConfigured,

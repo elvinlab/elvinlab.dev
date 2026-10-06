@@ -31,3 +31,6 @@ drafts/
 
 # CodeGraph index (per-checkout, never committed)
 .codegraph/
+
+# Email previews (pnpm-free script, see docs/TESTING.md)
+.email-preview/

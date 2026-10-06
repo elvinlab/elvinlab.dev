@@ -5,7 +5,13 @@ import type { NoteMail } from '@/features/subscribe/ports.ts';
 
 import { createResendMailer } from './resend.ts';
 
-const config = { apiKey: 'test-api-key-123', from: 'Lab <notes@example.test>' };
+const config = {
+  apiKey: 'test-api-key-123',
+  from: 'Lab <notes@example.test>',
+  siteUrl: 'https://site.test',
+  siteName: 'elvinlab',
+  ownerName: 'Ada Example',
+};
 const RECIPIENT = ['reader', 'example.test'].join('@');
 const note = (change: Partial<NoteMail> = {}): NoteMail => ({
   to: RECIPIENT,
@@ -22,7 +28,7 @@ const ok = (body: unknown) =>
 afterEach(() => vi.restoreAllMocks());
 
 describe('Resend mailer', () => {
-  it('sends the confirmation as plain text with the link, a timeout and no redirects', async () => {
+  it('sends the confirmation as html plus text with the link, a timeout and no redirects', async () => {
     const request = ok({ id: 'abc' });
     const timeout = vi.spyOn(AbortSignal, 'timeout');
     await createResendMailer(config, request).sendConfirmation({
@@ -40,7 +46,11 @@ describe('Resend mailer', () => {
     expect(body.subject).toContain('Confirma');
     expect(body.text).toContain('https://site.test/es/confirm/?token=T');
     expect(body.text).toContain('aviso de algún proyecto');
-    expect(body.html).toBeUndefined();
+    expect(body.html).toContain('<!doctype html>');
+    expect(body.html).toContain('href="https://site.test/es/confirm/?token=T"');
+    expect(body.html).toContain('https://site.test/email/logo.png');
+    expect(body.html).toContain('href="https://site.test/privacy/"');
+    expect(body.text).toContain('Ada Example');
   });
 
   it('writes the confirmation in English for an English subscriber', async () => {
@@ -77,6 +87,10 @@ describe('Resend mailer', () => {
     expect(body[1].subject).toBe('New note: A note');
     expect(body[0].text).toContain('https://site.test/notes/a-note/');
     expect(body[0].text).toContain('token=abc.def');
+    expect(body[0].html).toContain('lang="es"');
+    expect(body[1].html).toContain('lang="en"');
+    expect(body[1].html).toContain('href="https://site.test/en/privacy/"');
+    expect(body[0].html).toContain('href="https://site.test/subscribe/unsubscribe/?token=abc.def"');
   });
 
   it('keeps a hostile title on one line so it cannot add headers', async () => {
@@ -84,6 +98,7 @@ describe('Resend mailer', () => {
     await createResendMailer(config, request).sendNote([note({ title: 'a\r\nBcc: x' })], 'k');
     const body = JSON.parse(String(request.mock.calls[0]?.[1]?.body));
     expect(body[0].subject).not.toMatch(/[\r\n]/);
+    expect(body[0].html).not.toContain('Bcc: x\r');
   });
 
   it('rejects an empty or oversized batch without calling the provider', async () => {

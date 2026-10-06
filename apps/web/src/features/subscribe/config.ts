@@ -29,4 +29,5 @@ export const SUBSCRIBE_POLICY = {
 export const SUBSCRIBE_PATHS = {
   confirm: '/subscribe/confirm/',
   unsubscribe: '/subscribe/unsubscribe/',
+  privacy: '/privacy/',
 } as const;
