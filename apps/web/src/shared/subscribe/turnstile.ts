@@ -11,7 +11,12 @@ export type TurnstileOptions = {
   appearance: 'interaction-only';
   callback: (token: string) => void;
   'expired-callback': () => void;
-  'error-callback': () => void;
+  /** Receives Cloudflare's error code (for example `600010`); it may be missing. */
+  'error-callback': (code?: string) => void;
+  /** The widget is about to show a checkbox the reader must tick. */
+  'before-interactive-callback'?: () => void;
+  /** The checkbox was handled; the widget goes quiet again. */
+  'after-interactive-callback'?: () => void;
 };
 
 export type TurnstileApi = {

@@ -30,6 +30,16 @@ describe('callSubscribeAction', () => {
     ).resolves.toEqual({ ok: false, code: 'SERVICE_UNAVAILABLE' });
   });
 
+  it('keeps the fixed message of an error, so the form can tell two 429s apart', async () => {
+    await expect(
+      callSubscribeAction(
+        'request',
+        {},
+        respond('{"code":"TOO_MANY_REQUESTS","message":"Too many attempts."}', 429),
+      ),
+    ).resolves.toEqual({ ok: false, code: 'TOO_MANY_REQUESTS', message: 'Too many attempts.' });
+  });
+
   it.each([
     ['an unreadable success body', respond('nope')],
     ['an unreadable error body', respond('<html>', 502)],

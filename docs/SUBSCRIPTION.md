@@ -94,7 +94,7 @@ Valores de `apps/web/src/features/subscribe/config.ts` y `wrangler.jsonc`:
 | --- | --- |
 | Turnstile | Acción `subscribe`; falla cerrado |
 | Honeypot | Campo oculto que debe llegar vacío |
-| Tiempo mínimo de llenado | 3 segundos |
+| Tiempo mínimo de llenado | 1,5 segundos |
 | Limitador por IP | 3 por minuto (`SUBSCRIBE_RATE_LIMITER`) |
 | Reenvío de confirmación | Una dirección `pending` no recibe otro correo antes de 10 minutos |
 | Limpieza de `pending` | 7 días |
@@ -177,7 +177,9 @@ Los comandos exactos están en la [receta 6.14](CONFIGURATION.md#614-suscripció
 | «Hoy llegaron muchas solicitudes» | Se alcanzó el tope de 30 confirmaciones del día | Esperar al día UTC siguiente |
 | No llega el correo de confirmación | Dominio de Resend sin verificar o `SUBSCRIBE_FROM` mal | Panel de Resend y el secreto; revisa también spam |
 | El endpoint o el comando responde 401 | Token equivocado | Que la variable coincida con el secreto del Worker |
-| 429 | Limitador (3 por minuto) | Espera un minuto |
+| 429 | Limitador (3 por minuto) | Espera un minuto; el formulario muestra «Demasiados intentos seguidos» |
+| El formulario se queda en «Verificando…» | Un desafío interactivo de Turnstile que el lector no vio, o una extensión que lo bloquea | El formulario ahora dice «Marca la casilla de abajo» cuando aparece la casilla y, tras 25 s sin token, pide reintentar o desactivar bloqueadores |
+| Un error con un código entre paréntesis, por ejemplo «(código 600010)» | El código de error de Turnstile | `110200`: dominio no permitido para la site key (ajustes del widget en Turnstile). `600010`: el desafío falló o fue bloqueado (extensión, red, puntuación de bot) |
 | 503 en el endpoint | Falta `SUBSCRIBE_ADMIN_TOKEN` en el Worker, o falla un binding | `wrangler secret list` y los logs. Con el flag apagado la ruta no existe (404) |
 | 404 al enviar | Borrador o slug no publicado | Libera la nota y revisa el slug |
 | La nota no llegó a nadie | Todos tienen ya `last_note` con ese slug, o el idioma no coincide | La simulación: `recipients` cuenta solo quien falta, del mismo idioma |

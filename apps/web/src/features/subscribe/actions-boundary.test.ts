@@ -140,6 +140,16 @@ describe('subscribe Actions boundary', () => {
     ).rejects.toMatchObject({ code: 'TOO_MANY_REQUESTS' });
   });
 
+  it('request maps the rate limiter to its own fixed TOO_MANY_REQUESTS message', async () => {
+    mocks.subscribe.mockResolvedValueOnce({ ok: false, error: 'rate_limited' });
+    await expect(
+      actions.request.handler({ email: 'a@b.test' }, { request: request() }),
+    ).rejects.toMatchObject({
+      code: 'TOO_MANY_REQUESTS',
+      message: 'Too many attempts in a row. Please wait a minute and try again.',
+    });
+  });
+
   it('confirm and unsubscribe return their result strings as data, not errors', async () => {
     mocks.confirm.mockResolvedValueOnce('invalid_or_expired');
     mocks.unsubscribe.mockResolvedValueOnce('unsubscribed');

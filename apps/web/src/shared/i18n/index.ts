@@ -136,6 +136,12 @@ export const t = createTranslator({
       'subscribe.success': 'Revisa tu bandeja de entrada para confirmar la suscripción.',
       'subscribe.error': 'No se pudo suscribir. Inténtalo más tarde.',
       'subscribe.capped': 'Hoy llegaron muchas solicitudes. Inténtalo de nuevo mañana.',
+      'subscribe.rateLimited':
+        'Demasiados intentos seguidos. Espera un minuto y vuelve a intentarlo.',
+      'subscribe.interactive': 'Marca la casilla de abajo para verificar que eres una persona.',
+      'subscribe.timeout':
+        'No pudimos verificar que eres una persona. Revisa tu conexión o desactiva bloqueadores y vuelve a intentarlo.',
+      'subscribe.codeLabel': 'código',
       'subscribe.noscript':
         'Activa JavaScript para suscribirte por correo, o sigue las notas por RSS.',
       'subscribe.privacy': 'Cómo se usa tu correo',
@@ -315,6 +321,11 @@ export const t = createTranslator({
       'subscribe.success': 'Check your inbox to confirm your subscription.',
       'subscribe.error': 'Unable to subscribe. Please try again later.',
       'subscribe.capped': 'Many requests came in today. Please try again tomorrow.',
+      'subscribe.rateLimited': 'Too many attempts in a row. Wait a minute and try again.',
+      'subscribe.interactive': 'Tick the box below to confirm you are a person.',
+      'subscribe.timeout':
+        'We could not verify that you are a person. Check your connection or turn off blockers and try again.',
+      'subscribe.codeLabel': 'code',
       'subscribe.noscript':
         'Turn on JavaScript to subscribe by email, or follow the notes via RSS.',
       'subscribe.privacy': 'How your email is used',

@@ -424,5 +424,11 @@
     "category": "added",
     "title": "Back to top button",
     "description": "A small pixel arrow appears at the bottom right when you scroll up a long page and takes you back to the top. It never covers the footer controls and stays still with reduced motion."
+  },
+  "subscribe-turnstile-ux": {
+    "date": "2026-10-06",
+    "category": "fixed",
+    "title": "Subscription form no longer waits forever",
+    "description": "The footer form now says when to tick the Turnstile box, times out after 25 s with a clear retry message, shows the error code, tells the per-minute limit from the daily one, and accepts a form filled after 1.5 s."
   }
 }

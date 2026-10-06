@@ -16,6 +16,7 @@ import {
   unsubscribeConfigured,
 } from '@/features/subscribe/index.ts';
 import { site } from '@/shared/config/index.ts';
+import { SUBSCRIBE_RATE_LIMITED_MESSAGE } from '@/shared/subscribe/client-policy.ts';
 
 const FAILURE = 'Unable to send your message. Please try again later.';
 const MARKS_FAILURE = 'Unable to save your footprint. Please try again later.';
@@ -136,6 +137,13 @@ export const server = {
         // The same fixed answer for every address once the day is capped.
         if (!result.ok && result.error === 'daily_cap') {
           throw new ActionError({ code: 'TOO_MANY_REQUESTS', message: SUBSCRIBE_CAPPED });
+        }
+        // The per-minute limiter runs before Turnstile and the lookup, so this answer says nothing about an address.
+        if (!result.ok && result.error === 'rate_limited') {
+          throw new ActionError({
+            code: 'TOO_MANY_REQUESTS',
+            message: SUBSCRIBE_RATE_LIMITED_MESSAGE,
+          });
         }
         // One fixed message whatever the reason: it must not reveal who is on the list.
         if (!result.ok) throw new ActionError({ code: 'BAD_REQUEST', message: SUBSCRIBE_FAILURE });
