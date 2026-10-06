@@ -14,6 +14,8 @@ export const SUBSCRIBE_POLICY = {
   providerTimeoutMs: PROVIDER_TIMEOUT_MS,
   providerResponseMaxBytes: PROVIDER_RESPONSE_MAX_BYTES,
   requestMaxBytes: 8_192,
+  /** The owner trigger takes `{ slug, dryRun }` only. */
+  notifyRequestMaxBytes: 1_024,
   turnstileAction: SUBSCRIBE_CLIENT_POLICY.turnstileAction,
   /** A confirmation link stops working after this long. */
   confirmExpiryMs: 48 * HOUR_MS,

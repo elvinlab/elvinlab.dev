@@ -273,6 +273,7 @@ Cuatro ámbitos: **build** (se leen al compilar), **Worker** (en producción, en
 | `TURNSTILE_HOSTNAME` | Worker (runtime) | no | yes | Hostname Turnstile must report for a valid token (for example the production domain). It makes a token from another site invalid. | Cloudflare Worker variable; `.dev.vars` locally (`localhost`) |
 | `SUBSCRIBE_FROM` | Worker (runtime) | yes | no | Sender of the subscription emails (`Name <address>` or a bare address), on a domain verified in Resend. Required only when `features.subscribe` is on. An address is never written in tracked files. | Cloudflare Worker secret; `.dev.vars` locally |
 | `SUBSCRIBE_TOKEN_SECRET` | Worker (runtime) | yes | no | Random secret (at least 32 characters) that signs the unsubscribe link of every email. Required only when `features.subscribe` is on. Changing it invalidates the unsubscribe links already sent. | Cloudflare Worker secret; `.dev.vars` locally |
+| `SUBSCRIBE_ADMIN_TOKEN` | Worker (runtime) | yes | no | Random secret (at least 32 characters) the owner sends as a Bearer token to `POST /api/subscribe/notify`, the trigger that emails a published note to the list (`pnpm notify:note`). Required only to send notes; without it the endpoint answers 503. Keep it in a password manager, never in the repository. | Cloudflare Worker secret; `.dev.vars` locally |
 | `CLOUDFLARE_API_TOKEN` | CI | yes | yes | Cloudflare API token with permission to deploy the Worker; used only by the deploy job. | GitHub environment secret (`production`) |
 | `CLOUDFLARE_ACCOUNT_ID` | CI | no | yes | Cloudflare account id the deploy job targets. Not a secret, but not needed anywhere else. | GitHub repository variable |
 | `DEV_CHECK_STRIP_DEPS` | local tooling | no | no | Set to `1` to run `pnpm check:dev-cold-start` as its own negative control: it removes the pre-optimized dependencies first and must then fail. | the shell, only when running that check |
@@ -312,6 +313,9 @@ SUBSCRIBE_FROM=
 
 # Random secret (at least 32 characters) that signs the unsubscribe link of every email. Required only when `features.subscribe` is on. Changing it invalidates the unsubscribe links already sent.
 SUBSCRIBE_TOKEN_SECRET=
+
+# Random secret (at least 32 characters) the owner sends as a Bearer token to `POST /api/subscribe/notify`, the trigger that emails a published note to the list (`pnpm notify:note`). Required only to send notes; without it the endpoint answers 503. Keep it in a password manager, never in the repository.
+SUBSCRIBE_ADMIN_TOKEN=
 ```
 <!-- docs:end dev-vars-example -->
 
@@ -459,6 +463,7 @@ Hasta completar todos los pasos el formulario no sirve de nada (las Actions resp
 4. **Verificá el dominio de envío en Resend** (registros DNS SPF y DKIM en la zona de Cloudflare) para que `SUBSCRIBE_FROM` sea aceptado. El plan gratuito permite 100 correos al día y 3000 al mes; el envío se topa en 100 por ejecución.
 5. **Encendé el flag**: poné `features.subscribe: true` en `site.config.ts`, corré `pnpm docs:config` si cambiaste algo generado y liberá (sección 7).
 6. **Comprobalo** con una dirección tuya de prueba: suscribite desde el footer de cualquier página, abrí el enlace del correo, pulsá el botón y luego dáte de baja desde un correo de nota. Nunca pruebes con la dirección de otra persona.
+7. **Enviá una nota a la lista** (cada vez que publiques una). La primera vez, creá el secreto del disparador: `openssl rand -base64 48`, luego `mise exec -- pnpm exec wrangler secret put SUBSCRIBE_ADMIN_TOKEN` y guardalo en un gestor de contraseñas (nunca en el repositorio ni en un archivo versionado; sin él, el endpoint responde 503 y el resto de la suscripción sigue funcionando). Orden: **primero liberá la nota (sección 7), después avisá**. Corré `SUBSCRIBE_ADMIN_TOKEN=... pnpm notify:note <slug>` (el token va por variable de entorno, nunca como argumento): es una **prueba en seco** que solo cuenta destinatarios y cupo del día y no envía nada. Si los números son los esperados, repetí con `--send`. Una nota en español llega solo a suscriptores en español, y una en inglés solo a los de inglés. El tope es de 100 correos al día entre confirmaciones y notas: si queda algo pendiente, el comando lo dice y lo volvés a correr al día siguiente (continúa donde quedó, sin repetir envíos). El endpoint `POST /api/subscribe/notify` solo recibe el `slug`: el título, el resumen y el enlace salen de la nota publicada.
 
 Para apagarlo, poné `features.subscribe: false`: el formulario y las páginas desaparecen en el próximo build y la sección de privacidad se va con ellos (la lista queda en D1).
 

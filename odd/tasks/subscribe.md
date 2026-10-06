@@ -61,3 +61,13 @@ Follow-up for the coordinator: `apps/web/src/actions/index.ts` still passes `sit
 - Secrets `SUBSCRIBE_TOKEN_SECRET` (generated on the spot, never displayed) and `SUBSCRIBE_FROM` created on the Worker `elvinlab`; `wrangler secret list` shows both next to the contact and Turnstile secrets.
 - Still open: the Resend sending domain was assumed verified because the contact form already sends from the same domain (not checked in Resend's panel); flip `features.subscribe: true` and release (needs explicit authorization); a real end-to-end test with an address the owner owns.
 
+## Released 2026-10-06
+`main` = `bc0b0c8`, flag on. Read-only production checks passed (see the ledger). Waiting on the owner's real end-to-end test and the sender trigger for new notes.
+
+## Owner trigger for sending a note (bounded writer, not committed)
+- [x] `POST /api/subscribe/notify` (server route injected by the flag-gated integration; Bearer `SUBSCRIBE_ADMIN_TOKEN`, constant-time compare, rate limit `notify:<ip>` before the token, JSON only, strict body `{ slug, dryRun? }`, note built server side from the published collection). Pure handler `notifySubscribers` in `features/subscribe/notify.ts`; ADR 0014 section added.
+- [x] Language filter: `listUnnotified`/`countUnnotified` take the locale (port, fake, D1 with bound parameter); `NoteToSend` carries `locale`.
+- [x] Owner command `pnpm notify:note <slug> [--send]` (`apps/web/scripts/notify-subscribers.ts`): token from the environment only, dry run by default, plain-sentence counts, non-zero exit on errors.
+- [x] New secret `SUBSCRIBE_ADMIN_TOKEN` in `ENV_VARS` (optional) with its own `notifyBindingsSchema` so the public subscription does not depend on it; docs (recipe 6.14 step 7, NOTES), changelog, white-label assertion that `/api/subscribe/` does not exist with the flag off.
+- Owner steps still open: create the secret on the Worker (`openssl rand -base64 48`, `wrangler secret put SUBSCRIBE_ADMIN_TOKEN`), release, then run the command (dry run first). Not run: e2e, Lighthouse, any remote command.
+

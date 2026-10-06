@@ -4,7 +4,7 @@ import { join, resolve } from 'node:path';
 import { describe, expect, it } from 'vitest';
 
 import { bindingsSchema } from '@/features/contact/bindings.ts';
-import { subscribeBindingsSchema } from '@/features/subscribe/bindings.ts';
+import { notifyBindingsSchema, subscribeBindingsSchema } from '@/features/subscribe/bindings.ts';
 
 import { ENV_VARS } from './env-vars.ts';
 
@@ -53,9 +53,11 @@ describe('ENV_VARS registry', () => {
       (variable) => variable.name,
     );
     const bound = new Set(
-      [...Object.keys(bindingsSchema.shape), ...Object.keys(subscribeBindingsSchema.shape)].filter(
-        (key) => !key.endsWith('_RATE_LIMITER') && key !== 'SITE_DB',
-      ),
+      [
+        ...Object.keys(bindingsSchema.shape),
+        ...Object.keys(subscribeBindingsSchema.shape),
+        ...Object.keys(notifyBindingsSchema.shape),
+      ].filter((key) => !key.endsWith('_RATE_LIMITER') && key !== 'SITE_DB'),
     );
     expect(registered.sort()).toEqual([...bound].sort());
   });

@@ -273,6 +273,7 @@ Four scopes: **build** (read while building), **Worker** (in production, at runt
 | `TURNSTILE_HOSTNAME` | Worker (runtime) | no | yes | Hostname Turnstile must report for a valid token (for example the production domain). It makes a token from another site invalid. | Cloudflare Worker variable; `.dev.vars` locally (`localhost`) |
 | `SUBSCRIBE_FROM` | Worker (runtime) | yes | no | Sender of the subscription emails (`Name <address>` or a bare address), on a domain verified in Resend. Required only when `features.subscribe` is on. An address is never written in tracked files. | Cloudflare Worker secret; `.dev.vars` locally |
 | `SUBSCRIBE_TOKEN_SECRET` | Worker (runtime) | yes | no | Random secret (at least 32 characters) that signs the unsubscribe link of every email. Required only when `features.subscribe` is on. Changing it invalidates the unsubscribe links already sent. | Cloudflare Worker secret; `.dev.vars` locally |
+| `SUBSCRIBE_ADMIN_TOKEN` | Worker (runtime) | yes | no | Random secret (at least 32 characters) the owner sends as a Bearer token to `POST /api/subscribe/notify`, the trigger that emails a published note to the list (`pnpm notify:note`). Required only to send notes; without it the endpoint answers 503. Keep it in a password manager, never in the repository. | Cloudflare Worker secret; `.dev.vars` locally |
 | `CLOUDFLARE_API_TOKEN` | CI | yes | yes | Cloudflare API token with permission to deploy the Worker; used only by the deploy job. | GitHub environment secret (`production`) |
 | `CLOUDFLARE_ACCOUNT_ID` | CI | no | yes | Cloudflare account id the deploy job targets. Not a secret, but not needed anywhere else. | GitHub repository variable |
 | `DEV_CHECK_STRIP_DEPS` | local tooling | no | no | Set to `1` to run `pnpm check:dev-cold-start` as its own negative control: it removes the pre-optimized dependencies first and must then fail. | the shell, only when running that check |
@@ -312,6 +313,9 @@ SUBSCRIBE_FROM=
 
 # Random secret (at least 32 characters) that signs the unsubscribe link of every email. Required only when `features.subscribe` is on. Changing it invalidates the unsubscribe links already sent.
 SUBSCRIBE_TOKEN_SECRET=
+
+# Random secret (at least 32 characters) the owner sends as a Bearer token to `POST /api/subscribe/notify`, the trigger that emails a published note to the list (`pnpm notify:note`). Required only to send notes; without it the endpoint answers 503. Keep it in a password manager, never in the repository.
+SUBSCRIBE_ADMIN_TOKEN=
 ```
 <!-- docs:end dev-vars-example -->
 
@@ -459,6 +463,7 @@ Until every step below is done the form shows nothing useful (the Actions answer
 4. **Verify the sending domain in Resend** (DNS records SPF and DKIM in the Cloudflare zone) so `SUBSCRIBE_FROM` is accepted. The free plan allows 100 emails a day and 3,000 a month; the sender caps each run at 100.
 5. **Flip the flag**: set `features.subscribe: true` in `site.config.ts`, run `pnpm docs:config` if you changed anything generated, and release (section 7).
 6. **Check it** with a throwaway address you own: subscribe from the footer of any page, open the link in the email, press the button, then unsubscribe from a note email. Never test with someone else's address.
+7. **Send a note to the list** (every time you publish one). The first time, create the trigger secret: `openssl rand -base64 48`, then `mise exec -- pnpm exec wrangler secret put SUBSCRIBE_ADMIN_TOKEN`, and keep it in a password manager (never in the repository or any tracked file; without it the endpoint answers 503 and the rest of the subscription keeps working). Order: **release the note first (section 7), then notify**. Run `SUBSCRIBE_ADMIN_TOKEN=... pnpm notify:note <slug>` (the token goes in an environment variable, never as an argument): it is a **dry run** that only counts recipients and the day's allowance and sends nothing. If the numbers look right, repeat it with `--send`. A Spanish note reaches only Spanish subscribers and an English one only English subscribers. The cap is 100 emails a day across confirmations and notes: when some are left, the command says so and you run it again the next day (it resumes where it stopped, with no repeated sends). The endpoint `POST /api/subscribe/notify` takes only the `slug`: the title, summary and link come from the published note.
 
 To switch it off, set `features.subscribe: false`: the form and the pages disappear from the next build and the privacy section goes with them (the list stays in D1).
 

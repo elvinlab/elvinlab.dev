@@ -9,8 +9,19 @@ import {
 } from './adapters/d1.ts';
 import { createResendMailer } from './adapters/resend.ts';
 import { createWebCryptoTokens } from './adapters/webcrypto.ts';
-import { listBindingsSchema, sendBindingsSchema, subscribeBindingsSchema } from './bindings.ts';
+import {
+  listBindingsSchema,
+  notifyBindingsSchema,
+  sendBindingsSchema,
+  subscribeBindingsSchema,
+} from './bindings.ts';
 import { SUBSCRIBE_PATHS, SUBSCRIBE_POLICY } from './config.ts';
+import {
+  type NoteLookup,
+  type NotifyRequest,
+  type NotifyResponse,
+  notifySubscribers,
+} from './notify.ts';
 import type { EmailSite, SubscribeLinks, SubscribePorts } from './ports.ts';
 import {
   type ConfirmResult,
@@ -171,4 +182,40 @@ export async function sendNoteConfigured(
     },
     options,
   );
+}
+
+/** The owner trigger; a missing or invalid binding answers 503 (nothing leaks about which one). */
+export async function notifyConfigured(
+  request: NotifyRequest,
+  bindings: unknown,
+  site: string | EmailSite,
+  findNote: NoteLookup,
+  fetcher: typeof fetch = fetch,
+  log: (message: string) => void = console.error,
+): Promise<NotifyResponse> {
+  const parsed = notifyBindingsSchema.safeParse(bindings);
+  if (!parsed.success) {
+    log(`subscribe notify unavailable, bindings rejected: ${rejectedNames(parsed.error)}`);
+    return { status: 503 };
+  }
+  const config = parsed.data;
+  const report = (detail: string) => log(`subscribe notify: ${detail}`);
+  return notifySubscribers(request, {
+    report,
+    now: Date.now,
+    adminToken: config.SUBSCRIBE_ADMIN_TOKEN,
+    findNote,
+    repository: createD1SubscriberRepository(config.SITE_DB as D1Like),
+    quota: createD1SubscribeQuota(config.SITE_DB as D1Like),
+    tokens: createWebCryptoTokens(config.SUBSCRIBE_TOKEN_SECRET),
+    links: createLinks(emailSite(site).url),
+    // A different key from the public form, so guessing the token never uses up visitors' budget.
+    limiter: {
+      async allow(address) {
+        const result = await config.SUBSCRIBE_RATE_LIMITER.limit({ key: `notify:${address}` });
+        return allowedSchema.safeParse(result).success;
+      },
+    },
+    mailer: createResendMailer(mailerConfig(config, site), fetcher, report),
+  });
 }

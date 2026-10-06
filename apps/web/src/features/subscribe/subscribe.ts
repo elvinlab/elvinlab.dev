@@ -31,6 +31,8 @@ const noteSchema = z.strictObject({
     .max(2_048)
     .refine((value) => value.startsWith('https://') || value.startsWith('http://localhost')),
   summary: z.string().max(1_000).optional(),
+  /** Language of the note: it goes only to the confirmed subscribers of that locale. */
+  locale: z.enum(['es', 'en']),
 });
 
 export type SubscribeResult =
@@ -206,14 +208,18 @@ export async function sendNote(
   >,
   options: { dailyCap?: number; batchSize?: number } = {},
 ): Promise<SendNoteResult> {
-  const { slug, title, url, summary } = noteSchema.parse(note);
+  const { slug, title, url, summary, locale } = noteSchema.parse(note);
   // Confirmations and notes share the provider's daily pool; notes use what is left of it.
   const left =
     SUBSCRIBE_POLICY.providerDailyTotal -
     (await ports.quota.confirmationsToday(utcDay(ports.now())));
   const dailyCap = Math.min(options.dailyCap ?? SUBSCRIBE_POLICY.dailyCap, left);
   if (dailyCap <= 0)
-    return { sent: 0, remaining: await ports.repository.countUnnotified(slug), failed: false };
+    return {
+      sent: 0,
+      remaining: await ports.repository.countUnnotified(slug, locale),
+      failed: false,
+    };
   const batchSize = Math.min(
     options.batchSize ?? SUBSCRIBE_POLICY.batchSize,
     SUBSCRIBE_POLICY.batchSize,
@@ -221,7 +227,11 @@ export async function sendNote(
   let sent = 0;
   let failed = false;
   while (sent < dailyCap && !failed) {
-    const batch = await ports.repository.listUnnotified(slug, Math.min(batchSize, dailyCap - sent));
+    const batch = await ports.repository.listUnnotified(
+      slug,
+      locale,
+      Math.min(batchSize, dailyCap - sent),
+    );
     const first = batch[0];
     if (!first) break;
     const messages: NoteMail[] = await Promise.all(
@@ -250,5 +260,5 @@ export async function sendNote(
     );
     sent += batch.length;
   }
-  return { sent, remaining: await ports.repository.countUnnotified(slug), failed };
+  return { sent, remaining: await ports.repository.countUnnotified(slug, locale), failed };
 }
