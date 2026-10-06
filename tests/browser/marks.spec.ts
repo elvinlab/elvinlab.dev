@@ -222,7 +222,7 @@ for (const note of NOTES) {
     test('an unavailable store leaves no marks UI and shifts nothing beyond the reserved box', async ({
       page,
     }) => {
-      await mockMarks(page, { getStatus: 503, getDelay: 400 });
+      await mockMarks(page, { getStatus: 503, getDelay: 1500 });
       await page.goto(note.path);
       await expect(header(page)).toBeAttached();
       const before = (await page.locator('[data-article]').boundingBox())?.y ?? 0;
