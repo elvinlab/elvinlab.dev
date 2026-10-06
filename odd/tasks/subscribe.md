@@ -126,3 +126,8 @@ Dry run first (4 confirmed Spanish subscribers had never received a note; pool 9
 - Added `/subscribe/` and `/en/subscribe/` (`features/subscribe/components/SubscribeLanding.astro`, routes `subscribe-routes/index.astro` and `en-index.astro`, registered in `integrations/subscribe-routes.ts`, so they exist only with the blog and `features.subscribe` on). The band was split: `shared/subscribe/SubscribeForm.astro` (form, stub script, privacy link; `variant` band or page), `PixelEnvelope.astro` and `subscribe-root.ts` (the `data-*` root attributes); the footer band keeps every selector and text key.
 - Sitemap filter now hides only `/subscribe/confirm/` and `/subscribe/unsubscribe/` (and `/en` twins); `showSubscribeCta` test covers `/subscribe/`. Copy in `subscribe.page.*` (ES and EN). BRAND row, DESIGN line, SUBSCRIPTION es/en "link to share" section, changelog `subscribe-landing`.
 - Evidence: see the handoff (biome, typecheck, vitest, depcruise, docs:config, build, js-budget, white-label, one e2e run of `subscribe.spec.ts` at 1280 px, one Lighthouse run of `/subscribe/`).
+
+## Closing state, 2026-10-06 (owner decisions)
+- Note 2 is not sent to subscribers (owner decision). Notes 1 and 3 reached every confirmed subscriber; after the release a dry run `pnpm notify:note vibe-coding-o-especificar-primero` must report 0 recipients (the ledger covers it).
+- Next step: DMARC `p=quarantine` after weeks of reports; the policy is `p=none` today.
+- Do not run `pnpm notify:note` against production before the release that reads `subscriber_notes`.
