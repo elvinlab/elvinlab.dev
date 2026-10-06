@@ -11,9 +11,9 @@ import SubscribeBand from '@/shared/subscribe/SubscribeBand.astro';
 import BrandMark from '@/shared/ui/BrandMark.astro';
 import ExternalHint from '@/shared/ui/ExternalHint.astro';
 
-type Props = { locale: Locale; subscribeCta?: boolean };
+type Props = { locale: Locale; subscribeCta?: boolean; subscribeLink?: boolean };
 
-const { locale, subscribeCta = false } = Astro.props;
+const { locale, subscribeCta = false, subscribeLink = false } = Astro.props;
 const year = new Date().getFullYear();
 // 44 px tall hit area; -mx-3 cancels the px-3 so the text keeps its column alignment under md.
 const footerLink =
@@ -48,6 +48,14 @@ const footerLink =
           class={footerLink}
         >
           {t(locale, 'footer.changelog')}
+        </a>
+      )}
+      {subscribeLink && (
+        <a
+          href={locale === 'es' ? '/subscribe/' : '/en/subscribe/'}
+          class={footerLink}
+        >
+          {t(locale, 'footer.subscribe')}
         </a>
       )}
       {site.socials.length > 0 && (

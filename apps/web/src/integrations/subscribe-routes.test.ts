@@ -5,6 +5,8 @@ import { subscribeRoutes } from './subscribe-routes.ts';
 describe('subscribeRoutes', () => {
   it('returns the two pages in both languages and the notify endpoint when enabled', () => {
     expect(subscribeRoutes(true).map((route) => route.pattern)).toEqual([
+      '/subscribe',
+      '/en/subscribe',
       '/subscribe/confirm',
       '/subscribe/unsubscribe',
       '/en/subscribe/confirm',

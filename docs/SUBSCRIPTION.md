@@ -22,6 +22,11 @@ Quien lee deja su correo en la banda del footer y recibe las notas nuevas y, de 
 
 Dónde se muestra la banda: en el footer de todas las páginas cuando están encendidos `features.blog`, `features.subscribe` y hay clave pública de Turnstile. **No** aparece en `/me` (se imprime como CV) ni en las páginas `/subscribe/*`. Las páginas de confirmación y baja existen en español e inglés (`/en/subscribe/...`).
 
+### Enlace para compartir
+
+`elvinlab.dev/subscribe` es el enlace que se manda a alguien (en inglés, `elvinlab.dev/en/subscribe`). Explica qué son las notas, trae el mismo formulario del footer, la última nota publicada en ese idioma y no muestra la banda del footer. Es indexable y está en el sitemap; las páginas de confirmación y baja siguen ocultas. El footer de todas las páginas (salvo el CV imprimible de `/me`) también trae el enlace «Suscribirse» a esa página.
+
+
 ## 3. Arquitectura en un dibujo
 
 ```
@@ -44,7 +49,7 @@ Dónde se muestra la banda: en el footer de todas las páginas cuando están enc
 | Código del navegador (banda, formulario, Turnstile) | `apps/web/src/shared/subscribe/` |
 | Correos (HTML y texto) | `features/subscribe/email-templates.ts` |
 | Páginas de confirmación y baja, y el endpoint del dueño | `apps/web/src/subscribe-routes/`, registradas por `integrations/subscribe-routes.ts` solo con el flag encendido |
-| Migración | `apps/web/migrations/0002_subscribers.sql` |
+| Migraciones | `apps/web/migrations/0002_subscribers.sql` y `0003_subscriber_notes.sql` |
 
 **Cambiar de proveedor de correo:** escribe otro adaptador que implemente `SubscriptionMailer` (`sendConfirmation` y `sendNote`) y cámbialo en el `runtime`. El dominio y el esquema de la base no cambian; los tests ya lo prueban con un mailer falso.
 
@@ -59,8 +64,18 @@ Dónde se muestra la banda: en el footer de todas las páginas cuando están enc
 | `status` | `pending`, `confirmed` o `unsubscribed` |
 | `locale` | `es` o `en`: idioma de la página donde se suscribió |
 | `confirm_hash`, `confirm_expires`, `confirm_sent_at` | Huella SHA-256 del enlace de confirmación, su vencimiento y cuándo se envió |
-| `last_note` | Slug de la última nota enviada a esa persona |
+| `last_note` | Slug de la última nota enviada a esa persona (informativo: ya no decide a quién se envía) |
 | `created_at`, `confirmed_at`, `unsubscribed_at` | Fechas de cada paso |
+
+La tabla `subscriber_notes` (migración `0003_subscriber_notes.sql`) guarda qué notas ya se enviaron a cada persona, solo para no enviar la misma dos veces:
+
+| Columna | Contenido |
+| --- | --- |
+| `subscriber_id` | El `id` del suscriptor (`ON DELETE CASCADE`: al borrar la persona se borran sus filas) |
+| `slug` | La nota enviada |
+| `sent_at` | Cuándo se registró el envío (en el relleno inicial desde `last_note`, la fecha de confirmación) |
+
+La clave primaria es `(subscriber_id, slug)`: una nota no puede registrarse dos veces para la misma persona. `last_note` solo recordaba una nota y por eso se enviaban duplicados al mandar notas fuera de orden; ahora decide esta tabla.
 
 La tabla `subscribe_quota` solo cuenta correos de confirmación por día UTC; no tiene datos personales.
 
@@ -79,8 +94,10 @@ La tabla `subscribe_quota` solo cuenta correos de confirmación por día UTC; no
 **Borrar una dirección a pedido.** La petición llega por `/contact`. El dueño, desde `apps/web` y con `wrangler login` hecho, ejecuta:
 
 ```bash
-mise exec -- pnpm exec wrangler d1 execute SITE_DB --remote --command "DELETE FROM subscribers WHERE email = '<address>'"
+mise exec -- pnpm exec wrangler d1 execute SITE_DB --remote --command "DELETE FROM subscriber_notes WHERE subscriber_id IN (SELECT id FROM subscribers WHERE email = '<address>'); DELETE FROM subscribers WHERE email = '<address>'"
 ```
+
+Borra a la persona y sus registros de envío (`subscriber_notes`). La clave foránea con `ON DELETE CASCADE` haría lo mismo sola, pero no se depende de ella: la primera sentencia borra las filas de envío explícitamente.
 
 Reemplaza `<address>` a mano por la dirección **en minúsculas** (así se guarda). La CLI no usa parámetros enlazados: el valor va dentro de la sentencia, por eso conviene copiar la dirección exacta y no incluir comillas simples. En el código, las consultas sí usan parámetros enlazados (`?`), nunca texto concatenado.
 
@@ -127,7 +144,8 @@ El envío es **manual a propósito**: se decidió mantenerlo así mientras se ob
    SUBSCRIBE_ADMIN_TOKEN="$(cat ~/.config/elvinlab/subscribe-admin-token)" mise exec -- pnpm notify:note <slug> --send
    ```
 
-4. **Lee los conteos.** La simulación dice cuántos destinatarios faltan y cuántos se enviarían hoy. El envío dice cuántos salieron y cuántos siguen esperando. Si `remaining` es mayor que 0, vuelve a correrlo al día siguiente: continúa donde quedó, porque `last_note` marca a quién ya se le envió esa nota.
+4. **Lee los conteos.** La simulación dice cuántos destinatarios faltan y cuántos se enviarían hoy. El envío dice cuántos salieron y cuántos siguen esperando. Si `remaining` es mayor que 0, vuelve a correrlo al día siguiente: continúa donde quedó, porque la tabla `subscriber_notes` registra a quién ya se le envió esa nota.
+5. **El orden no importa y no hay duplicados.** Puedes enviar notas antiguas o en cualquier orden, y repetir un comando: cada persona recibe cada nota una sola vez. Quien confirma más tarde recibe la nota cuando se envíe de nuevo, y nadie más la recibe otra vez.
 
 Reglas que conviene tener presentes:
 
@@ -141,7 +159,7 @@ Reglas que conviene tener presentes:
 
 Los comandos exactos están en la [receta 6.14](CONFIGURATION.md#614-suscripción-por-correo-a-las-notas-nuevas-subscribe); aquí solo el mapa:
 
-1. Aplicar la migración `0002_subscribers.sql` a la base D1 real.
+1. Aplicar las migraciones `0002_subscribers.sql` y `0003_subscriber_notes.sql` a la base D1 real (un solo comando: aplica las pendientes).
 2. Crear los secretos del Worker `SUBSCRIBE_FROM`, `SUBSCRIBE_TOKEN_SECRET` y `SUBSCRIBE_ADMIN_TOKEN`.
 3. El limitador `SUBSCRIBE_RATE_LIMITER` ya está declarado en `wrangler.jsonc`.
 4. Verificar el dominio de envío en Resend (SPF y DKIM).
@@ -183,7 +201,7 @@ Los comandos exactos están en la [receta 6.14](CONFIGURATION.md#614-suscripció
 | Un error con un código entre paréntesis, por ejemplo «(código 600010)» | El código de error de Turnstile | `110200`: dominio no permitido para la site key (ajustes del widget en Turnstile). `600010`: el desafío falló o fue bloqueado (extensión, red, puntuación de bot) |
 | 503 en el endpoint | Falta `SUBSCRIBE_ADMIN_TOKEN` en el Worker, o falla un binding | `wrangler secret list` y los logs. Con el flag apagado la ruta no existe (404) |
 | 404 al enviar | Borrador o slug no publicado | Libera la nota y revisa el slug |
-| La nota no llegó a nadie | Todos tienen ya `last_note` con ese slug, o el idioma no coincide | La simulación: `recipients` cuenta solo quien falta, del mismo idioma |
+| La nota no llegó a nadie | Todos tienen ya una fila en `subscriber_notes` para ese slug (ya se les envió), o el idioma no coincide, o falta aplicar la migración `0003` | La simulación: `recipients` cuenta solo quien falta, del mismo idioma |
 | 502 | Resend rechazó un lote | Nada se marcó como enviado en ese lote: vuelve a correr el comando |
 
 ## 11. Decisiones y dónde están

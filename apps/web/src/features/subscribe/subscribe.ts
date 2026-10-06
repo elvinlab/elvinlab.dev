@@ -200,7 +200,7 @@ export async function unsubscribe(
 
 /**
  * Sends a note to the confirmed subscribers who have not received it yet, in provider-sized
- * batches and at most `dailyCap` per run (less when confirmations already used part of the pool). `lastNote` is written only after a batch was accepted, so
+ * batches and at most `dailyCap` per run (less when confirmations already used part of the pool). the delivery records are written only after a batch was accepted, so
  * a failed or capped run resumes where it stopped. Returns counts only.
  */
 export async function sendNote(
@@ -260,6 +260,7 @@ export async function sendNote(
     await ports.repository.markNotified(
       batch.map((subscriber) => subscriber.id),
       slug,
+      ports.now(),
     );
     sent += batch.length;
   }

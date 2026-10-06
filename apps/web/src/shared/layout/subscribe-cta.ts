@@ -18,3 +18,15 @@ export function showSubscribeCta({ features, turnstileSiteKey, path, printable }
   if (printable || path.startsWith('/subscribe/')) return false;
   return isSubscribeFormShown(features, turnstileSiteKey);
 }
+
+/**
+ * Whether the footer links to the subscription page: wherever the subscription is reachable, so a
+ * reader can always find the shareable page. Only the printable CV never carries it.
+ */
+export function showSubscribeLink({
+  features,
+  turnstileSiteKey,
+  printable,
+}: Pick<Input, 'features' | 'turnstileSiteKey' | 'printable'> & { path?: string }): boolean {
+  return !printable && isSubscribeFormShown(features, turnstileSiteKey);
+}

@@ -1,7 +1,7 @@
 ---
 /**
  * Sticky 72 px navbar card. Sections follow the feature flags; under `md` they collapse into a
- * disclosure menu. The language link and theme toggle stay visible at every width.
+ * disclosure menu. The language link and theme toggle (when its switch is on) stay visible at every width.
  */
 
 import { getCollection } from 'astro:content';
@@ -67,8 +67,8 @@ const linkClass =
     >
       {otherLocale}
     </a>
-    <ThemeToggle label={t(locale, 'theme.switch')} />
-    <BackgroundPicker label={t(locale, 'background.switch')} />
+    {site.features.themeToggle && <ThemeToggle label={t(locale, 'theme.switch')} />}
+    {site.features.backgroundPicker && <BackgroundPicker label={t(locale, 'background.switch')} />}
     <button
       type="button"
       class="grid size-11 shrink-0 place-items-center rounded-control transition-colors duration-150 hover:bg-card-hover active:scale-96 md:hidden"

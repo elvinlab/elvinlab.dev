@@ -288,13 +288,17 @@ export const siteConfigSchema = z
           .describe(
             'Giscus comments on notes. Needs the `giscus` block below, otherwise nothing renders.',
           ),
-        contact: z.boolean().describe('The /contact form and its nav entry.'),
+        contact: z
+          .boolean()
+          .describe(
+            'The /contact form: off removes the route and the contact Action, hides the nav entry and every link to it (the legal pages and the subscription messages then name no Contact page), and keeps it out of the sitemap.',
+          ),
         credentials: z.boolean().describe('Certificates and degrees on /me.'),
         experiments: z.boolean().describe('The experiments (projects) section and its pages.'),
         changelog: z
           .boolean()
           .describe(
-            'Visitor-facing /changelog page: off hides the footer link, marks it noindex and keeps it out of the sitemap.',
+            'Visitor-facing /changelog page: off removes the route, the footer link and the sitemap entry.',
           ),
         me: z
           .boolean()
@@ -316,9 +320,33 @@ export const siteConfigSchema = z
           .describe(
             'Email subscription to new notes (double opt-in, list in D1, mail through Resend). Needs the `SITE_DB` D1 binding (table `subscribers`), the `SUBSCRIBE_RATE_LIMITER` binding and the `SUBSCRIBE_FROM` and `SUBSCRIBE_TOKEN_SECRET` secrets, otherwise nothing renders.',
           ),
+        backToTop: z
+          .boolean()
+          .default(true)
+          .describe(
+            'The floating "back to top" button. Off renders neither the button nor its script.',
+          ),
+        languageHint: z
+          .boolean()
+          .default(true)
+          .describe(
+            'The banner that suggests the other language to visitors whose browser prefers it. Off renders neither the banner nor its script.',
+          ),
+        themeToggle: z
+          .boolean()
+          .default(true)
+          .describe(
+            "The theme button in the navbar. Off renders no button and no script: the theme still resolves from the visitor's system preference (or the default theme) on every page.",
+          ),
+        backgroundPicker: z
+          .boolean()
+          .default(true)
+          .describe(
+            'The navbar button that cycles the banner background effect. Off renders no button and no script: the effect follows the owner default from `background`.',
+          ),
       })
       .describe(
-        'Feature flags: off means the routes are not generated and the nav entry is hidden.',
+        'Feature flags: off means the routes are not generated and the nav entry is hidden. The four interface switches (`backToTop`, `languageHint`, `themeToggle`, `backgroundPicker`) default to on and render nothing when off.',
       ),
     integrations: z
       .object({

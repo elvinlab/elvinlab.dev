@@ -63,6 +63,13 @@ function assertSubscribeEnabled(): void {
   }
 }
 
+/** The contact Action exists only while `features.contact` is on (its page is not routed otherwise). */
+function assertContactEnabled(): void {
+  if (!site.features.contact) {
+    throw new ActionError({ code: 'SERVICE_UNAVAILABLE', message: FAILURE });
+  }
+}
+
 /** Reads `token` from an untyped JSON body; the domain validates the value. */
 function tokenOf(input: unknown): unknown {
   return typeof input === 'object' && input !== null
@@ -89,6 +96,7 @@ export const server = {
     accept: 'json',
     async handler(input: unknown, { request }) {
       assertSameOrigin(request, FAILURE);
+      assertContactEnabled();
       // Cloudflare overwrites this header; never use user input or X-Forwarded-For as identity.
       const result = await submitConfiguredContact(
         input,

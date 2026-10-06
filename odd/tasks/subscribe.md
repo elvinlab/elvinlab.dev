@@ -91,3 +91,43 @@ The owner subscribed from the footer, confirmed, and received the note email. Dr
 
 ## Progress 2026-10-06: 8-bit landing pages (bounded writer, not committed)
 - [x] `/subscribe/confirm/` and `/subscribe/unsubscribe/` restyled as the band's dashed card with a pixel icon (envelope, check, exclamation) switched by `data-state`; BRAND row added, changelog `subscribe-pages-8bit`, e2e extended. Checks: see the coordinator handoff.
+
+## Dark mode check, 2026-10-06
+The owner confirmed the note email in dark mode in their own client and says it looks good. Still not checked: Outlook rendering and the unsubscribe click-through (it removes the owner from the list).
+
+## The friend's retry, 2026-10-06
+After the release `e3dedd6` the friend who got stuck on "Verificando…" retried from their Android phone and subscribed and confirmed without trouble. Server side: 3 subscribers, all confirmed, none pending; 4 of the 30 daily confirmation emails used. Closes the field report that started with the interactive Turnstile checkbox that readers did not notice.
+
+## Unsubscribe click-through, 2026-10-06
+The owner unsubscribed one address from a note email in production: the page answered fast and said all fine. Server side right after: 2 confirmed, 1 unsubscribed (unsubscribed_at set), no confirmation hash left. The remaining open checks of the subscription are Outlook rendering and the DMARC report address (owner DNS step).
+
+## Outlook check, 2026-10-06
+The owner opened the note email in Outlook and says it looks good. Email clients checked by the owner: Gmail (light and dark) and Outlook. The only open item of the subscription is the DMARC report address, an owner DNS step.
+
+## Email Routing and the new sender, 2026-10-06 (owner-authorized, exact operations, the machine's wrangler login)
+- DMARC: the owner activated Cloudflare DMARC Management in the dashboard; DNS now has ONE `_dmarc` record, `p=none` with Cloudflare's report address (not recorded here). The dashboard's "DKIM: No" and "SPF: N/A" are the scan of the root domain, not the real state: DKIM `resend._domainkey` and the Resend SPF on `send.elvinlab.dev` are published.
+- Email Routing for the zone was unconfigured and the root had no MX, so a reader's reply to a note email bounced. With `wrangler email routing`: the owner's personal address registered as a destination (the owner verified it by clicking Cloudflare's email), routing enabled (status ready; MX `route1/2/3.mx.cloudflare.net` and root SPF `include:_spf.mx.cloudflare.net` added; DMARC and the Resend SPF untouched), two forward rules (`notes@` and, for the first note email that already went out, `notas@`), catch-all left disabled (drop).
+- `SUBSCRIBE_FROM` set to the English sender `Lab Notes <notes@elvinlab.dev>` (was the Spanish `notas@`); no release needed, new emails use it at once. Resend needs nothing new: the whole domain is verified.
+- Not verified: that a message sent to `notes@` really reaches the owner's inbox (to be tested by the owner from another account) and the SPF/DKIM/DMARC PASS lines of a received note email (Gmail "Show original").
+
+## Note 3 sent to the whole list, 2026-10-06 (owner-requested)
+Dry run first (4 confirmed Spanish subscribers had never received a note; pool 94), then `pnpm notify:note vibe-coding-o-especificar-primero --send`: sent to 4, 0 waiting. Counts only in the tracker, no addresses. This was the first send with the English sender `Lab Notes <notes@elvinlab.dev>`.
+
+
+## Progress 2026-10-06: delivery ledger so a note can never be sent twice (bounded writer, not committed)
+- Found in production: `last_note` remembers one slug, so after note 1 went out, note 3 would have been re-sent to the same people. Fix: migration `0003_subscriber_notes.sql` (table `subscriber_notes`, PK `(subscriber_id, slug)`, `ON DELETE CASCADE`, backfill from `last_note`); `listUnnotified` and `countUnnotified` use `NOT EXISTS` on it; `markNotified(ids, slug, now)` inserts the rows and still writes `last_note`. ADR 0014 section, `/privacy` sentence (ES and EN, `privacyUpdated` 2026-10-06), SUBSCRIPTION and CONFIGURATION docs (es/en), changelog `subscriber-notes-ledger`.
+- Tests: domain (A,B,A once; order 3,1,2; late confirmer; daily-cap resume; pending and unsubscribed never recorded) and D1 adapter tests over the real migrations 0002 then 0003 (backfill, cascade with `PRAGMA foreign_keys = ON`, bound parameters). Checks: see the coordinator handoff.
+- [ ] Owner step 1: apply 0003 to the remote database: `cd apps/web && mise exec -- pnpm exec wrangler d1 migrations apply elvinlab-dev-db --remote` (applies the pending ones only).
+- [ ] Owner step 2: after 0003, run once (records that note 3 also reached the four confirmed subscribers and the one who later unsubscribed; the backfill only knows note 1):
+  `INSERT OR IGNORE INTO subscriber_notes (subscriber_id, slug, sent_at) SELECT id, 'vibe-coding-o-especificar-primero', COALESCE(confirmed_at, created_at, 0) FROM subscribers WHERE status IN ('confirmed','unsubscribed');`
+- [ ] Owner step 3: release (the code that reads the new table must not run before 0003 exists), then a dry run for note 3 must say 0 recipients.
+
+## Progress 2026-10-06: shareable subscription page (bounded writer, not committed)
+- Added `/subscribe/` and `/en/subscribe/` (`features/subscribe/components/SubscribeLanding.astro`, routes `subscribe-routes/index.astro` and `en-index.astro`, registered in `integrations/subscribe-routes.ts`, so they exist only with the blog and `features.subscribe` on). The band was split: `shared/subscribe/SubscribeForm.astro` (form, stub script, privacy link; `variant` band or page), `PixelEnvelope.astro` and `subscribe-root.ts` (the `data-*` root attributes); the footer band keeps every selector and text key.
+- Sitemap filter now hides only `/subscribe/confirm/` and `/subscribe/unsubscribe/` (and `/en` twins); `showSubscribeCta` test covers `/subscribe/`. Copy in `subscribe.page.*` (ES and EN). BRAND row, DESIGN line, SUBSCRIPTION es/en "link to share" section, changelog `subscribe-landing`.
+- Evidence: see the handoff (biome, typecheck, vitest, depcruise, docs:config, build, js-budget, white-label, one e2e run of `subscribe.spec.ts` at 1280 px, one Lighthouse run of `/subscribe/`).
+
+## Closing state, 2026-10-06 (owner decisions)
+- Note 2 is not sent to subscribers (owner decision). Notes 1 and 3 reached every confirmed subscriber; after the release a dry run `pnpm notify:note vibe-coding-o-especificar-primero` must report 0 recipients (the ledger covers it).
+- Next step: DMARC `p=quarantine` after weeks of reports; the policy is `p=none` today.
+- Do not run `pnpm notify:note` against production before the release that reads `subscriber_notes`.

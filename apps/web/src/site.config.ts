@@ -71,6 +71,10 @@ export const siteConfig = {
     readingMode: true,
     marks: true,
     subscribe: true,
+    backToTop: true,
+    languageHint: true,
+    themeToggle: true,
+    backgroundPicker: true,
   },
   // Public ids of third-party services. They ship in the HTML by design. An environment variable
   // with the same purpose overrides each one (PUBLIC_CF_ANALYTICS_TOKEN, PUBLIC_TURNSTILE_SITE_KEY).
@@ -79,7 +83,7 @@ export const siteConfig = {
     turnstileSiteKey: '0x4AAAAAAFKtcGkx9Mt92EHt',
   },
   // "Last updated" dates of the legal pages: bump the one whose text you change (YYYY-MM-DD).
-  legal: { privacyUpdated: '2026-10-05', termsUpdated: '2026-10-01' },
+  legal: { privacyUpdated: '2026-10-06', termsUpdated: '2026-10-01' },
   // Comments (https://giscus.app): GitHub Discussions of this repo, "Announcements" category.
   giscus: {
     repo: 'elvinlab/elvinlab.dev',

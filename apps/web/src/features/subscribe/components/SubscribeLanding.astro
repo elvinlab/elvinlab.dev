@@ -1,0 +1,86 @@
+---
+/**
+ * The page to send to someone: `/subscribe/` and `/en/subscribe/`. A stranger's first impression,
+ * so it is calm: a pixel envelope (the one accent), a short headline in the pixel display face, the
+ * same form as the footer band, three short value points and the latest note as proof the blog is
+ * real. The footer band does not render here (`showSubscribeCta` excludes `/subscribe/*`).
+ */
+import { getCollection } from 'astro:content';
+import { localizePath } from '@elvinlab/core';
+import pixelifySansLatin from '@fontsource-variable/pixelify-sans/files/pixelify-sans-latin-wght-normal.woff2?url';
+
+import { filterByLang, formatDate, readingMinutes, sortNotes } from '@/features/notes/index.ts';
+import { integrations, isEnabled, site } from '@/shared/config/index.ts';
+import { LOCALES, type Locale, t } from '@/shared/i18n/index.ts';
+import BaseLayout from '@/shared/layout/BaseLayout.astro';
+import { isSubscribeFormShown } from '@/shared/subscribe/availability.ts';
+import PixelEnvelope from '@/shared/subscribe/PixelEnvelope.astro';
+import SubscribeForm from '@/shared/subscribe/SubscribeForm.astro';
+import { subscribeRootAttributes } from '@/shared/subscribe/subscribe-root.ts';
+
+type Props = { locale: Locale };
+
+const { locale } = Astro.props;
+const points = [
+  { title: t(locale, 'subscribe.page.p1.title'), body: t(locale, 'subscribe.page.p1.body') },
+  { title: t(locale, 'subscribe.page.p2.title'), body: t(locale, 'subscribe.page.p2.body') },
+  { title: t(locale, 'subscribe.page.p3.title'), body: t(locale, 'subscribe.page.p3.body') },
+];
+const noteEntries = isEnabled('blog') ? await getCollection('notes') : [];
+const [latest] = filterByLang(
+  sortNotes(noteEntries.map((entry) => ({ slug: entry.id, data: entry.data, body: entry.body ?? '' }))),
+  locale,
+);
+const showForm = isSubscribeFormShown(site.features, integrations.turnstileSiteKey);
+---
+
+<BaseLayout
+  locale={locale}
+  path="/subscribe/"
+  title={t(locale, 'subscribe.page.metaTitle')}
+  description={t(locale, 'subscribe.page.description')}
+>
+  <link slot="head" rel="preload" as="font" type="font/woff2" href={pixelifySansLatin} crossorigin />
+  <div class="mx-auto mt-8 flex w-full max-w-[40rem] flex-col gap-8 md:mt-12 md:gap-10" data-subscribe-landing>
+    <header class="group/hero flex flex-col items-start gap-3">
+      <PixelEnvelope width={45} height={35} class="motion-safe:transition-transform motion-safe:duration-200 motion-safe:[transition-timing-function:steps(2,end)] motion-safe:group-hover/hero:-translate-y-1 motion-safe:group-focus-within/hero:-translate-y-1" />
+      <p class="font-mono text-sm text-muted">{t(locale, 'subscribe.page.eyebrow')}</p>
+      <h1 class="max-w-hero font-pixel text-hero font-semibold leading-[1.1] text-balance">{t(locale, 'subscribe.page.title')}</h1>
+      <p class="max-w-[52ch] text-intro leading-relaxed text-text-secondary">{t(locale, 'subscribe.page.subtitle')}</p>
+    </header>
+
+    {showForm && (
+      <section
+        {...subscribeRootAttributes(locale)}
+        aria-label={t(locale, 'subscribe.title')}
+        class="rounded-control border border-dashed border-divider bg-card p-5"
+      >
+        <div class="flex flex-col gap-2">
+          <SubscribeForm locale={locale} variant="page" />
+        </div>
+      </section>
+    )}
+
+    <ul class="flex flex-col gap-4">
+      {points.map((point) => (
+        <li class="flex items-start gap-3">
+          <span aria-hidden="true" class="mt-2.5 size-1.5 shrink-0 bg-muted"></span>
+          <p class="text-text-secondary"><strong class="font-semibold text-text">{point.title}</strong> {point.body}</p>
+        </li>
+      ))}
+    </ul>
+
+    {latest && (
+      <section data-latest-note data-card-link class="relative flex flex-col gap-3 rounded-card bg-card p-5 transition-colors duration-150 hover:bg-card-hover">
+        <p class="font-mono text-sm text-muted">{t(locale, 'subscribe.page.latest')}</p>
+        <h2 class="font-display text-card-title font-bold leading-tight">
+          <a href={localizePath(`/notes/${latest.slug}/`, locale, LOCALES)} class="transition-colors duration-150 after:absolute after:inset-0 hover:text-primary">{latest.data.title}</a>
+        </h2>
+        <p class="font-mono text-sm text-muted">
+          <time datetime={latest.data.pubDate.toISOString()}>{formatDate(latest.data.pubDate, locale)}</time>{' · '}<span class="whitespace-nowrap">{t(locale, 'notes.readingTime', { min: readingMinutes(latest.body) })}</span>
+        </p>
+        <span aria-hidden="true" class="w-fit text-primary underline decoration-dashed underline-offset-4">{t(locale, 'subscribe.page.read')}</span>
+      </section>
+    )}
+  </div>
+</BaseLayout>

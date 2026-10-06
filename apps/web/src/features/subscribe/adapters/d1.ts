@@ -56,10 +56,15 @@ const SQL = {
   unsubscribe: `UPDATE subscribers SET status = 'unsubscribed', confirm_hash = NULL, confirm_expires = NULL, unsubscribed_at = ?2
     WHERE id = ?1 AND status <> 'unsubscribed'`,
   unnotified: `SELECT ${COLUMNS} FROM subscribers
-    WHERE status = 'confirmed' AND locale = ?2 AND (last_note IS NULL OR last_note <> ?1) ORDER BY id LIMIT ?3`,
+    WHERE status = 'confirmed' AND locale = ?2
+      AND NOT EXISTS (SELECT 1 FROM subscriber_notes WHERE subscriber_id = subscribers.id AND slug = ?1)
+    ORDER BY id LIMIT ?3`,
   countUnnotified: `SELECT COUNT(*) AS total FROM subscribers
-    WHERE status = 'confirmed' AND locale = ?2 AND (last_note IS NULL OR last_note <> ?1)`,
+    WHERE status = 'confirmed' AND locale = ?2
+      AND NOT EXISTS (SELECT 1 FROM subscriber_notes WHERE subscriber_id = subscribers.id AND slug = ?1)`,
   // The ids travel as one JSON array parameter: D1 caps bound parameters per statement at 100.
+  recordNotified: `INSERT OR IGNORE INTO subscriber_notes (subscriber_id, slug, sent_at)
+    SELECT value, ?2, ?3 FROM json_each(?1)`,
   markNotified: `UPDATE subscribers SET last_note = ?2 WHERE status = 'confirmed' AND id IN (SELECT value FROM json_each(?1))`,
   // One statement: the increment is refused (no row returned) once the day reached the cap.
   reserve: `INSERT INTO subscribe_quota (day, confirmations) VALUES (?1, 1)
@@ -127,9 +132,12 @@ export function createD1SubscriberRepository(db: D1Like): SubscriberRepository {
     async countUnnotified(slug, locale) {
       return countSchema.parse(await one(SQL.countUnnotified, slug, locale)).total;
     },
-    async markNotified(ids, slug) {
+    async markNotified(ids, slug, now) {
       if (ids.length === 0) return;
-      await run(SQL.markNotified, JSON.stringify(ids), slug);
+      const json = JSON.stringify(ids);
+      // The delivery records decide who gets a note; `last_note` only documents the last send.
+      await run(SQL.recordNotified, json, slug, now);
+      await run(SQL.markNotified, json, slug);
     },
     async purgePendingBefore(cutoff) {
       return (await run(SQL.purge, cutoff)).meta.changes;

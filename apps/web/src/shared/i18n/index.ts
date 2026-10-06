@@ -38,6 +38,7 @@ export const t = createTranslator({
       'footer.privacy': 'Privacidad',
       'footer.terms': 'Términos',
       'footer.changelog': 'Changelog',
+      'footer.subscribe': 'Suscribirse',
       'aside.label': 'Barra lateral',
       'backtotop.label': 'Volver arriba',
       'banner.expand': 'Expandir el fondo',
@@ -136,6 +137,9 @@ export const t = createTranslator({
       'subscribe.success': 'Revisa tu bandeja de entrada para confirmar la suscripción.',
       'subscribe.error':
         'No se pudo suscribir. Inténtalo más tarde o escríbeme desde la página de Contacto y te agrego a mano.',
+      'subscribe.errorNoContact': 'No se pudo suscribir. Inténtalo más tarde.',
+      'subscribe.timeoutNoContact':
+        'No pudimos verificar que eres una persona. Revisa tu conexión o desactiva bloqueadores y vuelve a intentarlo.',
       'subscribe.capped': 'Hoy llegaron muchas solicitudes. Inténtalo de nuevo mañana.',
       'subscribe.rateLimited':
         'Demasiados intentos seguidos. Espera un minuto y vuelve a intentarlo.',
@@ -149,6 +153,24 @@ export const t = createTranslator({
       'subscribe.working': 'Procesando…',
       'subscribe.unavailable': 'No está disponible por ahora. Inténtalo más tarde.',
       'subscribe.back': 'Volver a las notas',
+      'subscribe.page.metaTitle': 'Suscríbete a las notas',
+      'subscribe.page.description':
+        'Recibe por correo cada nota nueva de Lab Notes: las decisiones detrás de lo que construyo, sin relleno y sin ruido.',
+      'subscribe.page.eyebrow': 'lab notes · por correo',
+      'subscribe.page.title': 'Lo que construyo, en tu correo.',
+      'subscribe.page.subtitle':
+        'Documento las decisiones detrás de lo que construyo: qué probé, qué descarté y por qué. Sin relleno y sin ruido.',
+      'subscribe.page.p1.title': 'Una nota, un correo.',
+      'subscribe.page.p1.body': 'Te escribo cuando publico algo nuevo, sin calendario fijo.',
+      'subscribe.page.p2.title': 'Decisiones, no tutoriales.',
+      'subscribe.page.p2.body':
+        'Lo que funcionó, lo que no y el contexto para decidir mejor tú también.',
+      'subscribe.page.p3.title': 'De vez en cuando, un proyecto.',
+      'subscribe.page.p3.body': 'Si algo mío merece que le eches un ojo, te aviso. Nada más.',
+      'subscribe.page.reassurance':
+        'Sin spam. Tu correo se usa solo para esto. Te das de baja en un clic.',
+      'subscribe.page.latest': 'La última nota',
+      'subscribe.page.read': 'Leerla',
       'subscribe.confirm.title': 'Confirmar suscripción',
       'subscribe.confirm.body':
         'Pulsa el botón para confirmar que quieres recibir por correo las notas nuevas y avisos de mis proyectos.',
@@ -224,6 +246,7 @@ export const t = createTranslator({
       'footer.privacy': 'Privacy',
       'footer.terms': 'Terms',
       'footer.changelog': 'Changelog',
+      'footer.subscribe': 'Subscribe',
       'aside.label': 'Sidebar',
       'backtotop.label': 'Back to top',
       'banner.expand': 'Expand the background',
@@ -322,6 +345,9 @@ export const t = createTranslator({
       'subscribe.success': 'Check your inbox to confirm your subscription.',
       'subscribe.error':
         'Unable to subscribe. Please try again later, or write to me from the Contact page and I will add you by hand.',
+      'subscribe.errorNoContact': 'Unable to subscribe. Please try again later.',
+      'subscribe.timeoutNoContact':
+        'We could not verify that you are a person. Check your connection or turn off blockers and try again.',
       'subscribe.capped': 'Many requests came in today. Please try again tomorrow.',
       'subscribe.rateLimited': 'Too many attempts in a row. Wait a minute and try again.',
       'subscribe.interactive': 'Tick the box below to confirm you are a person.',
@@ -334,6 +360,25 @@ export const t = createTranslator({
       'subscribe.working': 'Working…',
       'subscribe.unavailable': 'Not available right now. Please try again later.',
       'subscribe.back': 'Back to the notes',
+      'subscribe.page.metaTitle': 'Subscribe to the notes',
+      'subscribe.page.description':
+        'Get every new Lab Notes post by email: the decisions behind what I build, with no filler and no noise.',
+      'subscribe.page.eyebrow': 'lab notes · by email',
+      'subscribe.page.title': 'What I build, in your inbox.',
+      'subscribe.page.subtitle':
+        'I write down the decisions behind what I build: what I tried, what I dropped and why. No filler, no noise.',
+      'subscribe.page.p1.title': 'One note, one email.',
+      'subscribe.page.p1.body': 'I write when I publish something new, on no fixed schedule.',
+      'subscribe.page.p2.title': 'Decisions, not tutorials.',
+      'subscribe.page.p2.body':
+        'What worked, what did not, and the context to decide better yourself.',
+      'subscribe.page.p3.title': 'Now and then, a project.',
+      'subscribe.page.p3.body':
+        'If something of mine deserves a look, I let you know. Nothing else.',
+      'subscribe.page.reassurance':
+        'No spam. Your address is used for this only. Unsubscribe in one click.',
+      'subscribe.page.latest': 'The latest note',
+      'subscribe.page.read': 'Read it',
       'subscribe.confirm.title': 'Confirm subscription',
       'subscribe.confirm.body':
         'Press the button to confirm you want to get new notes and announcements of my projects by email.',

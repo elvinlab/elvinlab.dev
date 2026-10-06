@@ -74,3 +74,5 @@ Expected effect (not measured): Lighthouse about 170 s per shard (setup plus hal
 
 The slowest gate went from 265 s to 179 s and the whole release from about 328 s to 237 s (about 28% less). The first run had cold caches; the shards are now close to balanced (130 to 179 s), so a fifth e2e shard would save little. Local `pnpm verify --all` is about 245 s; the change-scoped plans stay the way to avoid it.
 
+Second run with the shards (2026-10-06, run 37497270008 on `e3dedd6`): static 50 s, lighthouse 152 and 153 s, e2e 150, 151, 173 and 173 s, checks 3 s, deploy 35 s; **whole run 221 s** (about 328 s before the sharding, so about 33% less). Slowest gate 173 s.
+

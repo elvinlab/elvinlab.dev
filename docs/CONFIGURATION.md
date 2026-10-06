@@ -116,17 +116,21 @@ Las descripciones vienen del esquema (`.describe()`), por eso están en inglés.
 | `me.stack` | `object[]` | yes |  | Tech stack groups. |
 | `me.stack[].label` | `{ <locale>: string }` | yes |  | Group name (Languages, Frontend, ...). |
 | `me.stack[].items` | `string[]` | yes |  | Tools in the group. |
-| `features` | `object` | yes |  | Feature flags: off means the routes are not generated and the nav entry is hidden. |
+| `features` | `object` | yes |  | Feature flags: off means the routes are not generated and the nav entry is hidden. The four interface switches (`backToTop`, `languageHint`, `themeToggle`, `backgroundPicker`) default to on and render nothing when off. |
 | `features.blog` | `boolean` | yes |  | Lab Notes: the notes index, note pages, RSS and the nav entry. |
 | `features.comments` | `boolean` | yes |  | Giscus comments on notes. Needs the `giscus` block below, otherwise nothing renders. |
-| `features.contact` | `boolean` | yes |  | The /contact form and its nav entry. |
+| `features.contact` | `boolean` | yes |  | The /contact form: off removes the route and the contact Action, hides the nav entry and every link to it (the legal pages and the subscription messages then name no Contact page), and keeps it out of the sitemap. |
 | `features.credentials` | `boolean` | yes |  | Certificates and degrees on /me. |
 | `features.experiments` | `boolean` | yes |  | The experiments (projects) section and its pages. |
-| `features.changelog` | `boolean` | yes |  | Visitor-facing /changelog page: off hides the footer link, marks it noindex and keeps it out of the sitemap. |
+| `features.changelog` | `boolean` | yes |  | Visitor-facing /changelog page: off removes the route, the footer link and the sitemap entry. |
 | `features.me` | `boolean` | yes |  | The /me recruiter page: off hides it from the nav, marks it noindex and keeps it out of the sitemap. |
 | `features.readingMode` | `boolean` | yes |  | Reading mode on notes: off renders no toggle, loads no script or CSS and stores nothing in the browser. |
 | `features.marks` | `boolean` | yes |  | The anonymous "I was here" footprint button on notes. Needs the `SITE_DB` D1 binding (the site database, table `note_footprints`) and the `MARKS_RATE_LIMITER` binding, otherwise the buttons never render. |
 | `features.subscribe` | `boolean` | yes |  | Email subscription to new notes (double opt-in, list in D1, mail through Resend). Needs the `SITE_DB` D1 binding (table `subscribers`), the `SUBSCRIBE_RATE_LIMITER` binding and the `SUBSCRIBE_FROM` and `SUBSCRIBE_TOKEN_SECRET` secrets, otherwise nothing renders. |
+| `features.backToTop` | `boolean` | no | `true` | The floating "back to top" button. Off renders neither the button nor its script. |
+| `features.languageHint` | `boolean` | no | `true` | The banner that suggests the other language to visitors whose browser prefers it. Off renders neither the banner nor its script. |
+| `features.themeToggle` | `boolean` | no | `true` | The theme button in the navbar. Off renders no button and no script: the theme still resolves from the visitor's system preference (or the default theme) on every page. |
+| `features.backgroundPicker` | `boolean` | no | `true` | The navbar button that cycles the banner background effect. Off renders no button and no script: the effect follows the owner default from `background`. |
 | `integrations` | `object` | no | `{}` | Public ids of third-party services. They ship in the HTML by design, so they live here and not in secrets. |
 | `integrations.cloudflareAnalyticsToken` | `string` | no |  | Cloudflare Web Analytics beacon token (public). Omit to turn analytics off. Env `PUBLIC_CF_ANALYTICS_TOKEN` overrides it. |
 | `integrations.turnstileSiteKey` | `string` | no |  | Cloudflare Turnstile public site key for the contact form, bound to the domain. Env `PUBLIC_TURNSTILE_SITE_KEY` overrides it (use a test key locally). |
@@ -340,9 +344,32 @@ Cada bandera de `features` apaga la función completa: no se genera la ruta, des
 | `contact` | Formulario `/contact` | Necesita los secretos del Worker; sin ellos falla cerrado |
 | `credentials` | Certificados en `/me` | |
 | `experiments` | Sección y páginas de experimentos | Las páginas `/experiments/` aún no se generan (issue #64): déjalo en `false` hasta que existan, o los enlaces apuntan a nada |
-| `changelog` | Página `/changelog` y su enlace | |
+| `changelog` | Página `/changelog` y su enlace | Apagada no se genera la ruta (ver «Qué hace cada interruptor») |
 | `me` | Página `/me` (portafolio) | |
 | `readingMode` | Modo lectura en las notas | Apagada: no se envía botón, script, CSS ni se guarda nada en el navegador |
+
+#### Qué hace cada interruptor
+
+Todas las banderas viven en `features` de `site.config.ts`. Las cuatro últimas (interfaz) valen `true` si las omites. Comprobado contra el código.
+
+| Bandera | Qué controla | Qué desaparece si está apagada | Dependencias |
+| --- | --- | --- | --- |
+| `blog` | Lab Notes: índice `/notes`, notas y feed `/rss.xml` | Las rutas (`integrations/blog-routes.ts`), la entrada «Notas» del menú, el feed y las entradas del sitemap; la portada y `/me` dejan de leer notas | Sin notas publicadas el menú también oculta «Notas». `subscribe` exige `blog` |
+| `comments` | Comentarios y reacciones (Giscus) en las notas | El componente y su sección en privacidad y términos | Necesita el bloque `giscus`; sin él no se pinta nada |
+| `contact` | Página `/contact` (y `/en/contact`) y la Action `contact` | Las rutas (`integrations/contact-routes.ts`), la Action (responde «no disponible» sin llegar a ningún proveedor), la entrada del menú, el botón de la tarjeta del autor y de `/me`, y la entrada del sitemap. Las páginas de privacidad y términos dejan de enlazar a contacto (remiten a «los canales publicados en este sitio») y privacidad pierde su sección «Formulario de contacto». Los mensajes de error de la suscripción dejan de mencionar la página de Contacto | Con la bandera activa, necesita los secretos del Worker (`CONTACT_*`) y la clave de Turnstile; sin ellos falla cerrado |
+| `credentials` | Certificados y títulos en `/me` | La sección de certificados de `/me` | |
+| `experiments` | Sección de experimentos | La entrada del menú, la sección de la portada y la de `/me`, y su entrada en el sitemap | Las páginas `/experiments/` aún no existen (issue #64); `home.experiments` también la necesita |
+| `me` | Página `/me` | La entrada «Sobre mí» del menú, la tarjeta de contratación de la portada, el enlace de la barra lateral de las notas y la tarjeta de compartir de `/me`; la página queda `noindex` y fuera del sitemap | |
+| `changelog` | Página `/changelog` (y `/en/changelog`) | Las rutas (`integrations/changelog-routes.ts`), el enlace del pie y la entrada del sitemap | |
+| `readingMode` | Modo lectura en las notas | Botón, script y CSS; no se guarda nada en el navegador | |
+| `marks` | Botón de huella en las notas y en la portada | El botón y su contador, y la sección de privacidad | Necesita `SITE_DB` (D1) y `MARKS_RATE_LIMITER` |
+| `subscribe` | Suscripción por correo | Las rutas `/subscribe/**`, el endpoint `/api/subscribe/notify`, el enlace y el formulario del pie, y la sección de privacidad | Necesita `blog` y una clave de Turnstile para mostrar el formulario; además `SITE_DB`, `SUBSCRIBE_RATE_LIMITER`, `SUBSCRIBE_FROM` y `SUBSCRIBE_TOKEN_SECRET` (ver 6.14) |
+| `backToTop` | Botón flotante «volver arriba» | El botón y su script (el resto de la página no depende de él) | |
+| `languageHint` | Aviso que sugiere el otro idioma según el navegador | El aviso y su script | |
+| `themeToggle` | Botón de tema del menú | El botón y su script. El tema se sigue resolviendo en cada página con el script previo al pintado: preferencia del sistema o tema por defecto, y se olvida una elección guardada antes | |
+| `backgroundPicker` | Botón del menú que cambia el efecto del banner | El botón y su script; el fondo sigue el valor por defecto de `background` e ignora una elección guardada antes | |
+
+Con `contact` apagado, la Action y las rutas no existen, así que el formulario del pie de suscripción no tiene ya adónde mandar a la gente: el mensaje de error se limita a pedir que se reintente más tarde.
 
 #### Apariencia y secciones de la portada
 
@@ -457,7 +484,7 @@ Quien visita deja su correo en el formulario del footer (la banda de suscripció
 
 Hasta completar todos los pasos el formulario no sirve de nada (las Actions responden «no disponible»), así que hacelos **en este orden**, en tus propias cuentas, antes de encender el flag:
 
-1. **Aplicá la migración a la base real** (necesita `wrangler login`): `cd apps/web && mise exec -- pnpm exec wrangler d1 migrations apply elvinlab-dev-db --remote` (aplica `migrations/0002_subscribers.sql`). La migración crea dos tablas: `subscribers` y `subscribe_quota` (contador por día UTC de correos de confirmación). Los valores del tope (30 confirmaciones al día de los 100 del proveedor) viven en `SUBSCRIBE_POLICY` (`features/subscribe/config.ts`); las notas usan lo que sobra de los 100 de cada día.
+1. **Aplicá la migración a la base real** (necesita `wrangler login`): `cd apps/web && mise exec -- pnpm exec wrangler d1 migrations apply elvinlab-dev-db --remote` (aplica todas las migraciones pendientes: `migrations/0002_subscribers.sql` y `migrations/0003_subscriber_notes.sql`; una instalación que ya corrió la 0002 recibe solo la 0003, la tabla de notas ya enviadas a cada suscriptor). Las migraciones crean tres tablas: `subscribers`, `subscriber_notes` (qué notas recibió ya cada suscriptor, para no enviar una nota dos veces) y `subscribe_quota` (contador por día UTC de correos de confirmación). Los valores del tope (30 confirmaciones al día de los 100 del proveedor) viven en `SUBSCRIBE_POLICY` (`features/subscribe/config.ts`); las notas usan lo que sobra de los 100 de cada día.
 2. **Creá los dos secretos** del Worker (nunca en archivos versionados): `SUBSCRIBE_FROM`, el remitente (`Nombre <dirección>`) en un dominio verificado en Resend, y `SUBSCRIBE_TOKEN_SECRET`, de al menos 32 caracteres aleatorios. Generá el segundo con `openssl rand -base64 48`, luego `mise exec -- pnpm exec wrangler secret put SUBSCRIBE_TOKEN_SECRET` y lo mismo con `SUBSCRIBE_FROM`. En local ponelos en `apps/web/.dev.vars` (ignorado por git). `RESEND_API_KEY` y `TURNSTILE_SECRET_KEY` son los que ya usa el formulario de contacto. Cambiar `SUBSCRIBE_TOKEN_SECRET` más adelante invalida los enlaces de baja ya enviados.
 3. **Enlazá el limitador**: `SUBSCRIBE_RATE_LIMITER` ya está declarado en `ratelimits` de `wrangler.jsonc` (con un `namespace_id` único); se activa con el próximo deploy. No hay que crear nada a mano.
 4. **Verificá el dominio de envío en Resend** (registros DNS SPF y DKIM en la zona de Cloudflare) para que `SUBSCRIBE_FROM` sea aceptado. El plan gratuito permite 100 correos al día y 3000 al mes; el envío se topa en 100 por ejecución.

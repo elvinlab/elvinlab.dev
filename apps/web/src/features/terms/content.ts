@@ -18,7 +18,8 @@ export type TermsContent = {
 export type TermsInput = {
   owner: string;
   domain: string;
-  contact: { es: string; en: string };
+  /** Paths of the contact page; omit when `features.contact` is off (no link, the owner is reached through the published channels). */
+  contact?: { es: string; en: string };
   /** "Last updated" date (YYYY-MM-DD), from `legal` in the site config. */
   updated: string;
   privacy: { es: string; en: string };
@@ -51,7 +52,7 @@ export function buildTermsContent({
         {
           id: 'owner',
           title: 'Quién publica este sitio',
-          body: `<p>${domain} lo publica ${owner}. Para cualquier consulta sobre estos términos o sobre el contenido, escribe desde la página de <a href="${contact.es}">contacto</a>.</p>`,
+          body: `<p>${domain} lo publica ${owner}. Para cualquier consulta sobre estos términos o sobre el contenido, escribe ${contact ? `desde la página de <a href="${contact.es}">contacto</a>` : 'por los canales publicados en este sitio'}.</p>`,
         },
         {
           id: 'content',
@@ -107,7 +108,7 @@ export function buildTermsContent({
         {
           id: 'owner',
           title: 'Who publishes this site',
-          body: `<p>${domain} is published by ${owner}. For any question about these terms or the content, write from the <a href="${contact.en}">contact</a> page.</p>`,
+          body: `<p>${domain} is published by ${owner}. For any question about these terms or the content, write ${contact ? `from the <a href="${contact.en}">contact</a> page` : 'through the channels published on this site'}.</p>`,
         },
         {
           id: 'content',

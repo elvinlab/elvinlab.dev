@@ -12,8 +12,9 @@ export function isHiddenFromSitemap(pathname: string, features?: typeof site.fea
   if (!flags.blog && (withoutLocale === '/notes/' || withoutLocale.startsWith('/notes/'))) {
     return true;
   }
-  // The subscription pages are token landing pages: never worth indexing, whatever the flags say.
-  if (withoutLocale.startsWith('/subscribe/')) return true;
+  // The confirm and unsubscribe pages are token landing pages: never worth indexing, whatever the
+  // flags say. The `/subscribe/` page itself is meant to be found and shared.
+  if (/^\/subscribe\/(confirm|unsubscribe)(\/|$)/.test(withoutLocale)) return true;
   if (!flags.me && (withoutLocale === '/me/' || pathname === '/me/' || pathname === '/en/me/')) {
     return true;
   }
@@ -25,6 +26,7 @@ export function isHiddenFromSitemap(pathname: string, features?: typeof site.fea
   ) {
     return true;
   }
+  if (!flags.contact && withoutLocale === '/contact/') return true;
   if (
     !flags.changelog &&
     (withoutLocale === '/changelog/' || pathname === '/changelog/' || pathname === '/en/changelog/')

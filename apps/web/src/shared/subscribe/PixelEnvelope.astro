@@ -1,0 +1,9 @@
+---
+/** The 9x7 pixel envelope of the subscription surfaces: pink is its one accent. Hover and focus
+ * motion is the caller's, through `class` (a two-step hop, off under reduced motion). */
+type Props = { width: number; height: number; class?: string };
+
+const { width, height, class: className } = Astro.props;
+---
+
+<svg aria-hidden="true" focusable="false" width={width} height={height} viewBox="0 0 9 7" class:list={['[shape-rendering:crispEdges]', className]}><path class="fill-pink" d="M0 0h9v1H0zM0 1h1v1H0zM8 1h1v1H8zM0 2h1v1H0zM8 2h1v1H8zM0 3h1v1H0zM8 3h1v1H8zM0 4h1v1H0zM8 4h1v1H8zM0 5h1v1H0zM8 5h1v1H8zM0 6h9v1H0z"></path><path class="fill-pink" d="M1 1h1v1H1zM7 1h1v1H7zM2 2h1v1H2zM6 2h1v1H6zM3 3h1v1H3zM5 3h1v1H5zM4 4h1v1H4z"></path><path class="fill-chip" d="M2 1h5v1H2zM1 2h1v1H1zM3 2h3v1H3zM7 2h1v1H7zM1 3h2v1H1zM4 3h1v1H4zM6 3h2v1H6zM1 4h3v1H1zM5 4h3v1H5zM1 5h7v1H1z"></path></svg>

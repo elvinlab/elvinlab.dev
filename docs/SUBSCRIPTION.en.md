@@ -22,6 +22,11 @@ A reader leaves an email in the footer band and gets the new notes and, now and 
 
 Where the band shows: in the footer of every page while `features.blog` and `features.subscribe` are on and a Turnstile site key exists. It does **not** show on `/me` (it prints as a CV) or on the `/subscribe/*` pages. The confirmation and unsubscribe pages exist in Spanish and English (`/en/subscribe/...`).
 
+### Link to share
+
+`elvinlab.dev/subscribe` is the link to send to someone (`elvinlab.dev/en/subscribe` in English). It explains what the notes are, carries the same form as the footer and the latest note in that language, and does not show the footer band. It is indexed and in the sitemap; the confirmation and unsubscribe pages stay hidden. The footer of every page (except the printable CV at `/me`) also carries a "Subscribe" link to that page.
+
+
 ## 3. Architecture in one picture
 
 ```
@@ -30,7 +35,7 @@ Where the band shows: in the footer of every page while `features.blog` and `fea
         ▼
  features/subscribe/subscribe.ts   (domain: validation, rules, no providers)
         │
-        ├── SubscriberRepository ──► D1 adapter: tables `subscribers`, `subscribe_quota`
+        ├── SubscriberRepository ──► D1 adapter: tables `subscribers`, `subscriber_notes`, `subscribe_quota`
         ├── SubscribeQuota       ──► D1 adapter (daily confirmation cap)
         ├── SubscriptionMailer   ──► Resend adapter (confirmation and note batches)
         ├── SubscribeVerifier    ──► Turnstile (action `subscribe`)
@@ -44,7 +49,7 @@ Where the band shows: in the footer of every page while `features.blog` and `fea
 | Browser code (band, form, Turnstile) | `apps/web/src/shared/subscribe/` |
 | Emails (HTML and text) | `features/subscribe/email-templates.ts` |
 | Confirmation and unsubscribe pages, and the owner endpoint | `apps/web/src/subscribe-routes/`, registered by `integrations/subscribe-routes.ts` only while the flag is on |
-| Migration | `apps/web/migrations/0002_subscribers.sql` |
+| Migrations | `apps/web/migrations/0002_subscribers.sql` and `0003_subscriber_notes.sql` |
 
 **Swapping the mail provider:** write another adapter that implements `SubscriptionMailer` (`sendConfirmation` and `sendNote`) and wire it in the `runtime`. The domain and the database schema do not change; the tests already prove it with a fake mailer.
 
@@ -59,8 +64,18 @@ Where the band shows: in the footer of every page while `features.blog` and `fea
 | `status` | `pending`, `confirmed` or `unsubscribed` |
 | `locale` | `es` or `en`: language of the page where they subscribed |
 | `confirm_hash`, `confirm_expires`, `confirm_sent_at` | SHA-256 hash of the confirmation link, its expiry and when it was sent |
-| `last_note` | Slug of the last note sent to that person |
+| `last_note` | Slug of the last note sent to that person (informational: it no longer decides who gets a note) |
 | `created_at`, `confirmed_at`, `unsubscribed_at` | Dates of each step |
+
+The `subscriber_notes` table (migration `0003_subscriber_notes.sql`) keeps which notes were already sent to each person, only so the same note is never sent twice:
+
+| Column | Content |
+| --- | --- |
+| `subscriber_id` | The subscriber's `id` (`ON DELETE CASCADE`: deleting the person deletes their rows) |
+| `slug` | The note that was sent |
+| `sent_at` | When the send was recorded (in the initial backfill from `last_note`, the confirmation date) |
+
+The primary key is `(subscriber_id, slug)`: a note cannot be recorded twice for the same person. `last_note` could remember only one note, which is why sending notes out of order produced duplicates; this table decides now.
 
 The `subscribe_quota` table only counts confirmation emails per UTC day; it holds no personal data.
 
@@ -79,8 +94,10 @@ The `subscribe_quota` table only counts confirmation emails per UTC day; it hold
 **Deleting one address on request.** The request arrives through `/contact`. The owner, from `apps/web` and logged in with `wrangler login`, runs:
 
 ```bash
-mise exec -- pnpm exec wrangler d1 execute SITE_DB --remote --command "DELETE FROM subscribers WHERE email = '<address>'"
+mise exec -- pnpm exec wrangler d1 execute SITE_DB --remote --command "DELETE FROM subscriber_notes WHERE subscriber_id IN (SELECT id FROM subscribers WHERE email = '<address>'); DELETE FROM subscribers WHERE email = '<address>'"
 ```
+
+This deletes the person and their delivery records (`subscriber_notes`). The foreign key with `ON DELETE CASCADE` would do the same on its own, but nothing depends on it: the first statement deletes the delivery rows explicitly.
 
 Replace `<address>` by hand with the address **in lower case** (that is how it is stored). The CLI does not use bound parameters: the value goes inside the statement, so copy the exact address and do not include single quotes. In the code, queries do use bound parameters (`?`), never concatenated text.
 
@@ -127,7 +144,8 @@ Sending is **manual on purpose**: the owner decided to keep it that way while th
    SUBSCRIBE_ADMIN_TOKEN="$(cat ~/.config/elvinlab/subscribe-admin-token)" mise exec -- pnpm notify:note <slug> --send
    ```
 
-4. **Read the counts.** The simulation says how many recipients are still waiting and how many would go out today. The send says how many went out and how many are still waiting. If `remaining` is greater than 0, run it again the next day: it resumes where it stopped, because `last_note` records who already got that note.
+4. **Read the counts.** The simulation says how many recipients are still waiting and how many would go out today. The send says how many went out and how many are still waiting. If `remaining` is greater than 0, run it again the next day: it resumes where it stopped, because the `subscriber_notes` table records who already got that note.
+5. **Order does not matter and nothing is duplicated.** You can send older notes, or send in any order, and re-run a command: each person receives each note once. Someone who confirms later receives the note when it is next sent, and nobody else gets it again.
 
 Rules to keep in mind:
 
@@ -141,7 +159,7 @@ Rules to keep in mind:
 
 The exact commands are in [recipe 6.14](CONFIGURATION.en.md#614-email-subscription-to-new-notes-subscribe); this is only the map:
 
-1. Apply the migration `0002_subscribers.sql` to the real D1 database.
+1. Apply the migrations `0002_subscribers.sql` and `0003_subscriber_notes.sql` to the real D1 database (one command: it applies the pending ones).
 2. Create the Worker secrets `SUBSCRIBE_FROM`, `SUBSCRIBE_TOKEN_SECRET` and `SUBSCRIBE_ADMIN_TOKEN`.
 3. The `SUBSCRIBE_RATE_LIMITER` binding is already declared in `wrangler.jsonc`.
 4. Verify the sending domain in Resend (SPF and DKIM).
@@ -183,7 +201,7 @@ The exact commands are in [recipe 6.14](CONFIGURATION.en.md#614-email-subscripti
 | An error with a code in parentheses, for example "(code 600010)" | The Turnstile error code | `110200`: domain not allowed for the site key (Turnstile widget settings). `600010`: the challenge failed or was blocked (extension, network, bot score) |
 | 503 on the endpoint | `SUBSCRIBE_ADMIN_TOKEN` is missing on the Worker, or a binding fails | `wrangler secret list` and the logs. With the flag off the route does not exist (404) |
 | 404 when sending | Draft or unpublished slug | Release the note and check the slug |
-| The note reached nobody | Every subscriber already has `last_note` for that slug, or the language does not match | The simulation: `recipients` counts only who is still missing, in the same language |
+| The note reached nobody | Every subscriber already has a `subscriber_notes` row for that slug (they were already sent it), or the language does not match, or migration `0003` was not applied | The simulation: `recipients` counts only who is still missing, in the same language |
 | 502 | Resend refused a batch | Nothing in that batch was marked as sent: run the command again |
 
 ## 11. Decisions and where they are recorded

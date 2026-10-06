@@ -23,7 +23,8 @@ export type PrivacyContent = {
 export type PrivacyInput = {
   owner: string;
   domain: string;
-  contact: { es: string; en: string };
+  /** Paths of the contact page; omit when `features.contact` is off (no link, no contact form section). */
+  contact?: { es: string; en: string };
   /** "Last updated" date (YYYY-MM-DD), from `legal` in the site config. */
   updated: string;
   /** Present only when giscus comments are configured; the section is omitted otherwise. */
@@ -76,19 +77,30 @@ const marksSection: Record<'es' | 'en', PrivacySection> = {
   },
 };
 
-const subscribeSection = (contact: {
-  es: string;
-  en: string;
-}): Record<'es' | 'en', PrivacySection> => ({
+type ContactPaths = { es: string; en: string } | undefined;
+
+/** Where to reach the owner: the contact page when it exists, the published channels otherwise. */
+const reach = (contact: ContactPaths, locale: 'es' | 'en', preposition: string): string => {
+  if (contact) {
+    return locale === 'es'
+      ? `${preposition} la página de <a href="${contact.es}">contacto</a>`
+      : `${preposition} the <a href="${contact.en}">contact</a> page`;
+  }
+  return locale === 'es'
+    ? `${preposition} los canales publicados en este sitio`
+    : `${preposition} the channels published on this site`;
+};
+
+const subscribeSection = (contact: ContactPaths): Record<'es' | 'en', PrivacySection> => ({
   es: {
     id: 'subscribe',
     title: 'Suscripción por correo',
-    body: `<p>Si te suscribes, guardo tu correo para enviarte las notas nuevas y, de vez en cuando, un aviso de algún proyecto mío. Nada más: nunca lo comparto ni lo vendo.</p><p><strong>Qué guardo.</strong> Tu correo, el idioma de la página donde te suscribiste, si confirmaste o te diste de baja, y las fechas de esos pasos. Mientras no confirmes, lo guardo con una huella del enlace de confirmación, y lo borro a los 7 días.</p><p><strong>Cómo funciona.</strong> Te escribo primero para que confirmes: así nadie puede apuntar tu correo sin que lo sepas. Cada correo trae un enlace para darte de baja con un clic, sin cuenta y sin preguntas.</p><p><strong>Quién interviene.</strong> Cloudflare guarda la lista y Resend entrega los correos, ambos solo como apoyo técnico. Turnstile comprueba que eres una persona; no guardo tu IP.</p><p><strong>Si te das de baja</strong> dejo tu correo marcado como “dado de baja” para no volver a escribirte por error. Si prefieres que lo borre por completo, pídelo desde <a href="${contact.es}">contacto</a> y lo elimino.</p>`,
+    body: `<p>Si te suscribes, guardo tu correo para enviarte las notas nuevas y, de vez en cuando, un aviso de algún proyecto mío. Nada más: nunca lo comparto ni lo vendo.</p><p><strong>Qué guardo.</strong> Tu correo, el idioma de la página donde te suscribiste, si confirmaste o te diste de baja, y las fechas de esos pasos. También guardo qué notas ya te envié, solo para no mandarte la misma dos veces. Mientras no confirmes, lo guardo con una huella del enlace de confirmación, y lo borro a los 7 días.</p><p><strong>Cómo funciona.</strong> Te escribo primero para que confirmes: así nadie puede apuntar tu correo sin que lo sepas. Cada correo trae un enlace para darte de baja con un clic, sin cuenta y sin preguntas.</p><p><strong>Quién interviene.</strong> Cloudflare guarda la lista y Resend entrega los correos, ambos solo como apoyo técnico. Turnstile comprueba que eres una persona; no guardo tu IP.</p><p><strong>Si te das de baja</strong> dejo tu correo marcado como “dado de baja” para no volver a escribirte por error. Si prefieres que lo borre por completo, pídelo ${reach(contact, 'es', 'desde')} y lo elimino.</p>`,
   },
   en: {
     id: 'subscribe',
     title: 'Email subscription',
-    body: `<p>If you subscribe, I keep your email to send you new notes and, now and then, a heads-up about one of my projects. Nothing else: I never share or sell it.</p><p><strong>What I keep.</strong> Your email, the language of the page where you signed up, whether you confirmed or unsubscribed, and the dates of those steps. Until you confirm, it is stored with a fingerprint of the confirmation link, and I delete it after 7 days.</p><p><strong>How it works.</strong> I write to you first so you can confirm: this way nobody can sign your address up without you knowing. Every email carries a one-click unsubscribe link, with no account and no questions.</p><p><strong>Who is involved.</strong> Cloudflare stores the list and Resend delivers the emails, both only as technical support. Turnstile checks that you are a person; I do not store your IP.</p><p><strong>If you unsubscribe,</strong> I keep your address marked as “unsubscribed” so I never email you by mistake. If you would rather have it deleted completely, ask through <a href="${contact.en}">contact</a> and I will remove it.</p>`,
+    body: `<p>If you subscribe, I keep your email to send you new notes and, now and then, a heads-up about one of my projects. Nothing else: I never share or sell it.</p><p><strong>What I keep.</strong> Your email, the language of the page where you signed up, whether you confirmed or unsubscribed, and the dates of those steps. I also keep which notes I already sent you, only so I never send you the same one twice. Until you confirm, it is stored with a fingerprint of the confirmation link, and I delete it after 7 days.</p><p><strong>How it works.</strong> I write to you first so you can confirm: this way nobody can sign your address up without you knowing. Every email carries a one-click unsubscribe link, with no account and no questions.</p><p><strong>Who is involved.</strong> Cloudflare stores the list and Resend delivers the emails, both only as technical support. Turnstile checks that you are a person; I do not store your IP.</p><p><strong>If you unsubscribe,</strong> I keep your address marked as “unsubscribed” so I never email you by mistake. If you would rather have it deleted completely, ask ${reach(contact, 'en', 'through')} and I will remove it.</p>`,
   },
 });
 
@@ -101,8 +113,13 @@ export function buildPrivacyContent(input: PrivacyInput): Record<'es' | 'en', Pr
     ...(input.subscribe ? [subscribeSection(input.contact)[locale]] : []),
   ];
   const withSections = (locale: 'es' | 'en'): PrivacyContent => {
-    const { sections } = content[locale];
-    const at = sections.findIndex((item) => item.id === 'contact-form') + 1;
+    // Without a contact page there is no contact form to disclose; the extra sections then follow
+    // the analytics one.
+    const sections = content[locale].sections.filter(
+      (item) => input.contact !== undefined || item.id !== 'contact-form',
+    );
+    const at =
+      sections.findIndex((item) => item.id === (input.contact ? 'contact-form' : 'analytics')) + 1;
     return {
       ...content[locale],
       sections: [...sections.slice(0, at), ...extra(locale), ...sections.slice(at)],
@@ -129,7 +146,7 @@ function buildBaseContent({
         {
           id: 'controller',
           title: 'Responsable y contacto',
-          body: `<p>El responsable del tratamiento es ${owner}. Puedes ejercer tus derechos y escribir a través de la página de <a href="${contact.es}">contacto</a>.</p>`,
+          body: `<p>El responsable del tratamiento es ${owner}. Puedes ejercer tus derechos y escribir ${reach(contact, 'es', 'a través de')}.</p>`,
         },
         {
           id: 'analytics',
@@ -159,7 +176,7 @@ function buildBaseContent({
         {
           id: 'rights',
           title: 'Tus derechos',
-          body: `<p>Puedes ejercer los derechos de <strong>acceso, rectificación, supresión y oposición</strong> a través de la página de <a href="${contact.es}">contacto</a>. Se responderá en los plazos que marque la normativa aplicable.</p>`,
+          body: `<p>Puedes ejercer los derechos de <strong>acceso, rectificación, supresión y oposición</strong> ${reach(contact, 'es', 'a través de')}. Se responderá en los plazos que marque la normativa aplicable.</p>`,
         },
       ],
     },
@@ -172,7 +189,7 @@ function buildBaseContent({
         {
           id: 'controller',
           title: 'Controller and contact',
-          body: `<p>The data controller is ${owner}. You can exercise your rights and get in touch through the <a href="${contact.en}">contact</a> page.</p>`,
+          body: `<p>The data controller is ${owner}. You can exercise your rights and get in touch ${reach(contact, 'en', 'through')}.</p>`,
         },
         {
           id: 'analytics',
@@ -202,7 +219,7 @@ function buildBaseContent({
         {
           id: 'rights',
           title: 'Your rights',
-          body: `<p>You can exercise your rights of <strong>access, rectification, erasure and objection</strong> through the <a href="${contact.en}">contact</a> page. Requests are answered within the timeframes required by applicable law.</p>`,
+          body: `<p>You can exercise your rights of <strong>access, rectification, erasure and objection</strong> ${reach(contact, 'en', 'through')}. Requests are answered within the timeframes required by applicable law.</p>`,
         },
       ],
     },

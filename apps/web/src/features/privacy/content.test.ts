@@ -241,6 +241,7 @@ describe('buildPrivacyContent with subscribe', () => {
     const es = body(withSubscribe.es);
     expect(es).toMatch(/aviso de algún proyecto/);
     expect(es).toMatch(/7 días/);
+    expect(es).toMatch(/qué notas ya te envié, solo para no mandarte la misma dos veces/);
     expect(es).toMatch(/baja con un clic/);
     expect(es).toMatch(/Cloudflare/);
     expect(es).toMatch(/Resend/);
@@ -249,10 +250,33 @@ describe('buildPrivacyContent with subscribe', () => {
     const en = body(withSubscribe.en);
     expect(en).toMatch(/heads-up about one of my projects/);
     expect(en).toMatch(/7 days/);
+    expect(en).toMatch(
+      /which notes I already sent you, only so I never send you the same one twice/,
+    );
     expect(en).toMatch(/one-click unsubscribe link/);
     expect(en).toMatch(/Cloudflare/);
     expect(en).toMatch(/Resend/);
     expect(en).toMatch(/do not store your IP/);
     expect(en).toContain('/en/contact/');
+  });
+});
+
+describe('buildPrivacyContent without a contact page', () => {
+  const { contact: _contact, ...rest } = input;
+  const without = buildPrivacyContent({ ...rest, subscribe: true });
+
+  it('links to no contact page and drops the contact form section', () => {
+    const text = everyText(without);
+    expect(text).not.toContain('/contact/');
+    for (const locale of ['es', 'en'] as const) {
+      expect(without[locale].sections.map((section) => section.id)).not.toContain('contact-form');
+    }
+  });
+
+  it('keeps the same section ids in both locales and the subscribe section', () => {
+    expect(without.en.sections.map((section) => section.id)).toEqual(
+      without.es.sections.map((section) => section.id),
+    );
+    expect(without.en.sections.map((section) => section.id)).toContain('subscribe');
   });
 });

@@ -109,3 +109,14 @@ describe('buildTermsContent', () => {
     }
   });
 });
+
+describe('buildTermsContent without a contact page', () => {
+  const { contact: _contact, ...rest } = input;
+  const without = buildTermsContent(rest);
+
+  it('links to no contact page and keeps both locales in step', () => {
+    expect(everyText(without)).not.toContain('/contact/');
+    expect(ids(without.en)).toEqual(ids(without.es));
+    expect(body(without.es, 'owner').length).toBeGreaterThan(0);
+  });
+});

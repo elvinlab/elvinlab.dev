@@ -480,3 +480,24 @@ describe('parseSiteConfig', () => {
     expect(() => parseSiteConfig(broken)).toThrow();
   });
 });
+
+describe('interface switches', () => {
+  const withFeatures = (extra: Record<string, boolean>) => ({
+    ...valid,
+    features: { ...valid.features, ...extra },
+  });
+  const keys = ['backToTop', 'languageHint', 'themeToggle', 'backgroundPicker'] as const;
+
+  it("defaults every switch to on so existing configs keep today's interface", () => {
+    const parsed = parseSiteConfig(valid);
+    for (const key of keys) expect(parsed.features[key]).toBe(true);
+  });
+
+  it.each(keys)('accepts %s set to false', (key) => {
+    expect(parseSiteConfig(withFeatures({ [key]: false })).features[key]).toBe(false);
+  });
+
+  it.each(keys)('rejects a non-boolean %s', (key) => {
+    expect(() => parseSiteConfig(withFeatures({ [key]: 'no' as never }))).toThrow();
+  });
+});

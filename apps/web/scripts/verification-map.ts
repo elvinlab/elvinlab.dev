@@ -132,12 +132,7 @@ const ME = area(
   `${SRC}/content/experience.json`,
   `${SRC}/content/credentials.json`,
 );
-const CONTACT = area(
-  `${SRC}/features/contact/**`,
-  `${SRC}/pages/contact/**`,
-  `${SRC}/pages/en/contact/**`,
-  `${SRC}/actions/**`,
-);
+const CONTACT = area(`${SRC}/features/contact/**`, `${SRC}/contact-routes/**`, `${SRC}/actions/**`);
 const LEGAL = area(
   `${SRC}/features/privacy/**`,
   `${SRC}/features/terms/**`,
@@ -149,8 +144,7 @@ const LEGAL = area(
 const CHANGELOG = area(
   `${SRC}/features/changelog/**`,
   `${SRC}/content/changelog.json`,
-  `${SRC}/pages/changelog/**`,
-  `${SRC}/pages/en/changelog/**`,
+  `${SRC}/changelog-routes/**`,
 );
 const EVERY_PAGE = [...NOTE_PAGE, ...HOME, ...ME, ...CONTACT, ...LEGAL, ...CHANGELOG];
 
@@ -317,6 +311,7 @@ export const CHECKS: readonly CheckDef[] = [
   lighthouse('/notes/smoke-es/', NOTE_PAGE),
   lighthouse('/contact/', CONTACT),
   lighthouse('/en/contact/', CONTACT),
+  lighthouse('/subscribe/', SUBSCRIBE),
 ];
 
 /** True when `path` matches any glob. */
