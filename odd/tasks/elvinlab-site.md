@@ -425,4 +425,5 @@ Contents: terminal icon next to the wordmark and as the favicon (pixel, softer c
 - 2026-10-06 tenth release `e3dedd6` (owner-authorized): the Turnstile messaging fix (instruction kept on submit, fallback kept after the time-out), a clear used-link message, and two `pnpm verify` fixes (V8). CI 221 s. Issue #78 (T50) closed with a summary comment. Open for later: dark mode of the emails in Apple Mail, the unsubscribe click-through, DMARC with a report address (owner DNS step), credentials status and a certificates page together with Experiments, navbar with six links.
 - 2026-10-06: the owner confirmed the email looks good in dark mode in their client. Open: Outlook rendering, the unsubscribe click-through, DMARC report address (owner DNS step).
 - 2026-10-06: the friend who got stuck on "Verificando…" retried after `e3dedd6` and subscribed and confirmed fine (D1: 3 confirmed, 0 pending). The Turnstile report is closed.
+- 2026-10-06: the owner ran the unsubscribe click-through in production and D1 shows it (2 confirmed, 1 unsubscribed).
 

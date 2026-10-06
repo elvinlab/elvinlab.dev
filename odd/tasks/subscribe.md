@@ -98,3 +98,6 @@ The owner confirmed the note email in dark mode in their own client and says it 
 ## The friend's retry, 2026-10-06
 After the release `e3dedd6` the friend who got stuck on "Verificando…" retried from their Android phone and subscribed and confirmed without trouble. Server side: 3 subscribers, all confirmed, none pending; 4 of the 30 daily confirmation emails used. Closes the field report that started with the interactive Turnstile checkbox that readers did not notice.
 
+## Unsubscribe click-through, 2026-10-06
+The owner unsubscribed one address from a note email in production: the page answered fast and said all fine. Server side right after: 2 confirmed, 1 unsubscribed (unsubscribed_at set), no confirmation hash left. The remaining open checks of the subscription are Outlook rendering and the DMARC report address (owner DNS step).
+
