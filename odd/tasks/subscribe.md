@@ -95,3 +95,6 @@ The owner subscribed from the footer, confirmed, and received the note email. Dr
 ## Dark mode check, 2026-10-06
 The owner confirmed the note email in dark mode in their own client and says it looks good. Still not checked: Outlook rendering and the unsubscribe click-through (it removes the owner from the list).
 
+## The friend's retry, 2026-10-06
+After the release `e3dedd6` the friend who got stuck on "Verificando…" retried from their Android phone and subscribed and confirmed without trouble. Server side: 3 subscribers, all confirmed, none pending; 4 of the 30 daily confirmation emails used. Closes the field report that started with the interactive Turnstile checkbox that readers did not notice.
+
