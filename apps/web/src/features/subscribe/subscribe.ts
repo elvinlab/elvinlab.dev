@@ -35,7 +35,8 @@ const noteSchema = z.strictObject({
 
 export type SubscribeResult =
   | { ok: true }
-  | { ok: false; error: 'Unable to subscribe. Please try again later.' };
+  | { ok: false; error: 'Unable to subscribe. Please try again later.' }
+  | { ok: false; error: 'daily_cap' };
 export type ConfirmResult = 'confirmed' | 'invalid_or_expired';
 export type UnsubscribeResult = 'unsubscribed' | 'invalid';
 export type NoteToSend = z.input<typeof noteSchema>;
@@ -45,6 +46,11 @@ const REJECTED: SubscribeResult = {
   ok: false,
   error: 'Unable to subscribe. Please try again later.',
 };
+
+const CAPPED: SubscribeResult = { ok: false, error: 'daily_cap' };
+
+/** The UTC day (`YYYY-MM-DD`) that a quota counter belongs to. */
+const utcDay = (time: number): string => new Date(time).toISOString().slice(0, 10);
 
 /** `<id>.<HMAC(id)>`: stateless, so it can go into every later email without storing a secret per row. */
 export async function createUnsubscribeToken(
@@ -66,7 +72,7 @@ export async function subscribe(
 ): Promise<SubscribeResult> {
   const reject = (stage: string): SubscribeResult => {
     ports.report?.(stage);
-    return REJECTED;
+    return stage === 'daily_cap' ? CAPPED : REJECTED;
   };
   const parsed = inputSchema.safeParse(input);
   if (!parsed.success || !ip || !ipSchema.safeParse(ip).success) return reject('invalid_input');
@@ -81,8 +87,12 @@ export async function subscribe(
     if (!(await ports.verifier.verify(token, ip))) return reject('turnstile');
 
     const now = ports.now();
+    const day = utcDay(now);
     let existing: Subscriber | null;
     try {
+      // Checked before the lookup so a capped day answers every address alike.
+      if ((await ports.quota.confirmationsToday(day)) >= SUBSCRIBE_POLICY.confirmationsDailyCap)
+        return reject('daily_cap');
       await ports.repository.purgePendingBefore(now - SUBSCRIBE_POLICY.pendingPurgeMs);
       existing = await ports.repository.findByEmail(email);
     } catch {
@@ -95,6 +105,14 @@ export async function subscribe(
       now - existing.confirmSentAt <= SUBSCRIBE_POLICY.resendCooldownMs
     )
       return { ok: true };
+
+    // Spent even if the send fails: a failed send still counts as an attempt for abuse purposes.
+    try {
+      if (!(await ports.quota.reserveConfirmation(day, SUBSCRIBE_POLICY.confirmationsDailyCap)))
+        return reject('daily_cap');
+    } catch {
+      return reject('store');
+    }
 
     const confirmToken = ports.tokens.randomToken();
     const confirmHash = await ports.tokens.hash(confirmToken);
@@ -177,16 +195,25 @@ export async function unsubscribe(
 
 /**
  * Sends a note to the confirmed subscribers who have not received it yet, in provider-sized
- * batches and at most `dailyCap` per run. `lastNote` is written only after a batch was accepted, so
+ * batches and at most `dailyCap` per run (less when confirmations already used part of the pool). `lastNote` is written only after a batch was accepted, so
  * a failed or capped run resumes where it stopped. Returns counts only.
  */
 export async function sendNote(
   note: NoteToSend,
-  ports: Pick<SubscribePorts, 'repository' | 'mailer' | 'tokens' | 'links' | 'report'>,
+  ports: Pick<
+    SubscribePorts,
+    'repository' | 'quota' | 'mailer' | 'tokens' | 'links' | 'report' | 'now'
+  >,
   options: { dailyCap?: number; batchSize?: number } = {},
 ): Promise<SendNoteResult> {
   const { slug, title, url, summary } = noteSchema.parse(note);
-  const dailyCap = options.dailyCap ?? SUBSCRIBE_POLICY.dailyCap;
+  // Confirmations and notes share the provider's daily pool; notes use what is left of it.
+  const left =
+    SUBSCRIBE_POLICY.providerDailyTotal -
+    (await ports.quota.confirmationsToday(utcDay(ports.now())));
+  const dailyCap = Math.min(options.dailyCap ?? SUBSCRIBE_POLICY.dailyCap, left);
+  if (dailyCap <= 0)
+    return { sent: 0, remaining: await ports.repository.countUnnotified(slug), failed: false };
   const batchSize = Math.min(
     options.batchSize ?? SUBSCRIBE_POLICY.batchSize,
     SUBSCRIBE_POLICY.batchSize,

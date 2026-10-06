@@ -58,6 +58,8 @@ export function initSubscribeForm(root: HTMLElement): void {
     if (outcome.ok) {
       form.hidden = true;
       say(text['success'] ?? '');
+    } else if (outcome.code === 'TOO_MANY_REQUESTS') {
+      say(text['capped'] ?? text['error'] ?? '');
     } else {
       say(text['error'] ?? '');
     }

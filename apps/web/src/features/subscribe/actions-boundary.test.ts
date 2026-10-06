@@ -125,8 +125,19 @@ describe('subscribe Actions boundary', () => {
       { email: 'a@b.test' },
       '192.0.2.1',
       expect.anything(),
-      'https://site.test',
+      {
+        url: 'https://site.test',
+        name: expect.any(String),
+        ownerName: expect.any(String),
+      },
     );
+  });
+
+  it('request maps the daily cap to a fixed TOO_MANY_REQUESTS error', async () => {
+    mocks.subscribe.mockResolvedValueOnce({ ok: false, error: 'daily_cap' });
+    await expect(
+      actions.request.handler({ email: 'a@b.test' }, { request: request() }),
+    ).rejects.toMatchObject({ code: 'TOO_MANY_REQUESTS' });
   });
 
   it('confirm and unsubscribe return their result strings as data, not errors', async () => {

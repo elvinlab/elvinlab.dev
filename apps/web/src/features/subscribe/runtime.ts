@@ -2,7 +2,11 @@ import { z } from 'zod';
 
 import { createTurnstileVerifier } from '@/shared/lib/turnstile.ts';
 
-import { createD1SubscriberRepository, type D1Like } from './adapters/d1.ts';
+import {
+  createD1SubscribeQuota,
+  createD1SubscriberRepository,
+  type D1Like,
+} from './adapters/d1.ts';
 import { createResendMailer } from './adapters/resend.ts';
 import { createWebCryptoTokens } from './adapters/webcrypto.ts';
 import { listBindingsSchema, sendBindingsSchema, subscribeBindingsSchema } from './bindings.ts';
@@ -82,6 +86,7 @@ export async function submitConfiguredSubscribe(
     now: Date.now,
     report,
     repository: createD1SubscriberRepository(config.SITE_DB as D1Like),
+    quota: createD1SubscribeQuota(config.SITE_DB as D1Like),
     tokens: createWebCryptoTokens(config.SUBSCRIBE_TOKEN_SECRET),
     links: createLinks(emailSite(site).url),
     limiter: {
@@ -157,7 +162,9 @@ export async function sendNoteConfigured(
     note,
     {
       report,
+      now: Date.now,
       repository: createD1SubscriberRepository(config.SITE_DB as D1Like),
+      quota: createD1SubscribeQuota(config.SITE_DB as D1Like),
       tokens: createWebCryptoTokens(config.SUBSCRIBE_TOKEN_SECRET),
       links: createLinks(emailSite(site).url),
       mailer: createResendMailer(mailerConfig(config, site), request, report),

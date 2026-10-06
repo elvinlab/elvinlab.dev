@@ -53,6 +53,13 @@ export interface SubscriberRepository {
   purgePendingBefore(cutoff: number): Promise<number>;
 }
 
+/** Global counter of confirmation emails per UTC day (`YYYY-MM-DD`). */
+export interface SubscribeQuota {
+  /** Atomic: counts one confirmation for the day unless `cap` was reached; false at the cap. */
+  reserveConfirmation(day: string, cap: number): Promise<boolean>;
+  confirmationsToday(day: string): Promise<number>;
+}
+
 export type ConfirmationMail = {
   to: string;
   locale: SubscribeLocale;
@@ -113,6 +120,7 @@ export type SubscribeReport = (detail: string) => void;
 
 export type SubscribePorts = {
   repository: SubscriberRepository;
+  quota: SubscribeQuota;
   mailer: SubscriptionMailer;
   verifier: SubscribeVerifier;
   limiter: SubscribeLimiter;

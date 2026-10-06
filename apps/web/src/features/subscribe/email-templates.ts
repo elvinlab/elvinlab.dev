@@ -165,7 +165,7 @@ function layout(input: Layout): string {
 <tr><td height="3" bgcolor="${COLOR.pink}" style="height:3px;font-size:0;line-height:0;background-color:${COLOR.pink};border-radius:8px 8px 0 0">&nbsp;</td></tr>
 <tr><td class="em-card em-pad" bgcolor="${COLOR.card}" style="padding:28px 32px;background-color:${COLOR.card};border:1px dashed ${COLOR.border};border-top:0;border-radius:0 0 8px 8px">
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"><tr>
-<td width="32" valign="middle" style="width:32px;padding-right:10px"><img src="${escapeHtml(logo)}" alt="elvinlab" width="32" height="32" style="display:block;border:0;width:32px;height:32px"></td>
+<td width="32" valign="middle" style="width:32px;padding-right:10px"><img src="${escapeHtml(logo)}" alt="" width="32" height="32" style="display:block;border:0;width:32px;height:32px"></td>
 <td valign="middle" class="em-text" style="font-family:${MONO};font-size:18px;font-weight:700;color:${COLOR.text}">${escapeHtml(input.siteName)}</td>
 </tr></table>
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td class="em-rule" height="1" style="height:1px;font-size:0;line-height:0;border-bottom:1px dashed ${COLOR.border};padding-top:16px">&nbsp;</td></tr></table>

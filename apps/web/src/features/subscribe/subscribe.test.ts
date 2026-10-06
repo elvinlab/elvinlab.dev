@@ -190,6 +190,64 @@ describe('subscribe', () => {
   });
 });
 
+describe('global daily confirmation cap', () => {
+  const CAP = SUBSCRIBE_POLICY.confirmationsDailyCap;
+  const mail = (index: number) => [`cap${index}`, 'example.test'].join('@');
+  const fill = async (ports: Parameters<typeof subscribe>[2], count: number) => {
+    for (let index = 0; index < count; index += 1)
+      await subscribe(input({ email: mail(index) }), IP, ports);
+  };
+
+  it('refuses the confirmation after the cap with a fixed code and no mail', async () => {
+    const { ports, confirmations, reports, rows } = createFakePorts();
+    await fill(ports, CAP);
+    expect(confirmations).toHaveLength(CAP);
+    const newAddress = await subscribe(input({ email: mail(999) }), IP, ports);
+    const knownAddress = await subscribe(input({ email: mail(0) }), IP, ports);
+    expect(newAddress).toEqual({ ok: false, error: 'daily_cap' });
+    expect(knownAddress).toEqual(newAddress);
+    expect(confirmations).toHaveLength(CAP);
+    expect(rows.size).toBe(CAP);
+    expect(reports).toEqual(['daily_cap', 'daily_cap']);
+  });
+
+  it('resets on the next UTC day', async () => {
+    const { ports, confirmations } = createFakePorts();
+    await fill(ports, CAP);
+    FAKE_CLOCK.time = Date.UTC(2030, 0, 2, 0, 0, 1);
+    // START is 1970-01-12; the cap day above is that date, so any later UTC date is a new day.
+    await expect(subscribe(input({ email: mail(999) }), IP, ports)).resolves.toEqual({ ok: true });
+    expect(confirmations).toHaveLength(CAP + 1);
+  });
+
+  it('counts cooldown resends and returning unsubscribed addresses, not confirmed ones', async () => {
+    const { ports, days, confirmations } = createFakePorts();
+    await subscribe(input(), IP, ports);
+    expect([...days.values()]).toEqual([1]);
+    await subscribe(input(), IP, ports); // inside cooldown: no mail, no quota
+    expect([...days.values()]).toEqual([1]);
+    FAKE_CLOCK.time += SUBSCRIBE_POLICY.resendCooldownMs + 1;
+    await subscribe(input(), IP, ports); // resend
+    expect([...days.values()]).toEqual([2]);
+    await confirmSubscription('token2', ports);
+    await subscribe(input(), IP, ports); // confirmed: nothing
+    expect([...days.values()]).toEqual([2]);
+    const id = (await ports.repository.findByEmail(EMAIL))?.id ?? '';
+    const token = await createUnsubscribeToken(id, ports);
+    await unsubscribe(token, ports);
+    await subscribe(input(), IP, ports); // coming back
+    expect([...days.values()]).toEqual([3]);
+    expect(confirmations).toHaveLength(3);
+  });
+
+  it('consumes quota even when the send fails', async () => {
+    const { ports, days, state } = createFakePorts();
+    state.failNext = true;
+    await subscribe(input(), IP, ports);
+    expect([...days.values()]).toEqual([1]);
+  });
+});
+
 describe('confirmSubscription', () => {
   it('confirms once and never again', async () => {
     const { ports, rows } = createFakePorts();
@@ -308,6 +366,21 @@ describe('sendNote', () => {
     const recipients = batches.flatMap((batch) => batch.messages.map((message) => message.to));
     expect(new Set(recipients).size).toBe(7);
     expect(recipients).toHaveLength(7);
+  });
+
+  it('sends only what is left of the shared provider pool', async () => {
+    const { ports, days } = await withConfirmed(3);
+    const today = new Date(START).toISOString().slice(0, 10);
+    expect(SUBSCRIBE_POLICY.providerDailyTotal - SUBSCRIBE_POLICY.confirmationsDailyCap).toBe(70);
+    days.set(today, SUBSCRIBE_POLICY.providerDailyTotal - 2);
+    await expect(sendNote(note, ports)).resolves.toEqual({ sent: 2, remaining: 1, failed: false });
+  });
+
+  it('is a no-op once the provider pool is used up', async () => {
+    const { ports, batches, days } = await withConfirmed(2);
+    days.set(new Date(START).toISOString().slice(0, 10), SUBSCRIBE_POLICY.providerDailyTotal);
+    await expect(sendNote(note, ports)).resolves.toEqual({ sent: 0, remaining: 2, failed: false });
+    expect(batches).toHaveLength(0);
   });
 
   it('never sends a second time to someone who already got the note', async () => {

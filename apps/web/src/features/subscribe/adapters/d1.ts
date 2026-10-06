@@ -1,6 +1,10 @@
 import { z } from 'zod';
 
-import type { Subscriber, SubscriberRepository } from '@/features/subscribe/ports.ts';
+import type {
+  SubscribeQuota,
+  Subscriber,
+  SubscriberRepository,
+} from '@/features/subscribe/ports.ts';
 
 /** The slice of the Cloudflare D1 API this adapter uses; a real D1 binding satisfies it. */
 export interface D1Like {
@@ -57,6 +61,10 @@ const SQL = {
     WHERE status = 'confirmed' AND (last_note IS NULL OR last_note <> ?1)`,
   // The ids travel as one JSON array parameter: D1 caps bound parameters per statement at 100.
   markNotified: `UPDATE subscribers SET last_note = ?2 WHERE status = 'confirmed' AND id IN (SELECT value FROM json_each(?1))`,
+  // One statement: the increment is refused (no row returned) once the day reached the cap.
+  reserve: `INSERT INTO subscribe_quota (day, confirmations) VALUES (?1, 1)
+    ON CONFLICT(day) DO UPDATE SET confirmations = confirmations + 1 WHERE confirmations < ?2 RETURNING confirmations`,
+  quotaToday: 'SELECT confirmations AS total FROM subscribe_quota WHERE day = ?1',
   purge: "DELETE FROM subscribers WHERE status = 'pending' AND created_at < ?1",
 } as const;
 
@@ -125,6 +133,20 @@ export function createD1SubscriberRepository(db: D1Like): SubscriberRepository {
     },
     async purgePendingBefore(cutoff) {
       return (await run(SQL.purge, cutoff)).meta.changes;
+    },
+  };
+}
+
+export function createD1SubscribeQuota(db: D1Like): SubscribeQuota {
+  return {
+    async reserveConfirmation(day, cap) {
+      if (cap <= 0) return false;
+      const reserved = await db.prepare(SQL.reserve).bind(day, cap).first();
+      return reserved !== null;
+    },
+    async confirmationsToday(day) {
+      const row = await db.prepare(SQL.quotaToday).bind(day).first();
+      return row === null ? 0 : countSchema.parse(row).total;
     },
   };
 }

@@ -25,6 +25,7 @@ const FORM = {
   submit: 'Suscribirme',
   success: 'Revisa tu bandeja de entrada para confirmar la suscripción.',
   error: 'No se pudo suscribir. Inténtalo más tarde.',
+  capped: 'Hoy llegaron muchas solicitudes. Inténtalo de nuevo mañana.',
 };
 
 const LANDING = {
@@ -206,6 +207,25 @@ test.describe('form in the footer', () => {
     await band.getByLabel(FORM.email).fill('reader@example.test');
     await band.getByRole('button', { name: FORM.submit }).click();
     await expect(band.getByRole('status').filter({ hasText: FORM.error })).toBeVisible();
+    await expect(band.getByLabel(FORM.email)).toBeVisible();
+  });
+
+  test('a daily_cap error shows its fixed message and keeps the form', async ({ page }) => {
+    await stubTurnstile(page);
+    await mockAction(page, 'request', {
+      status: 429,
+      body: JSON.stringify({
+        type: 'AstroActionError',
+        code: 'TOO_MANY_REQUESTS',
+        status: 429,
+        message: 'Too many requests today. Please try again tomorrow.',
+      }),
+    });
+    await page.goto('/notes/smoke-es/');
+    const band = page.locator(FIELD);
+    await band.getByLabel(FORM.email).fill('reader@example.test');
+    await band.getByRole('button', { name: FORM.submit }).click();
+    await expect(band.getByRole('status').filter({ hasText: FORM.capped })).toBeVisible();
     await expect(band.getByLabel(FORM.email)).toBeVisible();
   });
 

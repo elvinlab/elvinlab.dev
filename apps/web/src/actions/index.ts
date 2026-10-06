@@ -20,6 +20,7 @@ import { site } from '@/shared/config/index.ts';
 const FAILURE = 'Unable to send your message. Please try again later.';
 const MARKS_FAILURE = 'Unable to save your footprint. Please try again later.';
 const SUBSCRIBE_FAILURE = 'Unable to subscribe. Please try again later.';
+const SUBSCRIBE_CAPPED = 'Too many requests today. Please try again tomorrow.';
 const SUBSCRIBE_UNAVAILABLE = 'Subscriptions are not available right now.';
 
 // Astro checkOrigin covers form content types; JSON requires this explicit check too.
@@ -125,7 +126,17 @@ export const server = {
         assertSameOrigin(request, SUBSCRIBE_FAILURE);
         assertSubscribeEnabled();
         const ip = resolveClientIp(request.headers.get('cf-connecting-ip'), import.meta.env.DEV);
-        const result = await guardList(() => submitConfiguredSubscribe(input, ip, env, site.url));
+        const result = await guardList(() =>
+          submitConfiguredSubscribe(input, ip, env, {
+            url: site.url,
+            name: site.identity.handle,
+            ownerName: site.identity.name,
+          }),
+        );
+        // The same fixed answer for every address once the day is capped.
+        if (!result.ok && result.error === 'daily_cap') {
+          throw new ActionError({ code: 'TOO_MANY_REQUESTS', message: SUBSCRIBE_CAPPED });
+        }
         // One fixed message whatever the reason: it must not reveal who is on the list.
         if (!result.ok) throw new ActionError({ code: 'BAD_REQUEST', message: SUBSCRIBE_FAILURE });
         return { ok: true };

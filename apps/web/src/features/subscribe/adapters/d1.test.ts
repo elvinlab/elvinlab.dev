@@ -5,7 +5,7 @@ import { beforeEach, describe, expect, it } from 'vitest';
 
 import type { NewPendingSubscriber, SubscriberRepository } from '@/features/subscribe/ports.ts';
 
-import { createD1SubscriberRepository, type D1Like } from './d1.ts';
+import { createD1SubscribeQuota, createD1SubscriberRepository, type D1Like } from './d1.ts';
 import { asD1 } from './sqlite-d1.ts';
 
 const migration = readFileSync(
@@ -165,5 +165,24 @@ describe('D1 subscriber repository', () => {
       }),
     };
     await expect(createD1SubscriberRepository(broken).findById('a')).rejects.toThrow();
+  });
+});
+
+describe('D1 subscribe quota', () => {
+  it('counts per day, refuses at the cap and resets on a new day', async () => {
+    const quota = createD1SubscribeQuota(asD1(sqlite, statements));
+    await expect(quota.confirmationsToday('2030-01-01')).resolves.toBe(0);
+    await expect(quota.reserveConfirmation('2030-01-01', 2)).resolves.toBe(true);
+    await expect(quota.reserveConfirmation('2030-01-01', 2)).resolves.toBe(true);
+    await expect(quota.reserveConfirmation('2030-01-01', 2)).resolves.toBe(false);
+    await expect(quota.confirmationsToday('2030-01-01')).resolves.toBe(2);
+    await expect(quota.reserveConfirmation('2030-01-02', 2)).resolves.toBe(true);
+    await expect(quota.confirmationsToday('2030-01-02')).resolves.toBe(1);
+  });
+
+  it('binds its parameters instead of building SQL from them', async () => {
+    const quota = createD1SubscribeQuota(asD1(sqlite, statements));
+    await quota.reserveConfirmation("2030-01-01' OR 1=1 --", 5);
+    expect(statements.join('\n')).not.toContain('OR 1=1');
   });
 });

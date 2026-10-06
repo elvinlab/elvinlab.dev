@@ -405,6 +405,6 @@
     "date": "2026-10-05",
     "category": "added",
     "title": "Email subscription to new notes",
-    "description": "Readers can subscribe by email to new notes and project announcements, with double opt-in, an unsubscribe link in every email and a privacy section. It ships off until the owner applies the migration, sets the secrets and enables the flag. The form lives only in a pixel-style band in the footer of every page (not the subscription pages or /me) and loads its script and Turnstile on first focus. Both emails are designed HTML with a plain-text fallback."
+    "description": "Readers can subscribe by email to new notes and project announcements, with double opt-in, an unsubscribe link in every email and a privacy section. It ships off until the owner applies the migration, sets the secrets and enables the flag. The form lives in a pixel-style band in the footer of every page and loads its script on first focus. Both emails are designed HTML with a plain-text fallback. A global cap of 30 confirmation emails a day keeps part of the provider's daily pool for notes."
   }
 }

@@ -3,6 +3,7 @@ import type {
   NewPendingSubscriber,
   NoteMail,
   SubscribePorts,
+  SubscribeQuota,
   Subscriber,
   SubscriberRepository,
   SubscriptionMailer,
@@ -93,6 +94,23 @@ export function createFakeRepository() {
   return { repository, rows };
 }
 
+/** In-memory daily counter with the same contract as the D1 quota. */
+export function createFakeQuota() {
+  const days = new Map<string, number>();
+  const quota: SubscribeQuota = {
+    async reserveConfirmation(day, cap) {
+      const used = days.get(day) ?? 0;
+      if (used >= cap) return false;
+      days.set(day, used + 1);
+      return true;
+    },
+    async confirmationsToday(day) {
+      return days.get(day) ?? 0;
+    },
+  };
+  return { quota, days };
+}
+
 /** Records what it was asked to send; can be told to fail. */
 export function createFakeMailer() {
   const confirmations: ConfirmationMail[] = [];
@@ -153,9 +171,11 @@ export const FAKE_CLOCK = { time: 1_000_000_000 };
 export function createFakePorts(overrides: Partial<SubscribePorts> = {}) {
   const repo = createFakeRepository();
   const mail = createFakeMailer();
+  const quota = createFakeQuota();
   const reports: string[] = [];
   const ports: SubscribePorts = {
     repository: repo.repository,
+    quota: quota.quota,
     mailer: mail.mailer,
     verifier: { verify: async () => true },
     limiter: { allow: async () => true },
@@ -168,5 +188,5 @@ export function createFakePorts(overrides: Partial<SubscribePorts> = {}) {
     report: (detail) => reports.push(detail),
     ...overrides,
   };
-  return { ports, rows: repo.rows, reports, ...mail };
+  return { ports, rows: repo.rows, days: quota.days, reports, ...mail };
 }

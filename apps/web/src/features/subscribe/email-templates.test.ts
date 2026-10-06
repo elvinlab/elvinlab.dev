@@ -62,7 +62,7 @@ describe.each(locales)('emails in %s', (locale) => {
     const images = mail.html.match(/<img\b[^>]*>/g) ?? [];
     expect(images).toHaveLength(1);
     for (const image of images) {
-      expect(image).toMatch(/\balt="[^"]+"/);
+      expect(image).toMatch(/\balt="[^"]*"/);
       expect(image).toMatch(/\bwidth="\d+"/);
       expect(image).toMatch(/\bheight="\d+"/);
     }

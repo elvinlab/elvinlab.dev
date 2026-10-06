@@ -134,6 +134,7 @@ export const t = createTranslator({
       'subscribe.verifying': 'Verificando…',
       'subscribe.success': 'Revisa tu bandeja de entrada para confirmar la suscripción.',
       'subscribe.error': 'No se pudo suscribir. Inténtalo más tarde.',
+      'subscribe.capped': 'Hoy llegaron muchas solicitudes. Inténtalo de nuevo mañana.',
       'subscribe.noscript':
         'Activa JavaScript para suscribirte por correo, o sigue las notas por RSS.',
       'subscribe.privacy': 'Cómo se usa tu correo',
@@ -310,6 +311,7 @@ export const t = createTranslator({
       'subscribe.verifying': 'Verifying…',
       'subscribe.success': 'Check your inbox to confirm your subscription.',
       'subscribe.error': 'Unable to subscribe. Please try again later.',
+      'subscribe.capped': 'Many requests came in today. Please try again tomorrow.',
       'subscribe.noscript':
         'Turn on JavaScript to subscribe by email, or follow the notes via RSS.',
       'subscribe.privacy': 'How your email is used',
