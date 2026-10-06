@@ -61,3 +61,6 @@ Follow-up for the coordinator: `apps/web/src/actions/index.ts` still passes `sit
 - Secrets `SUBSCRIBE_TOKEN_SECRET` (generated on the spot, never displayed) and `SUBSCRIBE_FROM` created on the Worker `elvinlab`; `wrangler secret list` shows both next to the contact and Turnstile secrets.
 - Still open: the Resend sending domain was assumed verified because the contact form already sends from the same domain (not checked in Resend's panel); flip `features.subscribe: true` and release (needs explicit authorization); a real end-to-end test with an address the owner owns.
 
+## Released 2026-10-06
+`main` = `bc0b0c8`, flag on. Read-only production checks passed (see the ledger). Waiting on the owner's real end-to-end test and the sender trigger for new notes.
+
