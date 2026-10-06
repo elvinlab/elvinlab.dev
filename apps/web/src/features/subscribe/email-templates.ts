@@ -179,6 +179,11 @@ function layout(input: Layout): string {
 `;
 }
 
+/** Escapes a footer sentence and turns its domain into an explicit link in the template's violet. */
+function withDomainLink(sentence: string, domain: string, siteUrl: string): string {
+  return escapeHtml(sentence).replace(escapeHtml(domain), link(siteUrl, domain));
+}
+
 function footerParagraph(html: string): string {
   return `<p class="em-muted" style="margin:0 0 8px;font-family:${SANS};font-size:12px;line-height:18px;color:${COLOR.muted}">${html}</p>`;
 }
@@ -195,7 +200,7 @@ export function renderConfirmationEmail(input: ConfirmationEmailInput): Rendered
     `<p class="em-muted" style="margin:0;font-family:${MONO};font-size:12px;line-height:18px;color:${COLOR.muted};word-break:break-all">${escapeHtml(input.confirmUrl)}</p>`,
   ].join('\n');
   const footer = [
-    footerParagraph(escapeHtml(copy.confirmFooter(domain))),
+    footerParagraph(withDomainLink(copy.confirmFooter(domain), domain, input.siteUrl)),
     footerParagraph(
       `${link(input.privacyUrl, copy.privacy)} &middot; ${escapeHtml(copy.sentBy)} ${escapeHtml(input.ownerName)}`,
     ),
@@ -244,7 +249,7 @@ export function renderNoteEmail(input: NoteEmailInput): RenderedEmail {
     .filter(Boolean)
     .join('\n');
   const footer = [
-    footerParagraph(escapeHtml(copy.noteFooter(domain))),
+    footerParagraph(withDomainLink(copy.noteFooter(domain), domain, input.siteUrl)),
     footerParagraph(
       `${link(input.unsubscribeUrl, copy.unsubscribe)} &middot; ${link(input.privacyUrl, copy.privacy)} &middot; ${escapeHtml(copy.sentBy)} ${escapeHtml(input.ownerName)}`,
     ),
