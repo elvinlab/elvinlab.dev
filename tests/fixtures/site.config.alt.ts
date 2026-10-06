@@ -23,6 +23,7 @@ export const siteConfig = {
     changelog: true,
     readingMode: false,
     marks: false,
+    subscribe: false,
   },
   legal: { privacyUpdated: '2026-01-01', termsUpdated: '2026-01-01' },
   background: { galaxy: true, cursorWaves: false },

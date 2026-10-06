@@ -16,3 +16,9 @@ TURNSTILE_SECRET_KEY=
 
 # Hostname Turnstile must report for a valid token (for example the production domain). It makes a token from another site invalid.
 TURNSTILE_HOSTNAME=
+
+# Sender of the subscription emails (`Name <address>` or a bare address), on a domain verified in Resend. Required only when `features.subscribe` is on. An address is never written in tracked files.
+SUBSCRIBE_FROM=
+
+# Random secret (at least 32 characters) that signs the unsubscribe link of every email. Required only when `features.subscribe` is on. Changing it invalidates the unsubscribe links already sent.
+SUBSCRIBE_TOKEN_SECRET=

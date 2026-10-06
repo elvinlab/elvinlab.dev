@@ -109,9 +109,14 @@ const GLOBAL = area(
   'packages/core/src/**',
 );
 const NOTES = area(`${SRC}/features/notes/**`, `${SRC}/blog-routes/**`, 'tests/fixtures/**');
+const SUBSCRIBE = area(
+  `${SRC}/features/subscribe/**`,
+  `${SRC}/shared/subscribe/**`,
+  `${SRC}/subscribe-routes/**`,
+);
 const MARKS = area(`${SRC}/features/marks/**`, `${SRC}/actions/**`, 'apps/web/migrations/**');
 const COMMENTS = area(`${SRC}/features/comments/**`);
-const NOTE_PAGE = [...NOTES, ...MARKS, ...COMMENTS];
+const NOTE_PAGE = [...NOTES, ...MARKS, ...COMMENTS, ...SUBSCRIBE];
 const HOME = area(
   `${SRC}/pages/index.astro`,
   `${SRC}/pages/en/index.astro`,
@@ -301,12 +306,13 @@ export const CHECKS: readonly CheckDef[] = [
   e2e({ file: 'pixel-display.spec.ts', covers: [...NOTE_PAGE, ...HOME], responsive: true }),
   e2e({ file: 'reading-mode.spec.ts', covers: NOTE_PAGE, helpers: true, responsive: true }),
   e2e({ file: 'smoke.spec.ts', covers: EVERY_PAGE }),
+  e2e({ file: 'subscribe.spec.ts', covers: NOTE_PAGE, helpers: true, responsive: true }),
   e2e({ file: 'theme.spec.ts', covers: EVERY_PAGE }),
   e2e({ file: 'type-scale.spec.ts', covers: [...NOTE_PAGE, ...HOME], responsive: true }),
 
   lighthouse('/', HOME),
   lighthouse('/en/', HOME),
-  lighthouse('/notes/', NOTES),
+  lighthouse('/notes/', [...NOTES, ...SUBSCRIBE]),
   lighthouse('/notes/smoke-es/', NOTE_PAGE),
   lighthouse('/contact/', CONTACT),
   lighthouse('/en/contact/', CONTACT),

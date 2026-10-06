@@ -447,7 +447,16 @@ test.describe('heartbeat', () => {
     await mockMarks(page);
     await page.goto(NOTES[0]?.path ?? '/');
     const icon = page.locator('.mb:visible .mi').first();
-    await expect.poll(() => beat(icon)).toBe('marks-beat');
+    // The beat lasts well under a second: check on every animation frame so a loaded machine
+    // cannot step over the window between two slow polls.
+    await page.waitForFunction(
+      () => {
+        const heart = document.querySelector('.mb .mi');
+        return heart ? getComputedStyle(heart).animationName === 'marks-beat' : false;
+      },
+      undefined,
+      { polling: 'raf', timeout: 5000 },
+    );
     // The class is removed after the beat: it plays once, not on a loop.
     await expect.poll(() => beat(icon), { timeout: 3000 }).toBe('none');
   });

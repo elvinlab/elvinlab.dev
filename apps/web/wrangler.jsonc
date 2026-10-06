@@ -23,6 +23,11 @@
       "name": "MARKS_RATE_LIMITER",
       "namespace_id": "1002",
       "simple": { "limit": 30, "period": 60 }
+    },
+    {
+      "name": "SUBSCRIBE_RATE_LIMITER",
+      "namespace_id": "1003",
+      "simple": { "limit": 3, "period": 60 }
     }
   ],
   // Site-wide D1 database `elvinlab-dev-db` (created 2026-10-05), shared by every feature: each one owns

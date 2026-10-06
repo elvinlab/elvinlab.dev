@@ -1,7 +1,8 @@
 import { describe, expect, it, vi } from 'vitest';
 
+import { createTurnstileVerifier } from '@/shared/lib/turnstile.ts';
+
 import { createResendSender } from './adapters/resend.ts';
-import { createTurnstileVerifier } from './adapters/turnstile.ts';
 import { CONTACT_POLICY } from './config.ts';
 import { submitContact } from './contact.ts';
 import type { ContactPorts } from './ports.ts';

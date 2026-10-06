@@ -26,6 +26,7 @@ const valid = {
     changelog: true,
     readingMode: true,
     marks: true,
+    subscribe: false,
   },
   legal: { privacyUpdated: '2026-10-01', termsUpdated: '2026-10-01' },
   background: { galaxy: true, cursorWaves: false },
@@ -375,6 +376,11 @@ describe('parseSiteConfig', () => {
   it('rejects config missing the readingMode feature', () => {
     const { readingMode: _omitted, ...features } = valid.features;
     expect(() => parseSiteConfig({ ...valid, features })).toThrow(/readingMode/);
+  });
+
+  it('rejects config missing the subscribe feature', () => {
+    const { subscribe: _omitted, ...features } = valid.features;
+    expect(() => parseSiteConfig({ ...valid, features })).toThrow(/subscribe/);
   });
 
   it('rejects config missing the marks feature', () => {

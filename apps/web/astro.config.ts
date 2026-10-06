@@ -15,6 +15,7 @@ import { defineConfig } from 'astro/config';
 import expressiveCode from 'astro-expressive-code';
 
 import { CONTACT_POLICY } from './src/features/contact/config.ts';
+import { isSubscribeActive } from './src/features/subscribe/availability.ts';
 import { blogRoutesIntegration } from './src/integrations/blog-routes.ts';
 import { externalLinks } from './src/integrations/external-links.ts';
 import { noindexHeaders } from './src/integrations/noindex-headers.ts';
@@ -22,6 +23,7 @@ import { readNoteDatesFromDisk } from './src/integrations/note-dates.ts';
 import { ogImages } from './src/integrations/og-images.ts';
 import { hasPublishedNotesOnDisk } from './src/integrations/published-notes.ts';
 import { isHiddenFromSitemap } from './src/integrations/sitemap-filter.ts';
+import { subscribeRoutesIntegration } from './src/integrations/subscribe-routes.ts';
 import { site } from './src/shared/config/index.ts';
 import { LOCALES, t } from './src/shared/i18n/index.ts';
 
@@ -75,6 +77,8 @@ export default defineConfig({
     }),
     // Notes pages and RSS feed exist only when `features.blog` is on.
     blogRoutesIntegration(site.features.blog),
+    // Confirmation and unsubscribe pages: only with the blog and the flag on.
+    subscribeRoutesIntegration(isSubscribeActive(site.features)),
     mdx(),
     preact(),
     sitemap({

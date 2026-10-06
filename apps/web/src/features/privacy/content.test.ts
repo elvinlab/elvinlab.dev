@@ -203,3 +203,56 @@ describe('buildPrivacyContent with comments', () => {
     }
   });
 });
+
+describe('buildPrivacyContent with subscribe', () => {
+  const withSubscribe = buildPrivacyContent({ ...input, subscribe: true });
+  const ids = (page: PrivacyContent): string[] => page.sections.map((section) => section.id);
+  const body = (page: PrivacyContent): string =>
+    page.sections.find((section) => section.id === 'subscribe')?.body ?? '';
+
+  it('has no subscribe section and no subscription wording unless the feature is on', () => {
+    expect(ids(content.es)).not.toContain('subscribe');
+    expect(ids(content.en)).not.toContain('subscribe');
+    expect(everyText(content)).not.toMatch(/suscri|subscri|unsubscribe/i);
+  });
+
+  it('adds the same section id to both locales, after the contact form', () => {
+    for (const locale of ['es', 'en'] as const) {
+      const sectionIds = ids(withSubscribe[locale]);
+      expect(sectionIds.indexOf('subscribe')).toBe(sectionIds.indexOf('contact-form') + 1);
+    }
+  });
+
+  it('comes after the comments and marks sections when they are on too', () => {
+    const all = buildPrivacyContent({
+      ...input,
+      subscribe: true,
+      marks: true,
+      comments: { repo: 'ada/site' },
+    });
+    for (const locale of ['es', 'en'] as const) {
+      const sectionIds = ids(all[locale]);
+      expect(sectionIds.indexOf('subscribe')).toBeGreaterThan(sectionIds.indexOf('contact-form'));
+      expect(sectionIds.indexOf('subscribe')).toBe(sectionIds.indexOf('marks') + 1);
+    }
+  });
+
+  it('says what is stored, why, who is involved, and how to leave or erase', () => {
+    const es = body(withSubscribe.es);
+    expect(es).toMatch(/aviso de algún proyecto/);
+    expect(es).toMatch(/7 días/);
+    expect(es).toMatch(/baja con un clic/);
+    expect(es).toMatch(/Cloudflare/);
+    expect(es).toMatch(/Resend/);
+    expect(es).toMatch(/no guardo tu IP/);
+    expect(es).toContain('/contact/');
+    const en = body(withSubscribe.en);
+    expect(en).toMatch(/heads-up about one of my projects/);
+    expect(en).toMatch(/7 days/);
+    expect(en).toMatch(/one-click unsubscribe link/);
+    expect(en).toMatch(/Cloudflare/);
+    expect(en).toMatch(/Resend/);
+    expect(en).toMatch(/do not store your IP/);
+    expect(en).toContain('/en/contact/');
+  });
+});

@@ -2,8 +2,7 @@ import { z } from 'zod';
 
 import { CONTACT_POLICY } from '@/features/contact/config.ts';
 import type { ContactReport, MailSender } from '@/features/contact/ports.ts';
-
-import { readProviderJson } from './response.ts';
+import { readProviderJson } from '@/shared/lib/provider-json.ts';
 
 export type ResendConfig = { apiKey: string; from: string; to: string };
 const replyToSchema = z

@@ -1,7 +1,6 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
-import { CONTACT_POLICY } from '@/features/contact/config.ts';
-
+import { PROVIDER_TIMEOUT_MS } from './provider-json.ts';
 import { createTurnstileVerifier } from './turnstile.ts';
 
 const config = { secretKey: 'test-secret', hostname: 'example.test', action: 'contact' };
@@ -24,7 +23,7 @@ describe('Turnstile verifier', () => {
       redirect: 'manual',
       signal: expect.any(AbortSignal),
     });
-    expect(timeout).toHaveBeenCalledWith(CONTACT_POLICY.providerTimeoutMs);
+    expect(timeout).toHaveBeenCalledWith(PROVIDER_TIMEOUT_MS);
     expect(JSON.parse(String(options?.body))).toEqual({
       secret: config.secretKey,
       response: 'token',

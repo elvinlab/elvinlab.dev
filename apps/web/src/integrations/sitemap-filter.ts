@@ -12,6 +12,8 @@ export function isHiddenFromSitemap(pathname: string, features?: typeof site.fea
   if (!flags.blog && (withoutLocale === '/notes/' || withoutLocale.startsWith('/notes/'))) {
     return true;
   }
+  // The subscription pages are token landing pages: never worth indexing, whatever the flags say.
+  if (withoutLocale.startsWith('/subscribe/')) return true;
   if (!flags.me && (withoutLocale === '/me/' || pathname === '/me/' || pathname === '/en/me/')) {
     return true;
   }

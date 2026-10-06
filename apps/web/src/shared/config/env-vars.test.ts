@@ -4,6 +4,7 @@ import { join, resolve } from 'node:path';
 import { describe, expect, it } from 'vitest';
 
 import { bindingsSchema } from '@/features/contact/bindings.ts';
+import { subscribeBindingsSchema } from '@/features/subscribe/bindings.ts';
 
 import { ENV_VARS } from './env-vars.ts';
 
@@ -47,12 +48,16 @@ describe('ENV_VARS registry', () => {
     for (const variable of ENV_VARS) expect(variable.description.length).toBeGreaterThan(20);
   });
 
-  it('matches the Worker bindings the contact form validates (secrets and settings)', () => {
+  it('matches the Worker bindings the contact form and the subscription validate (secrets and settings)', () => {
     const registered = ENV_VARS.filter((variable) => variable.scope === 'worker').map(
       (variable) => variable.name,
     );
-    const bound = Object.keys(bindingsSchema.shape).filter((key) => key !== 'CONTACT_RATE_LIMITER');
-    expect(registered.sort()).toEqual(bound.sort());
+    const bound = new Set(
+      [...Object.keys(bindingsSchema.shape), ...Object.keys(subscribeBindingsSchema.shape)].filter(
+        (key) => !key.endsWith('_RATE_LIMITER') && key !== 'SITE_DB',
+      ),
+    );
+    expect(registered.sort()).toEqual([...bound].sort());
   });
 
   it('never marks a public build variable as secret, nor a Worker secret as public', () => {

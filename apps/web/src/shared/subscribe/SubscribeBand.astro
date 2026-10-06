@@ -1,0 +1,100 @@
+---
+/**
+ * The footer subscription band: the only place of the email subscription. It ships the markup and
+ * a stub of a few lines; the form logic and Turnstile load on the first focus or pointer enter, so
+ * a page that nobody interacts with pays no script and no third-party request (LCP budget).
+ */
+import { localizePath } from '@elvinlab/core';
+
+import { integrations } from '@/shared/config/index.ts';
+import { LOCALES, type Locale, t } from '@/shared/i18n/index.ts';
+import { SUBSCRIBE_CLIENT_POLICY } from '@/shared/subscribe/client-policy.ts';
+
+type Props = { locale: Locale };
+
+const { locale } = Astro.props;
+const privacyHref = `${localizePath('/privacy/', locale, LOCALES)}#subscribe`;
+---
+
+<section
+  data-subscribe-cta
+  data-subscribe
+  data-locale={locale}
+  data-site-key={integrations.turnstileSiteKey}
+  data-action={SUBSCRIBE_CLIENT_POLICY.turnstileAction}
+  data-sending={t(locale, 'subscribe.sending')}
+  data-verifying={t(locale, 'subscribe.verifying')}
+  data-success={t(locale, 'subscribe.success')}
+  data-error={t(locale, 'subscribe.error')}
+  data-capped={t(locale, 'subscribe.capped')}
+  class="group/cta mb-8 flex flex-col gap-5 rounded-control border border-dashed border-divider bg-card p-5 md:flex-row md:items-start md:justify-between md:gap-8"
+>
+  <div class="flex items-start gap-4 md:max-w-[28rem]">
+    <svg aria-hidden="true" focusable="false" width="36" height="28" viewBox="0 0 9 7" class="mt-1 shrink-0 [shape-rendering:crispEdges] motion-safe:transition-transform motion-safe:duration-200 motion-safe:[transition-timing-function:steps(2,end)] motion-safe:group-hover/cta:-translate-y-1 motion-safe:group-focus-within/cta:-translate-y-1"><path class="fill-pink" d="M0 0h9v1H0zM0 1h1v1H0zM8 1h1v1H8zM0 2h1v1H0zM8 2h1v1H8zM0 3h1v1H0zM8 3h1v1H8zM0 4h1v1H0zM8 4h1v1H8zM0 5h1v1H0zM8 5h1v1H8zM0 6h9v1H0z"></path><path class="fill-pink" d="M1 1h1v1H1zM7 1h1v1H7zM2 2h1v1H2zM6 2h1v1H6zM3 3h1v1H3zM5 3h1v1H5zM4 4h1v1H4z"></path><path class="fill-chip" d="M2 1h5v1H2zM1 2h1v1H1zM3 2h3v1H3zM7 2h1v1H7zM1 3h2v1H1zM4 3h1v1H4zM6 3h2v1H6zM1 4h3v1H1zM5 4h3v1H5zM1 5h7v1H1z"></path></svg>
+    <div class="flex flex-col gap-1">
+      <h2 class="font-display text-lg font-bold">{t(locale, 'subscribe.title')}</h2>
+      <p class="text-sm text-text-secondary">{t(locale, 'subscribe.body')}</p>
+    </div>
+  </div>
+  <div class="flex w-full flex-col gap-2 md:max-w-[26rem]">
+    <form class="relative flex flex-col gap-2" novalidate>
+      <label for="subscribe-email" class="text-sm font-medium text-text">{t(locale, 'subscribe.email')}</label>
+      <div class="flex flex-col gap-3 sm:flex-row">
+        <div class="relative min-w-0 sm:flex-1">
+          <span aria-hidden="true" class="pointer-events-none absolute inset-y-0 left-3 grid place-items-center font-mono text-sm text-pink">&gt;</span>
+          <input
+            id="subscribe-email"
+            name="email"
+            type="email"
+            inputmode="email"
+            required
+            autocomplete="email"
+            autocapitalize="none"
+            spellcheck="false"
+            placeholder={t(locale, 'subscribe.placeholder')}
+            maxlength={SUBSCRIBE_CLIENT_POLICY.emailMaxLength}
+            class="h-11 w-full min-w-0 rounded-control border border-divider bg-page pr-3 pl-8 font-mono text-sm text-text placeholder:text-muted hover:border-primary/60 focus-visible:border-primary"
+          />
+        </div>
+        <button type="submit" class="h-11 shrink-0 rounded-control bg-button px-5 font-medium text-white hover:bg-button/90 hover:translate-y-px active:translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-50 motion-reduce:transition-none">
+          {t(locale, 'subscribe.submit')}
+        </button>
+      </div>
+      <div class="absolute -left-[9999px]" aria-hidden="true">
+        <input type="text" name="homepage" tabindex="-1" autocomplete="off" />
+      </div>
+    </form>
+    <div data-widget class="w-full empty:hidden"></div>
+    <p role="status" aria-live="polite" class="text-sm text-text-secondary empty:sr-only" data-status></p>
+    <noscript><p class="text-sm text-text-secondary">{t(locale, 'subscribe.noscript')}</p></noscript>
+    <a href={privacyHref} class="inline-flex h-11 w-fit items-center text-sm text-primary underline decoration-dashed underline-offset-4">{t(locale, 'subscribe.privacy')}</a>
+  </div>
+</section>
+
+<script>
+  // Stub: the real form logic is fetched on the first interaction, never on page load.
+  const root = document.querySelector<HTMLElement>('[data-subscribe]');
+  const form = root?.querySelector('form');
+  if (root && form) {
+    let armed = false;
+    let queued = false;
+    const onSubmit = (event: Event) => {
+      // Submitted before the logic arrived: hold it and replay once the real handler is attached.
+      event.preventDefault();
+      queued = true;
+    };
+    const arm = () => {
+      if (armed) return;
+      armed = true;
+      void import('@/shared/subscribe/form-client.ts').then((m) => {
+        m.initSubscribeForm(root);
+        form.removeEventListener('submit', onSubmit);
+        if (queued) form.requestSubmit();
+      });
+    };
+    form.addEventListener('focusin', arm, { once: true });
+    form.addEventListener('pointerenter', arm, { once: true });
+    form.addEventListener('submit', onSubmit);
+    form.addEventListener('submit', arm);
+  }
+</script>

@@ -1,9 +1,14 @@
 import { z } from 'zod';
 
-import { CONTACT_POLICY } from '@/features/contact/config.ts';
-import type { ContactReport, ContactVerifier } from '@/features/contact/ports.ts';
+import { PROVIDER_TIMEOUT_MS, readProviderJson } from './provider-json.ts';
 
-import { readProviderJson } from './response.ts';
+/** Diagnostic sink: codes and names only, never user data, secrets or tokens. */
+export type ProviderReport = (detail: string) => void;
+
+/** Decides whether an anti-bot token is valid for a client address. */
+export interface TokenVerifier {
+  verify(token: string, ip: string): Promise<boolean>;
+}
 
 export type TurnstileConfig = { secretKey: string; hostname: string; action: string };
 const verificationSchema = z.object({
@@ -25,12 +30,12 @@ const describeError = (error: unknown): string =>
 export function createTurnstileVerifier(
   config: TurnstileConfig,
   request: typeof fetch = fetch,
-  report: ContactReport = () => {},
-): ContactVerifier {
+  report: ProviderReport = () => {},
+): TokenVerifier {
   return {
     async verify(token, ip) {
       try {
-        const signal = AbortSignal.timeout(CONTACT_POLICY.providerTimeoutMs);
+        const signal = AbortSignal.timeout(PROVIDER_TIMEOUT_MS);
         const response = await request(
           'https://challenges.cloudflare.com/turnstile/v0/siteverify',
           {

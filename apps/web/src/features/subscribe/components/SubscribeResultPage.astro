@@ -1,0 +1,75 @@
+---
+/** Landing page of an emailed link (`confirm` or `unsubscribe`). It reads `?token=` on the client and
+ * shows one button; only the click POSTs, so a mail scanner that prefetches the link changes
+ * nothing. The token is never written into the HTML. */
+import { localizePath } from '@elvinlab/core';
+
+import { LOCALES, type Locale, t } from '@/shared/i18n/index.ts';
+import BaseLayout from '@/shared/layout/BaseLayout.astro';
+
+type Props = { locale: Locale; kind: 'confirm' | 'unsubscribe' };
+
+const { locale, kind } = Astro.props;
+const title = t(locale, `subscribe.${kind}.title`);
+const notesHref = localizePath('/notes/', locale, LOCALES);
+---
+
+<BaseLayout locale={locale} path={`/subscribe/${kind}/`} title={title} noindex>
+  <article
+    class="max-w-[68ch] pt-10 md:pt-14"
+    data-subscribe-page
+    data-kind={kind}
+    data-working={t(locale, 'subscribe.working')}
+    data-done={t(locale, `subscribe.${kind}.done`)}
+    data-invalid={t(locale, `subscribe.${kind}.invalid`)}
+    data-unavailable={t(locale, 'subscribe.unavailable')}
+  >
+    <h1 class="text-3xl font-bold tracking-tight">{title}</h1>
+    <p class="mt-3 text-text-secondary" data-explain>{t(locale, `subscribe.${kind}.body`)}</p>
+    <button type="button" data-go class="mt-6 h-11 rounded-control bg-button px-5 font-medium text-white hover:bg-button/90 disabled:cursor-not-allowed disabled:opacity-50">
+      {t(locale, `subscribe.${kind}.button`)}
+    </button>
+    <noscript><p class="mt-6 text-text-secondary">{t(locale, 'subscribe.unavailable')}</p></noscript>
+    <p role="status" aria-live="polite" class="mt-6 text-text-secondary empty:hidden" data-status></p>
+    <a href={notesHref} class="mt-2 flex h-11 w-fit items-center text-primary underline decoration-dashed underline-offset-4 sm:ml-5 sm:mt-6 sm:inline-flex">{t(locale, 'subscribe.back')}</a>
+  </article>
+</BaseLayout>
+
+<script>
+  import { callSubscribeAction } from '@/shared/subscribe/action-client.ts';
+
+  const root = document.querySelector<HTMLElement>('[data-subscribe-page]');
+  const button = root?.querySelector<HTMLButtonElement>('[data-go]');
+  const status = root?.querySelector<HTMLElement>('[data-status]');
+  const explain = root?.querySelector<HTMLElement>('[data-explain]');
+
+  if (root && button && status && explain) {
+    const text = root.dataset;
+    const kind = text['kind'] === 'unsubscribe' ? 'unsubscribe' : 'confirm';
+    const token = new URLSearchParams(location.search).get('token') ?? '';
+    const finish = (message: string) => {
+      button.hidden = true;
+      explain.hidden = true;
+      status.textContent = message;
+    };
+
+    if (!token) {
+      finish(text['invalid'] ?? '');
+    } else {
+      button.addEventListener('click', async () => {
+        button.disabled = true;
+        status.textContent = text['working'] ?? '';
+        const outcome = await callSubscribeAction(kind, { token });
+        if (!outcome.ok) {
+          // Unavailable or unreachable: the link may still be good, so the button stays.
+          button.disabled = false;
+          status.textContent = text['unavailable'] ?? '';
+        } else if (outcome.data['result'] === 'confirmed' || outcome.data['result'] === 'unsubscribed') {
+          finish(text['done'] ?? '');
+        } else {
+          finish(text['invalid'] ?? '');
+        }
+      });
+    }
+  }
+</script>

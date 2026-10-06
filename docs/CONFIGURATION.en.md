@@ -126,6 +126,7 @@ The descriptions come from the schema (`.describe()`), which is why they are in 
 | `features.me` | `boolean` | yes |  | The /me recruiter page: off hides it from the nav, marks it noindex and keeps it out of the sitemap. |
 | `features.readingMode` | `boolean` | yes |  | Reading mode on notes: off renders no toggle, loads no script or CSS and stores nothing in the browser. |
 | `features.marks` | `boolean` | yes |  | The anonymous "I was here" footprint button on notes. Needs the `SITE_DB` D1 binding (the site database, table `note_footprints`) and the `MARKS_RATE_LIMITER` binding, otherwise the buttons never render. |
+| `features.subscribe` | `boolean` | yes |  | Email subscription to new notes (double opt-in, list in D1, mail through Resend). Needs the `SITE_DB` D1 binding (table `subscribers`), the `SUBSCRIBE_RATE_LIMITER` binding and the `SUBSCRIBE_FROM` and `SUBSCRIBE_TOKEN_SECRET` secrets, otherwise nothing renders. |
 | `integrations` | `object` | no | `{}` | Public ids of third-party services. They ship in the HTML by design, so they live here and not in secrets. |
 | `integrations.cloudflareAnalyticsToken` | `string` | no |  | Cloudflare Web Analytics beacon token (public). Omit to turn analytics off. Env `PUBLIC_CF_ANALYTICS_TOKEN` overrides it. |
 | `integrations.turnstileSiteKey` | `string` | no |  | Cloudflare Turnstile public site key for the contact form, bound to the domain. Env `PUBLIC_TURNSTILE_SITE_KEY` overrides it (use a test key locally). |
@@ -270,6 +271,8 @@ Four scopes: **build** (read while building), **Worker** (in production, at runt
 | `CONTACT_TO` | Worker (runtime) | yes | yes | Inbox that receives contact messages. Never written in tracked files; the site only exposes the /contact form. | Cloudflare Worker secret; `.dev.vars` locally |
 | `TURNSTILE_SECRET_KEY` | Worker (runtime) | yes | yes | Cloudflare Turnstile secret key that verifies the anti-bot token server side. | Cloudflare Worker secret; `.dev.vars` locally (use the Cloudflare test secret) |
 | `TURNSTILE_HOSTNAME` | Worker (runtime) | no | yes | Hostname Turnstile must report for a valid token (for example the production domain). It makes a token from another site invalid. | Cloudflare Worker variable; `.dev.vars` locally (`localhost`) |
+| `SUBSCRIBE_FROM` | Worker (runtime) | yes | no | Sender of the subscription emails (`Name <address>` or a bare address), on a domain verified in Resend. Required only when `features.subscribe` is on. An address is never written in tracked files. | Cloudflare Worker secret; `.dev.vars` locally |
+| `SUBSCRIBE_TOKEN_SECRET` | Worker (runtime) | yes | no | Random secret (at least 32 characters) that signs the unsubscribe link of every email. Required only when `features.subscribe` is on. Changing it invalidates the unsubscribe links already sent. | Cloudflare Worker secret; `.dev.vars` locally |
 | `CLOUDFLARE_API_TOKEN` | CI | yes | yes | Cloudflare API token with permission to deploy the Worker; used only by the deploy job. | GitHub environment secret (`production`) |
 | `CLOUDFLARE_ACCOUNT_ID` | CI | no | yes | Cloudflare account id the deploy job targets. Not a secret, but not needed anywhere else. | GitHub repository variable |
 | `DEV_CHECK_STRIP_DEPS` | local tooling | no | no | Set to `1` to run `pnpm check:dev-cold-start` as its own negative control: it removes the pre-optimized dependencies first and must then fail. | the shell, only when running that check |
@@ -303,6 +306,12 @@ TURNSTILE_SECRET_KEY=
 
 # Hostname Turnstile must report for a valid token (for example the production domain). It makes a token from another site invalid.
 TURNSTILE_HOSTNAME=
+
+# Sender of the subscription emails (`Name <address>` or a bare address), on a domain verified in Resend. Required only when `features.subscribe` is on. An address is never written in tracked files.
+SUBSCRIBE_FROM=
+
+# Random secret (at least 32 characters) that signs the unsubscribe link of every email. Required only when `features.subscribe` is on. Changing it invalidates the unsubscribe links already sent.
+SUBSCRIBE_TOKEN_SECRET=
 ```
 <!-- docs:end dev-vars-example -->
 
@@ -437,6 +446,21 @@ A one-tap, anonymous "I was here" button on every note (header and end of the ar
 5. Check it: open a note, press the button and reload (the count is kept), or `curl -s -X POST https://YOUR-DOMAIN/_actions/marks.get/ -H 'content-type: application/json' -H 'origin: https://YOUR-DOMAIN' -d '{"slug":"<a published note slug>"}'`, which answers with the total.
 
 To turn it off, set `features.marks: false`: no markup, no CSS and no script reach the page. To use another database (for example Turso), write an adapter for the `MarkStore` port in `apps/web/src/features/marks/ports.ts` next to `adapters/d1.ts`.
+
+### 6.14 Email subscription to new notes (`subscribe`)
+
+Visitors leave an email in the footer form (the subscription band, the only place of the subscription; it loads its code and Turnstile only on first focus) and get one email for each new note and, now and then, an announcement of one of the author's projects. The list lives in the shared D1 database (table `subscribers`), signing up needs a confirmation click (double opt-in), every email carries an unsubscribe link (also in the `List-Unsubscribe` header; no one-click POST, see ADR 0014), and Resend only sends (it sits behind a port). The flag is `features.subscribe` (ships **off**); the routes `/subscribe/confirm/`, `/subscribe/unsubscribe/` (and their `/en` twins) exist only while it and `features.blog` are on. The form also needs a Turnstile site key (recipe 6.6). Decision record: [ADR 0014](adr/0014-email-subscription-d1-list-resend-port.md); the privacy page gets its `subscribe` section when the flag is on.
+
+Until every step below is done the form shows nothing useful (the Actions answer "unavailable"), so do them **in this order**, in your own accounts, before flipping the flag:
+
+1. **Apply the migration to the real database** (needs `wrangler login`): `cd apps/web && mise exec -- pnpm exec wrangler d1 migrations apply elvinlab-dev-db --remote` (it applies `migrations/0002_subscribers.sql`). The migration creates two tables: `subscribers` and `subscribe_quota` (a per-UTC-day counter of confirmation emails). The cap values (30 confirmations a day out of the provider's 100) live in `SUBSCRIBE_POLICY` (`features/subscribe/config.ts`); notes use what is left of the 100 each day.
+2. **Create the two secrets** on the Worker (never in tracked files): `SUBSCRIBE_FROM`, the sender (`Name <address>`) on a domain verified in Resend, and `SUBSCRIBE_TOKEN_SECRET`, at least 32 random characters. Generate the second with `openssl rand -base64 48`, then `mise exec -- pnpm exec wrangler secret put SUBSCRIBE_TOKEN_SECRET` and the same for `SUBSCRIBE_FROM`. Locally put both in `apps/web/.dev.vars` (git-ignored). `RESEND_API_KEY` and `TURNSTILE_SECRET_KEY` are the ones the contact form already uses. Changing `SUBSCRIBE_TOKEN_SECRET` later invalidates the unsubscribe links already sent.
+3. **Bind the rate limiter**: `SUBSCRIBE_RATE_LIMITER` is already declared under `ratelimits` in `wrangler.jsonc` (a unique `namespace_id`); it becomes active with the next deploy. Nothing to create by hand.
+4. **Verify the sending domain in Resend** (DNS records SPF and DKIM in the Cloudflare zone) so `SUBSCRIBE_FROM` is accepted. The free plan allows 100 emails a day and 3,000 a month; the sender caps each run at 100.
+5. **Flip the flag**: set `features.subscribe: true` in `site.config.ts`, run `pnpm docs:config` if you changed anything generated, and release (section 7).
+6. **Check it** with a throwaway address you own: subscribe from the footer of any page, open the link in the email, press the button, then unsubscribe from a note email. Never test with someone else's address.
+
+To switch it off, set `features.subscribe: false`: the form and the pages disappear from the next build and the privacy section goes with them (the list stays in D1).
 
 ## 7. Releasing and rolling back
 

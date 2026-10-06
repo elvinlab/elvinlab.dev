@@ -10,9 +10,18 @@ import {
   type NoteCatalog,
   readConfiguredMarks,
 } from '@/features/marks/index.ts';
+import {
+  confirmConfiguredSubscription,
+  submitConfiguredSubscribe,
+  unsubscribeConfigured,
+} from '@/features/subscribe/index.ts';
+import { site } from '@/shared/config/index.ts';
 
 const FAILURE = 'Unable to send your message. Please try again later.';
 const MARKS_FAILURE = 'Unable to save your footprint. Please try again later.';
+const SUBSCRIBE_FAILURE = 'Unable to subscribe. Please try again later.';
+const SUBSCRIBE_CAPPED = 'Too many requests today. Please try again tomorrow.';
+const SUBSCRIBE_UNAVAILABLE = 'Subscriptions are not available right now.';
 
 // Astro checkOrigin covers form content types; JSON requires this explicit check too.
 function assertSameOrigin(request: Request, message: string): void {
@@ -44,6 +53,34 @@ async function guardStore(run: () => Promise<MarksResult | null>): Promise<Marks
     console.error('marks store failed');
     return null;
   }
+}
+
+/** The routes and Actions of the subscription exist only while the blog and the flag are on. */
+function assertSubscribeEnabled(): void {
+  if (!site.features.blog || !site.features.subscribe) {
+    throw new ActionError({ code: 'SERVICE_UNAVAILABLE', message: SUBSCRIBE_UNAVAILABLE });
+  }
+}
+
+/** Reads `token` from an untyped JSON body; the domain validates the value. */
+function tokenOf(input: unknown): unknown {
+  return typeof input === 'object' && input !== null
+    ? (input as { token?: unknown }).token
+    : undefined;
+}
+
+/** A list failure (D1 down) is unavailable, never a leaked stack; null is what the runtime returns. */
+async function guardList<T>(run: () => Promise<T | null>): Promise<T> {
+  let result: T | null = null;
+  try {
+    result = await run();
+  } catch {
+    console.error('subscribe store failed');
+  }
+  if (result === null) {
+    throw new ActionError({ code: 'SERVICE_UNAVAILABLE', message: SUBSCRIBE_UNAVAILABLE });
+  }
+  return result;
 }
 
 export const server = {
@@ -79,6 +116,48 @@ export const server = {
         // Cloudflare overwrites this header; it only feeds the rate limiter and is never stored.
         const ip = resolveClientIp(request.headers.get('cf-connecting-ip'), import.meta.env.DEV);
         return unwrapMarks(await guardStore(() => leaveConfiguredMarks(input, ip, env, catalog)));
+      },
+    }),
+  },
+  subscribe: {
+    request: defineAction({
+      accept: 'json',
+      async handler(input: unknown, { request }) {
+        assertSameOrigin(request, SUBSCRIBE_FAILURE);
+        assertSubscribeEnabled();
+        const ip = resolveClientIp(request.headers.get('cf-connecting-ip'), import.meta.env.DEV);
+        const result = await guardList(() =>
+          submitConfiguredSubscribe(input, ip, env, {
+            url: site.url,
+            name: site.identity.handle,
+            ownerName: site.identity.name,
+          }),
+        );
+        // The same fixed answer for every address once the day is capped.
+        if (!result.ok && result.error === 'daily_cap') {
+          throw new ActionError({ code: 'TOO_MANY_REQUESTS', message: SUBSCRIBE_CAPPED });
+        }
+        // One fixed message whatever the reason: it must not reveal who is on the list.
+        if (!result.ok) throw new ActionError({ code: 'BAD_REQUEST', message: SUBSCRIBE_FAILURE });
+        return { ok: true };
+      },
+    }),
+    confirm: defineAction({
+      accept: 'json',
+      async handler(input: unknown, { request }) {
+        assertSameOrigin(request, SUBSCRIBE_FAILURE);
+        assertSubscribeEnabled();
+        return {
+          result: await guardList(() => confirmConfiguredSubscription(tokenOf(input), env)),
+        };
+      },
+    }),
+    unsubscribe: defineAction({
+      accept: 'json',
+      async handler(input: unknown, { request }) {
+        assertSameOrigin(request, SUBSCRIBE_FAILURE);
+        assertSubscribeEnabled();
+        return { result: await guardList(() => unsubscribeConfigured(tokenOf(input), env)) };
       },
     }),
   },

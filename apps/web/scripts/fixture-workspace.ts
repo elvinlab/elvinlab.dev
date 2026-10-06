@@ -43,6 +43,21 @@ export function enableFixtureNotice(web: string): void {
 }
 
 /**
+ * Turns the subscription flag on in the copied site config so the notes form and the confirm and
+ * unsubscribe pages are built and covered. The Turnstile site key comes from the environment
+ * override that `fixture-preview.ts` sets; the widget script and the Actions are mocked in e2e.
+ */
+export function enableFixtureSubscribe(web: string): void {
+  const configPath = join(web, 'src/site.config.ts');
+  const config = readFileSync(configPath, 'utf8');
+  // The real site may already ship the flag on: that is what the fixture wants, so it stays as is.
+  if (/subscribe: true,/.test(config)) return;
+  const patched = config.replace(/subscribe: false,/, 'subscribe: true,');
+  if (patched === config) throw new Error('fixture: could not enable the subscribe flag');
+  writeFileSync(configPath, patched);
+}
+
+/**
  * Drops the real third-party ids (analytics token, Turnstile key) from the copied site config, so
  * fixture builds never load the Cloudflare beacon or call out to the network. Tests that need a
  * Turnstile key set it through the environment override.

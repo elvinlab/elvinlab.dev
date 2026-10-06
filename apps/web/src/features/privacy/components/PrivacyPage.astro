@@ -5,6 +5,7 @@
  */
 
 import { buildPrivacyContent } from '@/features/privacy/content.ts';
+import { isSubscribeActive } from '@/features/subscribe/index.ts';
 import { isEnabled, site } from '@/shared/config/index.ts';
 import type { Locale } from '@/shared/i18n/index.ts';
 import BaseLayout from '@/shared/layout/BaseLayout.astro';
@@ -22,6 +23,7 @@ const content = buildPrivacyContent({
   ...(isEnabled('comments') && site.giscus && { comments: { repo: site.giscus.repo } }),
   readingMode: isEnabled('readingMode'),
   marks: isEnabled('marks'),
+  subscribe: isSubscribeActive(site.features),
 })[locale];
 ---
 

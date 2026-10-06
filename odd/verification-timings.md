@@ -41,9 +41,11 @@ Run `37390786594` on `main`, read with `gh`. Critical path: e2e, then `checks`, 
 | Scenario | Seconds | Saved vs 340 s | Date and notes |
 | --- | ---: | ---: | --- |
 | Layout-wide plan (simulated `shared/layout/Navbar.astro`, `--files`), build family fresh in the registry so not run | 115 | 66% | 2026-10-05: lint 0.2, typecheck 11, unit 3, e2e 31 specs at 1280 px 70, Lighthouse 2 URLs x 1 run 30 |
-| Full local stack (`--all`) | pending | | parent to fill |
-| CI e2e critical path | pending | | parent to fill from the run summary |
+| Full local stack (`--all`) | 247 | 27% vs 340 s | 2026-10-05 after the speed-up: one merged e2e run (122 s instead of 33 + 68) and Lighthouse at 1 run (72 s instead of 199 s); typecheck 12, cold start 25. The saving of `--all` is modest by design: the big wins are the change-scoped plans |
+| (note on the row above, original text) | | | the speed-up targets the change-scoped plans; `--all` still runs everything on purpose (about 344 s on 2026-10-05, before the change) |
+| CI e2e critical path (slowest shard) | 163 | 54% vs 355 s | 2026-10-05, run 37396687889 on `4910e5d`: shards 122, 152 and 163 s (was one job of 355 s) |
+| CI whole pipeline (slowest gate + checks + deploy) | 326 | 17% vs 391 s | static 46, lighthouse 275, e2e 163 (slowest shard), checks 2, deploy 49. Lighthouse is now the longest gate; this was the first run, with cold caches, so the cache saving is not yet visible |
 
 ## CI durations
 
-Each job writes `<job>: <n>s` (the e2e shards one line each) to its run's step summary, so every run on `main` records its own timings. The CI baseline above is the only CI number so far; the after-numbers are pending the first run with the caches warm (the first run populates them and will not show the saving). No CI figure here is estimated.
+Each job writes `<job>: <n>s` (the e2e shards one line each) to its run's step summary, so every run on `main` records its own timings. The CI baseline above is the only CI number so far; the first after-numbers are above; compare the next run, when the caches are warm, the first run with the caches warm (the first run populates them and will not show the saving). No CI figure here is estimated.

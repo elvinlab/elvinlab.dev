@@ -7,12 +7,13 @@ import '@fontsource/press-start-2p/latin-400.css';
 import { site } from '@/shared/config/index.ts';
 import { type Locale, t } from '@/shared/i18n/index.ts';
 import { externalLinkAttrs } from '@/shared/lib/external-link.ts';
+import SubscribeBand from '@/shared/subscribe/SubscribeBand.astro';
 import BrandMark from '@/shared/ui/BrandMark.astro';
 import ExternalHint from '@/shared/ui/ExternalHint.astro';
 
-type Props = { locale: Locale };
+type Props = { locale: Locale; subscribeCta?: boolean };
 
-const { locale } = Astro.props;
+const { locale, subscribeCta = false } = Astro.props;
 const year = new Date().getFullYear();
 // 44 px tall hit area; -mx-3 cancels the px-3 so the text keeps its column alignment under md.
 const footerLink =
@@ -20,6 +21,7 @@ const footerLink =
 ---
 
 <footer class="mt-16 animate-fade-in-up border-t border-dashed border-divider py-8 [animation-delay:250ms]">
+  {subscribeCta && <SubscribeBand locale={locale} />}
   <div class="flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
     <div class="flex flex-col gap-3">
       <p class="flex items-center gap-2 font-retro text-xs leading-relaxed text-text-secondary">

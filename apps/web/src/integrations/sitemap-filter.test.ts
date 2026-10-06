@@ -12,6 +12,7 @@ const allOn = {
   changelog: true,
   readingMode: true,
   marks: true,
+  subscribe: false,
 };
 
 describe('isHiddenFromSitemap', () => {
@@ -60,5 +61,15 @@ describe('isHiddenFromSitemap', () => {
   it('keeps notes URLs when blog is on', () => {
     expect(isHiddenFromSitemap('/notes/x/', allOn)).toBe(false);
     expect(isHiddenFromSitemap('/en/notes/x/', allOn)).toBe(false);
+  });
+
+  it('always hides the noindex subscription pages and their English twins', () => {
+    for (const path of [
+      '/subscribe/confirm/',
+      '/subscribe/unsubscribe/',
+      '/en/subscribe/confirm/',
+    ]) {
+      expect(isHiddenFromSitemap(path, allOn)).toBe(true);
+    }
   });
 });
