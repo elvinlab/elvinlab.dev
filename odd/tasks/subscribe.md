@@ -10,8 +10,8 @@ Local implementation on `develop`. The owner's human steps (apply the migration 
 Delegated direct, one writer at a time: W1 server side (S1, S2), W2 UI and docs (S3, S4). Trigger: more than two non-trivial files and mapping beyond the inline budget (explorer map of contact and marks done first).
 
 ## Tasks
-- [ ] S1 Domain: `features/subscribe` ports, pure rules (`subscribe`, `confirm`, `unsubscribe`, `sendNote`, stale purge), token helpers (random confirm token + SHA-256 hash, HMAC unsubscribe token), fake adapters, unit tests first.
-- [ ] S2 Adapters and wiring: D1 repository and migration `0002_subscribers.sql`, Resend mailer (confirmation and batch note email with `List-Unsubscribe` headers), Turnstile verifier parameterized by action, bindings schema, `SUBSCRIBE_RATE_LIMITER` in wrangler, env vars registry, `features.subscribe` flag (off) and `pnpm docs:config`.
+- [x] S1 Domain: `features/subscribe` ports, pure rules (`subscribe`, `confirm`, `unsubscribe`, `sendNote`, stale purge), token helpers (random confirm token + SHA-256 hash, HMAC unsubscribe token), fake adapters, unit tests first.
+- [x] S2 Adapters and wiring: D1 repository and migration `0002_subscribers.sql`, Resend mailer (confirmation and batch note email with `List-Unsubscribe` headers), Turnstile verifier parameterized by action, bindings schema, `SUBSCRIBE_RATE_LIMITER` in wrangler, env vars registry, `features.subscribe` flag (off) and `pnpm docs:config`.
 - [ ] S3 Delivery: Astro Actions (`subscribe.request`, `.confirm`, `.unsubscribe`), one-click POST endpoint, confirm and unsubscribe pages (ES and EN) gated by the blog and subscribe flags, the form on `/notes` next to RSS (no heavy island: Turnstile loads on first interaction).
 - [ ] S4 Privacy, docs, changelog, e2e (form, confirm, unsubscribe, flag off hides everything, axe in both themes), white-label and budgets, local D1 run subscribe to confirm to unsubscribe.
 
@@ -20,3 +20,5 @@ Repeating an email does not duplicate rows or leak existence; only the confirmat
 
 ## Progress
 Created. ADR 0014 accepted (option (b), our own list through the batch API). Explorer map of contact and marks done.
+
+W1 (S1, S2) done, uncommitted: `features/subscribe` (domain, D1, Resend, WebCrypto tokens, bindings, runtime), migration 0002 applied to a local D1 only, `SUBSCRIBE_RATE_LIMITER` (1003) in wrangler, flag `features.subscribe` (off), two env vars. Turnstile verifier and `readProviderJson` moved to `shared/lib/` (contact imports them from there; depcruise forbids feature-to-feature internals). Observed: biome, typecheck, whole web vitest (85 files, 881 tests), depcruise, docs:config up to date, `wrangler d1 migrations apply SITE_DB --local` clean. Not run: e2e, Lighthouse, white-label (S4).

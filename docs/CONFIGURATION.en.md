@@ -126,6 +126,7 @@ The descriptions come from the schema (`.describe()`), which is why they are in 
 | `features.me` | `boolean` | yes |  | The /me recruiter page: off hides it from the nav, marks it noindex and keeps it out of the sitemap. |
 | `features.readingMode` | `boolean` | yes |  | Reading mode on notes: off renders no toggle, loads no script or CSS and stores nothing in the browser. |
 | `features.marks` | `boolean` | yes |  | The anonymous "I was here" footprint button on notes. Needs the `SITE_DB` D1 binding (the site database, table `note_footprints`) and the `MARKS_RATE_LIMITER` binding, otherwise the buttons never render. |
+| `features.subscribe` | `boolean` | yes |  | Email subscription to new notes (double opt-in, list in D1, mail through Resend). Needs the `SITE_DB` D1 binding (table `subscribers`), the `SUBSCRIBE_RATE_LIMITER` binding and the `SUBSCRIBE_FROM` and `SUBSCRIBE_TOKEN_SECRET` secrets, otherwise nothing renders. |
 | `integrations` | `object` | no | `{}` | Public ids of third-party services. They ship in the HTML by design, so they live here and not in secrets. |
 | `integrations.cloudflareAnalyticsToken` | `string` | no |  | Cloudflare Web Analytics beacon token (public). Omit to turn analytics off. Env `PUBLIC_CF_ANALYTICS_TOKEN` overrides it. |
 | `integrations.turnstileSiteKey` | `string` | no |  | Cloudflare Turnstile public site key for the contact form, bound to the domain. Env `PUBLIC_TURNSTILE_SITE_KEY` overrides it (use a test key locally). |
@@ -270,6 +271,8 @@ Four scopes: **build** (read while building), **Worker** (in production, at runt
 | `CONTACT_TO` | Worker (runtime) | yes | yes | Inbox that receives contact messages. Never written in tracked files; the site only exposes the /contact form. | Cloudflare Worker secret; `.dev.vars` locally |
 | `TURNSTILE_SECRET_KEY` | Worker (runtime) | yes | yes | Cloudflare Turnstile secret key that verifies the anti-bot token server side. | Cloudflare Worker secret; `.dev.vars` locally (use the Cloudflare test secret) |
 | `TURNSTILE_HOSTNAME` | Worker (runtime) | no | yes | Hostname Turnstile must report for a valid token (for example the production domain). It makes a token from another site invalid. | Cloudflare Worker variable; `.dev.vars` locally (`localhost`) |
+| `SUBSCRIBE_FROM` | Worker (runtime) | yes | no | Sender of the subscription emails (`Name <address>` or a bare address), on a domain verified in Resend. Required only when `features.subscribe` is on. An address is never written in tracked files. | Cloudflare Worker secret; `.dev.vars` locally |
+| `SUBSCRIBE_TOKEN_SECRET` | Worker (runtime) | yes | no | Random secret (at least 32 characters) that signs the unsubscribe link of every email. Required only when `features.subscribe` is on. Changing it invalidates the unsubscribe links already sent. | Cloudflare Worker secret; `.dev.vars` locally |
 | `CLOUDFLARE_API_TOKEN` | CI | yes | yes | Cloudflare API token with permission to deploy the Worker; used only by the deploy job. | GitHub environment secret (`production`) |
 | `CLOUDFLARE_ACCOUNT_ID` | CI | no | yes | Cloudflare account id the deploy job targets. Not a secret, but not needed anywhere else. | GitHub repository variable |
 | `DEV_CHECK_STRIP_DEPS` | local tooling | no | no | Set to `1` to run `pnpm check:dev-cold-start` as its own negative control: it removes the pre-optimized dependencies first and must then fail. | the shell, only when running that check |
@@ -303,6 +306,12 @@ TURNSTILE_SECRET_KEY=
 
 # Hostname Turnstile must report for a valid token (for example the production domain). It makes a token from another site invalid.
 TURNSTILE_HOSTNAME=
+
+# Sender of the subscription emails (`Name <address>` or a bare address), on a domain verified in Resend. Required only when `features.subscribe` is on. An address is never written in tracked files.
+SUBSCRIBE_FROM=
+
+# Random secret (at least 32 characters) that signs the unsubscribe link of every email. Required only when `features.subscribe` is on. Changing it invalidates the unsubscribe links already sent.
+SUBSCRIBE_TOKEN_SECRET=
 ```
 <!-- docs:end dev-vars-example -->
 

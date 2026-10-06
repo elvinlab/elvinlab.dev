@@ -1,8 +1,6 @@
 import { describe, expect, it, vi } from 'vitest';
 
-import { CONTACT_POLICY } from '@/features/contact/config.ts';
-
-import { readProviderJson } from './response.ts';
+import { PROVIDER_RESPONSE_MAX_BYTES, readProviderJson } from './provider-json.ts';
 
 const signal = () => new AbortController().signal;
 
@@ -33,7 +31,7 @@ describe('bounded provider JSON', () => {
     const response = new Response(
       new ReadableStream({
         start(controller) {
-          controller.enqueue(new Uint8Array(CONTACT_POLICY.providerResponseMaxBytes));
+          controller.enqueue(new Uint8Array(PROVIDER_RESPONSE_MAX_BYTES));
           controller.enqueue(new Uint8Array(1));
         },
         cancel,

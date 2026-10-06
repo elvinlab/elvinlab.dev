@@ -87,6 +87,24 @@ export const ENV_VARS: readonly EnvVar[] = [
     setIn: 'Cloudflare Worker variable; `.dev.vars` locally (`localhost`)',
   },
   {
+    name: 'SUBSCRIBE_FROM',
+    scope: 'worker',
+    secret: true,
+    required: false,
+    description:
+      'Sender of the subscription emails (`Name <address>` or a bare address), on a domain verified in Resend. Required only when `features.subscribe` is on. An address is never written in tracked files.',
+    setIn: 'Cloudflare Worker secret; `.dev.vars` locally',
+  },
+  {
+    name: 'SUBSCRIBE_TOKEN_SECRET',
+    scope: 'worker',
+    secret: true,
+    required: false,
+    description:
+      'Random secret (at least 32 characters) that signs the unsubscribe link of every email. Required only when `features.subscribe` is on. Changing it invalidates the unsubscribe links already sent.',
+    setIn: 'Cloudflare Worker secret; `.dev.vars` locally',
+  },
+  {
     name: 'CLOUDFLARE_API_TOKEN',
     scope: 'ci',
     secret: true,

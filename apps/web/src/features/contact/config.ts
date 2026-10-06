@@ -1,3 +1,5 @@
+import { PROVIDER_RESPONSE_MAX_BYTES, PROVIDER_TIMEOUT_MS } from '@/shared/lib/provider-json.ts';
+
 /** Public contact policy only; addresses and provider secrets belong to runtime bindings. */
 export const CONTACT_POLICY = {
   mailSubject: 'New contact message',
@@ -6,8 +8,8 @@ export const CONTACT_POLICY = {
   messageMaxLength: 5_000,
   tokenMaxLength: 2_048,
   minFillTimeMs: 3_000,
-  providerTimeoutMs: 5_000,
-  providerResponseMaxBytes: 8_192,
+  providerTimeoutMs: PROVIDER_TIMEOUT_MS,
+  providerResponseMaxBytes: PROVIDER_RESPONSE_MAX_BYTES,
   requestMaxBytes: 32_768,
   turnstileAction: 'contact',
 } as const;

@@ -1,4 +1,6 @@
-import { CONTACT_POLICY } from '@/features/contact/config.ts';
+/** Shared limits for calls to third-party providers (Turnstile, Resend). */
+export const PROVIDER_TIMEOUT_MS = 5_000;
+export const PROVIDER_RESPONSE_MAX_BYTES = 8_192;
 
 /** Caps decoded provider data in memory; timeout covers the body, not just response headers. */
 export async function readProviderJson(response: Response, signal: AbortSignal): Promise<unknown> {
@@ -21,8 +23,7 @@ export async function readProviderJson(response: Response, signal: AbortSignal):
       signal.throwIfAborted();
       if (done) break;
       size += value.byteLength;
-      if (size > CONTACT_POLICY.providerResponseMaxBytes)
-        throw new Error('Invalid provider response.');
+      if (size > PROVIDER_RESPONSE_MAX_BYTES) throw new Error('Invalid provider response.');
       text += decoder.decode(value, { stream: true });
     }
     return JSON.parse(text + decoder.decode()) as unknown;

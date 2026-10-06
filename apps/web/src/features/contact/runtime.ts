@@ -1,7 +1,8 @@
 import { z } from 'zod';
 
+import { createTurnstileVerifier } from '@/shared/lib/turnstile.ts';
+
 import { createResendSender } from './adapters/resend.ts';
-import { createTurnstileVerifier } from './adapters/turnstile.ts';
 import { bindingsSchema } from './bindings.ts';
 import { CONTACT_POLICY } from './config.ts';
 import { type ContactResult, submitContact } from './contact.ts';

@@ -311,6 +311,11 @@ export const siteConfigSchema = z
           .describe(
             'The anonymous "I was here" footprint button on notes. Needs the `SITE_DB` D1 binding (the site database, table `note_footprints`) and the `MARKS_RATE_LIMITER` binding, otherwise the buttons never render.',
           ),
+        subscribe: z
+          .boolean()
+          .describe(
+            'Email subscription to new notes (double opt-in, list in D1, mail through Resend). Needs the `SITE_DB` D1 binding (table `subscribers`), the `SUBSCRIBE_RATE_LIMITER` binding and the `SUBSCRIBE_FROM` and `SUBSCRIBE_TOKEN_SECRET` secrets, otherwise nothing renders.',
+          ),
       })
       .describe(
         'Feature flags: off means the routes are not generated and the nav entry is hidden.',
