@@ -21,7 +21,7 @@ const TURNSTILE_STUB = `
 const THEMES = ['elvinlab-dark', 'elvinlab-light'] as const;
 
 const FORM = {
-  email: 'Correo electrónico',
+  email: 'Dónde enviarte las notas',
   submit: 'Suscribirme',
   success: 'Revisa tu bandeja de entrada para confirmar la suscripción.',
   error: 'No se pudo suscribir. Inténtalo más tarde.',
@@ -214,7 +214,7 @@ test.describe('form in the footer', () => {
   }) => {
     await stubTurnstile(page);
     await page.goto('/');
-    const honeypot = page.locator('input[name="website"]');
+    const honeypot = page.locator('input[name="homepage"]');
     await expect(honeypot).toHaveAttribute('tabindex', '-1');
     await expect(honeypot.locator('xpath=..')).toHaveAttribute('aria-hidden', 'true');
     await page.locator(FIELD).getByLabel(FORM.email).focus();
@@ -223,7 +223,7 @@ test.describe('form in the footer', () => {
       await page.keyboard.press('Tab');
       visited.push(await page.evaluate(() => document.activeElement?.getAttribute('name') ?? ''));
     }
-    expect(visited).not.toContain('website');
+    expect(visited).not.toContain('homepage');
   });
 
   for (const theme of THEMES) {

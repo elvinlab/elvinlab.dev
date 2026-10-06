@@ -9,7 +9,7 @@ import { createTurnstileLoader, type TurnstileApi } from '@/shared/subscribe/tur
 export function initSubscribeForm(root: HTMLElement): void {
   const form = root.querySelector('form');
   const email = form?.querySelector<HTMLInputElement>('input[name=email]');
-  const honeypot = form?.querySelector<HTMLInputElement>('input[name=website]');
+  const honeypot = form?.querySelector<HTMLInputElement>('input[name=homepage]');
   const box = root.querySelector<HTMLElement>('[data-widget]');
   const submit = form?.querySelector<HTMLButtonElement>('button[type=submit]');
   const status = root.querySelector<HTMLElement>('[data-status]');

@@ -127,9 +127,9 @@ export const t = createTranslator({
       'subscribe.title': 'Recibe las notas por correo',
       'subscribe.body':
         'Un correo con cada nota nueva y, de vez en cuando, un aviso de algún proyecto mío. Sin spam; te das de baja cuando quieras.',
-      'subscribe.email': 'Correo electrónico',
+      'subscribe.email': 'Dónde enviarte las notas',
       'subscribe.submit': 'Suscribirme',
-      'subscribe.placeholder': 'tu@correo.com',
+      'subscribe.placeholder': 'escribe tu correo',
       'subscribe.sending': 'Enviando…',
       'subscribe.verifying': 'Verificando…',
       'subscribe.success': 'Revisa tu bandeja de entrada para confirmar la suscripción.',
@@ -303,9 +303,9 @@ export const t = createTranslator({
       'subscribe.title': 'Get the notes by email',
       'subscribe.body':
         'An email for each new note and, now and then, an announcement of a project of mine. No spam; unsubscribe any time.',
-      'subscribe.email': 'Email',
+      'subscribe.email': 'Where to send the notes',
       'subscribe.submit': 'Subscribe',
-      'subscribe.placeholder': 'you@email.com',
+      'subscribe.placeholder': 'type your email',
       'subscribe.sending': 'Sending…',
       'subscribe.verifying': 'Verifying…',
       'subscribe.success': 'Check your inbox to confirm your subscription.',
