@@ -409,3 +409,4 @@ Contents: terminal icon next to the wordmark and as the favicon (pixel, softer c
 
 ### Email subscription to new notes (T50, issue #78), built on `develop`, flag off, not released
 `features/subscribe` (D1 table `subscribers` in the existing site database, Resend behind a port, double opt-in, signed unsubscribe, form on `/notes`, `/subscribe/*` pages, privacy section), ADR 0014, tracker `odd/tasks/subscribe.md`. Whole battery green (247 s). Waiting on the owner: apply migration 0002 remotely, secrets `SUBSCRIBE_FROM` and `SUBSCRIBE_TOKEN_SECRET`, rate limiter binding, Resend domain, then `features.subscribe: true` and a release.
+- 2026-10-05 night: the subscription form now lives only in the global footer (pixel band, terminal-style field); `develop` pushed, NOT released (flag off). Next: end-to-end test of the flow, the designed email template, the confirmation cap decision, then the release. See `odd/tasks/subscribe.md`.
