@@ -376,5 +376,23 @@
     "category": "added",
     "title": "Footprint heart beats on hover, focus and first view",
     "description": "The pixel heart beats twice in two steps on hover or keyboard focus and once when the button first scrolls into view; it never loops and stays still under reduced motion."
+  },
+  "verification-faster": {
+    "date": "2026-10-05",
+    "category": "changed",
+    "title": "Faster verification, locally and in CI",
+    "description": "The local check runner audits Lighthouse once per page, narrows layout-only changes, and runs all browser specs in one pass; CI caches its downloads and splits the browser tests in three. No threshold or assertion changed."
+  },
+  "marks-tooltip-dismiss": {
+    "date": "2026-10-05",
+    "category": "fixed",
+    "title": "Privacy tooltip closes on its own",
+    "description": "The footprint privacy tooltip now hides when the mouse leaves, after a few seconds on touch screens, and with Escape."
+  },
+  "pnpm-verify": {
+    "date": "2026-10-05",
+    "category": "added",
+    "title": "pnpm verify plans only the checks a change touches",
+    "description": "A new command lists, runs and records just the checks affected by the uncommitted work, with a registry of what last passed."
   }
 }

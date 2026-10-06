@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
+import { CHECKS } from './verification-map.ts';
 import { additionsOnly, planChecks, refineChanged } from './verify-plan.ts';
 
 const ids = (changed: string[], extra: Partial<Parameters<typeof planChecks>[0]> = {}) =>
@@ -48,12 +49,90 @@ describe('planChecks', () => {
     expect(planned).not.toContain('e2e:contact.spec.ts');
   });
 
-  it('treats global CSS as a wide change that selects every check', () => {
-    const plan = planChecks({ mode: 'changed', changed: ['apps/web/src/styles/global.css'] });
-    expect(plan.wide).toBe(true);
-    expect(plan.items.map((item) => item.id)).toContain('lighthouse:/en/contact/');
-    expect(plan.items.map((item) => item.id)).toContain('e2e:smoke.spec.ts');
-    expect(plan.items.map((item) => item.id)).toContain('cold-start');
+  it('treats a toolchain or dependency change as FULL-wide: every check is selected', () => {
+    for (const file of [
+      'package.json',
+      'playwright.config.ts',
+      'apps/web/scripts/verify-plan.ts',
+    ]) {
+      const plan = planChecks({ mode: 'changed', changed: [file] });
+      expect(plan.wide).toBe(true);
+      expect(plan.layoutWide).toBe(false);
+      const planned = plan.items.map((item) => item.id);
+      expect(planned).toContain('lighthouse:/en/contact/');
+      expect(planned).toContain('e2e:smoke.spec.ts');
+      expect(planned).toContain('cold-start');
+    }
+  });
+
+  describe('layout-wide change', () => {
+    const navbar = ['apps/web/src/shared/layout/Navbar.astro'];
+
+    it('selects cheap families, every e2e spec and two Lighthouse URLs only', () => {
+      const plan = planChecks({ mode: 'changed', changed: navbar });
+      const planned = plan.items.map((item) => item.id);
+      expect(plan.wide).toBe(false);
+      expect(plan.layoutWide).toBe(true);
+      for (const id of ['lint', 'typecheck', 'unit', 'build', 'js-budget', 'white-label']) {
+        expect(planned).toContain(id);
+      }
+      for (const id of ['cold-start', 'depcruise', 'docs-config']) {
+        expect(planned).not.toContain(id);
+      }
+      expect(planned.filter((id) => id.startsWith('lighthouse:'))).toEqual([
+        'lighthouse:/',
+        'lighthouse:/notes/smoke-es/',
+      ]);
+      expect(planned.filter((id) => id.startsWith('e2e:')).length).toBe(
+        CHECKS.filter((check) => check.kind === 'e2e').length,
+      );
+    });
+
+    it('treats global CSS and the BaseLayout the same way', () => {
+      for (const file of [
+        'apps/web/src/styles/global.css',
+        'apps/web/src/shared/layout/BaseLayout.astro',
+      ]) {
+        const plan = planChecks({ mode: 'changed', changed: [file] });
+        expect(plan.layoutWide).toBe(true);
+        expect(plan.items.map((item) => item.id)).not.toContain('cold-start');
+      }
+    });
+
+    it('runs every spec in one 1280 px invocation, without the 3-viewport rerun', () => {
+      const plan = planChecks({ mode: 'changed', changed: navbar });
+      const e2eCommands = plan.commands.filter((command) => command.argv[1] === 'test:e2e');
+      expect(e2eCommands).toHaveLength(1);
+      expect(e2eCommands[0]?.env?.['E2E_WIDE_SPECS']).toBe('');
+      const lighthouse = plan.commands.find((command) =>
+        command.covers[0]?.startsWith('lighthouse:'),
+      );
+      expect(lighthouse?.argv).toEqual([
+        'node',
+        'apps/web/scripts/run-lighthouse-ci.ts',
+        '--runs',
+        '1',
+        '--url',
+        '/',
+        '--url',
+        '/notes/smoke-es/',
+      ]);
+    });
+
+    it('keeps a responsive spec at three viewports when another changed file selects it', () => {
+      const plan = planChecks({
+        mode: 'changed',
+        changed: [...navbar, 'tests/browser/marks.spec.ts'],
+      });
+      const command = plan.commands.find((c) => c.argv[1] === 'test:e2e');
+      expect(command?.env?.['E2E_WIDE_SPECS']).toBe('tests/browser/marks.spec.ts');
+    });
+
+    it('does not widen to everything with --all', () => {
+      const plan = planChecks({ mode: 'all', changed: navbar });
+      expect(plan.layoutWide).toBe(false);
+      expect(plan.items.map((item) => item.id)).toContain('cold-start');
+    });
   });
 
   it('plans only the changed spec for a spec edit', () => {
@@ -110,28 +189,23 @@ describe('planChecks', () => {
     expect(plan.items.length).toBeGreaterThan(30);
   });
 
-  it('groups specs: quick viewport by default, all viewports for responsive ones', () => {
+  it('runs all selected specs in ONE invocation; only responsive ones get three viewports', () => {
     const plan = planChecks({
       mode: 'changed',
       changed: ['tests/browser/contact.spec.ts', 'tests/browser/marks.spec.ts'],
     });
-    const e2eCommands = plan.commands.filter(
-      (command) => command.argv.includes('playwright') || command.argv[1]?.startsWith('test:e2e'),
-    );
-    expect(e2eCommands.map((command) => command.argv.slice(0, 2))).toEqual([
-      ['pnpm', 'test:e2e:quick'],
-      ['pnpm', 'test:e2e'],
-    ]);
+    const e2eCommands = plan.commands.filter((command) => command.argv[1] === 'test:e2e');
+    expect(e2eCommands).toHaveLength(1);
     expect(e2eCommands[0]?.argv).toContain('tests/browser/contact.spec.ts');
-    expect(e2eCommands[1]?.argv).toContain('tests/browser/marks.spec.ts');
+    expect(e2eCommands[0]?.argv).toContain('tests/browser/marks.spec.ts');
+    expect(e2eCommands[0]?.env?.['E2E_WIDE_SPECS']).toBe('tests/browser/marks.spec.ts');
     const all = planChecks({
       mode: 'changed',
       changed: ['tests/browser/contact.spec.ts'],
       viewports: 'all',
     });
-    expect(all.commands.find((command) => command.argv[1]?.startsWith('test:e2e'))?.argv[1]).toBe(
-      'test:e2e',
-    );
+    const command = all.commands.find((c) => c.argv[1] === 'test:e2e');
+    expect(command?.env).toBeUndefined();
   });
 
   it('scopes lint and unit commands to the changed files', () => {
@@ -163,6 +237,8 @@ describe('planChecks', () => {
     expect(lighthouse?.argv).toEqual([
       'node',
       'apps/web/scripts/run-lighthouse-ci.ts',
+      '--runs',
+      '1',
       '--url',
       '/contact/',
       '--url',

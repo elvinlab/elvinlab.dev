@@ -1,0 +1,235 @@
+{
+  "version": 1,
+  "checks": {
+    "lint": {
+      "fingerprint": "6878cff462404c38dee7d3a5c5021942fb29f71b",
+      "recordedAt": "2026-10-06T00:46:23.562Z",
+      "result": "pass"
+    },
+    "typecheck": {
+      "fingerprint": "73275c61172b000ddd740b2696d827571c78fc8c",
+      "recordedAt": "2026-10-06T00:46:23.562Z",
+      "result": "pass"
+    },
+    "depcruise": {
+      "fingerprint": "3f7c2c186d3391223f27ef20fadcf1e97da70e47",
+      "recordedAt": "2026-10-06T00:46:23.562Z",
+      "result": "pass"
+    },
+    "docs-config": {
+      "fingerprint": "1cf89eac1c1f9576d5f3c6a4bdf056aa2b5405db",
+      "recordedAt": "2026-10-06T00:46:23.562Z",
+      "result": "pass"
+    },
+    "unit": {
+      "fingerprint": "cfe387edd8a56d9cac8b8d1ab81529e65cc87e50",
+      "recordedAt": "2026-10-06T00:46:23.562Z",
+      "result": "pass"
+    },
+    "build": {
+      "fingerprint": "686f81228561e4ec4ce9b8a4d8d93762ca6c9198",
+      "recordedAt": "2026-10-06T00:46:23.562Z",
+      "result": "pass"
+    },
+    "js-budget": {
+      "fingerprint": "9a321d7ad2f5483ea396fee8653772df65c40a80",
+      "recordedAt": "2026-10-06T00:46:23.562Z",
+      "result": "pass"
+    },
+    "white-label": {
+      "fingerprint": "a76a8fac661c4dfa9240e274fda4f76d57100504",
+      "recordedAt": "2026-10-06T00:46:23.562Z",
+      "result": "pass"
+    },
+    "cold-start": {
+      "fingerprint": "8339c6270535cebd47a8522a9be0c26fd1065917",
+      "recordedAt": "2026-10-06T00:46:23.562Z",
+      "result": "pass"
+    },
+    "e2e:a11y.spec.ts": {
+      "fingerprint": "848e27d6f68385fe0e8f5711134b0fb9db2673be",
+      "recordedAt": "2026-10-06T00:46:23.562Z",
+      "result": "pass"
+    },
+    "e2e:background.spec.ts": {
+      "fingerprint": "2bf34769affc837d4c3cf651b869dbc1abf9bae6",
+      "recordedAt": "2026-10-06T00:46:23.562Z",
+      "result": "pass"
+    },
+    "e2e:card-links.spec.ts": {
+      "fingerprint": "d1ab938ebb93d04c424d51fb6bf371365e4d31a5",
+      "recordedAt": "2026-10-06T00:46:23.562Z",
+      "result": "pass"
+    },
+    "e2e:comments.spec.ts": {
+      "fingerprint": "ddd94f7f0dddced6731764ab7d37da9a52bf3701",
+      "recordedAt": "2026-10-06T00:46:23.562Z",
+      "result": "pass"
+    },
+    "e2e:contact.spec.ts": {
+      "fingerprint": "6d6a3b5f35df293176749debeff2c546a8cb5aae",
+      "recordedAt": "2026-10-06T00:46:23.562Z",
+      "result": "pass"
+    },
+    "e2e:cookies.spec.ts": {
+      "fingerprint": "ca7680856fe1b3fb8bf445957281ba79f0542d21",
+      "recordedAt": "2026-10-06T00:46:23.562Z",
+      "result": "pass"
+    },
+    "e2e:cv-and-credentials.spec.ts": {
+      "fingerprint": "8d8edc2be1b8d8324590bb587f9f1f3b1024ddb6",
+      "recordedAt": "2026-10-06T00:46:23.562Z",
+      "result": "pass"
+    },
+    "e2e:external-links.spec.ts": {
+      "fingerprint": "bcdec6ce8a4b898c13ebd37217c3a39516e7b0e0",
+      "recordedAt": "2026-10-06T00:46:23.562Z",
+      "result": "pass"
+    },
+    "e2e:favicon.spec.ts": {
+      "fingerprint": "ced49c37de1f7186b491021adbba1450c709c90b",
+      "recordedAt": "2026-10-06T00:46:23.562Z",
+      "result": "pass"
+    },
+    "e2e:home-sections.spec.ts": {
+      "fingerprint": "9953f3880917ed48ae43bc43182ce995ce79a568",
+      "recordedAt": "2026-10-06T00:46:23.562Z",
+      "result": "pass"
+    },
+    "e2e:internal-links.spec.ts": {
+      "fingerprint": "8d27e9bb248be69332acdd7a9be35f7d6a59e07f",
+      "recordedAt": "2026-10-06T00:46:23.562Z",
+      "result": "pass"
+    },
+    "e2e:legal.spec.ts": {
+      "fingerprint": "f7ee9c9832de8c32dc8b27438a54afe93fea0bda",
+      "recordedAt": "2026-10-06T00:46:23.562Z",
+      "result": "pass"
+    },
+    "e2e:link-previews.spec.ts": {
+      "fingerprint": "7011a70959ceeffb98f26688a6519dc3a4ad23c9",
+      "recordedAt": "2026-10-06T00:46:23.562Z",
+      "result": "pass"
+    },
+    "e2e:me-experience-locale.spec.ts": {
+      "fingerprint": "67983250e824e1b6007c502fea29ec3542fa4e7e",
+      "recordedAt": "2026-10-06T00:46:23.562Z",
+      "result": "pass"
+    },
+    "e2e:me-photo.spec.ts": {
+      "fingerprint": "3518bb9e36435f5b38faa8f1d27b4b34e063fa2a",
+      "recordedAt": "2026-10-06T00:46:23.562Z",
+      "result": "pass"
+    },
+    "e2e:note-share.spec.ts": {
+      "fingerprint": "4ae91ede569a59f0373e55e3e95aa7bd351b5980",
+      "recordedAt": "2026-10-06T00:46:23.562Z",
+      "result": "pass"
+    },
+    "e2e:note-translations.spec.ts": {
+      "fingerprint": "b99abe6cd2b3ffc59203fcb3daf9100fc10e4070",
+      "recordedAt": "2026-10-06T00:46:23.562Z",
+      "result": "pass"
+    },
+    "e2e:performance.spec.ts": {
+      "fingerprint": "75781cb355d0ba00a7a1b6507a32866af2b3f247",
+      "recordedAt": "2026-10-06T00:46:23.562Z",
+      "result": "pass"
+    },
+    "e2e:smoke.spec.ts": {
+      "fingerprint": "eab41beb0c72df500cd247836972237a5fbed9b5",
+      "recordedAt": "2026-10-06T00:46:23.562Z",
+      "result": "pass"
+    },
+    "e2e:theme.spec.ts": {
+      "fingerprint": "dce19db4f2d5073c0b38ef0b1a822368a8f70c81",
+      "recordedAt": "2026-10-06T00:46:23.562Z",
+      "result": "pass"
+    },
+    "e2e:calm-pages.spec.ts": {
+      "fingerprint": "f8d2faea75bd19f748001b33bca1a46664c62146",
+      "recordedAt": "2026-10-06T00:46:23.562Z",
+      "result": "pass"
+    },
+    "e2e:brand-mark.spec.ts": {
+      "fingerprint": "c0c7abccbd198b5afdaa05dd0dfbb2763818ef74",
+      "recordedAt": "2026-10-06T00:46:23.562Z",
+      "result": "pass"
+    },
+    "e2e:focus-not-obscured.spec.ts": {
+      "fingerprint": "3dc333e5584ff57ad3a7941825728ba203f18862",
+      "recordedAt": "2026-10-06T00:46:23.562Z",
+      "result": "pass"
+    },
+    "e2e:interaction-polish.spec.ts": {
+      "fingerprint": "47520c9ccff869d56b7d5d3ede99ab8de6802790",
+      "recordedAt": "2026-10-06T00:46:23.562Z",
+      "result": "pass"
+    },
+    "e2e:home-marks.spec.ts": {
+      "fingerprint": "e9d444b2bfd4ceb742a402bd891922897cb9f8e8",
+      "recordedAt": "2026-10-06T00:46:23.562Z",
+      "result": "pass"
+    },
+    "e2e:marks.spec.ts": {
+      "fingerprint": "b67ff26366342c46214390eeeab26a3a55f7d91e",
+      "recordedAt": "2026-10-06T00:46:23.562Z",
+      "result": "pass"
+    },
+    "e2e:mobile-ux.spec.ts": {
+      "fingerprint": "bf0571c53c21f1fc66a282b9f14e1f19f4968e56",
+      "recordedAt": "2026-10-06T00:46:23.562Z",
+      "result": "pass"
+    },
+    "e2e:notes-layout.spec.ts": {
+      "fingerprint": "88bf3f1ac32ba43d321115c3f2164a2ae79eada2",
+      "recordedAt": "2026-10-06T00:46:23.562Z",
+      "result": "pass"
+    },
+    "e2e:pixel-display.spec.ts": {
+      "fingerprint": "56b23e00963207f997bfe07c95c6babb95f7f33b",
+      "recordedAt": "2026-10-06T00:46:23.562Z",
+      "result": "pass"
+    },
+    "e2e:reading-mode.spec.ts": {
+      "fingerprint": "8a0d0caebdd7f9886b96871041f98a74ed135ddf",
+      "recordedAt": "2026-10-06T00:46:23.562Z",
+      "result": "pass"
+    },
+    "e2e:type-scale.spec.ts": {
+      "fingerprint": "83bdb1b0cbfcdc0ceab4cac7204b3e6e38fbd76c",
+      "recordedAt": "2026-10-06T00:46:23.562Z",
+      "result": "pass"
+    },
+    "lighthouse:/": {
+      "fingerprint": "9b4bd33203f6f3d9daa2fd0a3bb9f2e11ceeb0bc",
+      "recordedAt": "2026-10-06T00:46:23.562Z",
+      "result": "pass"
+    },
+    "lighthouse:/en/": {
+      "fingerprint": "9b4bd33203f6f3d9daa2fd0a3bb9f2e11ceeb0bc",
+      "recordedAt": "2026-10-06T00:46:23.562Z",
+      "result": "pass"
+    },
+    "lighthouse:/notes/": {
+      "fingerprint": "3283120765aee089cdcd60602a960c78bcdeeac7",
+      "recordedAt": "2026-10-06T00:46:23.562Z",
+      "result": "pass"
+    },
+    "lighthouse:/notes/smoke-es/": {
+      "fingerprint": "613c752589855d70325b47f6d952a3aee18b3d88",
+      "recordedAt": "2026-10-06T00:46:23.562Z",
+      "result": "pass"
+    },
+    "lighthouse:/contact/": {
+      "fingerprint": "06333720e1875f20409bfc3c3f6e7fa4de50baa8",
+      "recordedAt": "2026-10-06T00:46:23.562Z",
+      "result": "pass"
+    },
+    "lighthouse:/en/contact/": {
+      "fingerprint": "06333720e1875f20409bfc3c3f6e7fa4de50baa8",
+      "recordedAt": "2026-10-06T00:46:23.562Z",
+      "result": "pass"
+    }
+  }
+}

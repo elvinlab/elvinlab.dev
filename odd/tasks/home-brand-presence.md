@@ -13,13 +13,27 @@ Owner, 2026-10-05: the cursor blocks next to the brand (nav and footer) used to 
 Local implementation on `develop`. No remote operation, no push, no release. One writer at a time.
 
 ## Tasks
-- [ ] H1 Brand icon: `docs/BRAND.md`, navbar and footer markup, tests (icon present and decorative, same link name, 44 px tap height kept, no overflow at 360 px, no animation at rest, hover gesture, reduced motion).
-- [ ] H2 Server: catalog accepts `home` (unit tests), ADR 0013 and recipe note.
-- [ ] H3 Home card: `home.marks` flag, a card variant of `MarkSection`, strings ES and EN, privacy page wording ("each note and the home page"), e2e (visible, tap, shared behavior, hidden when unavailable, axe in both themes, tooltip).
-- [ ] H4 Verification with `pnpm verify` (plan, then only what it lists, without Lighthouse), then one Lighthouse run by the parent comparing the home, the contact pages and the notes with the baseline in the ledger.
+- [x] H1 Brand icon (97a69d8; final design: the favicon terminal, 32 px nav / 16 px footer, heart only on the footprint button): `docs/BRAND.md`, navbar and footer markup, tests (icon present and decorative, same link name, 44 px tap height kept, no overflow at 360 px, no animation at rest, hover gesture, reduced motion).
+- [x] H2 Server (04bd3a5): catalog accepts `home` (unit tests), ADR 0013 and recipe note.
+- [x] H3 Home card (04bd3a5): `home.marks` flag, a card variant of `MarkSection`, strings ES and EN, privacy page wording ("each note and the home page"), e2e (visible, tap, shared behavior, hidden when unavailable, axe in both themes, tooltip).
+- [x] H4 Verification with `pnpm verify` (plan, then only what it lists, without Lighthouse), then one Lighthouse run by the parent comparing the home, the contact pages and the notes with the baseline in the ledger.
 
 ## Acceptance
 The brand shows an icon next to the wordmark on every page at 360, 768 and 1280 px in both themes without layout shift and without movement at rest. The home shows the footprint card, counts separately from the notes, and nothing breaks when the store is unavailable. Home and notes Lighthouse LCP stay under the 2500 ms budget with the margin recorded in the ledger.
 
 ## Progress
-Created 2026-10-05.
+Created 2026-10-05. Done the same day:
+- Footprint text smaller (de2f638): button 14 -> 13 px, title 16 -> 15 px; the tooltip stays at the 13 px floor.
+- Footprint icon and animation in 8-bit style (356d412): pink pixel heart, stepped stamp, square ring.
+- Favicon redone as a pixel Linux terminal (7bb7af9), without the saturated violet; the same terminal sits next to the wordmark (97a69d8).
+- Home footprint card (04bd3a5): slug `home` through the catalog (`PAGE_KEYS`), `home.marks` flag, privacy wording for notes and home.
+- Heartbeat (hover, focus, once when first seen; never loops) and two fixes it exposed: the stamp being overridden by the hover beat, and the first-visit nudge cut short by the heart's animationend.
+- The WebGL background e2e now mocks the marks Action (the home reads its counter and the fixture has no database).
+
+## Verification evidence
+- Full stack `pnpm verify --all --run --record` green on 2026-10-05 (344 s): lint, typecheck, depcruise, docs:config, unit, build, JS budget, white-label, dev cold start, e2e 1280 px (20 specs), e2e 3 viewports (11 specs), Lighthouse 6 URLs. It seeded `odd/verification-state.json` (46 checks).
+- Lighthouse LCP after the heartbeat: home 2265-2295 ms, note 2263-2286 ms (budget 2500; margin about 215 ms).
+- MARKS_CSS is about 3330 bytes; its guard is `< 3350`.
+
+## Not done (owner did not select them)
+Smaller type scale and less text on screen (collapsed decision record on mobile, shorter latest-note card on the home).

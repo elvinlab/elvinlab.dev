@@ -16,6 +16,18 @@ function requestedPaths(args: string[]): string[] {
 }
 
 /**
+ * Runs per URL from `--runs <n>`. Undefined keeps `numberOfRuns` of lighthouserc.json (3: CI and
+ * `pnpm test:lighthouse`); `pnpm verify` passes 1 for the local loop. Thresholds never change.
+ */
+function requestedRuns(args: string[]): number | undefined {
+  const index = args.indexOf('--runs');
+  if (index === -1) return undefined;
+  const runs = Number(args[index + 1]);
+  if (!Number.isInteger(runs) || runs < 1) throw new Error('--runs needs a positive integer');
+  return runs;
+}
+
+/**
  * Writes a temporary copy of lighthouserc.json holding only the requested URLs (same host and port
  * as the file) and returns its path, or undefined to use the committed configuration unchanged.
  */
@@ -35,10 +47,17 @@ function filteredConfig(paths: string[], dir: string): string | undefined {
 
 const scratch = mkdtempSync(join(tmpdir(), 'lhci-'));
 try {
-  const config = filteredConfig(requestedPaths(process.argv.slice(2)), scratch);
+  const args = process.argv.slice(2);
+  const config = filteredConfig(requestedPaths(args), scratch);
+  const runs = requestedRuns(args);
   const result = spawnSync(
     process.execPath,
-    [cli, 'autorun', ...(config ? [`--config=${config}`] : [])],
+    [
+      cli,
+      'autorun',
+      ...(config ? [`--config=${config}`] : []),
+      ...(runs ? [`--collect.numberOfRuns=${runs}`] : []),
+    ],
     {
       cwd: root,
       env: { ...process.env, CHROME_PATH: chromium.executablePath(), SITE_INDEXABLE: 'true' },

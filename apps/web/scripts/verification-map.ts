@@ -24,8 +24,11 @@ export interface CheckDef {
   readonly urlPath?: string;
 }
 
-/** Files that select every check at once. */
-export const WIDE: readonly string[] = [
+/**
+ * FULL-wide files: dependencies, lockfile, toolchain and config, and this tool itself. They
+ * select every check, exactly as `--all` does.
+ */
+export const FULL_WIDE: readonly string[] = [
   'package.json',
   'apps/web/package.json',
   'packages/core/package.json',
@@ -40,9 +43,6 @@ export const WIDE: readonly string[] = [
   'lighthouserc.json',
   'apps/web/astro.config.ts',
   'apps/web/wrangler.jsonc',
-  'apps/web/src/styles/**',
-  'packages/core/src/tokens/**',
-  'apps/web/src/shared/layout/BaseLayout.astro',
   'apps/web/scripts/fixture-workspace.ts',
   '.dependency-cruiser.cjs',
   // The verification tool itself: a bug in it invalidates what it recorded.
@@ -50,7 +50,37 @@ export const WIDE: readonly string[] = [
   'apps/web/scripts/verify-plan.ts',
   'apps/web/scripts/verify-state.ts',
   'apps/web/scripts/verify-scope.ts',
+  'apps/web/scripts/run-lighthouse-ci.ts',
 ];
+
+/**
+ * LAYOUT-wide files: they can change every page's bytes but not the toolchain. They select the
+ * cheap families, every e2e spec at 1280 px and `LAYOUT_LIGHTHOUSE`; not the three-viewport
+ * re-run of the responsive specs, not the other Lighthouse URLs, not the dev cold start.
+ * `--viewports all` and `--all` stay the explicit way to run those.
+ */
+export const LAYOUT_WIDE: readonly string[] = [
+  'apps/web/src/styles/**',
+  'packages/core/src/tokens/**',
+  'apps/web/src/shared/layout/**',
+  'apps/web/src/shared/i18n/**',
+];
+
+/** Families a layout-wide change selects (the rest of the families stay scope driven). */
+export const LAYOUT_FAMILIES: readonly string[] = [
+  'lint',
+  'typecheck',
+  'unit',
+  'build',
+  'js-budget',
+  'white-label',
+];
+
+/** Lighthouse URLs a layout-wide change selects: the home and one note cover the shared chrome. */
+export const LAYOUT_LIGHTHOUSE: readonly string[] = ['/', '/notes/smoke-es/'];
+
+/** Every file that is wide in either class (used by the drift guard for empty globs). */
+export const WIDE: readonly string[] = [...FULL_WIDE, ...LAYOUT_WIDE];
 
 /** Specs under `tests/browser/` deliberately without an e2e check. None today. */
 export const UNMAPPED_OK: readonly string[] = [];

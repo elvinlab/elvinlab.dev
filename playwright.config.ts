@@ -1,11 +1,16 @@
 import { defineConfig } from '@playwright/test';
 
+// `pnpm verify` runs one invocation: E2E_WIDE_SPECS (comma separated) limits the 360 and 768 px
+// projects to the width dependent specs, so the others run at 1280 px only. Unset (CI,
+// `pnpm test:e2e`): every project runs every spec.
+const wideSpecs = process.env['E2E_WIDE_SPECS']?.split(',').filter(Boolean);
+
 export default defineConfig({
   testDir: './tests/browser',
   fullyParallel: true,
   forbidOnly: Boolean(process.env['CI']),
   retries: 0,
-  workers: '50%',
+  workers: '100%',
   reporter: [['list'], ['html', { open: 'never' }]],
   use: {
     baseURL: 'http://127.0.0.1:4322',
@@ -17,6 +22,9 @@ export default defineConfig({
   projects: [360, 768, 1280].map((width) => ({
     name: `chromium-${width}`,
     use: { browserName: 'chromium', viewport: { width, height: 900 } },
+    ...(wideSpecs && width !== 1280
+      ? { testMatch: wideSpecs.map((spec) => `**/${spec.split('/').pop()}`) }
+      : {}),
   })),
   webServer: {
     command: 'node apps/web/scripts/fixture-preview.ts 4322',

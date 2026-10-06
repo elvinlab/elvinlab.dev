@@ -3,7 +3,16 @@
  * an ordered plan with reasons and the commands that run it out. No I/O: `verify-scope.ts`
  * reads git and executes, `verify-state.ts` owns the fingerprints.
  */
-import { CHECKS, type CheckDef, inScope, matchesAny, WIDE } from './verification-map.ts';
+import {
+  CHECKS,
+  type CheckDef,
+  FULL_WIDE,
+  inScope,
+  LAYOUT_FAMILIES,
+  LAYOUT_LIGHTHOUSE,
+  LAYOUT_WIDE,
+  matchesAny,
+} from './verification-map.ts';
 
 export type PlanMode = 'changed' | 'all' | 'stale';
 
@@ -14,7 +23,10 @@ export interface PlanInput {
   readonly staleIds?: ReadonlySet<string>;
   readonly viewports?: 'quick' | 'all';
   readonly checks?: readonly CheckDef[];
+  /** Overrides the FULL-wide globs (tests). */
   readonly wide?: readonly string[];
+  /** Overrides the LAYOUT-wide globs (tests). */
+  readonly layoutWide?: readonly string[];
 }
 
 export interface PlanItem {
@@ -28,17 +40,25 @@ export interface PlanCommand {
   readonly label: string;
   /** Empty argv means there is nothing to execute (recorded as a pass). */
   readonly argv: readonly string[];
+  /** Extra environment variables for the process. */
+  readonly env?: Readonly<Record<string, string>>;
   /** Check ids a green run of this command proves. */
   readonly covers: readonly string[];
 }
 
 export interface Plan {
+  /** FULL-wide change: every check is selected. */
   readonly wide: boolean;
+  /** LAYOUT-wide change: cheap families, every e2e spec at 1280 px, two Lighthouse URLs. */
+  readonly layoutWide: boolean;
   readonly items: readonly PlanItem[];
   readonly commands: readonly PlanCommand[];
   /** Checks the diff selected but the registry says are unchanged since their last green run. */
   readonly skippedFresh: readonly string[];
 }
+
+/** Lighthouse runs per URL for `pnpm verify`; `lighthouserc.json` (CI, `pnpm test:lighthouse`) keeps 3. */
+export const LOCAL_LIGHTHOUSE_RUNS = 1;
 
 const RANK: Readonly<Record<string, number>> = {
   lint: 0,
@@ -100,10 +120,20 @@ export function refineChanged(
 }
 
 function select(input: PlanInput, checks: readonly CheckDef[]) {
-  const wideGlobs = input.wide ?? WIDE;
+  const wideGlobs = input.wide ?? FULL_WIDE;
+  const layoutGlobs = input.layoutWide ?? LAYOUT_WIDE;
   const wideFiles = input.changed.filter((file) => matchesAny(file, wideGlobs));
-  const reasons = new Map<string, string[]>();
   const wide = input.mode === 'changed' && wideFiles.length > 0;
+  const layoutFiles = wide
+    ? []
+    : input.changed.filter((file) => input.mode === 'changed' && matchesAny(file, layoutGlobs));
+  const layoutWide = layoutFiles.length > 0;
+  // Files that only matter through the layout class do not also select by per-check scope, or a
+  // Navbar edit would pull every Lighthouse URL and the three-viewport specs back in.
+  const scoped = input.changed.filter((file) => !layoutFiles.includes(file));
+  const reasons = new Map<string, string[]>();
+  /** Checks selected only because of the layout class (e2e stays at 1280 px). */
+  const layoutOnly = new Set<string>();
   for (const check of checks) {
     if (input.mode === 'all') {
       reasons.set(check.id, ['forced by --all']);
@@ -114,8 +144,13 @@ function select(input: PlanInput, checks: readonly CheckDef[]) {
     } else if (wide) {
       reasons.set(check.id, [`wide change: ${summarize(wideFiles)}`]);
     } else {
-      const matched = input.changed.filter((file) => inScope(check, file));
+      const matched = scoped.filter((file) => inScope(check, file));
       if (matched.length > 0) reasons.set(check.id, [summarize(matched)]);
+      if (layoutWide && layoutSelects(check)) {
+        const because = `layout-wide change: ${summarize(layoutFiles)}`;
+        if (matched.length === 0) layoutOnly.add(check.id);
+        reasons.set(check.id, [...(reasons.get(check.id) ?? []), because]);
+      }
     }
   }
   const skippedFresh: string[] = [];
@@ -127,7 +162,13 @@ function select(input: PlanInput, checks: readonly CheckDef[]) {
       }
     }
   }
-  return { reasons, wide, skippedFresh };
+  return { reasons, wide, layoutWide, layoutOnly, skippedFresh };
+}
+
+function layoutSelects(check: CheckDef): boolean {
+  if (check.kind === 'family') return LAYOUT_FAMILIES.includes(check.id);
+  if (check.kind === 'e2e') return true;
+  return LAYOUT_LIGHTHOUSE.includes(check.urlPath ?? '');
 }
 
 function lintCommand(full: boolean, changed: readonly string[], lint: CheckDef): PlanCommand {
@@ -176,7 +217,7 @@ function unitCommands(full: boolean, changed: readonly string[]): PlanCommand[] 
 
 export function planChecks(input: PlanInput): Plan {
   const checks = input.checks ?? CHECKS;
-  const { reasons, wide, skippedFresh } = select(input, checks);
+  const { reasons, wide, layoutWide, layoutOnly, skippedFresh } = select(input, checks);
   const byId = new Map(checks.map((check) => [check.id, check]));
 
   if (reasons.has('js-budget') && !reasons.has('build') && byId.has('build')) {
@@ -193,13 +234,13 @@ export function planChecks(input: PlanInput): Plan {
     reasons: reasons.get(check.id) ?? [],
   }));
 
-  const full = input.mode !== 'changed' || wide;
+  const full = input.mode !== 'changed' || wide || layoutWide;
   const commands: PlanCommand[] = [];
   const specs = { quick: [] as CheckDef[], all: [] as CheckDef[] };
   const urls: CheckDef[] = [];
   for (const check of selected) {
     if (check.kind === 'e2e') {
-      const wideRun = check.responsive || input.viewports === 'all';
+      const wideRun = (check.responsive && !layoutOnly.has(check.id)) || input.viewports === 'all';
       (wideRun ? specs.all : specs.quick).push(check);
     } else if (check.kind === 'lighthouse') {
       urls.push(check);
@@ -212,15 +253,22 @@ export function planChecks(input: PlanInput): Plan {
       if (argv) commands.push({ label: check.label, argv, covers: [check.id] });
     }
   }
-  for (const [script, group, label] of [
-    ['test:e2e:quick', specs.quick, 'e2e (1280 px)'],
-    ['test:e2e', specs.all, 'e2e (3 viewports)'],
-  ] as const) {
-    if (group.length === 0) continue;
+  const e2eChecks = [...specs.quick, ...specs.all];
+  if (e2eChecks.length > 0) {
+    // One Playwright invocation (one fixture server). Specs that are not width dependent run on
+    // the 1280 px project only: the config narrows the 360 and 768 projects to E2E_WIDE_SPECS.
+    const wideSpecs = specs.all.flatMap((check) => (check.spec ? [check.spec] : []));
+    const label =
+      specs.all.length === 0
+        ? 'e2e (1280 px)'
+        : specs.quick.length === 0
+          ? 'e2e (3 viewports)'
+          : `e2e (1280 px, plus 3 viewports for ${specs.all.length})`;
     commands.push({
-      label: `${label}: ${group.length} spec${group.length === 1 ? '' : 's'}`,
-      argv: ['pnpm', script, ...group.flatMap((check) => (check.spec ? [check.spec] : []))],
-      covers: group.map((check) => check.id),
+      label: `${label}: ${e2eChecks.length} spec${e2eChecks.length === 1 ? '' : 's'}`,
+      argv: ['pnpm', 'test:e2e', ...e2eChecks.flatMap((check) => (check.spec ? [check.spec] : []))],
+      ...(specs.quick.length > 0 ? { env: { E2E_WIDE_SPECS: wideSpecs.join(',') } } : {}),
+      covers: e2eChecks.map((check) => check.id),
     });
   }
   if (urls.length > 0) {
@@ -230,10 +278,12 @@ export function planChecks(input: PlanInput): Plan {
       argv: [
         'node',
         'apps/web/scripts/run-lighthouse-ci.ts',
+        '--runs',
+        String(LOCAL_LIGHTHOUSE_RUNS),
         ...(every ? [] : urls.flatMap((check) => ['--url', check.urlPath ?? ''])),
       ],
       covers: urls.map((check) => check.id),
     });
   }
-  return { wide, items, commands, skippedFresh };
+  return { wide, layoutWide, items, commands, skippedFresh };
 }
