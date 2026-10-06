@@ -225,3 +225,21 @@ for (const path of ['/', '/notes/', '/notes/smoke-es/', '/en/', '/me/']) {
     });
   });
 }
+
+for (const phone of PHONES) {
+  test(`the hero text stays clear of the expand button at ${phone.width}x${phone.height}`, async ({
+    page,
+  }) => {
+    await page.setViewportSize(phone);
+    await page.goto('/');
+    const hero = page.locator('[data-hero-content]');
+    const toggle = page.locator('[data-banner-toggle]');
+    await expect(toggle).toBeVisible();
+    const text = await hero.boundingBox();
+    const button = await toggle.boundingBox();
+    expect(text).not.toBeNull();
+    expect(button).not.toBeNull();
+    // The last line of the hero ends above the button, not underneath it.
+    expect((text?.y ?? 0) + (text?.height ?? 0)).toBeLessThanOrEqual(button?.y ?? 0);
+  });
+}

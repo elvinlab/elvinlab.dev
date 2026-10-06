@@ -155,9 +155,9 @@ export const t = createTranslator({
       'marks.count.one': '1 huella',
       'marks.count.many': '{n} huellas',
       'marks.thanks': '¡Gracias por pasar!',
-      'marks.cap': 'Ya dejaste todas las huellas que caben aquí. ¡Gracias!',
+      'marks.cap': '¡Gracias por tus huellas!',
       'marks.invite': '¿Te gustó? Deja tu huella',
-      'marks.privacy': 'Anónimo: no guardamos tu IP ni datos tuyos.',
+      'marks.privacy': 'Anónimo: sin guardar tu IP ni datos.',
     },
     en: {
       'placeholder.title': 'Coming soon',
@@ -301,9 +301,9 @@ export const t = createTranslator({
       'marks.count.one': '1 mark',
       'marks.count.many': '{n} marks',
       'marks.thanks': 'Thanks for stopping by!',
-      'marks.cap': 'You have left all the marks that fit here. Thank you!',
+      'marks.cap': 'Thanks for your marks!',
       'marks.invite': 'Enjoyed it? Leave your mark',
-      'marks.privacy': 'Anonymous: your IP and personal data are not stored.',
+      'marks.privacy': 'Anonymous: no IP or data stored.',
     },
   },
 });

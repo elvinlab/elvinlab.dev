@@ -77,6 +77,13 @@ const {
   .banner[data-expanded] {
     min-height: var(--h-expanded);
   }
+  /* The expand/collapse button sits 12 px from the bottom and is 36 px tall: on a phone the hero text
+     reaches that corner, so keep the text clear of it (60 px). */
+  @media (pointer: coarse), (max-width: 767px) {
+    .banner:has([data-banner-toggle]) [data-banner-inner] {
+      padding-bottom: max(var(--banner-pad-bottom), 3.75rem);
+    }
+  }
   /* Touch and phone-width screens: the canvas is hidden on coarse pointers, so a viewport-tall banner is
      mostly empty. A smaller floor lets the hero text size the banner (min-height never clips it). */
   @media (pointer: coarse), (max-width: 767px) {

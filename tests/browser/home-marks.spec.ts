@@ -12,14 +12,14 @@ const HOMES = [
     path: '/',
     button: 'Dejé mi huella',
     many: (n: number) => `${n} huellas`,
-    tip: 'Anónimo: no guardamos tu IP ni datos tuyos.',
+    tip: 'Anónimo: sin guardar tu IP ni datos.',
     privacy: '/privacy/#marks',
   },
   {
     path: '/en/',
     button: 'I was here',
     many: (n: number) => `${n} marks`,
-    tip: 'Anonymous: your IP and personal data are not stored.',
+    tip: 'Anonymous: no IP or data stored.',
     privacy: '/en/privacy/#marks',
   },
 ] as const;

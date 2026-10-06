@@ -15,7 +15,7 @@ const NOTES = [
     button: 'Dejé mi huella',
     many: (n: number) => `${n} huellas`,
     hint: 'Sé de los primeros en dejar tu huella',
-    cap: 'Ya dejaste todas las huellas que caben aquí. ¡Gracias!',
+    cap: '¡Gracias por tus huellas!',
     invite: '¿Te gustó? Deja tu huella',
   },
   {
@@ -24,7 +24,7 @@ const NOTES = [
     button: 'I was here',
     many: (n: number) => `${n} marks`,
     hint: 'Be among the first to leave your mark',
-    cap: 'You have left all the marks that fit here. Thank you!',
+    cap: 'Thanks for your marks!',
     invite: 'Enjoyed it? Leave your mark',
   },
 ] as const;
@@ -290,12 +290,12 @@ for (const theme of ['elvinlab-dark', 'elvinlab-light']) {
 const PRIVACY_TIPS = [
   {
     path: '/notes/smoke-es/',
-    text: 'Anónimo: no guardamos tu IP ni datos tuyos.',
+    text: 'Anónimo: sin guardar tu IP ni datos.',
     href: '/privacy/#marks',
   },
   {
     path: '/en/notes/smoke-en/',
-    text: 'Anonymous: your IP and personal data are not stored.',
+    text: 'Anonymous: no IP or data stored.',
     href: '/en/privacy/#marks',
   },
 ] as const;

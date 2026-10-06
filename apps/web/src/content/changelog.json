@@ -394,5 +394,11 @@
     "category": "added",
     "title": "pnpm verify plans only the checks a change touches",
     "description": "A new command lists, runs and records just the checks affected by the uncommitted work, with a registry of what last passed."
+  },
+  "phone-hero-and-marks-copy": {
+    "date": "2026-10-05",
+    "category": "fixed",
+    "title": "Hero text clear of the expand button, shorter footprint copy",
+    "description": "On phones the last hero line no longer sits under the expand button, and the footprint cap message and privacy tooltip are shorter."
   }
 }
