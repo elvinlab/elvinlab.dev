@@ -24,7 +24,7 @@ Where the band shows: in the footer of every page while `features.blog` and `fea
 
 ### Link to share
 
-`elvinlab.dev/subscribe` is the link to send to someone (`elvinlab.dev/en/subscribe` in English). It explains what the notes are, carries the same form as the footer and the latest note in that language, and does not show the footer band. It is indexed and in the sitemap; the confirmation and unsubscribe pages stay hidden.
+`elvinlab.dev/subscribe` is the link to send to someone (`elvinlab.dev/en/subscribe` in English). It explains what the notes are, carries the same form as the footer and the latest note in that language, and does not show the footer band. It is indexed and in the sitemap; the confirmation and unsubscribe pages stay hidden. The footer of every page (except the printable CV at `/me`) also carries a "Subscribe" link to that page.
 
 
 ## 3. Architecture in one picture

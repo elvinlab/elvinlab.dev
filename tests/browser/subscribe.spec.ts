@@ -673,3 +673,30 @@ test('confirm and unsubscribe stay noindex while the subscription page is indexa
     await expect(page.locator('meta[name="robots"]'), path).toHaveAttribute('content', /noindex/);
   }
 });
+
+test.describe('footer link to the subscription page', () => {
+  test('is in the footer links on ordinary pages and leads to the page, in both languages', async ({
+    page,
+  }) => {
+    for (const [path, name, target] of [
+      ['/', 'Suscribirse', '/subscribe/'],
+      ['/contact/', 'Suscribirse', '/subscribe/'],
+      ['/en/', 'Subscribe', '/en/subscribe/'],
+    ] as const) {
+      await page.goto(path);
+      const link = page.locator('footer').getByRole('link', { name, exact: true });
+      await expect(link, path).toHaveAttribute('href', target);
+    }
+    await page.goto('/');
+    await page.locator('footer').getByRole('link', { name: 'Suscribirse', exact: true }).click();
+    await expect(page).toHaveURL(/\/subscribe\/$/);
+    await expect(page.getByRole('heading', { level: 1 })).toBeVisible();
+  });
+
+  test('is not on the printable CV', async ({ page }) => {
+    await page.goto('/me/');
+    await expect(
+      page.locator('footer').getByRole('link', { name: 'Suscribirse', exact: true }),
+    ).toHaveCount(0);
+  });
+});

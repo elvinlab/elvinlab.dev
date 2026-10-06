@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { showSubscribeCta } from './subscribe-cta.ts';
+import { showSubscribeCta, showSubscribeLink } from './subscribe-cta.ts';
 
 const on = { blog: true, subscribe: true };
 const base = { features: on, turnstileSiteKey: 'key', path: '/', printable: false };
@@ -24,5 +24,20 @@ describe('showSubscribeCta', () => {
     expect(showSubscribeCta({ ...base, features: { blog: false, subscribe: true } })).toBe(false);
     expect(showSubscribeCta({ ...base, turnstileSiteKey: undefined })).toBe(false);
     expect(showSubscribeCta({ ...base, turnstileSiteKey: '  ' })).toBe(false);
+  });
+});
+
+describe('showSubscribeLink', () => {
+  it('shows the footer link wherever the subscription is reachable, even on its own pages', () => {
+    for (const path of ['/', '/notes/', '/subscribe/', '/subscribe/confirm/']) {
+      expect(showSubscribeLink({ ...base, path })).toBe(true);
+    }
+  });
+
+  it('is hidden on the printable CV and when the flag, the blog or the Turnstile key is missing', () => {
+    expect(showSubscribeLink({ ...base, path: '/me/', printable: true })).toBe(false);
+    expect(showSubscribeLink({ ...base, features: { blog: true, subscribe: false } })).toBe(false);
+    expect(showSubscribeLink({ ...base, features: { blog: false, subscribe: true } })).toBe(false);
+    expect(showSubscribeLink({ ...base, turnstileSiteKey: undefined })).toBe(false);
   });
 });

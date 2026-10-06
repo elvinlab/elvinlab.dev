@@ -16,7 +16,7 @@ import { type Locale, t } from '@/shared/i18n/index.ts';
 import Footer from '@/shared/layout/Footer.astro';
 import Navbar from '@/shared/layout/Navbar.astro';
 import SiteNotice from '@/shared/layout/SiteNotice.astro';
-import { showSubscribeCta } from '@/shared/layout/subscribe-cta.ts';
+import { showSubscribeCta, showSubscribeLink } from '@/shared/layout/subscribe-cta.ts';
 import Seo from '@/shared/seo/Seo.astro';
 import BackToTop from '@/shared/ui/BackToTop.astro';
 import LanguageHint from '@/shared/ui/LanguageHint.astro';
@@ -42,6 +42,12 @@ type Props = {
 };
 
 const { locale, printable = false, translations, ...seo } = Astro.props;
+const subscribeLink = showSubscribeLink({
+  features: site.features,
+  turnstileSiteKey: integrations.turnstileSiteKey,
+  path: seo.path,
+  printable,
+});
 const subscribeCta = showSubscribeCta({
   features: site.features,
   turnstileSiteKey: integrations.turnstileSiteKey,
@@ -106,7 +112,7 @@ const preloadedFonts = [spaceGroteskLatin, jetbrainsMonoLatin];
       </div>
     </main>
     <div class="mx-auto max-w-[1200px] px-3 md:px-4" data-site-chrome>
-      <Footer locale={locale} subscribeCta={subscribeCta} />
+      <Footer locale={locale} subscribeCta={subscribeCta} subscribeLink={subscribeLink} />
     </div>
     <div class="mx-auto max-w-[1200px] px-3 md:px-4">
       <LanguageHint locale={locale} translations={translations} />

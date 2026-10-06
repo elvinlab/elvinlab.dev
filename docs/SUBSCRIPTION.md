@@ -24,7 +24,7 @@ Dónde se muestra la banda: en el footer de todas las páginas cuando están enc
 
 ### Enlace para compartir
 
-`elvinlab.dev/subscribe` es el enlace que se manda a alguien (en inglés, `elvinlab.dev/en/subscribe`). Explica qué son las notas, trae el mismo formulario del footer, la última nota publicada en ese idioma y no muestra la banda del footer. Es indexable y está en el sitemap; las páginas de confirmación y baja siguen ocultas.
+`elvinlab.dev/subscribe` es el enlace que se manda a alguien (en inglés, `elvinlab.dev/en/subscribe`). Explica qué son las notas, trae el mismo formulario del footer, la última nota publicada en ese idioma y no muestra la banda del footer. Es indexable y está en el sitemap; las páginas de confirmación y baja siguen ocultas. El footer de todas las páginas (salvo el CV imprimible de `/me`) también trae el enlace «Suscribirse» a esa página.
 
 
 ## 3. Arquitectura en un dibujo
