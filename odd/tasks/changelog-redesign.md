@@ -47,3 +47,12 @@ Release naming (date only, or "Release N" plus date); whether developer-facing e
 ## Progress
 
 - 2026-10-06: recorded only.
+
+## Decisions (owner delegated them on 2026-10-07: "mejoramos esa parte para que salga en este release")
+
+Evidence behind them: `main` received about 22 production deploys in 4 days (6 on 2026-10-01 and 6 on 2026-10-06; only the last ones record `develop: <sha>`), so grouping by deploy would give about 22 blocks of 1 to 4 entries; the 83 entries are already dated by the day they reached production (1, 28, 16, 22, 11 and 6 entries on six days).
+1. **A release is a production day.** Entries are grouped by `date` (no migration of the existing data); an optional title per day lives in `apps/web/src/content/releases.json` (`{ "YYYY-MM-DD": { "title": "..." } }`). No semantic versions, no "Release N" numbering (the deploy count and the owner's own count of releases do not agree), no commit links for now. ADR 0010 is amended: still dated and single language, now grouped by day with kind groups.
+2. **Kind groups inside each day**, fixed order, friendly labels and a pixel icon each (9x9 grid, crisp edges, no rainbow: tokens only): `added` New (Novedades), `changed` Changes (Cambios), `fixed` Fixes (Correcciones), `removed` Removed (Eliminado), `security` Security (Seguridad), `deprecated` Deprecated (Obsoleto). Stored values stay Keep-a-Changelog; no new `perf` category now (performance entries stay under Changes).
+3. **Scale:** static pagination by days with the listing kit (`shared/lib/listing.ts`, `shared/ui/Pager.astro`, `ListingSummary.astro`): config `changelog.perPage` (days per page, default 4), pages `/changelog/page/N/` and `/en/changelog/page/N/`; newest first only (no sorting); the two newest days open and the rest collapsed in native `<details>` (no JavaScript); component CSS emitted only where it renders; its own budget type in `page-weight-budget.json`.
+4. **Authoring tools:** `pnpm changelog:audit` lists the `feat`, `fix` and `perf` commits since the last release (the `develop: <sha>` recorded by the release commit on `origin/main`) that did NOT touch `changelog.json` (the rule is that the entry travels in the same work unit), and `pnpm changelog:stamp [--date YYYY-MM-DD]` sets the date of the entries that are not in `origin/main`'s changelog to the release day. `CLAUDE.md` points to both instead of the manual `git log` step.
+5. **Not now:** Atom feed, commit links, a `perf` category; recorded as follow-ups.
