@@ -1,6 +1,6 @@
 # 0015. Images live in the repository; Cloudflare R2 is the documented way out
 
-Status: Accepted (2026-10-06)
+Status: Accepted (2026-10-06). The owner asked the same day to move the originals out of the repository soon: planned in `odd/tasks/images-to-r2.md`; this ADR will be superseded by ADR 0016 when that is done.
 
 See also: the image rules in `docs/DESIGN.md` ("Images of experiments and credentials") and ADR 0004 (white-label by configuration and content).
 
