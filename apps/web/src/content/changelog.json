@@ -468,39 +468,39 @@
     "description": "Four interface switches (backToTop, languageHint, themeToggle, backgroundPicker) join features, all on by default and rendering nothing when off. Turning contact or changelog off now removes their routes, links and sitemap entries, and the legal pages and subscription errors stop pointing to a Contact page."
   },
   "me-facts-consistent": {
-    "date": "2026-10-06",
+    "date": "2026-10-07",
     "category": "changed",
     "title": "/me facts agree with each other",
     "description": "Languages now come from one configurable field (me.languages), availability reads \"collaborations and projects\" and shows the lookingFor line in the sidebar, the CV button says \"View CV (PDF)\" because it opens a viewer, and experience tags show names like .NET, React and Spring Boot instead of raw ids."
   },
   "me-hero-first-screen": {
-    "date": "2026-10-06",
+    "date": "2026-10-07",
     "category": "changed",
     "title": "/me hero and sidebar explained",
     "description": "The /me headline now follows the page language and a short sentence says what I do; Contact is the primary action, with the CV, LinkedIn and GitHub as named secondary links. Location, languages, work mode and availability appear right under the hero on mobile, and every quick fact, stack group and the contact card has an icon and a short explanation on hover, focus or tap (Escape closes it). New optional config: me.headline, me.pitch, and a hint and icon on each stack group."
   },
   "experiments-page": {
-    "date": "2026-10-06",
+    "date": "2026-10-07",
     "category": "added",
     "title": "Experiments page and recent experiments on /me",
     "description": "An Experiments page (/experiments/, /en/experiments/) shows featured projects (up to 3) as exhibition pieces with a gallery of real screenshots, then a quiet list of compact cards. The list is paginated (12 per page) and sortable (newest, oldest, A-Z) with static pages, no JavaScript. /me shows recent rows. For forks: an `experiments` block in site.config.ts sets size, sorts, featured limit, rows and intro."
   },
   "immutable-built-assets": {
-    "date": "2026-10-06",
+    "date": "2026-10-07",
     "category": "changed",
     "title": "Built assets keep their cache for a year",
     "description": "Fingerprint-named assets under /_astro/ use a one-year immutable cache policy. A changed build produces new asset names, while HTML and non-fingerprinted files keep their existing policies."
   },
   "experiment-image-policy": {
-    "date": "2026-10-06",
+    "date": "2026-10-07",
     "category": "added",
     "title": "Experiment images and honest fallback covers",
     "description": "Own screenshots live beside the source and are optimized at build time; a missing referenced image fails the build. Experiments without screenshots show no image at all: text-only cards and a single-column panel, never a fake cover. The image policy and ADR 0015 explain the repository storage decision and the deferred R2 migration."
   },
-  "experiments-responsive-contrast": {
+  "portfolio-guide-and-stress-tool": {
     "date": "2026-10-07",
-    "category": "fixed",
-    "title": "Experiments fit tablet screens with readable indices",
-    "description": "Featured experiment glows stay inside their horizontal media bounds, preventing tablet-width scrolling. Compact experiment indices keep their outlined pixel style with the existing readable text token in both themes."
+    "category": "added",
+    "title": "A guide to edit the profile and add experiments",
+    "description": "docs/PORTFOLIO.md (Spanish and English) says which file and field to change for /me, experiments, images, order and sorting, with copy-paste templates. pnpm stress:experiments builds the site with 30 or 100 generated experiments in a temporary workspace to check pages, weight and links without touching your files."
   }
 }
