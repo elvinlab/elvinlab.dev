@@ -1,0 +1,52 @@
+---
+/** The quick-facts card (location, languages, work mode, availability), the single source of those
+ * rows. `MeSidebar` renders it for `lg+` and `MePage` renders it under the hero below `lg`; each
+ * caller hides the other copy with `display: none`, so only one is exposed to assistive tech.
+ * Every row has an icon and a short hover/focus explanation. */
+import { site } from '@/shared/config/index.ts';
+import { type Locale, t } from '@/shared/i18n/index.ts';
+import InfoTip from '@/shared/ui/InfoTip.astro';
+import SocialIcon from '@/shared/ui/SocialIcon.astro';
+
+type Props = {
+  locale: Locale;
+  /** Keeps the tooltip ids unique when the card is rendered twice on one page. */
+  idPrefix: string;
+  class?: string;
+};
+
+const { locale, idPrefix, class: className } = Astro.props;
+const facts = [
+  {
+    key: 'location',
+    icon: 'pin',
+    label: t(locale, 'me.basedIn'),
+    value: `${site.identity.location ?? ''}${site.me.timezone ? `, ${site.me.timezone}` : ''}`,
+    tip: t(locale, 'me.tip.location'),
+  },
+  ...(site.me.languages
+    ? [{ key: 'languages', icon: 'globe', label: t(locale, 'me.languagesLabel'), value: site.me.languages[locale], tip: t(locale, 'me.tip.languages') }]
+    : []),
+  { key: 'workMode', icon: 'laptop', label: t(locale, 'me.workMode'), value: site.me.workMode[locale], tip: t(locale, 'me.tip.workMode') },
+  ...(site.recruiter.available
+    ? [{ key: 'availability', icon: 'spark', label: t(locale, 'me.availability'), value: site.recruiter.lookingFor[locale], tip: t(locale, 'me.tip.availability') }]
+    : []),
+];
+---
+
+<section class:list={['tip-card flex flex-col gap-3 rounded-card bg-card p-5', className]}>
+  <h2 class="font-display text-base font-bold">{t(locale, 'me.quickFacts')}</h2>
+  <dl class="flex flex-col gap-3 text-sm">
+    {facts.map((fact) => (
+      <div class="flex flex-col">
+        <dt class="text-meta text-muted">
+          <InfoTip id={`${idPrefix}-${fact.key}`} text={fact.tip} dense><SocialIcon name={fact.icon} />{fact.label}</InfoTip>
+        </dt>
+        {/* Indent = icon (18 px) + trigger gap (0.5 rem), so the value lines up under the label. */}
+        <dd class="pl-[1.625rem] font-medium text-pretty">
+          {(fact.value ?? '').split(' · ').map((part) => <span class="block">{part}</span>)}
+        </dd>
+      </div>
+    ))}
+  </dl>
+</section>

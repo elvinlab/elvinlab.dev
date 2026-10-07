@@ -472,5 +472,11 @@
     "category": "changed",
     "title": "/me facts agree with each other",
     "description": "Languages now come from one configurable field (me.languages), availability reads \"collaborations and projects\" and shows the lookingFor line in the sidebar, the CV button says \"View CV (PDF)\" because it opens a viewer, and experience tags show names like .NET, React and Spring Boot instead of raw ids."
+  },
+  "me-hero-first-screen": {
+    "date": "2026-10-06",
+    "category": "changed",
+    "title": "/me hero and sidebar explained",
+    "description": "The /me headline now follows the page language and a short sentence says what I do; Contact is the primary action, with the CV, LinkedIn and GitHub as named secondary links. Location, languages, work mode and availability appear right under the hero on mobile, and every quick fact, stack group and the contact card has an icon and a short explanation on hover, focus or tap (Escape closes it). New optional config: me.headline, me.pitch, and a hint and icon on each stack group."
   }
 }

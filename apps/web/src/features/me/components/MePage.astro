@@ -10,6 +10,7 @@ import AtAGlance from '@/features/me/components/AtAGlance.astro';
 import ExperienceTimeline from '@/features/me/components/ExperienceTimeline.astro';
 import MeHero from '@/features/me/components/MeHero.astro';
 import MeSidebar from '@/features/me/components/MeSidebar.astro';
+import QuickFacts from '@/features/me/components/QuickFacts.astro';
 import WhatIBring from '@/features/me/components/WhatIBring.astro';
 import { hasPublishedNotes, NoteIndexRow, sortNotes } from '@/features/notes/index.ts';
 import { ExperimentTile, sortExperiments } from '@/features/portfolio/index.ts';
@@ -54,6 +55,7 @@ const bio = site.identity.bio[locale];
   </Banner>
 
   <div class="flex flex-col gap-4">
+    <QuickFacts locale={locale} idPrefix="qf-main" class="lg:hidden" />
     <AtAGlance locale={locale} />
     <WhatIBring locale={locale} />
     <ExperienceTimeline locale={locale} entries={experience} />

@@ -1,52 +1,46 @@
 ---
-/** /me sidebar: quick facts, tech stack and a "let's talk" card. */
+/** /me sidebar: quick facts (`lg+` only; below `lg` they sit under the hero), tech stack and a
+ * "let's talk" card. Stack groups and the contact card carry an icon and a hover/focus explanation. */
 import { localizePath } from '@elvinlab/core';
 
+import QuickFacts from '@/features/me/components/QuickFacts.astro';
 import { isEnabled, site } from '@/shared/config/index.ts';
 import { LOCALES, type Locale, t } from '@/shared/i18n/index.ts';
 import Chip from '@/shared/ui/Chip.astro';
+import InfoTip from '@/shared/ui/InfoTip.astro';
+import SocialIcon from '@/shared/ui/SocialIcon.astro';
 
 type Props = { locale: Locale };
 
 const { locale } = Astro.props;
-const facts = [
-  { label: t(locale, 'me.basedIn'), value: `${site.identity.location ?? ''}${site.me.timezone ? `, ${site.me.timezone}` : ''}` },
-  ...(site.me.languages ? [{ label: t(locale, 'me.languagesLabel'), value: site.me.languages[locale] }] : []),
-  { label: t(locale, 'me.workMode'), value: site.me.workMode[locale] },
-  ...(site.recruiter.available ? [{ label: t(locale, 'me.availability'), value: site.recruiter.lookingFor[locale] }] : []),
-];
 const contactHref = localizePath('/contact/', locale, LOCALES);
+const GROUP_LABEL = 'font-mono text-meta font-medium text-muted';
 ---
 
 <div class="flex flex-col gap-4 lg:sticky lg:top-4">
-  <section class="flex flex-col gap-3 rounded-card bg-card p-5">
-    <h2 class="font-display text-base font-bold">{t(locale, 'me.quickFacts')}</h2>
-    <dl class="grid grid-cols-[auto_1fr] gap-x-3 gap-y-2.5 text-sm">
-      {facts.map((fact) => (
-        <>
-          <dt class="text-muted">{fact.label}</dt>
-          <dd class="text-right font-medium">
-            {(fact.value ?? '').split(' · ').map((part) => <span class="block">{part}</span>)}
-          </dd>
-        </>
-      ))}
-    </dl>
-  </section>
+  <QuickFacts locale={locale} idPrefix="qf-side" class="hidden lg:flex" />
 
-  <section class="flex flex-col gap-3 rounded-card bg-card p-5">
+  <section class="tip-card flex flex-col gap-3 rounded-card bg-card p-5">
     <h2 class="font-display text-base font-bold">{t(locale, 'me.stack')}</h2>
-    {site.me.stack.map((group) => (
+    {site.me.stack.map((group, index) => (
       <div class="flex flex-col gap-1.5">
-        <p class="font-mono text-meta font-medium text-muted">{group.label[locale]}</p>
+        {group.hint ? (
+          <InfoTip id={`stack-tip-${index}`} text={group.hint[locale] ?? ''} class={GROUP_LABEL} dense>
+            {group.icon && <SocialIcon name={group.icon} />}{group.label[locale]}
+          </InfoTip>
+        ) : (
+          <p class:list={[GROUP_LABEL, 'flex items-center gap-2']}>{group.icon && <SocialIcon name={group.icon} />}{group.label[locale]}</p>
+        )}
         <div class="flex flex-wrap gap-1.5">{group.items.map((item) => <Chip>{item}</Chip>)}</div>
       </div>
     ))}
   </section>
 
   {isEnabled('contact') && (
-    <section class="flex flex-col gap-3 overflow-hidden rounded-card bg-card p-5 print:hidden">
-      <span class="-mx-5 -mt-5 h-[3px] bg-gradient-to-r from-primary via-cyan to-pink"></span>
-      <h2 class="font-display text-base font-bold">{t(locale, 'me.letsTalk.title')}</h2>
+    <section class="tip-card flex flex-col gap-3 rounded-card bg-card bg-[length:100%_3px] bg-no-repeat p-5 bg-gradient-to-r from-primary via-cyan to-pink print:hidden">
+      <h2 class="font-display text-base font-bold">
+        <InfoTip id="contact-tip" text={t(locale, 'me.tip.contact')} place="up"><SocialIcon name="mail" />{t(locale, 'me.letsTalk.title')}</InfoTip>
+      </h2>
       <p class="text-sm text-text-secondary">{t(locale, 'me.letsTalk.body')}</p>
       <a href={contactHref} class="flex h-11 items-center justify-center rounded-control bg-button px-4 font-medium text-white active:scale-96">{t(locale, 'me.contactMe')}</a>
     </section>

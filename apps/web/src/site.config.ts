@@ -114,9 +114,17 @@ export const siteConfig = {
     timezone: 'UTC−6',
     workMode: { es: 'Remoto', en: 'Remote' },
     languages: { es: 'Español nativo · Inglés B1', en: 'Spanish native · English B1' },
+    headline: {
+      es: 'Ingeniero de software full-stack, con enfoque en frontend.',
+      en: 'Full-stack software engineer with a frontend focus.',
+    },
+    pitch: {
+      es: 'Desarrollo interfaces, servicios y herramientas para productos web. Trabajo con SaaS en producción y uso agentes de IA para apoyar el desarrollo, con pruebas y revisión humana.',
+      en: 'I build interfaces, backend services and tools for web products. I work on production SaaS and use AI agents to support development, with testing and human review.',
+    },
     intro: {
-      es: 'Ingeniero de software full-stack de Costa Rica, construyendo software desde 2020, con enfoque en frontend y experiencia en SaaS en producción. Conecto necesidades de producto con arquitectura mantenible, servicios backend e interfaces accesibles, e integro la IA en productos y procesos de ingeniería con validación explícita y revisión humana.',
-      en: 'Full-stack software engineer from Costa Rica, building software since 2020, with a frontend focus and production SaaS experience. I connect product requirements with maintainable architecture, backend services and accessible interfaces, and integrate AI into products and engineering workflows with explicit validation and human review.',
+      es: 'Tres formas en las que puedo ayudar a un equipo o a un proyecto.',
+      en: 'Three ways I can help a team or a project.',
     },
     facts: [
       {
@@ -157,24 +165,57 @@ export const siteConfig = {
     stack: [
       {
         label: { es: 'Frontend', en: 'Frontend' },
+        icon: 'code',
         items: ['JavaScript', 'Vue 2', 'Vuetify 2', 'Vuex', 'Axios'],
+        hint: {
+          es: 'Lo que la gente ve y usa en pantalla: las interfaces de un producto.',
+          en: 'What people see and use on screen: the interfaces of a product.',
+        },
       },
       {
         label: { es: 'Backend y datos', en: 'Backend and data' },
+        icon: 'server',
         items: ['Java 21', 'Spring Boot', 'Spring Data JPA', 'MySQL', 'SQL'],
+        hint: {
+          es: 'Los servicios y las bases de datos que hay detrás de un producto.',
+          en: 'The services and databases behind a product.',
+        },
       },
       {
         label: { es: 'Calidad y arquitectura', en: 'Quality and architecture' },
+        icon: 'shield-check',
         items: ['Jest', 'Vue Test Utils', 'JUnit', 'Clean/Hexagonal', 'ADRs'],
+        hint: {
+          es: 'Las pruebas y las decisiones de diseño que mantienen el código fiable y fácil de cambiar.',
+          en: 'The tests and design decisions that keep code reliable and easy to change.',
+        },
       },
       {
         label: { es: 'Cloud y entrega', en: 'Cloud and delivery' },
+        icon: 'cloud',
         items: ['AWS', 'Docker', 'GitHub Actions', 'CI/CD'],
+        hint: {
+          es: 'Dónde corre el software y cómo llega a producción de forma automática.',
+          en: 'Where software runs and how it reaches production automatically.',
+        },
       },
-      { label: { es: 'IA', en: 'AI' }, items: ['LLM APIs', 'Claude Code', 'OpenCode'] },
+      {
+        label: { es: 'IA', en: 'AI' },
+        icon: 'bot',
+        items: ['LLM APIs', 'Claude Code', 'OpenCode'],
+        hint: {
+          es: 'Modelos y agentes de IA que uso para apoyar el desarrollo.',
+          en: 'AI models and agents I use to support development.',
+        },
+      },
       {
         label: { es: 'Proyectos personales', en: 'Personal projects' },
+        icon: 'flask',
         items: ['TypeScript', 'Astro', 'React', 'Tailwind CSS', 'Cloudflare Workers'],
+        hint: {
+          es: 'Las herramientas con las que construyo mis propios proyectos, como este sitio.',
+          en: 'The tools I use to build my own projects, such as this site.',
+        },
       },
     ],
   },

@@ -230,6 +230,58 @@ describe('parseSiteConfig', () => {
     });
   });
 
+  describe('me.headline and me.pitch', () => {
+    it('are optional, so a white-label profile falls back to identity.role', () => {
+      const { me } = parseSiteConfig(valid);
+      expect(me.headline).toBeUndefined();
+      expect(me.pitch).toBeUndefined();
+    });
+
+    it('accept one text per locale', () => {
+      const headline = { es: 'Ingeniera full-stack', en: 'Full-stack engineer' };
+      const pitch = { es: 'Construyo productos web.', en: 'I build web products.' };
+      const config = { ...valid, me: { ...valid.me, headline, pitch } };
+      const parsed = parseSiteConfig(config).me;
+      expect(parsed.headline).toEqual(headline);
+      expect(parsed.pitch).toEqual(pitch);
+    });
+
+    it('reject a non-localized value', () => {
+      for (const field of ['headline', 'pitch']) {
+        const broken = { ...valid, me: { ...valid.me, [field]: 'Full-stack engineer' } };
+        expect(() => parseSiteConfig(broken), field).toThrow(new RegExp(field));
+      }
+    });
+  });
+
+  describe('me.stack hint', () => {
+    const withStack = (stack: unknown) => ({ ...valid, me: { ...valid.me, stack } });
+
+    it('is optional on each group', () => {
+      expect(parseSiteConfig(valid).me.stack[0]?.hint).toBeUndefined();
+    });
+
+    it('accepts one text per locale', () => {
+      const hint = { es: 'Lo que ve la gente.', en: 'What people see.' };
+      const stack = [{ label: { es: 'Frontend', en: 'Frontend' }, items: ['Astro'], hint }];
+      expect(parseSiteConfig(withStack(stack)).me.stack[0]?.hint).toEqual(hint);
+    });
+
+    it('accepts an optional icon name and rejects an empty one', () => {
+      const group = { label: { es: 'Frontend', en: 'Frontend' }, items: ['Astro'] };
+      expect(parseSiteConfig(withStack([{ ...group, icon: 'code' }])).me.stack[0]?.icon).toBe(
+        'code',
+      );
+      expect(parseSiteConfig(valid).me.stack[0]?.icon).toBeUndefined();
+      expect(() => parseSiteConfig(withStack([{ ...group, icon: '' }]))).toThrow(/icon/);
+    });
+
+    it('rejects a non-localized hint', () => {
+      const stack = [{ label: { es: 'Frontend', en: 'Frontend' }, items: ['Astro'], hint: 'x' }];
+      expect(() => parseSiteConfig(withStack(stack))).toThrow(/hint/);
+    });
+  });
+
   describe('recruiter.openToWork', () => {
     it('defaults to true so existing configs keep the green status dot', () => {
       expect(parseSiteConfig(valid).recruiter.openToWork).toBe(true);

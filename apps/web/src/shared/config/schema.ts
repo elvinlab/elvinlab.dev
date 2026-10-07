@@ -252,6 +252,16 @@ export const siteConfigSchema = z
           .describe(
             'Spoken languages per locale, for example "Spanish native · English B1". Shown in the /me sidebar; omit to hide the row.',
           ),
+        headline: localized
+          .optional()
+          .describe(
+            'The role line under the name on /me, per locale. Omit to show `identity.role`.',
+          ),
+        pitch: localized
+          .optional()
+          .describe(
+            'One or two sentences under the /me headline that say what you do, per locale. Omit to hide it.',
+          ),
         intro: localized.describe('The "what I bring" intro paragraph per locale.'),
         facts: z
           .array(
@@ -277,6 +287,18 @@ export const siteConfigSchema = z
             z.object({
               label: localized.describe('Group name (Languages, Frontend, ...).'),
               items: z.array(z.string().min(1)).min(1).describe('Tools in the group.'),
+              icon: z
+                .string()
+                .min(1)
+                .optional()
+                .describe(
+                  'Icon name shown before the group name (code, server, shield-check, cloud, bot, flask, layers, ...). Omit for no icon.',
+                ),
+              hint: localized
+                .optional()
+                .describe(
+                  'One plain-language sentence per locale that says what the group is. Shown as a hover and focus tooltip; omit for no tooltip.',
+                ),
             }),
           )
           .min(1)

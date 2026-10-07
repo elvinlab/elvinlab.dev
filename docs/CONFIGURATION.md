@@ -106,6 +106,8 @@ Las descripciones vienen del esquema (`.describe()`), por eso están en inglés.
 | `me.timezone` | `string` | yes |  | Display timezone, for example `UTC−6`. |
 | `me.workMode` | `{ <locale>: string }` | yes |  | Work mode per locale (remote, hybrid, ...). |
 | `me.languages` | `{ <locale>: string }` | no |  | Spoken languages per locale, for example "Spanish native · English B1". Shown in the /me sidebar; omit to hide the row. |
+| `me.headline` | `{ <locale>: string }` | no |  | The role line under the name on /me, per locale. Omit to show `identity.role`. |
+| `me.pitch` | `{ <locale>: string }` | no |  | One or two sentences under the /me headline that say what you do, per locale. Omit to hide it. |
 | `me.intro` | `{ <locale>: string }` | yes |  | The "what I bring" intro paragraph per locale. |
 | `me.facts` | `object[]` | yes |  | At-a-glance strip: value and label pairs (the design shows up to four). |
 | `me.facts[].value` | `{ <locale>: string }` | yes |  | The highlighted value. |
@@ -117,6 +119,8 @@ Las descripciones vienen del esquema (`.describe()`), por eso están en inglés.
 | `me.stack` | `object[]` | yes |  | Tech stack groups. |
 | `me.stack[].label` | `{ <locale>: string }` | yes |  | Group name (Languages, Frontend, ...). |
 | `me.stack[].items` | `string[]` | yes |  | Tools in the group. |
+| `me.stack[].icon` | `string` | no |  | Icon name shown before the group name (code, server, shield-check, cloud, bot, flask, layers, ...). Omit for no icon. |
+| `me.stack[].hint` | `{ <locale>: string }` | no |  | One plain-language sentence per locale that says what the group is. Shown as a hover and focus tooltip; omit for no tooltip. |
 | `features` | `object` | yes |  | Feature flags: off means the routes are not generated and the nav entry is hidden. The four interface switches (`backToTop`, `languageHint`, `themeToggle`, `backgroundPicker`) default to on and render nothing when off. |
 | `features.blog` | `boolean` | yes |  | Lab Notes: the notes index, note pages, RSS and the nav entry. |
 | `features.comments` | `boolean` | yes |  | Giscus comments on notes. Needs the `giscus` block below, otherwise nothing renders. |
