@@ -70,6 +70,7 @@ me: {
     "result": { "es": "Lo que entregó, sin cifras inventadas.", "en": "What it delivered, with no invented numbers." },
     "tags": ["astro", "typescript"],
     "year": 2026,
+    "publishedAt": "2026-03-14",
     "status": "shipped",
     "url": "https://example.dev",
     "repo": "https://github.com/user/my-project",
@@ -95,7 +96,7 @@ me: {
 
 - `images[]`: one to four, **in display order**. The first is the cover: `/me` rows, the compact card and the first slide use it. `alt` is required (up to 140 characters); `caption` is optional (up to 120) and shows under the image. One image is a plain figure; two or more are a gallery with thumbnails that works without JavaScript; none gives a typographic cover (never a fake screenshot).
 - `featured: true`: the experiment is a **big piece** (gallery, three facts, actions). At most `experiments.maxFeatured` (3 by default). If none is featured, the first entry by the usual order is the big piece.
-- `order`: position within the same tier (lower first, 100 by default). Featured entries always come first; ties go to the newest year, then the key.
+- `order`: position within the same tier (lower first, 100 by default) and the tie-break of every sort. Featured entries always come first. `publishedAt` (optional, `YYYY-MM-DD`) sets the exact date used to sort by date; without it 1 January of `year` is used.
 - `status`: `running` (green dot, "In progress"), `shipped` (violet, "Published") or `archived` (muted, "Archived").
 - `note`: slug of a **published** note; adds the "Read the case" button (it names the note's language when it differs from the page's).
 - `url` and `repo`: https only; never a private repository. Leave both out for private work.
@@ -113,12 +114,24 @@ me: {
 The list builds itself from the data; there is nothing to configure per page.
 
 - **Big tier:** the `featured` entries (up to `experiments.maxFeatured`). They show as exhibition pieces on page 1 only.
-- **Compact tier:** every other entry, as cards grouped by year (newest first).
+- **Compact tier:** every other entry, as quiet cards (a cover only when the entry has a real image, a status only when it is not "Shipped", up to two tags). They are grouped by year only when the visible page holds two or more years and the sort is by date.
 - **Static pagination:** page 1 (`/experiments/`, `/en/experiments/`) holds every big piece and the first `experiments.perPage` cards (12 by default). When there are more cards, the next pages live at `/experiments/page/2/`, `/experiments/page/3/` ... (and the `/en/...` twins), with `experiments.perPage` cards each and no big pieces. **Extra pages exist only when needed**: with up to `perPage` compact cards none is generated and no pager renders. `/experiments/page/1/` does not exist (it answers 404; page 1 is the base URL). Every page has its own title, description, canonical, hreflang and `rel="prev"`/`rel="next"`, and is in the sitemap.
+- **Sorting:** `experiments.defaultSort` (`newest` by default), `experiments.sorts` (the sorts a visitor can choose: `newest`, `oldest`, `title` A to Z) and `experiments.sortFrom` (4 by default). The sort applies to the compact cards only; the big pieces always lead page 1. An entry's date is `publishedAt` (`YYYY-MM-DD`, optional) or, when missing, 1 January of its `year`; ties go to `order`, then the key. The "Sort" switch and the pages of the other sorts (`/experiments/oldest/`, `/experiments/oldest/page/2/` and the `/en/...` twins) exist only when the compact cards number at least `sortFrom` and more than one sort is enabled. Those pages carry `noindex, follow`, a self canonical and are not in the sitemap: the default sort is the only indexable one, so there is no duplicate content. Everything is real links, with no client-side sorting or filtering.
 - **`/me` rows:** `experiments.meRows` (3 by default). The first entries by the usual order always stay on page 1, so the `/experiments/#<id>` links never point at another page. `meRows` never exceeds `perPage`: a larger value is lowered to `perPage`.
-- **Cost:** the 30- and 100-entry stress fixtures measured 976 and 964 bytes (about 1 KB) of marginal HTML per compact card, comparing page 2 and later only (page 1 also holds the big pieces and has another shell). It depends on the content of each entry. Measure your own entries; lazy images and off-screen rendering do not remove HTML download or parse costs.
+- **Cost:** the 30- and 100-entry stress fixtures measured 929 and 919 bytes (about 1 KB) of marginal HTML per compact card, comparing page 2 and later only (page 1 also holds the big pieces and has another shell). It depends on the content of each entry. Measure your own entries; lazy images and off-screen rendering do not remove HTML download or parse costs.
 - **When filters or tag pages would be added** (not implemented): above about 24 entries, or once the tags are varied; always as static pages `/experiments/tag/<tag>/`, never client-side filtering.
 - **Try it with many:** `pnpm stress:experiments [count]` generates entries in a temporary workspace (it never touches your files), builds and reports pages, HTML bytes and cost per card; see [TESTING.md](TESTING.md#stress-the-experiments-list-pnpm-stressexperiments).
+
+### Reusing the listing kit (for Education or any other list)
+
+Sorting, pagination and their controls are generic and live in `shared/`; Experiments is only the first user. For a new list:
+
+1. **Pure logic** (`apps/web/src/shared/lib/listing.ts`, tested): `sortItems(items, key, comparators)` (stable), `paginate(items, { perPage, leading?, pinned? })`, `pageWindow(current, total)`, `summaryRange(page, perPage, total)`, `listingPath({ base, sort, defaultSort, page })` and `availableSorts(...)`. They know nothing about config or Astro.
+2. **A list adapter** (like `features/portfolio/lib/pagination.ts`): define your list's comparators (all ending in the same tie-break: `order`, then the id), which entries are the "leading" content of page 1, and call the kit. A thin file with its tests.
+3. **Settings**: a block in `site.config.ts` with `perPage`, `defaultSort`, `sorts` and `sortFrom` (same schema as `experiments`; the sort keys are those of `LISTING_SORTS`), then `pnpm docs:config`.
+4. **Static routes**: a base page, `page/[page]`, `[sort]` and `[sort]/page/[page]` (and the `/en/` twins), each with a `getStaticPaths` that generates only what exists: the routes of an alternate sort only when it is enabled and the list reaches `sortFrom`. Alternate sorts carry `noindex, follow`, a self canonical, `prev`/`next` inside the same sort, hreflang to the same sort and page, and stay out of the sitemap (`sitemap-filter.ts`).
+5. **UI**: `shared/ui/Pager.astro`, `SortSwitch.astro` and `ListingSummary.astro` with your URLs and labels (`listing.*` in the dictionary). They are real links (the current one has `aria-current`); there is no client-side sorting or filtering.
+6. **Tests**: copy the pattern of `pnpm stress:experiments` for your list (pages, links, canonical, `noindex` and no routes for disabled sorts).
 
 Header texts of the page (optional, defaulting to the dictionary):
 
@@ -127,6 +140,9 @@ experiments: {
   perPage: 12,
   maxFeatured: 3,
   meRows: 3,
+  defaultSort: "newest",
+  sorts: ["newest", "oldest", "title"],
+  sortFrom: 4,
   intro: { es: 'Proyectos que construí, decisiones que tomé y lo que aprendí.', en: 'Projects I built, decisions I made and what I learned.' },
   words: { es: ['construir', 'probar', 'aprender', 'repetir'], en: ['build', 'test', 'learn', 'repeat'] },
 },
@@ -134,7 +150,7 @@ experiments: {
 
 `words` is the decorative comment stack beside the title (desktop only, 1 to 6 words per language, the `// ` is added for you).
 
-These five settings are the editorial tunables, not every presentation constant. Gallery limits (1-4 images), visible tag counts (3 on big pieces, 2 on compact cards), the seven-page pager window, image dimensions and grid breakpoints remain schema/component rules. The `/me` notes preview still takes three notes; `experiments.meRows` controls experiments only. Changes to those rules require code and relevant tests, not another `site.config.ts` field.
+These settings are the editorial tunables, not every presentation constant. Gallery limits (1-4 images), visible tag counts (3 on big pieces, 2 on compact cards), the seven-page pager window, image dimensions and grid breakpoints remain schema/component rules. The `/me` notes preview still takes three notes; `experiments.meRows` controls experiments only. Changes to those rules require code and relevant tests, not another `site.config.ts` field.
 
 ## 5. Experience entries
 
@@ -190,6 +206,10 @@ The dedicated education page (`/education/`) is planned and does not exist yet; 
 | `experiments.perPage` | integer 4 to 48 (12 by default) | the build fails and names the field |
 | `experiments.maxFeatured` | integer 1 to 6 (3 by default) | the build fails; more featured entries than the limit also fails |
 | `experiments.meRows` | integer 1 to 6 (3 by default), never more than `perPage` | above `perPage` it is lowered to `perPage` |
+| `experiments.defaultSort` | `newest`, `oldest` or `title` (`newest` by default), must be in `sorts` | the build fails and names the field |
+| `experiments.sorts` | at least one of `newest`, `oldest`, `title` | the build fails; with a single sort the switch does not render |
+| `experiments.sortFrom` | integer 2 to 48 (4 by default) | below that many compact cards there is no switch and no alternate-sort pages |
+| `publishedAt` of an experiment | a valid `YYYY-MM-DD` date | the build fails |
 | `experiments.intro` | text per language (default language required) | the build fails if the default language is missing or an unsupported one is present |
 | `experiments.words` | 1 to 6 words per language, up to 24 characters each | the build fails |
 | `images[]` of an experiment | one to four, file name without folders | the build fails; a missing file fails too |

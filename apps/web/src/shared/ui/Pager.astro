@@ -1,0 +1,140 @@
+---
+/**
+ * The page navigation of a listing: Previous and Next at the ends, numbered links in between (a
+ * window with an ellipsis beyond seven pages, always keeping the first and the last page) and the
+ * current page as plain text with `aria-current="page"`. Real links only, so every page stays a
+ * crawlable URL. It renders nothing while the list has one page. Generic: it knows nothing about
+ * what is listed, the page passes the model (`pages`, `current`), `href` and the accessible name.
+ * Styles are scoped here, so they ship only on the pages that use it.
+ */
+import { type Locale, t } from '@/shared/i18n/index.ts';
+import { pageWindow } from '@/shared/lib/listing.ts';
+
+type Props = {
+  locale: Locale;
+  page: number;
+  pages: number;
+  /** Locale-aware URL of a page of this listing. */
+  href: (page: number) => string;
+  /** Accessible name of the navigation; a generic one is used when omitted. */
+  label?: string;
+};
+
+const { locale, page, pages, href, label = t(locale, 'listing.pager.label') } = Astro.props;
+const items = pageWindow(page, pages);
+const arrow = 'M8 4h1v1H8zM7 3h1v3H7zM6 2h1v5H6zM5 1h1v7H5zM0 3h5v3H0z';
+---
+
+{pages > 1 && (
+  <nav class="lk-pager" aria-label={label} data-listing-nav>
+    {page > 1 ? (
+      <a class="lk-step lk-prev" href={href(page - 1)} rel="prev">
+        <svg class="lk-arrow" viewBox="0 0 9 9" width="18" height="18" shape-rendering="crispEdges" fill="currentColor" aria-hidden="true" focusable="false"><path d={arrow}></path></svg>
+        {t(locale, 'listing.pager.prev')}
+      </a>
+    ) : <span class="lk-step-gap" aria-hidden="true"></span>}
+    <ul class="lk-pages">
+      {items.map((item) => (
+        <li>
+          {item.kind === 'ellipsis' ? (
+            <span class="lk-num lk-gap" aria-hidden="true">…</span>
+          ) : item.page === page ? (
+            <span class="lk-num lk-current" aria-current="page">{item.page}</span>
+          ) : (
+            <a class="lk-num" href={href(item.page)} aria-label={t(locale, 'listing.pager.goto', { page: item.page })}>{item.page}</a>
+          )}
+        </li>
+      ))}
+    </ul>
+    {page < pages ? (
+      <a class="lk-step lk-next" href={href(page + 1)} rel="next">
+        {t(locale, 'listing.pager.next')}
+        <svg class="lk-arrow" viewBox="0 0 9 9" width="18" height="18" shape-rendering="crispEdges" fill="currentColor" aria-hidden="true" focusable="false"><path d={arrow}></path></svg>
+      </a>
+    ) : <span class="lk-step-gap" aria-hidden="true"></span>}
+  </nav>
+)}
+
+<style>
+  .lk-pager {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 0.25rem 0.5rem;
+  }
+  .lk-pages {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.125rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .lk-num,
+  .lk-step {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 2.75rem;
+    font: 400 0.9375rem / 1 var(--font-mono);
+    color: var(--color-text-secondary);
+    text-decoration: none;
+  }
+  .lk-num {
+    min-width: 2.75rem;
+    padding: 0 0.5rem;
+    border-radius: var(--radius-control);
+  }
+  .lk-step {
+    gap: 0.5rem;
+    padding: 0 0.75rem;
+    border-radius: var(--radius-control);
+  }
+  .lk-gap {
+    color: var(--color-muted);
+  }
+  .lk-prev .lk-arrow {
+    transform: scaleX(-1);
+  }
+  /* The current page is a quiet chip, not a link: no outline, no pink. */
+  .lk-current {
+    background: var(--color-chip);
+    font-weight: 700;
+    color: var(--color-text);
+  }
+  a.lk-num,
+  a.lk-step {
+    transition: color 150ms, background-color 150ms;
+  }
+  @media (hover: hover) {
+    a.lk-num:hover,
+    a.lk-step:hover {
+      color: var(--color-primary);
+      background: var(--color-card-hover);
+    }
+  }
+  a.lk-num:focus-visible,
+  a.lk-step:focus-visible {
+    outline: 2px solid var(--color-primary);
+    outline-offset: 2px;
+  }
+  /* Keeps the numbers centered when only one of Previous and Next exists (wide screens). */
+  .lk-step-gap {
+    display: none;
+  }
+  @media (min-width: 640px) {
+    .lk-pager {
+      flex-wrap: nowrap;
+      gap: 0.5rem;
+    }
+    .lk-step-gap {
+      display: block;
+      width: 6.5rem;
+    }
+    .lk-step {
+      min-width: 6.5rem;
+    }
+  }
+</style>

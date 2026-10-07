@@ -1,4 +1,9 @@
-import { site } from '@/shared/config/index.ts';
+import { LISTING_SORTS, site } from '@/shared/config/index.ts';
+
+/** `/experiments/oldest/` and `/experiments/oldest/page/2/`: the URLs of a sort, whichever one is the default. */
+const SORTED_EXPERIMENTS = new RegExp(
+  `^/experiments/(?:${LISTING_SORTS.join('|')})/(?:page/\\d+/)?$`,
+);
 
 /**
  * True when a pathname should be excluded from the sitemap because its feature flag is off.
@@ -28,6 +33,9 @@ export function isHiddenFromSitemap(pathname: string, features?: typeof site.fea
   ) {
     return true;
   }
+  // The alternate sorts of the experiments list are `noindex` duplicates of the default order:
+  // never in the sitemap, whatever the flags say. They exist only on a long enough list.
+  if (SORTED_EXPERIMENTS.test(withoutLocale)) return true;
   if (!flags.contact && withoutLocale === '/contact/') return true;
   if (
     !flags.changelog &&

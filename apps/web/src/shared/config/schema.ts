@@ -10,6 +10,10 @@ const siteHref = z.union([httpsUrl, z.string().regex(/^\/(?!\/)\S*$/)], {
   error: 'must be an https URL or a site path starting with "/"',
 });
 
+/** The sorts a list page can offer (`experiments.sorts`); the education page reuses the first two. */
+export const LISTING_SORTS = ['newest', 'oldest', 'title'] as const;
+export type ListingSort = (typeof LISTING_SORTS)[number];
+
 /** Text keyed by locale, e.g. `{ es: 'Hola', en: 'Hello' }`. Checked against `locales` below. */
 const localized = z.record(z.string(), z.string().trim().min(1));
 
@@ -221,7 +225,7 @@ export const siteConfigSchema = z
           .max(48)
           .default(12)
           .describe(
-            'Compact cards per page of `/experiments/`. Page 1 also holds the big pieces; a second page exists only when the compact cards exceed this number (`/experiments/page/2/`). About 1 KB of HTML per compact card (976 B measured with 30 generated entries and 964 B with 100, comparing pages 2 and later); the cost depends on the content, so measure your own entries with `pnpm stress:experiments`.',
+            'Compact cards per page of `/experiments/`. Page 1 also holds the big pieces; a second page exists only when the compact cards exceed this number (`/experiments/page/2/`). About 1 KB of HTML per compact card (929 B measured with 30 generated entries and 919 B with 100, comparing pages 2 and later); the cost depends on the content, so measure your own entries with `pnpm stress:experiments`.',
           ),
         maxFeatured: z
           .int()
@@ -248,12 +252,41 @@ export const siteConfigSchema = z
           .record(z.string(), z.array(z.string().trim().min(1).max(24)).min(1).max(6))
           .optional()
           .describe(
-            'Optional decorative comment stack beside the title of `/experiments/` (desktop only), per locale: one to six short words, for example `{ "es": ["construir", "probar"] }`. The leading `// ` is added for you. Omit it to use the interface default.',
+            'Optional decorative comment stack beside the title of `/experiments/` (desktop only), per locale: one to six short words, for example `{ "es": ["construir", "probar"] }`. The leading `// ` is added for you. Nothing renders there unless you set this (the default header is just the title and the intro).',
           ),
+        defaultSort: z
+          .enum(LISTING_SORTS)
+          .default('newest')
+          .describe(
+            'Order of the compact cards at `/experiments/`: `newest` (publication date, newest first), `oldest` or `title` (A to Z). Big (featured) pieces always lead page 1 whatever the sort. It must be one of `sorts`.',
+          ),
+        sorts: z
+          .array(z.enum(LISTING_SORTS))
+          .min(1)
+          .default([...LISTING_SORTS])
+          .describe(
+            'Sorts the visitor can choose, from `newest`, `oldest` and `title`. Each one except `defaultSort` is a static page (`/experiments/oldest/`, `/experiments/oldest/page/2/`) that search engines are told not to index and that stays out of the sitemap. A list of one sort shows no switch.',
+          ),
+        sortFrom: z
+          .int()
+          .min(2)
+          .max(48)
+          .default(4)
+          .describe(
+            'The sort switch and the alternate-sort pages exist only when the compact cards (everything that is not a big piece) number at least this many; below it the order is not worth choosing.',
+          ),
+      })
+      .refine((value) => new Set(value.sorts).size === value.sorts.length, {
+        path: ['sorts'],
+        message: 'sorts must not repeat a sort',
+      })
+      .refine((value) => value.sorts.includes(value.defaultSort), {
+        path: ['sorts'],
+        message: 'sorts must include defaultSort',
       })
       .prefault({})
       .describe(
-        'Settings of the experiments list (`features.experiments`): pagination, big pieces, the rows on `/me` and the page header texts. Every key is optional and falls back to its default.',
+        'Settings of the experiments list (`features.experiments`): pagination, sorting, big pieces, the rows on `/me` and the page header texts. Every key is optional and falls back to its default.',
       ),
     recruiter: z
       .object({

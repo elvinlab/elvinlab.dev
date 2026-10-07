@@ -11,7 +11,7 @@ const entry = (file: string): string =>
   fileURLToPath(new URL(`../experiments-routes/${file}`, import.meta.url));
 
 /**
- * The experiments page (and its later pages) in both languages. Like the blog and contact routes they live outside
+ * The experiments page, its later pages and its alternate sorts in both languages. Like the blog and contact routes they live outside
  * `src/pages` so they can be left out: with the flag off the pages do not exist at all.
  */
 export function experimentsRoutes(enabled: boolean): ExperimentsRoute[] {
@@ -23,6 +23,13 @@ export function experimentsRoutes(enabled: boolean): ExperimentsRoute[] {
     // `getStaticPaths` in the entrypoints generates a page only while the compact tier needs one.
     { pattern: '/experiments/page/[page]', entrypoint: entry('page.astro') },
     { pattern: '/en/experiments/page/[page]', entrypoint: entry('en-page.astro') },
+    // The alternate sorts (`/experiments/oldest/`, `/experiments/oldest/page/2/`): `getStaticPaths`
+    // generates them only for the enabled non-default sorts and only when the compact list reaches
+    // `experiments.sortFrom`, so on a small list none of them exists.
+    { pattern: '/experiments/[sort]', entrypoint: entry('sort.astro') },
+    { pattern: '/en/experiments/[sort]', entrypoint: entry('en-sort.astro') },
+    { pattern: '/experiments/[sort]/page/[page]', entrypoint: entry('sort-page.astro') },
+    { pattern: '/en/experiments/[sort]/page/[page]', entrypoint: entry('en-sort-page.astro') },
   ];
 }
 

@@ -1,0 +1,90 @@
+---
+/**
+ * A segmented control to choose the order of a listing. Every option is a real link to the static
+ * page of that sort (never client-side sorting), the current one carries `aria-current="true"`, and
+ * choosing another sort always lands on its first page. It renders nothing with fewer than two
+ * options. Generic: the page passes the options with their labels and URLs. Styles are scoped here.
+ */
+import { type Locale, t } from '@/shared/i18n/index.ts';
+
+type Option = { key: string; label: string; href: string };
+type Props = {
+  locale: Locale;
+  options: readonly Option[];
+  current: string;
+  /** Accessible name of the group; the visible label is used when omitted. */
+  label?: string;
+};
+
+const { locale, options, current, label } = Astro.props;
+const visible = t(locale, 'listing.sort.label');
+---
+
+{options.length > 1 && (
+  <nav class="lk-sort" aria-label={label ?? visible} data-listing-sort>
+    <span class="lk-sort-label" aria-hidden="true">{visible}</span>
+    <ul class="lk-sort-options">
+      {options.map((option) => (
+        <li>
+          <a
+            class="lk-sort-option"
+            href={option.href}
+            aria-current={option.key === current ? 'true' : undefined}
+            data-sort={option.key}
+          >{option.label}</a>
+        </li>
+      ))}
+    </ul>
+  </nav>
+)}
+
+<style>
+  .lk-sort {
+    display: inline-flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.25rem 0.75rem;
+    max-width: 100%;
+  }
+  .lk-sort-label {
+    font: 400 0.8125rem / 1 var(--font-mono);
+    color: var(--color-muted);
+  }
+  .lk-sort-options {
+    display: flex;
+    max-width: 100%;
+    gap: 0.125rem;
+    margin: 0;
+    padding: 0.125rem;
+    list-style: none;
+    border-radius: var(--radius-control);
+    background: var(--color-chip);
+  }
+  .lk-sort-option {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 2.75rem;
+    padding: 0 0.75rem;
+    border-radius: calc(var(--radius-control) - 0.125rem);
+    font: 400 0.8125rem / 1 var(--font-mono);
+    white-space: nowrap;
+    color: var(--color-text-secondary);
+    text-decoration: none;
+    transition: color 150ms, background-color 150ms;
+  }
+  .lk-sort-option[aria-current='true'] {
+    background: var(--color-card);
+    font-weight: 700;
+    color: var(--color-text);
+  }
+  @media (hover: hover) {
+    .lk-sort-option:not([aria-current='true']):hover {
+      color: var(--color-primary);
+    }
+  }
+  .lk-sort-option:focus-visible {
+    outline: 2px solid var(--color-primary);
+    outline-offset: 2px;
+  }
+</style>

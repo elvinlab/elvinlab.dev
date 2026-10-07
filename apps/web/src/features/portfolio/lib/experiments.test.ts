@@ -5,7 +5,7 @@ import {
   assertNotesExist,
   caseLinkLabelKey,
   experimentTagLabel,
-  tierExperiments,
+  splitTiers,
   visibleExperimentTags,
 } from './experiments.ts';
 
@@ -80,8 +80,8 @@ describe('assertFeaturedLimit', () => {
   });
 });
 
-describe('tierExperiments', () => {
-  it('makes the featured entries the big pieces and the rest compact, grouped by year, newest first', () => {
+describe('splitTiers', () => {
+  it('makes the featured entries the big pieces and keeps the rest in their incoming order', () => {
     const list = [
       entry('a', 2026, true),
       entry('b', 2026),
@@ -89,20 +89,19 @@ describe('tierExperiments', () => {
       entry('d', 2026),
       entry('e', 2024),
     ];
-    const { big, compact } = tierExperiments(list);
+    const { big, rest } = splitTiers(list);
     expect(big.map((e) => e.id)).toEqual(['a']);
-    expect(compact.map((g) => g.year)).toEqual([2026, 2025, 2024]);
-    expect(compact[0]?.entries.map((e) => e.id)).toEqual(['b', 'd']);
+    expect(rest.map((e) => e.id)).toEqual(['b', 'c', 'd', 'e']);
   });
 
   it('uses the first entry as the only big piece when none is featured', () => {
-    const { big, compact } = tierExperiments([entry('a', 2026), entry('b', 2025)]);
+    const { big, rest } = splitTiers([entry('a', 2026), entry('b', 2025)]);
     expect(big.map((e) => e.id)).toEqual(['a']);
-    expect(compact.flatMap((g) => g.entries.map((e) => e.id))).toEqual(['b']);
+    expect(rest.map((e) => e.id)).toEqual(['b']);
   });
 
-  it('has no compact tier when every entry is featured, and handles an empty list', () => {
-    expect(tierExperiments([entry('a', 2026, true), entry('b', 2026, true)]).compact).toEqual([]);
-    expect(tierExperiments([])).toEqual({ big: [], compact: [] });
+  it('has nothing left over when every entry is featured, and handles an empty list', () => {
+    expect(splitTiers([entry('a', 2026, true), entry('b', 2026, true)]).rest).toEqual([]);
+    expect(splitTiers([])).toEqual({ big: [], rest: [] });
   });
 });

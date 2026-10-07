@@ -1,13 +1,13 @@
 ---
 /**
- * The media frame of one experiment piece. Three shapes, one 16:10 box:
+ * The media frame of one experiment piece, rendered only when the entry has images (an entry without
+ * one has no media column, so no fake image is ever drawn). Two shapes, one 16:10 box:
  *
  * - 2 to 4 images: a CSS-only gallery. A `<fieldset>` holds one visually hidden radio per slide, the
  *   slides, and a strip of thumbnail labels. The checked radio picks the visible slide with sibling
  *   selectors, so it works without JavaScript and arrow keys move between slides natively. Slides
  *   that are not selected are `display: none`, so their lazy images do not download until shown.
  * - 1 image: a plain figure with its caption.
- * - no image: a decorative typographic cover (year, slug, pink block over faint grid lines).
  *
  * Only the first slide of the page's first piece is eager (`priority`). The styles are scoped to
  * this component, so they ship on `/experiments/` only and never reach `/me`.
@@ -51,15 +51,7 @@ const isGallery = slides.length > 1;
 const group = `${experiment.id}-shots`;
 ---
 
-{!first ? (
-  <div class="xp-media">
-    <div class="xp-clip xp-cover" aria-hidden="true">
-      <span class="xp-cover-year">{experiment.year}</span>
-      <svg class="xp-star" viewBox="0 0 7 7" width="21" height="21" shape-rendering="crispEdges" fill="currentColor" aria-hidden="true" focusable="false"><rect x="3" y="0" width="1" height="7"></rect><rect x="0" y="3" width="7" height="1"></rect><rect x="2" y="2" width="3" height="3"></rect></svg>
-      <span class="xp-cover-slug">{experiment.id}<span class="xp-block"></span></span>
-    </div>
-  </div>
-) : isGallery ? (
+{isGallery ? (
   <div class="xp-media">
     <fieldset class="xp-gallery">
       <legend class="xp-sr">{t(locale, 'experiment.gallery', { title: experiment.title })}</legend>
@@ -101,10 +93,10 @@ const group = `${experiment.id}-shots`;
               alt=""
               format="webp"
               quality={70}
-              width={96}
-              height={60}
-              widths={[96, 192, 256]}
-              sizes="112px"
+              width={80}
+              height={50}
+              widths={[80, 160]}
+              sizes="80px"
               loading="lazy"
               decoding="async"
             />
@@ -114,7 +106,7 @@ const group = `${experiment.id}-shots`;
       </div>
     </fieldset>
   </div>
-) : (
+) : first ? (
   <div class="xp-media">
     <figure class="xp-slide xp-single">
       <div class="xp-shot">
@@ -139,7 +131,7 @@ const group = `${experiment.id}-shots`;
       )}
     </figure>
   </div>
-)}
+) : null}
 
 <style>
   .xp-media {
@@ -246,10 +238,10 @@ const group = `${experiment.id}-shots`;
     align-items: baseline;
     justify-content: space-between;
     gap: 1rem;
-    margin-top: 0.75rem;
+    margin-top: 0.625rem;
     padding-inline: 0.25rem;
-    font: 400 0.8125rem / 1.4 var(--font-mono);
-    color: var(--color-text-secondary);
+    font: 400 0.75rem / 1.4 var(--font-mono);
+    color: var(--color-muted);
   }
   .xp-cap-text {
     min-width: 0;
@@ -261,47 +253,20 @@ const group = `${experiment.id}-shots`;
     font-variant-numeric: tabular-nums;
   }
 
-  /* Four equal columns that shrink: up to four thumbnails never wrap, at any width. */
+  /* Small fixed thumbnails (80 x 50): four of them plus gaps fit a 390 px phone, so they never wrap. */
   .xp-thumbs {
-    display: grid;
-    grid-template-columns: repeat(4, minmax(0, 1fr));
+    display: flex;
     gap: 0.5rem;
-    max-width: 28rem;
     margin-top: 0.75rem;
-    padding-bottom: 0.625rem;
-  }
-  /* The pixel notch under the active thumbnail: three square steps, narrow at the top. */
-  .xp-thumb::after {
-    content: '';
-    position: absolute;
-    top: 100%;
-    left: 50%;
-    width: 10px;
-    height: 6px;
-    margin: 3px 0 0 -5px;
-    color: var(--color-primary);
-    opacity: 0;
-    pointer-events: none;
-    background:
-      linear-gradient(currentColor, currentColor) top center / 2px 2px no-repeat,
-      linear-gradient(currentColor, currentColor) center / 6px 2px no-repeat,
-      linear-gradient(currentColor, currentColor) bottom center / 10px 2px no-repeat;
-  }
-  .xp-radio:nth-of-type(1):checked ~ .xp-thumbs > .xp-thumb:nth-child(1)::after,
-  .xp-radio:nth-of-type(2):checked ~ .xp-thumbs > .xp-thumb:nth-child(2)::after,
-  .xp-radio:nth-of-type(3):checked ~ .xp-thumbs > .xp-thumb:nth-child(3)::after,
-  .xp-radio:nth-of-type(4):checked ~ .xp-thumbs > .xp-thumb:nth-child(4)::after {
-    opacity: 1;
   }
   .xp-thumb {
     position: relative;
     display: block;
+    flex: 0 0 5rem;
     min-width: 0;
-    aspect-ratio: 96 / 60;
+    aspect-ratio: 8 / 5;
     border-radius: var(--radius-inner);
-    outline: 1px solid var(--color-divider);
-    outline-offset: -1px;
-    opacity: 0.7;
+    opacity: 0.6;
     cursor: pointer;
   }
   .xp-thumb :global(img) {
@@ -316,44 +281,6 @@ const group = `${experiment.id}-shots`;
     .xp-thumb:hover {
       opacity: 1;
     }
-  }
-
-  /* The typographic cover for an experiment with no real image: faint grid, year, slug and the pink block. */
-  .xp-cover {
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    padding: 1.25rem;
-    background:
-      linear-gradient(var(--color-divider) 1px, transparent 1px) 0 0 / 100% 2.5rem,
-      linear-gradient(90deg, var(--color-divider) 1px, transparent 1px) 0 0 / 2.5rem 100%,
-      var(--color-chip);
-    font-family: var(--font-mono);
-  }
-  .xp-cover-year {
-    font-size: 0.8125rem;
-    color: var(--color-muted);
-  }
-  .xp-star {
-    position: absolute;
-    top: 1.25rem;
-    right: 1.25rem;
-    color: var(--color-cyan);
-  }
-  .xp-cover-slug {
-    display: flex;
-    align-items: baseline;
-    gap: 0.375rem;
-    font-size: 1.25rem;
-    color: var(--color-text-secondary);
-    overflow-wrap: anywhere;
-  }
-  .xp-block {
-    display: inline-block;
-    flex-shrink: 0;
-    width: 0.5rem;
-    height: 0.9rem;
-    background: var(--color-pink);
   }
 
   /* Hover and focus: the image grows slightly inside its frame and the brackets turn violet. */

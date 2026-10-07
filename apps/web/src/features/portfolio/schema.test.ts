@@ -28,6 +28,14 @@ describe('experimentSchema', () => {
     expect(() => schema.parse({ ...valid, url: 'mailto:me@example.dev' })).toThrow();
   });
 
+  it('accepts an optional publishedAt as a real ISO calendar date', () => {
+    expect(schema.parse(valid).publishedAt).toBeUndefined();
+    expect(schema.parse({ ...valid, publishedAt: '2026-03-09' }).publishedAt).toBe('2026-03-09');
+    for (const bad of ['2026-3-9', '2026-02-30', '2026-13-01', '09/03/2026', '2026-03-09T10:00Z']) {
+      expect(() => schema.parse({ ...valid, publishedAt: bad }), bad).toThrow();
+    }
+  });
+
   it('accepts an optional non-negative integer order', () => {
     expect(schema.parse(valid).order).toBeUndefined();
     expect(schema.parse({ ...valid, order: 1 }).order).toBe(1);

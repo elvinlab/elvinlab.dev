@@ -483,7 +483,7 @@
     "date": "2026-10-06",
     "category": "added",
     "title": "Experiments page and recent experiments on /me",
-    "description": "An Experiments page (/experiments/, /en/experiments/) shows the featured projects (up to 3) as exhibition pieces: what each solves, my own part and the result, with a gallery of real screenshots (works without JavaScript, motion respects reduced motion). Other projects are compact cards by year, paginated at 12 per page (/experiments/page/2/) when the list grows. /me shows recent rows. For forks: an `experiments` block in site.config.ts sets page size, featured limit, /me rows, intro and words."
+    "description": "An Experiments page (/experiments/, /en/experiments/) shows featured projects (up to 3) as exhibition pieces with a gallery of real screenshots, then a quiet list of compact cards. The list is paginated (12 per page) and sortable (newest, oldest, A-Z) with static pages, no JavaScript. /me shows recent rows. For forks: an `experiments` block in site.config.ts sets size, sorts, featured limit, rows and intro."
   },
   "immutable-built-assets": {
     "date": "2026-10-06",
@@ -495,7 +495,7 @@
     "date": "2026-10-06",
     "category": "added",
     "title": "Experiment images and honest fallback covers",
-    "description": "Own screenshots live beside the source and are optimized at build time; a missing referenced image fails the build. Experiments without screenshots use a CSS-only typographic cover instead of a fake image. The image policy and ADR 0015 explain the repository storage decision and the deferred R2 migration."
+    "description": "Own screenshots live beside the source and are optimized at build time; a missing referenced image fails the build. Experiments without screenshots show no image at all: text-only cards and a single-column panel, never a fake cover. The image policy and ADR 0015 explain the repository storage decision and the deferred R2 migration."
   },
   "experiments-responsive-contrast": {
     "date": "2026-10-07",

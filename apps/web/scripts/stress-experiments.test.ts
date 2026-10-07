@@ -3,7 +3,9 @@ import { describe, expect, it } from 'vitest';
 import { experimentSchema } from '@/features/portfolio/schema.ts';
 
 import {
+  ALTERNATE_SORTS,
   checkPagerLinks,
+  checkSortVariants,
   countCards,
   generateExperiments,
   perCardCost,
@@ -33,7 +35,9 @@ describe('generateExperiments', () => {
     const list = Object.values(entries);
     const featured = list.filter((entry) => entry['featured'] === true);
     expect(featured).toHaveLength(3);
-    const galleries = featured.map((entry) => (entry['images'] as unknown[]).length);
+    const galleries = featured.map(
+      (entry) => (entry['images'] as unknown[] | undefined)?.length ?? 0,
+    );
     expect(galleries.filter((n) => n === 4)).toHaveLength(2);
     const years = new Set(list.filter((entry) => entry['featured'] !== true).map((e) => e['year']));
     expect(years.size).toBeGreaterThanOrEqual(4);
@@ -48,6 +52,24 @@ describe('generateExperiments', () => {
       expect(files).toEqual(referenced);
     }
     expect(Object.values(entries).some((entry) => 'note' in entry)).toBe(false);
+  });
+
+  it('leaves the third featured entry without an image, so the single-column panel is built', () => {
+    const { entries } = generateExperiments(30);
+    const featured = Object.values(entries).filter((entry) => entry['featured'] === true);
+    expect(
+      featured.map((entry) => (entry['images'] as unknown[] | undefined)?.length ?? 0),
+    ).toEqual([4, 4, 0]);
+  });
+
+  it('gives every other compact entry a publishedAt inside its year, and the schema accepts it', () => {
+    const schema = experimentSchema();
+    const dated = Object.values(generateExperiments(40).entries).filter((e) => 'publishedAt' in e);
+    expect(dated.length).toBeGreaterThan(5);
+    for (const entry of dated) {
+      expect(String(entry['publishedAt']).startsWith(`${entry['year']}-`)).toBe(true);
+      expect(schema.safeParse(entry).success).toBe(true);
+    }
   });
 
   it('with fewer entries than featured slots, features them all', () => {
@@ -68,7 +90,7 @@ const page = (opts: {
 <link rel="alternate" hreflang="es" href="https://stress.invalid${opts.other}">
 ${opts.prev ? `<link rel="prev" href="https://stress.invalid${opts.prev}">` : ''}
 ${opts.next ? `<link rel="next" href="https://stress.invalid${opts.next}">` : ''}
-</head><body><nav aria-label="main"><a href="/experiments/" aria-current="page">Experiments</a></nav><nav class="xp-pager" aria-label="x">${(opts.links ?? []).map((href) => `<a href="${href}">n</a>`).join('')}<span aria-current="page">${opts.current ?? 1}</span></nav></body></html>`;
+</head><body><nav aria-label="main"><a href="/experiments/" aria-current="page">Experiments</a></nav><nav class="lk-pager" aria-label="x" data-listing-nav>${(opts.links ?? []).map((href) => `<a href="${href}">n</a>`).join('')}<span aria-current="page">${opts.current ?? 1}</span></nav></body></html>`;
 
 function site(): Record<string, string> {
   const out: Record<string, string> = {};
@@ -137,6 +159,13 @@ describe('countCards and perCardCost', () => {
       ]),
     ).toBe(500);
     expect(perCardCost([{ path: '/experiments/page/2/', bytes: 10_000, cards: 12 }])).toBeNull();
+    // Pages of an alternate sort are not part of the comparison.
+    expect(
+      perCardCost([
+        { path: '/experiments/page/2/', bytes: 10_000, cards: 12 },
+        { path: '/experiments/oldest/page/3/', bytes: 1_000, cards: 2 },
+      ]),
+    ).toBeNull();
     expect(perCardCost([])).toBeNull();
   });
 
@@ -156,5 +185,128 @@ describe('countCards and perCardCost', () => {
         { path: '/en/experiments/page/2/', bytes: 99_000, cards: 3 },
       ]),
     ).toBeNull();
+  });
+});
+
+/** A built page of an alternate sort (or of the default sort) with its sort switch. */
+const sortedPage = (opts: {
+  path: string;
+  other: string;
+  switchLinks: string[];
+  noindex?: boolean;
+  prev?: string;
+  next?: string;
+  pager?: string[];
+}) => `<html><head>
+${opts.noindex === false ? '' : '<meta name="robots" content="noindex, follow">'}
+<link rel="canonical" href="https://stress.invalid${opts.path}">
+<link rel="alternate" hreflang="es" href="https://stress.invalid${opts.other}">
+${opts.prev ? `<link rel="prev" href="https://stress.invalid${opts.prev}">` : ''}
+${opts.next ? `<link rel="next" href="https://stress.invalid${opts.next}">` : ''}
+</head><body><nav data-listing-sort>${opts.switchLinks
+  .map((href, i) => `<a href="${href}"${i === 0 ? ' aria-current="true"' : ''}>s</a>`)
+  .join(
+    '',
+  )}</nav><nav data-listing-nav>${(opts.pager ?? []).map((href) => `<a href="${href}">n</a>`).join('')}</nav></body></html>`;
+
+/** Two pages of the default sort and of each alternate sort, in both locales. */
+function sortedSite(): Record<string, string> {
+  const out: Record<string, string> = {};
+  for (const prefix of ['', '/en']) {
+    const other = (path: string) => (prefix === '' ? `/en${path}` : path.replace(/^\/en/, ''));
+    const switchLinks = [
+      `${prefix}/experiments/`,
+      ...ALTERNATE_SORTS.map((sort) => `${prefix}/experiments/${sort}/`),
+    ];
+    for (const sort of [undefined, ...ALTERNATE_SORTS]) {
+      const base = sort === undefined ? `${prefix}/experiments/` : `${prefix}/experiments/${sort}/`;
+      const second = `${base}page/2/`;
+      out[base] = sortedPage({
+        path: base,
+        other: other(base),
+        switchLinks,
+        noindex: sort !== undefined,
+        next: second,
+        pager: [second],
+      });
+      out[second] = sortedPage({
+        path: second,
+        other: other(second),
+        switchLinks,
+        noindex: sort !== undefined,
+        prev: base,
+        pager: [base],
+      });
+    }
+  }
+  return out;
+}
+
+describe('checkSortVariants', () => {
+  const options = {
+    sorts: ALTERNATE_SORTS,
+    absent: ['newest'],
+    expectedPages: 2,
+    defaultSort: 'newest',
+  };
+
+  it('accepts consistent sorted pages in both locales', () => {
+    expect(checkSortVariants(sortedSite(), options)).toEqual([]);
+  });
+
+  it('reports a sorted page that is indexable, with a wrong canonical or a broken sort link', () => {
+    const pages = sortedSite();
+    pages['/experiments/oldest/'] = (pages['/experiments/oldest/'] ?? '').replace(
+      /<meta name="robots"[^>]*>/,
+      '',
+    );
+    pages['/experiments/title/'] = (pages['/experiments/title/'] ?? '').replace(
+      'href="/experiments/oldest/"',
+      'href="/experiments/oldest/9/"',
+    );
+    pages['/en/experiments/title/page/2/'] = (pages['/en/experiments/title/page/2/'] ?? '').replace(
+      'https://stress.invalid/en/experiments/title/page/2/',
+      'https://stress.invalid/en/experiments/title/',
+    );
+    const text = checkSortVariants(pages, options).join('\n');
+    expect(text).toMatch(/\/experiments\/oldest\/: not noindex/);
+    expect(text).toMatch(
+      /\/experiments\/title\/: sort link \/experiments\/oldest\/9\/ does not resolve/,
+    );
+    expect(text).toMatch(/\/en\/experiments\/title\/page\/2\/: canonical is/);
+  });
+
+  it('reports broken prev/next and hreflang inside a sort, and a pager that leaves the sort', () => {
+    const pages = sortedSite();
+    pages['/experiments/oldest/'] = (pages['/experiments/oldest/'] ?? '').replace(
+      /<link rel="next"[^>]*>/,
+      '',
+    );
+    pages['/experiments/oldest/page/2/'] = (pages['/experiments/oldest/page/2/'] ?? '')
+      .replace('href="/experiments/oldest/">n', 'href="/experiments/">n')
+      .replace(/<link rel="alternate"[^>]*>/, '');
+    const text = checkSortVariants(pages, options).join('\n');
+    expect(text).toMatch(/\/experiments\/oldest\/: rel=next is missing/);
+    expect(text).toMatch(/oldest\/page\/2\/: pager link \/experiments\/ leaves the sort/);
+    expect(text).toMatch(/oldest\/page\/2\/: hreflang alternate/);
+  });
+
+  it('reports a sort page that should not exist and a page that was not built', () => {
+    const pages = { ...sortedSite(), '/experiments/newest/': '<html></html>' };
+    expect(checkSortVariants(pages, options).join('\n')).toMatch(/\/experiments\/newest\/ exists/);
+    const missing = sortedSite();
+    delete missing['/en/experiments/oldest/page/2/'];
+    expect(checkSortVariants(missing, options).join('\n')).toMatch(
+      /oldest\/page\/2\/ was not built/,
+    );
+  });
+
+  it('reports a default page whose switch is missing', () => {
+    const pages = sortedSite();
+    pages['/experiments/'] = (pages['/experiments/'] ?? '').replace(
+      /<nav data-listing-sort>[\s\S]*?<\/nav>/,
+      '',
+    );
+    expect(checkSortVariants(pages, options).join('\n')).toMatch(/\/experiments\/: 0 sort links/);
   });
 });

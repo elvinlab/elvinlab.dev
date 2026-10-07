@@ -1,7 +1,8 @@
 /**
- * Stress tool for the paginated experiments list: builds the site in a TEMPORARY workspace with N
- * generated experiments and reports how many pages came out, the HTML bytes of each page and the
- * cost of one compact card, then checks that the pager links resolve between pages. The real
+ * Stress tool for the paginated, sortable experiments list: builds the site in a TEMPORARY workspace
+ * with N generated experiments and reports how many pages came out, the HTML bytes of each page and
+ * the cost of one compact card, then checks that the pager links resolve between pages and that the
+ * pages of the alternate sorts exist, are `noindex` and link consistently. The real
  * `experiments.json` and `src/assets/experiments/` are never touched: the workspace is a copy that
  * is deleted at the end. `pnpm stress:experiments [count] [--serve <port>]`, 30 entries by default.
  * With `--serve` the temporary build stays up with `astro preview` on that port until the process
@@ -27,6 +28,8 @@ const TAGS = ['astro', 'typescript', 'cloudflare', 'tooling', 'ai-agents'] as co
 const STATUSES = ['running', 'shipped', 'archived'] as const;
 const FEATURED = 3;
 const FEATURED_WITH_GALLERY = 2;
+/** Sorts the generated site offers besides the default one (`newest`): the experiments defaults. */
+export const ALTERNATE_SORTS = ['oldest', 'title'] as const;
 const GALLERY_SIZE = 4;
 
 export type StressImage = { slug: string; files: string[] };
@@ -45,8 +48,9 @@ const image = (file: string, n: number) => ({
 });
 
 /**
- * `total` experiments: three featured (the first two with a four-image gallery, the third with one
- * image) and the rest compact, spread over several years, every third with a cover. Pure and
+ * `total` experiments: three featured (the first two with a four-image gallery, the third with no
+ * image, so the single-column panel is exercised) and the rest compact, spread over several years
+ * (every other one with a `publishedAt` inside its year), every third with a cover. Pure and
  * deterministic, so the same count always yields the same site.
  */
 export function generateExperiments(total: number): GeneratedExperiments {
@@ -60,7 +64,7 @@ export function generateExperiments(total: number): GeneratedExperiments {
     const gallery = isFeatured
       ? n <= FEATURED_WITH_GALLERY
         ? GALLERY_SIZE
-        : 1
+        : 0
       : compactIndex % 3 === 0
         ? 1
         : 0;
@@ -81,6 +85,9 @@ export function generateExperiments(total: number): GeneratedExperiments {
         ? { url: `https://example.com/${id}/` }
         : { repo: `https://github.com/example/${id}` }),
       ...(isFeatured ? { featured: true } : {}),
+      ...(!isFeatured && n % 2 === 0
+        ? { publishedAt: `${year}-${String((n % 12) + 1).padStart(2, '0')}-15` }
+        : {}),
       ...(files.length > 0 ? { images: files.map((file, i) => image(file, i + 1)) } : {}),
     };
     if (files.length > 0) images.push({ slug: id, files });
@@ -100,7 +107,13 @@ const attr = (html: string, tag: string, name: string): string[] =>
 const pathOf = (url: string): string => new URL(url, 'https://stress.invalid').pathname;
 
 const pagerNav = (html: string): string =>
-  /<nav[^>]*\bclass="xp-pager"[^>]*>([\s\S]*?)<\/nav>/.exec(html)?.[1] ?? '';
+  /<nav[^>]*\bdata-listing-nav[^>]*>([\s\S]*?)<\/nav>/.exec(html)?.[1] ?? '';
+
+const sortNav = (html: string): string =>
+  /<nav[^>]*\bdata-listing-sort[^>]*>([\s\S]*?)<\/nav>/.exec(html)?.[1] ?? '';
+
+const sortHrefs = (html: string): string[] =>
+  [...sortNav(html).matchAll(/\bhref="([^"]+)"/g)].map((match) => match[1] ?? '');
 
 const pagerHrefs = (html: string): string[] =>
   [...pagerNav(html).matchAll(/\bhref="([^"]+)"/g)].map((match) => match[1] ?? '');
@@ -156,6 +169,87 @@ export function checkPagerLinks(pages: BuiltPages, expectedPages: number): strin
   return problems;
 }
 
+/**
+ * Problems of the alternate-sort pages (`/experiments/<sort>/`, `/experiments/<sort>/page/N/`), an
+ * empty list when all is well. `sorts` must exist with `expectedPages` pages each in both locales
+ * and be `noindex` with a self canonical, `rel="prev"`/`rel="next"` inside the same sort, hreflang
+ * to the same sort and page in the other locale, and a pager that stays inside the sort; `absent`
+ * sorts (disabled, or the default one) must not exist at all. Every page of the default sort must
+ * carry a sort switch whose links all resolve, and none of the pages of this list may have a
+ * switch link to a page that was not built.
+ */
+export function checkSortVariants(
+  pages: BuiltPages,
+  {
+    sorts,
+    absent,
+    expectedPages,
+    defaultSort,
+  }: {
+    sorts: readonly string[];
+    absent: readonly string[];
+    expectedPages: number;
+    defaultSort: string;
+  },
+): string[] {
+  const problems: string[] = [];
+  for (const prefix of ['', '/en']) {
+    for (const sort of absent) {
+      for (const path of Object.keys(pages)) {
+        if (path.startsWith(`${prefix}/experiments/${sort}/`)) problems.push(`${path} exists`);
+      }
+    }
+    const everyPage = [
+      ...Array.from({ length: expectedPages }, (_, i) => i + 1).map((n) => ({
+        sort: undefined as string | undefined,
+        n,
+      })),
+      ...sorts.flatMap((sort) =>
+        Array.from({ length: expectedPages }, (_, i) => ({
+          sort: sort as string | undefined,
+          n: i + 1,
+        })),
+      ),
+    ];
+    for (const { sort, n } of everyPage) {
+      const base = sort === undefined ? `${prefix}/experiments/` : `${prefix}/experiments/${sort}/`;
+      const path = n === 1 ? base : `${base}page/${n}/`;
+      const html = pages[path];
+      if (html === undefined) {
+        problems.push(`${path} was not built`);
+        continue;
+      }
+      const links = sortHrefs(html);
+      const expectedLinks = [defaultSort, ...sorts].length;
+      if (links.length !== expectedLinks)
+        problems.push(`${path}: ${links.length} sort links, expected ${expectedLinks}`);
+      for (const href of links)
+        if (!(href in pages)) problems.push(`${path}: sort link ${href} does not resolve`);
+      if (!/<a[^>]*\baria-current="true"/.test(sortNav(html)))
+        problems.push(`${path}: no current sort in the switch`);
+      if (sort === undefined) continue;
+      if (!/<meta name="robots"[^>]*noindex/.test(html)) problems.push(`${path}: not noindex`);
+      const canonical = attr(html, 'canonical', 'href').map(pathOf);
+      if (canonical.length !== 1 || canonical[0] !== path)
+        problems.push(`${path}: canonical is ${canonical.join(',') || 'missing'}`);
+      const prev = attr(html, 'prev', 'href').map(pathOf).join();
+      const next = attr(html, 'next', 'href').map(pathOf).join();
+      const prevPath = n === 2 ? base : `${base}page/${n - 1}/`;
+      if (n > 1 && prev !== prevPath) problems.push(`${path}: rel=prev is ${prev || 'missing'}`);
+      if (n === 1 && prev) problems.push(`${path}: page 1 has rel=prev`);
+      if (n < expectedPages && next !== `${base}page/${n + 1}/`)
+        problems.push(`${path}: rel=next is ${next || 'missing'}`);
+      if (n === expectedPages && next) problems.push(`${path}: the last page has rel=next`);
+      const otherLocale = prefix === '' ? `/en${path}` : path.replace(/^\/en/, '');
+      if (!attr(html, 'alternate', 'href').map(pathOf).includes(otherLocale))
+        problems.push(`${path}: hreflang alternate ${otherLocale} missing`);
+      for (const href of pagerHrefs(html))
+        if (!href.startsWith(base)) problems.push(`${path}: pager link ${href} leaves the sort`);
+    }
+  }
+  return problems;
+}
+
 export type PageWeight = { path: string; bytes: number; cards: number };
 
 /** Number of compact cards in a built page. */
@@ -170,7 +264,7 @@ export const countCards = (html: string): number =>
  * differ in card count.
  */
 export function perCardCost(weights: readonly PageWeight[]): number | null {
-  const later = weights.filter((w) => /\/page\/\d+\/$/.test(w.path));
+  const later = weights.filter((w) => /^(?:\/en)?\/experiments\/page\/\d+\/$/.test(w.path));
   const sorted = later.filter((w) => w.cards > 0).sort((a, b) => b.cards - a.cards);
   const [most] = sorted;
   const fewest = sorted.at(-1);
@@ -190,6 +284,11 @@ function readBuilt(client: string, prefix: string): BuiltPages {
   for (let n = 2; add(`${prefix}/experiments/page/${n}/`); n++);
   // `/page/1/` must not exist: record it if it does so the check reports it.
   add(`${prefix}/experiments/page/1/`);
+  // Every sort key, enabled or not: a page of a disabled sort must be reported, not skipped.
+  for (const sort of ['newest', 'oldest', 'title']) {
+    if (!add(`${prefix}/experiments/${sort}/`)) continue;
+    for (let n = 2; add(`${prefix}/experiments/${sort}/page/${n}/`); n++);
+  }
   return pages;
 }
 
@@ -241,7 +340,7 @@ async function main(): Promise<void> {
     const client = join(workspace.web, 'dist/client');
     const built = { ...readBuilt(client, ''), ...readBuilt(client, '/en') };
     const spanish = Object.keys(built)
-      .filter((path) => !path.startsWith('/en/') && !path.endsWith('/page/1/'))
+      .filter((path) => /^\/experiments\/(?:page\/(?!1\/)\d+\/)?$/.test(path))
       .sort();
     const pageCount = spanish.length;
     const weights: PageWeight[] = spanish.map((path) => ({
@@ -260,13 +359,21 @@ async function main(): Promise<void> {
       `Marginal HTML cost per compact card: ${cost === null ? 'n/a (one page)' : `${cost.toFixed(0)} B`}`,
     );
 
-    const problems = checkPagerLinks(built, pageCount);
+    const problems = [
+      ...checkPagerLinks(built, pageCount),
+      ...checkSortVariants(built, {
+        sorts: ALTERNATE_SORTS,
+        absent: ['newest'],
+        expectedPages: pageCount,
+        defaultSort: 'newest',
+      }),
+    ];
     if (problems.length > 0) {
       console.error(`\nPager checks FAILED:\n  - ${problems.join('\n  - ')}`);
       process.exitCode = 1;
     } else {
       console.log(
-        `Pager checks passed: ${pageCount} pages x 2 locales, links resolve, canonical/prev/next/hreflang consistent.`,
+        `Pager checks passed: ${pageCount} pages x 2 locales, links resolve, canonical/prev/next/hreflang consistent; sorts ${ALTERNATE_SORTS.join(', ')}: ${pageCount} pages x 2 locales, noindex, links resolve.`,
       );
     }
 

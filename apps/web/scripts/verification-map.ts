@@ -157,6 +157,11 @@ const EXPERIMENTS = area(
   `${SRC}/content/experiments.json`,
   `${SRC}/assets/experiments/**`,
   `${SRC}/shared/lib/experiment-image.ts`,
+  // The listing kit (sorting, paging, pager, sort switch, summary) only the experiments list uses for now.
+  `${SRC}/shared/lib/listing.ts`,
+  `${SRC}/shared/ui/Pager.astro`,
+  `${SRC}/shared/ui/SortSwitch.astro`,
+  `${SRC}/shared/ui/ListingSummary.astro`,
 );
 const EVERY_PAGE = [
   ...NOTE_PAGE,

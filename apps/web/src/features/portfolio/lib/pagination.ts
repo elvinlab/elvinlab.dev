@@ -1,7 +1,32 @@
-import { tierExperiments } from './experiments.ts';
+/**
+ * The experiments side of the listing kit (`shared/lib/listing.ts`): what an experiment is sorted
+ * by, which entries are big pieces, how the compact list is grouped by year, and the URLs of its
+ * pages. The generic sorting, paging, windowing and path logic lives in the kit; this file only
+ * says what is specific to experiments.
+ */
+import type { ListingSort } from '@/shared/config/schema.ts';
+import {
+  availableSorts,
+  type Comparator,
+  listingPath,
+  paginate,
+  sortItems,
+} from '@/shared/lib/listing.ts';
+
+import { splitTiers } from './experiments.ts';
+import { DEFAULT_EXPERIMENT_ORDER } from './portfolio.ts';
+
+export type ExperimentSort = ListingSort;
 
 /** The experiments settings of `site.config.ts` (`experiments` block), after validation. */
-export type ExperimentsSettings = { perPage: number; maxFeatured: number; meRows: number };
+export type ExperimentsSettings = {
+  perPage: number;
+  maxFeatured: number;
+  meRows: number;
+  defaultSort: ExperimentSort;
+  sorts: readonly ExperimentSort[];
+  sortFrom: number;
+};
 
 /**
  * `/me` rows never exceed `perPage`: every row links to an anchor of `/experiments/`, and only page
@@ -14,88 +39,137 @@ export function resolveExperimentsSettings(config: ExperimentsSettings): Experim
   return { ...config, meRows: clampMeRows(config.meRows, config.perPage) };
 }
 
-/** One compact card with its running number across the whole list (big pieces come first). */
-export type NumberedEntry<T> = { entry: T; index: number };
+type Sortable = {
+  id: string;
+  title: string;
+  year: number;
+  featured: boolean;
+  publishedAt?: string | undefined;
+  order?: number | undefined;
+};
 
-/** A page of `/experiments/`: big pieces (page 1 only) and the compact cards grouped by year. */
+/** The date an experiment sorts by: its `publishedAt`, else 1 January of its `year` (ISO, so it compares as text). */
+export const experimentDate = ({
+  publishedAt,
+  year,
+}: Pick<Sortable, 'publishedAt' | 'year'>): string =>
+  publishedAt ?? `${String(year).padStart(4, '0')}-01-01`;
+
+const text = (a: string, b: string): number => (a < b ? -1 : a > b ? 1 : 0);
+
+/**
+ * The comparators of the three sorts. Every one ends in the same tie-break (`order` ascending, then
+ * the id), so equal dates or titles never depend on the loader. Titles use a collator that ignores
+ * case and accents, in the locale the caller passes (use the site's default locale so the Spanish
+ * and English twins of a page list the same entries).
+ */
+function comparators<T extends Sortable>(locale: string): Record<ExperimentSort, Comparator<T>> {
+  const collator = new Intl.Collator(locale, { sensitivity: 'base', numeric: true });
+  const tie = (a: T, b: T): number =>
+    (a.order ?? DEFAULT_EXPERIMENT_ORDER) - (b.order ?? DEFAULT_EXPERIMENT_ORDER) ||
+    text(a.id, b.id);
+  return {
+    newest: (a, b) => text(experimentDate(b), experimentDate(a)) || tie(a, b),
+    oldest: (a, b) => text(experimentDate(a), experimentDate(b)) || tie(a, b),
+    title: (a, b) => collator.compare(a.title, b.title) || tie(a, b),
+  };
+}
+
+/** A new array of `entries` in the order of `sort`. */
+export function sortExperimentList<T extends Sortable>(
+  entries: readonly T[],
+  sort: ExperimentSort,
+  locale: string,
+): T[] {
+  return sortItems(entries, sort, comparators<T>(locale));
+}
+
+/** A page of `/experiments/`: big pieces (page 1 only) and its slice of the compact list. */
 export type ExperimentsPageData<T> = {
   page: number;
   pages: number;
   big: T[];
-  groups: { year: number; entries: NumberedEntry<T>[] }[];
+  entries: T[];
+  /** `entries` as runs of the same year (meaningful for the date sorts). */
+  groups: { year: number; entries: T[] }[];
+  from: number;
+  to: number;
+  total: number;
 };
 
-type Paginable = { id: string; year: number; featured: boolean };
-
 /**
- * Splits the already sorted experiments into pages. Page 1 holds every big piece plus `perPage`
- * compact cards; later pages hold only compact cards, `perPage` each. A year heading repeats on a
- * page when its group continues from the previous one. Extra pages exist only when the compact tier
- * exceeds `perPage`.
+ * Splits the experiments into pages. The big pieces (featured entries) always lead page 1 and never
+ * move with the sort; the rest, the compact list, is sorted by `sort` and paged `perPage` at a time.
+ * Extra pages exist only when the compact list exceeds `perPage`.
  *
- * The first `pinFirst` entries of the sort (the rows of `/me`) always land on page 1: a pinned
- * compact entry takes a slot of page 1 even when its year would place it later. The `/me` anchors
- * (`/experiments/#<id>`) therefore never point at another page.
+ * The first `pinFirst` entries of the incoming order (the rows of `/me`) always land on page 1: a
+ * pinned compact entry takes a slot of page 1 even when the sort would place it later, so the
+ * `/me` anchors (`/experiments/#<id>`) never point at another page. Pass 0 for a sort that is not
+ * the default one: no anchor points at it.
  */
-export function paginateExperiments<T extends Paginable>(
-  sorted: readonly T[],
-  { perPage, pinFirst }: { perPage: number; pinFirst: number },
+export function paginateExperiments<T extends Sortable>(
+  incoming: readonly T[],
+  {
+    perPage,
+    pinFirst,
+    sort = 'newest',
+    locale = 'es',
+  }: { perPage: number; pinFirst: number; sort?: ExperimentSort; locale?: string },
 ): ExperimentsPageData<T>[] {
-  const { big, compact } = tierExperiments(sorted);
-  const flat = compact.flatMap(({ entries }) => entries);
-  const pinned = new Set(sorted.slice(0, pinFirst));
-  const firstPage = new Set<T>(flat.filter((entry) => pinned.has(entry)));
-  for (const entry of flat) {
-    if (firstPage.size >= perPage) break;
-    firstPage.add(entry);
-  }
-  const chunks: T[][] = [flat.filter((entry) => firstPage.has(entry))];
-  const rest = flat.filter((entry) => !firstPage.has(entry));
-  for (let at = 0; at < rest.length; at += perPage) chunks.push(rest.slice(at, at + perPage));
-
-  let index = big.length;
-  return chunks.map((chunk, i) => {
+  const { big, rest } = splitTiers(incoming);
+  const pinned = pinFirst > 0 ? new Set(incoming.slice(0, pinFirst)) : undefined;
+  const pages = paginate(sortExperimentList(rest, sort, locale), {
+    perPage,
+    leading: big.length,
+    ...(pinned ? { pinned } : {}),
+  });
+  return pages.map(({ page, pages: count, items, from, to, total }) => {
     const groups: ExperimentsPageData<T>['groups'] = [];
-    for (const entry of chunk) {
-      const numbered = { entry, index: ++index };
+    for (const entry of items) {
       const last = groups.at(-1);
-      if (last?.year === entry.year) last.entries.push(numbered);
-      else groups.push({ year: entry.year, entries: [numbered] });
+      if (last?.year === entry.year) last.entries.push(entry);
+      else groups.push({ year: entry.year, entries: [entry] });
     }
-    return { page: i + 1, pages: chunks.length, big: i === 0 ? big : [], groups };
+    return {
+      page,
+      pages: count,
+      big: page === 1 ? big : [],
+      entries: items,
+      groups,
+      from,
+      to,
+      total,
+    };
   });
 }
 
-/** Path of a page of the experiments list, without locale prefix: page 1 is the base URL. */
-export const experimentsPagePath = (page: number): string =>
-  page <= 1 ? '/experiments/' : `/experiments/page/${page}/`;
+/**
+ * Year headings help to scan a date order and only there: not for A to Z, and not when the page
+ * holds a single year (a lone heading above every card says nothing).
+ */
+export function showYearHeadings(
+  page: { groups: readonly { year: number }[] },
+  sort: ExperimentSort,
+): boolean {
+  return sort !== 'title' && new Set(page.groups.map((group) => group.year)).size >= 2;
+}
 
-export type PagerItem = { kind: 'page'; page: number } | { kind: 'ellipsis' };
+/** How many experiments are in the compact list (everything that is not a big piece). */
+export const compactCount = (entries: readonly Sortable[]): number =>
+  splitTiers(entries).rest.length;
 
-/** Most pages the pager lists in full; beyond that it shows a window with ellipses. */
-const PAGER_FULL_LIMIT = 7;
+/** The sorts the page offers for a compact list of `count` entries, default first; none below `sortFrom`. */
+export const offeredExperimentSorts = (
+  count: number,
+  { sorts, defaultSort, sortFrom }: ExperimentsSettings,
+): ExperimentSort[] => availableSorts({ sorts, defaultSort, count, from: sortFrom });
 
 /**
- * The numbered items of the pager: every page up to seven, otherwise the first, the last, the
- * current page and its neighbours. A gap of one page is filled instead of hidden behind an ellipsis.
+ * Path of a page of the experiments list, without locale prefix: page 1 of the default sort is the
+ * base URL, another sort lives under its key (`/experiments/oldest/page/2/`).
  */
-export function pagerItems(current: number, pages: number): PagerItem[] {
-  const shown = new Set<number>();
-  if (pages <= PAGER_FULL_LIMIT) {
-    for (let page = 1; page <= pages; page++) shown.add(page);
-  } else {
-    for (const page of [1, pages, current - 1, current, current + 1]) {
-      if (page >= 1 && page <= pages) shown.add(page);
-    }
-  }
-  const sorted = [...shown].sort((a, b) => a - b);
-  const items: PagerItem[] = [];
-  let previous = 0;
-  for (const page of sorted) {
-    if (page - previous === 2) items.push({ kind: 'page', page: previous + 1 });
-    else if (page - previous > 2) items.push({ kind: 'ellipsis' });
-    items.push({ kind: 'page', page });
-    previous = page;
-  }
-  return items;
-}
+export const experimentsPagePath = (
+  page: number,
+  sort?: ExperimentSort,
+  defaultSort: ExperimentSort = 'newest',
+): string => listingPath({ base: '/experiments', sort, defaultSort, page });

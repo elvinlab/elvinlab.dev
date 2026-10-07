@@ -2,19 +2,39 @@ import { describe, expect, it } from 'vitest';
 
 import {
   clampMeRows,
+  compactCount,
+  type ExperimentsSettings,
+  experimentDate,
   experimentsPagePath,
-  pagerItems,
+  offeredExperimentSorts,
   paginateExperiments,
   resolveExperimentsSettings,
+  showYearHeadings,
+  sortExperimentList,
 } from './pagination.ts';
 
-type Entry = { id: string; year: number; featured: boolean };
+type Entry = {
+  id: string;
+  title: string;
+  year: number;
+  featured: boolean;
+  publishedAt?: string;
+  order?: number;
+};
 
-const entry = (id: string, year: number, featured = false): Entry => ({ id, year, featured });
+const entry = (id: string, year: number, extra: Partial<Entry> = {}): Entry => ({
+  id,
+  title: id,
+  year,
+  featured: false,
+  ...extra,
+});
 
 /** Sorted the way `sortExperiments` returns them: featured first, then newest year. */
 function catalog(featured: number, compact: number): Entry[] {
-  const big = Array.from({ length: featured }, (_, i) => entry(`big-${i + 1}`, 2026, true));
+  const big = Array.from({ length: featured }, (_, i) =>
+    entry(`big-${i + 1}`, 2026, { featured: true }),
+  );
   const rest = Array.from({ length: compact }, (_, i) =>
     entry(`c-${String(i + 1).padStart(3, '0')}`, 2025 - Math.floor(i / 5)),
   );
@@ -22,44 +42,137 @@ function catalog(featured: number, compact: number): Entry[] {
 }
 
 const ids = (entries: readonly Entry[]) => entries.map((e) => e.id);
-const compactIds = (page: ReturnType<typeof paginateExperiments<Entry>>[number]) =>
-  page.groups.flatMap((group) => group.entries.map(({ entry: e }) => e.id));
+
+const settings: ExperimentsSettings = {
+  perPage: 12,
+  maxFeatured: 3,
+  meRows: 3,
+  defaultSort: 'newest',
+  sorts: ['newest', 'oldest', 'title'],
+  sortFrom: 4,
+};
+
+describe('experimentDate', () => {
+  it('uses publishedAt, else 1 January of the year', () => {
+    expect(experimentDate(entry('a', 2025, { publishedAt: '2025-07-04' }))).toBe('2025-07-04');
+    expect(experimentDate(entry('a', 2025))).toBe('2025-01-01');
+  });
+});
+
+describe('sortExperimentList', () => {
+  const list = [
+    entry('b', 2024, { title: 'banana' }),
+    entry('a', 2025, { title: 'Apple' }),
+    entry('c', 2025, { title: 'cherry', publishedAt: '2025-09-01' }),
+    entry('d', 2023, { title: 'Éclair' }),
+  ];
+
+  it('newest puts the latest date first, a publishedAt after 1 January of the same year', () => {
+    expect(ids(sortExperimentList(list, 'newest', 'es'))).toEqual(['c', 'a', 'b', 'd']);
+  });
+
+  it('oldest is the exact reverse order of dates', () => {
+    expect(ids(sortExperimentList(list, 'oldest', 'es'))).toEqual(['d', 'b', 'a', 'c']);
+  });
+
+  it('title is A to Z, case-insensitive and accent-aware', () => {
+    expect(ids(sortExperimentList(list, 'title', 'es'))).toEqual(['a', 'b', 'c', 'd']);
+    const mixed = [entry('x', 2025, { title: 'zebra' }), entry('y', 2025, { title: 'Alpha' })];
+    expect(ids(sortExperimentList(mixed, 'title', 'en'))).toEqual(['y', 'x']);
+  });
+
+  it('breaks ties by order ascending (default 100), then by id', () => {
+    const tied = [
+      entry('z', 2025),
+      entry('m', 2025, { order: 5 }),
+      entry('a', 2025),
+      entry('q', 2025, { order: 200 }),
+    ];
+    expect(ids(sortExperimentList(tied, 'newest', 'es'))).toEqual(['m', 'a', 'z', 'q']);
+    expect(ids(sortExperimentList(tied, 'oldest', 'es'))).toEqual(['m', 'a', 'z', 'q']);
+    const sameTitle = [entry('b', 2025, { title: 'same' }), entry('a', 2025, { title: 'same' })];
+    expect(ids(sortExperimentList(sameTitle, 'title', 'es'))).toEqual(['a', 'b']);
+  });
+});
 
 describe('paginateExperiments', () => {
+  const options = { perPage: 12, pinFirst: 3 };
+  const compactIds = (page: ReturnType<typeof paginateExperiments<Entry>>[number]) =>
+    ids(page.entries);
+
   it('returns one page, with no pager, when the compact tier fits in perPage', () => {
-    const pages = paginateExperiments(catalog(2, 12), { perPage: 12, pinFirst: 3 });
+    const pages = paginateExperiments(catalog(2, 12), options);
     expect(pages).toHaveLength(1);
     expect(pages[0]?.pages).toBe(1);
     expect(ids(pages[0]?.big ?? [])).toEqual(['big-1', 'big-2']);
-    expect(compactIds(pages[0] as never)).toHaveLength(12);
+    expect(pages[0]?.entries).toHaveLength(12);
   });
 
   it('creates a second page only when the compact tier exceeds perPage', () => {
-    expect(paginateExperiments(catalog(3, 13), { perPage: 12, pinFirst: 3 })).toHaveLength(2);
-    expect(paginateExperiments(catalog(0, 0), { perPage: 12, pinFirst: 3 })).toHaveLength(1);
-    expect(paginateExperiments([], { perPage: 12, pinFirst: 3 })[0]?.big).toEqual([]);
+    expect(paginateExperiments(catalog(3, 13), options)).toHaveLength(2);
+    expect(paginateExperiments(catalog(0, 0), options)).toHaveLength(1);
+    expect(paginateExperiments([], options)[0]?.big).toEqual([]);
   });
 
   it('puts every big piece and the first perPage compact cards on page 1, only compact cards after', () => {
-    const pages = paginateExperiments(catalog(3, 30), { perPage: 12, pinFirst: 3 });
+    const pages = paginateExperiments(catalog(3, 30), options);
     expect(pages.map((p) => p.page)).toEqual([1, 2, 3]);
     expect(pages.every((p) => p.pages === 3)).toBe(true);
     expect(ids(pages[0]?.big ?? [])).toEqual(['big-1', 'big-2', 'big-3']);
     expect(pages[1]?.big).toEqual([]);
-    expect(pages[2]?.big).toEqual([]);
-    expect(pages.map((p) => compactIds(p).length)).toEqual([12, 12, 6]);
+    expect(pages.map((p) => p.entries.length)).toEqual([12, 12, 6]);
   });
 
-  it('lists every entry exactly once across pages and numbers them continuously', () => {
+  it('reports the range of each page over the compact list (not counting the big pieces)', () => {
+    const pages = paginateExperiments(catalog(3, 27), options);
+    expect(pages.map((p) => [p.from, p.to, p.total])).toEqual([
+      [1, 12, 27],
+      [13, 24, 27],
+      [25, 27, 27],
+    ]);
+  });
+
+  it('lists every entry exactly once across pages, whatever the sort', () => {
     const all = catalog(2, 40);
-    const pages = paginateExperiments(all, { perPage: 12, pinFirst: 3 });
-    const seen = pages.flatMap((p) => [...ids(p.big), ...compactIds(p)]);
-    expect([...seen].sort()).toEqual(ids(all).sort());
-    const numbers = pages.flatMap((p) => p.groups.flatMap((g) => g.entries.map((e) => e.index)));
-    expect(numbers).toEqual(Array.from({ length: 40 }, (_, i) => i + 3));
+    for (const sort of ['newest', 'oldest', 'title'] as const) {
+      const pages = paginateExperiments(all, { ...options, sort });
+      const seen = pages.flatMap((p) => [...ids(p.big), ...compactIds(p)]);
+      expect([...seen].sort(), sort).toEqual(ids(all).sort());
+    }
   });
 
-  it('repeats a year heading at the top of the next page when its group continues', () => {
+  it('keeps the featured pieces on page 1, first, whatever the sort', () => {
+    const all = [
+      entry('f1', 2020, { featured: true, title: 'Zzz' }),
+      entry('f2', 2019, { featured: true, title: 'Yyy' }),
+      ...Array.from({ length: 20 }, (_, i) => entry(`c-${i}`, 2025 - i, { title: `t-${i}` })),
+    ];
+    for (const sort of ['newest', 'oldest', 'title'] as const) {
+      const pages = paginateExperiments(all, { perPage: 12, pinFirst: 0, sort });
+      expect(ids(pages[0]?.big ?? []), sort).toEqual(['f1', 'f2']);
+      expect(pages.slice(1).every((p) => p.big.length === 0)).toBe(true);
+    }
+  });
+
+  it('orders the compact list with the chosen sort across pages', () => {
+    const all = Array.from({ length: 30 }, (_, i) =>
+      entry(`e-${String(i).padStart(2, '0')}`, 2000 + i),
+    );
+    const oldest = paginateExperiments([entry('f', 2026, { featured: true }), ...all], {
+      perPage: 12,
+      pinFirst: 0,
+      sort: 'oldest',
+    });
+    expect(oldest.flatMap(compactIds)).toEqual(ids(all));
+    const newest = paginateExperiments([entry('f', 2026, { featured: true }), ...all], {
+      perPage: 12,
+      pinFirst: 0,
+      sort: 'newest',
+    });
+    expect(newest.flatMap(compactIds)).toEqual(ids(all).reverse());
+  });
+
+  it('groups a page by year runs for the date sorts, repeating a year that continues', () => {
     const all = [
       entry('a', 2025),
       ...['b', 'c', 'd', 'e'].map((id) => entry(id, 2025)),
@@ -72,15 +185,7 @@ describe('paginateExperiments', () => {
     expect(pages[1]?.groups.map((g) => g.year)).toEqual([2025, 2024]);
   });
 
-  it('groups by year, newest first, inside each page', () => {
-    const pages = paginateExperiments(catalog(1, 22), { perPage: 12, pinFirst: 3 });
-    for (const page of pages) {
-      const years = page.groups.map((g) => g.year);
-      expect(years).toEqual([...years].sort((a, b) => b - a));
-    }
-  });
-
-  it('keeps the first pinFirst entries of the sort on page 1 for several shapes', () => {
+  it('keeps the first pinFirst entries of the incoming order on page 1 for several shapes', () => {
     const shapes: [number, number, number, number][] = [
       // featured, compact, perPage, pinFirst
       [0, 30, 12, 3],
@@ -93,23 +198,53 @@ describe('paginateExperiments', () => {
     for (const [featured, compact, perPage, pinFirst] of shapes) {
       const all = catalog(featured, compact);
       const [first] = paginateExperiments(all, { perPage, pinFirst });
-      const onFirst = new Set([...ids(first?.big ?? []), ...compactIds(first as never)]);
+      const onFirst = new Set([...ids(first?.big ?? []), ...ids(first?.entries ?? [])]);
       for (const id of ids(all.slice(0, pinFirst))) expect(onFirst.has(id)).toBe(true);
     }
   });
 
-  it('pulls an old entry that the sort ranks early (low order) onto page 1', () => {
-    // Sorted by `order` first, so the oldest entry leads the compact tier of the sort but sits
-    // last when the compact tier is grouped by year.
+  it('pulls an old entry that the incoming order ranks early (low order) onto page 1', () => {
     const all = [
-      entry('f', 2026, true),
+      entry('f', 2026, { featured: true }),
       entry('old-but-first', 2020),
       ...Array.from({ length: 20 }, (_, i) => entry(`n-${i}`, 2025)),
     ];
-    const pages = paginateExperiments(all, { perPage: 12, pinFirst: 3 });
-    expect(compactIds(pages[0] as never)).toContain('old-but-first');
-    expect(compactIds(pages[0] as never)).toHaveLength(12);
+    const pages = paginateExperiments(all, options);
+    expect(pages[0] ? ids(pages[0].entries) : []).toContain('old-but-first');
+    expect(pages[0]?.entries).toHaveLength(12);
     expect(pages[0]?.groups.at(-1)?.year).toBe(2020);
+  });
+});
+
+describe('showYearHeadings', () => {
+  const page = (...years: number[]) => ({ groups: years.map((year) => ({ year, entries: [] })) });
+
+  it('shows year headings only for a date sort and two or more distinct years', () => {
+    expect(showYearHeadings(page(2026, 2025), 'newest')).toBe(true);
+    expect(showYearHeadings(page(2026, 2025), 'oldest')).toBe(true);
+    expect(showYearHeadings(page(2026), 'newest')).toBe(false);
+    expect(showYearHeadings(page(2026, 2025), 'title')).toBe(false);
+    expect(showYearHeadings(page(2026, 2025, 2026), 'newest')).toBe(true);
+    expect(showYearHeadings(page(2026, 2026), 'newest')).toBe(false);
+  });
+});
+
+describe('compactCount and offeredExperimentSorts', () => {
+  it('counts every entry that is not a big piece', () => {
+    expect(compactCount(catalog(2, 5))).toBe(5);
+    expect(compactCount(catalog(0, 5))).toBe(4);
+    expect(compactCount([])).toBe(0);
+  });
+
+  it('offers the enabled sorts from sortFrom compact entries on, default first', () => {
+    expect(offeredExperimentSorts(3, settings)).toEqual([]);
+    expect(offeredExperimentSorts(4, settings)).toEqual(['newest', 'oldest', 'title']);
+    expect(offeredExperimentSorts(9, { ...settings, defaultSort: 'title' })).toEqual([
+      'title',
+      'newest',
+      'oldest',
+    ]);
+    expect(offeredExperimentSorts(9, { ...settings, sorts: ['newest'] })).toEqual([]);
   });
 });
 
@@ -119,13 +254,9 @@ describe('clampMeRows and resolveExperimentsSettings', () => {
     expect(clampMeRows(3, 12)).toBe(3);
   });
 
-  it('applies the documented defaults and the clamp', () => {
-    expect(resolveExperimentsSettings({ perPage: 12, maxFeatured: 3, meRows: 3 })).toEqual({
-      perPage: 12,
-      maxFeatured: 3,
-      meRows: 3,
-    });
-    expect(resolveExperimentsSettings({ perPage: 4, maxFeatured: 1, meRows: 6 }).meRows).toBe(4);
+  it('applies the clamp and keeps the rest', () => {
+    expect(resolveExperimentsSettings(settings)).toEqual(settings);
+    expect(resolveExperimentsSettings({ ...settings, perPage: 4, meRows: 6 }).meRows).toBe(4);
   });
 });
 
@@ -135,26 +266,12 @@ describe('experimentsPagePath', () => {
     expect(experimentsPagePath(2)).toBe('/experiments/page/2/');
     expect(experimentsPagePath(12)).toBe('/experiments/page/12/');
   });
-});
 
-describe('pagerItems', () => {
-  const shape = (items: ReturnType<typeof pagerItems>) =>
-    items.map((item) => (item.kind === 'ellipsis' ? '…' : item.page));
-
-  it('shows every page up to seven', () => {
-    expect(shape(pagerItems(1, 2))).toEqual([1, 2]);
-    expect(shape(pagerItems(4, 7))).toEqual([1, 2, 3, 4, 5, 6, 7]);
-  });
-
-  it('shows a window with ellipses beyond seven pages', () => {
-    expect(shape(pagerItems(1, 9))).toEqual([1, 2, '…', 9]);
-    expect(shape(pagerItems(5, 9))).toEqual([1, '…', 4, 5, 6, '…', 9]);
-    expect(shape(pagerItems(9, 9))).toEqual([1, '…', 8, 9]);
-    expect(shape(pagerItems(3, 9))).toEqual([1, 2, 3, 4, '…', 9]);
-    expect(shape(pagerItems(8, 9))).toEqual([1, '…', 7, 8, 9]);
-  });
-
-  it('never hides a gap of a single page behind an ellipsis', () => {
-    expect(shape(pagerItems(4, 8))).toEqual([1, 2, 3, 4, 5, '…', 8]);
+  it('puts a non-default sort in the path', () => {
+    expect(experimentsPagePath(1, 'oldest')).toBe('/experiments/oldest/');
+    expect(experimentsPagePath(3, 'title')).toBe('/experiments/title/page/3/');
+    expect(experimentsPagePath(1, 'newest')).toBe('/experiments/');
+    expect(experimentsPagePath(2, 'newest', 'title')).toBe('/experiments/newest/page/2/');
+    expect(experimentsPagePath(2, 'title', 'title')).toBe('/experiments/page/2/');
   });
 });

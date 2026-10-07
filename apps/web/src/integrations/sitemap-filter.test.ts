@@ -55,6 +55,32 @@ describe('isHiddenFromSitemap', () => {
     }
   });
 
+  it('never lists the alternate sorts of the experiments list, whatever the flags', () => {
+    const paths = [
+      '/experiments/oldest/',
+      '/experiments/title/page/2/',
+      '/experiments/newest/page/12/',
+      '/en/experiments/oldest/',
+      '/en/experiments/title/page/3/',
+    ];
+    for (const path of paths) {
+      expect(isHiddenFromSitemap(path, allOn), path).toBe(true);
+      expect(isHiddenFromSitemap(path, { ...allOn, experiments: false }), path).toBe(true);
+    }
+  });
+
+  it('keeps the default order and its later pages, and ignores paths that are not a sort', () => {
+    for (const path of [
+      '/experiments/',
+      '/experiments/page/2/',
+      '/en/experiments/page/2/',
+      '/experiments/some-case/',
+      '/experiments/oldest/extra/',
+    ]) {
+      expect(isHiddenFromSitemap(path, allOn), path).toBe(false);
+    }
+  });
+
   it('returns true for /changelog/ when changelog feature is off', () => {
     const features = { ...allOn, changelog: false };
     expect(isHiddenFromSitemap('/changelog/', features)).toBe(true);

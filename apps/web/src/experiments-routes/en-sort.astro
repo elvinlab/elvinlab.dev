@@ -1,0 +1,10 @@
+---
+import ExperimentsPage from './ExperimentsPage.astro';
+import { sortParam, sortPaths } from './static-paths.ts';
+
+export const getStaticPaths = sortPaths;
+
+const { sort } = Astro.params;
+---
+
+<ExperimentsPage locale="en" sort={sortParam(sort)} />

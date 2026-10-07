@@ -1,0 +1,23 @@
+---
+/**
+ * "Showing 13-24 of 27": where the current page sits in the whole list. Renders nothing for an
+ * empty list. Generic and quiet; styles are scoped here.
+ */
+import { type Locale, t } from '@/shared/i18n/index.ts';
+
+type Props = { locale: Locale; from: number; to: number; total: number };
+
+const { locale, from, to, total } = Astro.props;
+---
+
+{total > 0 && (
+  <p class="lk-summary" data-listing-summary>{t(locale, 'listing.summary', { from, to, total })}</p>
+)}
+
+<style>
+  .lk-summary {
+    margin: 0;
+    font: 400 0.875rem / 1.4 var(--font-mono);
+    color: var(--color-muted);
+  }
+</style>

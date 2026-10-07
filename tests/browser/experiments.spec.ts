@@ -99,11 +99,23 @@ test.describe('pagination and head of the list (two entries: a single page)', ()
       // One page only: no pager and no prev/next links in the head.
       await expect(page.getByRole('navigation', { name: pager })).toHaveCount(0);
       await expect(page.locator('link[rel="prev"], link[rel="next"]')).toHaveCount(0);
+      // The decorative `// word` stack renders only when `experiments.words` is configured.
+      await expect(page.locator('.xp-lab')).toHaveCount(0);
+      // Both entries are big pieces: no compact list, so no sort switch and no summary either.
+      await expect(
+        page.locator('[data-listing-sort], [data-listing-nav], [data-listing-summary]'),
+      ).toHaveCount(0);
     });
   }
 
-  test('there is no second page and no page 1 duplicate: both answer 404', async ({ request }) => {
+  test('there is no second page, no page 1 duplicate and no alternate-sort page: all answer 404', async ({
+    request,
+  }) => {
     for (const path of [
+      '/experiments/oldest/',
+      '/en/experiments/oldest/',
+      '/experiments/title/',
+      '/en/experiments/title/page/2/',
       '/experiments/page/2/',
       '/en/experiments/page/2/',
       '/experiments/page/1/',

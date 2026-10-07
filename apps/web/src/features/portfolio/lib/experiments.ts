@@ -60,22 +60,14 @@ export function assertFeaturedLimit(
 
 /**
  * Splits already sorted experiments into the big pieces (the featured ones, or the first entry when
- * none is featured) and the compact tier, grouped by year with the newest year first. Entries keep
- * their incoming order inside a year.
+ * none is featured) and the rest, which keep their incoming order: the compact list sorts and pages
+ * them on its own (`paginateExperiments`). The big pieces never move with the sort.
  */
-export function tierExperiments<T extends { year: number; featured: boolean }>(
+export function splitTiers<T extends { featured: boolean }>(
   sorted: readonly T[],
-): { big: T[]; compact: { year: number; entries: T[] }[] } {
+): { big: T[]; rest: T[] } {
   const featured = sorted.filter((entry) => entry.featured);
   const big = featured.length > 0 ? featured : sorted.slice(0, 1);
   const bigSet = new Set<T>(big);
-  const groups = new Map<number, T[]>();
-  for (const entry of sorted) {
-    if (bigSet.has(entry)) continue;
-    groups.set(entry.year, [...(groups.get(entry.year) ?? []), entry]);
-  }
-  const compact = [...groups]
-    .sort(([a], [b]) => b - a)
-    .map(([year, entries]) => ({ year, entries }));
-  return { big, compact };
+  return { big, rest: sorted.filter((entry) => !bigSet.has(entry)) };
 }

@@ -574,18 +574,50 @@ describe('interface switches', () => {
 describe('experiments block', () => {
   const withExperiments = (experiments: unknown) => ({ ...valid, experiments });
 
-  it('is optional and defaults to 12 per page, 3 featured and 3 rows on /me', () => {
-    expect(parseSiteConfig(valid).experiments).toEqual({ perPage: 12, maxFeatured: 3, meRows: 3 });
-    expect(parseSiteConfig(withExperiments({})).experiments).toEqual({
+  it('is optional and defaults to 12 per page, 3 featured, 3 rows on /me and every sort', () => {
+    const defaults = {
       perPage: 12,
       maxFeatured: 3,
       meRows: 3,
-    });
+      defaultSort: 'newest',
+      sorts: ['newest', 'oldest', 'title'],
+      sortFrom: 4,
+    };
+    expect(parseSiteConfig(valid).experiments).toEqual(defaults);
+    expect(parseSiteConfig(withExperiments({})).experiments).toEqual(defaults);
   });
 
   it('accepts values inside the ranges', () => {
     const parsed = parseSiteConfig(withExperiments({ perPage: 24, maxFeatured: 2, meRows: 5 }));
-    expect(parsed.experiments).toEqual({ perPage: 24, maxFeatured: 2, meRows: 5 });
+    expect(parsed.experiments).toMatchObject({ perPage: 24, maxFeatured: 2, meRows: 5 });
+  });
+
+  it('accepts a default sort, a subset of sorts that includes it and a threshold', () => {
+    const parsed = parseSiteConfig(
+      withExperiments({ defaultSort: 'oldest', sorts: ['oldest', 'newest'], sortFrom: 8 }),
+    );
+    expect(parsed.experiments).toMatchObject({
+      defaultSort: 'oldest',
+      sorts: ['oldest', 'newest'],
+      sortFrom: 8,
+    });
+    expect(parseSiteConfig(withExperiments({ sorts: ['newest'] })).experiments.sorts).toEqual([
+      'newest',
+    ]);
+  });
+
+  it('rejects an unknown sort, an empty or duplicated list and a default that is not enabled', () => {
+    for (const bad of [
+      { defaultSort: 'random' },
+      { sorts: ['random'] },
+      { sorts: [] },
+      { sorts: ['newest', 'newest'] },
+      { defaultSort: 'title', sorts: ['newest', 'oldest'] },
+      { sortFrom: 1 },
+      { sortFrom: 2.5 },
+    ]) {
+      expect(() => parseSiteConfig(withExperiments(bad)), JSON.stringify(bad)).toThrow();
+    }
   });
 
   it('rejects values outside the ranges and non-integers', () => {
