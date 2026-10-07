@@ -1,0 +1,9 @@
+---
+import { ChangelogPage, laterChangelogPaths } from '@/features/changelog/index.ts';
+
+export const getStaticPaths = laterChangelogPaths;
+
+const { page } = Astro.params;
+---
+
+<ChangelogPage locale="en" page={Number(page)} />

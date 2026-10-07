@@ -14,6 +14,7 @@ export type PageType =
   | 'home'
   | 'me'
   | 'experiments'
+  | 'changelog'
   | 'contact'
   | 'subscribe'
   | 'notes-index'
@@ -63,6 +64,8 @@ export function classifyPage(path: string): PageType {
   if (segments[0] === 'en') segments.shift();
   const [first, second, ...rest] = segments;
   if (first === undefined) return 'home';
+  // `/changelog/` and its later pages `/changelog/page/N/`.
+  if (first === 'changelog' && (second === undefined || second === 'page')) return 'changelog';
   if (second === undefined) {
     if (first === 'me' || first === 'experiments' || first === 'contact' || first === 'subscribe')
       return first;

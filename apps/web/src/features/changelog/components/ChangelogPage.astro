@@ -1,30 +1,102 @@
 ---
-/** /changelog page: lists every entry, newest first. The route exists only while `features.changelog` is on. */
-import { getCollection } from 'astro:content';
+/**
+ * One page of `/changelog/` for one locale: a quiet header (log icon, title, intro), the release
+ * days (one native `<details>` each, no JavaScript) and the summary and pager of the listing kit.
+ * A release is a production day; inside it the entries are grouped by kind in a fixed order. The
+ * two newest days of page 1 start open, everything else starts collapsed but stays in the HTML.
+ * Its CSS is one string (`changelog-styles.ts`), `cl-` prefixed. The route exists only while
+ * `features.changelog` is on.
+ */
+import { localizePath } from '@elvinlab/core';
 
-import { sortChangelog } from '@/features/changelog/lib/changelog.ts';
-import type { Locale } from '@/shared/i18n/index.ts';
+import { loadChangelogPages } from '@/features/changelog/lib/load-changelog.ts';
+import { changelogHref, formatReleaseDate } from '@/features/changelog/lib/releases.ts';
+import { site } from '@/shared/config/index.ts';
+import { LOCALES, type Locale, t } from '@/shared/i18n/index.ts';
 import BaseLayout from '@/shared/layout/BaseLayout.astro';
+import ListingSummary from '@/shared/ui/ListingSummary.astro';
+import Pager from '@/shared/ui/Pager.astro';
 
-import ChangelogList from './ChangelogList.astro';
+import ChangelogIcon from './ChangelogIcon.astro';
+import { CHANGELOG_CSS } from './changelog-styles.ts';
 
-type Props = { locale: Locale };
+type Props = { locale: Locale; page?: number };
 
-const { locale } = Astro.props;
-const path = locale === 'es' ? '/changelog/' : '/en/changelog/';
-const title = 'Changelog';
-const description =
-  locale === 'es' ? 'Registro de cambios visibles del sitio.' : 'Log of visible site changes.';
+/** Days that start open on page 1. */
+const OPEN_DAYS = 2;
 
-const entries = sortChangelog(await getCollection('changelog')).map((entry) => entry.data);
+const { locale, page = 1 } = Astro.props;
+const { releases, pages } = await loadChangelogPages();
+const current = pages.find((candidate) => candidate.page === page);
+if (!current) throw new Error(`/changelog/ has no page ${page} (${pages.length} in total)`);
+const href = (target: number): string => localizePath(changelogHref(target), locale, LOCALES);
+const pageUrl = (target: number): string => new URL(href(target), site.url).href;
+const paged = page > 1;
+const title = paged ? t(locale, 'changelog.page.title', { page }) : t(locale, 'changelog.title');
+const description = paged
+  ? t(locale, 'changelog.page.description', { page, pages: pages.length })
+  : t(locale, 'changelog.description');
 ---
 
-<BaseLayout locale={locale} path={path} title={title} description={description}>
-  <article class="max-w-none">
-    <header class="mb-8">
-      <h1 class="text-3xl font-bold tracking-tight">{title}</h1>
-      <p class="mt-2 text-muted">{description}</p>
+<BaseLayout locale={locale} path={changelogHref(page)} title={title} description={description}>
+  {paged && <link slot="head" rel="prev" href={pageUrl(page - 1)} />}
+  {page < pages.length && <link slot="head" rel="next" href={pageUrl(page + 1)} />}
+  <style is:inline set:html={CHANGELOG_CSS} />
+  <section class="cl-page">
+    <header class="cl-header">
+      <h1><ChangelogIcon name="log" class="cl-logo" />{t(locale, 'changelog.title')}</h1>
+      <p>{t(locale, 'changelog.intro')}</p>
     </header>
-    <ChangelogList entries={entries} locale={locale} />
-  </article>
+    {releases.length === 0 ? (
+      <p class="cl-empty">{t(locale, 'changelog.empty')}</p>
+    ) : (
+      <ol class="cl-list">
+        {current.items.map((release, index) => (
+          <li>
+            <details class="cl-release" open={!paged && index < OPEN_DAYS}>
+              <summary>
+                <h2 class="cl-head">
+                  <time class="cl-date" datetime={release.date}>{formatReleaseDate(new Date(release.date), locale)}</time>
+                  {release.title && <span class="cl-name">{release.title}</span>}
+                </h2>
+                <span class="cl-meta">
+                  <span class="cl-counts">
+                    {release.groups.map((group) => (
+                      <span class="cl-count">
+                        <ChangelogIcon name={group.kind} />
+                        <span aria-hidden="true">{group.entries.length}</span>
+                        <span class="sr-only">{group.entries.length} {t(locale, `changelog.kind.${group.kind}`)}</span>
+                      </span>
+                    ))}
+                  </span>
+                  <span class="cl-chevron" aria-hidden="true"></span>
+                </span>
+              </summary>
+              <div class="cl-body">
+                {release.groups.map((group) => (
+                  <section class="cl-kind">
+                    <h3><ChangelogIcon name={group.kind} />{t(locale, `changelog.kind.${group.kind}`)}</h3>
+                    <ul class="cl-items">
+                      {group.entries.map((entry) => (
+                        <li>
+                          <p class="cl-t">{entry.title}</p>
+                          {entry.description && <p class="cl-d">{entry.description}</p>}
+                        </li>
+                      ))}
+                    </ul>
+                  </section>
+                ))}
+              </div>
+            </details>
+          </li>
+        ))}
+      </ol>
+    )}
+    {pages.length > 1 && (
+      <footer class="cl-foot">
+        <ListingSummary locale={locale} from={current.from} to={current.to} total={current.total} />
+        <Pager locale={locale} page={page} pages={pages.length} href={href} label={t(locale, 'changelog.pager.label')} />
+      </footer>
+    )}
+  </section>
 </BaseLayout>

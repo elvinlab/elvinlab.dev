@@ -87,6 +87,13 @@ describe('isHiddenFromSitemap', () => {
     expect(isHiddenFromSitemap('/en/changelog/', features)).toBe(true);
   });
 
+  it('lists the later changelog pages only while the changelog feature is on', () => {
+    for (const path of ['/changelog/page/2/', '/en/changelog/page/2/']) {
+      expect(isHiddenFromSitemap(path, allOn), path).toBe(false);
+      expect(isHiddenFromSitemap(path, { ...allOn, changelog: false }), path).toBe(true);
+    }
+  });
+
   it('returns false for unrelated paths regardless of feature flags', () => {
     const features = { ...allOn, me: false, experiments: false, changelog: false };
     expect(isHiddenFromSitemap('/notes/', features)).toBe(false);

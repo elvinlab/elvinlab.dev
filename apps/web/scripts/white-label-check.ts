@@ -87,6 +87,9 @@ try {
     readFileSync(join(source, 'tests/fixtures/site.config.alt.ts'), 'utf8'),
   );
   writeFileSync(join(workspace.web, 'src/content/experiments.json'), '{}\n');
+  // The owner's changelog entries and release headlines must not reach a fork's build.
+  writeFileSync(join(workspace.web, 'src/content/changelog.json'), '{}\n');
+  writeFileSync(join(workspace.web, 'src/content/releases.json'), '{}\n');
 
   const cli = join(realpathSync(join(source, 'apps/web/node_modules/astro')), 'bin/astro.mjs');
   const build = spawnSync(process.execPath, [cli, 'build'], {
@@ -144,6 +147,18 @@ try {
     if (!page.includes(empty) || /<article/.test(page)) {
       fail(
         `/${file}/ does not render the empty state (or renders an experiment card) for an empty experiments file`,
+      );
+    }
+  }
+  // The neutral changelog and releases files are empty: the page exists and shows the empty state.
+  for (const [file, empty] of [
+    ['changelog', 'Todavía no hay cambios registrados.'],
+    ['en/changelog', 'No changes recorded yet.'],
+  ] as const) {
+    const page = readFileSync(join(workspace.web, `dist/client/${file}/index.html`), 'utf8');
+    if (!page.includes(empty) || /class="cl-release"/.test(page)) {
+      fail(
+        `/${file}/ does not render the empty state (or renders a release day) for an empty changelog`,
       );
     }
   }

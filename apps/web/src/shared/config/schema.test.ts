@@ -665,3 +665,24 @@ describe('experiments block', () => {
     expect(() => parseSiteConfig(withExperiments({ words: { es: [] } }))).toThrow();
   });
 });
+
+describe('changelog block', () => {
+  const withChangelog = (changelog: unknown) => ({ ...valid, changelog });
+
+  it('is optional and defaults to 4 release days per page', () => {
+    expect(parseSiteConfig(valid).changelog).toEqual({ perPage: 4 });
+    expect(parseSiteConfig(withChangelog({})).changelog).toEqual({ perPage: 4 });
+  });
+
+  it('accepts 2 to 30 days per page and rejects the rest', () => {
+    expect(parseSiteConfig(withChangelog({ perPage: 2 })).changelog.perPage).toBe(2);
+    expect(parseSiteConfig(withChangelog({ perPage: 30 })).changelog.perPage).toBe(30);
+    for (const perPage of [1, 31, 2.5, '4']) {
+      expect(() => parseSiteConfig(withChangelog({ perPage }))).toThrow();
+    }
+  });
+
+  it('rejects unknown keys', () => {
+    expect(() => parseSiteConfig(withChangelog({ pages: 4 }))).toThrow();
+  });
+});

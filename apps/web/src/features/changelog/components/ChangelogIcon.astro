@@ -1,0 +1,10 @@
+---
+/** A 9 x 9 pixel icon with crisp edges, decorative (`aria-hidden`): the text next to it names the kind. */
+import { type IconName, iconPath } from './kind-icons.ts';
+
+type Props = { name: IconName; class?: string };
+
+const { name, class: className = 'cl-ico' } = Astro.props;
+---
+
+<svg class={className} data-kind={name} viewBox="0 0 9 9" fill="currentColor" shape-rendering="crispEdges" aria-hidden="true" focusable="false"><path d={iconPath(name)}></path></svg>

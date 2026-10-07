@@ -1,7 +1,7 @@
 import { defineCollection } from 'astro:content';
 import { file, glob } from 'astro/loaders';
 
-import { changelogSchema } from '@/features/changelog/index.ts';
+import { changelogSchema, releaseSchema } from '@/features/changelog/index.ts';
 import { credentialSchema } from '@/features/credentials/index.ts';
 import { experienceSchema } from '@/features/me/index.ts';
 import { noteSchema } from '@/features/notes/index.ts';
@@ -32,6 +32,12 @@ const changelog = defineCollection({
   schema: changelogSchema(),
 });
 
+// Optional headline per release day (a release is a production day); a day without one is date-only.
+const releases = defineCollection({
+  loader: file('./src/content/releases.json'),
+  schema: releaseSchema(),
+});
+
 // Recruiter data: keyed JSON files the owner edits (certificates/degrees and the CV timeline).
 const credentials = defineCollection({
   loader: file('./src/content/credentials.json'),
@@ -42,4 +48,4 @@ const experience = defineCollection({
   schema: experienceSchema(),
 });
 
-export const collections = { notes, experiments, credentials, experience, changelog };
+export const collections = { notes, experiments, credentials, experience, changelog, releases };

@@ -39,7 +39,11 @@ export function isHiddenFromSitemap(pathname: string, features?: typeof site.fea
   if (!flags.contact && withoutLocale === '/contact/') return true;
   if (
     !flags.changelog &&
-    (withoutLocale === '/changelog/' || pathname === '/changelog/' || pathname === '/en/changelog/')
+    (withoutLocale === '/changelog/' ||
+      pathname === '/changelog/' ||
+      pathname === '/en/changelog/' ||
+      // The later pages of the paginated list: `/changelog/page/2/` and its English twin.
+      /^\/changelog\/page\/\d+\/$/.test(withoutLocale))
   ) {
     return true;
   }

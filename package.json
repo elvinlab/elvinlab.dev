@@ -18,6 +18,8 @@
     "depcruise": "node apps/web/scripts/mirror-astro.ts && depcruise apps/web/boundaries-mirror/src packages/core/src",
     "new-post": "pnpm --filter web new-post",
     "test:white-label": "node apps/web/scripts/white-label-check.ts",
+    "changelog:audit": "node apps/web/scripts/changelog-audit.ts",
+    "changelog:stamp": "node apps/web/scripts/changelog-stamp.ts",
     "check:dev-cold-start": "node apps/web/scripts/dev-cold-start-check.ts",
     "docs:config": "node --import ./apps/web/scripts/register-alias.mjs apps/web/scripts/generate-config-docs.ts",
     "notify:note": "node --import ./apps/web/scripts/register-alias.mjs apps/web/scripts/notify-subscribers.ts",

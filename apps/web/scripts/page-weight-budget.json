@@ -31,6 +31,16 @@
         "date": "2026-10-07"
       }
     },
+    "changelog": {
+      "why": "Release days grouped by kind, 4 days per page (page 1 opens the 2 newest); the flat list was about 130 KB, and the page CSS ships only here.",
+      "styleBytes": 56500,
+      "htmlBytes": 110000,
+      "measured": {
+        "styleBytes": 54304,
+        "htmlBytes": 105715,
+        "date": "2026-10-07"
+      }
+    },
     "contact": {
       "why": "Form page: the lightest shared head, only the site stylesheet plus the form.",
       "styleBytes": 55100,
@@ -72,7 +82,7 @@
       }
     },
     "default": {
-      "why": "Legal pages, changelog, subscribe steps, paged or sorted listings: ceiling for anything without its own type.",
+      "why": "Legal pages, subscribe steps, paged or sorted listings: ceiling for anything without its own type.",
       "styleBytes": 55000,
       "htmlBytes": 135300,
       "measured": {

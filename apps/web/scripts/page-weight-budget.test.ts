@@ -48,7 +48,9 @@ describe('classifyPage', () => {
     ['/en/notes/some-slug/', 'note'],
     ['/notes/page/2/', 'default'],
     ['/privacy/', 'default'],
-    ['/changelog/', 'default'],
+    ['/changelog/', 'changelog'],
+    ['/en/changelog/', 'changelog'],
+    ['/changelog/page/2/', 'changelog'],
   ])('%s is %s', (path, type) => {
     expect(classifyPage(path)).toBe(type);
   });

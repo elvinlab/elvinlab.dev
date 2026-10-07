@@ -84,7 +84,7 @@ The single source of truth is [`apps/web/scripts/verification-map.ts`](../apps/w
 | You touched | Run | Skip, if untouched |
 | --- | --- | --- |
 | Documentation, trackers, `odd/` | `lint` on the files | everything else |
-| `changelog.json` | the changelog unit test, `lint` | build, e2e |
+| `changelog.json`, `releases.json` | the changelog unit tests (`releases.test.ts`), `lint`; the build when the page layout changed | e2e |
 | A note (`content/notes/**`) | `build` (it validates the frontmatter), `lint` | e2e, Lighthouse (the gate measures fixtures, not real notes) |
 | Schema, `site.config.ts`, `env-vars.ts`, fixtures | `docs:config`, the config unit tests, `typecheck`, `test:white-label`, `build` | e2e, Lighthouse |
 | Unit-tested logic (`lib/`, `ports`, `adapters`, `actions`) | the related unit tests, `typecheck`, `lint` | e2e (unless the page behavior changed), Lighthouse |
@@ -137,10 +137,11 @@ budget in `apps/web/scripts/page-weight-budget.json`:
 | `home` | `/`, `/en/` |
 | `me` | `/me/`, `/en/me/` |
 | `experiments` | `/experiments/`, `/en/experiments/` (the first page only) |
+| `changelog` | `/changelog/`, `/changelog/page/N/` and their `/en/` twins (days grouped by kind, 4 days per page; its CSS ships only there) |
 | `contact`, `subscribe` | `/contact/`, `/subscribe/` and their `/en/` twins |
 | `notes-index` | `/notes/`, `/en/notes/` |
 | `note` | any `/notes/<slug>/` (the real notes and the `smoke-es` fixture note) |
-| `default` | everything else: legal, changelog, subscribe steps, paged or sorted listings |
+| `default` | everything else: legal, subscribe steps, paged or sorted listings |
 
 The check prints one line per page with the number, the budget and, on failure, the overshoot, even
 when everything passes, and exits 1 when any page is over:
@@ -218,6 +219,10 @@ The e2e suite covers the contact form island with a stubbed Turnstile script and
 ## Email previews
 
 The subscription emails (confirmation and new note, Spanish and English) are pure functions in `apps/web/src/features/subscribe/email-templates.ts`. To look at them without sending anything, run `mise exec -- node --import ./apps/web/scripts/register-alias.mjs apps/web/scripts/preview-email.ts`: it writes the HTML and text versions with sample data (on `https://example.test`, with a hostile title to prove escaping) into the git-ignored `.email-preview/` folder. Open the `.html` files in a browser; email clients differ, so a real test send to your own address (needs a verified Resend domain) remains an owner step.
+
+## Changelog tools
+
+`pnpm changelog:audit` (`apps/web/scripts/changelog-audit.ts`) reads the local ref `origin/main` (no fetch), finds the `develop: <sha>` of the last release and lists the `feat`, `fix` and `perf` commits since then that did not touch `changelog.json`; it exits 1 when there are any and exits 2 when the release commit has no `develop:` line. `pnpm changelog:stamp [--date YYYY-MM-DD] [--dry-run]` (`changelog-stamp.ts`) dates the entries that are not in `origin/main`'s `changelog.json`. Both are pure functions with unit tests next to them; the rest of the changelog is covered by `releases.test.ts` (grouping, kind order, day titles) and `tests/browser/changelog.spec.ts` (days and kinds in order, the two newest open, the pager to page 2, canonical and prev, with JavaScript off). Pagination itself is the listing kit's and is tested in `shared/lib/listing.test.ts`.
 
 ## Perf watch: `/experiments/` at scale
 

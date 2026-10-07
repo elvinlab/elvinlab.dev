@@ -130,3 +130,18 @@ Candidate: `develop` plus the uncommitted change of this task (experiments page 
 | `mise exec -- pnpm check:page-weight` | All 24 built pages within budget. |
 
 Unit 117 files / 1261 tests; lint, typecheck, dependency boundaries, docs drift, JS budget, white-label, dev cold start and e2e (35 specs) passed; Lighthouse 10 URLs passed. Independent measurements: `/experiments/` LCP 2117-2123 ms in 6 runs (before 2271-2273), `/me/` 2419-2430 and `/contact/` 2112-2117 unchanged; 30-entry stress build 78 checks with 0 overflow and 0 contrast nodes. Not run: the CI itself (it runs on the next push to `main`, which is the owner's decision).
+
+## Release 13 candidate: changelog by production day and the LCP margin work (parent, 2026-10-07): essentials only
+
+Owner decision: skip the full battery ("quita demasiado tiempo, solo lo esencial"); the CI on `main` runs the whole stack on the push.
+
+| Check | Result |
+| --- | --- |
+| `pnpm lint` / `pnpm typecheck` | clean (468 files) / 0 errors. |
+| `vitest run` | 119 files, 1288 tests passed. |
+| `pnpm depcruise`, `pnpm test:white-label`, `pnpm docs:config` | no violations, passed, up to date. |
+| `pnpm --filter web build` then `pnpm check:page-weight` | all 26 pages within budget (`changelog` type: 105,715 of 110,000 B HTML, 54,304 of 56,500 B style). |
+| `pnpm test:e2e:quick changelog.spec.ts a11y.spec.ts` | 39 passed. |
+| `pnpm changelog:audit` / `pnpm changelog:stamp --dry-run` | exit 0, every feat/fix/perf commit has an entry / nothing to stamp. |
+
+Not re-run, by owner decision: `pnpm verify --run` (the registry in `odd/verification-state.json` reflects the full battery of `f59a459`, 336 s, 55 checks; the changelog commit is not recorded), dev cold start, JS budget, Lighthouse (the changelog pages are not in `lighthouserc.json`), and the wider e2e batch. The CI on `main` re-runs everything before the deploy.
