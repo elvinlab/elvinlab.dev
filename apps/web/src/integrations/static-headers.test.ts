@@ -22,10 +22,14 @@ function rulesFor(pattern: string): string[] {
 }
 
 describe('static asset headers', () => {
-  it('caches the fingerprinted /_astro files for a year as immutable', () => {
-    // Workers static assets default to `max-age=0, must-revalidate`, so without this rule every
-    // font, script and image is revalidated on every visit.
-    expect(rulesFor('/_astro/*')).toContain('Cache-Control: public, max-age=31556952, immutable');
+  it('leaves the cache policy of the fingerprinted /_astro files to the Astro adapter', () => {
+    // The Cloudflare adapter writes `/_astro/* Cache-Control: public, max-age=31536000, immutable`
+    // into the built `_headers` by itself, but only when this file has no `/_astro/*` rule. A rule
+    // here switches that default off and its value is served instead; `.github/scripts/smoke-check.sh`
+    // expects exactly `public, max-age=31536000, immutable` and rolls the deploy back otherwise (the
+    // release of 2026-10-07 was rolled back because of a `max-age=31556952` rule added here).
+    expect(rulesFor('/_astro/*')).toEqual([]);
+    expect(headers).not.toMatch(/cache-control/i);
   });
 
   it('keeps the security headers on every path', () => {

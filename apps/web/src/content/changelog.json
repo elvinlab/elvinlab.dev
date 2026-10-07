@@ -485,12 +485,6 @@
     "title": "Experiments page and recent experiments on /me",
     "description": "An Experiments page (/experiments/, /en/experiments/) shows featured projects (up to 3) as exhibition pieces with a gallery of real screenshots, then a quiet list of compact cards. The list is paginated (12 per page) and sortable (newest, oldest, A-Z) with static pages, no JavaScript. /me shows recent rows. For forks: an `experiments` block in site.config.ts sets size, sorts, featured limit, rows and intro."
   },
-  "immutable-built-assets": {
-    "date": "2026-10-07",
-    "category": "changed",
-    "title": "Built assets keep their cache for a year",
-    "description": "Fingerprint-named assets under /_astro/ use a one-year immutable cache policy. A changed build produces new asset names, while HTML and non-fingerprinted files keep their existing policies."
-  },
   "experiment-image-policy": {
     "date": "2026-10-07",
     "category": "added",
