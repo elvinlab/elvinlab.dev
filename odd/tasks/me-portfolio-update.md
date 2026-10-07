@@ -72,7 +72,8 @@ Exploration: done in-session by delegated explorers (map of `/me`, project conte
 - M1 route: delegated writer (2+ non-trivial files, precise spec; trigger: Writer trigger). Parent review: read the full diff, re-ran `vitest run src/features/me src/shared/config` (150 passed), then closed three gaps inline as mechanical edits (document icon `file` in `SocialIcon.astro` used by `MeHero`, home-card label `recruiter.cv` to "Ver CV" / "View CV", smoke spec assertion).
 - M1 checks observed: tag-label test RED then GREEN; `pnpm typecheck` 0 errors; `pnpm lint` clean (409 files); `pnpm docs:config` up to date; `pnpm depcruise` clean; `pnpm test:e2e:quick tests/browser/smoke.spec.ts` 18 passed at 1280 px. Not run: Lighthouse, full e2e (text-only change; Lighthouse is measured once at M6 and after M2/M2b/M3 which change layout/bytes).
 - M1 decisions: `me.languages` is optional in the schema because `tests/fixtures/site.config.alt.ts` must keep parsing; the sidebar availability row now shows `lookingFor`; `status` (home card, OG) now reads "Abierto a colaboraciones y proyectos".
-- M1 review tier: not yet assessed (RDD assessment is run per work-unit commit below).
+- M1 commit: `17291e0` on `develop` (16 files, +192/-23, tracker included; about 190 authored lines, under the 400 heuristic). Running count: about 190.
+- M1 review: receipt-driven development is off (decided by clone_local), so no native review was started: `disabled/unmanaged`. `gentle-ai review assess --base-ref HEAD~1 --committed-only` reported `high` / `high_risk` only because `odd/tasks/me-portfolio-update.md` matches a hot-path signal (the tracker file, not code); recorded, not acted on. Ordinary checks above stand.
 
 ## Next step
 
