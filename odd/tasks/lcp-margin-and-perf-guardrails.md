@@ -1,0 +1,34 @@
+# Feature: widen the LCP margin of the heavier pages and enforce page-weight guardrails (issue #87, T58)
+
+Status: **started 2026-10-07** (owner: "dale con el issue 87 del margen de LCP"). Tier 3. Related: issue #87, `docs/TESTING.md` ("The note-page LCP gate is sensitive to a few bytes"), the closed #72 (cut the inline CSS), `odd/tasks/me-portfolio-update.md` (headroom policy, release 12).
+
+## Objective
+
+The CI Lighthouse gate (`largest-contentful-paint <= 2500 ms`, pessimistic over 3 runs) must pass with a comfortable margin instead of by a few milliseconds, on `/experiments/`, `/me/` and the pages that follow, and regressions in page weight must fail loudly before a release.
+
+## Problem and evidence
+
+- CI run 37647514387 (release 12, second attempt): `/experiments/` LCP 2289, 2436 and 2513 ms; the third value is 13 ms over the gate and failed `lighthouse (1)`. The same page passed in the first attempt and measures about 2270 ms on the owner's machine. The same CI job re-run passed. So the margin is thinner than the runner noise.
+- Known mechanism (`docs/TESTING.md`): the lab server does not compress, under simulated slow 4G (1.6 Mbps, 150 ms RTT) each raw KB in the head costs about 11 ms and a few hundred bytes can cost a TCP round trip; the whole site stylesheet is inlined in every page (about 52 KB before page-specific CSS).
+- Measured earlier in this feature: bytes below the fold are almost free for LCP (the projects block added 28 KB of lazy image and cards with LCP unchanged), bytes in the head and the hero are expensive.
+
+## Plan (decide with data, one change at a time, measured with the same fixture and machine)
+
+1. Analyze: LCP element and phases per page from the Lighthouse reports; inline CSS size per page and the share that belongs to the page itself (selector-prefix breakdown); how much of that CSS belongs to parts that do not render with today's content (pager, sort switch, summary, compact cards when every entry is featured).
+2. A/B the global lever: `build.inlineStylesheets` `'always'` against `'auto'` (external, cached stylesheet) on `/`, `/me/`, `/experiments/`: keep only if LCP does not get worse.
+3. Ship less CSS where it is not needed (conditional loading of the listing parts) and re-measure.
+4. Guardrails: a per-page-type HTML and inline-CSS budget check (next to `check:js-budget`), documented thresholds, tests, and the rule "head and hero bytes are expensive, bytes below the fold are cheap" in `docs/DESIGN.md`.
+5. Record before/after numbers, close the issue with evidence.
+
+## Constraints
+
+Visual design unchanged unless a measured gain needs it; SEO/semantics, accessibility and the other gates unchanged; changes touching `astro.config.ts` or the verification scripts are full-wide (run the whole stack once); no remote operation without the owner's authorization (release, push, issue edits).
+
+## Progress
+
+- 2026-10-07: document created; analysis done (parent, read-only plus one reverted experiment).
+- Finding 1 (Lighthouse reports, last full battery): on every page the LCP is text with Load Delay 0 and Load Time 0; all the time is Render Delay (1650-1960 ms), i.e. the time to first paint, driven by the head bytes (inline CSS) the simulated link must receive, about 8-9 ms per raw KB. By page: /contact/ 2114 ms (inline CSS 52.9 KB), /experiments/ 2268 ms (70.5 KB), / 2295 ms (56.2 KB), /me/ 2419 ms (54.1 KB), note page 2412 ms. The 154 ms gap between /contact/ and /experiments/ matches the 17.5 KB of page-specific CSS.
+- Finding 2 (CSS breakdown of the built /experiments/): shared site CSS 47.9 KB; page .xp- rules 12.4 KB; listing kit 2.9 KB; compact cards .xc- 2.2 KB; scoped leftovers 2.6 KB; @font-face 2.4 KB; 4,375 B of [data-astro-cid-*] attribute selectors alone (350 B on the other pages). With today's content (both entries featured) the compact cards, pager, sort switch and summary do not render but their CSS ships (about 5 KB, about 45 ms).
+- Experiment REJECTED: build.inlineStylesheets 'auto' (external stylesheet), 3 Lighthouse runs per page on the owner's machine: /contact/ 1815, 2121, 2125 ms (before: about 2114-2263); /experiments/ 2120, 2430, 2436 (before: 2271-2273); /me/ 2275, 2284, 2289 (before: 2347-2428). Mixed and bimodal (about 300 ms between runs); the gate uses the worst of three, which got worse on /experiments/. Kept 'always' (as the comment in astro.config.ts already argued). astro.config.ts reverted, no change committed.
+- Plan chosen: ship component CSS only where the component renders, drop the scoped-attribute overhead and dead rules of the experiments page (target page CSS under about 8 KB, worst-case LCP at least 80 ms lower), add a per-page-type HTML and inline-CSS budget check () wired into verify and CI, document the rule. Delegated to one writer (a multi-file change with a precise brief); the parent re-measures independently.
+- Open, not in this slice: /me/ (2419 ms locally, CI 2417-2421) and the note page (2412 ms) have a thin margin too (about 80-90 ms); their LCP element sits after the hero or the header and competes with an eager image. Candidate follow-up after this slice, measured the same way.
