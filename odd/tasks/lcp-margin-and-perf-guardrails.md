@@ -1,6 +1,6 @@
 # Feature: widen the LCP margin of the heavier pages and enforce page-weight guardrails (issue #87, T58)
 
-Status: **started 2026-10-07** (owner: "dale con el issue 87 del margen de LCP"). Tier 3. Related: issue #87, `docs/TESTING.md` ("The note-page LCP gate is sensitive to a few bytes"), the closed #72 (cut the inline CSS), `odd/tasks/me-portfolio-update.md` (headroom policy, release 12).
+Status: **first slice delivered in release 13 (`30ccbf9`, 2026-10-07); issue #87 stays open for `/me/` and the note page (about 70-90 ms of LCP margin).** Started 2026-10-07 (owner: "dale con el issue 87 del margen de LCP"). Tier 3. Related: issue #87, `docs/TESTING.md` ("The note-page LCP gate is sensitive to a few bytes"), the closed #72 (cut the inline CSS), `odd/tasks/me-portfolio-update.md` (headroom policy, release 12).
 
 ## Objective
 

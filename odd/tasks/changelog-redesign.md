@@ -1,6 +1,6 @@
 # Feature: a better visitor changelog (releases, dates, grouped by kind)
 
-Status: **recorded, not started** (owner, 2026-10-06: "improve the changelog, it is already growing a lot; segment by releases and dates, group by fixed, changes, features, and make it look good; write it down in the docs and in the GitHub project").
+Status: **delivered in release 13 (`30ccbf9`, 2026-10-07); issue #90 closed.** Originally recorded (owner, 2026-10-06: "improve the changelog, it is already growing a lot; segment by releases and dates, group by fixed, changes, features, and make it look good; write it down in the docs and in the GitHub project").
 Tier: 3 (information design plus an amendment of ADR 0010). The GitHub issue is drafted in `odd/issues-to-create.md` (T63) and is not created yet: creating it is a remote operation that needs the owner's explicit authorization.
 
 ## Current state (checked 2026-10-06)
