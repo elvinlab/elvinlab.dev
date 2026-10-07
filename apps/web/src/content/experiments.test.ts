@@ -27,8 +27,20 @@ describe('content/experiments.json', () => {
 
   it('only points at images that exist in assets/experiments/<id>/', () => {
     for (const [id, project] of Object.entries(experimentSchemaParsed())) {
-      if (project.image === undefined) continue;
-      expect(existsSync(read(`../assets/experiments/${id}/${project.image.file}`)), id).toBe(true);
+      for (const image of project.images ?? []) {
+        expect(existsSync(read(`../assets/experiments/${id}/${image.file}`)), id).toBe(true);
+      }
+    }
+  });
+
+  it('gives every image a non-empty alt text in both locales', () => {
+    for (const [id, project] of Object.entries(experimentSchemaParsed())) {
+      for (const image of project.images ?? []) {
+        for (const locale of ['es', 'en'] as const) {
+          const alt = typeof image.alt === 'string' ? image.alt : image.alt[locale];
+          expect(alt?.length ?? 0, `${id} ${image.file} ${locale}`).toBeGreaterThan(0);
+        }
+      }
     }
   });
 });

@@ -1,4 +1,4 @@
-import { expect, test } from '@playwright/test';
+import { expect, type Page, test } from '@playwright/test';
 
 /**
  * The experiments page and the compact experiments block on `/me`. The fixture build copies the real `experiments.json`;
@@ -55,17 +55,188 @@ for (const { path, heading, live, code } of PAGES) {
   });
 }
 
-test('the card shows its screenshot lazily with alternative text', async ({ page }) => {
+test('the second piece shows its screenshot lazily with alternative text and explicit size', async ({
+  page,
+}) => {
   await page.goto('/experiments/');
-  const shot = page.getByRole('img', { name: 'Captura de la página de inicio de elvinlab.dev' });
+  const shot = page.getByRole('img', {
+    name: 'Captura de la nota que cuenta el caso de agentic-dev-setup',
+  });
   await expect(shot).toHaveAttribute('loading', 'lazy');
   await expect(shot).toHaveAttribute('decoding', 'async');
-  await expect(shot).toHaveAttribute('width', '800');
-  await expect(shot).toHaveAttribute('height', '500');
+  await expect(shot).toHaveAttribute('width', '1280');
+  await expect(shot).toHaveAttribute('height', '800');
   await page.goto('/en/experiments/');
   await expect(
     page.getByRole('img', { name: 'Screenshot of the elvinlab.dev home page' }),
   ).toBeVisible();
+});
+
+test('the page title stays inside the page-title scale of the sibling pages', async ({ page }) => {
+  const size = async (path: string) =>
+    page.goto(path).then(() =>
+      page
+        .locator('h1')
+        .first()
+        .evaluate((el) => Number.parseFloat(getComputedStyle(el).fontSize)),
+    );
+  const contact = await size('/contact/');
+  for (const path of ['/experiments/', '/en/experiments/']) {
+    expect(await size(path), path).toBeLessThanOrEqual(contact);
+  }
+});
+
+test('no piece is ever dimmed: the scroll reveal moves pieces but never touches opacity', async ({
+  page,
+}) => {
+  await page.goto('/experiments/');
+  const opacities = await page.evaluate(() =>
+    [...document.querySelectorAll('main article')].flatMap((piece) => [
+      getComputedStyle(piece).opacity,
+      ...piece
+        .getAnimations()
+        .flatMap((animation) =>
+          (animation.effect as KeyframeEffect)
+            .getKeyframes()
+            .map((frame) => String(frame['opacity'])),
+        ),
+    ]),
+  );
+  expect(opacities.length).toBeGreaterThan(0);
+  expect(opacities.every((value) => value === '1' || value === 'undefined')).toBe(true);
+});
+
+test('the gallery thumbnails never wrap, even on a phone', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto('/experiments/');
+  const tops = await page
+    .locator('#elvinlab-dev label.xp-thumb')
+    .evaluateAll((labels) => labels.map((label) => Math.round(label.getBoundingClientRect().top)));
+  expect(tops).toHaveLength(4);
+  expect(new Set(tops).size).toBe(1);
+});
+
+test('the featured flagship leads: elvinlab.dev comes before agentic-dev-setup', async ({
+  page,
+}) => {
+  await page.goto('/experiments/');
+  const ids = await page.locator('main article').evaluateAll((pieces) => pieces.map((p) => p.id));
+  expect(ids).toEqual(['elvinlab-dev', 'agentic-dev-setup']);
+});
+
+test('only the first image of the first piece is eager, every other one is lazy', async ({
+  page,
+}) => {
+  await page.goto('/experiments/');
+  const images = page.locator('main img');
+  expect(await images.count()).toBeGreaterThan(2);
+  await expect(page.locator('main img[loading="eager"]')).toHaveCount(1);
+  await expect(page.locator('main article').first().locator('img[loading="eager"]')).toHaveCount(1);
+  await expect(page.locator('main img[fetchpriority="high"]')).toHaveCount(1);
+  for (const image of await page.locator('main img:not([loading="eager"])').all()) {
+    await expect(image).toHaveAttribute('loading', 'lazy');
+  }
+});
+
+test.describe('the gallery of an experiment with several images', () => {
+  const piece = (page: Page) => page.locator('#elvinlab-dev');
+  const caption = (page: Page) => piece(page).locator('figcaption:visible');
+
+  test('shows the first slide and works with the mouse and the arrow keys', async ({ page }) => {
+    await page.goto('/experiments/');
+    await expect(
+      piece(page).getByRole('group', { name: 'Capturas de elvinlab.dev' }),
+    ).toBeVisible();
+    await expect(caption(page)).toContainText('Inicio: la última nota y el perfil');
+    await expect(caption(page)).toContainText('1 / 4');
+    await expect(piece(page).locator('figure:visible')).toHaveCount(1);
+
+    // Clicking the second thumbnail (a label with a full accessible name) shows its slide.
+    const second = piece(page).getByRole('radio', { name: /Captura 2 de 4: \/me/ });
+    await piece(page).locator('label.xp-thumb').nth(1).click();
+    await expect(second).toBeChecked();
+    await expect(caption(page)).toContainText('/me: la página para quien evalúa mi perfil');
+    await expect(caption(page)).toContainText('2 / 4');
+    await expect(piece(page).locator('figure:visible')).toHaveCount(1);
+
+    // Arrow keys move between radios natively.
+    await page.locator('#elvinlab-dev-shot-2').focus();
+    await page.keyboard.press('ArrowRight');
+    await expect(caption(page)).toContainText('3 / 4');
+    await page.keyboard.press('ArrowLeft');
+    await page.keyboard.press('ArrowLeft');
+    await expect(caption(page)).toContainText('1 / 4');
+  });
+
+  test('has a visible focus ring on the focused thumbnail and one radio per slide', async ({
+    page,
+  }) => {
+    await page.goto('/experiments/');
+    await expect(piece(page).getByRole('radio')).toHaveCount(4);
+    await page.keyboard.press('Tab');
+    await page.locator('#elvinlab-dev-shot-1').focus();
+    await page.keyboard.press('ArrowRight');
+    const ring = await piece(page)
+      .locator('label.xp-thumb')
+      .nth(1)
+      .evaluate((el) => getComputedStyle(el).boxShadow);
+    expect(ring).not.toBe('none');
+  });
+});
+
+test.describe('without JavaScript', () => {
+  test.use({ javaScriptEnabled: false });
+
+  test('the first slide is shown and choosing a thumbnail still changes the slide', async ({
+    page,
+  }) => {
+    await page.goto('/experiments/');
+    const piece = page.locator('#elvinlab-dev');
+    const caption = piece.locator('figcaption:visible');
+    await expect(caption).toContainText('1 / 4');
+    await piece.locator('label.xp-thumb').nth(2).click();
+    await expect(caption).toContainText('3 / 4');
+  });
+});
+
+test('a single image is a plain figure and there is no compact tier with two featured entries', async ({
+  page,
+}) => {
+  await page.goto('/experiments/');
+  const single = page.locator('#agentic-dev-setup');
+  await expect(single.getByRole('radio')).toHaveCount(0);
+  await expect(single.locator('fieldset')).toHaveCount(0);
+  await expect(single.locator('figcaption')).toContainText('La nota que cuenta el caso');
+  await expect(page.getByRole('heading', { name: 'Más experimentos' })).toHaveCount(0);
+  await expect(page.locator('li.xc')).toHaveCount(0);
+});
+
+for (const id of ['elvinlab-dev', 'agentic-dev-setup']) {
+  test(`#${id} lands on its piece even with content-visibility on later pieces`, async ({
+    page,
+  }) => {
+    await page.goto(`/experiments/#${id}`);
+    await expect(page.locator(`#${id}`)).toBeInViewport();
+  });
+}
+
+test.describe('with reduced motion', () => {
+  test.use({ reducedMotion: 'reduce' });
+
+  test('no piece runs an animation or a transition on load or after scrolling', async ({
+    page,
+  }) => {
+    await page.goto('/experiments/');
+    await page.mouse.wheel(0, 1200);
+    await page.waitForTimeout(300);
+    const running = await page.evaluate(
+      () =>
+        [...document.querySelectorAll('main article, main article *')]
+          .flatMap((el) => el.getAnimations())
+          .filter((animation) => animation.playState === 'running').length,
+    );
+    expect(running).toBe(0);
+  });
 });
 
 for (const [path, section, all, text, indexPath] of [

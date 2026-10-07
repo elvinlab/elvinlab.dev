@@ -483,6 +483,6 @@
     "date": "2026-10-06",
     "category": "added",
     "title": "Experiments page and recent experiments on /me",
-    "description": "A new Experiments page (/experiments/, /en/experiments/) says what each project solves, what I did myself and the result. /me shows recent experiments as compact rows that open the matching card, with a closing button to the full page. The Projects menu entry is now Experiments. For forks: new optional fields in experiments.json; an image lives in src/assets/experiments/<entry key>/; an unpublished note fails the build."
+    "description": "An Experiments page (/experiments/, /en/experiments/) shows the featured projects (up to 3) as exhibition pieces: what each solves, what I did myself and the result, next to a gallery of real screenshots with captions and thumbnails (no JavaScript needed, soft motion that respects reduced motion). Other projects are compact cards grouped by year. /me shows recent experiments as compact rows. For forks: experiments.json takes up to four `images`, an `order` and an `archived` status."
   }
 }

@@ -5,7 +5,7 @@
  */
 import { spawnSync } from 'node:child_process';
 import { readdirSync, readFileSync, realpathSync, writeFileSync } from 'node:fs';
-import { join, resolve } from 'node:path';
+import { basename, extname, join, resolve } from 'node:path';
 
 import { createFixtureWorkspace } from './fixture-workspace.ts';
 
@@ -33,6 +33,31 @@ if (!OWNER.every((token) => token.test(realConfig))) {
 if (!NOW_FOCUS.every((text) => realConfig.includes(text))) {
   fail('the Now card text is not in the real site.config.ts — the check would be vacuous');
 }
+
+const IMAGE_FILE = /\.(?:png|jpe?g|webp|avif)$/i;
+
+/** Base names (no extension) of every image under `dir`, recursively. */
+function imageBaseNames(dir: string): string[] {
+  const names: string[] = [];
+  for (const entry of readdirSync(dir, { withFileTypes: true })) {
+    const path = join(dir, entry.name);
+    if (entry.isDirectory()) names.push(...imageBaseNames(path));
+    else if (IMAGE_FILE.test(entry.name)) names.push(basename(entry.name, extname(entry.name)));
+  }
+  return names;
+}
+
+// Every owner image (photo, avatar, experiment captures) lives under `src/assets`. Astro emits it as
+// `_astro/<name>.<hash>.<ext>`, so the names are read from the real files instead of a hand-kept list:
+// adding or renaming an owner image keeps the leak check honest. Negative control: names must exist.
+const OWNER_IMAGES = [...new Set(imageBaseNames(join(source, 'apps/web/src/assets')))];
+const experimentImages = imageBaseNames(join(source, 'apps/web/src/assets/experiments'));
+if (OWNER_IMAGES.length === 0 || experimentImages.length === 0) {
+  fail('no owner image names found under src/assets — the image leak check would be vacuous');
+}
+const OWNER_IMAGE_REFERENCE = new RegExp(
+  `_astro/(?:${OWNER_IMAGES.map((name) => name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('|')})\\.[\\w-]+\\.(?:png|jpe?g|webp|avif)`,
+);
 
 function collectHtml(dir: string): string {
   let html = '';
@@ -103,9 +128,10 @@ try {
   // The owner's images live in `src/assets` and are named by `identity.avatar` / `identity.photo`.
   // The alternative config names none, so no page may reference them (the raw files still reach
   // `_astro/` because the eager asset glob emits every image of the folder; a fork replaces them).
-  if (/_astro\/(?:photo|avatar|cover)\./.test(rawHtml)) {
+  const leakedImage = OWNER_IMAGE_REFERENCE.exec(rawHtml);
+  if (leakedImage) {
     fail(
-      'a page of the alternative-identity build references an owner image (photo, avatar or experiment cover)',
+      `a page of the alternative-identity build references an owner image (${leakedImage[0]}): photo, avatar or experiment capture`,
     );
   }
   // The neutral `experiments.json` is empty: the experiments pages exist (the flag is on in the

@@ -110,7 +110,7 @@ jobs:
         run: |
           echo "e2e (shard ${{ matrix.shard }}/4): $(( $(date +%s) - JOB_START ))s" >> "$GITHUB_STEP_SUMMARY"
 
-  # Sharded: the 6 URLs of lighthouserc.json split across 2 runners (`--shard=N/2`, every 2nd URL),
+  # Sharded: the URLs of lighthouserc.json (10 today) split across 2 runners (`--shard=N/2`, every 2nd URL),
   # still 3 runs per URL and the same assertions. `checks` needs this whole matrix, so it passes only
   # if both shards do (a matrix job's result is `failure` when any shard failed).
   lighthouse:

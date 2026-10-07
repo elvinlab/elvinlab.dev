@@ -48,9 +48,9 @@ export function experimentSchema() {
       .describe('Up to five kebab-case tags.'),
     year: z.int().min(2000).describe('Year the project started or shipped.'),
     status: z
-      .enum(['running', 'shipped'])
+      .enum(['running', 'shipped', 'archived'])
       .default('shipped')
-      .describe('`running` shows a green dot; `shipped` a violet one.'),
+      .describe('`running` shows a green dot, `shipped` a violet one and `archived` a muted one.'),
     url: httpsUrl
       .optional()
       .describe(
@@ -66,20 +66,39 @@ export function experimentSchema() {
       .describe(
         'Slug of a published note that tells the case. The build fails if no such note is published.',
       ),
-    image: z
-      .object({
-        file: z
-          .string()
-          .regex(imageFile)
-          .describe(
-            'File name inside the own folder of the entry `apps/web/src/assets/experiments/<entry key>/` (png, jpg, webp or avif).',
+    images: z
+      .array(
+        z.object({
+          file: z
+            .string()
+            .regex(imageFile)
+            .describe(
+              'File name inside the own folder of the entry `apps/web/src/assets/experiments/<entry key>/` (png, jpg, webp or avif).',
+            ),
+          alt: text(140).describe(
+            `Alternative text describing the screenshot (max 140 characters each). ${LOCALIZED_HINT}.`,
           ),
-        alt: text(140).describe(
-          `Alternative text describing the screenshot (max 140 characters each). ${LOCALIZED_HINT}.`,
-        ),
-      })
+          caption: text(120)
+            .optional()
+            .describe(
+              `A short caption shown under the image in the gallery (max 120 characters each). ${LOCALIZED_HINT}.`,
+            ),
+        }),
+      )
+      .min(1)
+      .max(4)
       .optional()
-      .describe('Screenshot shown on the card. Use your own screenshots only.'),
+      .describe(
+        'One to four screenshots, in display order. The first is the cover (used by `/me` and as the first slide). Use your own screenshots only; leave the field out for a typographic cover.',
+      ),
+    order: z
+      .int()
+      .min(0)
+      .max(1000)
+      .optional()
+      .describe(
+        'Position among entries of the same tier: lower comes first (default 100). Featured entries always come before the others; ties go to the newest year, then the key.',
+      ),
     featured: z.boolean().default(false).describe('Featured experiments lead the lists.'),
   });
 }

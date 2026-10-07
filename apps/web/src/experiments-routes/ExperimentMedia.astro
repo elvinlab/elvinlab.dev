@@ -1,0 +1,404 @@
+---
+/**
+ * The media frame of one experiment piece. Three shapes, one 16:10 box:
+ *
+ * - 2 to 4 images: a CSS-only gallery. A `<fieldset>` holds one visually hidden radio per slide, the
+ *   slides, and a strip of thumbnail labels. The checked radio picks the visible slide with sibling
+ *   selectors, so it works without JavaScript and arrow keys move between slides natively. Slides
+ *   that are not selected are `display: none`, so their lazy images do not download until shown.
+ * - 1 image: a plain figure with its caption.
+ * - no image: a decorative typographic cover (year, slug, pink block over faint grid lines).
+ *
+ * Only the first slide of the page's first piece is eager (`priority`). The styles are scoped to
+ * this component, so they ship on `/experiments/` only and never reach `/me`.
+ */
+import { Image } from 'astro:assets';
+
+import type { ExperimentEntry } from '@/features/portfolio/index.ts';
+import { LOCALES, type Locale, t } from '@/shared/i18n/index.ts';
+import { resolveExperimentImages } from '@/shared/lib/experiment-image.ts';
+import { pickLocale } from '@/shared/lib/localized.ts';
+
+type Props = {
+  experiment: ExperimentEntry;
+  locale: Locale;
+  /** The first image is the first thing in the viewport of the page: load it eagerly with high priority. */
+  priority?: boolean;
+};
+
+const { experiment, locale, priority = false } = Astro.props;
+const configured = experiment.images ?? [];
+const metadata = resolveExperimentImages(
+  experiment.id,
+  configured.map((image) => image.file),
+);
+const slides = configured.flatMap((image, index) => {
+  const src = metadata[index];
+  if (!src) return [];
+  const caption = pickLocale(image.caption, locale, LOCALES.defaultLocale);
+  const position = t(locale, 'experiment.shot', { n: String(index + 1), total: String(configured.length) });
+  return [{
+    src,
+    alt: pickLocale(image.alt, locale, LOCALES.defaultLocale),
+    caption,
+    counter: `${index + 1} / ${configured.length}`,
+    label: caption ? `${position}: ${caption}` : position,
+    id: `${experiment.id}-shot-${index + 1}`,
+  }];
+});
+const [first] = slides;
+const isGallery = slides.length > 1;
+const group = `${experiment.id}-shots`;
+---
+
+{!first ? (
+  <div class="xp-media">
+    <div class="xp-clip xp-cover" aria-hidden="true">
+      <span class="xp-cover-year">{experiment.year}</span>
+      <svg class="xp-star" viewBox="0 0 7 7" width="21" height="21" shape-rendering="crispEdges" fill="currentColor" aria-hidden="true" focusable="false"><rect x="3" y="0" width="1" height="7"></rect><rect x="0" y="3" width="7" height="1"></rect><rect x="2" y="2" width="3" height="3"></rect></svg>
+      <span class="xp-cover-slug">{experiment.id}<span class="xp-block"></span></span>
+    </div>
+  </div>
+) : isGallery ? (
+  <div class="xp-media">
+    <fieldset class="xp-gallery">
+      <legend class="xp-sr">{t(locale, 'experiment.gallery', { title: experiment.title })}</legend>
+      {slides.map((slide, index) => (
+        <input type="radio" class="xp-radio" name={group} id={slide.id} checked={index === 0} />
+      ))}
+      <div class="xp-stage">
+        {slides.map((slide, index) => (
+          <figure class="xp-slide">
+            <div class="xp-shot">
+              <div class="xp-clip">
+                <Image
+                  src={slide.src}
+                  alt={slide.alt}
+                  format="webp"
+                  quality={80}
+                  width={1280}
+                  height={800}
+                  widths={[640, 960, 1280]}
+                  sizes="(min-width: 1024px) 640px, calc(100vw - 2rem)"
+                  loading={priority && index === 0 ? 'eager' : 'lazy'}
+                  fetchpriority={priority && index === 0 ? 'high' : undefined}
+                  decoding={priority && index === 0 ? 'sync' : 'async'}
+                />
+              </div>
+            </div>
+            <figcaption class="xp-cap">
+              <span class="xp-cap-text">{slide.caption}</span>
+              <span class="xp-cap-count">{slide.counter}</span>
+            </figcaption>
+          </figure>
+        ))}
+      </div>
+      <div class="xp-thumbs">
+        {slides.map((slide) => (
+          <label for={slide.id} class="xp-thumb">
+            <Image
+              src={slide.src}
+              alt=""
+              format="webp"
+              quality={70}
+              width={96}
+              height={60}
+              widths={[96, 192, 256]}
+              sizes="112px"
+              loading="lazy"
+              decoding="async"
+            />
+            <span class="xp-sr">{slide.label}</span>
+          </label>
+        ))}
+      </div>
+    </fieldset>
+  </div>
+) : (
+  <div class="xp-media">
+    <figure class="xp-slide xp-single">
+      <div class="xp-shot">
+        <div class="xp-clip">
+          <Image
+            src={first.src}
+            alt={first.alt}
+            format="webp"
+            quality={80}
+            width={1280}
+            height={800}
+            widths={[640, 960, 1280]}
+            sizes="(min-width: 1024px) 640px, calc(100vw - 2rem)"
+            loading={priority ? 'eager' : 'lazy'}
+            fetchpriority={priority ? 'high' : undefined}
+            decoding={priority ? 'sync' : 'async'}
+          />
+        </div>
+      </div>
+      {first.caption && (
+        <figcaption class="xp-cap"><span class="xp-cap-text">{first.caption}</span></figcaption>
+      )}
+    </figure>
+  </div>
+)}
+
+<style>
+  .xp-media {
+    position: relative;
+    isolation: isolate;
+    min-width: 0;
+  }
+  .xp-sr {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    margin: -1px;
+    padding: 0;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+  .xp-gallery {
+    position: relative;
+    min-inline-size: 0;
+    margin: 0;
+    padding: 0;
+    border: 0;
+  }
+  .xp-radio {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 1px;
+    height: 1px;
+    margin: 0;
+    opacity: 0;
+    pointer-events: none;
+  }
+  .xp-slide {
+    margin: 0;
+  }
+  .xp-gallery .xp-slide {
+    display: none;
+  }
+  /* The checked radio shows its own slide and marks its own thumbnail. */
+  .xp-radio:nth-of-type(1):checked ~ .xp-stage > .xp-slide:nth-child(1),
+  .xp-radio:nth-of-type(2):checked ~ .xp-stage > .xp-slide:nth-child(2),
+  .xp-radio:nth-of-type(3):checked ~ .xp-stage > .xp-slide:nth-child(3),
+  .xp-radio:nth-of-type(4):checked ~ .xp-stage > .xp-slide:nth-child(4) {
+    display: block;
+  }
+  .xp-radio:nth-of-type(1):checked ~ .xp-thumbs > .xp-thumb:nth-child(1),
+  .xp-radio:nth-of-type(2):checked ~ .xp-thumbs > .xp-thumb:nth-child(2),
+  .xp-radio:nth-of-type(3):checked ~ .xp-thumbs > .xp-thumb:nth-child(3),
+  .xp-radio:nth-of-type(4):checked ~ .xp-thumbs > .xp-thumb:nth-child(4) {
+    outline: 2px solid var(--color-primary);
+    outline-offset: -2px;
+    opacity: 1;
+  }
+  .xp-radio:nth-of-type(1):focus-visible ~ .xp-thumbs > .xp-thumb:nth-child(1),
+  .xp-radio:nth-of-type(2):focus-visible ~ .xp-thumbs > .xp-thumb:nth-child(2),
+  .xp-radio:nth-of-type(3):focus-visible ~ .xp-thumbs > .xp-thumb:nth-child(3),
+  .xp-radio:nth-of-type(4):focus-visible ~ .xp-thumbs > .xp-thumb:nth-child(4) {
+    box-shadow:
+      0 0 0 2px var(--color-page),
+      0 0 0 4px var(--color-cyan);
+  }
+
+  /* The image box: hairline outline, clipped zoom, square-capped pixel corner brackets (3 px bars, 14 px arms) on the frame. */
+  .xp-shot {
+    position: relative;
+    color: color-mix(in srgb, var(--color-text) 38%, transparent);
+  }
+  .xp-shot::after {
+    content: '';
+    position: absolute;
+    inset: -6px;
+    pointer-events: none;
+    background:
+      linear-gradient(currentColor, currentColor) top left / 14px 3px no-repeat,
+      linear-gradient(currentColor, currentColor) top left / 3px 14px no-repeat,
+      linear-gradient(currentColor, currentColor) top right / 14px 3px no-repeat,
+      linear-gradient(currentColor, currentColor) top right / 3px 14px no-repeat,
+      linear-gradient(currentColor, currentColor) bottom left / 14px 3px no-repeat,
+      linear-gradient(currentColor, currentColor) bottom left / 3px 14px no-repeat,
+      linear-gradient(currentColor, currentColor) bottom right / 14px 3px no-repeat,
+      linear-gradient(currentColor, currentColor) bottom right / 3px 14px no-repeat;
+  }
+  .xp-clip {
+    position: relative;
+    aspect-ratio: 16 / 10;
+    overflow: hidden;
+    border-radius: var(--radius-card);
+    background: var(--color-chip);
+    outline: 1px solid var(--color-divider);
+    outline-offset: -1px;
+  }
+  .xp-clip :global(img) {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: top;
+  }
+
+  .xp-cap {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-top: 0.75rem;
+    padding-inline: 0.25rem;
+    font: 400 0.8125rem / 1.4 var(--font-mono);
+    color: var(--color-text-secondary);
+  }
+  .xp-cap-text {
+    min-width: 0;
+    text-wrap: pretty;
+  }
+  .xp-cap-count {
+    flex-shrink: 0;
+    color: var(--color-muted);
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* Four equal columns that shrink: up to four thumbnails never wrap, at any width. */
+  .xp-thumbs {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 0.5rem;
+    max-width: 28rem;
+    margin-top: 0.75rem;
+    padding-bottom: 0.625rem;
+  }
+  /* The pixel notch under the active thumbnail: three square steps, narrow at the top. */
+  .xp-thumb::after {
+    content: '';
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    width: 10px;
+    height: 6px;
+    margin: 3px 0 0 -5px;
+    color: var(--color-primary);
+    opacity: 0;
+    pointer-events: none;
+    background:
+      linear-gradient(currentColor, currentColor) top center / 2px 2px no-repeat,
+      linear-gradient(currentColor, currentColor) center / 6px 2px no-repeat,
+      linear-gradient(currentColor, currentColor) bottom center / 10px 2px no-repeat;
+  }
+  .xp-radio:nth-of-type(1):checked ~ .xp-thumbs > .xp-thumb:nth-child(1)::after,
+  .xp-radio:nth-of-type(2):checked ~ .xp-thumbs > .xp-thumb:nth-child(2)::after,
+  .xp-radio:nth-of-type(3):checked ~ .xp-thumbs > .xp-thumb:nth-child(3)::after,
+  .xp-radio:nth-of-type(4):checked ~ .xp-thumbs > .xp-thumb:nth-child(4)::after {
+    opacity: 1;
+  }
+  .xp-thumb {
+    position: relative;
+    display: block;
+    min-width: 0;
+    aspect-ratio: 96 / 60;
+    border-radius: var(--radius-inner);
+    outline: 1px solid var(--color-divider);
+    outline-offset: -1px;
+    opacity: 0.7;
+    cursor: pointer;
+  }
+  .xp-thumb :global(img) {
+    display: block;
+    border-radius: inherit;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: top;
+  }
+  @media (hover: hover) {
+    .xp-thumb:hover {
+      opacity: 1;
+    }
+  }
+
+  /* The typographic cover for an experiment with no real image: faint grid, year, slug and the pink block. */
+  .xp-cover {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 1.25rem;
+    background:
+      linear-gradient(var(--color-divider) 1px, transparent 1px) 0 0 / 100% 2.5rem,
+      linear-gradient(90deg, var(--color-divider) 1px, transparent 1px) 0 0 / 2.5rem 100%,
+      var(--color-chip);
+    font-family: var(--font-mono);
+  }
+  .xp-cover-year {
+    font-size: 0.8125rem;
+    color: var(--color-muted);
+  }
+  .xp-star {
+    position: absolute;
+    top: 1.25rem;
+    right: 1.25rem;
+    color: var(--color-cyan);
+  }
+  .xp-cover-slug {
+    display: flex;
+    align-items: baseline;
+    gap: 0.375rem;
+    font-size: 1.25rem;
+    color: var(--color-text-secondary);
+    overflow-wrap: anywhere;
+  }
+  .xp-block {
+    display: inline-block;
+    flex-shrink: 0;
+    width: 0.5rem;
+    height: 0.9rem;
+    background: var(--color-pink);
+  }
+
+  /* Hover and focus: the image grows slightly inside its frame and the brackets turn violet. */
+  @media (prefers-reduced-motion: no-preference) {
+    .xp-clip :global(img) {
+      transition: transform 400ms ease-out;
+    }
+    .xp-shot {
+      transition: color 250ms ease-out;
+    }
+    .xp-thumb {
+      transition: opacity 150ms ease-out;
+    }
+    .xp-gallery .xp-slide {
+      animation: xp-fade 280ms steps(4, end);
+    }
+    /* The first slide is the LCP candidate: it never fades in on load, only when chosen again. */
+    .xp-radio:nth-of-type(1):checked ~ .xp-stage > .xp-slide:nth-child(1) {
+      animation: none;
+    }
+  }
+  @media (hover: hover) {
+    .xp-media:hover .xp-shot {
+      color: var(--color-primary);
+    }
+  }
+  .xp-media:focus-within .xp-shot {
+    color: var(--color-primary);
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    @media (hover: hover) {
+      .xp-media:hover .xp-clip :global(img) {
+        transform: scale(1.03);
+      }
+    }
+    .xp-media:focus-within .xp-clip :global(img) {
+      transform: scale(1.03);
+    }
+  }
+  @keyframes xp-fade {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+</style>

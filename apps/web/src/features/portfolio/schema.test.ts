@@ -28,6 +28,17 @@ describe('experimentSchema', () => {
     expect(() => schema.parse({ ...valid, url: 'mailto:me@example.dev' })).toThrow();
   });
 
+  it('accepts an optional non-negative integer order', () => {
+    expect(schema.parse(valid).order).toBeUndefined();
+    expect(schema.parse({ ...valid, order: 1 }).order).toBe(1);
+    expect(() => schema.parse({ ...valid, order: -1 })).toThrow();
+    expect(() => schema.parse({ ...valid, order: 1.5 })).toThrow();
+  });
+
+  it('accepts the archived status', () => {
+    expect(schema.parse({ ...valid, status: 'archived' }).status).toBe('archived');
+  });
+
   it('defaults status to shipped and rejects unknown status', () => {
     const { status: _, ...rest } = valid;
     expect(schema.parse(rest).status).toBe('shipped');
@@ -56,7 +67,7 @@ describe('experimentSchema', () => {
     expect(parsed.subtitle).toBeUndefined();
     expect(parsed.repo).toBeUndefined();
     expect(parsed.note).toBeUndefined();
-    expect(parsed.image).toBeUndefined();
+    expect(parsed.images).toBeUndefined();
   });
 
   it('accepts the optional case fields, localized and capped at 200 characters', () => {
@@ -85,13 +96,34 @@ describe('experimentSchema', () => {
     expect(() => schema.parse({ ...valid, note: 'Not Kebab' })).toThrow();
   });
 
-  it('accepts an image as a file name inside an assets/experiments folder with localized alt text', () => {
-    const image = { file: 'cover.jpg', alt: { es: 'Captura', en: 'Screenshot' } };
-    expect(schema.parse({ ...valid, image }).image).toEqual(image);
-    expect(() => schema.parse({ ...valid, image: { file: '../secret.jpg', alt: 'x' } })).toThrow();
+  it('accepts one to four images, each a file name with localized alt and optional caption', () => {
+    const one = { file: 'cover.jpg', alt: { es: 'Captura', en: 'Screenshot' } };
+    expect(schema.parse({ ...valid, images: [one] }).images).toEqual([one]);
+    const withCaption = { ...one, caption: { es: 'Inicio', en: 'Home' } };
+    expect(schema.parse({ ...valid, images: [withCaption] }).images).toEqual([withCaption]);
+    const four = ['a', 'b', 'c', 'd'].map((n) => ({ file: `${n}.jpg`, alt: 'x' }));
+    expect(schema.parse({ ...valid, images: four }).images).toHaveLength(4);
+  });
+
+  it('rejects zero or five images, a path in the file, a missing or long alt and a long caption', () => {
+    const one = { file: 'a.jpg', alt: 'x' };
+    expect(() => schema.parse({ ...valid, images: [] })).toThrow();
     expect(() =>
-      schema.parse({ ...valid, image: { file: 'a.jpg', alt: 'x'.repeat(141) } }),
+      schema.parse({ ...valid, images: Array.from({ length: 5 }, () => one) }),
     ).toThrow();
-    expect(() => schema.parse({ ...valid, image: { file: 'a.jpg' } })).toThrow();
+    expect(() =>
+      schema.parse({ ...valid, images: [{ file: '../secret.jpg', alt: 'x' }] }),
+    ).toThrow();
+    expect(() => schema.parse({ ...valid, images: [{ file: 'a.jpg' }] })).toThrow();
+    expect(() => schema.parse({ ...valid, images: [{ ...one, alt: 'x'.repeat(141) }] })).toThrow();
+    expect(() =>
+      schema.parse({ ...valid, images: [{ ...one, caption: 'x'.repeat(121) }] }),
+    ).toThrow();
+  });
+
+  it('no longer accepts the single `image` field', () => {
+    expect(schema.parse({ ...valid, image: { file: 'a.jpg', alt: 'x' } })).not.toHaveProperty(
+      'image',
+    );
   });
 });

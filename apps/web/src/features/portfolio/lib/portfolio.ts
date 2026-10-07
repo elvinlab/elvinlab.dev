@@ -1,4 +1,10 @@
-type ExperimentLike = { data: { year: number; featured: boolean } };
+type ExperimentLike = {
+  id?: string;
+  data: { year: number; featured: boolean; order?: number | undefined };
+};
+
+/** `order` of an entry that does not set one. */
+export const DEFAULT_EXPERIMENT_ORDER = 100;
 
 /** Whole years between `startedYear` and `reference` (this year by default), clamped at zero. */
 export function yearsSince(startedYear: number, reference = new Date().getUTCFullYear()): number {
@@ -14,10 +20,18 @@ export function splitStatus(status: string): { headline: string; tags: string[] 
   return { headline, tags };
 }
 
-/** Experiments with featured ones first, then newest year. Returns a new array. */
+/**
+ * Experiments with featured ones first, then `order` ascending (default 100), then newest year, then
+ * id so the result never depends on the loader. Returns a new array.
+ */
 export function sortExperiments<T extends ExperimentLike>(experiments: readonly T[]): T[] {
+  const order = (e: T) => e.data.order ?? DEFAULT_EXPERIMENT_ORDER;
   return [...experiments].sort(
-    (a, b) => Number(b.data.featured) - Number(a.data.featured) || b.data.year - a.data.year,
+    (a, b) =>
+      Number(b.data.featured) - Number(a.data.featured) ||
+      order(a) - order(b) ||
+      b.data.year - a.data.year ||
+      (a.id ?? '').localeCompare(b.id ?? ''),
   );
 }
 

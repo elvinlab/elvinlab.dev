@@ -1,0 +1,203 @@
+---
+/**
+ * The `/experiments/` page for one locale: a lab-style header (title, intro, decorative comment
+ * stack) and every experiment as an exhibition piece, separated by dashed dividers with a mono
+ * label. Styles are scoped here and in the piece and media components, so none of them reaches `/me`.
+ */
+
+import { loadExperiments, tierExperiments } from '@/features/portfolio/index.ts';
+import { type Locale, t } from '@/shared/i18n/index.ts';
+import BaseLayout from '@/shared/layout/BaseLayout.astro';
+
+import ExperimentCompact from './ExperimentCompact.astro';
+import ExperimentPiece from './ExperimentPiece.astro';
+
+type Props = { locale: Locale };
+
+const { locale } = Astro.props;
+const experiments = await loadExperiments();
+const { big, compact } = tierExperiments(experiments);
+const total = String(big.length).padStart(2, '0');
+let next = big.length;
+const numbered = compact.map(({ year, entries }) => ({
+  year,
+  entries: entries.map((experiment) => ({ experiment, index: ++next })),
+}));
+const lab = [1, 2, 3, 4] as const;
+---
+
+<BaseLayout locale={locale} path="/experiments/" title={t(locale, 'experiments.title')} description={t(locale, 'experiments.description')}>
+  <section class="xp-page">
+    <header class="xp-header">
+      <div class="xp-header-text">
+        <h1>
+          <svg class="xp-flask" viewBox="0 0 9 9" shape-rendering="crispEdges" fill="currentColor" aria-hidden="true" focusable="false"><rect x="2" y="0" width="5" height="1"></rect><rect x="3" y="1" width="1" height="3"></rect><rect x="5" y="1" width="1" height="3"></rect><rect x="2" y="4" width="1" height="1"></rect><rect x="6" y="4" width="1" height="1"></rect><rect x="1" y="5" width="1" height="3"></rect><rect x="7" y="5" width="1" height="3"></rect><rect x="2" y="6" width="5" height="2"></rect><rect x="1" y="8" width="7" height="1"></rect></svg>{t(locale, 'experiments.title')}
+        </h1>
+        <p>{t(locale, 'experiments.intro')}</p>
+      </div>
+      <ul class="xp-lab" aria-hidden="true">
+        {lab.map((n) => <li>{t(locale, `experiments.lab.${n}`)}</li>)}
+      </ul>
+    </header>
+    {experiments.length === 0 ? (
+      <p class="xp-empty">{t(locale, 'experiments.empty')}</p>
+    ) : (
+      <div class="xp-list">
+        {big.map((experiment, i) => (
+          <>
+            {i > 0 && (
+              <div class="xp-divider" aria-hidden="true">
+                <span>{String(i + 1).padStart(2, '0')} / {total}</span>
+              </div>
+            )}
+            <ExperimentPiece experiment={experiment} locale={locale} index={i + 1} />
+          </>
+        ))}
+      </div>
+    )}
+    {compact.length > 0 && (
+      <section class="xp-more" aria-labelledby="xp-more-title">
+        <h2 id="xp-more-title" class="xp-rule">{t(locale, 'experiments.more')}</h2>
+        {numbered.map(({ year, entries }) => (
+          <div class="xp-year">
+            <h3 class="xp-rule">{year}</h3>
+            <ul class="xp-grid">
+              {entries.map(({ experiment, index }) => <ExperimentCompact experiment={experiment} locale={locale} index={index} />)}
+            </ul>
+          </div>
+        ))}
+      </section>
+    )}
+  </section>
+</BaseLayout>
+
+<style>
+  .xp-page {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+  }
+  .xp-header {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 2rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px dashed var(--color-divider);
+  }
+  /* Same size, weight and tracking as the title of the other pages (`text-3xl font-bold tracking-tight`). */
+  .xp-header-text h1 {
+    display: flex;
+    align-items: center;
+    gap: 0.625rem;
+    margin: 0;
+    font-size: 1.875rem;
+    font-weight: 700;
+    line-height: 2.25rem;
+    letter-spacing: -0.025em;
+  }
+  .xp-header-text p {
+    max-width: 60ch;
+    margin: 0.5rem 0 0;
+    font-size: 1.0625rem;
+    line-height: 1.55;
+    color: var(--color-text-secondary);
+  }
+  /* The pixel flask before the title: the single pink accent of the header, a 9 x 9 grid with crisp edges. */
+  .xp-flask {
+    flex-shrink: 0;
+    width: 27px;
+    height: 27px;
+    color: var(--color-pink);
+    shape-rendering: crispEdges;
+  }
+  .xp-lab {
+    display: none;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    font: 400 0.8125rem / 1.35 var(--font-mono);
+    color: var(--color-muted);
+    user-select: none;
+  }
+  .xp-lab li:nth-child(odd) {
+    color: color-mix(in srgb, var(--color-muted) 70%, var(--color-primary));
+  }
+  @media (min-width: 768px) {
+    .xp-lab {
+      display: block;
+      flex-shrink: 0;
+      text-align: right;
+    }
+  }
+  .xp-list {
+    display: flex;
+    flex-direction: column;
+    gap: 3rem;
+  }
+  .xp-divider {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    font: 400 0.8125rem / 1 var(--font-mono);
+    color: var(--color-muted);
+  }
+  /* Square dashes (8 px on, 8 px off, 2 px tall) instead of a dashed border, which renders round. */
+  .xp-divider::before,
+  .xp-divider::after {
+    content: '';
+    flex: 1;
+    height: 2px;
+    background: repeating-linear-gradient(90deg, var(--color-divider) 0 8px, transparent 8px 16px);
+  }
+  .xp-more {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+  }
+  .xp-rule {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin: 0;
+  }
+  .xp-rule::after {
+    content: '';
+    flex: 1;
+    height: 2px;
+    background: repeating-linear-gradient(90deg, var(--color-divider) 0 8px, transparent 8px 16px);
+  }
+  h2.xp-rule {
+    font: 700 1.5rem / 1.2 var(--font-display);
+  }
+  h3.xp-rule {
+    font: 400 0.9375rem / 1 var(--font-mono);
+    color: var(--color-muted);
+  }
+  .xp-year {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+  .xp-grid {
+    display: grid;
+    gap: 1rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    grid-template-columns: 1fr;
+  }
+  @media (min-width: 640px) {
+    .xp-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+  @media (min-width: 1024px) {
+    .xp-grid {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+  .xp-empty {
+    color: var(--color-text-secondary);
+  }
+</style>

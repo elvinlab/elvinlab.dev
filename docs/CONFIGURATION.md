@@ -233,7 +233,7 @@ Experimentos (proyectos) del portafolio, publicados en `/experiments/` (y `/en/e
 }
 ```
 
-**Cómo añadir un experimento:** agrega una entrada con clave nueva. Los textos (`description`, `subtitle`, `problem`, `contribution`, `result`) son una cadena para todos los idiomas o un objeto `{ "es": …, "en": … }`; cuenta qué hiciste tú y qué resultó, sin inventar cifras. `url` es el enlace principal (sitio en vivo) y `repo` el del código. `note` es el slug de una nota publicada que cuenta el caso: si no existe, el build falla (nunca queda un enlace muerto). Para la captura, copia tu propia imagen a la carpeta de la entrada, `apps/web/src/assets/experiments/<clave de la entrada>/`, y pon su nombre de archivo en `image.file` (por ejemplo `cover.jpg`) con un `image.alt`; un archivo que no existe también rompe el build. Los experimentos destacados van primero y los tres primeros aparecen en `/me`. Con `features.experiments` apagado no hay página ni enlaces.
+**Cómo añadir un experimento:** agrega una entrada con clave nueva. Los textos (`description`, `subtitle`, `problem`, `contribution`, `result`) son una cadena para todos los idiomas o un objeto `{ "es": …, "en": … }`; cuenta qué hiciste tú y qué resultó, sin inventar cifras. `url` es el enlace principal (sitio en vivo) y `repo` el del código. `note` es el slug de una nota publicada que cuenta el caso: si no existe, el build falla (nunca queda un enlace muerto). Para las capturas, copia tus propias imágenes (1280 x 800, 16:10) a la carpeta de la entrada, `apps/web/src/assets/experiments/<clave de la entrada>/`, y lístalas en `images` (de 1 a 4, en el orden en que se muestran): cada una con `file` (por ejemplo `cover.jpg`), un `alt` obligatorio (hasta 140 caracteres) y un `caption` opcional (hasta 120) que aparece bajo la imagen. La primera es la portada: la usan `/me` y la primera diapositiva. Con una sola imagen se muestra como figura; con dos o más, como galería con miniaturas que funciona sin JavaScript; sin `images`, la página muestra una portada tipográfica. Un archivo que no existe también rompe el build. `status` admite `running`, `shipped` y `archived`. Los experimentos destacados van primero y los tres primeros aparecen en `/me`. Con `features.experiments` apagado no hay página ni enlaces.
 
 <!-- docs:start experiments -->
 | Key | Type | Required | Default | Description |
@@ -246,13 +246,15 @@ Experimentos (proyectos) del portafolio, publicados en `/experiments/` (y `/en/e
 | `result` | `string \| { <locale>: string }` | no |  | What it delivered, with no invented numbers (max 200 characters each). One string, or one text per locale such as `{ "es": "...", "en": "..." }`. |
 | `tags` | `string[] (max 5)` | no | `[]` | Up to five kebab-case tags. |
 | `year` | `integer (min 2000)` | yes |  | Year the project started or shipped. |
-| `status` | `'running' \| 'shipped'` | no | `shipped` | `running` shows a green dot; `shipped` a violet one. |
+| `status` | `'running' \| 'shipped' \| 'archived'` | no | `shipped` | `running` shows a green dot, `shipped` a violet one and `archived` a muted one. |
 | `url` | `URL` | no |  | Live or main link (https only). Leave it out for private work: a private repository is never linked. |
 | `repo` | `URL` | no |  | Public code link (https only). Never a private repository. |
 | `note` | `string` | no |  | Slug of a published note that tells the case. The build fails if no such note is published. |
-| `image` | `object` | no |  | Screenshot shown on the card. Use your own screenshots only. |
-| `image.file` | `string` | yes |  | File name inside the own folder of the entry `apps/web/src/assets/experiments/<entry key>/` (png, jpg, webp or avif). |
-| `image.alt` | `string \| { <locale>: string }` | yes |  | Alternative text describing the screenshot (max 140 characters each). One string, or one text per locale such as `{ "es": "...", "en": "..." }`. |
+| `images` | `object[] (max 4)` | no |  | One to four screenshots, in display order. The first is the cover (used by `/me` and as the first slide). Use your own screenshots only; leave the field out for a typographic cover. |
+| `images[].file` | `string` | yes |  | File name inside the own folder of the entry `apps/web/src/assets/experiments/<entry key>/` (png, jpg, webp or avif). |
+| `images[].alt` | `string \| { <locale>: string }` | yes |  | Alternative text describing the screenshot (max 140 characters each). One string, or one text per locale such as `{ "es": "...", "en": "..." }`. |
+| `images[].caption` | `string \| { <locale>: string }` | no |  | A short caption shown under the image in the gallery (max 120 characters each). One string, or one text per locale such as `{ "es": "...", "en": "..." }`. |
+| `order` | `integer (min 0, max 1000)` | no |  | Position among entries of the same tier: lower comes first (default 100). Featured entries always come before the others; ties go to the newest year, then the key. |
 | `featured` | `boolean` | no | `false` | Featured experiments lead the lists. |
 <!-- docs:end experiments -->
 

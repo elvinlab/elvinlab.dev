@@ -23,6 +23,29 @@ describe('sortExperiments', () => {
     expect(sortExperiments(items).map((e) => e.data.title)).toEqual(['c', 'b', 'a']);
   });
 
+  it('orders featured entries by `order` ascending, then newest year, then id', () => {
+    const entry = (id: string, year: number, order?: number) => ({
+      id,
+      data: { year, featured: true, ...(order === undefined ? {} : { order }) },
+    });
+    const sorted = sortExperiments([
+      entry('zeta', 2026),
+      entry('beta', 2026),
+      entry('flagship', 2024, 1),
+      entry('second', 2020, 2),
+      entry('alpha', 2026),
+    ]);
+    expect(sorted.map((e) => e.id)).toEqual(['flagship', 'second', 'alpha', 'beta', 'zeta']);
+  });
+
+  it('keeps `featured` above `order`', () => {
+    const sorted = sortExperiments([
+      { id: 'plain', data: { year: 2026, featured: false, order: 1 } },
+      { id: 'big', data: { year: 2020, featured: true, order: 50 } },
+    ]);
+    expect(sorted.map((e) => e.id)).toEqual(['big', 'plain']);
+  });
+
   it('does not mutate the input', () => {
     const copy = [...items];
     sortExperiments(items);

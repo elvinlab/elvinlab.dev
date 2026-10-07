@@ -30,6 +30,19 @@ export function pickExperimentImage(
   return image.default;
 }
 
+/** Resolves every configured file of an entry, in order; one missing file fails the build. */
+export function pickExperimentImages(
+  available: ImageModules,
+  id: string,
+  files: readonly string[] | undefined,
+): ImageMetadata[] {
+  return (files ?? []).map((file) => pickExperimentImage(available, id, file));
+}
+
+export function resolveExperimentImages(id: string, files: readonly string[] | undefined) {
+  return pickExperimentImages(modules, id, files);
+}
+
 export function resolveExperimentImage(id: string, file: string): ImageMetadata {
   return pickExperimentImage(modules, id, file);
 }

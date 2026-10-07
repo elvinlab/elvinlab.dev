@@ -1,6 +1,6 @@
 ---
 /**
- * One experiment as a compact row for `/me`: mono index, 96 x 60 thumbnail (or the year when there is
+ * One experiment as a compact row for `/me`: mono index, 96 x 60 thumbnail of the cover, the first image (or the year when there is
  * no image), title with the status pill, and one line of the description. The whole row is one link
  * to the experiment's card on the experiments page. The thumbnail is decorative (`alt=""`): the
  * row's text already names the experiment.
@@ -16,7 +16,8 @@ import { pickLocale } from '@/shared/lib/localized.ts';
 type Props = { experiment: ExperimentEntry; locale: Locale; index: number };
 
 const { experiment, locale, index } = Astro.props;
-const image = experiment.image ? resolveExperimentImage(experiment.id, experiment.image.file) : undefined;
+const cover = experiment.images?.[0];
+const image = cover ? resolveExperimentImage(experiment.id, cover.file) : undefined;
 const href = `${localizePath('/experiments/', locale, LOCALES)}#${experiment.id}`;
 const THUMB = 'h-[60px] w-24 rounded-inner outline outline-1 -outline-offset-1 outline-divider';
 ---

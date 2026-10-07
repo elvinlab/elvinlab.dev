@@ -41,3 +41,43 @@ export function caseLinkLabelKey(
 ): 'experiment.case' | 'experiment.case.es' | 'experiment.case.en' {
   return noteLang === pageLocale ? 'experiment.case' : `experiment.case.${noteLang}`;
 }
+
+/** Most entries shown as big exhibition pieces; every other entry is a compact card. */
+export const MAX_BIG_PIECES = 3;
+
+/**
+ * Fails the build when more than `MAX_BIG_PIECES` experiments are featured, so the big exhibition
+ * pieces stay few and the index stays scannable.
+ */
+export function assertFeaturedLimit(
+  experiments: readonly { id: string; data: { featured: boolean } }[],
+): void {
+  const featured = experiments.filter(({ data }) => data.featured);
+  if (featured.length > MAX_BIG_PIECES) {
+    throw new Error(
+      `${featured.length} experiments are featured (${featured.map(({ id }) => id).join(', ')}), but at most ${MAX_BIG_PIECES} may be: set \`featured\` to false on the others so the experiments page stays scannable`,
+    );
+  }
+}
+
+/**
+ * Splits already sorted experiments into the big pieces (the featured ones, or the first entry when
+ * none is featured) and the compact tier, grouped by year with the newest year first. Entries keep
+ * their incoming order inside a year.
+ */
+export function tierExperiments<T extends { year: number; featured: boolean }>(
+  sorted: readonly T[],
+): { big: T[]; compact: { year: number; entries: T[] }[] } {
+  const featured = sorted.filter((entry) => entry.featured);
+  const big = featured.length > 0 ? featured : sorted.slice(0, 1);
+  const bigSet = new Set<T>(big);
+  const groups = new Map<number, T[]>();
+  for (const entry of sorted) {
+    if (bigSet.has(entry)) continue;
+    groups.set(entry.year, [...(groups.get(entry.year) ?? []), entry]);
+  }
+  const compact = [...groups]
+    .sort(([a], [b]) => b - a)
+    .map(([year, entries]) => ({ year, entries }));
+  return { big, compact };
+}

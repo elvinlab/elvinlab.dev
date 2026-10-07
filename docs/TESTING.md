@@ -64,9 +64,9 @@ The single source of truth is [`apps/web/scripts/verification-map.ts`](../apps/w
 - `pnpm verify --files <paths>` plans (and with `--run` executes) for a simulated change set without editing files; it cannot be combined with `--record`.
 - `--run` ends with `elapsed <n>s (full stack baseline 340 s: saved <p>%)`. Baseline, what changed and the measurements: [`odd/verification-timings.md`](../odd/verification-timings.md).
 - CI shards the `e2e` job in four (`--shard=N/4`); white-label, `version.txt` and the image check run in shard 1 only; `checks` needs the whole matrix. Each job prints its duration in the run summary.
-- CI also runs Lighthouse in two shards (`--shard=N/2`): each takes every second URL of `lighthouserc.json` (shard 1: `/`, `/me/`, `/notes/`, `/contact/`, `/subscribe/`; shard 2: `/en/`, `/en/me/`, `/notes/smoke-es/`, `/en/contact/`), still 3 runs per URL and the same assertions. Locally `pnpm test:lighthouse` runs all nine; `node apps/web/scripts/run-lighthouse-ci.ts --shard 1/2` reproduces a CI shard. `--url` wins over `--shard`; `--runs` composes with both. `checks` needs the whole matrix, so it fails if either shard fails.
+- CI also runs Lighthouse in two shards (`--shard=N/2`): each takes every second URL of `lighthouserc.json` (shard 1: `/`, `/me/`, `/experiments/`, `/notes/smoke-es/`, `/en/contact/`; shard 2: `/en/`, `/en/me/`, `/notes/`, `/contact/`, `/subscribe/`), still 3 runs per URL and the same assertions. Locally `pnpm test:lighthouse` runs all ten; `node apps/web/scripts/run-lighthouse-ci.ts --shard 1/2` reproduces a CI shard. `--url` wins over `--shard`; `--runs` composes with both. `checks` needs the whole matrix, so it fails if either shard fails.
 - A diff in `apps/web/src/shared/i18n/index.ts` that only adds keys is ignored; a changed or removed key counts.
-- `pnpm verify --run` with Lighthouse runs only the affected URLs (`run-lighthouse-ci.ts --url <path>`, repeatable); with no flag it measures all six as before.
+- `pnpm verify --run` with Lighthouse runs only the affected URLs (`run-lighthouse-ci.ts --url <path>`, repeatable); with no flag it measures every URL of `lighthouserc.json` as before.
 - Biome does not read Markdown, so a docs-only change plans `lint` and runs nothing.
 - Most e2e specs are mapped to every page, so a change in a shared component such as the footer still selects nearly all of them; narrowing a spec's scope means checking what its pages render.
 - Seed the registry once with `pnpm verify --all --run --record`, then use `--stale` before a release.
@@ -178,3 +178,7 @@ The e2e suite covers the contact form island with a stubbed Turnstile script and
 ## Email previews
 
 The subscription emails (confirmation and new note, Spanish and English) are pure functions in `apps/web/src/features/subscribe/email-templates.ts`. To look at them without sending anything, run `mise exec -- node --import ./apps/web/scripts/register-alias.mjs apps/web/scripts/preview-email.ts`: it writes the HTML and text versions with sample data (on `https://example.test`, with a hostile title to prove escaping) into the git-ignored `.email-preview/` folder. Open the `.html` files in a browser; email clients differ, so a real test send to your own address (needs a verified Resend domain) remains an owner step.
+
+## Perf watch: `/experiments/` at scale
+
+`/experiments/` is in `lighthouserc.json`. Each compact card costs about 1 KB of HTML (measured with 12 temporary entries); the lab server does not compress, so watch the LCP of that URL in `test:lighthouse` as entries grow. Thresholds recorded in `docs/DESIGN.md` (not implemented): above about 12 compact cards add static pagination; above about 24 entries add static tag pages; `/me` always shows 3 rows.
