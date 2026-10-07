@@ -5,44 +5,72 @@
  * label. Styles are scoped here and in the piece and media components, so none of them reaches `/me`.
  */
 
-import { loadExperiments, tierExperiments } from '@/features/portfolio/index.ts';
-import { type Locale, t } from '@/shared/i18n/index.ts';
+import { localizePath } from '@elvinlab/core';
+
+import {
+  experimentsPagePath,
+  experimentsSettings,
+  introText,
+  labWords,
+  loadExperiments,
+  paginateExperiments,
+} from '@/features/portfolio/index.ts';
+import { site } from '@/shared/config/index.ts';
+import { LOCALES, type Locale, t } from '@/shared/i18n/index.ts';
 import BaseLayout from '@/shared/layout/BaseLayout.astro';
 
 import ExperimentCompact from './ExperimentCompact.astro';
 import ExperimentPiece from './ExperimentPiece.astro';
+import ExperimentsPager from './ExperimentsPager.astro';
 
-type Props = { locale: Locale };
+type Props = { locale: Locale; page?: number };
 
-const { locale } = Astro.props;
+const { locale, page = 1 } = Astro.props;
 const experiments = await loadExperiments();
-const { big, compact } = tierExperiments(experiments);
+const { perPage, meRows } = experimentsSettings;
+const pages = paginateExperiments(experiments, { perPage, pinFirst: meRows });
+const current = pages.find((candidate) => candidate.page === page);
+if (!current) throw new Error(`/experiments/ has no page ${page} (${pages.length} in total)`);
+const { big, groups } = current;
 const total = String(big.length).padStart(2, '0');
-let next = big.length;
-const numbered = compact.map(({ year, entries }) => ({
-  year,
-  entries: entries.map((experiment) => ({ experiment, index: ++next })),
-}));
-const lab = [1, 2, 3, 4] as const;
+const hasMore = groups.length > 0;
+const paged = page > 1;
+const pageUrl = (target: number): string =>
+  new URL(localizePath(experimentsPagePath(target), locale, LOCALES), site.url).href;
+const title = paged ? t(locale, 'experiments.page.title', { page }) : t(locale, 'experiments.title');
+const description = paged
+  ? t(locale, 'experiments.page.description', { page, pages: pages.length })
+  : t(locale, 'experiments.description');
+const intro = introText(site.experiments.intro, locale, LOCALES.defaultLocale, t(locale, 'experiments.intro'));
+const labKeys = [1, 2, 3, 4] as const;
+const lab = labWords(
+  site.experiments.words,
+  locale,
+  LOCALES.defaultLocale,
+  labKeys.map((n) => t(locale, `experiments.lab.${n}`)),
+);
 ---
 
-<BaseLayout locale={locale} path="/experiments/" title={t(locale, 'experiments.title')} description={t(locale, 'experiments.description')}>
+<BaseLayout locale={locale} path={experimentsPagePath(page)} title={title} description={description}>
+  {paged && <link slot="head" rel="prev" href={pageUrl(page - 1)} />}
+  {page < pages.length && <link slot="head" rel="next" href={pageUrl(page + 1)} />}
   <section class="xp-page">
     <header class="xp-header">
       <div class="xp-header-text">
         <h1>
           <svg class="xp-flask" viewBox="0 0 9 9" shape-rendering="crispEdges" fill="currentColor" aria-hidden="true" focusable="false"><rect x="2" y="0" width="5" height="1"></rect><rect x="3" y="1" width="1" height="3"></rect><rect x="5" y="1" width="1" height="3"></rect><rect x="2" y="4" width="1" height="1"></rect><rect x="6" y="4" width="1" height="1"></rect><rect x="1" y="5" width="1" height="3"></rect><rect x="7" y="5" width="1" height="3"></rect><rect x="2" y="6" width="5" height="2"></rect><rect x="1" y="8" width="7" height="1"></rect></svg>{t(locale, 'experiments.title')}
         </h1>
-        <p>{t(locale, 'experiments.intro')}</p>
+        <p>{intro}</p>
+        {paged && <p class="xp-pagestatus">{t(locale, 'experiments.page.status', { page, pages: pages.length })}</p>}
       </div>
       <ul class="xp-lab" aria-hidden="true">
-        {lab.map((n) => <li>{t(locale, `experiments.lab.${n}`)}</li>)}
+        {lab.map((word) => <li>{word}</li>)}
       </ul>
     </header>
     {experiments.length === 0 ? (
       <p class="xp-empty">{t(locale, 'experiments.empty')}</p>
     ) : (
-      <div class="xp-list">
+      big.length > 0 && <div class="xp-list">
         {big.map((experiment, i) => (
           <>
             {i > 0 && (
@@ -55,19 +83,20 @@ const lab = [1, 2, 3, 4] as const;
         ))}
       </div>
     )}
-    {compact.length > 0 && (
+    {hasMore && (
       <section class="xp-more" aria-labelledby="xp-more-title">
         <h2 id="xp-more-title" class="xp-rule">{t(locale, 'experiments.more')}</h2>
-        {numbered.map(({ year, entries }) => (
+        {groups.map(({ year, entries }) => (
           <div class="xp-year">
             <h3 class="xp-rule">{year}</h3>
             <ul class="xp-grid">
-              {entries.map(({ experiment, index }) => <ExperimentCompact experiment={experiment} locale={locale} index={index} />)}
+              {entries.map(({ entry, index }) => <ExperimentCompact experiment={entry} locale={locale} index={index} />)}
             </ul>
           </div>
         ))}
       </section>
     )}
+    <ExperimentsPager locale={locale} page={page} pages={pages.length} />
   </section>
 </BaseLayout>
 
@@ -95,6 +124,11 @@ const lab = [1, 2, 3, 4] as const;
     font-weight: 700;
     line-height: 2.25rem;
     letter-spacing: -0.025em;
+  }
+  .xp-header-text .xp-pagestatus {
+    margin-top: 0.375rem;
+    font: 400 0.9375rem / 1.3 var(--font-mono);
+    color: var(--color-muted);
   }
   .xp-header-text p {
     max-width: 60ch;

@@ -1,0 +1,10 @@
+---
+import ExperimentsPage from './ExperimentsPage.astro';
+import { laterPagePaths } from './static-paths.ts';
+
+export const getStaticPaths = laterPagePaths;
+
+const { page } = Astro.params;
+---
+
+<ExperimentsPage locale="es" page={Number(page)} />

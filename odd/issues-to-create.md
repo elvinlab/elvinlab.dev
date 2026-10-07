@@ -17,7 +17,7 @@ Common Conventions: `CLAUDE.md`, `docs/CONVENTIONS.md`, `docs/DESIGN.md`, `docs/
 - **Verification:** see the tracker; closing battery `pnpm verify --run` plus Lighthouse on every new URL.
 
 ## T52 Experiments: pagination, central configuration and authoring guide
-- **Tier:** 3 (done today, tracked for history; close with the release commit).
+- **Tier:** 3 (implemented with focused proof; full-wide verification and release-commit closure pending; issue #81 remains In Progress).
 - **Goal:** `/experiments/` paginates (12 per page) when there are many experiments, every tunable lives in `site.config.ts`, and a guide explains how to add or edit content.
 - **Files:** `apps/web/src/experiments-routes/**`, `features/portfolio/**`, `integrations/experiments-routes.ts`, `sitemap-filter.ts`, `site.config.ts`, `shared/config/schema.ts`, `docs/PORTFOLIO.md` and `.en.md`, `docs/CONFIGURATION*.md`, `docs/DESIGN.md`, `docs/TESTING.md`, `CLAUDE.md`, `apps/web/scripts/stress-experiments.ts`.
 - **Acceptance criteria:** pages exist only above the threshold; pager accessible and in the lab style; title, canonical, hreflang, prev/next per page; first `/me` rows always on page 1; stress run with 30 and 100 entries reported; sweep of hardcoded owner strings done.

@@ -60,3 +60,38 @@ Production checks after the release at `bc0b0c8` (read only, public GET requests
 
 Production checks after the release at `950e582` (read only: no footprint was left on a real note): `version.txt` `950e582`; `/`, the note, `/en/`, `/contact/`, `/privacy/`, `/en/privacy/`, `/rss.xml`, `/changelog/` and `/favicon.ico` answer 200; the note carries 2 marks instances, the tooltip text and the `/privacy/#marks` link, the comments reassurance, and the X and WhatsApp share links; `/privacy/` has the marks section and the 2026-10-05 date; the `marks.get` action on a published note answers `{"total":0}` from D1 (HTTP 200), an unknown slug answers 400 and a foreign origin 403.
 
+
+## Experiments X8/C1 documentation and stopped full-wide attempt (2026-10-07)
+
+Candidate: existing dirty pagination/config implementation on `develop` HEAD `a43790d`, plus closure documentation. This record is **partial/failed**, not a new green boundary. No source logic changed during the documentation pass, and no meaningful runnable unit RED applies to schema-description/documentation accuracy.
+
+| Command/check | Observed result |
+| --- | --- |
+| `mise exec -- pnpm docs:config` | Passed; regenerated `docs/CONFIGURATION.md` and `docs/CONFIGURATION.en.md` before execution checks. |
+| `git diff --check` | Passed before full-wide launch. |
+| `mise exec -- pnpm verify --run --record` | One foreground attempt; lint failed first. Runner then started typecheck; interrupted owned run on observed lint failure, exit 130. No completed typecheck or remaining family result claimed; state registry gained no green entry. |
+| `mise exec -- pnpm exec biome check . --reporter=json --max-diagnostics=100` | Parent-requested read-only diagnostic: exit 1; 440 unchanged files, 6 errors, 0 warnings, no writes. |
+
+Lint diagnostics: `apps/web/scripts/stress-experiments.test.ts` has unsafe optional chaining at line 45 and a formatting error; `apps/web/scripts/stress-experiments.ts`, `apps/web/src/experiments-routes/static-paths.ts` and `apps/web/src/shared/config/schema.test.ts` have formatting errors; `apps/web/src/features/portfolio/lib/pagination.test.ts` has an import-order error. These five existing implementation paths were not editable in the documentation phase. No runtime semantic fix is indicated.
+
+Not completed in this attempt: typecheck, architecture, generated-doc drift check, full units, build, JS budget, white-label, cold-start, all e2e and Lighthouse. Existing focused proof remains 9 Vitest files/199 tests; 30-entry (3 pages per locale) and 100-entry (9 pages per locale) HTML assertions; 390 px ES/EN light/dark Enter/current/no-overflow checks and four axe scans with zero violations. Required wider screenshots and stressed Lighthouse remain pending; prior X2 full/focused checks are historical evidence only.
+
+Preflight found ports 4321-4323 free and left the owned 100-entry preview on 4324 unchanged. No owner service was stopped, no harness/config was changed, and no commits, release refs, credentials or remote operations were used. Next: parent-authorized narrow normalization/test-expression correction, followed by authorized verification; commit/release preparation follows applicable proof. Planned changelog dates for the missing cache/image-policy entries remain provisional until the actual production release.
+
+## Experiments X8/C1 normalized full-wide proof (2026-10-07)
+
+Candidate: dirty implementation on `develop` HEAD `a43790d`, documentation accuracy pass, and the parent-authorized five-path normalization/fixture-entry guard. The earlier stopped attempt above remains historical evidence; this is a separately authorized normalized candidate. No product logic or test harness changed. No functional RED is claimed; the prior six-error Biome diagnostic supplied lint RED.
+
+| Command/check | Observed result |
+| --- | --- |
+| `mise exec -- pnpm exec biome check --write` on the five diagnosed paths only | Normalized 5 files; explicit missing-entry guard preserves failure instead of masking it. No source writes afterward. |
+| `mise exec -- pnpm lint` | Passed, 440 files, no fixes. |
+| `mise exec -- pnpm --filter web exec vitest run scripts/stress-experiments.test.ts src/features/portfolio/lib/pagination.test.ts src/shared/config/schema.test.ts` | Passed, 3 files / 139 tests. |
+| `git diff --check` | Passed before final battery. |
+| `mise exec -- pnpm verify --run --record` | Passed, exit 0, 351 s; recorded 54 checks in `odd/verification-state.json`. |
+
+Full-wide native results: lint clean; typecheck 363 files / 0 errors; dependency boundaries and docs drift passed; core units 4 files / 37 tests plus web units 113 files / 1181 tests; production build passed; JS budget max 19.94 KiB gzip (30 KiB limit; experiments 5.47 KiB, `/me` 8.39 KiB); white-label passed; dev cold start 7 routes; E2E 806 passed across 35 specs (1280 px plus three viewports for 12 width-dependent specs, 178.4 s); Lighthouse 10 URLs × 1 local run passed all assertions (117.3 s).
+
+Lighthouse: performance 0.96-0.99; accessibility and SEO 1.0; best practices 0.96-1.0; LCP 2113-2421 ms; CLS 0-0.0406. `/experiments/`: performance 0.98 / LCP 2274 ms / CLS 0; `/me/`: 0.98 / 2269 ms / 0; `/en/me/`: 0.97 / 2421 ms / 0. Reports: `.lighthouseci/`, `playwright-report/`, full command output `rtk recall 57789e586405`.
+
+Remaining acceptance evidence: parent-reviewed changed-screen screenshots at 390/820/1440 px in ES/EN and both themes, and stressed-fixture Lighthouse (ordinary full-wide fixture results do not cover the 30/100-entry stress builds). Commit/local release preparation and explicitly authorized remote publication remain separate pending steps. The owned preview on 4324 was preserved; no owner server, credential, remote operation, commit or release ref was used.

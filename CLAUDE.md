@@ -37,7 +37,7 @@ pnpm enforces a minimum release age: when it proposes `minimumReleaseAgeExclude`
 
 CI runs the production JavaScript gzip budget, Playwright/a11y/theme checks, white-label build, and mobile Lighthouse budgets on every push to `main`, before that same run deploys. Lighthouse audits an isolated production-build fixture and writes HTML/JSON reports to the ignored `.lighthouseci/` directory; it does not upload reports.
 
-Read `docs/PLAN.md`, `docs/BRAND.md` (both in Spanish; decisions in them are settled), `docs/DESIGN.md`, `docs/CONVENTIONS.md` and `docs/adr/` before any work. To change a setting, secret, dependency or release, follow `docs/CONFIGURATION.md`; to write a note, `docs/NOTES.md` (both have an English twin, `*.en.md`). Their reference tables are generated from the code: after changing a schema or `shared/config/env-vars.ts`, run `pnpm docs:config`.
+Read `docs/PLAN.md`, `docs/BRAND.md` (both in Spanish; decisions in them are settled), `docs/DESIGN.md`, `docs/CONVENTIONS.md` and `docs/adr/` before any work. To change a setting, secret, dependency or release, follow `docs/CONFIGURATION.md`; to edit the `/me` profile or add an experiment, `docs/PORTFOLIO.md`; to write a note, `docs/NOTES.md` (each has an English twin, `*.en.md`). Their reference tables are generated from the code: after changing a schema or `shared/config/env-vars.ts`, run `pnpm docs:config`.
 
 ## What this repo is
 

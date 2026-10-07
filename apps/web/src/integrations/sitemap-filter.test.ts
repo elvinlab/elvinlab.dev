@@ -42,6 +42,19 @@ describe('isHiddenFromSitemap', () => {
     expect(isHiddenFromSitemap('/en/experiments/', features)).toBe(true);
   });
 
+  it('hides every page of the experiments list when the experiments feature is off', () => {
+    const features = { ...allOn, experiments: false };
+    for (const path of [
+      '/experiments/page/2/',
+      '/experiments/page/12/',
+      '/en/experiments/page/2/',
+      '/en/experiments/page/12/',
+    ]) {
+      expect(isHiddenFromSitemap(path, features), path).toBe(true);
+      expect(isHiddenFromSitemap(path, allOn), path).toBe(false);
+    }
+  });
+
   it('returns true for /changelog/ when changelog feature is off', () => {
     const features = { ...allOn, changelog: false };
     expect(isHiddenFromSitemap('/changelog/', features)).toBe(true);

@@ -213,6 +213,48 @@ export const siteConfigSchema = z
       .describe(
         'Settings of the footprint button (`features.marks`). Every key is optional and falls back to its default.',
       ),
+    experiments: z
+      .strictObject({
+        perPage: z
+          .int()
+          .min(4)
+          .max(48)
+          .default(12)
+          .describe(
+            'Compact cards per page of `/experiments/`. Page 1 also holds the big pieces; a second page exists only when the compact cards exceed this number (`/experiments/page/2/`). Stress fixtures measured 2250-2563 bytes (about 2.2-2.6 KB) of marginal HTML per compact card; actual cost depends on content and images, so measure your own entries.',
+          ),
+        maxFeatured: z
+          .int()
+          .min(1)
+          .max(6)
+          .default(3)
+          .describe(
+            'Most experiments that may have `featured: true` (the big exhibition pieces). The build fails with the list of offenders when more are featured.',
+          ),
+        meRows: z
+          .int()
+          .min(1)
+          .max(6)
+          .default(3)
+          .describe(
+            'Rows of "Recent experiments" on `/me`. Never more than `perPage`: a larger value is lowered to `perPage`, so every row links to an anchor that lives on page 1.',
+          ),
+        intro: localized
+          .optional()
+          .describe(
+            'Optional intro under the title of `/experiments/`, per locale (the default locale is required). Omit it to use the interface default.',
+          ),
+        words: z
+          .record(z.string(), z.array(z.string().trim().min(1).max(24)).min(1).max(6))
+          .optional()
+          .describe(
+            'Optional decorative comment stack beside the title of `/experiments/` (desktop only), per locale: one to six short words, for example `{ "es": ["construir", "probar"] }`. The leading `// ` is added for you. Omit it to use the interface default.',
+          ),
+      })
+      .prefault({})
+      .describe(
+        'Settings of the experiments list (`features.experiments`): pagination, big pieces, the rows on `/me` and the page header texts. Every key is optional and falls back to its default.',
+      ),
     recruiter: z
       .object({
         available: z
@@ -464,6 +506,12 @@ export const siteConfigSchema = z
       'me.workMode': { path: ['me', 'workMode'], text: config.me.workMode },
       'me.intro': { path: ['me', 'intro'], text: config.me.intro },
       ...(config.notice && { notice: { path: ['notice'], text: config.notice } }),
+      ...(config.experiments.intro && {
+        'experiments.intro': { path: ['experiments', 'intro'], text: config.experiments.intro },
+      }),
+      ...(config.experiments.words && {
+        'experiments.words': { path: ['experiments', 'words'], text: config.experiments.words },
+      }),
       ...Object.fromEntries(
         (config.now?.items ?? []).map((item, index) => [
           `now.items.${index}`,

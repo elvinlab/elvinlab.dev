@@ -15,7 +15,7 @@ This guide answers two questions in one place: **where each thing is configured*
 - [9. Common problems](#9-common-problems)
 - [10. Using this site as a base for someone else (white-label)](#10-using-this-site-as-a-base-for-someone-else-white-label)
 
-To write notes, see the separate guide: [How to create a note](NOTES.en.md).
+To write notes, see the separate guide: [How to create a note](NOTES.en.md). To edit the `/me` profile and the experiments, see [Portfolio guide: profile and experiments](PORTFOLIO.en.md).
 
 ## 1. The map: what to change and where
 
@@ -23,7 +23,8 @@ To write notes, see the separate guide: [How to create a note](NOTES.en.md).
 | --- | --- | --- |
 | Name, bio, role, links, languages, active features, comments, analytics, legal dates | [`apps/web/src/site.config.ts`](../apps/web/src/site.config.ts) | At build time: an invalid value breaks the build and lists every problem |
 | Notes (the blog) | `apps/web/src/content/notes/<slug>/index.mdx` (drafts in `drafts/`) | The note schema (see [the notes guide](NOTES.en.md)) |
-| Experience, certificates, experiments, changelog | `apps/web/src/content/*.json` | One schema per file (section 4) |
+| Experience, certificates, experiments, changelog | `apps/web/src/content/*.json` | One schema per file (section 4); the profile and projects guide is [PORTFOLIO.en.md](PORTFOLIO.en.md) |
+| Experiments list: page size, featured limit, `/me` rows, intro and words | the `experiments` block of [`site.config.ts`](../apps/web/src/site.config.ts) | At build time (section 3) |
 | Theme colors, radii and fonts | `packages/core/src/tokens/tokens.json` | Regenerate with `pnpm --filter @elvinlab/core tokens` |
 | UI texts (ES/EN) | `apps/web/src/shared/i18n/index.ts` | Types require the same keys in both languages |
 | Privacy and terms text | `apps/web/src/features/privacy/content.ts` and `.../terms/content.ts` | Content tests (no emails, no unverifiable promises) |
@@ -96,6 +97,12 @@ The descriptions come from the schema (`.describe()`), which is why they are in 
 | `marks.animation` | `'stamp' \| 'burst' \| 'pulse' \| 'none'` | no | `stamp` | Animation played when a reader leaves a footprint: `stamp` an ink stamp pressed on the page, `burst` a burst of pixel squares, `pulse` a soft ring, `none` no animation. All obey `prefers-reduced-motion`. |
 | `marks.maxPerVisitor` | `integer (min 1, max 200)` | no | `50` | Footprints one browser can leave on one note; after that taps add nothing. |
 | `marks.showCountFrom` | `integer (min 0, max 1000)` | no | `5` | The counter is hidden until a note has this many footprints; before that the button invites the reader to be among the first. |
+| `experiments` | `object` | no | `{}` | Settings of the experiments list (`features.experiments`): pagination, big pieces, the rows on `/me` and the page header texts. Every key is optional and falls back to its default. |
+| `experiments.perPage` | `integer (min 4, max 48)` | no | `12` | Compact cards per page of `/experiments/`. Page 1 also holds the big pieces; a second page exists only when the compact cards exceed this number (`/experiments/page/2/`). Stress fixtures measured 2250-2563 bytes (about 2.2-2.6 KB) of marginal HTML per compact card; actual cost depends on content and images, so measure your own entries. |
+| `experiments.maxFeatured` | `integer (min 1, max 6)` | no | `3` | Most experiments that may have `featured: true` (the big exhibition pieces). The build fails with the list of offenders when more are featured. |
+| `experiments.meRows` | `integer (min 1, max 6)` | no | `3` | Rows of "Recent experiments" on `/me`. Never more than `perPage`: a larger value is lowered to `perPage`, so every row links to an anchor that lives on page 1. |
+| `experiments.intro` | `{ <locale>: string }` | no |  | Optional intro under the title of `/experiments/`, per locale (the default locale is required). Omit it to use the interface default. |
+| `experiments.words` | `{ <locale>: string (max 24)[] (max 6) }` | no |  | Optional decorative comment stack beside the title of `/experiments/` (desktop only), per locale: one to six short words, for example `{ "es": ["construir", "probar"] }`. The leading `// ` is added for you. Omit it to use the interface default. |
 | `recruiter` | `object` | yes |  | Recruiter card on the home page and /me. |
 | `recruiter.available` | `boolean` | yes |  | Show or hide the whole availability line (not whether you are open to work). |
 | `recruiter.openToWork` | `boolean` | no | `true` | Whether you are open to work: green status dot when true, the brand accent colour when false. |
@@ -214,7 +221,7 @@ Grouped by year, newest first. Only shown when `features.credentials` is on.
 
 ### Experiments — `experiments.json`
 
-Portfolio experiments (projects), published at `/experiments/` (and `/en/experiments/`) and as compact rows on `/me` (up to three, with a closing button to the full page). **Only link public repositories**; for private work leave `url` and `repo` out.
+Portfolio experiments (projects), published at `/experiments/` (and `/en/experiments/`) and as compact rows on `/me` (`experiments.meRows`, three by default, with a closing button to the full page). **Only link public repositories**; for private work leave `url` and `repo` out.
 
 ```json
 {
@@ -233,7 +240,7 @@ Portfolio experiments (projects), published at `/experiments/` (and `/en/experim
 }
 ```
 
-**How to add an experiment:** add an entry with a new key. The texts (`description`, `subtitle`, `problem`, `contribution`, `result`) are one string for every language or an object `{ "es": …, "en": … }`; say what you did yourself and what came out of it, with no invented numbers. `url` is the main link (live site) and `repo` the code link. `note` is the slug of a published note that tells the case: if it does not exist the build fails (a dead link never ships). For the screenshots, copy your own images (1280 x 800, 16:10) into the entry's own folder, `apps/web/src/assets/experiments/<entry key>/`, and list them in `images` (1 to 4, in display order): each has a `file` (for example `cover.jpg`), a required `alt` (up to 140 characters) and an optional `caption` (up to 120) shown under the image. The first one is the cover: `/me` and the first slide use it. One image shows as a figure; two or more show as a gallery with thumbnails that works without JavaScript; with no `images` the page shows a typographic cover. A file that does not exist also breaks the build. `status` accepts `running`, `shipped` and `archived`. Featured experiments come first and the first three appear on `/me`. With `features.experiments` off there is no page and no links.
+**How to add an experiment:** add an entry with a new key. The texts (`description`, `subtitle`, `problem`, `contribution`, `result`) are one string for every language or an object `{ "es": …, "en": … }`; say what you did yourself and what came out of it, with no invented numbers. `url` is the main link (live site) and `repo` the code link. `note` is the slug of a published note that tells the case: if it does not exist the build fails (a dead link never ships). For the screenshots, copy your own images (1280 x 800, 16:10) into the entry's own folder, `apps/web/src/assets/experiments/<entry key>/`, and list them in `images` (1 to 4, in display order): each has a `file` (for example `cover.jpg`), a required `alt` (up to 140 characters) and an optional `caption` (up to 120) shown under the image. The first one is the cover: `/me` and the first slide use it. One image shows as a figure; two or more show as a gallery with thumbnails that works without JavaScript; with no `images` the page shows a typographic cover. A file that does not exist also breaks the build. `status` accepts `running`, `shipped` and `archived`. Featured experiments come first (at most `experiments.maxFeatured`, 3 by default) and the first `experiments.meRows` appear on `/me`. The list is paginated: page 1 holds the featured pieces and the first `experiments.perPage` compact cards (12 by default), later pages live at `/experiments/page/N/` and exist only when needed. The complete "I want to change X" guide is [PORTFOLIO.en.md](PORTFOLIO.en.md); the `experiments` block of `site.config.ts` is in section 3. With `features.experiments` off there is no page and no links.
 
 <!-- docs:start experiments -->
 | Key | Type | Required | Default | Description |

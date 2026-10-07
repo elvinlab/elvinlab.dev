@@ -15,6 +15,25 @@ test.beforeEach(({ browserName: _browserName }, testInfo) => {
   test.skip(testInfo.project.name !== 'chromium-1280', 'content does not depend on the width');
 });
 
+for (const { path } of PAGES) {
+  for (const theme of ['elvinlab-light', 'elvinlab-dark']) {
+    test(`${path} featured glow stays inside 820px in ${theme}`, async ({ page }) => {
+      await page.setViewportSize({ width: 820, height: 900 });
+      await page.emulateMedia({ reducedMotion: 'reduce' });
+      await page.addInitScript((value) => localStorage.setItem('theme', value), theme);
+      await page.goto(path);
+      await page.evaluate(() => document.fonts.ready);
+      await expect(page.locator('html')).toHaveAttribute('data-theme', theme);
+      await expect(page.locator('.xp-piece[data-featured]')).toBeVisible();
+      const geometry = await page.evaluate(() => ({
+        scroll: document.documentElement.scrollWidth,
+        viewport: window.innerWidth,
+      }));
+      expect(geometry.scroll).toBeLessThanOrEqual(geometry.viewport);
+    });
+  }
+}
+
 for (const { path, heading, live, code } of PAGES) {
   test(`${path} lists both experiments with working links`, async ({ page, request }) => {
     await page.goto(path);
@@ -54,6 +73,46 @@ for (const { path, heading, live, code } of PAGES) {
     }
   });
 }
+
+test.describe('pagination and head of the list (two entries: a single page)', () => {
+  for (const [path, title, pager] of [
+    ['/experiments/', 'Experimentos — ', /Paginación de experimentos/],
+    ['/en/experiments/', 'Experiments — ', /Experiments pagination/],
+  ] as const) {
+    test(`${path} has a title, a self canonical, hreflang alternates and no pager`, async ({
+      page,
+    }) => {
+      await page.goto(path);
+      await expect(page).toHaveTitle(new RegExp(`^${title}`));
+      await expect(page.locator('meta[name="description"]')).toHaveAttribute('content', /.{40,}/);
+      await expect(page.locator('link[rel="canonical"]')).toHaveAttribute(
+        'href',
+        new RegExp(`${path}$`),
+      );
+      const alternate = (hreflang: string) =>
+        page.locator(`link[rel="alternate"][hreflang="${hreflang}"]`);
+      await expect(alternate('es')).toHaveAttribute('href', /\/experiments\/$/);
+      await expect(alternate('en')).toHaveAttribute('href', /\/en\/experiments\/$/);
+      await expect(alternate('x-default')).toHaveAttribute('href', /\/experiments\/$/);
+      await expect(page.locator('meta[property="og:title"]')).toHaveAttribute('content', /\S/);
+      await expect(page.locator('meta[name="robots"]')).toHaveCount(0);
+      // One page only: no pager and no prev/next links in the head.
+      await expect(page.getByRole('navigation', { name: pager })).toHaveCount(0);
+      await expect(page.locator('link[rel="prev"], link[rel="next"]')).toHaveCount(0);
+    });
+  }
+
+  test('there is no second page and no page 1 duplicate: both answer 404', async ({ request }) => {
+    for (const path of [
+      '/experiments/page/2/',
+      '/en/experiments/page/2/',
+      '/experiments/page/1/',
+      '/en/experiments/page/1/',
+    ]) {
+      expect((await request.get(path)).status(), path).toBe(404);
+    }
+  });
+});
 
 test('the second piece shows its screenshot lazily with alternative text and explicit size', async ({
   page,

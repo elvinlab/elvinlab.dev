@@ -570,3 +570,66 @@ describe('interface switches', () => {
     expect(() => parseSiteConfig(withFeatures({ [key]: 'no' as never }))).toThrow();
   });
 });
+
+describe('experiments block', () => {
+  const withExperiments = (experiments: unknown) => ({ ...valid, experiments });
+
+  it('is optional and defaults to 12 per page, 3 featured and 3 rows on /me', () => {
+    expect(parseSiteConfig(valid).experiments).toEqual({ perPage: 12, maxFeatured: 3, meRows: 3 });
+    expect(parseSiteConfig(withExperiments({})).experiments).toEqual({
+      perPage: 12,
+      maxFeatured: 3,
+      meRows: 3,
+    });
+  });
+
+  it('accepts values inside the ranges', () => {
+    const parsed = parseSiteConfig(withExperiments({ perPage: 24, maxFeatured: 2, meRows: 5 }));
+    expect(parsed.experiments).toEqual({ perPage: 24, maxFeatured: 2, meRows: 5 });
+  });
+
+  it('rejects values outside the ranges and non-integers', () => {
+    for (const bad of [
+      { perPage: 3 },
+      { perPage: 49 },
+      { perPage: 12.5 },
+      { maxFeatured: 0 },
+      { maxFeatured: 7 },
+      { meRows: 0 },
+      { meRows: 7 },
+    ]) {
+      expect(() => parseSiteConfig(withExperiments(bad)), JSON.stringify(bad)).toThrow();
+    }
+  });
+
+  it('rejects an unknown key instead of ignoring a typo', () => {
+    expect(() => parseSiteConfig(withExperiments({ perpage: 10 }))).toThrow();
+  });
+
+  it('accepts a localized intro and words, and checks their locales', () => {
+    const parsed = parseSiteConfig(
+      withExperiments({
+        intro: { es: 'Mis experimentos.', en: 'My experiments.' },
+        words: { es: ['construir', 'probar'], en: ['build', 'test'] },
+      }),
+    );
+    expect(parsed.experiments.intro?.['en']).toBe('My experiments.');
+    expect(parsed.experiments.words?.['es']).toEqual(['construir', 'probar']);
+    expect(() => parseSiteConfig(withExperiments({ intro: { en: 'Only English' } }))).toThrow(
+      /default locale "es"/,
+    );
+    expect(() => parseSiteConfig(withExperiments({ words: { es: ['a'], fr: ['b'] } }))).toThrow(
+      /"fr"/,
+    );
+    expect(() => parseSiteConfig(withExperiments({ words: { en: ['a'] } }))).toThrow(
+      /default locale "es"/,
+    );
+  });
+
+  it('allows at most six words per locale', () => {
+    const six = ['a', 'b', 'c', 'd', 'e', 'f'];
+    expect(() => parseSiteConfig(withExperiments({ words: { es: six } }))).not.toThrow();
+    expect(() => parseSiteConfig(withExperiments({ words: { es: [...six, 'g'] } }))).toThrow();
+    expect(() => parseSiteConfig(withExperiments({ words: { es: [] } }))).toThrow();
+  });
+});

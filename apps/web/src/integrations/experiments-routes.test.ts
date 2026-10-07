@@ -7,6 +7,8 @@ describe('experimentsRoutes', () => {
     expect(experimentsRoutes(true).map((route) => route.pattern)).toEqual([
       '/experiments',
       '/en/experiments',
+      '/experiments/page/[page]',
+      '/en/experiments/page/[page]',
     ]);
   });
 
@@ -14,6 +16,15 @@ describe('experimentsRoutes', () => {
     for (const route of experimentsRoutes(true)) {
       expect(route.entrypoint).toMatch(/\/experiments-routes\/[^/]+$/);
     }
+  });
+
+  it('names a dynamic entrypoint for the later pages, never a page 1 route', () => {
+    const paged = experimentsRoutes(true).filter((route) => route.pattern.includes('[page]'));
+    expect(paged.map((route) => route.entrypoint.split('/').at(-1))).toEqual([
+      'page.astro',
+      'en-page.astro',
+    ]);
+    expect(experimentsRoutes(true).some((route) => /page\/1\b/.test(route.pattern))).toBe(false);
   });
 
   it('returns no routes when the flag is off', () => {

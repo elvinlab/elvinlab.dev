@@ -483,6 +483,24 @@
     "date": "2026-10-06",
     "category": "added",
     "title": "Experiments page and recent experiments on /me",
-    "description": "An Experiments page (/experiments/, /en/experiments/) shows the featured projects (up to 3) as exhibition pieces: what each solves, what I did myself and the result, next to a gallery of real screenshots with captions and thumbnails (no JavaScript needed, soft motion that respects reduced motion). Other projects are compact cards grouped by year. /me shows recent experiments as compact rows. For forks: experiments.json takes up to four `images`, an `order` and an `archived` status."
+    "description": "An Experiments page (/experiments/, /en/experiments/) shows the featured projects (up to 3) as exhibition pieces: what each solves, my own part and the result, with a gallery of real screenshots (works without JavaScript, motion respects reduced motion). Other projects are compact cards by year, paginated at 12 per page (/experiments/page/2/) when the list grows. /me shows recent rows. For forks: an `experiments` block in site.config.ts sets page size, featured limit, /me rows, intro and words."
+  },
+  "immutable-built-assets": {
+    "date": "2026-10-06",
+    "category": "changed",
+    "title": "Built assets keep their cache for a year",
+    "description": "Fingerprint-named assets under /_astro/ use a one-year immutable cache policy. A changed build produces new asset names, while HTML and non-fingerprinted files keep their existing policies."
+  },
+  "experiment-image-policy": {
+    "date": "2026-10-06",
+    "category": "added",
+    "title": "Experiment images and honest fallback covers",
+    "description": "Own screenshots live beside the source and are optimized at build time; a missing referenced image fails the build. Experiments without screenshots use a CSS-only typographic cover instead of a fake image. The image policy and ADR 0015 explain the repository storage decision and the deferred R2 migration."
+  },
+  "experiments-responsive-contrast": {
+    "date": "2026-10-07",
+    "category": "fixed",
+    "title": "Experiments fit tablet screens with readable indices",
+    "description": "Featured experiment glows stay inside their horizontal media bounds, preventing tablet-width scrolling. Compact experiment indices keep their outlined pixel style with the existing readable text token in both themes."
   }
 }

@@ -22,7 +22,9 @@ export function isHiddenFromSitemap(pathname: string, features?: typeof site.fea
     !flags.experiments &&
     (withoutLocale === '/experiments/' ||
       pathname === '/experiments/' ||
-      pathname === '/en/experiments/')
+      pathname === '/en/experiments/' ||
+      // The later pages of the paginated list: `/experiments/page/2/` and its English twin.
+      /^\/experiments\/page\/\d+\/$/.test(withoutLocale))
   ) {
     return true;
   }

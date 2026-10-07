@@ -59,6 +59,10 @@ export const siteConfig = {
       },
     ],
   },
+  // The experiments list (`/experiments/`) and the rows on `/me`: docs/PORTFOLIO.md. `intro` and
+  // `words` (the decorative `// build` stack by the title, per locale) are optional and fall back to
+  // the interface defaults, for example: intro: { es: '...', en: '...' }, words: { es: ['construir'], en: ['build'] }.
+  experiments: { perPage: 12, maxFeatured: 3, meRows: 3 },
   socials: [
     { label: 'GitHub', url: 'https://github.com/elvinlab', icon: 'github' },
     { label: 'LinkedIn', url: 'https://www.linkedin.com/in/elvinlab', icon: 'linkedin' },

@@ -42,20 +42,18 @@ export function caseLinkLabelKey(
   return noteLang === pageLocale ? 'experiment.case' : `experiment.case.${noteLang}`;
 }
 
-/** Most entries shown as big exhibition pieces; every other entry is a compact card. */
-export const MAX_BIG_PIECES = 3;
-
 /**
- * Fails the build when more than `MAX_BIG_PIECES` experiments are featured, so the big exhibition
- * pieces stay few and the index stays scannable.
+ * Fails the build when more than `max` experiments are featured (`experiments.maxFeatured` in
+ * `site.config.ts`), so the big exhibition pieces stay few and the index stays scannable.
  */
 export function assertFeaturedLimit(
   experiments: readonly { id: string; data: { featured: boolean } }[],
+  max: number,
 ): void {
   const featured = experiments.filter(({ data }) => data.featured);
-  if (featured.length > MAX_BIG_PIECES) {
+  if (featured.length > max) {
     throw new Error(
-      `${featured.length} experiments are featured (${featured.map(({ id }) => id).join(', ')}), but at most ${MAX_BIG_PIECES} may be: set \`featured\` to false on the others so the experiments page stays scannable`,
+      `${featured.length} experiments are featured (${featured.map(({ id }) => id).join(', ')}), but at most ${max} may be (\`experiments.maxFeatured\` in site.config.ts): set \`featured\` to false on the others so the experiments page stays scannable`,
     );
   }
 }
