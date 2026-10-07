@@ -1,5 +1,7 @@
 ---
-/** /me hero: portrait (`identity.photo`, else the avatar) or initials, greeting, name, role and the recruiter call-to-action buttons. */
+/** /me hero: portrait (`identity.photo`, else the avatar) or initials, greeting, name, headline (`me.headline`, else
+ * `identity.role`), the optional pitch and the call-to-action row: contact is primary, the CV and the social
+ * links (icon plus visible name) are secondary. */
 
 import { Image } from 'astro:assets';
 import { localizePath } from '@elvinlab/core';
@@ -18,6 +20,14 @@ const photo = resolvePhoto(site.identity);
 const cvUrl = resolveCvUrl(site.recruiter.cvUrl, locale, LOCALES.defaultLocale);
 const initials = site.identity.name.split(' ').slice(0, 2).map((p) => p[0]).join('');
 const contactHref = localizePath('/contact/', locale, LOCALES);
+const headline = site.me.headline?.[locale] ?? site.identity.role[locale];
+const pitch = site.me.pitch?.[locale];
+
+const CTA = 'flex h-12 items-center gap-2 rounded-control px-5 font-medium active:scale-96';
+const PRIMARY = `${CTA} bg-button text-white`;
+const SECONDARY = `${CTA} bg-chip transition-colors duration-150 hover:bg-card-hover`;
+// Contact leads; without the contact feature the CV (when set) takes the primary style.
+const contactEnabled = isEnabled('contact');
 ---
 
 <section class="grid gap-8 md:grid-cols-[232px_1fr] md:items-center">
@@ -48,28 +58,29 @@ const contactHref = localizePath('/contact/', locale, LOCALES);
     <h1 class="font-display text-4xl font-bold leading-none tracking-tight md:text-6xl">
       {site.identity.name}<span aria-hidden="true" class="ml-1 inline-block h-3 w-2 bg-pink align-baseline md:h-4"></span>
     </h1>
-    <p class="text-xl text-text-secondary md:text-2xl">{site.identity.role[locale]}</p>
+    <p class="text-xl text-text-secondary text-balance md:text-2xl">{headline}</p>
+    {pitch && <p class="max-w-[60ch] text-base leading-relaxed text-text-secondary text-pretty md:text-lg">{pitch}</p>}
     <div class="mt-1 flex flex-wrap gap-2.5 print:hidden">
-      {cvUrl && (
-        <a href={cvUrl} {...externalLinkAttrs(cvUrl, site.url)} class="flex h-12 items-center gap-2 rounded-control bg-button px-5 font-medium text-white active:scale-96">
-          <SocialIcon name="download" />{t(locale, 'me.cv')}<ExternalHint href={cvUrl} locale={locale} />
-        </a>
-      )}
-      {isEnabled('contact') && (
-        <a href={contactHref} class="flex h-12 items-center gap-2 rounded-control bg-chip px-5 font-medium transition-colors duration-150 hover:bg-card-hover">
+      {contactEnabled && (
+        <a href={contactHref} class={PRIMARY}>
           <SocialIcon name="mail" />{t(locale, 'me.contactMe')}
         </a>
       )}
+      {cvUrl && (
+        <a href={cvUrl} {...externalLinkAttrs(cvUrl, site.url)} class={contactEnabled ? SECONDARY : PRIMARY}>
+          <SocialIcon name="file" />{t(locale, 'me.cv')}<ExternalHint href={cvUrl} locale={locale} />
+        </a>
+      )}
       {site.socials.map((social) => (
-        <a href={social.url} {...externalLinkAttrs(social.url, site.url, 'me')} class="grid size-12 place-items-center rounded-control bg-chip transition-colors duration-150 hover:bg-card-hover">
-          <span class="sr-only">{social.label}</span><ExternalHint href={social.url} locale={locale} /><SocialIcon name={social.icon} />
+        <a href={social.url} {...externalLinkAttrs(social.url, site.url, 'me')} class={SECONDARY}>
+          <SocialIcon name={social.icon} />{social.label}<ExternalHint href={social.url} locale={locale} />
         </a>
       ))}
     </div>
 
     {/* Interactive buttons above are useless on paper; print the reachable URLs as text instead. */}
     <dl class="mt-1 hidden gap-x-3 text-sm print:grid print:grid-cols-[auto_1fr]">
-      {isEnabled('contact') && (
+      {contactEnabled && (
         <>
           <dt class="text-muted">{t(locale, 'me.contactMe')}</dt>
           <dd>{site.url}{contactHref}</dd>

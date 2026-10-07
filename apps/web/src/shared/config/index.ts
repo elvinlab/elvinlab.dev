@@ -5,7 +5,13 @@ import { buildEnv } from './env.ts';
 import { resolveIntegrations } from './integrations.ts';
 import { type Feature, parseSiteConfig, type SiteConfig } from './schema.ts';
 
-export { type Feature, parseSiteConfig, type SiteConfig } from './schema.ts';
+export {
+  type Feature,
+  LISTING_SORTS,
+  type ListingSort,
+  parseSiteConfig,
+  type SiteConfig,
+} from './schema.ts';
 
 /** The validated site config. Parsed on import, so a bad `site.config.ts` fails the build. */
 export const site: SiteConfig = parseSiteConfig(siteConfig);

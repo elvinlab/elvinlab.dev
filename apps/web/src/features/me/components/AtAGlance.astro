@@ -1,5 +1,6 @@
 ---
-/** The "at a glance" strip: derived years fact plus configured facts. */
+/** The "at a glance" strip: derived years fact plus configured facts. Location, languages, work mode and
+ * availability live in `QuickFacts`, so they are not repeated here. One column on phones, one row from `sm`. */
 
 import { yearsSince } from '@/features/portfolio/index.ts';
 import { site } from '@/shared/config/index.ts';
@@ -15,12 +16,18 @@ const facts = [
   },
   ...site.me.facts.map((fact) => ({ value: fact.value[locale], label: fact.label[locale] })),
 ];
+const COLUMNS: Record<number, string> = {
+  1: 'sm:grid-cols-1',
+  2: 'sm:grid-cols-2',
+  3: 'sm:grid-cols-3',
+  4: 'sm:grid-cols-4',
+};
 ---
 
 <section class="rounded-card bg-card px-3 py-5" aria-label={t(locale, 'me.atAGlance')}>
-  <dl class="grid grid-cols-2 md:grid-cols-4">
+  <dl class:list={['grid grid-cols-1', COLUMNS[Math.min(facts.length, 4)]]}>
     {facts.map((fact, index) => (
-      <div class:list={['flex flex-col gap-1.5 px-6 py-1', index > 0 && 'border-l border-dashed border-divider']}>
+      <div class:list={['flex flex-col gap-1.5 px-4 py-3 sm:px-6 sm:py-1', index > 0 && 'border-t border-dashed border-divider sm:border-t-0 sm:border-l']}>
         <dt class="order-2 text-sm text-muted">{fact.label}</dt>
         <dd class="order-1 font-display text-xl font-bold tracking-tight text-balance md:text-2xl">{fact.value}</dd>
       </div>

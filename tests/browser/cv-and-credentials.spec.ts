@@ -13,7 +13,7 @@ test.beforeEach(({ browserName: _browserName }, testInfo) => {
 test('every CV button points at the PDF of its own language', async ({ page }) => {
   const hrefOf = async (path: string) => {
     await page.goto(path);
-    const link = page.getByRole('link', { name: /^(Descargar|Download) CV/ }).first();
+    const link = page.getByRole('link', { name: /^(Ver|View) CV/ }).first();
     await expect(link).toBeVisible();
     return link.getAttribute('href');
   };

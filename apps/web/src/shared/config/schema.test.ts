@@ -213,6 +213,75 @@ describe('parseSiteConfig', () => {
     });
   });
 
+  describe('me.languages', () => {
+    it('is optional', () => {
+      expect(parseSiteConfig(valid).me.languages).toBeUndefined();
+    });
+
+    it('accepts one text per locale', () => {
+      const languages = { es: 'Español nativo · Inglés B1', en: 'Spanish native · English B1' };
+      const config = { ...valid, me: { ...valid.me, languages } };
+      expect(parseSiteConfig(config).me.languages).toEqual(languages);
+    });
+
+    it('rejects a non-localized value', () => {
+      const broken = { ...valid, me: { ...valid.me, languages: 'Spanish' } };
+      expect(() => parseSiteConfig(broken)).toThrow(/languages/);
+    });
+  });
+
+  describe('me.headline and me.pitch', () => {
+    it('are optional, so a white-label profile falls back to identity.role', () => {
+      const { me } = parseSiteConfig(valid);
+      expect(me.headline).toBeUndefined();
+      expect(me.pitch).toBeUndefined();
+    });
+
+    it('accept one text per locale', () => {
+      const headline = { es: 'Ingeniera full-stack', en: 'Full-stack engineer' };
+      const pitch = { es: 'Construyo productos web.', en: 'I build web products.' };
+      const config = { ...valid, me: { ...valid.me, headline, pitch } };
+      const parsed = parseSiteConfig(config).me;
+      expect(parsed.headline).toEqual(headline);
+      expect(parsed.pitch).toEqual(pitch);
+    });
+
+    it('reject a non-localized value', () => {
+      for (const field of ['headline', 'pitch']) {
+        const broken = { ...valid, me: { ...valid.me, [field]: 'Full-stack engineer' } };
+        expect(() => parseSiteConfig(broken), field).toThrow(new RegExp(field));
+      }
+    });
+  });
+
+  describe('me.stack hint', () => {
+    const withStack = (stack: unknown) => ({ ...valid, me: { ...valid.me, stack } });
+
+    it('is optional on each group', () => {
+      expect(parseSiteConfig(valid).me.stack[0]?.hint).toBeUndefined();
+    });
+
+    it('accepts one text per locale', () => {
+      const hint = { es: 'Lo que ve la gente.', en: 'What people see.' };
+      const stack = [{ label: { es: 'Frontend', en: 'Frontend' }, items: ['Astro'], hint }];
+      expect(parseSiteConfig(withStack(stack)).me.stack[0]?.hint).toEqual(hint);
+    });
+
+    it('accepts an optional icon name and rejects an empty one', () => {
+      const group = { label: { es: 'Frontend', en: 'Frontend' }, items: ['Astro'] };
+      expect(parseSiteConfig(withStack([{ ...group, icon: 'code' }])).me.stack[0]?.icon).toBe(
+        'code',
+      );
+      expect(parseSiteConfig(valid).me.stack[0]?.icon).toBeUndefined();
+      expect(() => parseSiteConfig(withStack([{ ...group, icon: '' }]))).toThrow(/icon/);
+    });
+
+    it('rejects a non-localized hint', () => {
+      const stack = [{ label: { es: 'Frontend', en: 'Frontend' }, items: ['Astro'], hint: 'x' }];
+      expect(() => parseSiteConfig(withStack(stack))).toThrow(/hint/);
+    });
+  });
+
   describe('recruiter.openToWork', () => {
     it('defaults to true so existing configs keep the green status dot', () => {
       expect(parseSiteConfig(valid).recruiter.openToWork).toBe(true);
@@ -499,5 +568,100 @@ describe('interface switches', () => {
 
   it.each(keys)('rejects a non-boolean %s', (key) => {
     expect(() => parseSiteConfig(withFeatures({ [key]: 'no' as never }))).toThrow();
+  });
+});
+
+describe('experiments block', () => {
+  const withExperiments = (experiments: unknown) => ({ ...valid, experiments });
+
+  it('is optional and defaults to 12 per page, 3 featured, 3 rows on /me and every sort', () => {
+    const defaults = {
+      perPage: 12,
+      maxFeatured: 3,
+      meRows: 3,
+      defaultSort: 'newest',
+      sorts: ['newest', 'oldest', 'title'],
+      sortFrom: 4,
+    };
+    expect(parseSiteConfig(valid).experiments).toEqual(defaults);
+    expect(parseSiteConfig(withExperiments({})).experiments).toEqual(defaults);
+  });
+
+  it('accepts values inside the ranges', () => {
+    const parsed = parseSiteConfig(withExperiments({ perPage: 24, maxFeatured: 2, meRows: 5 }));
+    expect(parsed.experiments).toMatchObject({ perPage: 24, maxFeatured: 2, meRows: 5 });
+  });
+
+  it('accepts a default sort, a subset of sorts that includes it and a threshold', () => {
+    const parsed = parseSiteConfig(
+      withExperiments({ defaultSort: 'oldest', sorts: ['oldest', 'newest'], sortFrom: 8 }),
+    );
+    expect(parsed.experiments).toMatchObject({
+      defaultSort: 'oldest',
+      sorts: ['oldest', 'newest'],
+      sortFrom: 8,
+    });
+    expect(parseSiteConfig(withExperiments({ sorts: ['newest'] })).experiments.sorts).toEqual([
+      'newest',
+    ]);
+  });
+
+  it('rejects an unknown sort, an empty or duplicated list and a default that is not enabled', () => {
+    for (const bad of [
+      { defaultSort: 'random' },
+      { sorts: ['random'] },
+      { sorts: [] },
+      { sorts: ['newest', 'newest'] },
+      { defaultSort: 'title', sorts: ['newest', 'oldest'] },
+      { sortFrom: 1 },
+      { sortFrom: 2.5 },
+    ]) {
+      expect(() => parseSiteConfig(withExperiments(bad)), JSON.stringify(bad)).toThrow();
+    }
+  });
+
+  it('rejects values outside the ranges and non-integers', () => {
+    for (const bad of [
+      { perPage: 3 },
+      { perPage: 49 },
+      { perPage: 12.5 },
+      { maxFeatured: 0 },
+      { maxFeatured: 7 },
+      { meRows: 0 },
+      { meRows: 7 },
+    ]) {
+      expect(() => parseSiteConfig(withExperiments(bad)), JSON.stringify(bad)).toThrow();
+    }
+  });
+
+  it('rejects an unknown key instead of ignoring a typo', () => {
+    expect(() => parseSiteConfig(withExperiments({ perpage: 10 }))).toThrow();
+  });
+
+  it('accepts a localized intro and words, and checks their locales', () => {
+    const parsed = parseSiteConfig(
+      withExperiments({
+        intro: { es: 'Mis experimentos.', en: 'My experiments.' },
+        words: { es: ['construir', 'probar'], en: ['build', 'test'] },
+      }),
+    );
+    expect(parsed.experiments.intro?.['en']).toBe('My experiments.');
+    expect(parsed.experiments.words?.['es']).toEqual(['construir', 'probar']);
+    expect(() => parseSiteConfig(withExperiments({ intro: { en: 'Only English' } }))).toThrow(
+      /default locale "es"/,
+    );
+    expect(() => parseSiteConfig(withExperiments({ words: { es: ['a'], fr: ['b'] } }))).toThrow(
+      /"fr"/,
+    );
+    expect(() => parseSiteConfig(withExperiments({ words: { en: ['a'] } }))).toThrow(
+      /default locale "es"/,
+    );
+  });
+
+  it('allows at most six words per locale', () => {
+    const six = ['a', 'b', 'c', 'd', 'e', 'f'];
+    expect(() => parseSiteConfig(withExperiments({ words: { es: six } }))).not.toThrow();
+    expect(() => parseSiteConfig(withExperiments({ words: { es: [...six, 'g'] } }))).toThrow();
+    expect(() => parseSiteConfig(withExperiments({ words: { es: [] } }))).toThrow();
   });
 });

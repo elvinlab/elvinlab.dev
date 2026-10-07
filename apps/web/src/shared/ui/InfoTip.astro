@@ -1,0 +1,124 @@
+---
+/**
+ * A focusable label (the slot: usually an icon plus text) with a short explanation that opens on
+ * hover, keyboard focus and tap. It follows the marks tooltip: `role="tooltip"`, `aria-describedby`,
+ * CSS only for showing it, one tiny script for Escape (WCAG 1.4.13: dismissible, hoverable,
+ * persistent). Styles and script are bundled by Astro once per page, however many tips it holds.
+ * The tooltip is anchored to the left edge of the trigger and never wider than the viewport minus
+ * the page gutter and card padding; inside a `.tip-card` (a size container) it is also capped at the
+ * card's inner width, so it cannot overflow the card or the screen. It never prints.
+ */
+type Props = {
+  /** Unique id of the tooltip on the page; the trigger points at it with `aria-describedby`. */
+  id: string;
+  /** The explanation: one plain sentence, already localized. */
+  text: string;
+  /** Opens below the trigger by default; `up` for triggers near the bottom of their column. */
+  place?: 'down' | 'up';
+  /** A 28 px trigger instead of 44 px, for dense lists of small labels (still above the 24 px WCAG minimum). */
+  dense?: boolean;
+  class?: string;
+};
+
+const { id, text, place = 'down', dense = false, class: className } = Astro.props;
+---
+
+<span class:list={['info-tip', className]} data-place={place} data-dense={dense ? '' : undefined}>
+  <!-- biome-ignore lint/a11y/noNoninteractiveTabindex: the trigger must take keyboard and touch focus to show the tooltip (WCAG 1.4.13) -->
+  <span class="info-tip-trigger" tabindex="0" aria-describedby={id}><slot /></span>
+  <span role="tooltip" id={id} class="info-tip-bubble">{text}</span>
+</span>
+
+<style is:global>
+  .info-tip {
+    position: relative;
+    display: inline-flex;
+    max-width: 100%;
+  }
+  .info-tip-trigger {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    min-height: 44px;
+    border-radius: var(--radius-inner);
+    cursor: help;
+  }
+  .info-tip-bubble {
+    position: absolute;
+    left: 0;
+    top: calc(100% - 0.25rem);
+    z-index: 30;
+    width: max-content;
+    max-width: min(18rem, calc(100vw - 4.5rem));
+    padding: 0.5rem 0.75rem;
+    border: 1px solid var(--color-divider);
+    border-radius: var(--radius-inner);
+    background: var(--color-card);
+    color: var(--color-text-secondary);
+    font: 400 0.8125rem/1.4 var(--font-mono);
+    text-align: left;
+    text-wrap: pretty;
+    visibility: hidden;
+    opacity: 0;
+    transition: opacity 0.12s, visibility 0s 0.12s;
+  }
+  /* A card that holds tips sets a size container, so the bubble can never be wider than the card's inner width. */
+  .tip-card {
+    container-type: inline-size;
+  }
+  @container (min-width: 0px) {
+    .info-tip-bubble {
+      max-width: min(18rem, 100cqw);
+    }
+  }
+  .info-tip[data-dense] .info-tip-trigger {
+    min-height: 28px;
+  }
+  .info-tip[data-place='up'] .info-tip-bubble {
+    top: auto;
+    bottom: calc(100% - 0.25rem);
+  }
+  /* The tooltip overlaps the trigger's own hit area, so the pointer can reach it without a gap. */
+  @media (hover: hover) {
+    .info-tip:hover .info-tip-bubble {
+      visibility: visible;
+      opacity: 1;
+      transition-delay: 0s;
+    }
+  }
+  .info-tip:focus-within .info-tip-bubble {
+    visibility: visible;
+    opacity: 1;
+    transition-delay: 0s;
+  }
+  /* Escape hides it until the pointer or the focus leaves (the script sets data-x). */
+  .info-tip[data-x] .info-tip-bubble {
+    visibility: hidden;
+    opacity: 0;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .info-tip-bubble {
+      transition: none;
+    }
+  }
+  @media print {
+    .info-tip-bubble {
+      display: none;
+    }
+  }
+</style>
+
+<script>
+  // Escape dismisses a tooltip wherever it is open (hover leaves no focus inside it); leaving re-arms it.
+  document.addEventListener('keydown', (event) => {
+    if (event.key !== 'Escape') return;
+    for (const tip of document.querySelectorAll('.info-tip')) {
+      if (tip.matches(':hover, :focus-within')) tip.setAttribute('data-x', '');
+    }
+  });
+  for (const tip of document.querySelectorAll('.info-tip')) {
+    const rearm = () => tip.removeAttribute('data-x');
+    tip.addEventListener('pointerleave', rearm);
+    tip.addEventListener('focusout', rearm);
+  }
+</script>

@@ -36,10 +36,49 @@ describe('isHiddenFromSitemap', () => {
     expect(isHiddenFromSitemap('/en/me/', features)).toBe(true);
   });
 
-  it('returns true for /experiments/ when experiments feature is off', () => {
+  it('returns true for /experiments/ when the experiments feature is off', () => {
     const features = { ...allOn, experiments: false };
     expect(isHiddenFromSitemap('/experiments/', features)).toBe(true);
     expect(isHiddenFromSitemap('/en/experiments/', features)).toBe(true);
+  });
+
+  it('hides every page of the experiments list when the experiments feature is off', () => {
+    const features = { ...allOn, experiments: false };
+    for (const path of [
+      '/experiments/page/2/',
+      '/experiments/page/12/',
+      '/en/experiments/page/2/',
+      '/en/experiments/page/12/',
+    ]) {
+      expect(isHiddenFromSitemap(path, features), path).toBe(true);
+      expect(isHiddenFromSitemap(path, allOn), path).toBe(false);
+    }
+  });
+
+  it('never lists the alternate sorts of the experiments list, whatever the flags', () => {
+    const paths = [
+      '/experiments/oldest/',
+      '/experiments/title/page/2/',
+      '/experiments/newest/page/12/',
+      '/en/experiments/oldest/',
+      '/en/experiments/title/page/3/',
+    ];
+    for (const path of paths) {
+      expect(isHiddenFromSitemap(path, allOn), path).toBe(true);
+      expect(isHiddenFromSitemap(path, { ...allOn, experiments: false }), path).toBe(true);
+    }
+  });
+
+  it('keeps the default order and its later pages, and ignores paths that are not a sort', () => {
+    for (const path of [
+      '/experiments/',
+      '/experiments/page/2/',
+      '/en/experiments/page/2/',
+      '/experiments/some-case/',
+      '/experiments/oldest/extra/',
+    ]) {
+      expect(isHiddenFromSitemap(path, allOn), path).toBe(false);
+    }
   });
 
   it('returns true for /changelog/ when changelog feature is off', () => {

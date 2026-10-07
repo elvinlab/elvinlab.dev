@@ -1,0 +1,258 @@
+---
+/**
+ * The `/experiments/` page for one locale and sort: a quiet header (flask, title, intro), the big
+ * pieces separated by a hairline, then the compact list with its sort switch, summary and pager.
+ * The big pieces lead page 1 whatever the sort; the sort and the page apply to the compact list.
+ * Styles are scoped here and in the piece and media components, so none of them reaches `/me`.
+ * The sort and pager controls are the generic listing kit of `shared/ui` (`shared/lib/listing.ts`).
+ */
+
+import { localizePath } from '@elvinlab/core';
+
+import {
+  type ExperimentSort,
+  experimentsHref,
+  introText,
+  labWords,
+  loadExperimentPages,
+  showYearHeadings,
+} from '@/features/portfolio/index.ts';
+import { site } from '@/shared/config/index.ts';
+import { LOCALES, type Locale, t } from '@/shared/i18n/index.ts';
+import BaseLayout from '@/shared/layout/BaseLayout.astro';
+import ListingSummary from '@/shared/ui/ListingSummary.astro';
+import Pager from '@/shared/ui/Pager.astro';
+import SortSwitch from '@/shared/ui/SortSwitch.astro';
+
+import ExperimentCompact from './ExperimentCompact.astro';
+import ExperimentPiece from './ExperimentPiece.astro';
+
+/** `sort` is set on the pages of a sort that is not the default one; they are not indexed. */
+type Props = { locale: Locale; page?: number; sort?: ExperimentSort };
+
+const { locale, page = 1, sort: requested } = Astro.props;
+const { experiments, pages, sort, offered } = await loadExperimentPages(requested);
+const current = pages.find((candidate) => candidate.page === page);
+if (!current) throw new Error(`/experiments/ has no page ${page} (${pages.length} in total)`);
+const { big, entries, groups } = current;
+const hasMore = entries.length > 0;
+const paged = page > 1;
+const href = (target: number, forSort: ExperimentSort | undefined = requested): string =>
+  localizePath(experimentsHref(target, forSort), locale, LOCALES);
+const pageUrl = (target: number): string => new URL(href(target), site.url).href;
+const sortLabel = t(locale, `listing.sort.${sort}`);
+const title = requested
+  ? t(locale, paged ? 'experiments.sorted.page.title' : 'experiments.sorted.title', { sort: sortLabel, page })
+  : paged
+    ? t(locale, 'experiments.page.title', { page })
+    : t(locale, 'experiments.title');
+const description = requested
+  ? t(locale, 'experiments.sorted.description', { sort: sortLabel, page, pages: pages.length })
+  : paged
+    ? t(locale, 'experiments.page.description', { page, pages: pages.length })
+    : t(locale, 'experiments.description');
+const intro = introText(site.experiments.intro, locale, LOCALES.defaultLocale, t(locale, 'experiments.intro'));
+const lab = labWords(site.experiments.words, locale, LOCALES.defaultLocale);
+const sortOptions = offered.map((key) => ({
+  key,
+  label: t(locale, `listing.sort.${key}`),
+  href: href(1, key),
+}));
+const years = showYearHeadings(current, sort);
+---
+
+<BaseLayout locale={locale} path={experimentsHref(page, requested)} title={title} description={description} noindex={requested !== undefined}>
+  {paged && <link slot="head" rel="prev" href={pageUrl(page - 1)} />}
+  {page < pages.length && <link slot="head" rel="next" href={pageUrl(page + 1)} />}
+  <section class="xp-page">
+    <header class="xp-header">
+      <div class="xp-header-text">
+        <h1>
+          <svg class="xp-flask" viewBox="0 0 9 9" shape-rendering="crispEdges" fill="currentColor" aria-hidden="true" focusable="false"><rect x="2" y="0" width="5" height="1"></rect><rect x="3" y="1" width="1" height="3"></rect><rect x="5" y="1" width="1" height="3"></rect><rect x="2" y="4" width="1" height="1"></rect><rect x="6" y="4" width="1" height="1"></rect><rect x="1" y="5" width="1" height="3"></rect><rect x="7" y="5" width="1" height="3"></rect><rect x="2" y="6" width="5" height="2"></rect><rect x="1" y="8" width="7" height="1"></rect></svg>{t(locale, 'experiments.title')}
+        </h1>
+        <p>{intro}</p>
+      </div>
+      {lab.length > 0 && (
+        <ul class="xp-lab" aria-hidden="true">
+          {lab.map((word) => <li>{word}</li>)}
+        </ul>
+      )}
+    </header>
+    {experiments.length === 0 ? (
+      <p class="xp-empty">{t(locale, 'experiments.empty')}</p>
+    ) : (
+      big.length > 0 && <div class="xp-list">
+        {big.map((experiment, i) => (
+          <>
+            {i > 0 && <div class="xp-hairline" aria-hidden="true"></div>}
+            <ExperimentPiece experiment={experiment} locale={locale} index={i + 1} />
+          </>
+        ))}
+      </div>
+    )}
+    {hasMore && (
+      <section class="xp-more" aria-labelledby="xp-more-title">
+        <div class="xp-more-head">
+          <h2 id="xp-more-title">{t(locale, 'experiments.more')}</h2>
+          <SortSwitch locale={locale} options={sortOptions} current={sort} label={t(locale, 'experiments.sort.label')} />
+        </div>
+        {years ? groups.map(({ year, entries: group }) => (
+          <div class="xp-year">
+            <p class="xp-year-label">{year}</p>
+            <ul class="xp-grid">
+              {group.map((entry) => <ExperimentCompact experiment={entry} locale={locale} />)}
+            </ul>
+          </div>
+        )) : (
+          <ul class="xp-grid">
+            {entries.map((entry) => <ExperimentCompact experiment={entry} locale={locale} />)}
+          </ul>
+        )}
+        {pages.length > 1 && (
+          <footer class="xp-foot">
+            <ListingSummary locale={locale} from={current.from} to={current.to} total={current.total} />
+            <Pager locale={locale} page={page} pages={pages.length} href={href} label={t(locale, 'experiments.pager.label')} />
+          </footer>
+        )}
+      </section>
+    )}
+  </section>
+</BaseLayout>
+
+<style>
+  .xp-page {
+    display: flex;
+    flex-direction: column;
+    gap: 3rem;
+  }
+  .xp-header {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 2rem;
+  }
+  /* Same size, weight and tracking as the title of the other pages (`text-3xl font-bold tracking-tight`). */
+  .xp-header-text h1 {
+    display: flex;
+    align-items: center;
+    gap: 0.625rem;
+    margin: 0;
+    font-size: 1.875rem;
+    font-weight: 700;
+    line-height: 2.25rem;
+    letter-spacing: -0.025em;
+  }
+  .xp-header-text p {
+    max-width: 60ch;
+    margin: 0.5rem 0 0;
+    font-size: 1.0625rem;
+    line-height: 1.55;
+    color: var(--color-text-secondary);
+  }
+  /* The pixel flask before the title: the single pink accent of the header, a 9 x 9 grid with crisp edges. */
+  .xp-flask {
+    flex-shrink: 0;
+    width: 27px;
+    height: 27px;
+    color: var(--color-pink);
+    shape-rendering: crispEdges;
+  }
+  /* Only rendered when `experiments.words` is configured. */
+  .xp-lab {
+    display: none;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    font: 400 0.8125rem / 1.35 var(--font-mono);
+    color: var(--color-muted);
+    user-select: none;
+  }
+  .xp-lab li:nth-child(odd) {
+    color: color-mix(in srgb, var(--color-muted) 70%, var(--color-primary));
+  }
+  @media (min-width: 768px) {
+    .xp-lab {
+      display: block;
+      flex-shrink: 0;
+      text-align: right;
+    }
+  }
+  .xp-list {
+    display: flex;
+    flex-direction: column;
+    gap: 3.5rem;
+  }
+  /* A plain hairline between two big pieces: no label, no dashes. */
+  .xp-hairline {
+    height: 1px;
+    background: var(--color-divider);
+  }
+  .xp-more {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+  .xp-more-head {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.75rem;
+  }
+  @media (min-width: 640px) {
+    .xp-more-head {
+      flex-direction: row;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+    }
+  }
+  .xp-more-head h2 {
+    margin: 0;
+    font: 700 1.5rem / 1.2 var(--font-display);
+  }
+  .xp-year {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+  .xp-year-label {
+    margin: 0;
+    font: 400 0.9375rem / 1 var(--font-mono);
+    color: var(--color-muted);
+  }
+  .xp-grid {
+    display: grid;
+    gap: 0.75rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    grid-template-columns: 1fr;
+  }
+  @media (min-width: 640px) {
+    .xp-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+  @media (min-width: 1024px) {
+    .xp-grid {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+  /* The summary and the pager close the list, aligned on one quiet row (stacked on a phone). */
+  .xp-foot {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    margin-top: 0.5rem;
+  }
+  @media (min-width: 640px) {
+    .xp-foot {
+      flex-direction: row;
+      justify-content: space-between;
+    }
+  }
+  .xp-empty {
+    color: var(--color-text-secondary);
+  }
+</style>

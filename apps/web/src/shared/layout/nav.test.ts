@@ -98,6 +98,16 @@ describe('navItems', () => {
   });
 });
 
+describe('navItems experiments entry', () => {
+  it('points the experiments key at the localized /experiments/ page', () => {
+    for (const locale of ['es', 'en'] as const) {
+      const projects = navItems(allOn, locale, true).find((item) => item.key === 'experiments');
+      expect(projects).toMatchObject({ path: '/experiments/' });
+      expect(projects?.localize).not.toBe(false);
+    }
+  });
+});
+
 describe('navItems English notes entry', () => {
   it('keeps the Spanish path, since posts only exist in Spanish', () => {
     const notes = navItems(allOn, 'en', true).find((item) => item.key === 'notes');

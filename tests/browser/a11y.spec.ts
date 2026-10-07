@@ -7,6 +7,8 @@ const PAGES = [
   '/',
   '/me/',
   '/en/me/',
+  '/experiments/',
+  '/en/experiments/',
   '/notes/',
   '/notes/smoke-es/',
   '/privacy/',

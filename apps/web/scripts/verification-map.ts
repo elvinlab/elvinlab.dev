@@ -128,6 +128,10 @@ const ME = area(
   `${SRC}/pages/me.astro`,
   `${SRC}/pages/en/me.astro`,
   `${SRC}/features/me/**`,
+  // The `/me` experiments block renders the compact portfolio rows.
+  `${SRC}/features/portfolio/components/ExperimentRow.astro`,
+  `${SRC}/content/experiments.json`,
+  `${SRC}/assets/experiments/**`,
   `${SRC}/features/credentials/**`,
   `${SRC}/content/experience.json`,
   `${SRC}/content/credentials.json`,
@@ -146,7 +150,28 @@ const CHANGELOG = area(
   `${SRC}/content/changelog.json`,
   `${SRC}/changelog-routes/**`,
 );
-const EVERY_PAGE = [...NOTE_PAGE, ...HOME, ...ME, ...CONTACT, ...LEGAL, ...CHANGELOG];
+// The experiments feature feeds `/experiments/`, the `/me` block and (when its home section is on) the home.
+const EXPERIMENTS = area(
+  `${SRC}/experiments-routes/**`,
+  `${SRC}/features/portfolio/**`,
+  `${SRC}/content/experiments.json`,
+  `${SRC}/assets/experiments/**`,
+  `${SRC}/shared/lib/experiment-image.ts`,
+  // The listing kit (sorting, paging, pager, sort switch, summary) only the experiments list uses for now.
+  `${SRC}/shared/lib/listing.ts`,
+  `${SRC}/shared/ui/Pager.astro`,
+  `${SRC}/shared/ui/SortSwitch.astro`,
+  `${SRC}/shared/ui/ListingSummary.astro`,
+);
+const EVERY_PAGE = [
+  ...NOTE_PAGE,
+  ...HOME,
+  ...ME,
+  ...EXPERIMENTS,
+  ...CONTACT,
+  ...LEGAL,
+  ...CHANGELOG,
+];
 
 const E2E_BASE = area('playwright.config.*', 'apps/web/scripts/fixture-preview.ts');
 const HELPERS = 'tests/browser/helpers/**';
@@ -292,12 +317,14 @@ export const CHECKS: readonly CheckDef[] = [
   e2e({ file: 'home-marks.spec.ts', covers: [...HOME, ...MARKS], helpers: true, responsive: true }),
   e2e({ file: 'marks.spec.ts', covers: [...NOTE_PAGE, ...HOME], helpers: true, responsive: true }),
   e2e({ file: 'me-experience-locale.spec.ts', covers: ME }),
+  e2e({ file: 'me-hero-tips.spec.ts', covers: ME }),
   e2e({ file: 'me-photo.spec.ts', covers: ME }),
   e2e({ file: 'mobile-ux.spec.ts', covers: EVERY_PAGE, responsive: true }),
   e2e({ file: 'note-share.spec.ts', covers: NOTE_PAGE }),
   e2e({ file: 'note-translations.spec.ts', covers: NOTE_PAGE }),
   e2e({ file: 'notes-layout.spec.ts', covers: NOTE_PAGE, responsive: true }),
   e2e({ file: 'performance.spec.ts', covers: EVERY_PAGE }),
+  e2e({ file: 'experiments.spec.ts', covers: [...EXPERIMENTS, ...ME] }),
   e2e({ file: 'pixel-display.spec.ts', covers: [...NOTE_PAGE, ...HOME], responsive: true }),
   e2e({ file: 'reading-mode.spec.ts', covers: NOTE_PAGE, helpers: true, responsive: true }),
   e2e({ file: 'smoke.spec.ts', covers: EVERY_PAGE }),
@@ -307,6 +334,9 @@ export const CHECKS: readonly CheckDef[] = [
 
   lighthouse('/', HOME),
   lighthouse('/en/', HOME),
+  lighthouse('/me/', ME),
+  lighthouse('/en/me/', ME),
+  lighthouse('/experiments/', EXPERIMENTS),
   lighthouse('/notes/', [...NOTES, ...SUBSCRIBE]),
   lighthouse('/notes/smoke-es/', NOTE_PAGE),
   lighthouse('/contact/', CONTACT),

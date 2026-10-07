@@ -15,7 +15,7 @@ Esta guía responde, en un solo lugar, a dos preguntas: **dónde se configura ca
 - [9. Problemas frecuentes](#9-problemas-frecuentes)
 - [10. Usar este sitio como base para otra persona (white-label)](#10-usar-este-sitio-como-base-para-otra-persona-white-label)
 
-Para escribir notas, mira la guía aparte: [Cómo crear una nota](NOTES.md).
+Para escribir notas, mira la guía aparte: [Cómo crear una nota](NOTES.md). Para editar el perfil de `/me` y los experimentos, mira la [guía del portafolio](PORTFOLIO.md).
 
 ## 1. El mapa: qué cambiar y dónde
 
@@ -23,7 +23,8 @@ Para escribir notas, mira la guía aparte: [Cómo crear una nota](NOTES.md).
 | --- | --- | --- |
 | Nombre, bio, rol, enlaces, idiomas, funciones activas, comentarios, analítica, fechas legales | [`apps/web/src/site.config.ts`](../apps/web/src/site.config.ts) | Al compilar: un valor inválido rompe el build y lista todos los problemas |
 | Notas (el blog) | `apps/web/src/content/notes/<slug>/index.mdx` (borradores en `drafts/`) | Esquema de la nota (ver [la guía de notas](NOTES.md)) |
-| Experiencia, certificados, experimentos, changelog | `apps/web/src/content/*.json` | Un esquema por archivo (sección 4) |
+| Experiencia, certificados, experimentos, changelog | `apps/web/src/content/*.json` | Un esquema por archivo (sección 4); la guía del perfil y los proyectos es [PORTFOLIO.md](PORTFOLIO.md) |
+| Lista de experimentos: tamaño de página, límite de destacados, filas de `/me`, intro y palabras | el bloque `experiments` de [`site.config.ts`](../apps/web/src/site.config.ts) | En el build (sección 3) |
 | Colores, radios y tipografías del tema | `packages/core/src/tokens/tokens.json` | Se regenera con `pnpm --filter @elvinlab/core tokens` |
 | Textos de la interfaz (ES/EN) | `apps/web/src/shared/i18n/index.ts` | El tipado exige las mismas claves en ambos idiomas |
 | Texto de privacidad y de términos | `apps/web/src/features/privacy/content.ts` y `.../terms/content.ts` | Tests de contenido (sin correos, sin promesas no verificables) |
@@ -96,15 +97,27 @@ Las descripciones vienen del esquema (`.describe()`), por eso están en inglés.
 | `marks.animation` | `'stamp' \| 'burst' \| 'pulse' \| 'none'` | no | `stamp` | Animation played when a reader leaves a footprint: `stamp` an ink stamp pressed on the page, `burst` a burst of pixel squares, `pulse` a soft ring, `none` no animation. All obey `prefers-reduced-motion`. |
 | `marks.maxPerVisitor` | `integer (min 1, max 200)` | no | `50` | Footprints one browser can leave on one note; after that taps add nothing. |
 | `marks.showCountFrom` | `integer (min 0, max 1000)` | no | `5` | The counter is hidden until a note has this many footprints; before that the button invites the reader to be among the first. |
+| `experiments` | `object` | no | `{}` | Settings of the experiments list (`features.experiments`): pagination, sorting, big pieces, the rows on `/me` and the page header texts. Every key is optional and falls back to its default. |
+| `experiments.perPage` | `integer (min 4, max 48)` | no | `12` | Compact cards per page of `/experiments/`. Page 1 also holds the big pieces; a second page exists only when the compact cards exceed this number (`/experiments/page/2/`). About 1 KB of HTML per compact card (929 B measured with 30 generated entries and 919 B with 100, comparing pages 2 and later); the cost depends on the content, so measure your own entries with `pnpm stress:experiments`. |
+| `experiments.maxFeatured` | `integer (min 1, max 6)` | no | `3` | Most experiments that may have `featured: true` (the big exhibition pieces). The build fails with the list of offenders when more are featured. |
+| `experiments.meRows` | `integer (min 1, max 6)` | no | `3` | Rows of "Recent experiments" on `/me`. Never more than `perPage`: a larger value is lowered to `perPage`, so every row links to an anchor that lives on page 1. |
+| `experiments.intro` | `{ <locale>: string }` | no |  | Optional intro under the title of `/experiments/`, per locale (the default locale is required). Omit it to use the interface default. |
+| `experiments.words` | `{ <locale>: string (max 24)[] (max 6) }` | no |  | Optional decorative comment stack beside the title of `/experiments/` (desktop only), per locale: one to six short words, for example `{ "es": ["construir", "probar"] }`. The leading `// ` is added for you. Nothing renders there unless you set this (the default header is just the title and the intro). |
+| `experiments.defaultSort` | `'newest' \| 'oldest' \| 'title'` | no | `newest` | Order of the compact cards at `/experiments/`: `newest` (publication date, newest first), `oldest` or `title` (A to Z). Big (featured) pieces always lead page 1 whatever the sort. It must be one of `sorts`. |
+| `experiments.sorts` | `'newest' \| 'oldest' \| 'title'[]` | no | `["newest","oldest","title"]` | Sorts the visitor can choose, from `newest`, `oldest` and `title`. Each one except `defaultSort` is a static page (`/experiments/oldest/`, `/experiments/oldest/page/2/`) that search engines are told not to index and that stays out of the sitemap. A list of one sort shows no switch. |
+| `experiments.sortFrom` | `integer (min 2, max 48)` | no | `4` | The sort switch and the alternate-sort pages exist only when the compact cards (everything that is not a big piece) number at least this many; below it the order is not worth choosing. |
 | `recruiter` | `object` | yes |  | Recruiter card on the home page and /me. |
 | `recruiter.available` | `boolean` | yes |  | Show or hide the whole availability line (not whether you are open to work). |
 | `recruiter.openToWork` | `boolean` | no | `true` | Whether you are open to work: green status dot when true, the brand accent colour when false. |
 | `recruiter.status` | `{ <locale>: string }` | yes |  | Availability text per locale. Parts separated by " · " show as a headline plus short tags on the home card (for example "Working at Buo · open to chat"); a single part is one tag (for example "Open to work"). |
-| `recruiter.lookingFor` | `{ <locale>: string }` | yes |  | What you are looking for, per locale. |
+| `recruiter.lookingFor` | `{ <locale>: string }` | yes |  | What you are open to, per locale. Shown as the availability line in the /me sidebar, below the status. |
 | `recruiter.cvUrl` | `URL \| { <locale>: URL }` | no |  | Link to a downloadable CV (https): one URL for every locale, or one per locale (`{ es: ..., en: ... }`, a locale without one falls back to the default locale). Omit to hide the CV button. |
 | `me` | `object` | yes |  | Singular /me profile data. Lists that grow (experience, certificates) live in `src/content/`. |
 | `me.timezone` | `string` | yes |  | Display timezone, for example `UTC−6`. |
 | `me.workMode` | `{ <locale>: string }` | yes |  | Work mode per locale (remote, hybrid, ...). |
+| `me.languages` | `{ <locale>: string }` | no |  | Spoken languages per locale, for example "Spanish native · English B1". Shown in the /me sidebar; omit to hide the row. |
+| `me.headline` | `{ <locale>: string }` | no |  | The role line under the name on /me, per locale. Omit to show `identity.role`. |
+| `me.pitch` | `{ <locale>: string }` | no |  | One or two sentences under the /me headline that say what you do, per locale. Omit to hide it. |
 | `me.intro` | `{ <locale>: string }` | yes |  | The "what I bring" intro paragraph per locale. |
 | `me.facts` | `object[]` | yes |  | At-a-glance strip: value and label pairs (the design shows up to four). |
 | `me.facts[].value` | `{ <locale>: string }` | yes |  | The highlighted value. |
@@ -116,6 +129,8 @@ Las descripciones vienen del esquema (`.describe()`), por eso están en inglés.
 | `me.stack` | `object[]` | yes |  | Tech stack groups. |
 | `me.stack[].label` | `{ <locale>: string }` | yes |  | Group name (Languages, Frontend, ...). |
 | `me.stack[].items` | `string[]` | yes |  | Tools in the group. |
+| `me.stack[].icon` | `string` | no |  | Icon name shown before the group name (code, server, shield-check, cloud, bot, flask, layers, ...). Omit for no icon. |
+| `me.stack[].hint` | `{ <locale>: string }` | no |  | One plain-language sentence per locale that says what the group is. Shown as a hover and focus tooltip; omit for no tooltip. |
 | `features` | `object` | yes |  | Feature flags: off means the routes are not generated and the nav entry is hidden. The four interface switches (`backToTop`, `languageHint`, `themeToggle`, `backgroundPicker`) default to on and render nothing when off. |
 | `features.blog` | `boolean` | yes |  | Lab Notes: the notes index, note pages, RSS and the nav entry. |
 | `features.comments` | `boolean` | yes |  | Giscus comments on notes. Needs the `giscus` block below, otherwise nothing renders. |
@@ -209,31 +224,49 @@ Se agrupan por año, el más nuevo primero. Solo se muestran si `features.creden
 
 ### Experimentos — `experiments.json`
 
-Proyectos del portafolio. **Solo enlaza repositorios públicos**; para trabajo privado deja `url` fuera.
+Experimentos (proyectos) del portafolio, publicados en `/experiments/` (y `/en/experiments/`) y como filas compactas en `/me` (`experiments.meRows`, tres por defecto, con un botón final hacia la página completa). **Solo enlaza repositorios públicos**; para trabajo privado deja `url` y `repo` fuera.
 
 ```json
 {
   "agentic-dev-setup": {
     "title": "agentic-dev-setup",
-    "description": "Multi-agent development environment.",
+    "description": { "es": "Entorno de desarrollo con agentes.", "en": "Multi-agent development setup." },
+    "problem": { "es": "…", "en": "…" },
+    "contribution": { "es": "…", "en": "…" },
+    "result": { "es": "…", "en": "…" },
     "tags": ["ai-agents", "tooling"],
     "year": 2026,
-    "url": "https://github.com/elvinlab/agentic-dev-setup",
+    "repo": "https://github.com/elvinlab/agentic-dev-setup",
+    "note": "agentic-dev-setup",
     "featured": true
   }
 }
 ```
 
+**Cómo añadir un experimento:** agrega una entrada con clave nueva. Los textos (`description`, `subtitle`, `problem`, `contribution`, `result`) son una cadena para todos los idiomas o un objeto `{ "es": …, "en": … }`; cuenta qué hiciste tú y qué resultó, sin inventar cifras. `url` es el enlace principal (sitio en vivo) y `repo` el del código. `note` es el slug de una nota publicada que cuenta el caso: si no existe, el build falla (nunca queda un enlace muerto). Para las capturas, copia tus propias imágenes (1280 x 800, 16:10) a la carpeta de la entrada, `apps/web/src/assets/experiments/<clave de la entrada>/`, y lístalas en `images` (de 1 a 4, en el orden en que se muestran): cada una con `file` (por ejemplo `cover.jpg`), un `alt` obligatorio (hasta 140 caracteres) y un `caption` opcional (hasta 120) que aparece bajo la imagen. La primera es la portada: la usan `/me` y la primera diapositiva. Con una sola imagen se muestra como figura; con dos o más, como galería con miniaturas que funciona sin JavaScript; sin `images`, la página muestra una portada tipográfica. Un archivo que no existe también rompe el build. `status` admite `running`, `shipped` y `archived`. Los experimentos destacados van primero (como máximo `experiments.maxFeatured`, 3 por defecto) y los primeros `experiments.meRows` aparecen en `/me`. La lista está paginada: la página 1 tiene las piezas destacadas y las primeras `experiments.perPage` tarjetas compactas (12 por defecto); las demás páginas viven en `/experiments/page/N/` y solo existen cuando hacen falta. La guía completa «quiero cambiar X» es [PORTFOLIO.md](PORTFOLIO.md); el bloque `experiments` de `site.config.ts` está en la sección 3. Con `features.experiments` apagado no hay página ni enlaces.
+
 <!-- docs:start experiments -->
 | Key | Type | Required | Default | Description |
 | --- | --- | --- | --- | --- |
 | `title` | `string (max 80)` | yes |  | Project name (max 80 characters). |
-| `description` | `string (max 200)` | yes |  | What it is, in one or two sentences (max 200 characters). |
+| `description` | `string \| { <locale>: string }` | yes |  | What it is, in one or two sentences (max 200 characters each). One string, or one text per locale such as `{ "es": "...", "en": "..." }`. |
+| `subtitle` | `string \| { <locale>: string }` | no |  | A short muted line under the title (max 200 characters each). One string, or one text per locale such as `{ "es": "...", "en": "..." }`. |
+| `problem` | `string \| { <locale>: string }` | no |  | The problem it solves (max 200 characters each). One string, or one text per locale such as `{ "es": "...", "en": "..." }`. |
+| `contribution` | `string \| { <locale>: string }` | no |  | What you did yourself, as opposed to tools or teammates (max 200 characters each). One string, or one text per locale such as `{ "es": "...", "en": "..." }`. |
+| `result` | `string \| { <locale>: string }` | no |  | What it delivered, with no invented numbers (max 200 characters each). One string, or one text per locale such as `{ "es": "...", "en": "..." }`. |
 | `tags` | `string[] (max 5)` | no | `[]` | Up to five kebab-case tags. |
 | `year` | `integer (min 2000)` | yes |  | Year the project started or shipped. |
-| `status` | `'running' \| 'shipped'` | no | `shipped` | `running` shows a green dot; `shipped` a violet one. |
-| `url` | `URL` | no |  | Public link (https only). Leave it out for private work: a private repository is never linked. |
-| `featured` | `boolean` | no | `false` | Featured projects lead the home strip. |
+| `publishedAt` | `string` | no |  | Optional date it shipped (`YYYY-MM-DD`), used to sort the list by date. Without it the sort uses 1 January of `year`. Keep it inside `year`. |
+| `status` | `'running' \| 'shipped' \| 'archived'` | no | `shipped` | `running` shows a green dot, `shipped` a violet one and `archived` a muted one. |
+| `url` | `URL` | no |  | Live or main link (https only). Leave it out for private work: a private repository is never linked. |
+| `repo` | `URL` | no |  | Public code link (https only). Never a private repository. |
+| `note` | `string` | no |  | Slug of a published note that tells the case. The build fails if no such note is published. |
+| `images` | `object[] (max 4)` | no |  | One to four screenshots, in display order. The first is the cover (used by `/me` and as the first slide). Use your own screenshots only; leave the field out for a typographic cover. |
+| `images[].file` | `string` | yes |  | File name inside the own folder of the entry `apps/web/src/assets/experiments/<entry key>/` (png, jpg, webp or avif). |
+| `images[].alt` | `string \| { <locale>: string }` | yes |  | Alternative text describing the screenshot (max 140 characters each). One string, or one text per locale such as `{ "es": "...", "en": "..." }`. |
+| `images[].caption` | `string \| { <locale>: string }` | no |  | A short caption shown under the image in the gallery (max 120 characters each). One string, or one text per locale such as `{ "es": "...", "en": "..." }`. |
+| `order` | `integer (min 0, max 1000)` | no |  | Position among entries of the same tier: lower comes first (default 100). Featured entries always come before the others; ties go to the newest year, then the key. |
+| `featured` | `boolean` | no | `false` | Featured experiments lead the lists. |
 <!-- docs:end experiments -->
 
 ### Changelog — `changelog.json`
@@ -343,7 +376,7 @@ Cada bandera de `features` apaga la función completa: no se genera la ruta, des
 | `comments` | Comentarios y reacciones (Giscus) | Necesita el bloque `giscus`; ver 6.5 |
 | `contact` | Formulario `/contact` | Necesita los secretos del Worker; sin ellos falla cerrado |
 | `credentials` | Certificados en `/me` | |
-| `experiments` | Sección y páginas de experimentos | Las páginas `/experiments/` aún no se generan (issue #64): déjalo en `false` hasta que existan, o los enlaces apuntan a nada |
+| `experiments` | Sección y páginas de experimentos (`/experiments/`) | |
 | `changelog` | Página `/changelog` y su enlace | Apagada no se genera la ruta (ver «Qué hace cada interruptor») |
 | `me` | Página `/me` (portafolio) | |
 | `readingMode` | Modo lectura en las notas | Apagada: no se envía botón, script, CSS ni se guarda nada en el navegador |
@@ -358,7 +391,7 @@ Todas las banderas viven en `features` de `site.config.ts`. Las cuatro últimas 
 | `comments` | Comentarios y reacciones (Giscus) en las notas | El componente y su sección en privacidad y términos | Necesita el bloque `giscus`; sin él no se pinta nada |
 | `contact` | Página `/contact` (y `/en/contact`) y la Action `contact` | Las rutas (`integrations/contact-routes.ts`), la Action (responde «no disponible» sin llegar a ningún proveedor), la entrada del menú, el botón de la tarjeta del autor y de `/me`, y la entrada del sitemap. Las páginas de privacidad y términos dejan de enlazar a contacto (remiten a «los canales publicados en este sitio») y privacidad pierde su sección «Formulario de contacto». Los mensajes de error de la suscripción dejan de mencionar la página de Contacto | Con la bandera activa, necesita los secretos del Worker (`CONTACT_*`) y la clave de Turnstile; sin ellos falla cerrado |
 | `credentials` | Certificados y títulos en `/me` | La sección de certificados de `/me` | |
-| `experiments` | Sección de experimentos | La entrada del menú, la sección de la portada y la de `/me`, y su entrada en el sitemap | Las páginas `/experiments/` aún no existen (issue #64); `home.experiments` también la necesita |
+| `experiments` | Sección de experimentos | Las rutas `/experiments/` y `/en/experiments/` (`integrations/experiments-routes.ts`), la entrada del menú, la sección de la portada y la de `/me`, y su entrada en el sitemap | `home.experiments` también la necesita |
 | `me` | Página `/me` | La entrada «Sobre mí» del menú, la tarjeta de contratación de la portada, el enlace de la barra lateral de las notas y la tarjeta de compartir de `/me`; la página queda `noindex` y fuera del sitemap | |
 | `changelog` | Página `/changelog` (y `/en/changelog`) | Las rutas (`integrations/changelog-routes.ts`), el enlace del pie y la entrada del sitemap | |
 | `readingMode` | Modo lectura en las notas | Botón, script y CSS; no se guarda nada en el navegador | |

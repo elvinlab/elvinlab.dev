@@ -10,6 +10,10 @@ const siteHref = z.union([httpsUrl, z.string().regex(/^\/(?!\/)\S*$/)], {
   error: 'must be an https URL or a site path starting with "/"',
 });
 
+/** The sorts a list page can offer (`experiments.sorts`); the education page reuses the first two. */
+export const LISTING_SORTS = ['newest', 'oldest', 'title'] as const;
+export type ListingSort = (typeof LISTING_SORTS)[number];
+
 /** Text keyed by locale, e.g. `{ es: 'Hola', en: 'Hello' }`. Checked against `locales` below. */
 const localized = z.record(z.string(), z.string().trim().min(1));
 
@@ -213,6 +217,77 @@ export const siteConfigSchema = z
       .describe(
         'Settings of the footprint button (`features.marks`). Every key is optional and falls back to its default.',
       ),
+    experiments: z
+      .strictObject({
+        perPage: z
+          .int()
+          .min(4)
+          .max(48)
+          .default(12)
+          .describe(
+            'Compact cards per page of `/experiments/`. Page 1 also holds the big pieces; a second page exists only when the compact cards exceed this number (`/experiments/page/2/`). About 1 KB of HTML per compact card (929 B measured with 30 generated entries and 919 B with 100, comparing pages 2 and later); the cost depends on the content, so measure your own entries with `pnpm stress:experiments`.',
+          ),
+        maxFeatured: z
+          .int()
+          .min(1)
+          .max(6)
+          .default(3)
+          .describe(
+            'Most experiments that may have `featured: true` (the big exhibition pieces). The build fails with the list of offenders when more are featured.',
+          ),
+        meRows: z
+          .int()
+          .min(1)
+          .max(6)
+          .default(3)
+          .describe(
+            'Rows of "Recent experiments" on `/me`. Never more than `perPage`: a larger value is lowered to `perPage`, so every row links to an anchor that lives on page 1.',
+          ),
+        intro: localized
+          .optional()
+          .describe(
+            'Optional intro under the title of `/experiments/`, per locale (the default locale is required). Omit it to use the interface default.',
+          ),
+        words: z
+          .record(z.string(), z.array(z.string().trim().min(1).max(24)).min(1).max(6))
+          .optional()
+          .describe(
+            'Optional decorative comment stack beside the title of `/experiments/` (desktop only), per locale: one to six short words, for example `{ "es": ["construir", "probar"] }`. The leading `// ` is added for you. Nothing renders there unless you set this (the default header is just the title and the intro).',
+          ),
+        defaultSort: z
+          .enum(LISTING_SORTS)
+          .default('newest')
+          .describe(
+            'Order of the compact cards at `/experiments/`: `newest` (publication date, newest first), `oldest` or `title` (A to Z). Big (featured) pieces always lead page 1 whatever the sort. It must be one of `sorts`.',
+          ),
+        sorts: z
+          .array(z.enum(LISTING_SORTS))
+          .min(1)
+          .default([...LISTING_SORTS])
+          .describe(
+            'Sorts the visitor can choose, from `newest`, `oldest` and `title`. Each one except `defaultSort` is a static page (`/experiments/oldest/`, `/experiments/oldest/page/2/`) that search engines are told not to index and that stays out of the sitemap. A list of one sort shows no switch.',
+          ),
+        sortFrom: z
+          .int()
+          .min(2)
+          .max(48)
+          .default(4)
+          .describe(
+            'The sort switch and the alternate-sort pages exist only when the compact cards (everything that is not a big piece) number at least this many; below it the order is not worth choosing.',
+          ),
+      })
+      .refine((value) => new Set(value.sorts).size === value.sorts.length, {
+        path: ['sorts'],
+        message: 'sorts must not repeat a sort',
+      })
+      .refine((value) => value.sorts.includes(value.defaultSort), {
+        path: ['sorts'],
+        message: 'sorts must include defaultSort',
+      })
+      .prefault({})
+      .describe(
+        'Settings of the experiments list (`features.experiments`): pagination, sorting, big pieces, the rows on `/me` and the page header texts. Every key is optional and falls back to its default.',
+      ),
     recruiter: z
       .object({
         available: z
@@ -227,7 +302,9 @@ export const siteConfigSchema = z
         status: localized.describe(
           'Availability text per locale. Parts separated by " · " show as a headline plus short tags on the home card (for example "Working at Buo · open to chat"); a single part is one tag (for example "Open to work").',
         ),
-        lookingFor: localized.describe('What you are looking for, per locale.'),
+        lookingFor: localized.describe(
+          'What you are open to, per locale. Shown as the availability line in the /me sidebar, below the status.',
+        ),
         cvUrl: z
           .union([
             httpsUrl,
@@ -245,6 +322,21 @@ export const siteConfigSchema = z
       .object({
         timezone: z.string().trim().min(1).describe('Display timezone, for example `UTC−6`.'),
         workMode: localized.describe('Work mode per locale (remote, hybrid, ...).'),
+        languages: localized
+          .optional()
+          .describe(
+            'Spoken languages per locale, for example "Spanish native · English B1". Shown in the /me sidebar; omit to hide the row.',
+          ),
+        headline: localized
+          .optional()
+          .describe(
+            'The role line under the name on /me, per locale. Omit to show `identity.role`.',
+          ),
+        pitch: localized
+          .optional()
+          .describe(
+            'One or two sentences under the /me headline that say what you do, per locale. Omit to hide it.',
+          ),
         intro: localized.describe('The "what I bring" intro paragraph per locale.'),
         facts: z
           .array(
@@ -270,6 +362,18 @@ export const siteConfigSchema = z
             z.object({
               label: localized.describe('Group name (Languages, Frontend, ...).'),
               items: z.array(z.string().min(1)).min(1).describe('Tools in the group.'),
+              icon: z
+                .string()
+                .min(1)
+                .optional()
+                .describe(
+                  'Icon name shown before the group name (code, server, shield-check, cloud, bot, flask, layers, ...). Omit for no icon.',
+                ),
+              hint: localized
+                .optional()
+                .describe(
+                  'One plain-language sentence per locale that says what the group is. Shown as a hover and focus tooltip; omit for no tooltip.',
+                ),
             }),
           )
           .min(1)
@@ -435,6 +539,12 @@ export const siteConfigSchema = z
       'me.workMode': { path: ['me', 'workMode'], text: config.me.workMode },
       'me.intro': { path: ['me', 'intro'], text: config.me.intro },
       ...(config.notice && { notice: { path: ['notice'], text: config.notice } }),
+      ...(config.experiments.intro && {
+        'experiments.intro': { path: ['experiments', 'intro'], text: config.experiments.intro },
+      }),
+      ...(config.experiments.words && {
+        'experiments.words': { path: ['experiments', 'words'], text: config.experiments.words },
+      }),
       ...Object.fromEntries(
         (config.now?.items ?? []).map((item, index) => [
           `now.items.${index}`,

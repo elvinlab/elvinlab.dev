@@ -3,8 +3,9 @@
 
 import type { Experiment } from '@/features/portfolio/schema.ts';
 import { site } from '@/shared/config/index.ts';
-import { type Locale, t } from '@/shared/i18n/index.ts';
+import { LOCALES, type Locale, t } from '@/shared/i18n/index.ts';
 import { externalLinkAttrs } from '@/shared/lib/external-link.ts';
+import { pickLocale } from '@/shared/lib/localized.ts';
 import ExternalHint from '@/shared/ui/ExternalHint.astro';
 
 type Props = { experiment: Experiment; locale: Locale };
@@ -27,6 +28,6 @@ const Tag = experiment.url ? 'a' : 'div';
       {t(locale, `exp.status.${experiment.status}`)}
     </span>
   </div>
-  <p class="text-sm leading-relaxed text-text-secondary">{experiment.description}</p>
+  <p class="text-sm leading-relaxed text-text-secondary">{pickLocale(experiment.description, locale, LOCALES.defaultLocale)}</p>
   {experiment.url && <ExternalHint href={experiment.url} locale={locale} />}
 </Tag>

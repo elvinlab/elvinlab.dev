@@ -2,6 +2,7 @@
 /** Experience timeline: sorted entries with a dashed spine, current role marked with a solid dot. */
 
 import { sortExperience } from '@/features/me/lib/experience.ts';
+import { tagLabel } from '@/features/me/lib/tag-label.ts';
 import type { Experience } from '@/features/me/schema.ts';
 import { LOCALES, type Locale, t } from '@/shared/i18n/index.ts';
 import { pickLocale } from '@/shared/lib/localized.ts';
@@ -35,7 +36,7 @@ const period = (e: Experience) => `${e.start} — ${e.end ?? t(locale, 'me.prese
             </p>
             <p class="leading-relaxed text-text-secondary">{pick(entry.summary)}</p>
             {entry.tags.length > 0 && (
-              <div class="flex flex-wrap gap-1.5">{entry.tags.map((tag) => <Chip>{tag}</Chip>)}</div>
+              <div class="flex flex-wrap gap-1.5">{entry.tags.map((tag) => <Chip>{tagLabel(tag)}</Chip>)}</div>
             )}
           </div>
         </li>

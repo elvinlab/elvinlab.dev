@@ -19,6 +19,7 @@ import { isSubscribeActive } from './src/features/subscribe/availability.ts';
 import { blogRoutesIntegration } from './src/integrations/blog-routes.ts';
 import { changelogRoutesIntegration } from './src/integrations/changelog-routes.ts';
 import { contactRoutesIntegration } from './src/integrations/contact-routes.ts';
+import { experimentsRoutesIntegration } from './src/integrations/experiments-routes.ts';
 import { externalLinks } from './src/integrations/external-links.ts';
 import { noindexHeaders } from './src/integrations/noindex-headers.ts';
 import { readNoteDatesFromDisk } from './src/integrations/note-dates.ts';
@@ -84,6 +85,7 @@ export default defineConfig({
     // The contact page exists only with `features.contact`; the changelog page only with `features.changelog`.
     contactRoutesIntegration(site.features.contact),
     changelogRoutesIntegration(site.features.changelog),
+    experimentsRoutesIntegration(site.features.experiments),
     mdx(),
     preact(),
     sitemap({

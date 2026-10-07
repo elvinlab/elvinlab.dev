@@ -1,10 +1,120 @@
 {
+  "elvinlab-dev": {
+    "title": "elvinlab.dev",
+    "description": {
+      "es": "Blog y portafolio configurable y bilingüe, con identidad reemplazable.",
+      "en": "A configurable, bilingual blog and portfolio with a replaceable identity."
+    },
+    "subtitle": {
+      "es": "Blog y portafolio configurable y bilingüe",
+      "en": "A configurable, bilingual blog and portfolio"
+    },
+    "problem": {
+      "es": "Publicar notas y un perfil profesional con una identidad reemplazable y controles de calidad.",
+      "en": "Publish notes and a professional profile with a replaceable identity and quality controls."
+    },
+    "contribution": {
+      "es": "Diseño y construcción completos: arquitectura, configuración, i18n, publicación y validación.",
+      "en": "End-to-end design and build: architecture, configuration, i18n, publishing and validation."
+    },
+    "result": {
+      "es": "Sitio publicado con código público, documentación y controles automáticos: pruebas, accesibilidad, presupuesto de JavaScript y Lighthouse.",
+      "en": "Published site with public code, documentation and automated checks: tests, accessibility, JavaScript budget and Lighthouse."
+    },
+    "tags": ["astro", "typescript", "cloudflare"],
+    "year": 2026,
+    "url": "https://elvinlab.dev",
+    "repo": "https://github.com/elvinlab/elvinlab.dev",
+    "note": "como-construi-este-sitio",
+    "images": [
+      {
+        "file": "cover.jpg",
+        "alt": {
+          "es": "Captura de la página de inicio de elvinlab.dev",
+          "en": "Screenshot of the elvinlab.dev home page"
+        },
+        "caption": {
+          "es": "Inicio: la última nota y el perfil",
+          "en": "Home: the latest note and the profile"
+        }
+      },
+      {
+        "file": "me.jpg",
+        "alt": {
+          "es": "Captura de la página Sobre mí con foto, resumen y experimentos",
+          "en": "Screenshot of the About me page with photo, summary and experiments"
+        },
+        "caption": {
+          "es": "/me: la página para quien evalúa mi perfil",
+          "en": "/me: the page for whoever is reviewing my profile"
+        }
+      },
+      {
+        "file": "note.jpg",
+        "alt": {
+          "es": "Captura de una nota con su registro de decisión",
+          "en": "Screenshot of a note with its decision record"
+        },
+        "caption": {
+          "es": "Una nota con su registro de decisión",
+          "en": "A note with its decision record"
+        }
+      },
+      {
+        "file": "contact.jpg",
+        "alt": {
+          "es": "Captura del formulario de contacto",
+          "en": "Screenshot of the contact form"
+        },
+        "caption": {
+          "es": "Contacto: un formulario, sin correo público",
+          "en": "Contact: a form, no public email"
+        }
+      }
+    ],
+    "order": 1,
+    "featured": true
+  },
   "agentic-dev-setup": {
     "title": "agentic-dev-setup",
-    "description": "Multi-agent development environment: model routing, tiered delegation and persistent memory.",
+    "description": {
+      "es": "Entorno de desarrollo con agentes: enrutamiento de modelos, delegación por niveles y memoria persistente.",
+      "en": "Multi-agent development environment: model routing, tiered delegation and persistent memory."
+    },
+    "subtitle": {
+      "es": "Entorno de desarrollo con agentes y revisión de cambios",
+      "en": "A development setup with agents and change review"
+    },
+    "problem": {
+      "es": "Coordinar herramientas y proveedores de IA con continuidad cuando cambian las cuotas disponibles.",
+      "en": "Coordinate AI tools and providers with continuity when the available quotas change."
+    },
+    "contribution": {
+      "es": "Integración, configuración y scripts propios sobre herramientas de terceros como Claude Code y OpenCode.",
+      "en": "My own integration, configuration and scripts on top of third-party tools such as Claude Code and OpenCode."
+    },
+    "result": {
+      "es": "Entorno público y documentado, usado para construir este sitio.",
+      "en": "A public, documented setup, used to build this site."
+    },
     "tags": ["ai-agents", "tooling"],
     "year": 2026,
-    "url": "https://github.com/elvinlab/agentic-dev-setup",
+    "repo": "https://github.com/elvinlab/agentic-dev-setup",
+    "note": "agentic-dev-setup",
+    "images": [
+      {
+        "file": "cover.jpg",
+        "alt": {
+          "es": "Captura de la nota que cuenta el caso de agentic-dev-setup",
+          "en": "Screenshot of the note that tells the agentic-dev-setup case"
+        },
+        "caption": {
+          "es": "La nota que cuenta el caso",
+          "en": "The note that tells the case"
+        }
+      }
+    ],
+    "order": 2,
     "featured": true
   }
 }
