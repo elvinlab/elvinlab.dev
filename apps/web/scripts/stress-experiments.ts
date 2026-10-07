@@ -164,11 +164,14 @@ export const countCards = (html: string): number =>
 
 /**
  * Marginal HTML cost of one compact card, in bytes: the difference between two pages with a
- * different number of cards divided by that difference (the pages share the same shell). Null when
- * no two pages differ in card count.
+ * different number of cards divided by that difference. Only the pages after the first are
+ * compared: page 1 also holds the big pieces, so it has another shell and would inflate the cost
+ * (it did: 2,563 B against about 1,000 B between pages 2 and 3). Null when no two of those pages
+ * differ in card count.
  */
 export function perCardCost(weights: readonly PageWeight[]): number | null {
-  const sorted = [...weights].filter((w) => w.cards > 0).sort((a, b) => b.cards - a.cards);
+  const later = weights.filter((w) => /\/page\/\d+\/$/.test(w.path));
+  const sorted = later.filter((w) => w.cards > 0).sort((a, b) => b.cards - a.cards);
   const [most] = sorted;
   const fewest = sorted.at(-1);
   if (!most || !fewest || most.cards === fewest.cards) return null;

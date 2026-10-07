@@ -129,14 +129,32 @@ describe('countCards and perCardCost', () => {
     expect(countCards('<li id="a" class="xc"><li id="b" class="xc"><li id="c">')).toBe(2);
   });
 
-  it('divides the byte difference by the card difference', () => {
+  it('divides the byte difference by the card difference between later pages', () => {
     expect(
       perCardCost([
-        { path: '/a/', bytes: 10_000, cards: 12 },
-        { path: '/b/', bytes: 6_000, cards: 4 },
+        { path: '/experiments/page/2/', bytes: 10_000, cards: 12 },
+        { path: '/experiments/page/3/', bytes: 6_000, cards: 4 },
       ]),
     ).toBe(500);
-    expect(perCardCost([{ path: '/a/', bytes: 10_000, cards: 12 }])).toBeNull();
+    expect(perCardCost([{ path: '/experiments/page/2/', bytes: 10_000, cards: 12 }])).toBeNull();
     expect(perCardCost([])).toBeNull();
+  });
+
+  it('ignores page 1, which also holds the big pieces and so has another shell', () => {
+    // Page 1 vs page 3 would give (123_000 - 99_000) / 9 = 2_667 B: the big pieces, not the cards.
+    // Pages 2 and 3 share a shell: (108_000 - 99_000) / 9 = 1_000 B per card.
+    expect(
+      perCardCost([
+        { path: '/experiments/', bytes: 123_000, cards: 12 },
+        { path: '/experiments/page/2/', bytes: 108_000, cards: 12 },
+        { path: '/experiments/page/3/', bytes: 99_000, cards: 3 },
+      ]),
+    ).toBe(1_000);
+    expect(
+      perCardCost([
+        { path: '/en/experiments/', bytes: 123_000, cards: 12 },
+        { path: '/en/experiments/page/2/', bytes: 99_000, cards: 3 },
+      ]),
+    ).toBeNull();
   });
 });

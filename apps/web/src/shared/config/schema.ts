@@ -221,7 +221,7 @@ export const siteConfigSchema = z
           .max(48)
           .default(12)
           .describe(
-            'Compact cards per page of `/experiments/`. Page 1 also holds the big pieces; a second page exists only when the compact cards exceed this number (`/experiments/page/2/`). Stress fixtures measured 2250-2563 bytes (about 2.2-2.6 KB) of marginal HTML per compact card; actual cost depends on content and images, so measure your own entries.',
+            'Compact cards per page of `/experiments/`. Page 1 also holds the big pieces; a second page exists only when the compact cards exceed this number (`/experiments/page/2/`). About 1 KB of HTML per compact card (976 B measured with 30 generated entries and 964 B with 100, comparing pages 2 and later); the cost depends on the content, so measure your own entries with `pnpm stress:experiments`.',
           ),
         maxFeatured: z
           .int()

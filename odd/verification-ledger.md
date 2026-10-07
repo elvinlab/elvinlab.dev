@@ -95,3 +95,9 @@ Full-wide native results: lint clean; typecheck 363 files / 0 errors; dependency
 Lighthouse: performance 0.96-0.99; accessibility and SEO 1.0; best practices 0.96-1.0; LCP 2113-2421 ms; CLS 0-0.0406. `/experiments/`: performance 0.98 / LCP 2274 ms / CLS 0; `/me/`: 0.98 / 2269 ms / 0; `/en/me/`: 0.97 / 2421 ms / 0. Reports: `.lighthouseci/`, `playwright-report/`, full command output `rtk recall 57789e586405`.
 
 Remaining acceptance evidence: parent-reviewed changed-screen screenshots at 390/820/1440 px in ES/EN and both themes, and stressed-fixture Lighthouse (ordinary full-wide fixture results do not cover the 30/100-entry stress builds). Commit/local release preparation and explicitly authorized remote publication remain separate pending steps. The owned preview on 4324 was preserved; no owner server, credential, remote operation, commit or release ref was used.
+
+## Confirmed exhibition CSS correction (2026-10-07)
+
+Correction proof (2026-10-07): two local CSS fixes, no global clipping/new colors. Overflow RED 4 failures (828 > 820), then GREEN 27 experiments tests including those four. Lint 440 clean; typecheck 363 files / 0 errors. Native `mise exec -- pnpm verify --stale --run --record` passed, exit 0, 114 s, 23 checks recorded: 1218 unit tests, 213 e2e tests (15 specs), build/boundaries/JS budget/white-label green; `/experiments/` Lighthouse performance 0.98, accessibility 1.0, LCP 2133 ms, CLS 0. Full output: `rtk recall 8cb0935b5183`.
+
+Independent corrected-stress proof remains pending; ordinary Lighthouse does not cover compact stress cards. Prior full-wide proof is historical; unaffected scopes remain fresh in the registry.
