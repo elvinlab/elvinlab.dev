@@ -466,5 +466,11 @@
     "category": "added",
     "title": "More on/off switches for forks",
     "description": "Four interface switches (backToTop, languageHint, themeToggle, backgroundPicker) join features, all on by default and rendering nothing when off. Turning contact or changelog off now removes their routes, links and sitemap entries, and the legal pages and subscription errors stop pointing to a Contact page."
+  },
+  "me-facts-consistent": {
+    "date": "2026-10-06",
+    "category": "changed",
+    "title": "/me facts agree with each other",
+    "description": "Languages now come from one configurable field (me.languages), availability reads \"collaborations and projects\" and shows the lookingFor line in the sidebar, the CV button says \"View CV (PDF)\" because it opens a viewer, and experience tags show names like .NET, React and Spring Boot instead of raw ids."
   }
 }

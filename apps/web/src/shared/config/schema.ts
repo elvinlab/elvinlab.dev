@@ -227,7 +227,9 @@ export const siteConfigSchema = z
         status: localized.describe(
           'Availability text per locale. Parts separated by " · " show as a headline plus short tags on the home card (for example "Working at Buo · open to chat"); a single part is one tag (for example "Open to work").',
         ),
-        lookingFor: localized.describe('What you are looking for, per locale.'),
+        lookingFor: localized.describe(
+          'What you are open to, per locale. Shown as the availability line in the /me sidebar, below the status.',
+        ),
         cvUrl: z
           .union([
             httpsUrl,
@@ -245,6 +247,11 @@ export const siteConfigSchema = z
       .object({
         timezone: z.string().trim().min(1).describe('Display timezone, for example `UTC−6`.'),
         workMode: localized.describe('Work mode per locale (remote, hybrid, ...).'),
+        languages: localized
+          .optional()
+          .describe(
+            'Spoken languages per locale, for example "Spanish native · English B1". Shown in the /me sidebar; omit to hide the row.',
+          ),
         intro: localized.describe('The "what I bring" intro paragraph per locale.'),
         facts: z
           .array(

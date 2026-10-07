@@ -97,8 +97,14 @@ export const siteConfig = {
   recruiter: {
     available: true,
     openToWork: false,
-    status: { es: 'Trabajando en Buo · Abierto a charlar', en: 'Working at Buo · Open to chat' },
-    lookingFor: { es: 'Actualmente en Buo', en: 'Currently at Buo' },
+    status: {
+      es: 'Abierto a colaboraciones y proyectos',
+      en: 'Open to collaborations and projects',
+    },
+    lookingFor: {
+      es: 'Colaboraciones y proyectos. Actualmente en Buo.',
+      en: 'Collaborations and projects. Currently at Buo.',
+    },
     cvUrl: {
       es: 'https://drive.google.com/file/d/1SZy6sPXxySHel7glTn1gBFwCUc6jytxS/view',
       en: 'https://drive.google.com/file/d/1eNpjsU4dRhvm6jLRINksr_w5ohcgVVTX/view',
@@ -107,6 +113,7 @@ export const siteConfig = {
   me: {
     timezone: 'UTC−6',
     workMode: { es: 'Remoto', en: 'Remote' },
+    languages: { es: 'Español nativo · Inglés B1', en: 'Spanish native · English B1' },
     intro: {
       es: 'Ingeniero de software full-stack de Costa Rica, construyendo software desde 2020, con enfoque en frontend y experiencia en SaaS en producción. Conecto necesidades de producto con arquitectura mantenible, servicios backend e interfaces accesibles, e integro la IA en productos y procesos de ingeniería con validación explícita y revisión humana.',
       en: 'Full-stack software engineer from Costa Rica, building software since 2020, with a frontend focus and production SaaS experience. I connect product requirements with maintainable architecture, backend services and accessible interfaces, and integrate AI into products and engineering workflows with explicit validation and human review.',
@@ -119,10 +126,6 @@ export const siteConfig = {
       {
         value: { es: 'Agentes de IA', en: 'AI agents' },
         label: { es: 'parte de mi día a día', en: 'part of my daily workflow' },
-      },
-      {
-        value: { es: 'ES · EN', en: 'ES · EN' },
-        label: { es: 'español nativo, inglés B1', en: 'Spanish native, English B1' },
       },
     ],
     strengths: [

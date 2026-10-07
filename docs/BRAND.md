@@ -42,7 +42,7 @@ La línea de posicionamiento es una sola y se usa igual en todas partes: **Full-
 | Dato | Valor |
 | --- | --- |
 | Nombre | Elvin González (elvinlab) |
-| Experiencia | 5+ años, contados desde 2020 (mismo cálculo en GitHub, sitio y LinkedIn) |
+| Experiencia | Desde 2020: el sitio calcula los años a partir de ese año (mismo punto de partida en GitHub y LinkedIn) |
 | Ubicación | Costa Rica |
 | Sitio | [elvinlab.dev](https://elvinlab.dev) |
 | GitHub | [github.com/elvinlab](https://github.com/elvinlab) |

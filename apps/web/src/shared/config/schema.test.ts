@@ -213,6 +213,23 @@ describe('parseSiteConfig', () => {
     });
   });
 
+  describe('me.languages', () => {
+    it('is optional', () => {
+      expect(parseSiteConfig(valid).me.languages).toBeUndefined();
+    });
+
+    it('accepts one text per locale', () => {
+      const languages = { es: 'Español nativo · Inglés B1', en: 'Spanish native · English B1' };
+      const config = { ...valid, me: { ...valid.me, languages } };
+      expect(parseSiteConfig(config).me.languages).toEqual(languages);
+    });
+
+    it('rejects a non-localized value', () => {
+      const broken = { ...valid, me: { ...valid.me, languages: 'Spanish' } };
+      expect(() => parseSiteConfig(broken)).toThrow(/languages/);
+    });
+  });
+
   describe('recruiter.openToWork', () => {
     it('defaults to true so existing configs keep the green status dot', () => {
       expect(parseSiteConfig(valid).recruiter.openToWork).toBe(true);

@@ -11,9 +11,9 @@ type Props = { locale: Locale };
 const { locale } = Astro.props;
 const facts = [
   { label: t(locale, 'me.basedIn'), value: `${site.identity.location ?? ''}${site.me.timezone ? `, ${site.me.timezone}` : ''}` },
-  { label: t(locale, 'me.languagesLabel'), value: t(locale, 'me.languagesValue') },
+  ...(site.me.languages ? [{ label: t(locale, 'me.languagesLabel'), value: site.me.languages[locale] }] : []),
   { label: t(locale, 'me.workMode'), value: site.me.workMode[locale] },
-  ...(site.recruiter.available ? [{ label: t(locale, 'me.availability'), value: site.recruiter.status[locale] }] : []),
+  ...(site.recruiter.available ? [{ label: t(locale, 'me.availability'), value: site.recruiter.lookingFor[locale] }] : []),
 ];
 const contactHref = localizePath('/contact/', locale, LOCALES);
 ---

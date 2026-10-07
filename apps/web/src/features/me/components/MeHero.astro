@@ -52,7 +52,7 @@ const contactHref = localizePath('/contact/', locale, LOCALES);
     <div class="mt-1 flex flex-wrap gap-2.5 print:hidden">
       {cvUrl && (
         <a href={cvUrl} {...externalLinkAttrs(cvUrl, site.url)} class="flex h-12 items-center gap-2 rounded-control bg-button px-5 font-medium text-white active:scale-96">
-          <SocialIcon name="download" />{t(locale, 'me.cv')}<ExternalHint href={cvUrl} locale={locale} />
+          <SocialIcon name="file" />{t(locale, 'me.cv')}<ExternalHint href={cvUrl} locale={locale} />
         </a>
       )}
       {isEnabled('contact') && (

@@ -100,11 +100,12 @@ The descriptions come from the schema (`.describe()`), which is why they are in 
 | `recruiter.available` | `boolean` | yes |  | Show or hide the whole availability line (not whether you are open to work). |
 | `recruiter.openToWork` | `boolean` | no | `true` | Whether you are open to work: green status dot when true, the brand accent colour when false. |
 | `recruiter.status` | `{ <locale>: string }` | yes |  | Availability text per locale. Parts separated by " · " show as a headline plus short tags on the home card (for example "Working at Buo · open to chat"); a single part is one tag (for example "Open to work"). |
-| `recruiter.lookingFor` | `{ <locale>: string }` | yes |  | What you are looking for, per locale. |
+| `recruiter.lookingFor` | `{ <locale>: string }` | yes |  | What you are open to, per locale. Shown as the availability line in the /me sidebar, below the status. |
 | `recruiter.cvUrl` | `URL \| { <locale>: URL }` | no |  | Link to a downloadable CV (https): one URL for every locale, or one per locale (`{ es: ..., en: ... }`, a locale without one falls back to the default locale). Omit to hide the CV button. |
 | `me` | `object` | yes |  | Singular /me profile data. Lists that grow (experience, certificates) live in `src/content/`. |
 | `me.timezone` | `string` | yes |  | Display timezone, for example `UTC−6`. |
 | `me.workMode` | `{ <locale>: string }` | yes |  | Work mode per locale (remote, hybrid, ...). |
+| `me.languages` | `{ <locale>: string }` | no |  | Spoken languages per locale, for example "Spanish native · English B1". Shown in the /me sidebar; omit to hide the row. |
 | `me.intro` | `{ <locale>: string }` | yes |  | The "what I bring" intro paragraph per locale. |
 | `me.facts` | `object[]` | yes |  | At-a-glance strip: value and label pairs (the design shows up to four). |
 | `me.facts[].value` | `{ <locale>: string }` | yes |  | The highlighted value. |
