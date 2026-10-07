@@ -85,8 +85,8 @@ describe('experimentSchema', () => {
     expect(() => schema.parse({ ...valid, note: 'Not Kebab' })).toThrow();
   });
 
-  it('accepts an image as a file name inside assets/projects with localized alt text', () => {
-    const image = { file: 'elvinlab-dev.jpg', alt: { es: 'Captura', en: 'Screenshot' } };
+  it('accepts an image as a file name inside an assets/experiments folder with localized alt text', () => {
+    const image = { file: 'cover.jpg', alt: { es: 'Captura', en: 'Screenshot' } };
     expect(schema.parse({ ...valid, image }).image).toEqual(image);
     expect(() => schema.parse({ ...valid, image: { file: '../secret.jpg', alt: 'x' } })).toThrow();
     expect(() =>

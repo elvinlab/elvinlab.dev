@@ -1,0 +1,56 @@
+---
+/**
+ * One experiment as a compact row for `/me`: mono index, 96 x 60 thumbnail (or the year when there is
+ * no image), title with the status pill, and one line of the description. The whole row is one link
+ * to the experiment's card on the experiments page. The thumbnail is decorative (`alt=""`): the
+ * row's text already names the experiment.
+ */
+import { Image } from 'astro:assets';
+import { localizePath } from '@elvinlab/core';
+
+import type { ExperimentEntry } from '@/features/portfolio/lib/load-experiments.ts';
+import { LOCALES, type Locale, t } from '@/shared/i18n/index.ts';
+import { resolveExperimentImage } from '@/shared/lib/experiment-image.ts';
+import { pickLocale } from '@/shared/lib/localized.ts';
+
+type Props = { experiment: ExperimentEntry; locale: Locale; index: number };
+
+const { experiment, locale, index } = Astro.props;
+const image = experiment.image ? resolveExperimentImage(experiment.id, experiment.image.file) : undefined;
+const href = `${localizePath('/experiments/', locale, LOCALES)}#${experiment.id}`;
+const THUMB = 'h-[60px] w-24 rounded-inner outline outline-1 -outline-offset-1 outline-divider';
+---
+
+<a
+  href={href}
+  class="grid min-h-11 grid-cols-[auto_6rem_1fr] items-center gap-3 px-2 py-3 transition-colors duration-150 hover:bg-card-hover md:rounded-inner"
+>
+  <span class="font-mono text-meta text-muted" aria-hidden="true">{String(index).padStart(2, '0')}</span>
+  {image ? (
+    <Image
+      src={image}
+      alt=""
+      format="webp"
+      quality={80}
+      width={96}
+      height={60}
+      widths={[96, 192]}
+      sizes="96px"
+      loading="lazy"
+      decoding="async"
+      class:list={[THUMB, 'object-cover object-top']}
+    />
+  ) : (
+    <span class:list={[THUMB, 'grid place-items-center bg-chip font-mono text-meta text-muted']} aria-hidden="true">{experiment.year}</span>
+  )}
+  <span class="flex min-w-0 flex-col gap-1">
+    <span class="flex flex-wrap items-center gap-x-2 gap-y-1">
+      <span class="font-display font-bold">{experiment.title}</span>
+      <span class="inline-flex shrink-0 items-center gap-1.5 rounded-pill bg-chip px-2 py-0.5 font-mono text-meta text-text-secondary">
+        <span class:list={['size-2 rounded-pill', experiment.status === 'running' ? 'bg-ok' : 'bg-primary']} aria-hidden="true"></span>
+        {t(locale, `exp.status.${experiment.status}`)}
+      </span>
+    </span>
+    <span class="line-clamp-2 text-sm text-text-secondary">{pickLocale(experiment.description, locale, LOCALES.defaultLocale)}</span>
+  </span>
+</a>

@@ -23,8 +23,8 @@ describe('isHiddenFromSitemap', () => {
   it('returns false when all features are on', () => {
     expect(isHiddenFromSitemap('/me/', allOn)).toBe(false);
     expect(isHiddenFromSitemap('/en/me/', allOn)).toBe(false);
-    expect(isHiddenFromSitemap('/projects/', allOn)).toBe(false);
-    expect(isHiddenFromSitemap('/en/projects/', allOn)).toBe(false);
+    expect(isHiddenFromSitemap('/experiments/', allOn)).toBe(false);
+    expect(isHiddenFromSitemap('/en/experiments/', allOn)).toBe(false);
     expect(isHiddenFromSitemap('/changelog/', allOn)).toBe(false);
     expect(isHiddenFromSitemap('/en/changelog/', allOn)).toBe(false);
     expect(isHiddenFromSitemap('/notes/', allOn)).toBe(false);
@@ -36,10 +36,10 @@ describe('isHiddenFromSitemap', () => {
     expect(isHiddenFromSitemap('/en/me/', features)).toBe(true);
   });
 
-  it('returns true for /projects/ when the experiments feature is off', () => {
+  it('returns true for /experiments/ when the experiments feature is off', () => {
     const features = { ...allOn, experiments: false };
-    expect(isHiddenFromSitemap('/projects/', features)).toBe(true);
-    expect(isHiddenFromSitemap('/en/projects/', features)).toBe(true);
+    expect(isHiddenFromSitemap('/experiments/', features)).toBe(true);
+    expect(isHiddenFromSitemap('/en/experiments/', features)).toBe(true);
   });
 
   it('returns true for /changelog/ when changelog feature is off', () => {

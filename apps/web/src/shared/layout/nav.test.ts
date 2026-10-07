@@ -98,11 +98,11 @@ describe('navItems', () => {
   });
 });
 
-describe('navItems projects entry', () => {
-  it('points the experiments key at the localized /projects/ page', () => {
+describe('navItems experiments entry', () => {
+  it('points the experiments key at the localized /experiments/ page', () => {
     for (const locale of ['es', 'en'] as const) {
       const projects = navItems(allOn, locale, true).find((item) => item.key === 'experiments');
-      expect(projects).toMatchObject({ path: '/projects/' });
+      expect(projects).toMatchObject({ path: '/experiments/' });
       expect(projects?.localize).not.toBe(false);
     }
   });

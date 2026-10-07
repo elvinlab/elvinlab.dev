@@ -128,10 +128,10 @@ const ME = area(
   `${SRC}/pages/me.astro`,
   `${SRC}/pages/en/me.astro`,
   `${SRC}/features/me/**`,
-  // The `/me` projects strip renders the portfolio cards.
-  `${SRC}/features/portfolio/components/ProjectCard.astro`,
+  // The `/me` experiments block renders the compact portfolio rows.
+  `${SRC}/features/portfolio/components/ExperimentRow.astro`,
   `${SRC}/content/experiments.json`,
-  `${SRC}/assets/projects/**`,
+  `${SRC}/assets/experiments/**`,
   `${SRC}/features/credentials/**`,
   `${SRC}/content/experience.json`,
   `${SRC}/content/credentials.json`,
@@ -150,15 +150,23 @@ const CHANGELOG = area(
   `${SRC}/content/changelog.json`,
   `${SRC}/changelog-routes/**`,
 );
-// The projects feature feeds `/projects/`, the `/me` strip and (when its home section is on) the home.
-const PROJECTS = area(
-  `${SRC}/projects-routes/**`,
+// The experiments feature feeds `/experiments/`, the `/me` block and (when its home section is on) the home.
+const EXPERIMENTS = area(
+  `${SRC}/experiments-routes/**`,
   `${SRC}/features/portfolio/**`,
   `${SRC}/content/experiments.json`,
-  `${SRC}/assets/projects/**`,
-  `${SRC}/shared/lib/project-image.ts`,
+  `${SRC}/assets/experiments/**`,
+  `${SRC}/shared/lib/experiment-image.ts`,
 );
-const EVERY_PAGE = [...NOTE_PAGE, ...HOME, ...ME, ...PROJECTS, ...CONTACT, ...LEGAL, ...CHANGELOG];
+const EVERY_PAGE = [
+  ...NOTE_PAGE,
+  ...HOME,
+  ...ME,
+  ...EXPERIMENTS,
+  ...CONTACT,
+  ...LEGAL,
+  ...CHANGELOG,
+];
 
 const E2E_BASE = area('playwright.config.*', 'apps/web/scripts/fixture-preview.ts');
 const HELPERS = 'tests/browser/helpers/**';
@@ -311,7 +319,7 @@ export const CHECKS: readonly CheckDef[] = [
   e2e({ file: 'note-translations.spec.ts', covers: NOTE_PAGE }),
   e2e({ file: 'notes-layout.spec.ts', covers: NOTE_PAGE, responsive: true }),
   e2e({ file: 'performance.spec.ts', covers: EVERY_PAGE }),
-  e2e({ file: 'projects.spec.ts', covers: [...PROJECTS, ...ME] }),
+  e2e({ file: 'experiments.spec.ts', covers: [...EXPERIMENTS, ...ME] }),
   e2e({ file: 'pixel-display.spec.ts', covers: [...NOTE_PAGE, ...HOME], responsive: true }),
   e2e({ file: 'reading-mode.spec.ts', covers: NOTE_PAGE, helpers: true, responsive: true }),
   e2e({ file: 'smoke.spec.ts', covers: EVERY_PAGE }),

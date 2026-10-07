@@ -214,7 +214,7 @@ Grouped by year, newest first. Only shown when `features.credentials` is on.
 
 ### Experiments — `experiments.json`
 
-Portfolio projects, published at `/projects/` (and `/en/projects/`) and as two cards on `/me`. **Only link public repositories**; for private work leave `url` and `repo` out.
+Portfolio experiments (projects), published at `/experiments/` (and `/en/experiments/`) and as compact rows on `/me` (up to three, with a closing button to the full page). **Only link public repositories**; for private work leave `url` and `repo` out.
 
 ```json
 {
@@ -233,7 +233,7 @@ Portfolio projects, published at `/projects/` (and `/en/projects/`) and as two c
 }
 ```
 
-**How to add a project:** add an entry with a new key. The texts (`description`, `subtitle`, `problem`, `contribution`, `result`) are one string for every language or an object `{ "es": …, "en": … }`; say what you did yourself and what came out of it, with no invented numbers. `url` is the main link (live site) and `repo` the code link. `note` is the slug of a published note that tells the case: if it does not exist the build fails (a dead link never ships). For the screenshot, copy your own image into `apps/web/src/assets/projects/` and put its file name in `image.file` with an `image.alt`; a file that does not exist also breaks the build. Featured projects come first and the first two appear on `/me`. With `features.experiments` off there is no page and no links.
+**How to add an experiment:** add an entry with a new key. The texts (`description`, `subtitle`, `problem`, `contribution`, `result`) are one string for every language or an object `{ "es": …, "en": … }`; say what you did yourself and what came out of it, with no invented numbers. `url` is the main link (live site) and `repo` the code link. `note` is the slug of a published note that tells the case: if it does not exist the build fails (a dead link never ships). For the screenshot, copy your own image into the entry's own folder, `apps/web/src/assets/experiments/<entry key>/`, and put its file name in `image.file` (for example `cover.jpg`) with an `image.alt`; a file that does not exist also breaks the build. Featured experiments come first and the first three appear on `/me`. With `features.experiments` off there is no page and no links.
 
 <!-- docs:start experiments -->
 | Key | Type | Required | Default | Description |
@@ -251,9 +251,9 @@ Portfolio projects, published at `/projects/` (and `/en/projects/`) and as two c
 | `repo` | `URL` | no |  | Public code link (https only). Never a private repository. |
 | `note` | `string` | no |  | Slug of a published note that tells the case. The build fails if no such note is published. |
 | `image` | `object` | no |  | Screenshot shown on the card. Use your own screenshots only. |
-| `image.file` | `string` | yes |  | File name inside `apps/web/src/assets/projects/` (png, jpg, webp or avif). |
+| `image.file` | `string` | yes |  | File name inside the own folder of the entry `apps/web/src/assets/experiments/<entry key>/` (png, jpg, webp or avif). |
 | `image.alt` | `string \| { <locale>: string }` | yes |  | Alternative text describing the screenshot (max 140 characters each). One string, or one text per locale such as `{ "es": "...", "en": "..." }`. |
-| `featured` | `boolean` | no | `false` | Featured projects lead the lists. |
+| `featured` | `boolean` | no | `false` | Featured experiments lead the lists. |
 <!-- docs:end experiments -->
 
 ### Changelog — `changelog.json`
@@ -363,7 +363,7 @@ Each `features` flag switches the whole feature off: the route is not generated,
 | `comments` | Comments and reactions (Giscus) | Needs the `giscus` block; see 6.5 |
 | `contact` | The `/contact` form | Needs the Worker secrets; without them it fails closed |
 | `credentials` | Certificates on `/me` | |
-| `experiments` | Projects section and pages (`/projects/`) | |
+| `experiments` | Experiments section and pages (`/experiments/`) | |
 | `changelog` | The `/changelog` page and its link | When off the route is not generated (see "What each switch does") |
 | `me` | The `/me` page (portfolio) | |
 | `readingMode` | Reading mode on notes | Off: no button, script or CSS ships and nothing is stored in the browser |
@@ -378,7 +378,7 @@ All flags live under `features` in `site.config.ts`. The last four (interface) d
 | `comments` | Comments and reactions (Giscus) on notes | The component and its mention in the privacy and terms pages | Needs the `giscus` block; without it nothing renders |
 | `contact` | The `/contact` page (and `/en/contact`) and the `contact` Action | The routes (`integrations/contact-routes.ts`), the Action (answers "unavailable" without reaching any provider), the menu entry, the author card and `/me` buttons, and the sitemap entry. The privacy and terms pages stop linking to contact (they point to "the channels published on this site") and privacy loses its "Contact form" section. The subscription error messages stop mentioning the Contact page | When on, needs the Worker secrets (`CONTACT_*`) and the Turnstile key; without them it fails closed |
 | `credentials` | Certificates and degrees on `/me` | The certificates section of `/me` | |
-| `experiments` | Projects section | The `/projects/` and `/en/projects/` routes (`integrations/projects-routes.ts`), the menu entry, the home section and the `/me` section, and its sitemap entry | `home.experiments` also needs it |
+| `experiments` | Experiments section | The `/experiments/` and `/en/experiments/` routes (`integrations/experiments-routes.ts`), the menu entry, the home section and the `/me` section, and its sitemap entry | `home.experiments` also needs it |
 | `me` | The `/me` page | The "About" menu entry, the home hiring card, the notes sidebar link and the `/me` share card; the page is marked `noindex` and kept out of the sitemap | |
 | `changelog` | The `/changelog` page (and `/en/changelog`) | The routes (`integrations/changelog-routes.ts`), the footer link and the sitemap entry | |
 | `readingMode` | Reading mode on notes | Button, script and CSS; nothing is stored in the browser | |

@@ -1,5 +1,5 @@
 ---
-/** The full `/me` recruiter page for one locale: hero, at-a-glance, projects, what I bring, experience,
+/** The full `/me` recruiter page for one locale: hero, at-a-glance, recent experiments, what I bring, experience,
  * latest notes, certificates by year, and a sidebar. Print-friendly. */
 import { getCollection } from 'astro:content';
 import { localizePath } from '@elvinlab/core';
@@ -13,7 +13,7 @@ import MeSidebar from '@/features/me/components/MeSidebar.astro';
 import QuickFacts from '@/features/me/components/QuickFacts.astro';
 import WhatIBring from '@/features/me/components/WhatIBring.astro';
 import { hasPublishedNotes, NoteIndexRow, sortNotes } from '@/features/notes/index.ts';
-import { loadProjects, ProjectCard } from '@/features/portfolio/index.ts';
+import { ExperimentRow, loadExperiments } from '@/features/portfolio/index.ts';
 import { isEnabled, site } from '@/shared/config/index.ts';
 import { LOCALES, type Locale, t } from '@/shared/i18n/index.ts';
 import Banner from '@/shared/layout/Banner.astro';
@@ -21,6 +21,7 @@ import BaseLayout from '@/shared/layout/BaseLayout.astro';
 import { profileCardPath } from '@/shared/seo/og.ts';
 import Card from '@/shared/ui/Card.astro';
 import SectionHeading from '@/shared/ui/SectionHeading.astro';
+import SocialIcon from '@/shared/ui/SocialIcon.astro';
 
 type Props = { locale: Locale };
 
@@ -29,7 +30,7 @@ const { locale } = Astro.props;
 
 const experience = (await getCollection('experience')).map((entry) => entry.data);
 const credentials = isEnabled('credentials') ? (await getCollection('credentials')).map((c) => c.data) : [];
-const projects = isEnabled('experiments') ? (await loadProjects()).slice(0, 2) : [];
+const experiments = isEnabled('experiments') ? (await loadExperiments()).slice(0, 3) : [];
 const noteEntries = isEnabled('blog') ? await getCollection('notes') : [];
 const allNotes = sortNotes(noteEntries.map((n) => ({ slug: n.id, data: n.data })));
 const notes = allNotes.slice(0, 3);
@@ -49,21 +50,24 @@ const bio = site.identity.bio[locale];
 >
   <Banner slot="banner" height="clamp(420px, 52vh, 520px)" locale={locale}>
     <BackgroundCanvas slot="background" />
-    <MeHero locale={locale} showProjects={projects.length > 0} />
+    <MeHero locale={locale} />
   </Banner>
 
   <div class="flex flex-col gap-4">
     <QuickFacts locale={locale} idPrefix="qf-main" class="lg:hidden" />
     <AtAGlance locale={locale} />
 
-    {projects.length > 0 && (
-      <Card as="section" id="projects" class="flex scroll-mt-24 flex-col gap-4">
-        <div class="flex flex-wrap items-baseline justify-between gap-3">
-          <SectionHeading text={t(locale, 'me.experiments')} />
-          <a href={localizePath('/projects/', locale, LOCALES)} class="relative text-sm text-primary underline decoration-dashed underline-offset-4 after:absolute after:-inset-x-2 after:-inset-y-3 print:hidden">{t(locale, 'me.projects.all')}</a>
-        </div>
-        <div class="grid items-start gap-4 sm:grid-cols-2">
-          {projects.map((project) => <ProjectCard project={project} locale={locale} compact />)}
+    {experiments.length > 0 && (
+      <Card as="section" id="experiments" class="flex scroll-mt-24 flex-col gap-2">
+        <SectionHeading text={t(locale, 'me.experiments')} />
+        <ol class="divide-y divide-dashed divide-divider">
+          {experiments.map((experiment, i) => <li><ExperimentRow experiment={experiment} locale={locale} index={i + 1} /></li>)}
+        </ol>
+        <div class="mt-2 flex flex-col gap-3 border-t border-dashed border-divider pt-4 sm:flex-row sm:items-center sm:justify-between print:hidden">
+          <p class="max-w-[48ch] text-sm text-text-secondary text-pretty">{t(locale, 'me.experiments.more.text')}</p>
+          <a href={localizePath('/experiments/', locale, LOCALES)} class="flex h-12 shrink-0 items-center justify-center gap-2 rounded-control bg-chip px-5 font-medium transition-colors duration-150 hover:bg-card-hover active:scale-96">
+            {t(locale, 'me.experiments.more.cta')}<SocialIcon name="arrow-right" />
+          </a>
         </div>
       </Card>
     )}

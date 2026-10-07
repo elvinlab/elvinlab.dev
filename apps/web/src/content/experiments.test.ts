@@ -25,10 +25,10 @@ describe('content/experiments.json', () => {
     }
   });
 
-  it('only points at images that exist in assets/projects', () => {
+  it('only points at images that exist in assets/experiments/<id>/', () => {
     for (const [id, project] of Object.entries(experimentSchemaParsed())) {
       if (project.image === undefined) continue;
-      expect(existsSync(read(`../assets/projects/${project.image.file}`)), id).toBe(true);
+      expect(existsSync(read(`../assets/experiments/${id}/${project.image.file}`)), id).toBe(true);
     }
   });
 });

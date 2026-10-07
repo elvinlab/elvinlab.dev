@@ -4,7 +4,7 @@ import { LOCALES } from '@/shared/i18n/index.ts';
 import { localizableText } from '@/shared/lib/localized.ts';
 
 const kebab = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
-// A bare file name (no folders) so an image can only come from `src/assets/projects/`.
+// A bare file name (no folders): it is looked up in the entry's own folder `src/assets/experiments/<id>/`.
 const imageFile = /^[\w][\w.-]*\.(?:png|jpe?g|webp|avif)$/i;
 
 const text = (max: number) =>
@@ -15,7 +15,7 @@ const httpsUrl = z.url({ protocol: /^https$/ });
 const LOCALIZED_HINT = 'One string, or one text per locale such as `{ "es": "...", "en": "..." }`';
 
 /**
- * A portfolio project, shown on `/projects/`, `/me` and (optionally) the home. `url` and `repo` are
+ * A portfolio experiment (project), shown on `/experiments/`, `/me` and (optionally) the home. `url` and `repo` are
  * https-only so a private repo is never linked and no email address slips in; leave them out for
  * private work. Text fields are a plain string (every locale) or one text per locale.
  */
@@ -71,14 +71,16 @@ export function experimentSchema() {
         file: z
           .string()
           .regex(imageFile)
-          .describe('File name inside `apps/web/src/assets/projects/` (png, jpg, webp or avif).'),
+          .describe(
+            'File name inside the own folder of the entry `apps/web/src/assets/experiments/<entry key>/` (png, jpg, webp or avif).',
+          ),
         alt: text(140).describe(
           `Alternative text describing the screenshot (max 140 characters each). ${LOCALIZED_HINT}.`,
         ),
       })
       .optional()
       .describe('Screenshot shown on the card. Use your own screenshots only.'),
-    featured: z.boolean().default(false).describe('Featured projects lead the lists.'),
+    featured: z.boolean().default(false).describe('Featured experiments lead the lists.'),
   });
 }
 

@@ -214,7 +214,7 @@ Se agrupan por año, el más nuevo primero. Solo se muestran si `features.creden
 
 ### Experimentos — `experiments.json`
 
-Proyectos del portafolio, publicados en `/projects/` (y `/en/projects/`) y como dos tarjetas en `/me`. **Solo enlaza repositorios públicos**; para trabajo privado deja `url` y `repo` fuera.
+Experimentos (proyectos) del portafolio, publicados en `/experiments/` (y `/en/experiments/`) y como filas compactas en `/me` (hasta tres, con un botón final hacia la página completa). **Solo enlaza repositorios públicos**; para trabajo privado deja `url` y `repo` fuera.
 
 ```json
 {
@@ -233,7 +233,7 @@ Proyectos del portafolio, publicados en `/projects/` (y `/en/projects/`) y como 
 }
 ```
 
-**Cómo añadir un proyecto:** agrega una entrada con clave nueva. Los textos (`description`, `subtitle`, `problem`, `contribution`, `result`) son una cadena para todos los idiomas o un objeto `{ "es": …, "en": … }`; cuenta qué hiciste tú y qué resultó, sin inventar cifras. `url` es el enlace principal (sitio en vivo) y `repo` el del código. `note` es el slug de una nota publicada que cuenta el caso: si no existe, el build falla (nunca queda un enlace muerto). Para la captura, copia tu propia imagen a `apps/web/src/assets/projects/` y pon su nombre en `image.file` con un `image.alt`; un archivo que no existe también rompe el build. Los proyectos destacados van primero y los dos primeros aparecen en `/me`. Con `features.experiments` apagado no hay página ni enlaces.
+**Cómo añadir un experimento:** agrega una entrada con clave nueva. Los textos (`description`, `subtitle`, `problem`, `contribution`, `result`) son una cadena para todos los idiomas o un objeto `{ "es": …, "en": … }`; cuenta qué hiciste tú y qué resultó, sin inventar cifras. `url` es el enlace principal (sitio en vivo) y `repo` el del código. `note` es el slug de una nota publicada que cuenta el caso: si no existe, el build falla (nunca queda un enlace muerto). Para la captura, copia tu propia imagen a la carpeta de la entrada, `apps/web/src/assets/experiments/<clave de la entrada>/`, y pon su nombre de archivo en `image.file` (por ejemplo `cover.jpg`) con un `image.alt`; un archivo que no existe también rompe el build. Los experimentos destacados van primero y los tres primeros aparecen en `/me`. Con `features.experiments` apagado no hay página ni enlaces.
 
 <!-- docs:start experiments -->
 | Key | Type | Required | Default | Description |
@@ -251,9 +251,9 @@ Proyectos del portafolio, publicados en `/projects/` (y `/en/projects/`) y como 
 | `repo` | `URL` | no |  | Public code link (https only). Never a private repository. |
 | `note` | `string` | no |  | Slug of a published note that tells the case. The build fails if no such note is published. |
 | `image` | `object` | no |  | Screenshot shown on the card. Use your own screenshots only. |
-| `image.file` | `string` | yes |  | File name inside `apps/web/src/assets/projects/` (png, jpg, webp or avif). |
+| `image.file` | `string` | yes |  | File name inside the own folder of the entry `apps/web/src/assets/experiments/<entry key>/` (png, jpg, webp or avif). |
 | `image.alt` | `string \| { <locale>: string }` | yes |  | Alternative text describing the screenshot (max 140 characters each). One string, or one text per locale such as `{ "es": "...", "en": "..." }`. |
-| `featured` | `boolean` | no | `false` | Featured projects lead the lists. |
+| `featured` | `boolean` | no | `false` | Featured experiments lead the lists. |
 <!-- docs:end experiments -->
 
 ### Changelog — `changelog.json`
@@ -363,7 +363,7 @@ Cada bandera de `features` apaga la función completa: no se genera la ruta, des
 | `comments` | Comentarios y reacciones (Giscus) | Necesita el bloque `giscus`; ver 6.5 |
 | `contact` | Formulario `/contact` | Necesita los secretos del Worker; sin ellos falla cerrado |
 | `credentials` | Certificados en `/me` | |
-| `experiments` | Sección y páginas de proyectos (`/projects/`) | |
+| `experiments` | Sección y páginas de experimentos (`/experiments/`) | |
 | `changelog` | Página `/changelog` y su enlace | Apagada no se genera la ruta (ver «Qué hace cada interruptor») |
 | `me` | Página `/me` (portafolio) | |
 | `readingMode` | Modo lectura en las notas | Apagada: no se envía botón, script, CSS ni se guarda nada en el navegador |
@@ -378,7 +378,7 @@ Todas las banderas viven en `features` de `site.config.ts`. Las cuatro últimas 
 | `comments` | Comentarios y reacciones (Giscus) en las notas | El componente y su sección en privacidad y términos | Necesita el bloque `giscus`; sin él no se pinta nada |
 | `contact` | Página `/contact` (y `/en/contact`) y la Action `contact` | Las rutas (`integrations/contact-routes.ts`), la Action (responde «no disponible» sin llegar a ningún proveedor), la entrada del menú, el botón de la tarjeta del autor y de `/me`, y la entrada del sitemap. Las páginas de privacidad y términos dejan de enlazar a contacto (remiten a «los canales publicados en este sitio») y privacidad pierde su sección «Formulario de contacto». Los mensajes de error de la suscripción dejan de mencionar la página de Contacto | Con la bandera activa, necesita los secretos del Worker (`CONTACT_*`) y la clave de Turnstile; sin ellos falla cerrado |
 | `credentials` | Certificados y títulos en `/me` | La sección de certificados de `/me` | |
-| `experiments` | Sección de proyectos | Las rutas `/projects/` y `/en/projects/` (`integrations/projects-routes.ts`), la entrada del menú, la sección de la portada y la de `/me`, y su entrada en el sitemap | `home.experiments` también la necesita |
+| `experiments` | Sección de experimentos | Las rutas `/experiments/` y `/en/experiments/` (`integrations/experiments-routes.ts`), la entrada del menú, la sección de la portada y la de `/me`, y su entrada en el sitemap | `home.experiments` también la necesita |
 | `me` | Página `/me` | La entrada «Sobre mí» del menú, la tarjeta de contratación de la portada, el enlace de la barra lateral de las notas y la tarjeta de compartir de `/me`; la página queda `noindex` y fuera del sitemap | |
 | `changelog` | Página `/changelog` (y `/en/changelog`) | Las rutas (`integrations/changelog-routes.ts`), el enlace del pie y la entrada del sitemap | |
 | `readingMode` | Modo lectura en las notas | Botón, script y CSS; no se guarda nada en el navegador | |
