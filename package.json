@@ -24,6 +24,7 @@
     "stress:experiments": "node apps/web/scripts/stress-experiments.ts",
     "test:lighthouse": "node apps/web/scripts/run-lighthouse-ci.ts",
     "check:js-budget": "node apps/web/scripts/performance-budget.ts",
+    "check:page-weight": "node apps/web/scripts/page-weight-budget.ts",
     "verify": "node apps/web/scripts/verify-scope.ts"
   },
   "devDependencies": {

@@ -73,6 +73,7 @@ export const LAYOUT_FAMILIES: readonly string[] = [
   'unit',
   'build',
   'js-budget',
+  'page-weight',
   'white-label',
 ];
 
@@ -278,6 +279,12 @@ export const CHECKS: readonly CheckDef[] = [
   family('js-budget', 'JavaScript budget', [
     ...BUILD_SCOPE,
     'apps/web/scripts/performance-budget.ts',
+  ]),
+  // Inline CSS and HTML bytes per page type: any page or style change can move them.
+  family('page-weight', 'page weight budget', [
+    ...BUILD_SCOPE,
+    'apps/web/scripts/page-weight-budget.ts',
+    'apps/web/scripts/page-weight-budget.json',
   ]),
   family('white-label', 'white-label build', [
     ...BUILD_SCOPE,

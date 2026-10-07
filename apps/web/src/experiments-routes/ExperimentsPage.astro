@@ -3,7 +3,8 @@
  * The `/experiments/` page for one locale and sort: a quiet header (flask, title, intro), the big
  * pieces separated by a hairline, then the compact list with its sort switch, summary and pager.
  * The big pieces lead page 1 whatever the sort; the sort and the page apply to the compact list.
- * Styles are scoped here and in the piece and media components, so none of them reaches `/me`.
+ * Its CSS is one string (`experiment-styles.ts`) with only the parts this page renders; the classes
+ * are `xp-`/`xc-` prefixed, so none of them reaches `/me`.
  * The sort and pager controls are the generic listing kit of `shared/ui` (`shared/lib/listing.ts`).
  */
 
@@ -26,6 +27,7 @@ import SortSwitch from '@/shared/ui/SortSwitch.astro';
 
 import ExperimentCompact from './ExperimentCompact.astro';
 import ExperimentPiece from './ExperimentPiece.astro';
+import { experimentsCss } from './experiment-styles.ts';
 
 /** `sort` is set on the pages of a sort that is not the default one; they are not indexed. */
 type Props = { locale: Locale; page?: number; sort?: ExperimentSort };
@@ -59,11 +61,22 @@ const sortOptions = offered.map((key) => ({
   href: href(1, key),
 }));
 const years = showYearHeadings(current, sort);
+const css = experimentsCss({
+  pieces: big.length > 0,
+  media: big.some((experiment) => (experiment.images?.length ?? 0) > 0),
+  gallery: big.some((experiment) => (experiment.images?.length ?? 0) > 1),
+  more: hasMore,
+  years: hasMore && years,
+  footer: hasMore && pages.length > 1,
+  lab: lab.length > 0,
+  empty: experiments.length === 0,
+});
 ---
 
 <BaseLayout locale={locale} path={experimentsHref(page, requested)} title={title} description={description} noindex={requested !== undefined}>
   {paged && <link slot="head" rel="prev" href={pageUrl(page - 1)} />}
   {page < pages.length && <link slot="head" rel="next" href={pageUrl(page + 1)} />}
+  <style is:inline set:html={css} />
   <section class="xp-page">
     <header class="xp-header">
       <div class="xp-header-text">
@@ -119,140 +132,3 @@ const years = showYearHeadings(current, sort);
   </section>
 </BaseLayout>
 
-<style>
-  .xp-page {
-    display: flex;
-    flex-direction: column;
-    gap: 3rem;
-  }
-  .xp-header {
-    display: flex;
-    align-items: flex-end;
-    justify-content: space-between;
-    gap: 2rem;
-  }
-  /* Same size, weight and tracking as the title of the other pages (`text-3xl font-bold tracking-tight`). */
-  .xp-header-text h1 {
-    display: flex;
-    align-items: center;
-    gap: 0.625rem;
-    margin: 0;
-    font-size: 1.875rem;
-    font-weight: 700;
-    line-height: 2.25rem;
-    letter-spacing: -0.025em;
-  }
-  .xp-header-text p {
-    max-width: 60ch;
-    margin: 0.5rem 0 0;
-    font-size: 1.0625rem;
-    line-height: 1.55;
-    color: var(--color-text-secondary);
-  }
-  /* The pixel flask before the title: the single pink accent of the header, a 9 x 9 grid with crisp edges. */
-  .xp-flask {
-    flex-shrink: 0;
-    width: 27px;
-    height: 27px;
-    color: var(--color-pink);
-    shape-rendering: crispEdges;
-  }
-  /* Only rendered when `experiments.words` is configured. */
-  .xp-lab {
-    display: none;
-    margin: 0;
-    padding: 0;
-    list-style: none;
-    font: 400 0.8125rem / 1.35 var(--font-mono);
-    color: var(--color-muted);
-    user-select: none;
-  }
-  .xp-lab li:nth-child(odd) {
-    color: color-mix(in srgb, var(--color-muted) 70%, var(--color-primary));
-  }
-  @media (min-width: 768px) {
-    .xp-lab {
-      display: block;
-      flex-shrink: 0;
-      text-align: right;
-    }
-  }
-  .xp-list {
-    display: flex;
-    flex-direction: column;
-    gap: 3.5rem;
-  }
-  /* A plain hairline between two big pieces: no label, no dashes. */
-  .xp-hairline {
-    height: 1px;
-    background: var(--color-divider);
-  }
-  .xp-more {
-    display: flex;
-    flex-direction: column;
-    gap: 1.5rem;
-  }
-  .xp-more-head {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 0.75rem;
-  }
-  @media (min-width: 640px) {
-    .xp-more-head {
-      flex-direction: row;
-      align-items: center;
-      justify-content: space-between;
-      gap: 1rem;
-    }
-  }
-  .xp-more-head h2 {
-    margin: 0;
-    font: 700 1.5rem / 1.2 var(--font-display);
-  }
-  .xp-year {
-    display: flex;
-    flex-direction: column;
-    gap: 0.75rem;
-  }
-  .xp-year-label {
-    margin: 0;
-    font: 400 0.9375rem / 1 var(--font-mono);
-    color: var(--color-muted);
-  }
-  .xp-grid {
-    display: grid;
-    gap: 0.75rem;
-    margin: 0;
-    padding: 0;
-    list-style: none;
-    grid-template-columns: 1fr;
-  }
-  @media (min-width: 640px) {
-    .xp-grid {
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-    }
-  }
-  @media (min-width: 1024px) {
-    .xp-grid {
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-    }
-  }
-  /* The summary and the pager close the list, aligned on one quiet row (stacked on a phone). */
-  .xp-foot {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 0.5rem;
-    margin-top: 0.5rem;
-  }
-  @media (min-width: 640px) {
-    .xp-foot {
-      flex-direction: row;
-      justify-content: space-between;
-    }
-  }
-  .xp-empty {
-    color: var(--color-text-secondary);
-  }
-</style>

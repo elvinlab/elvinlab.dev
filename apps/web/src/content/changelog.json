@@ -496,5 +496,11 @@
     "category": "added",
     "title": "A guide to edit the profile and add experiments",
     "description": "docs/PORTFOLIO.md (Spanish and English) says which file and field to change for /me, experiments, images, order and sorting, with copy-paste templates. pnpm stress:experiments builds the site with 30 or 100 generated experiments in a temporary workspace to check pages, weight and links without touching your files."
+  },
+  "page-weight-budget": {
+    "date": "2026-10-07",
+    "category": "added",
+    "title": "Page weight budget check",
+    "description": "pnpm check:page-weight fails the build when the inline CSS or the HTML of a page type (home, me, experiments, contact, notes) grows past its budget in page-weight-budget.json. /experiments/ also ships about 10 KB less CSS, because compact cards, pager and gallery styles load only where they render."
   }
 }

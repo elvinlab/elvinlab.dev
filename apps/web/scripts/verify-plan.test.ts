@@ -27,6 +27,7 @@ describe('planChecks', () => {
       'typecheck',
       'lint',
       'js-budget',
+      'page-weight',
       'build',
       'lighthouse:/contact/',
     ]) {
@@ -73,7 +74,15 @@ describe('planChecks', () => {
       const planned = plan.items.map((item) => item.id);
       expect(plan.wide).toBe(false);
       expect(plan.layoutWide).toBe(true);
-      for (const id of ['lint', 'typecheck', 'unit', 'build', 'js-budget', 'white-label']) {
+      for (const id of [
+        'lint',
+        'typecheck',
+        'unit',
+        'build',
+        'js-budget',
+        'page-weight',
+        'white-label',
+      ]) {
         expect(planned).toContain(id);
       }
       for (const id of ['cold-start', 'depcruise', 'docs-config']) {
@@ -155,9 +164,30 @@ describe('planChecks', () => {
     expect(build?.reasons[0]).toContain('js-budget');
   });
 
+  it('plans the page weight budget for the experiments page and builds first', () => {
+    const plan = planChecks({
+      mode: 'changed',
+      changed: ['apps/web/src/experiments-routes/experiment-styles.ts'],
+    });
+    const planned = plan.items.map((item) => item.id);
+    expect(planned).toContain('page-weight');
+    expect(planned.indexOf('build')).toBeLessThan(planned.indexOf('page-weight'));
+    expect(
+      plan.commands.some((command) => command.argv.join(' ') === 'pnpm check:page-weight'),
+    ).toBe(true);
+  });
+
   it('orders the plan: static checks, build family, e2e, Lighthouse', () => {
     const planned = ids(['apps/web/src/features/contact/contact.ts']);
-    const order = ['lint', 'typecheck', 'unit', 'build', 'js-budget', 'e2e:contact.spec.ts'];
+    const order = [
+      'lint',
+      'typecheck',
+      'unit',
+      'build',
+      'js-budget',
+      'page-weight',
+      'e2e:contact.spec.ts',
+    ];
     expect(order.map((id) => planned.indexOf(id))).toEqual(
       [...order.map((id) => planned.indexOf(id))].sort((a, b) => a - b),
     );
