@@ -288,6 +288,21 @@ export const siteConfigSchema = z
       .describe(
         'Settings of the experiments list (`features.experiments`): pagination, sorting, big pieces, the rows on `/me` and the page header texts. Every key is optional and falls back to its default.',
       ),
+    changelog: z
+      .strictObject({
+        perPage: z
+          .int()
+          .min(2)
+          .max(30)
+          .default(4)
+          .describe(
+            'Release days per page of `/changelog/`. A release is one production day, so this counts days, not entries; a second page exists only when the days exceed this number (`/changelog/page/2/`). Page 1 opens its two newest days; the rest stay collapsed.',
+          ),
+      })
+      .prefault({})
+      .describe(
+        'Settings of the changelog (`features.changelog`). Every key is optional and falls back to its default.',
+      ),
     recruiter: z
       .object({
         available: z

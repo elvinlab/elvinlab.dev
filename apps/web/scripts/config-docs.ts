@@ -5,7 +5,7 @@
  */
 import { z } from 'zod';
 
-import { changelogSchema } from '@/features/changelog/schema.ts';
+import { changelogSchema, releaseSchema } from '@/features/changelog/schema.ts';
 import { credentialSchema } from '@/features/credentials/schema.ts';
 import { experienceSchema } from '@/features/me/schema.ts';
 import { noteSchema } from '@/features/notes/schema.ts';
@@ -25,6 +25,7 @@ const SCHEMAS: Record<string, z.ZodType> = {
   credentials: credentialSchema(),
   experiments: experimentSchema(),
   changelog: changelogSchema(),
+  releases: releaseSchema(),
 };
 
 /** Fields without a description, as `block: path`; the test requires this to be empty. */
@@ -106,6 +107,7 @@ export const DOC_BLOCKS: Record<string, string[]> = {
     'credentials',
     'experiments',
     'changelog',
+    'releases',
     'env-vars',
     'dev-vars-example',
   ],
@@ -115,6 +117,7 @@ export const DOC_BLOCKS: Record<string, string[]> = {
     'credentials',
     'experiments',
     'changelog',
+    'releases',
     'env-vars',
     'dev-vars-example',
   ],

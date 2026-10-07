@@ -1,0 +1,95 @@
+{
+  "headroom": 0.04,
+  "types": {
+    "home": {
+      "why": "Hero is text: LCP follows the head bytes (about 8-9 ms per raw KB in the lab); the home is the heaviest first screen.",
+      "styleBytes": 58500,
+      "htmlBytes": 101400,
+      "measured": {
+        "styleBytes": 56211,
+        "htmlBytes": 97419,
+        "date": "2026-10-07"
+      }
+    },
+    "me": {
+      "why": "Recruiter page: hero photo plus experience blocks; its LCP margin is the thinnest after /experiments/.",
+      "styleBytes": 56300,
+      "htmlBytes": 120900,
+      "measured": {
+        "styleBytes": 54118,
+        "htmlBytes": 116193,
+        "date": "2026-10-07"
+      }
+    },
+    "experiments": {
+      "why": "Two featured pieces; the CSS of compact cards, pager, sort switch and gallery ships only where it renders.",
+      "styleBytes": 63300,
+      "htmlBytes": 98200,
+      "measured": {
+        "styleBytes": 60801,
+        "htmlBytes": 94423,
+        "date": "2026-10-07"
+      }
+    },
+    "changelog": {
+      "why": "Release days grouped by kind, 4 days per page (page 1 opens the 2 newest); the flat list was about 130 KB, and the page CSS ships only here.",
+      "styleBytes": 56500,
+      "htmlBytes": 110000,
+      "measured": {
+        "styleBytes": 54304,
+        "htmlBytes": 105715,
+        "date": "2026-10-07"
+      }
+    },
+    "contact": {
+      "why": "Form page: the lightest shared head, only the site stylesheet plus the form.",
+      "styleBytes": 55100,
+      "htmlBytes": 91000,
+      "measured": {
+        "styleBytes": 52942,
+        "htmlBytes": 87407,
+        "date": "2026-10-07"
+      }
+    },
+    "subscribe": {
+      "why": "Form page: the site stylesheet plus a small form, no page-specific CSS to speak of.",
+      "styleBytes": 55000,
+      "htmlBytes": 83000,
+      "measured": {
+        "styleBytes": 52883,
+        "htmlBytes": 79760,
+        "date": "2026-10-07"
+      }
+    },
+    "notes-index": {
+      "why": "Listing of note cards: site stylesheet only.",
+      "styleBytes": 55000,
+      "htmlBytes": 95600,
+      "measured": {
+        "styleBytes": 52883,
+        "htmlBytes": 91893,
+        "date": "2026-10-07"
+      }
+    },
+    "note": {
+      "why": "Note pages: article typography, share card and footprint button; the note-page LCP gate moves with a few hundred bytes (docs/TESTING.md).",
+      "styleBytes": 61000,
+      "htmlBytes": 130400,
+      "measured": {
+        "styleBytes": 58561,
+        "htmlBytes": 125374,
+        "date": "2026-10-07"
+      }
+    },
+    "default": {
+      "why": "Legal pages, subscribe steps, paged or sorted listings: ceiling for anything without its own type.",
+      "styleBytes": 55000,
+      "htmlBytes": 135300,
+      "measured": {
+        "styleBytes": 52883,
+        "htmlBytes": 130062,
+        "date": "2026-10-07"
+      }
+    }
+  }
+}

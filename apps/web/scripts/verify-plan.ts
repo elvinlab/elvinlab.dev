@@ -68,11 +68,12 @@ const RANK: Readonly<Record<string, number>> = {
   unit: 4,
   build: 5,
   'js-budget': 6,
-  'white-label': 7,
-  'cold-start': 8,
+  'page-weight': 7,
+  'white-label': 8,
+  'cold-start': 9,
 };
-const E2E_RANK = 9;
-const LIGHTHOUSE_RANK = 10;
+const E2E_RANK = 10;
+const LIGHTHOUSE_RANK = 11;
 
 const FAMILY_COMMAND: Readonly<Record<string, readonly string[]>> = {
   typecheck: ['pnpm', 'typecheck'],
@@ -80,6 +81,7 @@ const FAMILY_COMMAND: Readonly<Record<string, readonly string[]>> = {
   'docs-config': ['pnpm', 'docs:config'],
   build: ['pnpm', '--filter', 'web', 'build'],
   'js-budget': ['pnpm', 'check:js-budget'],
+  'page-weight': ['pnpm', 'check:page-weight'],
   'white-label': ['pnpm', 'test:white-label'],
   'cold-start': ['pnpm', 'check:dev-cold-start'],
 };
@@ -222,8 +224,10 @@ export function planChecks(input: PlanInput): Plan {
   const { reasons, wide, layoutWide, layoutOnly, skippedFresh } = select(input, checks);
   const byId = new Map(checks.map((check) => [check.id, check]));
 
-  if (reasons.has('js-budget') && !reasons.has('build') && byId.has('build')) {
-    reasons.set('build', ['required by js-budget (it measures the built pages)']);
+  for (const measuring of ['js-budget', 'page-weight']) {
+    if (reasons.has(measuring) && !reasons.has('build') && byId.has('build')) {
+      reasons.set('build', [`required by ${measuring} (it measures the built pages)`]);
+    }
   }
 
   const selected = checks

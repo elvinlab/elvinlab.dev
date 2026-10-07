@@ -88,6 +88,8 @@ jobs:
       - run: pnpm --filter web build
       - name: Check production JavaScript gzip budget
         run: pnpm check:js-budget
+      - name: Check page weight budget (inline CSS and HTML per page type)
+        run: pnpm check:page-weight
       - name: Install Chromium for browser checks
         run: pnpm exec playwright install --with-deps chromium
       - run: pnpm test:e2e --shard=${{ matrix.shard }}/4

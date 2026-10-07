@@ -84,14 +84,14 @@ The single source of truth is [`apps/web/scripts/verification-map.ts`](../apps/w
 | You touched | Run | Skip, if untouched |
 | --- | --- | --- |
 | Documentation, trackers, `odd/` | `lint` on the files | everything else |
-| `changelog.json` | the changelog unit test, `lint` | build, e2e |
+| `changelog.json`, `releases.json` | the changelog unit tests (`releases.test.ts`), `lint`; the build when the page layout changed | e2e |
 | A note (`content/notes/**`) | `build` (it validates the frontmatter), `lint` | e2e, Lighthouse (the gate measures fixtures, not real notes) |
 | Schema, `site.config.ts`, `env-vars.ts`, fixtures | `docs:config`, the config unit tests, `typecheck`, `test:white-label`, `build` | e2e, Lighthouse |
 | Unit-tested logic (`lib/`, `ports`, `adapters`, `actions`) | the related unit tests, `typecheck`, `lint` | e2e (unless the page behavior changed), Lighthouse |
 | Added, moved or removed files, or edited imports | `depcruise` | |
 | A feature's UI (`features/<x>/components`) | its unit tests, the e2e specs of that area, `a11y.spec.ts` for its page, `typecheck` | specs of other areas |
 | Client JavaScript, islands, scripts, client dependencies | `build` then `check:js-budget`, the area's e2e, `check:dev-cold-start` if a dependency was added | |
-| Anything that changes the HTML or CSS bytes of a gated URL (styles, layout, head or SEO tags, fonts, note or home or contact markup) | `test:lighthouse` and the area's e2e; compare the document size and the worst LCP with the ledger | Lighthouse if no page the gate loads changed |
+| Anything that changes the HTML or CSS bytes of a gated URL (styles, layout, head or SEO tags, fonts, note or home or contact markup) | `check:page-weight` after `build`, `test:lighthouse` and the area's e2e; compare the document size and the worst LCP with the ledger | Lighthouse if no page the gate loads changed |
 | Notes pages and what they render (`NotePage`, share panel, marks, prose styles) | the notes specs (`notes-layout`, `note-share`, `link-previews`, `note-translations`, `reading-mode`, `calm-pages`, `card-links`, `focus-not-obscured`, `marks`) and `a11y.spec.ts` | contact, home and `/me` specs |
 | Contact (`features/contact`, `ContactForm`) | `contact.spec.ts`, the contact unit tests, `check:js-budget` | notes specs |
 | Header, navbar, footer, `BaseLayout`, global CSS | a wide change: the whole stack once | |
@@ -107,6 +107,7 @@ Run the same gates as CI from the repository root:
 
 ```bash
 mise exec -- pnpm check:js-budget
+mise exec -- pnpm check:page-weight
 mise exec -- pnpm exec playwright install chromium  # one-time local browser setup
 mise exec -- pnpm test:e2e
 mise exec -- pnpm test:white-label
@@ -122,6 +123,46 @@ aggregated pessimistically so one bad run cannot be hidden by a better one.
 Lighthouse reports are written locally to `.lighthouseci/` (ignored by Git); the configuration
 does not upload them. CI runs every browser, white-label and performance gate in the `checks` job,
 which the deploy job requires.
+
+### Page weight budget (`pnpm check:page-weight`)
+
+After `pnpm --filter web build`, `apps/web/scripts/page-weight-budget.ts` reads every
+`apps/web/dist/client/**/index.html` and measures two numbers per page: the **inline `<style>` bytes**
+(the head CSS that delays the first paint, about 8-9 ms per raw KB in the lab) and the **HTML bytes**.
+Each page belongs to a type (`classifyPage`; the `/en/` prefix does not change it) and each type has a
+budget in `apps/web/scripts/page-weight-budget.json`:
+
+| Type | Pages |
+| --- | --- |
+| `home` | `/`, `/en/` |
+| `me` | `/me/`, `/en/me/` |
+| `experiments` | `/experiments/`, `/en/experiments/` (the first page only) |
+| `changelog` | `/changelog/`, `/changelog/page/N/` and their `/en/` twins (days grouped by kind, 4 days per page; its CSS ships only there) |
+| `contact`, `subscribe` | `/contact/`, `/subscribe/` and their `/en/` twins |
+| `notes-index` | `/notes/`, `/en/notes/` |
+| `note` | any `/notes/<slug>/` (the real notes and the `smoke-es` fixture note) |
+| `default` | everything else: legal, subscribe steps, paged or sorted listings |
+
+The check prints one line per page with the number, the budget and, on failure, the overshoot, even
+when everything passes, and exits 1 when any page is over:
+
+```
+FAIL  /experiments/  experiments  style 63410 / 63300 B (+110 B)  html 94423 / 98200 B
+```
+
+**Reading a failure.** Compare with the previous build of the same page (`wc -c`, or the per-part
+breakdown of the inline CSS). A shared stylesheet change moves every type at once; a change in one
+component moves its own type. Prefer fixing it: reuse existing utilities, emit a component's CSS only
+where it renders, delete dead CSS (see "Page weight rule" in [DESIGN.md](DESIGN.md)).
+
+**Updating a budget consciously.** Each type stores `styleBytes` and `htmlBytes` (the budget), a short
+`why`, and `measured` (the largest page of the type and the date). The budget is the measured value
+plus 4 percent, rounded up to 100 B, so a regression of a few KB fails and normal edits do not. When a
+feature really needs the bytes: build, run `node apps/web/scripts/page-weight-budget.ts --suggest`
+(prints the budgets of today's build with the same headroom), copy the affected type into the JSON
+with the new `measured` and date, and say why in the commit and in the changelog. Never raise a budget
+to make a failing run pass without a measured reason. The check runs in CI next to `check:js-budget`
+and in `pnpm verify` (family `page-weight`, planned for any change that can alter built pages).
 
 ### The note-page LCP gate is sensitive to a few bytes
 
@@ -178,6 +219,10 @@ The e2e suite covers the contact form island with a stubbed Turnstile script and
 ## Email previews
 
 The subscription emails (confirmation and new note, Spanish and English) are pure functions in `apps/web/src/features/subscribe/email-templates.ts`. To look at them without sending anything, run `mise exec -- node --import ./apps/web/scripts/register-alias.mjs apps/web/scripts/preview-email.ts`: it writes the HTML and text versions with sample data (on `https://example.test`, with a hostile title to prove escaping) into the git-ignored `.email-preview/` folder. Open the `.html` files in a browser; email clients differ, so a real test send to your own address (needs a verified Resend domain) remains an owner step.
+
+## Changelog tools
+
+`pnpm changelog:audit` (`apps/web/scripts/changelog-audit.ts`) reads the local ref `origin/main` (no fetch), finds the `develop: <sha>` of the last release and lists the `feat`, `fix` and `perf` commits since then that did not touch `changelog.json`; it exits 1 when there are any and exits 2 when the release commit has no `develop:` line. `pnpm changelog:stamp [--date YYYY-MM-DD] [--dry-run]` (`changelog-stamp.ts`) dates the entries that are not in `origin/main`'s `changelog.json`. Both are pure functions with unit tests next to them; the rest of the changelog is covered by `releases.test.ts` (grouping, kind order, day titles) and `tests/browser/changelog.spec.ts` (days and kinds in order, the two newest open, the pager to page 2, canonical and prev, with JavaScript off). Pagination itself is the listing kit's and is tested in `shared/lib/listing.test.ts`.
 
 ## Perf watch: `/experiments/` at scale
 

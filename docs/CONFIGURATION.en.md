@@ -106,6 +106,8 @@ The descriptions come from the schema (`.describe()`), which is why they are in 
 | `experiments.defaultSort` | `'newest' \| 'oldest' \| 'title'` | no | `newest` | Order of the compact cards at `/experiments/`: `newest` (publication date, newest first), `oldest` or `title` (A to Z). Big (featured) pieces always lead page 1 whatever the sort. It must be one of `sorts`. |
 | `experiments.sorts` | `'newest' \| 'oldest' \| 'title'[]` | no | `["newest","oldest","title"]` | Sorts the visitor can choose, from `newest`, `oldest` and `title`. Each one except `defaultSort` is a static page (`/experiments/oldest/`, `/experiments/oldest/page/2/`) that search engines are told not to index and that stays out of the sitemap. A list of one sort shows no switch. |
 | `experiments.sortFrom` | `integer (min 2, max 48)` | no | `4` | The sort switch and the alternate-sort pages exist only when the compact cards (everything that is not a big piece) number at least this many; below it the order is not worth choosing. |
+| `changelog` | `object` | no | `{}` | Settings of the changelog (`features.changelog`). Every key is optional and falls back to its default. |
+| `changelog.perPage` | `integer (min 2, max 30)` | no | `4` | Release days per page of `/changelog/`. A release is one production day, so this counts days, not entries; a second page exists only when the days exceed this number (`/changelog/page/2/`). Page 1 opens its two newest days; the rest stay collapsed. |
 | `recruiter` | `object` | yes |  | Recruiter card on the home page and /me. |
 | `recruiter.available` | `boolean` | yes |  | Show or hide the whole availability line (not whether you are open to work). |
 | `recruiter.openToWork` | `boolean` | no | `true` | Whether you are open to work: green status dot when true, the brand accent colour when false. |
@@ -293,6 +295,29 @@ The public `/changelog` page. One entry per change **a visitor would notice**, w
 | `description` | `string (max 500)` | no |  | One or two sentences of detail (max 500 characters). |
 <!-- docs:end changelog -->
 
+A **release is a production day**: the page groups entries by `date` (the day they reached production), inside each day by kind (`added` New, `changed` Changes, `fixed` Fixes, `removed` Removed, `security` Security, `deprecated` Deprecated, in that fixed order) and, inside a kind, by title. It paginates by days with `changelog.perPage` (default 4): `/changelog/`, `/changelog/page/2/`, and so on. The two newest days of page 1 start open; the rest is collapsed, but its content stays in the HTML.
+
+### Release headlines — `releases.json`
+
+Optional. One short headline per day, so a day has a name besides its date. The key is the day (`YYYY-MM-DD`); a day without a headline shows only its date, and a key without entries is ignored.
+
+```json
+{
+  "2026-10-07": { "title": "Experiments page and a clearer /me" }
+}
+```
+
+<!-- docs:start releases -->
+| Key | Type | Required | Default | Description |
+| --- | --- | --- | --- | --- |
+| `title` | `string (max 80)` | no |  | Optional headline of the release day, shown beside its date (max 80 characters). Without it the day shows only its date. The key is the day, as YYYY-MM-DD; a day without entries is ignored. |
+<!-- docs:end releases -->
+
+Two commands keep the changelog current:
+
+- `pnpm changelog:audit` finds the last release (the `develop: <sha>` line recorded by the release commit at the tip of `origin/main`, read from the local ref, no fetch), lists the `feat`, `fix` and `perf` commits since then that did **not** touch `changelog.json` (the entry travels in the same work unit) and exits non-zero if there are any. It says so when the commit has no `develop:` line.
+- `pnpm changelog:stamp [--date YYYY-MM-DD] [--dry-run]` sets `date` (today by default) on the entries that are **not** in `origin/main`'s `changelog.json`, never touching published ones. Run it when preparing the release; `--dry-run` only prints.
+
 ## 5. Reference: environment variables and secrets
 
 Four scopes: **build** (read while building), **Worker** (in production, at runtime), **CI** (GitHub Actions) and **local** (tooling only). Secret values never go in the repository.
@@ -430,7 +455,7 @@ Add an entry to the matching JSON (section 4) with a new key. To remove one, del
 
 ### 6.4 Changelog
 
-Add an entry **per visible change** when you release (today's date, the right category). Do not announce something that is not in production yet.
+Add an entry **per visible change** in the same work unit that ships it (the right category; the date is stamped at release with `pnpm changelog:stamp`). Before releasing, `pnpm changelog:audit` lists the `feat`/`fix`/`perf` commits without an entry. Do not announce something that is not in production yet.
 
 ### 6.5 Comments (Giscus)
 

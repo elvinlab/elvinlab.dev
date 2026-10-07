@@ -73,6 +73,7 @@ export const LAYOUT_FAMILIES: readonly string[] = [
   'unit',
   'build',
   'js-budget',
+  'page-weight',
   'white-label',
 ];
 
@@ -148,7 +149,13 @@ const LEGAL = area(
 const CHANGELOG = area(
   `${SRC}/features/changelog/**`,
   `${SRC}/content/changelog.json`,
+  `${SRC}/content/releases.json`,
   `${SRC}/changelog-routes/**`,
+  // The changelog pages its release days with the same listing kit as the experiments list.
+  `${SRC}/shared/lib/listing.ts`,
+  `${SRC}/shared/ui/Pager.astro`,
+  `${SRC}/shared/ui/ListingSummary.astro`,
+  `${SRC}/shared/ui/listing-styles.ts`,
 );
 // The experiments feature feeds `/experiments/`, the `/me` block and (when its home section is on) the home.
 const EXPERIMENTS = area(
@@ -279,6 +286,12 @@ export const CHECKS: readonly CheckDef[] = [
     ...BUILD_SCOPE,
     'apps/web/scripts/performance-budget.ts',
   ]),
+  // Inline CSS and HTML bytes per page type: any page or style change can move them.
+  family('page-weight', 'page weight budget', [
+    ...BUILD_SCOPE,
+    'apps/web/scripts/page-weight-budget.ts',
+    'apps/web/scripts/page-weight-budget.json',
+  ]),
   family('white-label', 'white-label build', [
     ...BUILD_SCOPE,
     'apps/web/scripts/white-label-check.ts',
@@ -325,6 +338,7 @@ export const CHECKS: readonly CheckDef[] = [
   e2e({ file: 'notes-layout.spec.ts', covers: NOTE_PAGE, responsive: true }),
   e2e({ file: 'performance.spec.ts', covers: EVERY_PAGE }),
   e2e({ file: 'experiments.spec.ts', covers: [...EXPERIMENTS, ...ME] }),
+  e2e({ file: 'changelog.spec.ts', covers: CHANGELOG }),
   e2e({ file: 'pixel-display.spec.ts', covers: [...NOTE_PAGE, ...HOME], responsive: true }),
   e2e({ file: 'reading-mode.spec.ts', covers: NOTE_PAGE, helpers: true, responsive: true }),
   e2e({ file: 'smoke.spec.ts', covers: EVERY_PAGE }),
