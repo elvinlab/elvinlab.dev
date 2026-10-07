@@ -214,31 +214,46 @@ Se agrupan por año, el más nuevo primero. Solo se muestran si `features.creden
 
 ### Experimentos — `experiments.json`
 
-Proyectos del portafolio. **Solo enlaza repositorios públicos**; para trabajo privado deja `url` fuera.
+Proyectos del portafolio, publicados en `/projects/` (y `/en/projects/`) y como dos tarjetas en `/me`. **Solo enlaza repositorios públicos**; para trabajo privado deja `url` y `repo` fuera.
 
 ```json
 {
   "agentic-dev-setup": {
     "title": "agentic-dev-setup",
-    "description": "Multi-agent development environment.",
+    "description": { "es": "Entorno de desarrollo con agentes.", "en": "Multi-agent development setup." },
+    "problem": { "es": "…", "en": "…" },
+    "contribution": { "es": "…", "en": "…" },
+    "result": { "es": "…", "en": "…" },
     "tags": ["ai-agents", "tooling"],
     "year": 2026,
-    "url": "https://github.com/elvinlab/agentic-dev-setup",
+    "repo": "https://github.com/elvinlab/agentic-dev-setup",
+    "note": "agentic-dev-setup",
     "featured": true
   }
 }
 ```
 
+**Cómo añadir un proyecto:** agrega una entrada con clave nueva. Los textos (`description`, `subtitle`, `problem`, `contribution`, `result`) son una cadena para todos los idiomas o un objeto `{ "es": …, "en": … }`; cuenta qué hiciste tú y qué resultó, sin inventar cifras. `url` es el enlace principal (sitio en vivo) y `repo` el del código. `note` es el slug de una nota publicada que cuenta el caso: si no existe, el build falla (nunca queda un enlace muerto). Para la captura, copia tu propia imagen a `apps/web/src/assets/projects/` y pon su nombre en `image.file` con un `image.alt`; un archivo que no existe también rompe el build. Los proyectos destacados van primero y los dos primeros aparecen en `/me`. Con `features.experiments` apagado no hay página ni enlaces.
+
 <!-- docs:start experiments -->
 | Key | Type | Required | Default | Description |
 | --- | --- | --- | --- | --- |
 | `title` | `string (max 80)` | yes |  | Project name (max 80 characters). |
-| `description` | `string (max 200)` | yes |  | What it is, in one or two sentences (max 200 characters). |
+| `description` | `string \| { <locale>: string }` | yes |  | What it is, in one or two sentences (max 200 characters each). One string, or one text per locale such as `{ "es": "...", "en": "..." }`. |
+| `subtitle` | `string \| { <locale>: string }` | no |  | A short muted line under the title (max 200 characters each). One string, or one text per locale such as `{ "es": "...", "en": "..." }`. |
+| `problem` | `string \| { <locale>: string }` | no |  | The problem it solves (max 200 characters each). One string, or one text per locale such as `{ "es": "...", "en": "..." }`. |
+| `contribution` | `string \| { <locale>: string }` | no |  | What you did yourself, as opposed to tools or teammates (max 200 characters each). One string, or one text per locale such as `{ "es": "...", "en": "..." }`. |
+| `result` | `string \| { <locale>: string }` | no |  | What it delivered, with no invented numbers (max 200 characters each). One string, or one text per locale such as `{ "es": "...", "en": "..." }`. |
 | `tags` | `string[] (max 5)` | no | `[]` | Up to five kebab-case tags. |
 | `year` | `integer (min 2000)` | yes |  | Year the project started or shipped. |
 | `status` | `'running' \| 'shipped'` | no | `shipped` | `running` shows a green dot; `shipped` a violet one. |
-| `url` | `URL` | no |  | Public link (https only). Leave it out for private work: a private repository is never linked. |
-| `featured` | `boolean` | no | `false` | Featured projects lead the home strip. |
+| `url` | `URL` | no |  | Live or main link (https only). Leave it out for private work: a private repository is never linked. |
+| `repo` | `URL` | no |  | Public code link (https only). Never a private repository. |
+| `note` | `string` | no |  | Slug of a published note that tells the case. The build fails if no such note is published. |
+| `image` | `object` | no |  | Screenshot shown on the card. Use your own screenshots only. |
+| `image.file` | `string` | yes |  | File name inside `apps/web/src/assets/projects/` (png, jpg, webp or avif). |
+| `image.alt` | `string \| { <locale>: string }` | yes |  | Alternative text describing the screenshot (max 140 characters each). One string, or one text per locale such as `{ "es": "...", "en": "..." }`. |
+| `featured` | `boolean` | no | `false` | Featured projects lead the lists. |
 <!-- docs:end experiments -->
 
 ### Changelog — `changelog.json`
@@ -348,7 +363,7 @@ Cada bandera de `features` apaga la función completa: no se genera la ruta, des
 | `comments` | Comentarios y reacciones (Giscus) | Necesita el bloque `giscus`; ver 6.5 |
 | `contact` | Formulario `/contact` | Necesita los secretos del Worker; sin ellos falla cerrado |
 | `credentials` | Certificados en `/me` | |
-| `experiments` | Sección y páginas de experimentos | Las páginas `/experiments/` aún no se generan (issue #64): déjalo en `false` hasta que existan, o los enlaces apuntan a nada |
+| `experiments` | Sección y páginas de proyectos (`/projects/`) | |
 | `changelog` | Página `/changelog` y su enlace | Apagada no se genera la ruta (ver «Qué hace cada interruptor») |
 | `me` | Página `/me` (portafolio) | |
 | `readingMode` | Modo lectura en las notas | Apagada: no se envía botón, script, CSS ni se guarda nada en el navegador |
@@ -363,7 +378,7 @@ Todas las banderas viven en `features` de `site.config.ts`. Las cuatro últimas 
 | `comments` | Comentarios y reacciones (Giscus) en las notas | El componente y su sección en privacidad y términos | Necesita el bloque `giscus`; sin él no se pinta nada |
 | `contact` | Página `/contact` (y `/en/contact`) y la Action `contact` | Las rutas (`integrations/contact-routes.ts`), la Action (responde «no disponible» sin llegar a ningún proveedor), la entrada del menú, el botón de la tarjeta del autor y de `/me`, y la entrada del sitemap. Las páginas de privacidad y términos dejan de enlazar a contacto (remiten a «los canales publicados en este sitio») y privacidad pierde su sección «Formulario de contacto». Los mensajes de error de la suscripción dejan de mencionar la página de Contacto | Con la bandera activa, necesita los secretos del Worker (`CONTACT_*`) y la clave de Turnstile; sin ellos falla cerrado |
 | `credentials` | Certificados y títulos en `/me` | La sección de certificados de `/me` | |
-| `experiments` | Sección de experimentos | La entrada del menú, la sección de la portada y la de `/me`, y su entrada en el sitemap | Las páginas `/experiments/` aún no existen (issue #64); `home.experiments` también la necesita |
+| `experiments` | Sección de proyectos | Las rutas `/projects/` y `/en/projects/` (`integrations/projects-routes.ts`), la entrada del menú, la sección de la portada y la de `/me`, y su entrada en el sitemap | `home.experiments` también la necesita |
 | `me` | Página `/me` | La entrada «Sobre mí» del menú, la tarjeta de contratación de la portada, el enlace de la barra lateral de las notas y la tarjeta de compartir de `/me`; la página queda `noindex` y fuera del sitemap | |
 | `changelog` | Página `/changelog` (y `/en/changelog`) | Las rutas (`integrations/changelog-routes.ts`), el enlace del pie y la entrada del sitemap | |
 | `readingMode` | Modo lectura en las notas | Botón, script y CSS; no se guarda nada en el navegador | |

@@ -1,5 +1,6 @@
 import {
   cpSync,
+  existsSync,
   mkdirSync,
   mkdtempSync,
   readdirSync,
@@ -90,6 +91,25 @@ export function overrideFixtureAppearance(web: string, requested: string | undef
   writeFileSync(configPath, patched);
 }
 
+/**
+ * A fixture build holds only the fixture notes, so a project of the real `experiments.json` whose
+ * `note` is one of the owner's published notes would fail the build (a dangling note is an error).
+ * The copy drops those `note` fields; the real files and the unit test of `experiments.json` keep
+ * proving the real slugs exist.
+ */
+export function dropUnavailableProjectNotes(web: string, availableNotes: readonly string[]): void {
+  const file = join(web, 'src/content/experiments.json');
+  if (!existsSync(file)) return;
+  const projects = JSON.parse(readFileSync(file, 'utf8')) as Record<
+    string,
+    { note?: string } & Record<string, unknown>
+  >;
+  for (const project of Object.values(projects)) {
+    if (project.note !== undefined && !availableNotes.includes(project.note)) delete project.note;
+  }
+  writeFileSync(file, `${JSON.stringify(projects, null, 2)}\n`);
+}
+
 /** Copies only build inputs; fixture builds never write into publishable content or local drafts. */
 export function createFixtureWorkspace(source: string, fixtures: string) {
   const root = mkdtempSync(join(tmpdir(), 'elvinlab-verification-'));
@@ -126,6 +146,12 @@ export function createFixtureWorkspace(source: string, fixtures: string) {
       force: false,
       errorOnExist: true,
     });
+    dropUnavailableProjectNotes(
+      web,
+      readdirSync(fixtures, { withFileTypes: true })
+        .filter((entry) => entry.isDirectory())
+        .map((entry) => entry.name),
+    );
     symlinkSync(join(source, 'node_modules'), join(root, 'node_modules'), 'dir');
     symlinkSync(
       join(source, 'packages/core/node_modules'),

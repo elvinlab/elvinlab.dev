@@ -39,4 +39,59 @@ describe('experimentSchema', () => {
     expect(schema.parse(rest).featured).toBe(false);
     expect(() => schema.parse({ ...valid, tags: ['a', 'b', 'c', 'd', 'e', 'f'] })).toThrow();
   });
+
+  it('keeps a plain string description valid and accepts one text per locale', () => {
+    expect(schema.parse(valid).description).toBe(valid.description);
+    const localized = { es: 'Hola', en: 'Hello' };
+    expect(schema.parse({ ...valid, description: localized }).description).toEqual(localized);
+  });
+
+  it('rejects a localized description without the default locale or with an unknown locale', () => {
+    expect(() => schema.parse({ ...valid, description: { en: 'Hello' } })).toThrow();
+    expect(() => schema.parse({ ...valid, description: { es: 'Hola', fr: 'Salut' } })).toThrow();
+  });
+
+  it('parses an entry that has only the original fields', () => {
+    const parsed = schema.parse(valid);
+    expect(parsed.subtitle).toBeUndefined();
+    expect(parsed.repo).toBeUndefined();
+    expect(parsed.note).toBeUndefined();
+    expect(parsed.image).toBeUndefined();
+  });
+
+  it('accepts the optional case fields, localized and capped at 200 characters', () => {
+    const fields = {
+      subtitle: { es: 'Sub', en: 'Sub' },
+      problem: { es: 'Problema', en: 'Problem' },
+      contribution: 'Mine',
+      result: { es: 'Resultado', en: 'Result' },
+    };
+    expect(schema.parse({ ...valid, ...fields }).problem).toEqual(fields.problem);
+    for (const key of Object.keys(fields)) {
+      expect(() => schema.parse({ ...valid, [key]: 'x'.repeat(201) })).toThrow();
+    }
+  });
+
+  it('treats repo like url: https only, never an email', () => {
+    const repo = 'https://github.com/elvinlab/elvinlab.dev';
+    expect(schema.parse({ ...valid, repo }).repo).toBe(repo);
+    expect(() => schema.parse({ ...valid, repo: 'http://insecure.dev' })).toThrow();
+    expect(() => schema.parse({ ...valid, repo: 'mailto:me@example.dev' })).toThrow();
+  });
+
+  it('requires note to be a kebab-case slug', () => {
+    expect(schema.parse({ ...valid, note: 'agentic-dev-setup' }).note).toBe('agentic-dev-setup');
+    expect(() => schema.parse({ ...valid, note: '/notes/x/' })).toThrow();
+    expect(() => schema.parse({ ...valid, note: 'Not Kebab' })).toThrow();
+  });
+
+  it('accepts an image as a file name inside assets/projects with localized alt text', () => {
+    const image = { file: 'elvinlab-dev.jpg', alt: { es: 'Captura', en: 'Screenshot' } };
+    expect(schema.parse({ ...valid, image }).image).toEqual(image);
+    expect(() => schema.parse({ ...valid, image: { file: '../secret.jpg', alt: 'x' } })).toThrow();
+    expect(() =>
+      schema.parse({ ...valid, image: { file: 'a.jpg', alt: 'x'.repeat(141) } }),
+    ).toThrow();
+    expect(() => schema.parse({ ...valid, image: { file: 'a.jpg' } })).toThrow();
+  });
 });

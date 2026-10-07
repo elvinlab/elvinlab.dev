@@ -35,6 +35,9 @@ export const siteConfig = {
   // Calm look: smaller type and fewer home sections. Use 'full' for the original look, and `home`
   // to switch single sections on or off (see docs/CONFIGURATION.md, "Appearance and home sections").
   appearance: 'full',
+  // The Projects grid stays off the home for now (the home is Lighthouse-gated and unchanged by the
+  // projects release); `/projects/` and `/me` show the projects.
+  home: { experiments: false },
   // What the owner is focused on: the sidebar "Now" card of the home (one to three rows, dated).
   // Bump `updatedAt` (YYYY-MM-DD) when the rows change; remove the whole block to hide the card.
   now: {
@@ -65,7 +68,7 @@ export const siteConfig = {
     comments: true,
     contact: true,
     credentials: true,
-    experiments: false,
+    experiments: true,
     me: true,
     changelog: true,
     readingMode: true,
@@ -98,8 +101,8 @@ export const siteConfig = {
     available: true,
     openToWork: false,
     status: {
-      es: 'Abierto a colaboraciones y proyectos',
-      en: 'Open to collaborations and projects',
+      es: 'Actualmente en Buo · Colaboraciones y proyectos',
+      en: 'Currently at Buo · Collaborations and projects',
     },
     lookingFor: {
       es: 'Colaboraciones y proyectos. Actualmente en Buo.',

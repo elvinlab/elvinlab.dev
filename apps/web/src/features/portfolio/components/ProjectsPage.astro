@@ -1,0 +1,29 @@
+---
+/** The `/projects/` page for one locale: heading, one intro line and every project as a full card. */
+import { loadProjects } from '@/features/portfolio/lib/load-projects.ts';
+import { type Locale, t } from '@/shared/i18n/index.ts';
+import BaseLayout from '@/shared/layout/BaseLayout.astro';
+
+import ProjectCard from './ProjectCard.astro';
+
+type Props = { locale: Locale };
+
+const { locale } = Astro.props;
+const projects = await loadProjects();
+---
+
+<BaseLayout locale={locale} path="/projects/" title={t(locale, 'projects.title')} description={t(locale, 'projects.description')}>
+  <section class="flex flex-col gap-6">
+    <header>
+      <h1 class="text-3xl font-bold tracking-tight">{t(locale, 'projects.title')}</h1>
+      <p class="mt-2 max-w-[60ch] text-text-secondary">{t(locale, 'projects.intro')}</p>
+    </header>
+    {projects.length === 0 ? (
+      <p class="text-text-secondary">{t(locale, 'projects.empty')}</p>
+    ) : (
+      <div class="grid items-start gap-4 sm:grid-cols-2">
+        {projects.map((project) => <ProjectCard project={project} locale={locale} headingTag="h2" />)}
+      </div>
+    )}
+  </section>
+</BaseLayout>

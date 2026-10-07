@@ -103,8 +103,23 @@ try {
   // The owner's images live in `src/assets` and are named by `identity.avatar` / `identity.photo`.
   // The alternative config names none, so no page may reference them (the raw files still reach
   // `_astro/` because the eager asset glob emits every image of the folder; a fork replaces them).
-  if (/_astro\/(?:photo|avatar)\./.test(rawHtml)) {
-    fail('a page of the alternative-identity build references an owner image (photo or avatar)');
+  if (/_astro\/(?:photo|avatar|elvinlab-dev)\./.test(rawHtml)) {
+    fail(
+      'a page of the alternative-identity build references an owner image (photo, avatar or project screenshot)',
+    );
+  }
+  // The neutral `experiments.json` is empty: the projects pages exist (the flag is on in the
+  // alternative config) and show the empty state, with no card.
+  for (const [file, empty] of [
+    ['projects', 'Todavía no hay proyectos publicados.'],
+    ['en/projects', 'No projects published yet.'],
+  ] as const) {
+    const page = readFileSync(join(workspace.web, `dist/client/${file}/index.html`), 'utf8');
+    if (!page.includes(empty) || /<article/.test(page)) {
+      fail(
+        `/${file}/ does not render the empty state (or renders a project card) for an empty projects file`,
+      );
+    }
   }
   const html = DESIGN_SYSTEM.reduce((acc, token) => acc.replace(token, ''), rawHtml);
   const leaked = OWNER.filter((token) => token.test(html));

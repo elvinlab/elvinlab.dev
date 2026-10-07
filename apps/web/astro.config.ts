@@ -23,6 +23,7 @@ import { externalLinks } from './src/integrations/external-links.ts';
 import { noindexHeaders } from './src/integrations/noindex-headers.ts';
 import { readNoteDatesFromDisk } from './src/integrations/note-dates.ts';
 import { ogImages } from './src/integrations/og-images.ts';
+import { projectsRoutesIntegration } from './src/integrations/projects-routes.ts';
 import { hasPublishedNotesOnDisk } from './src/integrations/published-notes.ts';
 import { isHiddenFromSitemap } from './src/integrations/sitemap-filter.ts';
 import { subscribeRoutesIntegration } from './src/integrations/subscribe-routes.ts';
@@ -84,6 +85,7 @@ export default defineConfig({
     // The contact page exists only with `features.contact`; the changelog page only with `features.changelog`.
     contactRoutesIntegration(site.features.contact),
     changelogRoutesIntegration(site.features.changelog),
+    projectsRoutesIntegration(site.features.experiments),
     mdx(),
     preact(),
     sitemap({

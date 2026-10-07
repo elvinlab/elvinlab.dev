@@ -14,6 +14,7 @@ import { afterEach, expect, it } from 'vitest';
 
 import {
   createFixtureWorkspace,
+  dropUnavailableProjectNotes,
   enableFixtureComments,
   enableFixtureNotice,
   enableFixtureSubscribe,
@@ -234,4 +235,33 @@ it('rejects an unknown appearance instead of silently ignoring a typo', () => {
 it('fails loudly when the config has no appearance line to rewrite', () => {
   const web = webWithConfig('export const siteConfig = {};\n');
   expect(() => overrideFixtureAppearance(web, 'minimal')).toThrow(/appearance/);
+});
+
+it('drops a project note that is not among the fixture notes and keeps the rest of the entry', () => {
+  const web = mkdtempSync(join(tmpdir(), 'fixture-projects-'));
+  temporary.push(web);
+  write(
+    web,
+    'src/content/experiments.json',
+    JSON.stringify({
+      owned: { title: 'A', note: 'owner-note' },
+      fixtured: { title: 'B', note: 'smoke-es' },
+      plain: { title: 'C' },
+    }),
+  );
+
+  dropUnavailableProjectNotes(web, ['smoke-es']);
+
+  const projects = JSON.parse(readFileSync(join(web, 'src/content/experiments.json'), 'utf8'));
+  expect(projects).toEqual({
+    owned: { title: 'A' },
+    fixtured: { title: 'B', note: 'smoke-es' },
+    plain: { title: 'C' },
+  });
+});
+
+it('leaves a workspace without experiments.json untouched', () => {
+  const web = mkdtempSync(join(tmpdir(), 'fixture-projects-'));
+  temporary.push(web);
+  expect(() => dropUnavailableProjectNotes(web, [])).not.toThrow();
 });

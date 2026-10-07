@@ -20,9 +20,7 @@ export function isHiddenFromSitemap(pathname: string, features?: typeof site.fea
   }
   if (
     !flags.experiments &&
-    (withoutLocale === '/experiments/' ||
-      pathname === '/experiments/' ||
-      pathname === '/en/experiments/')
+    (withoutLocale === '/projects/' || pathname === '/projects/' || pathname === '/en/projects/')
   ) {
     return true;
   }

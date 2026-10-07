@@ -214,31 +214,46 @@ Grouped by year, newest first. Only shown when `features.credentials` is on.
 
 ### Experiments — `experiments.json`
 
-Portfolio projects. **Only link public repositories**; for private work leave `url` out.
+Portfolio projects, published at `/projects/` (and `/en/projects/`) and as two cards on `/me`. **Only link public repositories**; for private work leave `url` and `repo` out.
 
 ```json
 {
   "agentic-dev-setup": {
     "title": "agentic-dev-setup",
-    "description": "Multi-agent development environment.",
+    "description": { "es": "Entorno de desarrollo con agentes.", "en": "Multi-agent development setup." },
+    "problem": { "es": "…", "en": "…" },
+    "contribution": { "es": "…", "en": "…" },
+    "result": { "es": "…", "en": "…" },
     "tags": ["ai-agents", "tooling"],
     "year": 2026,
-    "url": "https://github.com/elvinlab/agentic-dev-setup",
+    "repo": "https://github.com/elvinlab/agentic-dev-setup",
+    "note": "agentic-dev-setup",
     "featured": true
   }
 }
 ```
 
+**How to add a project:** add an entry with a new key. The texts (`description`, `subtitle`, `problem`, `contribution`, `result`) are one string for every language or an object `{ "es": …, "en": … }`; say what you did yourself and what came out of it, with no invented numbers. `url` is the main link (live site) and `repo` the code link. `note` is the slug of a published note that tells the case: if it does not exist the build fails (a dead link never ships). For the screenshot, copy your own image into `apps/web/src/assets/projects/` and put its file name in `image.file` with an `image.alt`; a file that does not exist also breaks the build. Featured projects come first and the first two appear on `/me`. With `features.experiments` off there is no page and no links.
+
 <!-- docs:start experiments -->
 | Key | Type | Required | Default | Description |
 | --- | --- | --- | --- | --- |
 | `title` | `string (max 80)` | yes |  | Project name (max 80 characters). |
-| `description` | `string (max 200)` | yes |  | What it is, in one or two sentences (max 200 characters). |
+| `description` | `string \| { <locale>: string }` | yes |  | What it is, in one or two sentences (max 200 characters each). One string, or one text per locale such as `{ "es": "...", "en": "..." }`. |
+| `subtitle` | `string \| { <locale>: string }` | no |  | A short muted line under the title (max 200 characters each). One string, or one text per locale such as `{ "es": "...", "en": "..." }`. |
+| `problem` | `string \| { <locale>: string }` | no |  | The problem it solves (max 200 characters each). One string, or one text per locale such as `{ "es": "...", "en": "..." }`. |
+| `contribution` | `string \| { <locale>: string }` | no |  | What you did yourself, as opposed to tools or teammates (max 200 characters each). One string, or one text per locale such as `{ "es": "...", "en": "..." }`. |
+| `result` | `string \| { <locale>: string }` | no |  | What it delivered, with no invented numbers (max 200 characters each). One string, or one text per locale such as `{ "es": "...", "en": "..." }`. |
 | `tags` | `string[] (max 5)` | no | `[]` | Up to five kebab-case tags. |
 | `year` | `integer (min 2000)` | yes |  | Year the project started or shipped. |
 | `status` | `'running' \| 'shipped'` | no | `shipped` | `running` shows a green dot; `shipped` a violet one. |
-| `url` | `URL` | no |  | Public link (https only). Leave it out for private work: a private repository is never linked. |
-| `featured` | `boolean` | no | `false` | Featured projects lead the home strip. |
+| `url` | `URL` | no |  | Live or main link (https only). Leave it out for private work: a private repository is never linked. |
+| `repo` | `URL` | no |  | Public code link (https only). Never a private repository. |
+| `note` | `string` | no |  | Slug of a published note that tells the case. The build fails if no such note is published. |
+| `image` | `object` | no |  | Screenshot shown on the card. Use your own screenshots only. |
+| `image.file` | `string` | yes |  | File name inside `apps/web/src/assets/projects/` (png, jpg, webp or avif). |
+| `image.alt` | `string \| { <locale>: string }` | yes |  | Alternative text describing the screenshot (max 140 characters each). One string, or one text per locale such as `{ "es": "...", "en": "..." }`. |
+| `featured` | `boolean` | no | `false` | Featured projects lead the lists. |
 <!-- docs:end experiments -->
 
 ### Changelog — `changelog.json`
@@ -348,7 +363,7 @@ Each `features` flag switches the whole feature off: the route is not generated,
 | `comments` | Comments and reactions (Giscus) | Needs the `giscus` block; see 6.5 |
 | `contact` | The `/contact` form | Needs the Worker secrets; without them it fails closed |
 | `credentials` | Certificates on `/me` | |
-| `experiments` | Experiments section and pages | The `/experiments/` pages are not built yet (issue #64): keep it `false` until they exist, or the links point nowhere |
+| `experiments` | Projects section and pages (`/projects/`) | |
 | `changelog` | The `/changelog` page and its link | When off the route is not generated (see "What each switch does") |
 | `me` | The `/me` page (portfolio) | |
 | `readingMode` | Reading mode on notes | Off: no button, script or CSS ships and nothing is stored in the browser |
@@ -363,7 +378,7 @@ All flags live under `features` in `site.config.ts`. The last four (interface) d
 | `comments` | Comments and reactions (Giscus) on notes | The component and its mention in the privacy and terms pages | Needs the `giscus` block; without it nothing renders |
 | `contact` | The `/contact` page (and `/en/contact`) and the `contact` Action | The routes (`integrations/contact-routes.ts`), the Action (answers "unavailable" without reaching any provider), the menu entry, the author card and `/me` buttons, and the sitemap entry. The privacy and terms pages stop linking to contact (they point to "the channels published on this site") and privacy loses its "Contact form" section. The subscription error messages stop mentioning the Contact page | When on, needs the Worker secrets (`CONTACT_*`) and the Turnstile key; without them it fails closed |
 | `credentials` | Certificates and degrees on `/me` | The certificates section of `/me` | |
-| `experiments` | Experiments section | The menu entry, the home section and the `/me` section, and its sitemap entry | The `/experiments/` pages do not exist yet (issue #64); `home.experiments` also needs it |
+| `experiments` | Projects section | The `/projects/` and `/en/projects/` routes (`integrations/projects-routes.ts`), the menu entry, the home section and the `/me` section, and its sitemap entry | `home.experiments` also needs it |
 | `me` | The `/me` page | The "About" menu entry, the home hiring card, the notes sidebar link and the `/me` share card; the page is marked `noindex` and kept out of the sitemap | |
 | `changelog` | The `/changelog` page (and `/en/changelog`) | The routes (`integrations/changelog-routes.ts`), the footer link and the sitemap entry | |
 | `readingMode` | Reading mode on notes | Button, script and CSS; nothing is stored in the browser | |

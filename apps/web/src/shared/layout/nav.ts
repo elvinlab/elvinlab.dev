@@ -15,7 +15,7 @@ export type NavItem = {
 const ITEMS: { item: NavItem; feature?: keyof SiteConfig['features'] }[] = [
   { item: { key: 'home', path: '/' } },
   { item: { key: 'notes', path: '/notes/' }, feature: 'blog' },
-  { item: { key: 'experiments', path: '/experiments/' }, feature: 'experiments' },
+  { item: { key: 'experiments', path: '/projects/' }, feature: 'experiments' },
   { item: { key: 'about', path: '/me/' }, feature: 'me' },
   { item: { key: 'contact', path: '/contact/' }, feature: 'contact' },
 ];

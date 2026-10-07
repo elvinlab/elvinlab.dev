@@ -478,5 +478,11 @@
     "category": "changed",
     "title": "/me hero and sidebar explained",
     "description": "The /me headline now follows the page language and a short sentence says what I do; Contact is the primary action, with the CV, LinkedIn and GitHub as named secondary links. Location, languages, work mode and availability appear right under the hero on mobile, and every quick fact, stack group and the contact card has an icon and a short explanation on hover, focus or tap (Escape closes it). New optional config: me.headline, me.pitch, and a hint and icon on each stack group."
+  },
+  "projects-page": {
+    "date": "2026-10-06",
+    "category": "added",
+    "title": "Projects page and project cards on /me",
+    "description": "A new Projects page (/projects/, /en/projects/) and two project cards on /me say what each project solves, what I did myself and the result, with links to the live site, the code and the written case. The Experiments menu entry is now Projects. For forks: new optional fields in experiments.json (subtitle, problem, contribution, result, repo, note, image); a note that is not published fails the build."
   }
 }
