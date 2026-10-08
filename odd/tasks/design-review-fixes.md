@@ -42,7 +42,7 @@ Home pills and pillars (BRAND.md must change first), one rule for page H1 fonts,
 - [x] **D3** (REOPENED 2026-10-08, see D7: the owner wanted tags clickable, hiding the tag list went against that) Notes: no category repeated as a tag chip; the tag list in the sidebar appears only from 6 notes.
 - [x] **D4** Footer: even gap between internal and social links on desktop.
 - [x] **D5** Home author card: small avatar below `lg`, unchanged from `lg`.
-- [ ] **D7** Clickable tags and categories as filters: chips link to `/notes/?tag=<tag>`, the notes index filters by that tag (combined with the search box) with a visible "Tag: #x, clear filter" notice; the sidebar tag list is visible again (revert of the six-notes rule); note page chips and breadcrumb category link too.
+- [x] **D7** Clickable tags and categories as filters: chips link to `/notes/?tag=<tag>`, the notes index filters by that tag (combined with the search box) with a visible "Tag: #x, clear filter" notice; the sidebar tag list is visible again (revert of the six-notes rule); note page chips and breadcrumb category link too.
 - [x] **D6** Changelog entry, tracker evidence, commits.
 
 ## Route record
@@ -69,6 +69,10 @@ Visual check by screenshot (1280 px and 390 px): contact has the "What to expect
 Not re-run: Lighthouse (no new heavy assets; `/en/me/` margin from the previous feature still thin), 3-viewport e2e, `/en/*` pages visually, dark theme.
 Docs: `docs/BRAND.md` says the subscription band also hides on `/contact/`.
 Left out on purpose (owner decisions): home pills and pillars (BRAND.md first), one rule for page H1 fonts, home column gap, changelog day headline for 2026-10-08 (set in `releases.json` at release).
+
+## D7 evidence (2026-10-08)
+
+One bounded writer (RED observed: 9 failed, 2 passed before the helpers existed), parent review of the full diff, one parent addition (the per-year note count follows the visible rows, with its own e2e). Parent checks: vitest on notes and shared (40 files, 400 tests pass), typecheck 0 errors, biome clean, e2e at 1280 px on notes-tag-filter, notes-layout and subscribe (84 passed); the writer also ran build, js-budget, page-weight, depcruise and a wider e2e set (140 passed) with the intermittent `/en/contact/` axe contrast check failing once and not recurring. With the real notes (preview): clicking `#herdr` leaves 1 of 3 notes, `?tag=agentes-ia` leaves 2, "Quitar filtro" returns to 3. The URL value is written with `textContent` (tested with markup in the tag). Tag links are not localized because the index exists only at `/notes/`. Not done: highlighting the active tag in the sidebar, localized `/en/notes/` index, static per-tag pages (not needed for filtering, and `?tag=` pages are not meant to be indexed separately).
 
 ## Correction log
 

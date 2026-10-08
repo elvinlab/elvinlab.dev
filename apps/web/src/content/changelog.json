@@ -519,6 +519,12 @@
     "date": "2026-10-08",
     "category": "changed",
     "title": "Contact, notes and experiments polish from a design review",
-    "description": "Contact gets a \"what to expect\" panel and no second email form; the notes list stops repeating the category as a tag and hides the tag list until there are enough notes; the elvinlab.dev experiment now mentions its data and backend work (D1, Workers API, double opt-in subscription); footer links are evenly spaced and the home author photo is smaller on phones."
+    "description": "Contact gets a \"what to expect\" panel and no second email form; the notes list stops repeating the category as a tag; the elvinlab.dev experiment now mentions its data and backend work (D1, Workers API, double opt-in subscription); footer links are evenly spaced and the home author photo is smaller on phones."
+  },
+  "notes-tag-filters": {
+    "date": "2026-10-08",
+    "category": "added",
+    "title": "Tags and categories filter the notes",
+    "description": "Clicking a tag or a category, on the notes list or inside a note, opens the notes index filtered by it (for example /notes/?tag=agentes-ia). A notice shows the active tag with a link to clear it, the filter combines with the search box, and the per-year note count follows what is visible."
   }
 }
