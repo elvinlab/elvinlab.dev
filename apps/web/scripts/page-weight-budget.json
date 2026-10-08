@@ -62,13 +62,13 @@
       }
     },
     "notes-index": {
-      "why": "Listing of note cards: site stylesheet only.",
-      "styleBytes": 55000,
-      "htmlBytes": 95600,
+      "why": "Listing of note cards: site stylesheet only. Every category and tag is a link to the filtered index, which costs about 4 KB of HTML.",
+      "styleBytes": 55600,
+      "htmlBytes": 99600,
       "measured": {
-        "styleBytes": 52883,
-        "htmlBytes": 91893,
-        "date": "2026-10-07"
+        "styleBytes": 53393,
+        "htmlBytes": 95705,
+        "date": "2026-10-08"
       }
     },
     "note": {

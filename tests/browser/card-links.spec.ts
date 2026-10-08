@@ -86,7 +86,12 @@ for (const card of CARDS) {
       await open(page, card.path);
       const root = card.locate(page);
       const href = await titleLinkOf(root).getAttribute('href');
-      const exposedLinks = root.locator('a[href]:not([aria-hidden="true"])');
+      // The only link to the note is the title. Category and tag chips are separate links to the
+      // filtered index (`/notes/?tag=...`) that sit above the stretched title layer; they are not
+      // links to the note, so they are excluded from this count on purpose.
+      const exposedLinks = root.locator(
+        'a[href]:not([aria-hidden="true"]):not([href^="/notes/?tag="])',
+      );
       await expect(exposedLinks).toHaveCount(1);
       await expect(root.locator(`a[href="${href}"]:not([aria-hidden="true"])`)).toHaveCount(1);
       await expect(
