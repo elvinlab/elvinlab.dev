@@ -68,7 +68,7 @@ Not claimed: any backend or database optimization experience (owner has not conf
 
 ## Release status
 
-NOT released: owner said 2026-10-08 "release todavia no". More items may join first. Release needs `pnpm changelog:audit` (entry `me-full-stack-story` exists, dated 2026-10-08, restamped on release), a real Lighthouse look at `/en/me/` (thinnest margin) and explicit authorization.
+RELEASED 2026-10-08 together with `odd/tasks/design-review-fixes.md`: `main` `91d2fea` (develop `071a76e`), CI run 37848470747 green, live and verified read-only. Earlier the owner had said "release todavia no"; the release was later authorized ("dale tienes permiso", "Si autorizo todo"). More items may join first. Release needs `pnpm changelog:audit` (entry `me-full-stack-story` exists, dated 2026-10-08, restamped on release), a real Lighthouse look at `/en/me/` (thinnest margin) and explicit authorization.
 
 ## Next step
 
