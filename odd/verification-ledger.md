@@ -145,3 +145,5 @@ Owner decision: skip the full battery ("quita demasiado tiempo, solo lo esencial
 | `pnpm changelog:audit` / `pnpm changelog:stamp --dry-run` | exit 0, every feat/fix/perf commit has an entry / nothing to stamp. |
 
 Not re-run, by owner decision: `pnpm verify --run` (the registry in `odd/verification-state.json` reflects the full battery of `f59a459`, 336 s, 55 checks; the changelog commit is not recorded), dev cold start, JS budget, Lighthouse (the changelog pages are not in `lighthouserc.json`), and the wider e2e batch. The CI on `main` re-runs everything before the deploy.
+
+Release 13 (`30ccbf9`, 2026-10-07): CI run 37656030923 ran the whole stack on `main` (static, e2e x4, lighthouse x2, checks, deploy and smoke check): all green. The checks listed above as "not re-run, by owner decision" were covered by that run.

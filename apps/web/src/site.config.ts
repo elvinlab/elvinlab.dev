@@ -122,12 +122,12 @@ export const siteConfig = {
     workMode: { es: 'Remoto', en: 'Remote' },
     languages: { es: 'Español nativo · Inglés B1', en: 'Spanish native · English B1' },
     headline: {
-      es: 'Ingeniero de software full-stack, con enfoque en frontend.',
-      en: 'Full-stack software engineer with a frontend focus.',
+      es: 'Del dato a la pantalla.',
+      en: 'From data to screen.',
     },
     pitch: {
-      es: 'Desarrollo interfaces, servicios y herramientas para productos web. Trabajo con SaaS en producción y uso agentes de IA para apoyar el desarrollo, con pruebas y revisión humana.',
-      en: 'I build interfaces, backend services and tools for web products. I work on production SaaS and use AI agents to support development, with testing and human review.',
+      es: 'Ingeniero full-stack: bases de datos, servicios backend, interfaces y despliegue, con IA integrada en el producto y en el flujo de desarrollo. Trabajo con SaaS en producción, con pruebas y revisión humana.',
+      en: 'Full-stack engineer: databases, backend services, interfaces and delivery, with AI built into the product and the development workflow. I work on production SaaS, with testing and human review.',
     },
     intro: {
       es: 'Tres formas en las que puedo ayudar a un equipo o a un proyecto.',
@@ -136,74 +136,81 @@ export const siteConfig = {
     facts: [
       {
         value: { es: 'Full stack', en: 'Full stack' },
-        label: { es: 'frontend, backend y cloud', en: 'frontend, backend and cloud' },
+        label: { es: 'datos, backend, frontend y cloud', en: 'data, backend, frontend and cloud' },
       },
       {
-        value: { es: 'Agentes de IA', en: 'AI agents' },
-        label: { es: 'parte de mi día a día', en: 'part of my daily workflow' },
+        value: { es: 'IA', en: 'AI' },
+        label: {
+          es: 'en el producto y en mi flujo de trabajo',
+          en: 'in the product and in my workflow',
+        },
       },
     ],
     strengths: [
       {
         icon: 'layers',
-        title: { es: 'Arquitectura clara', en: 'Clear architecture' },
+        title: { es: 'Del dato a la pantalla', en: 'From data to screen' },
         body: {
-          es: 'Límites que mantienen el código fácil de cambiar.',
-          en: 'Boundaries that keep code easy to change.',
+          es: 'Modelado SQL, servicios Java/Spring y pipelines ETL en producción, con límites que mantienen el código fácil de cambiar.',
+          en: 'SQL modeling, Java/Spring services and ETL pipelines in production, with boundaries that keep code easy to change.',
         },
       },
       {
         icon: 'bot',
-        title: { es: 'IA en el flujo', en: 'AI in the workflow' },
+        title: { es: 'IA en producto y en el flujo', en: 'AI in product and workflow' },
         body: {
-          es: 'Agentes, routing de modelos y skills reutilizables, con revisión humana explícita.',
-          en: 'Agents, model routing and reusable skills, with explicit human review.',
+          es: 'IA integrada en un SaaS, más agentes, routing de modelos y skills reutilizables, con revisión humana explícita.',
+          en: 'AI integrated into a SaaS, plus agents, model routing and reusable skills, with explicit human review.',
         },
       },
       {
         icon: 'gauge',
-        title: { es: 'Rápido por defecto', en: 'Fast by default' },
+        title: { es: 'Rápido y medido', en: 'Fast and measured' },
         body: {
-          es: 'Presupuestos de performance, no promesas.',
-          en: 'Performance budgets instead of performance hopes.',
+          es: 'Presupuestos de performance en el frontend y datos bien modelados por detrás. Números, no promesas.',
+          en: 'Performance budgets on the frontend and well-modeled data behind it. Numbers, not promises.',
         },
       },
     ],
     stack: [
       {
+        label: { es: 'Datos', en: 'Data' },
+        icon: 'database',
+        layer: true,
+        items: ['SQL', 'MySQL', 'SQL Server', 'MongoDB', 'ETL', 'Cloudflare D1'],
+        hint: {
+          es: 'Cómo modelo, guardo y muevo los datos. D1 es lo que uso en este sitio mientras lo aprendo.',
+          en: 'How I model, store and move data. D1 is what I use on this site while I learn it.',
+        },
+      },
+      {
+        label: { es: 'Backend', en: 'Backend' },
+        icon: 'server',
+        layer: true,
+        items: ['Java 21', 'Spring Boot', 'Spring Data JPA', '.NET', 'Node.js', 'APIs REST'],
+        hint: {
+          es: 'Los servicios que hay detrás de un producto: reglas de negocio, permisos e integraciones.',
+          en: 'The services behind a product: business rules, permissions and integrations.',
+        },
+      },
+      {
         label: { es: 'Frontend', en: 'Frontend' },
         icon: 'code',
-        items: ['JavaScript', 'Vue 2', 'Vuetify 2', 'Vuex', 'Axios'],
+        layer: true,
+        items: ['JavaScript', 'Vue 2', 'Vuetify 2', 'Vuex', 'React', 'Axios'],
         hint: {
           es: 'Lo que la gente ve y usa en pantalla: las interfaces de un producto.',
           en: 'What people see and use on screen: the interfaces of a product.',
         },
       },
       {
-        label: { es: 'Backend y datos', en: 'Backend and data' },
-        icon: 'server',
-        items: ['Java 21', 'Spring Boot', 'Spring Data JPA', 'MySQL', 'SQL'],
-        hint: {
-          es: 'Los servicios y las bases de datos que hay detrás de un producto.',
-          en: 'The services and databases behind a product.',
-        },
-      },
-      {
-        label: { es: 'Calidad y arquitectura', en: 'Quality and architecture' },
-        icon: 'shield-check',
-        items: ['Jest', 'Vue Test Utils', 'JUnit', 'Clean/Hexagonal', 'ADRs'],
-        hint: {
-          es: 'Las pruebas y las decisiones de diseño que mantienen el código fiable y fácil de cambiar.',
-          en: 'The tests and design decisions that keep code reliable and easy to change.',
-        },
-      },
-      {
         label: { es: 'Cloud y entrega', en: 'Cloud and delivery' },
         icon: 'cloud',
-        items: ['AWS', 'Docker', 'GitHub Actions', 'CI/CD'],
+        layer: true,
+        items: ['AWS', 'Docker', 'GitHub Actions', 'CI/CD', 'Cloudflare Workers'],
         hint: {
-          es: 'Dónde corre el software y cómo llega a producción de forma automática.',
-          en: 'Where software runs and how it reaches production automatically.',
+          es: 'Dónde corre el software y cómo llega a producción de forma automática. Cloudflare Workers es lo que estoy aprendiendo en este sitio.',
+          en: 'Where software runs and how it reaches production automatically. Cloudflare Workers is what I am learning on this site.',
         },
       },
       {
@@ -211,14 +218,25 @@ export const siteConfig = {
         icon: 'bot',
         items: ['LLM APIs', 'Claude Code', 'OpenCode'],
         hint: {
-          es: 'Modelos y agentes de IA que uso para apoyar el desarrollo.',
-          en: 'AI models and agents I use to support development.',
+          es: 'Modelos y agentes de IA, en el producto y para apoyar el desarrollo. Cruzan todas las capas.',
+          en: 'AI models and agents, in the product and to support development. They cut across every layer.',
+        },
+      },
+      {
+        label: { es: 'Calidad y arquitectura', en: 'Quality and architecture' },
+        icon: 'shield-check',
+        folded: true,
+        items: ['Jest', 'Vue Test Utils', 'JUnit', 'Clean/Hexagonal', 'ADRs'],
+        hint: {
+          es: 'Las pruebas y las decisiones de diseño que mantienen el código fiable y fácil de cambiar.',
+          en: 'The tests and design decisions that keep code reliable and easy to change.',
         },
       },
       {
         label: { es: 'Proyectos personales', en: 'Personal projects' },
         icon: 'flask',
-        items: ['TypeScript', 'Astro', 'React', 'Tailwind CSS', 'Cloudflare Workers'],
+        folded: true,
+        items: ['TypeScript', 'Astro', 'React', 'Tailwind CSS'],
         hint: {
           es: 'Las herramientas con las que construyo mis propios proyectos, como este sitio.',
           en: 'The tools I use to build my own projects, such as this site.',

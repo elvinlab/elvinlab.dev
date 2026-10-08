@@ -18,6 +18,8 @@ describe('tagLabel', () => {
     expect(tagLabel('reactjs')).toBe('React');
     expect(tagLabel('spring-boot')).toBe('Spring Boot');
     expect(tagLabel('sql-server')).toBe('SQL Server');
+    expect(tagLabel('sql')).toBe('SQL');
+    expect(tagLabel('etl')).toBe('ETL');
   });
 
   it('returns an unknown id unchanged', () => {

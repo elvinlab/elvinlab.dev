@@ -24,7 +24,7 @@ const links = [
 ---
 
 <section class="flex flex-col gap-4 rounded-card bg-card p-5">
-  <div class="aspect-square w-full overflow-hidden rounded-inner bg-gradient-to-br from-primary/25 to-cyan/15">
+  <div class="size-24 overflow-hidden rounded-inner lg:aspect-square lg:size-auto lg:w-full bg-gradient-to-br from-primary/25 to-cyan/15">
     {avatar ? (
       // Lazy: on phones the sidebar sits below the content, so the photo is never the LCP element.
       <Image src={avatar} alt={site.identity.name} format="webp" quality={80} class="size-full object-cover" loading="lazy" decoding="async" />

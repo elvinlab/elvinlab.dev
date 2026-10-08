@@ -1,5 +1,5 @@
 ---
-/** Search box for the notes index. Filters rows client-side (no reload). */
+/** Search box and active tag notice for the notes index. Filters rows client-side (no reload). */
 import { type Locale, t } from '@/shared/i18n/index.ts';
 
 type Props = { locale: Locale };
@@ -18,28 +18,48 @@ const { locale } = Astro.props;
       data-notes-search
     />
   </label>
+  <p class="flex flex-wrap items-center gap-x-2 font-mono text-sm text-text-secondary" role="status" data-notes-tag-notice hidden>
+    <span>{t(locale, 'notes.filter.tag')}</span>
+    <strong class="text-text" data-notes-tag-value></strong>
+    <a href="/notes/" class="inline-flex min-h-6 items-center text-primary underline decoration-dashed underline-offset-4">{t(locale, 'notes.filter.clear')}</a>
+  </p>
 </div>
 
 <script>
+  import { activeTag, rowHasTag } from '@/features/notes/lib/note-tags.ts';
+
   const root = document.querySelector<HTMLElement>('[data-notes-filter]');
   const search = root?.querySelector<HTMLInputElement>('[data-notes-search]');
   const rows = [...document.querySelectorAll<HTMLElement>('[data-note-row]')];
   const groups = [...document.querySelectorAll<HTMLElement>('[data-year-group]')];
   const empty = document.querySelector<HTMLElement>('[data-notes-empty]');
+  const notice = root?.querySelector<HTMLElement>('[data-notes-tag-notice]');
+  const noticeValue = root?.querySelector<HTMLElement>('[data-notes-tag-value]');
+  const tag = activeTag(location.search);
+
+  if (notice && noticeValue && tag) {
+    noticeValue.textContent = `#${tag}`;
+    notice.hidden = false;
+  }
 
   const apply = (): void => {
     const query = (search?.value ?? '').trim().toLowerCase();
     let visible = 0;
     for (const row of rows) {
-      const matchesQuery = !query || (row.dataset['search'] ?? '').includes(query);
-      row.hidden = !matchesQuery;
-      if (matchesQuery) visible += 1;
+      const matches =
+        rowHasTag(row.dataset['tags'] ?? '', tag) && (!query || (row.dataset['search'] ?? '').includes(query));
+      row.hidden = !matches;
+      if (matches) visible += 1;
     }
     for (const group of groups) {
-      group.hidden = !group.querySelector('[data-note-row]:not([hidden])');
+      const shown = group.querySelectorAll('[data-note-row]:not([hidden])').length;
+      group.hidden = shown === 0;
+      const count = group.querySelector('[data-year-count]');
+      if (count) count.textContent = (count.textContent ?? '').replace(/\d+/, String(shown));
     }
     if (empty) empty.hidden = visible > 0;
   };
 
   search?.addEventListener('input', apply);
+  apply();
 </script>

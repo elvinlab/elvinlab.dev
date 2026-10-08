@@ -280,6 +280,22 @@ describe('parseSiteConfig', () => {
       const stack = [{ label: { es: 'Frontend', en: 'Frontend' }, items: ['Astro'], hint: 'x' }];
       expect(() => parseSiteConfig(withStack(stack))).toThrow(/hint/);
     });
+
+    it('marks a group as a layer only when asked, and rejects a non-boolean', () => {
+      const group = { label: { es: 'Datos', en: 'Data' }, items: ['SQL'] };
+      expect(parseSiteConfig(withStack([{ ...group, layer: true }])).me.stack[0]?.layer).toBe(true);
+      expect(parseSiteConfig(valid).me.stack[0]?.layer).toBeUndefined();
+      expect(() => parseSiteConfig(withStack([{ ...group, layer: 'yes' }]))).toThrow(/layer/);
+    });
+
+    it('folds a group only when asked, and rejects a non-boolean', () => {
+      const group = { label: { es: 'Calidad', en: 'Quality' }, items: ['Jest'] };
+      expect(parseSiteConfig(withStack([{ ...group, folded: true }])).me.stack[0]?.folded).toBe(
+        true,
+      );
+      expect(parseSiteConfig(valid).me.stack[0]?.folded).toBeUndefined();
+      expect(() => parseSiteConfig(withStack([{ ...group, folded: 'yes' }]))).toThrow(/folded/);
+    });
   });
 
   describe('recruiter.openToWork', () => {

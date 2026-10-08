@@ -3,12 +3,15 @@
  * Contact page component: renders the locale-specific contact content with the form island.
  */
 
+import { localizePath } from '@elvinlab/core';
+
 import { ContactForm } from '@/features/contact/components/ContactForm.tsx';
 import { buildContactContent } from '@/features/contact/content.ts';
 import { integrations, site } from '@/shared/config/index.ts';
-import type { Locale } from '@/shared/i18n/index.ts';
+import { LOCALES, type Locale } from '@/shared/i18n/index.ts';
 import BaseLayout from '@/shared/layout/BaseLayout.astro';
 import { externalLinkAttrs } from '@/shared/lib/external-link.ts';
+import Card from '@/shared/ui/Card.astro';
 import ExternalHint from '@/shared/ui/ExternalHint.astro';
 import SocialIcon from '@/shared/ui/SocialIcon.astro';
 
@@ -19,34 +22,50 @@ type Props = {
 const { locale } = Astro.props;
 const content = buildContactContent()[locale];
 const siteKey = integrations.turnstileSiteKey;
+const privacyHref = localizePath('/privacy/', locale, LOCALES);
 const linkedin = site.socials.find((social) => social.icon === 'linkedin');
 ---
 
 <BaseLayout locale={locale} path="/contact/" title={content.pageTitle} description={content.pageDescription}>
-  <article class="max-w-xl">
-    <header class="mb-8">
-      <h1 class="text-3xl font-bold tracking-tight">{content.pageTitle}</h1>
-      <p class="mt-2 text-text-secondary">{content.pageDescription}</p>
-    </header>
+  <div class="flex flex-col gap-10 lg:grid lg:grid-cols-[minmax(0,36rem)_1fr] lg:items-start lg:gap-10">
+    <article>
+      <header class="mb-8">
+        <h1 class="text-3xl font-bold tracking-tight">{content.pageTitle}</h1>
+        <p class="mt-2 text-text-secondary">{content.pageDescription}</p>
+      </header>
 
-    <ContactForm client:visible siteKey={siteKey} strings={content.form} />
+      <ContactForm client:visible siteKey={siteKey} strings={content.form} />
 
-    {linkedin && (
-      <p class="mt-6 flex flex-wrap items-center gap-x-2 text-sm text-text-secondary">
-        <span>{content.linkedin}</span>
-        <a
-          href={linkedin.url}
-          {...externalLinkAttrs(linkedin.url, site.url, 'me')}
-          class="inline-flex h-11 items-center gap-2 rounded-control px-3 text-text transition-colors duration-150 hover:bg-card-hover"
-        >
-          <SocialIcon name={linkedin.icon} />
-          {linkedin.label}<ExternalHint href={linkedin.url} locale={locale} />
-        </a>
-      </p>
-    )}
+      {linkedin && (
+        <p class="mt-6 flex flex-wrap items-center gap-x-2 text-sm text-text-secondary">
+          <span>{content.linkedin}</span>
+          <a
+            href={linkedin.url}
+            {...externalLinkAttrs(linkedin.url, site.url, 'me')}
+            class="inline-flex h-11 items-center gap-2 rounded-control px-3 text-text transition-colors duration-150 hover:bg-card-hover"
+          >
+            <SocialIcon name={linkedin.icon} />
+            {linkedin.label}<ExternalHint href={linkedin.url} locale={locale} />
+          </a>
+        </p>
+      )}
 
-    <noscript>
-      <p class="mt-6 text-sm text-muted">{content.noscript}</p>
-    </noscript>
-  </article>
+      <noscript>
+        <p class="mt-6 text-sm text-muted">{content.noscript}</p>
+      </noscript>
+    </article>
+
+    <Card as="aside" class="flex flex-col gap-4 lg:mt-24">
+      <h2 class="font-display text-base font-bold">{content.aside.title}</h2>
+      <ul class="flex flex-col gap-3">
+        {content.aside.items.map((item) => (
+          <li class="flex items-start gap-3">
+            <span aria-hidden="true" class="mt-2 size-1.5 shrink-0 bg-muted"></span>
+            <p class="text-sm text-text-secondary">{item}</p>
+          </li>
+        ))}
+      </ul>
+      <a href={privacyHref} class="text-sm text-primary underline decoration-dashed underline-offset-4">{content.aside.privacyLabel}</a>
+    </Card>
+  </div>
 </BaseLayout>

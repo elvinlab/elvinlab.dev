@@ -6,6 +6,7 @@ export type ContactContent = {
   noscript: string;
   linkedin: string;
   form: ContactFormStrings;
+  aside: { title: string; items: string[]; privacyLabel: string };
 };
 
 export function buildContactContent(): Record<'es' | 'en', ContactContent> {
@@ -15,6 +16,15 @@ export function buildContactContent(): Record<'es' | 'en', ContactContent> {
       pageDescription: '¿Una idea, una oferta o una pregunta? Escríbeme y te respondo por correo.',
       noscript: 'Este formulario necesita JavaScript para funcionar.',
       linkedin: '¿Prefieres LinkedIn? Búscame allí.',
+      aside: {
+        title: 'Qué esperar',
+        items: [
+          'Respondo por correo. Suelo responder en unos días.',
+          'Cuéntame qué necesitas y para cuándo, y te digo si puedo ayudarte.',
+          'Tu mensaje solo se usa para responderte.',
+        ],
+        privacyLabel: 'Ver privacidad',
+      },
       form: {
         labels: {
           name: 'Nombre',
@@ -65,6 +75,15 @@ export function buildContactContent(): Record<'es' | 'en', ContactContent> {
       pageDescription: "An idea, an offer or a question? Write to me and I'll reply by email.",
       noscript: 'This form needs JavaScript to work.',
       linkedin: 'Prefer LinkedIn? Find me there.',
+      aside: {
+        title: 'What to expect',
+        items: [
+          'I reply by email. I usually answer within a few days.',
+          'Tell me what you need and by when, and I will tell you if I can help.',
+          'Your message is only used to reply to you.',
+        ],
+        privacyLabel: 'See privacy',
+      },
       form: {
         labels: {
           name: 'Name',
