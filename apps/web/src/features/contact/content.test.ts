@@ -335,4 +335,26 @@ describe('buildContactContent', () => {
     expect(content.es.linkedin).not.toContain('@');
     expect(content.en.linkedin).not.toContain('@');
   });
+
+  it('has the "what to expect" side panel in both locales, with the same number of items', () => {
+    expect(content.es.aside.title).toBe('Qué esperar');
+    expect(content.es.aside.items).toEqual([
+      'Respondo por correo. Suelo responder en unos días.',
+      'Cuéntame qué necesitas y para cuándo, y te digo si puedo ayudarte.',
+      'Tu mensaje solo se usa para responderte.',
+    ]);
+    expect(content.es.aside.privacyLabel).toBe('Ver privacidad');
+    expect(content.en.aside.title).toBe('What to expect');
+    expect(content.en.aside.items).toEqual([
+      'I reply by email. I usually answer within a few days.',
+      'Tell me what you need and by when, and I will tell you if I can help.',
+      'Your message is only used to reply to you.',
+    ]);
+    expect(content.en.aside.privacyLabel).toBe('See privacy');
+    for (const locale of ['es', 'en'] as const) {
+      for (const text of [content[locale].aside.title, ...content[locale].aside.items]) {
+        expect(text).not.toContain('@');
+      }
+    }
+  });
 });

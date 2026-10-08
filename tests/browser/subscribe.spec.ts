@@ -114,8 +114,14 @@ const ok = '[{"ok":1},true]';
 const unavailable = JSON.stringify({ type: 'AstroActionError', code: 'SERVICE_UNAVAILABLE' });
 const result = (value: string) => `[{"result":1},"${value}"]`;
 
-const FORM_PAGES = ['/', '/en/', '/contact/', '/privacy/', '/notes/', '/notes/smoke-es/'];
-const NO_FORM_PAGES = ['/me/', '/subscribe/confirm/', '/subscribe/unsubscribe/'];
+const FORM_PAGES = ['/', '/en/', '/privacy/', '/notes/', '/notes/smoke-es/'];
+const NO_FORM_PAGES = [
+  '/me/',
+  '/contact/',
+  '/en/contact/',
+  '/subscribe/confirm/',
+  '/subscribe/unsubscribe/',
+];
 const FIELD = 'footer [data-subscribe]';
 
 test.describe('form in the footer', () => {
