@@ -20,7 +20,8 @@ Owner feedback 2026-10-08: the page leans on frontend. Evidence read from code: 
 - `apps/web/src/shared/ui/SocialIcon.astro`: a `database` icon.
 - `apps/web/src/shared/config/schema.ts` (+ test, `docs:config`, `docs/PORTFOLIO*.md`): optional `me.stack[].layer` flag so layers are configuration, not hardcoded indexes (white-label).
 - `StackGroup.astro` (new) and the `me.stack.layers` i18n key.
-- `apps/web/src/features/me/components/MeSidebar.astro`: layered stack (vertical spine joining the groups).
+- `apps/web/src/features/me/components/MeSidebar.astro`: layered stack (vertical spine joining the groups) and the folded "More tools" block.
+- `me.stack[].folded` flag (schema, test, i18n `me.stack.more`, docs) for secondary groups.
 - Changelog entry in `apps/web/src/content/changelog.json`.
 
 ## Constraints
@@ -35,10 +36,11 @@ Owner feedback 2026-10-08: the page leans on frontend. Evidence read from code: 
 - [x] **M1** Copy: headline, pitch, facts, strengths, stack groups and order in `site.config.ts`; `experience.json` summaries and tags; tag labels with their test. Route: inline (copy decided with the owner in this conversation, edits are small and mechanical once decided; briefing a worker would cost more than writing it).
 - [x] **M2** Visual: `database` icon and the layered stack in `MeSidebar.astro`. Route: inline (one component plus one icon).
 - [x] **M3** Changelog entry, tracker evidence, commits. Route: inline.
+- [x] **M4** Folded secondary stack groups (slice of issue #85): `folded` flag, native `<details>`, AI stays visible. Route: inline (same pattern as `layer`, 4 small edits).
 
 ## Authorized scope
 
-M1 to M3 on `develop`, local commits only. Push and release stay the owner's decision.
+M1 to M4 on `develop`, local commits only. Push and release stay the owner's decision.
 
 ## Acceptance criteria
 
@@ -48,6 +50,13 @@ M1 to M3 on `develop`, local commits only. Push and release stay the owner's dec
 - Cloudflare appears in Cloud (and D1 in Data) marked as learning/in use on this site.
 - `/me` and `/en/me` build; unit, typecheck, lint and the `/me` e2e pass.
 
+## Commits (all local on `develop`, not pushed)
+
+- `ada6e76` feat(me): tell the full-stack story from data to screen, with a layered stack (M1, M2, M3)
+- `5d21217` docs(odd): record mobile and Lighthouse checks for the /me full-stack story
+- `2c59e8b` feat(me): fold secondary stack groups into a collapsed more-tools block (M4)
+- `acb43d5` fix(me): drop an inert print class from the folded stack block
+
 ## Progress and evidence
 
 2026-10-08, local on `develop`, not pushed. RED observed for `tagLabel('sql'|'etl')` and for `me.stack[].layer` before the code. Checks run (touched scope only, owner prefers light): biome (2 style fixes applied), typecheck 0 errors, depcruise clean, `docs:config` no drift after regeneration, vitest related 12 files / 241 tests pass, build, `check:js-budget` and `check:page-weight` PASS (26 pages), `test:white-label` PASS, e2e at 1280 px: me-hero-tips, me-experience-locale, a11y, type-scale, cv-and-credentials, smoke pass (the hero test pinned the old headline and was updated). One `/contact/` axe failure appeared once and passed 4/4 on rerun (page untouched: intermittent). Visual check of `/me/` at 1280 px by screenshot: layers 01 to 04 with the vertical rail, AI, quality and personal projects below.
@@ -56,6 +65,10 @@ Follow-up check 2026-10-08 (parent): mobile 390 px screenshot of the layered sta
 Added slice (owner: "mas cosas, que no sea complicado"; taken from issue #85 only): optional `me.stack[].folded` flag, secondary groups (quality, personal projects) fold into a native `<details>` "Mas herramientas / More tools", AI stays visible. RED observed for the flag, then typecheck 0 errors, 239 related unit tests, build, js-budget, page-weight PASS, e2e 1280 px 42 passed. The `/contact/` axe check failed once under parallel load and passed 12/12 alone (page untouched, intermittent, not investigated further). Left out on purpose: #83 (needs the /education/ page, T53), #84 (needs owner data), notes curation and chip-count cut of #85 (issue #85 stays open).
 Route record: all three tasks inline, no delegation trigger worth firing (copy already decided, small edits).
 Not claimed: any backend or database optimization experience (owner has not confirmed a real case).
+
+## Release status
+
+NOT released: owner said 2026-10-08 "release todavia no". More items may join first. Release needs `pnpm changelog:audit` (entry `me-full-stack-story` exists, dated 2026-10-08, restamped on release), a real Lighthouse look at `/en/me/` (thinnest margin) and explicit authorization.
 
 ## Next step
 
