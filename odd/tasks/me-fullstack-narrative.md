@@ -52,9 +52,10 @@ M1 to M3 on `develop`, local commits only. Push and release stay the owner's dec
 
 2026-10-08, local on `develop`, not pushed. RED observed for `tagLabel('sql'|'etl')` and for `me.stack[].layer` before the code. Checks run (touched scope only, owner prefers light): biome (2 style fixes applied), typecheck 0 errors, depcruise clean, `docs:config` no drift after regeneration, vitest related 12 files / 241 tests pass, build, `check:js-budget` and `check:page-weight` PASS (26 pages), `test:white-label` PASS, e2e at 1280 px: me-hero-tips, me-experience-locale, a11y, type-scale, cv-and-credentials, smoke pass (the hero test pinned the old headline and was updated). One `/contact/` axe failure appeared once and passed 4/4 on rerun (page untouched: intermittent). Visual check of `/me/` at 1280 px by screenshot: layers 01 to 04 with the vertical rail, AI, quality and personal projects below.
 Not re-run: Lighthouse (`/me/` margin is thin, issue #87: a real `/me/` Lighthouse run is advised before the release), the 3-viewport e2e, the mobile view of the new rail (only 1280 px seen).
+Follow-up check 2026-10-08 (parent): mobile 390 px screenshot of the layered stack looks clean and has no horizontal overflow; local mobile Lighthouse (1 run) `/me/` 98, LCP 2272 ms, `/en/me/` 97, LCP 2418 ms, CLS 0, no assertion failed against the 2500 ms gate (thin margin, issue #87; one local run, CI does 3).
 Route record: all three tasks inline, no delegation trigger worth firing (copy already decided, small edits).
 Not claimed: any backend or database optimization experience (owner has not confirmed a real case).
 
 ## Next step
 
-Owner review of the copy and the rail on a phone; real Lighthouse on `/me/` before releasing; release only on explicit authorization.
+Owner review of the copy; release only on explicit authorization (CI runs Lighthouse with 3 runs; `/en/me/` has the thinnest margin).
