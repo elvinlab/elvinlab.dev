@@ -1,0 +1,23 @@
+---
+/** One stack group of the `/me` sidebar: icon and name (with a hover and focus explanation when the group has a
+ * `hint`) over its tool chips. Layout around it (layer rail or plain block) belongs to `MeSidebar`. */
+import type { site } from '@/shared/config/index.ts';
+import type { Locale } from '@/shared/i18n/index.ts';
+import Chip from '@/shared/ui/Chip.astro';
+import InfoTip from '@/shared/ui/InfoTip.astro';
+import SocialIcon from '@/shared/ui/SocialIcon.astro';
+
+type Props = { group: (typeof site.me.stack)[number]; index: number; locale: Locale };
+
+const { group, index, locale } = Astro.props;
+const GROUP_LABEL = 'font-mono text-meta font-medium text-muted';
+---
+
+{group.hint ? (
+  <InfoTip id={`stack-tip-${index}`} text={group.hint[locale] ?? ''} class={GROUP_LABEL} dense>
+    {group.icon && <SocialIcon name={group.icon} />}{group.label[locale]}
+  </InfoTip>
+) : (
+  <p class:list={[GROUP_LABEL, 'flex items-center gap-2']}>{group.icon && <SocialIcon name={group.icon} />}{group.label[locale]}</p>
+)}
+<div class="flex flex-wrap gap-1.5">{group.items.map((item) => <Chip>{item}</Chip>)}</div>

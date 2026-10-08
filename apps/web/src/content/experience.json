@@ -5,10 +5,10 @@
     "start": 2024,
     "location": { "es": "Remoto", "en": "Remote" },
     "summary": {
-      "es": "Entrega de extremo a extremo en un SaaS de recursos humanos: interfaces Vue/Vuetify, servicios Java/Spring Boot y datos SQL. Integro IA en producto y creo skills reutilizables para revisión de PRs, pruebas y documentación, con supervisión humana.",
-      "en": "End-to-end delivery on an HR SaaS: Vue/Vuetify interfaces, Java/Spring Boot services and SQL data. I integrate AI into the product and build reusable skills for PR review, testing and documentation, with human oversight."
+      "es": "Entrega de extremo a extremo en un SaaS de recursos humanos: datos SQL, servicios Java/Spring Boot e interfaces Vue/Vuetify. Integro IA en producto y creo skills reutilizables para revisión de PRs, pruebas y documentación, con supervisión humana.",
+      "en": "End-to-end delivery on an HR SaaS: SQL data, Java/Spring Boot services and Vue/Vuetify interfaces. I integrate AI into the product and build reusable skills for PR review, testing and documentation, with human oversight."
     },
-    "tags": ["vue", "vuetify", "java", "spring-boot", "aws"]
+    "tags": ["sql", "java", "spring-boot", "vue", "aws"]
   },
   "blue-zone": {
     "role": { "es": "Desarrollador de software", "en": "Software Developer" },
@@ -20,7 +20,7 @@
       "es": "Flujos ETL desde Excel hacia AWS S3 con transformación de datos y manejo de errores; procesamiento en Java e interfaces AngularJS que consumían APIs REST; apoyo en QA, visualización de datos e incorporación de nuevos desarrolladores.",
       "en": "ETL flows from Excel to AWS S3 with data transformation and error handling; Java processing and AngularJS interfaces consuming REST APIs; support for QA, data visualization and onboarding of new developers."
     },
-    "tags": ["java", "angularjs", "aws"]
+    "tags": ["etl", "java", "aws", "angularjs"]
   },
   "cnet": {
     "role": { "es": "Desarrollador full-stack", "en": "Full-stack Developer" },
@@ -28,10 +28,10 @@
     "start": 2021,
     "end": 2022,
     "summary": {
-      "es": "Análisis de requisitos y desarrollo con .NET Framework y React, incluidos roles y permisos; liderazgo de entregas y coordinación con clientes bajo Scrum, modelado SQL Server/MySQL y capacitación de usuarios.",
-      "en": "Requirements analysis and development with .NET Framework and React, including roles and permissions; led delivery and client coordination under Scrum, SQL Server/MySQL modeling and user training."
+      "es": "Análisis de requisitos y desarrollo con .NET Framework y React, incluidos roles y permisos; modelado de datos en SQL Server y MySQL, liderazgo de entregas y coordinación con clientes bajo Scrum, y capacitación de usuarios.",
+      "en": "Requirements analysis and development with .NET Framework and React, including roles and permissions; SQL Server and MySQL data modeling, led delivery and client coordination under Scrum, and user training."
     },
-    "tags": ["dotnet", "reactjs", "sql-server", "mysql"]
+    "tags": ["sql-server", "mysql", "dotnet", "reactjs"]
   },
   "hacienda-el-orosi": {
     "role": { "es": "Desarrollador de software", "en": "Software Developer" },
@@ -42,6 +42,6 @@
       "es": "Liderazgo del desarrollo con el stack MERN desde los requisitos hasta las pruebas y la capacitación de usuarios; módulo contable para colaboradores, manejo multimedia con Firebase/AWS S3 y flujos de CI/CD.",
       "en": "Led development with the MERN stack from requirements to testing and user training; employee accounting module, multimedia handling with Firebase/AWS S3 and CI/CD workflows."
     },
-    "tags": ["mongodb", "express", "react", "node", "firebase"]
+    "tags": ["mongodb", "express", "node", "react", "firebase"]
   }
 }

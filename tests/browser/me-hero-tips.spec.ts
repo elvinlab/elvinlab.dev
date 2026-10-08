@@ -9,8 +9,8 @@ test.beforeEach(({ browserName: _browserName }, testInfo) => {
 });
 
 const PAGES = [
-  { path: '/me/', headline: /Ingeniero de software full-stack/, tip: /zona horaria/ },
-  { path: '/en/me/', headline: /Full-stack software engineer/, tip: /time zone/ },
+  { path: '/me/', headline: /Del dato a la pantalla/, tip: /zona horaria/ },
+  { path: '/en/me/', headline: /From data to screen/, tip: /time zone/ },
 ] as const;
 
 for (const { path, headline, tip } of PAGES) {

@@ -508,5 +508,11 @@
     "category": "changed",
     "title": "The changelog is grouped by release day and by kind",
     "description": "Each production day is a collapsible block with an optional headline, and its entries are grouped under New, Changes, Fixes, Removed, Security and Deprecated. The two newest days start open, older days are paged four at a time, and the page is lighter than the old flat list."
+  },
+  "me-full-stack-story": {
+    "date": "2026-10-08",
+    "category": "changed",
+    "title": "/me now tells the full-stack story, from data to screen",
+    "description": "The headline, strengths, stack and experience read as one thread: data, backend, frontend and cloud, with AI across all of them. The stack becomes a numbered path of layers, and Cloudflare Workers and D1 appear as what is being learned on this site."
   }
 }

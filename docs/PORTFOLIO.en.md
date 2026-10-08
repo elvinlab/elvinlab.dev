@@ -39,7 +39,7 @@ Everything is in `site.config.ts`. Texts are one object per language (the defaul
 
 ```ts
 me: {
-  headline: { es: 'Ingeniero de software full-stack, con enfoque en frontend.', en: 'Full-stack software engineer with a frontend focus.' },
+  headline: { es: 'Del dato a la pantalla.', en: 'From data to screen.' },
   pitch: { es: 'Desarrollo interfaces, servicios y herramientas para productos web.', en: 'I build interfaces, backend services and tools for web products.' },
   languages: { es: 'Español nativo · Inglés B1', en: 'Spanish native · English B1' },
 }
@@ -47,7 +47,7 @@ me: {
 
 - **Availability:** `recruiter.status` is the short label ("Collaborations and projects") and `recruiter.lookingFor` the sidebar line. `recruiter.available: false` hides the whole line.
 - **CV:** `recruiter.cvUrl` takes one https URL or one per language. With no CV the button does not render.
-- **Stack:** each `me.stack` group has `label`, `items` and, optionally, `icon` and `hint` (the tooltip sentence). To keep `/me` fast, do not add icons or tooltips per tool.
+- **Stack:** each `me.stack` group has `label`, `items` and, optionally, `icon`, `hint` (the tooltip sentence) and `layer`. Groups with `layer: true` are drawn as numbered layers of the product (for example data, backend, frontend, cloud) joined by a vertical line; list them first. Groups without `layer` (AI, quality, projects) cut across the layers and sit below. To keep `/me` fast, do not add icons or tooltips per tool.
 - **Photos:** `identity.avatar` and `identity.photo` are file names inside `apps/web/src/assets/`.
 
 ## 3. Add or edit an experiment
