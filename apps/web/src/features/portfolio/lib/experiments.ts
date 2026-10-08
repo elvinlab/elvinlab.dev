@@ -5,6 +5,7 @@ const EXPERIMENT_TAG_LABELS: Readonly<Record<string, string>> = {
   'ai-agents': 'AI agents',
   astro: 'Astro',
   cloudflare: 'Cloudflare',
+  d1: 'D1',
   tooling: 'Tooling',
   typescript: 'TypeScript',
 };

@@ -14,14 +14,14 @@
       "en": "Publish notes and a professional profile with a replaceable identity and quality controls."
     },
     "contribution": {
-      "es": "Diseño y construcción completos: arquitectura, configuración, i18n, publicación y validación.",
-      "en": "End-to-end design and build: architecture, configuration, i18n, publishing and validation."
+      "es": "Diseño y construcción completos: datos en D1 con migraciones, API en Workers, suscripción con doble opt-in, interfaz, i18n y despliegue.",
+      "en": "End-to-end design and build: D1 data with migrations, Workers API, double opt-in subscription, interface, i18n and deployment."
     },
     "result": {
       "es": "Sitio publicado con código público, documentación y controles automáticos: pruebas, accesibilidad, presupuesto de JavaScript y Lighthouse.",
       "en": "Published site with public code, documentation and automated checks: tests, accessibility, JavaScript budget and Lighthouse."
     },
-    "tags": ["astro", "typescript", "cloudflare"],
+    "tags": ["astro", "cloudflare", "d1", "typescript"],
     "year": 2026,
     "url": "https://elvinlab.dev",
     "repo": "https://github.com/elvinlab/elvinlab.dev",
