@@ -225,6 +225,7 @@ export const siteConfig = {
       {
         label: { es: 'Calidad y arquitectura', en: 'Quality and architecture' },
         icon: 'shield-check',
+        folded: true,
         items: ['Jest', 'Vue Test Utils', 'JUnit', 'Clean/Hexagonal', 'ADRs'],
         hint: {
           es: 'Las pruebas y las decisiones de diseño que mantienen el código fiable y fácil de cambiar.',
@@ -234,6 +235,7 @@ export const siteConfig = {
       {
         label: { es: 'Proyectos personales', en: 'Personal projects' },
         icon: 'flask',
+        folded: true,
         items: ['TypeScript', 'Astro', 'React', 'Tailwind CSS'],
         hint: {
           es: 'Las herramientas con las que construyo mis propios proyectos, como este sitio.',

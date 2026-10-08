@@ -134,6 +134,7 @@ The descriptions come from the schema (`.describe()`), which is why they are in 
 | `me.stack[].icon` | `string` | no |  | Icon name shown before the group name (code, server, shield-check, cloud, bot, flask, layers, ...). Omit for no icon. |
 | `me.stack[].hint` | `{ <locale>: string }` | no |  | One plain-language sentence per locale that says what the group is. Shown as a hover and focus tooltip; omit for no tooltip. |
 | `me.stack[].layer` | `boolean` | no |  | Draws the group as a numbered layer of the product (for example data, backend, frontend, cloud), joined to the next layer by a vertical line. Omit for a group that cuts across layers, such as AI or quality. Keep the layers first in the list. |
+| `me.stack[].folded` | `boolean` | no |  | Puts the group inside a collapsed "more tools" block under the stack (native details, no script). Use it for secondary groups so the stack stays short; a layer cannot be folded. |
 | `features` | `object` | yes |  | Feature flags: off means the routes are not generated and the nav entry is hidden. The four interface switches (`backToTop`, `languageHint`, `themeToggle`, `backgroundPicker`) default to on and render nothing when off. |
 | `features.blog` | `boolean` | yes |  | Lab Notes: the notes index, note pages, RSS and the nav entry. |
 | `features.comments` | `boolean` | yes |  | Giscus comments on notes. Needs the `giscus` block below, otherwise nothing renders. |

@@ -513,6 +513,6 @@
     "date": "2026-10-08",
     "category": "changed",
     "title": "/me now tells the full-stack story, from data to screen",
-    "description": "The headline, strengths, stack and experience read as one thread: data, backend, frontend and cloud, with AI across all of them. The stack becomes a numbered path of layers, and Cloudflare Workers and D1 appear as what is being learned on this site."
+    "description": "The headline, strengths, stack and experience read as one thread: data, backend, frontend and cloud, with AI across all of them. The stack becomes a numbered path of layers, and Cloudflare Workers and D1 appear as what is being learned on this site. Secondary stack groups (quality, personal projects) fold into a \"More tools\" block."
   }
 }

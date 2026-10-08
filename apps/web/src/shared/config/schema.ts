@@ -395,6 +395,12 @@ export const siteConfigSchema = z
                 .describe(
                   'Draws the group as a numbered layer of the product (for example data, backend, frontend, cloud), joined to the next layer by a vertical line. Omit for a group that cuts across layers, such as AI or quality. Keep the layers first in the list.',
                 ),
+              folded: z
+                .boolean()
+                .optional()
+                .describe(
+                  'Puts the group inside a collapsed "more tools" block under the stack (native details, no script). Use it for secondary groups so the stack stays short; a layer cannot be folded.',
+                ),
             }),
           )
           .min(1)

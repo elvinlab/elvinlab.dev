@@ -287,6 +287,15 @@ describe('parseSiteConfig', () => {
       expect(parseSiteConfig(valid).me.stack[0]?.layer).toBeUndefined();
       expect(() => parseSiteConfig(withStack([{ ...group, layer: 'yes' }]))).toThrow(/layer/);
     });
+
+    it('folds a group only when asked, and rejects a non-boolean', () => {
+      const group = { label: { es: 'Calidad', en: 'Quality' }, items: ['Jest'] };
+      expect(parseSiteConfig(withStack([{ ...group, folded: true }])).me.stack[0]?.folded).toBe(
+        true,
+      );
+      expect(parseSiteConfig(valid).me.stack[0]?.folded).toBeUndefined();
+      expect(() => parseSiteConfig(withStack([{ ...group, folded: 'yes' }]))).toThrow(/folded/);
+    });
   });
 
   describe('recruiter.openToWork', () => {
