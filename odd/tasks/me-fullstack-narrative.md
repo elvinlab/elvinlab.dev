@@ -63,7 +63,7 @@ M1 to M4 on `develop`, local commits only. Push and release stay the owner's dec
 Not re-run: Lighthouse (`/me/` margin is thin, issue #87: a real `/me/` Lighthouse run is advised before the release), the 3-viewport e2e, the mobile view of the new rail (only 1280 px seen).
 Follow-up check 2026-10-08 (parent): mobile 390 px screenshot of the layered stack looks clean and has no horizontal overflow; local mobile Lighthouse (1 run) `/me/` 98, LCP 2272 ms, `/en/me/` 97, LCP 2418 ms, CLS 0, no assertion failed against the 2500 ms gate (thin margin, issue #87; one local run, CI does 3).
 Added slice (owner: "mas cosas, que no sea complicado"; taken from issue #85 only): optional `me.stack[].folded` flag, secondary groups (quality, personal projects) fold into a native `<details>` "Mas herramientas / More tools", AI stays visible. RED observed for the flag, then typecheck 0 errors, 239 related unit tests, build, js-budget, page-weight PASS, e2e 1280 px 42 passed. The `/contact/` axe check failed once under parallel load and passed 12/12 alone (page untouched, intermittent, not investigated further). Left out on purpose: #83 (needs the /education/ page, T53), #84 (needs owner data), notes curation and chip-count cut of #85 (issue #85 stays open).
-Route record: all three tasks inline, no delegation trigger worth firing (copy already decided, small edits).
+Route record: all four tasks inline, no delegation trigger worth firing (copy already decided, small edits).
 Not claimed: any backend or database optimization experience (owner has not confirmed a real case).
 
 ## Release status
