@@ -514,5 +514,11 @@
     "category": "changed",
     "title": "/me now tells the full-stack story, from data to screen",
     "description": "The headline, strengths, stack and experience read as one thread: data, backend, frontend and cloud, with AI across all of them. The stack becomes a numbered path of layers, and Cloudflare Workers and D1 appear as what is being learned on this site. Secondary stack groups (quality, personal projects) fold into a \"More tools\" block."
+  },
+  "design-review-polish": {
+    "date": "2026-10-08",
+    "category": "changed",
+    "title": "Contact, notes and experiments polish from a design review",
+    "description": "Contact gets a \"what to expect\" panel and no second email form; the notes list stops repeating the category as a tag and hides the tag list until there are enough notes; the elvinlab.dev experiment now mentions its data and backend work (D1, Workers API, double opt-in subscription); footer links are evenly spaced and the home author photo is smaller on phones."
   }
 }
