@@ -39,9 +39,10 @@ Home pills and pillars (BRAND.md must change first), one rule for page H1 fonts,
 
 - [x] **D1** Experiments: `elvinlab-dev` contribution mentions D1 with migrations, Workers API, double opt-in subscription; tags add `d1` (displayed as "D1").
 - [x] **D2** Contact: side panel "What to expect" on the right (stacks below the form on phones) and no footer subscription band on `/contact/` and `/en/contact/`.
-- [x] **D3** Notes: no category repeated as a tag chip; the tag list in the sidebar appears only from 6 notes.
+- [x] **D3** (REOPENED 2026-10-08, see D7: the owner wanted tags clickable, hiding the tag list went against that) Notes: no category repeated as a tag chip; the tag list in the sidebar appears only from 6 notes.
 - [x] **D4** Footer: even gap between internal and social links on desktop.
 - [x] **D5** Home author card: small avatar below `lg`, unchanged from `lg`.
+- [ ] **D7** Clickable tags and categories as filters: chips link to `/notes/?tag=<tag>`, the notes index filters by that tag (combined with the search box) with a visible "Tag: #x, clear filter" notice; the sidebar tag list is visible again (revert of the six-notes rule); note page chips and breadcrumb category link too.
 - [x] **D6** Changelog entry, tracker evidence, commits.
 
 ## Route record
@@ -68,6 +69,10 @@ Visual check by screenshot (1280 px and 390 px): contact has the "What to expect
 Not re-run: Lighthouse (no new heavy assets; `/en/me/` margin from the previous feature still thin), 3-viewport e2e, `/en/*` pages visually, dark theme.
 Docs: `docs/BRAND.md` says the subscription band also hides on `/contact/`.
 Left out on purpose (owner decisions): home pills and pillars (BRAND.md first), one rule for page H1 fonts, home column gap, changelog day headline for 2026-10-08 (set in `releases.json` at release).
+
+## Correction log
+
+- 2026-10-08, owner: "las etiquetas y los tags yo queria hacerlas clickeables tipo busquedas". My review item 6 (noise) was my opinion, not a request; D3 hid the tag list and was wrong for the owner's intent. D7 reverts the hiding and adds the filter. The category de-duplication on a row stays (the category chip already filters the same notes).
 
 ## Next step
 
