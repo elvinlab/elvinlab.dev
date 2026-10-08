@@ -62,5 +62,5 @@ const tags = [...new Set(sortNotes(notes).flatMap((note) => note.data.tags))];
     ))}
   </div>
 
-  <NotesSidebar slot="aside" locale={locale} categories={categories} tags={tags} />
+  <NotesSidebar slot="aside" locale={locale} categories={categories} tags={tags} noteCount={notes.length} />
 </BaseLayout>
