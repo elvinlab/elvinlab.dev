@@ -53,7 +53,7 @@ const tags = [...new Set(sortNotes(notes).flatMap((note) => note.data.tags))];
       <section data-year-group class="flex flex-col">
         <h2 class="flex items-baseline gap-3 font-display text-3xl font-bold text-primary">
           {group.year}
-          <span class="font-mono text-sm text-muted">{t(locale, 'notes.count', { count: group.notes.length })}</span>
+          <span class="font-mono text-sm text-muted" data-year-count>{t(locale, 'notes.count', { count: group.notes.length })}</span>
         </h2>
         <div class="mt-2">
           {group.notes.map((note) => <NoteRow note={note} locale={locale} />)}
@@ -62,5 +62,5 @@ const tags = [...new Set(sortNotes(notes).flatMap((note) => note.data.tags))];
     ))}
   </div>
 
-  <NotesSidebar slot="aside" locale={locale} categories={categories} tags={tags} noteCount={notes.length} />
+  <NotesSidebar slot="aside" locale={locale} categories={categories} tags={tags} />
 </BaseLayout>

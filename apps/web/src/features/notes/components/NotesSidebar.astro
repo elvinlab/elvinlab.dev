@@ -2,7 +2,7 @@
 /** Notes index sidebar: author card, category and tag lists, RSS callout. */
 import { localizePath } from '@elvinlab/core';
 
-import { shouldShowTagList } from '@/features/notes/lib/note-tags.ts';
+import { tagHref } from '@/features/notes/lib/note-tags.ts';
 import { isEnabled, site } from '@/shared/config/index.ts';
 import { LOCALES, type Locale, t } from '@/shared/i18n/index.ts';
 import Chip from '@/shared/ui/Chip.astro';
@@ -11,10 +11,9 @@ type Props = {
   locale: Locale;
   categories: { name: string; count: number }[];
   tags: string[];
-  noteCount: number;
 };
 
-const { locale, categories, tags, noteCount } = Astro.props;
+const { locale, categories, tags } = Astro.props;
 const aboutHref = localizePath('/me/', locale, LOCALES);
 ---
 
@@ -34,19 +33,21 @@ const aboutHref = localizePath('/me/', locale, LOCALES);
       <h2 class="font-display text-base font-bold">{t(locale, 'notes.sidebar.categories')}</h2>
       <ul class="flex flex-col gap-1 text-sm">
         {categories.map((category) => (
-          <li class="flex items-center justify-between text-text-secondary">
-            <span>{category.name}</span>
-            <span class="font-mono text-muted">{category.count}</span>
+          <li>
+            <a href={tagHref(category.name)} class="flex items-center justify-between text-text-secondary transition-colors duration-150 hover:text-primary">
+              <span>{category.name}</span>
+              <span class="font-mono text-muted">{category.count}</span>
+            </a>
           </li>
         ))}
       </ul>
     </section>
   )}
 
-  {tags.length > 0 && shouldShowTagList(noteCount) && (
+  {tags.length > 0 && (
     <section class="flex flex-col gap-3 rounded-card bg-card p-5">
       <h2 class="font-display text-base font-bold">{t(locale, 'notes.sidebar.tags')}</h2>
-      <div class="flex flex-wrap gap-1.5">{tags.map((tag) => <Chip>#{tag}</Chip>)}</div>
+      <div class="flex flex-wrap gap-1.5">{tags.map((tag) => <Chip href={tagHref(tag)}>#{tag}</Chip>)}</div>
     </section>
   )}
 
