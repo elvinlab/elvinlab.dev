@@ -1,11 +1,17 @@
 ---
 /** Home notebook index: heading, an "all notes" link and compact rows for older notes. */
 import { NoteIndexRow, type NoteLike } from '@/features/notes/index.ts';
+import { otherNoteLanguages } from '@/features/portfolio/lib/notebook-language.ts';
 import { type Locale, t } from '@/shared/i18n/index.ts';
 
 type Props = { locale: Locale; notes: NoteLike[] };
 
 const { locale, notes } = Astro.props;
+const otherLangs = otherNoteLanguages(locale, notes.map((note) => note.data.lang));
+const languageNames = new Intl.DisplayNames([locale], { type: 'language' });
+const langNote = otherLangs
+  .map((lang) => languageNames.of(lang) ?? lang)
+  .join(', ');
 // The notes index exists only at `/notes/` (one index, no `/en/notes/`), so the link is not localized.
 ---
 
@@ -19,6 +25,7 @@ const { locale, notes } = Astro.props;
         {t(locale, 'home.allNotes')}
       </a>
     </div>
+    {otherLangs.length > 0 && <p data-notebook-lang-note class="text-sm text-text-secondary">{t(locale, 'home.notebook.langNote', { language: langNote })}</p>}
     <div>
       {notes.map((note) => <NoteIndexRow note={note} locale={locale} />)}
     </div>
