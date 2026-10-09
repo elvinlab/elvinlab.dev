@@ -35,7 +35,7 @@ Scores: design 23/32, audit 13/16 on four dimensions (accessibility 3, performan
 - [x] **I1** Responsive and accessibility: e2e guard against horizontal overflow (320, 390, 768, 1024; and a 32 px root font at 390) written first (RED), then fix thumbnails, `.info-tip-bubble`, `.mx`; 44 px hit areas for link chips, sidebar category/about/RSS links and the contact privacy link; header wraps at large fonts; `/me` aside not sticky; contact form `required`/`aria-required` plus a polite summary (after verifying what exists); 404 without the subscribe band; changelog counter `title`.
 - [x] **I2** Typography and headers: `PageHeader` with pixel H1 and pixel preload on the four pages, `--type-page-title`; remove ALL-CAPS and middle-dot joins; align the contact side panel with the form top; update `DESIGN.md`, `BRAND.md`, the unit and e2e tests that pin the old text or classes (`calm-pages.spec.ts` counts `span.uppercase`).
 - [x] **I3** Home: mobile-only primary CTA in the hero, "Ahora" card moved to the main column, one-line note on `/en/` that notes are written in Spanish.
-- [ ] **I4** Release preparation: changelog entry, page-weight budgets, full e2e at three viewports, push and release only with explicit authorization.
+- [x] **I4** Release preparation: changelog entry, page-weight budgets, full e2e at three viewports, push and release only with explicit authorization.
 
 ## Route record
 
