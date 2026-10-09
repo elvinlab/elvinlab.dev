@@ -526,5 +526,17 @@
     "category": "added",
     "title": "Tags and categories filter the notes",
     "description": "Clicking a tag or a category, on the notes list or inside a note, opens the notes index filtered by it (for example /notes/?tag=agentes-ia). A notice shows the active tag with a link to clear it, the filter combines with the search box, and the per-year note count follows what is visible. The notes list page budget grows by about 4 KB of HTML because every tag is now a link."
+  },
+  "pixel-page-titles": {
+    "date": "2026-10-08",
+    "category": "changed",
+    "title": "Pixel titles on every inner page, and calmer labels",
+    "description": "Notes, Experiments, Contact and the Changelog now share one pixel page title with the same spacing. Labels such as the decision record and the changelog kinds are written in normal case instead of capitals, and meta lines use spacing instead of middle dots. On phones the home hero has a \"View profile\" button, and the \"Now\" card sits under the pillars; on /en/ a line says the notes are written in Spanish."
+  },
+  "small-screen-a11y-fixes": {
+    "date": "2026-10-08",
+    "category": "fixed",
+    "title": "Small screens and accessibility fixes from a design audit",
+    "description": "Experiments, /me and the home no longer scroll sideways on narrow phones or at 1024 px. Tags, category and sidebar links have a 44 px tap area, the header wraps instead of overflowing at large font sizes, the contact form marks its fields as required and announces how many need attention, the /me sidebar no longer sticks, and the 404 page no longer shows the subscribe form."
   }
 }
