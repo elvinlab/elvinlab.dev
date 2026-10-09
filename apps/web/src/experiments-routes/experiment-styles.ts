@@ -537,7 +537,7 @@ const GALLERY = `
     color: var(--color-muted);
     font-variant-numeric: tabular-nums;
   }
-  /* Small fixed thumbnails (80 x 50): four of them plus gaps fit a 390 px phone, so they never wrap. */
+  /* Small thumbnails (80 x 50 at most): four of them plus gaps fit a 390 px phone; they shrink below 360 px instead of overflowing. */
   .xp-thumbs {
     display: flex;
     gap: 0.5rem;
@@ -546,7 +546,7 @@ const GALLERY = `
   .xp-thumb {
     position: relative;
     display: block;
-    flex: 0 0 5rem;
+    flex: 0 1 5rem;
     min-width: 0;
     aspect-ratio: 8 / 5;
     border-radius: var(--radius-inner);

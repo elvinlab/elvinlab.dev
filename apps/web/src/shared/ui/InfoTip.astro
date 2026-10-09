@@ -49,7 +49,7 @@ const { id, text, place = 'down', dense = false, class: className } = Astro.prop
     top: calc(100% - 0.25rem);
     z-index: 30;
     width: max-content;
-    max-width: min(18rem, calc(100vw - 4.5rem));
+    max-width: min(18rem, calc(100vw - 7rem));
     padding: 0.5rem 0.75rem;
     border: 1px solid var(--color-divider);
     border-radius: var(--radius-inner);
@@ -68,7 +68,7 @@ const { id, text, place = 'down', dense = false, class: className } = Astro.prop
   }
   @container (min-width: 0px) {
     .info-tip-bubble {
-      max-width: min(18rem, 100cqw);
+      max-width: min(18rem, calc(100cqw - 2.75rem));
     }
   }
   .info-tip[data-dense] .info-tip-trigger {

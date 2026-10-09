@@ -14,11 +14,11 @@ const fields = ['context', 'decision', 'outcome'] as const;
 
 <section class="rounded-inner bg-banner p-(--record-pad)" aria-label={t(locale, 'note.decision.title')}>
   <h2 class="mb-(--record-title-gap) font-mono text-(length:--record-title) uppercase tracking-wide text-cyan">{t(locale, 'note.decision.title')}</h2>
-  <div class="grid gap-(--record-gap) md:grid-cols-3 md:gap-0">
+  <div class="grid grid-cols-1 gap-(--record-gap) md:grid-cols-3 md:gap-0">
     {fields.map((field, index) => (
       <div class:list={['flex flex-col gap-1.5 md:px-(--record-col-pad)', index > 0 && 'border-t border-dashed border-divider pt-(--record-gap) md:border-t-0 md:border-l md:pt-0', index === 0 && 'md:pl-0']}>
         <span class="font-mono text-(length:--record-label) uppercase text-muted">{t(locale, `note.decision.${field}`)}</span>
-        <p class="text-(length:--record-body) leading-relaxed text-text-secondary">{decision[field]}</p>
+        <p class="min-w-0 text-(length:--record-body) leading-relaxed text-text-secondary [overflow-wrap:anywhere]">{decision[field]}</p>
       </div>
     ))}
   </div>

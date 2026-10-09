@@ -1,5 +1,8 @@
 ---
-/** Inline label pill (category, tag). Renders a link when `href` is set. */
+/**
+ * Inline label pill (category, tag). Renders a link when `href` is set; the link keeps its small
+ * look but its hit area grows to 44 px through an invisible pseudo-element (WCAG 2.5.8 target size).
+ */
 type Props = { href?: string; class?: string };
 
 const { href, class: className } = Astro.props;
@@ -8,6 +11,6 @@ const Tag = href ? 'a' : 'span';
 ---
 
 <Tag
-  class:list={[base, href && 'transition-colors duration-150 hover:text-primary', className]}
+  class:list={[base, href && 'relative transition-colors duration-150 hover:text-primary after:absolute after:-inset-x-0.5 after:-inset-y-2.5', className]}
   {...href ? { href } : {}}
 ><slot /></Tag>

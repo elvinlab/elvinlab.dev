@@ -46,9 +46,9 @@ const linkClass =
 <header data-navbar class="animate-fade-in-up transition-transform duration-300 will-change-transform">
   <nav
     aria-label={t(locale, 'nav.label')}
-    class="relative flex h-18 items-center gap-1 rounded-b-card bg-card/70 px-3 backdrop-blur-md md:gap-2 md:px-4"
+    class="relative flex min-h-18 flex-wrap items-center gap-x-1 rounded-b-card bg-card/70 px-3 backdrop-blur-md md:gap-2 md:px-4"
   >
-    <a href={localizePath('/', locale, LOCALES)} class="group mr-auto flex h-11 items-center gap-2 rounded-control px-1 font-retro text-xs md:px-2">
+    <a href={localizePath('/', locale, LOCALES)} class="group mr-auto flex h-11 min-w-0 items-center gap-2 rounded-control px-1 font-retro text-xs md:px-2">
       <BrandMark />{site.identity.handle}
     </a>
 

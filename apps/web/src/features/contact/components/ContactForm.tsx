@@ -3,7 +3,6 @@ import { useCallback, useEffect, useRef, useState } from 'preact/hooks';
 
 import {
   buildPayload,
-  type ContactFormStrings,
   type FormEvent,
   type FormState,
   formReducer,
@@ -17,10 +16,11 @@ import {
   type TurnstileOptions,
 } from '@/features/contact/client/turnstile.ts';
 import { CONTACT_POLICY } from '@/features/contact/config.ts';
+import type { ContactFormCopy } from '@/features/contact/content.ts';
 
 type Props = {
   siteKey: string | undefined;
-  strings: ContactFormStrings;
+  strings: ContactFormCopy;
 };
 
 function sleep(ms: number): Promise<void> {
@@ -72,6 +72,8 @@ function Field(props: FieldProps) {
     autoComplete,
     class: className,
     'aria-invalid': error ? ('true' as const) : ('false' as const),
+    required: true,
+    'aria-required': 'true' as const,
     disabled: props.disabled,
     // Spread only when there is an error: optional attributes must be absent, not `undefined`.
     ...(error ? { 'aria-describedby': `${id}-error` } : {}),
@@ -110,6 +112,7 @@ export function ContactForm({ siteKey, strings }: Props) {
   const [verifying, setVerifying] = useState(false);
   const [turnstileLoadError, setTurnstileLoadError] = useState(false);
   const [ready, setReady] = useState(false);
+  const [summary, setSummary] = useState('');
   // A ref, not state: the widget callback is created once and would capture a stale value.
   const submitPendingRef = useRef(false);
   const startedAtRef = useRef<number>(Date.now());
@@ -186,8 +189,12 @@ export function ContactForm({ siteKey, strings }: Props) {
 
     const fieldErrors = validateContact(values);
     setErrors(fieldErrors);
+    setSummary('');
 
     if (Object.keys(fieldErrors).length > 0) {
+      const count = Object.keys(fieldErrors).length;
+      const template = count === 1 ? strings.invalidSummary.one : strings.invalidSummary.other;
+      setSummary(template.replace('{count}', String(count)));
       const firstInvalid = Object.keys(fieldErrors)[0] as keyof typeof values;
       const input = formRef.current?.elements.namedItem(firstInvalid) as
         | HTMLInputElement
@@ -277,6 +284,12 @@ export function ContactForm({ siteKey, strings }: Props) {
       class="space-y-4"
       noValidate
     >
+      <p class="text-sm text-text-secondary">{strings.requiredNote}</p>
+
+      <p class="sr-only" role="status" aria-live="polite">
+        {summary}
+      </p>
+
       {!siteKey && (
         <p role="status" class="text-sm text-text-secondary">
           {strings.unavailable}

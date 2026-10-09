@@ -22,7 +22,7 @@ const aboutHref = localizePath('/me/', locale, LOCALES);
     <p class="font-display text-lg font-bold">{site.identity.name}</p>
     <p class="text-sm text-text-secondary">{site.identity.role[locale]}</p>
     {isEnabled('me') && (
-      <a href={aboutHref} class="text-sm text-primary underline decoration-dashed underline-offset-4">
+      <a href={aboutHref} class="flex min-h-11 items-center text-sm text-primary underline decoration-dashed underline-offset-4">
         {t(locale, 'notes.sidebar.about')}
       </a>
     )}
@@ -31,10 +31,10 @@ const aboutHref = localizePath('/me/', locale, LOCALES);
   {categories.length > 0 && (
     <section class="flex flex-col gap-3 rounded-card bg-card p-5">
       <h2 class="font-display text-base font-bold">{t(locale, 'notes.sidebar.categories')}</h2>
-      <ul class="flex flex-col gap-1 text-sm">
+      <ul class="flex flex-col text-sm">
         {categories.map((category) => (
           <li>
-            <a href={tagHref(category.name)} class="flex items-center justify-between text-text-secondary transition-colors duration-150 hover:text-primary">
+            <a href={tagHref(category.name)} class="flex min-h-11 items-center justify-between text-text-secondary transition-colors duration-150 hover:text-primary">
               <span>{category.name}</span>
               <span class="font-mono text-muted">{category.count}</span>
             </a>
@@ -55,6 +55,6 @@ const aboutHref = localizePath('/me/', locale, LOCALES);
     <span class="-mx-5 -mt-5 mb-1 h-1 bg-gradient-to-r from-primary via-cyan to-pink"></span>
     <h2 class="font-display text-base font-bold">{t(locale, 'notes.sidebar.rss.title')}</h2>
     <p class="text-sm text-text-secondary">{t(locale, 'notes.sidebar.rss.body')}</p>
-    <a href="/rss.xml" class="text-sm text-primary underline decoration-dashed underline-offset-4">RSS</a>
+    <a href="/rss.xml" class="flex min-h-11 items-center text-sm text-primary underline decoration-dashed underline-offset-4">RSS</a>
   </section>
 </div>

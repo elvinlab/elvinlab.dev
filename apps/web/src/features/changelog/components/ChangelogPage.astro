@@ -62,7 +62,7 @@ const description = paged
                 <span class="cl-meta">
                   <span class="cl-counts">
                     {release.groups.map((group) => (
-                      <span class="cl-count">
+                      <span class="cl-count" title={`${group.entries.length} ${t(locale, `changelog.kind.${group.kind}`)}`}>
                         <ChangelogIcon name={group.kind} />
                         <span aria-hidden="true">{group.entries.length}</span>
                         <span class="sr-only">{group.entries.length} {t(locale, `changelog.kind.${group.kind}`)}</span>
