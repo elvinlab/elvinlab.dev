@@ -12,13 +12,13 @@
       }
     },
     "me": {
-      "why": "Recruiter page: hero photo plus experience blocks; its LCP margin is the thinnest after /experiments/.",
-      "styleBytes": 56300,
-      "htmlBytes": 120900,
+      "why": "Recruiter page: hero photo plus experience blocks, the numbered layer rail and the folded more-tools block of the full-stack story, and 44 px hit areas; its LCP margin is the thinnest after /experiments/.",
+      "styleBytes": 57100,
+      "htmlBytes": 126000,
       "measured": {
-        "styleBytes": 54118,
-        "htmlBytes": 116193,
-        "date": "2026-10-07"
+        "styleBytes": 54879,
+        "htmlBytes": 121145,
+        "date": "2026-10-08"
       }
     },
     "experiments": {
