@@ -65,4 +65,4 @@ Not done on purpose: OG images and emails (uppercase and middle dots), the pink 
 
 ## Next step
 
-Release: needs the owner's explicit authorization (push of `develop`, release commit to `main`, CI watch, read-only live check).
+Record the result of the CI rerun (below), then verify the live site read-only and close I4.
