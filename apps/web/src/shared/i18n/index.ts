@@ -218,7 +218,7 @@ export const t = createTranslator({
       'subscribe.page.metaTitle': 'Suscríbete a las notas',
       'subscribe.page.description':
         'Recibe por correo cada nota nueva de Lab Notes: las decisiones detrás de lo que construyo, sin relleno y sin ruido.',
-      'subscribe.page.eyebrow': 'lab notes · por correo',
+      'subscribe.page.eyebrow': 'Lab Notes por correo',
       'subscribe.page.title': 'Lo que construyo, en tu correo.',
       'subscribe.page.subtitle':
         'Documento las decisiones detrás de lo que construyo: qué probé, qué descarté y por qué. Sin relleno y sin ruido.',
@@ -484,7 +484,7 @@ export const t = createTranslator({
       'subscribe.page.metaTitle': 'Subscribe to the notes',
       'subscribe.page.description':
         'Get every new Lab Notes post by email: the decisions behind what I build, with no filler and no noise.',
-      'subscribe.page.eyebrow': 'lab notes · by email',
+      'subscribe.page.eyebrow': 'Lab Notes by email',
       'subscribe.page.title': 'What I build, in your inbox.',
       'subscribe.page.subtitle':
         'I write down the decisions behind what I build: what I tried, what I dropped and why. No filler, no noise.',

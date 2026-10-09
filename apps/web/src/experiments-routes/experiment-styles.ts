@@ -41,24 +41,6 @@ const HEADER = `
     justify-content: space-between;
     gap: 2rem;
   }
-  /* Same size, weight and tracking as the title of the other pages (\`text-3xl font-bold tracking-tight\`). */
-  .xp-header-text h1 {
-    display: flex;
-    align-items: center;
-    gap: 0.625rem;
-    margin: 0;
-    font-size: 1.875rem;
-    font-weight: 700;
-    line-height: 2.25rem;
-    letter-spacing: -0.025em;
-  }
-  .xp-header-text p {
-    max-width: 60ch;
-    margin: 0.5rem 0 0;
-    font-size: 1.0625rem;
-    line-height: 1.55;
-    color: var(--color-text-secondary);
-  }
   /* The pixel flask before the title: the single pink accent of the header, a 9 x 9 grid with crisp edges. */
   .xp-flask {
     flex-shrink: 0;

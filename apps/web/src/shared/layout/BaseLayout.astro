@@ -10,6 +10,7 @@ import '@/styles/global.css';
 
 import { DEFAULT_THEME } from '@elvinlab/core';
 import jetbrainsMonoLatin from '@fontsource-variable/jetbrains-mono/files/jetbrains-mono-latin-wght-normal.woff2?url';
+import pixelifySansLatin from '@fontsource-variable/pixelify-sans/files/pixelify-sans-latin-wght-normal.woff2?url';
 import spaceGroteskLatin from '@fontsource-variable/space-grotesk/files/space-grotesk-latin-wght-normal.woff2?url';
 
 import { appearance, integrations, site } from '@/shared/config/index.ts';
@@ -41,9 +42,11 @@ type Props = {
   ogImageAlt?: string;
   /** Opt into the print stylesheet: hide chrome, drop the banner, force the light palette. */
   printable?: boolean;
+  /** The page H1 is in the pixel face (`PageHeader`, notes banner): preload its Latin file so the title does not flash a fallback. */
+  pixelTitle?: boolean;
 };
 
-const { locale, printable = false, translations, ...seo } = Astro.props;
+const { locale, printable = false, pixelTitle = false, translations, ...seo } = Astro.props;
 const subscribeLink = showSubscribeLink({
   features: site.features,
   turnstileSiteKey: integrations.turnstileSiteKey,
@@ -65,7 +68,10 @@ const beaconToken = integrations.analyticsToken;
 // Page CSS is inlined, so the browser only learns its font URLs after parsing it. Preloading the
 // two Latin variable files (the only subsets Spanish and English text use) starts them with the
 // HTML. Latin-ext, Vietnamese and Press Start 2P stay lazy via `unicode-range`/on-demand loading.
-const preloadedFonts = [spaceGroteskLatin, jetbrainsMonoLatin];
+// The pixel Latin file (~12 KB) is added only by pages whose H1 uses it; the home preloads it itself.
+const preloadedFonts = pixelTitle
+  ? [spaceGroteskLatin, jetbrainsMonoLatin, pixelifySansLatin]
+  : [spaceGroteskLatin, jetbrainsMonoLatin];
 ---
 
 <html lang={locale} data-theme={DEFAULT_THEME} data-appearance={appearance}>

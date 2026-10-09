@@ -13,6 +13,7 @@ import BaseLayout from '@/shared/layout/BaseLayout.astro';
 import { externalLinkAttrs } from '@/shared/lib/external-link.ts';
 import Card from '@/shared/ui/Card.astro';
 import ExternalHint from '@/shared/ui/ExternalHint.astro';
+import PageHeader from '@/shared/ui/PageHeader.astro';
 import SocialIcon from '@/shared/ui/SocialIcon.astro';
 
 type Props = {
@@ -26,14 +27,10 @@ const privacyHref = localizePath('/privacy/', locale, LOCALES);
 const linkedin = site.socials.find((social) => social.icon === 'linkedin');
 ---
 
-<BaseLayout locale={locale} path="/contact/" title={content.pageTitle} description={content.pageDescription}>
+<BaseLayout locale={locale} path="/contact/" title={content.pageTitle} description={content.pageDescription} pixelTitle>
+  <PageHeader title={content.pageTitle} description={content.pageDescription} />
   <div class="flex flex-col gap-10 lg:grid lg:grid-cols-[minmax(0,36rem)_1fr] lg:items-start lg:gap-10">
     <article>
-      <header class="mb-8">
-        <h1 class="text-3xl font-bold tracking-tight">{content.pageTitle}</h1>
-        <p class="mt-2 text-text-secondary">{content.pageDescription}</p>
-      </header>
-
       <ContactForm client:visible siteKey={siteKey} strings={content.form} />
 
       {linkedin && (
@@ -55,7 +52,7 @@ const linkedin = site.socials.find((social) => social.icon === 'linkedin');
       </noscript>
     </article>
 
-    <Card as="aside" class="flex flex-col gap-4 lg:mt-24">
+    <Card as="aside" class="flex flex-col gap-4">
       <h2 class="font-display text-base font-bold">{content.aside.title}</h2>
       <ul class="flex flex-col gap-3">
         {content.aside.items.map((item) => (

@@ -33,11 +33,11 @@ const categories = [...categoryCounts.entries()]
 const tags = [...new Set(sortNotes(notes).flatMap((note) => note.data.tags))];
 ---
 
-<BaseLayout locale={locale} path="/notes/" title={t(locale, 'notes.title')} noindex={noindex} translated={false}>
+<BaseLayout locale={locale} path="/notes/" title={t(locale, 'notes.title')} noindex={noindex} translated={false} pixelTitle>
   <Banner slot="banner" height="320px" locale={locale}>
     <BackgroundCanvas slot="background" />
     <p class="font-mono text-sm text-cyan">{t(locale, 'notes.eyebrow', { handle: site.identity.handle })}</p>
-    <h1 class="mt-2 font-display text-5xl font-bold md:text-6xl">
+    <h1 class="mt-2 font-pixel text-hero font-semibold leading-[1.1] text-balance">
       {t(locale, 'notes.title')}<span aria-hidden="true" class="ml-1 inline-block h-3 w-2 bg-pink align-baseline md:h-4"></span>
     </h1>
     <p class="mt-3 max-w-[58ch] text-lg leading-relaxed text-text-secondary">{t(locale, 'notes.subtitle')}</p>

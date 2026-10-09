@@ -31,6 +31,12 @@ describe('experimentsCss', () => {
     }
   });
 
+  it('leaves the page title to the shared PageHeader', () => {
+    const css = experimentsCss(NONE);
+    expect(css).not.toContain('.xp-header-text');
+    expect(css).toContain('.xp-flask');
+  });
+
   it('adds the compact cards only with the "more" section', () => {
     expect(experimentsCss({ ...NONE, more: true })).toContain('.xc-body');
     expect(experimentsCss({ ...NONE, more: true })).not.toContain('.xp-foot');

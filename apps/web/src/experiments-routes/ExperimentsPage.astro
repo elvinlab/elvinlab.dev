@@ -1,6 +1,6 @@
 ---
 /**
- * The `/experiments/` page for one locale and sort: a quiet header (flask, title, intro), the big
+ * The `/experiments/` page for one locale and sort: the shared `PageHeader` (flask, pixel title, intro), the big
  * pieces separated by a hairline, then the compact list with its sort switch, summary and pager.
  * The big pieces lead page 1 whatever the sort; the sort and the page apply to the compact list.
  * Its CSS is one string (`experiment-styles.ts`) with only the parts this page renders; the classes
@@ -22,6 +22,7 @@ import { site } from '@/shared/config/index.ts';
 import { LOCALES, type Locale, t } from '@/shared/i18n/index.ts';
 import BaseLayout from '@/shared/layout/BaseLayout.astro';
 import ListingSummary from '@/shared/ui/ListingSummary.astro';
+import PageHeader from '@/shared/ui/PageHeader.astro';
 import Pager from '@/shared/ui/Pager.astro';
 import SortSwitch from '@/shared/ui/SortSwitch.astro';
 
@@ -73,24 +74,21 @@ const css = experimentsCss({
 });
 ---
 
-<BaseLayout locale={locale} path={experimentsHref(page, requested)} title={title} description={description} noindex={requested !== undefined}>
+<BaseLayout locale={locale} path={experimentsHref(page, requested)} title={title} description={description} noindex={requested !== undefined} pixelTitle>
   {paged && <link slot="head" rel="prev" href={pageUrl(page - 1)} />}
   {page < pages.length && <link slot="head" rel="next" href={pageUrl(page + 1)} />}
   <style is:inline set:html={css} />
+  <div class="xp-header">
+    <PageHeader title={t(locale, 'experiments.title')} description={intro}>
+      <svg slot="icon" class="xp-flask" viewBox="0 0 9 9" shape-rendering="crispEdges" fill="currentColor" aria-hidden="true" focusable="false"><rect x="2" y="0" width="5" height="1"></rect><rect x="3" y="1" width="1" height="3"></rect><rect x="5" y="1" width="1" height="3"></rect><rect x="2" y="4" width="1" height="1"></rect><rect x="6" y="4" width="1" height="1"></rect><rect x="1" y="5" width="1" height="3"></rect><rect x="7" y="5" width="1" height="3"></rect><rect x="2" y="6" width="5" height="2"></rect><rect x="1" y="8" width="7" height="1"></rect></svg>
+    </PageHeader>
+    {lab.length > 0 && (
+      <ul class="xp-lab" aria-hidden="true">
+        {lab.map((word) => <li>{word}</li>)}
+      </ul>
+    )}
+  </div>
   <section class="xp-page">
-    <header class="xp-header">
-      <div class="xp-header-text">
-        <h1>
-          <svg class="xp-flask" viewBox="0 0 9 9" shape-rendering="crispEdges" fill="currentColor" aria-hidden="true" focusable="false"><rect x="2" y="0" width="5" height="1"></rect><rect x="3" y="1" width="1" height="3"></rect><rect x="5" y="1" width="1" height="3"></rect><rect x="2" y="4" width="1" height="1"></rect><rect x="6" y="4" width="1" height="1"></rect><rect x="1" y="5" width="1" height="3"></rect><rect x="7" y="5" width="1" height="3"></rect><rect x="2" y="6" width="5" height="2"></rect><rect x="1" y="8" width="7" height="1"></rect></svg>{t(locale, 'experiments.title')}
-        </h1>
-        <p>{intro}</p>
-      </div>
-      {lab.length > 0 && (
-        <ul class="xp-lab" aria-hidden="true">
-          {lab.map((word) => <li>{word}</li>)}
-        </ul>
-      )}
-    </header>
     {experiments.length === 0 ? (
       <p class="xp-empty">{t(locale, 'experiments.empty')}</p>
     ) : (

@@ -77,8 +77,10 @@ const readingLabel = t(locale, 'notes.readingTime', { min: readingMinutes(entry.
       {secondaryMetaSlot === 'header' && <LangBadge lang={data.lang} />}
     </div>
     <h1 class="mt-2 max-w-[22ch] font-display text-note-title font-bold leading-tight">{data.title}</h1>
-    <p class="mt-3 font-mono text-sm text-muted">
-      {secondaryMetaSlot === 'header' && <><span class="whitespace-nowrap">{site.identity.name}</span> · </>}<time class="whitespace-nowrap" datetime={data.pubDate.toISOString()}>{formatDate(data.pubDate, locale)}</time> · <span class="whitespace-nowrap">{readingLabel}</span>
+    <p class="mt-3 flex flex-wrap gap-x-3 gap-y-1 font-mono text-sm text-muted">
+      {secondaryMetaSlot === 'header' && <span class="whitespace-nowrap">{site.identity.name}</span>}
+      <time class="whitespace-nowrap" datetime={data.pubDate.toISOString()}>{formatDate(data.pubDate, locale)}</time>
+      <span class="whitespace-nowrap">{readingLabel}</span>
     </p>
     <MarkSection slug={entry.id} locale={locale} variant="header" />
   </Banner>
@@ -93,8 +95,10 @@ const readingLabel = t(locale, 'notes.readingTime', { min: readingMinutes(entry.
         {secondaryMetaSlot === 'foot' && <LangBadge lang={data.lang} />}
         {data.tags.map((tag) => <Chip href={tagHref(tag)}>#{tag}</Chip>)}
       </div>
-      <p class="font-mono text-meta text-muted">
-        {secondaryMetaSlot === 'foot' && <><span class="whitespace-nowrap">{site.identity.name}</span> · </>}{data.updatedDate && <><span class="whitespace-nowrap">{t(locale, 'note.updated', { date: formatDate(data.updatedDate, locale) })}</span> · </>}<span class="whitespace-nowrap">{t(locale, 'note.license')}</span>
+      <p class="flex flex-wrap gap-x-3 gap-y-1 font-mono text-meta text-muted">
+        {secondaryMetaSlot === 'foot' && <span class="whitespace-nowrap">{site.identity.name}</span>}
+        {data.updatedDate && <span class="whitespace-nowrap">{t(locale, 'note.updated', { date: formatDate(data.updatedDate, locale) })}</span>}
+        <span class="whitespace-nowrap">{t(locale, 'note.license')}</span>
       </p>
     </div>
     <MarkSection slug={entry.id} locale={locale} variant="end" />

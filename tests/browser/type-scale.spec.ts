@@ -8,20 +8,55 @@ import { expect, type Locator, type Page, test } from '@playwright/test';
  * the copy. The expected sizes follow the preset the page root carries (`html[data-appearance]`),
  * from `src/styles/type-scale.css` (rem at 16 px; `md` is 48 rem, so 360 is the phone column and
  * 1280 the desktop one):
- *   minimal: hero 32/44, section 20, note title 30/40, card title 20/22, prose 17
- *   full:    hero 32/52, section 22, note title 30/40, card title 24/30, prose 17
+ *   minimal: hero 32/44, page title 26/32, section 20, note title 30/40, card title 20/22, prose 17
+ *   full:    hero 32/52, page title 28/36, section 22, note title 30/40, card title 24/30, prose 17
  */
 type Preset = 'minimal' | 'full';
-type Scale = { hero: number; noteTitle: number; cardTitle: number; section: number; prose: number };
+type Scale = {
+  hero: number;
+  pageTitle: number;
+  noteTitle: number;
+  cardTitle: number;
+  section: number;
+  prose: number;
+};
 
 const SCALES: Record<Preset, Record<string, Scale>> = {
   minimal: {
-    'chromium-360': { hero: 32, noteTitle: 30, cardTitle: 20, section: 20, prose: 17 },
-    'chromium-1280': { hero: 44, noteTitle: 40, cardTitle: 22, section: 20, prose: 17 },
+    'chromium-360': {
+      hero: 32,
+      pageTitle: 26,
+      noteTitle: 30,
+      cardTitle: 20,
+      section: 20,
+      prose: 17,
+    },
+    'chromium-1280': {
+      hero: 44,
+      pageTitle: 32,
+      noteTitle: 40,
+      cardTitle: 22,
+      section: 20,
+      prose: 17,
+    },
   },
   full: {
-    'chromium-360': { hero: 32, noteTitle: 30, cardTitle: 24, section: 22, prose: 17 },
-    'chromium-1280': { hero: 52, noteTitle: 40, cardTitle: 30, section: 22, prose: 17 },
+    'chromium-360': {
+      hero: 32,
+      pageTitle: 28,
+      noteTitle: 30,
+      cardTitle: 24,
+      section: 22,
+      prose: 17,
+    },
+    'chromium-1280': {
+      hero: 52,
+      pageTitle: 36,
+      noteTitle: 40,
+      cardTitle: 30,
+      section: 22,
+      prose: 17,
+    },
   },
 };
 const PROSE_LINE_HEIGHT = 1.75;
@@ -69,6 +104,18 @@ test('the home computes the scale of its preset', async ({ page }, testInfo) => 
   expect(await fontSize(page.locator('main h2:has(> a[href*="/notes/"])'))).toBe(
     expected.cardTitle,
   );
+});
+
+test('the inner pages compute the page-title step of their preset', async ({ page }, testInfo) => {
+  const expected = SCALES[expectedPreset()][testInfo.project.name];
+  if (!expected) throw new Error('unreachable: skipped in beforeEach');
+  for (const path of ['/experiments/', '/contact/', '/changelog/', '/en/contact/']) {
+    await page.goto(path);
+    expect(await fontSize(page.locator('main h1')), path).toBe(expected.pageTitle);
+  }
+  // The notes banner keeps its own hero scale.
+  await page.goto('/notes/');
+  expect(await fontSize(page.locator('main h1'))).toBe(expected.hero);
 });
 
 test('a note computes the title and prose scale of its preset', async ({ page }, testInfo) => {

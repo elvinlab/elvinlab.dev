@@ -227,7 +227,16 @@ test('the decision record follows the preset spacing and keeps every label', asy
     expect(sizes.columns).toBe(3);
   }
   await expect(record.locator('h2')).toHaveCount(1);
-  await expect(record.locator('span.uppercase')).toHaveCount(3);
+  // Sentence case, never ALL-CAPS: the title and the three field labels keep their authored case.
+  const labels = record.locator('div > div > span');
+  await expect(labels).toHaveCount(3);
+  const transforms = await record
+    .locator('h2, div > div > span')
+    .evaluateAll((nodes) => nodes.map((node) => getComputedStyle(node).textTransform));
+  expect(transforms).toEqual(['none', 'none', 'none', 'none']);
+  expect(await labels.allTextContents()).toEqual(
+    (await labels.allTextContents()).map((text) => text.charAt(0).toUpperCase() + text.slice(1)),
+  );
   // Before the article text, as always.
   const order = await page.evaluate(() => {
     const section = document.querySelector('article section[aria-label]');
