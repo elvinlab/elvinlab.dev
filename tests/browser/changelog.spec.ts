@@ -86,3 +86,17 @@ for (const { base, prefix, labels, pager, lang } of LOCALES) {
 test('/changelog/page/1/ does not exist', async ({ request }) => {
   expect((await request.get('/changelog/page/1/')).status()).toBe(404);
 });
+
+test('each kind counter carries a title with the same text as its screen reader label', async ({
+  page,
+}) => {
+  await page.goto('/changelog/');
+  const counts = page.locator('.cl-count');
+  expect(await counts.count()).toBeGreaterThan(0);
+  for (let index = 0; index < (await counts.count()); index += 1) {
+    const count = counts.nth(index);
+    const label = (await count.locator('.sr-only').textContent())?.trim();
+    expect(label).toBeTruthy();
+    await expect(count).toHaveAttribute('title', label ?? '');
+  }
+});

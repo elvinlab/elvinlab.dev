@@ -76,8 +76,9 @@ const showForm = isSubscribeFormShown(site.features, integrations.turnstileSiteK
         <h2 class="font-display text-card-title font-bold leading-tight">
           <a href={localizePath(`/notes/${latest.slug}/`, locale, LOCALES)} class="transition-colors duration-150 after:absolute after:inset-0 hover:text-primary">{latest.data.title}</a>
         </h2>
-        <p class="font-mono text-sm text-muted">
-          <time datetime={latest.data.pubDate.toISOString()}>{formatDate(latest.data.pubDate, locale)}</time>{' · '}<span class="whitespace-nowrap">{t(locale, 'notes.readingTime', { min: readingMinutes(latest.body) })}</span>
+        <p class="flex flex-wrap gap-x-3 gap-y-1 font-mono text-sm text-muted">
+          <time datetime={latest.data.pubDate.toISOString()}>{formatDate(latest.data.pubDate, locale)}</time>
+          <span class="whitespace-nowrap">{t(locale, 'notes.readingTime', { min: readingMinutes(latest.body) })}</span>
         </p>
         <span aria-hidden="true" class="w-fit text-primary underline decoration-dashed underline-offset-4">{t(locale, 'subscribe.page.read')}</span>
       </section>

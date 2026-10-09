@@ -17,6 +17,11 @@ describe('showSubscribeCta', () => {
     expect(showSubscribeLink({ ...base, path: '/contact/' })).toBe(true);
   });
 
+  it('hides on the 404 page, where a subscribe band is noise', () => {
+    expect(showSubscribeCta({ ...base, path: '/404/' })).toBe(false);
+    expect(showSubscribeLink({ ...base, path: '/404/' })).toBe(true);
+  });
+
   it('hides on the subscription pages and the printable CV', () => {
     for (const path of ['/subscribe/', '/subscribe/confirm/', '/subscribe/unsubscribe/']) {
       expect(showSubscribeCta({ ...base, path })).toBe(false);

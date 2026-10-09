@@ -1,0 +1,19 @@
+---
+/**
+ * The one header of the inner pages (Experiments, Contact, Changelog): a pixel `<h1>` (the core
+ * `pixel` font token) on the `text-page-title` step of the preset scale, an optional description in
+ * the body face and an optional `icon` slot for the pixel icon placed before the title. It owns the
+ * air around the title: about 32 px above on a phone and 40 px from `md`, 32 px below. Titles are
+ * one or two words. Pages that use it pass `pixelTitle` to `BaseLayout` so the pixel file is preloaded.
+ */
+type Props = { title: string; description?: string };
+
+const { title, description } = Astro.props;
+---
+
+<header class="pt-8 pb-8 md:pt-10">
+  <h1 class="flex items-center gap-2.5 font-pixel text-page-title font-semibold leading-[1.15] text-balance">
+    <slot name="icon" />{title}
+  </h1>
+  {description && <p class="mt-2 max-w-[60ch] text-pretty text-[1.0625rem] leading-[1.55] text-text-secondary">{description}</p>}
+</header>

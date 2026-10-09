@@ -14,23 +14,6 @@ export const CHANGELOG_CSS = minifyCss(`
     flex-direction: column;
     gap: 2.5rem;
   }
-  .cl-header h1 {
-    display: flex;
-    align-items: center;
-    gap: 0.625rem;
-    margin: 0;
-    font-size: 1.875rem;
-    font-weight: 700;
-    line-height: 2.25rem;
-    letter-spacing: -0.025em;
-  }
-  .cl-header p {
-    max-width: 60ch;
-    margin: 0.5rem 0 0;
-    font-size: 1.0625rem;
-    line-height: 1.55;
-    color: var(--color-text-secondary);
-  }
   /* The pixel log before the title: the single pink accent of the page, a 9 x 9 grid with crisp edges. */
   .cl-logo {
     flex-shrink: 0;
@@ -161,8 +144,6 @@ export const CHANGELOG_CSS = minifyCss(`
     gap: 0.5rem;
     margin: 0 0 0.5rem;
     font: 400 0.8125rem / 1.2 var(--font-mono);
-    letter-spacing: 0.04em;
-    text-transform: uppercase;
     color: var(--color-text-secondary);
   }
   .cl-kind h3 .cl-ico {

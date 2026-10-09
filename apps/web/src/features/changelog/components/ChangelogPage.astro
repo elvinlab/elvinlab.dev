@@ -1,6 +1,6 @@
 ---
 /**
- * One page of `/changelog/` for one locale: a quiet header (log icon, title, intro), the release
+ * One page of `/changelog/` for one locale: the shared `PageHeader` (log icon, pixel title, intro), the release
  * days (one native `<details>` each, no JavaScript) and the summary and pager of the listing kit.
  * A release is a production day; inside it the entries are grouped by kind in a fixed order. The
  * two newest days of page 1 start open, everything else starts collapsed but stays in the HTML.
@@ -15,6 +15,7 @@ import { site } from '@/shared/config/index.ts';
 import { LOCALES, type Locale, t } from '@/shared/i18n/index.ts';
 import BaseLayout from '@/shared/layout/BaseLayout.astro';
 import ListingSummary from '@/shared/ui/ListingSummary.astro';
+import PageHeader from '@/shared/ui/PageHeader.astro';
 import Pager from '@/shared/ui/Pager.astro';
 
 import ChangelogIcon from './ChangelogIcon.astro';
@@ -38,15 +39,14 @@ const description = paged
   : t(locale, 'changelog.description');
 ---
 
-<BaseLayout locale={locale} path={changelogHref(page)} title={title} description={description}>
+<BaseLayout locale={locale} path={changelogHref(page)} title={title} description={description} pixelTitle>
   {paged && <link slot="head" rel="prev" href={pageUrl(page - 1)} />}
   {page < pages.length && <link slot="head" rel="next" href={pageUrl(page + 1)} />}
   <style is:inline set:html={CHANGELOG_CSS} />
+  <PageHeader title={t(locale, 'changelog.title')} description={t(locale, 'changelog.intro')}>
+    <ChangelogIcon slot="icon" name="log" class="cl-logo" />
+  </PageHeader>
   <section class="cl-page">
-    <header class="cl-header">
-      <h1><ChangelogIcon name="log" class="cl-logo" />{t(locale, 'changelog.title')}</h1>
-      <p>{t(locale, 'changelog.intro')}</p>
-    </header>
     {releases.length === 0 ? (
       <p class="cl-empty">{t(locale, 'changelog.empty')}</p>
     ) : (
@@ -62,7 +62,7 @@ const description = paged
                 <span class="cl-meta">
                   <span class="cl-counts">
                     {release.groups.map((group) => (
-                      <span class="cl-count">
+                      <span class="cl-count" title={`${group.entries.length} ${t(locale, `changelog.kind.${group.kind}`)}`}>
                         <ChangelogIcon name={group.kind} />
                         <span aria-hidden="true">{group.entries.length}</span>
                         <span class="sr-only">{group.entries.length} {t(locale, `changelog.kind.${group.kind}`)}</span>

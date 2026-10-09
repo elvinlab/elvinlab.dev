@@ -163,9 +163,9 @@ for (const { path, intro } of [
   test(`${path} shows its introduction once`, async ({ page }) => {
     await page.goto(path);
     const article = page.locator('main article');
-    await expect(article.getByText(intro)).toHaveCount(1);
-    // Header subtitle and the old second paragraph are one sentence now: one intro in the header.
-    await expect(article.locator(':scope > header > p')).toHaveCount(1);
+    // The page header (shared PageHeader, above the two columns) carries the one introduction.
+    await expect(page.locator('main').getByText(intro)).toHaveCount(1);
+    await expect(page.locator('main h1 + p')).toHaveText(intro);
     // The only other direct paragraph is the LinkedIn alternative under the form (the noscript
     // fallback is not rendered with scripts on).
     await expect(article.locator(':scope > p')).toHaveCount(1);

@@ -1,7 +1,7 @@
 /* Theme-driven type scale. The `appearance` preset of the site config reaches the document as
    `html[data-appearance]` (BaseLayout), and this file is the only place where the preset changes
-   a size: components use the `text-hero`, `text-section`, `text-note-title`, `text-card-title`
-   and `text-intro` utilities (and `.prose` reads the `--type-prose*` variables) and never test
+   a size: components use the `text-hero`, `text-page-title`, `text-section`, `text-note-title`,
+   `text-card-title` and `text-intro` utilities (and `.prose` reads the `--type-prose*` variables) and never test
    the preset. A fork changes its scale by editing the two blocks below.
 
    It lives in the web app, not in `@elvinlab/core`: the scale is keyed by `appearance`, an
@@ -13,6 +13,7 @@
 :root,
 [data-appearance="full"] {
   --type-hero: 2rem;
+  --type-page-title: 1.75rem;
   --type-section: 1.375rem;
   --type-section-leading: 1.875rem;
   --type-note-title: 1.875rem;
@@ -26,6 +27,7 @@
 
 [data-appearance="minimal"] {
   --type-hero: 2rem;
+  --type-page-title: 1.625rem;
   --type-section: 1.25rem;
   --type-section-leading: 1.75rem;
   --type-note-title: 1.875rem;
@@ -41,6 +43,7 @@
   :root,
   [data-appearance="full"] {
     --type-hero: 3.25rem;
+    --type-page-title: 2.25rem;
     --type-note-title: 2.5rem;
     --type-card-title: 1.875rem;
     --type-intro: 1.1875rem;
@@ -48,6 +51,7 @@
 
   [data-appearance="minimal"] {
     --type-hero: 2.75rem;
+    --type-page-title: 2rem;
     --type-note-title: 2.5rem;
     --type-card-title: 1.375rem;
     --type-intro: 1.1875rem;
@@ -57,6 +61,7 @@
 /* Tailwind utilities that read the runtime variables above (`inline` keeps the `var()` as is). */
 @theme inline {
   --text-hero: var(--type-hero);
+  --text-page-title: var(--type-page-title);
   --text-section: var(--type-section);
   --text-section--line-height: var(--type-section-leading);
   --text-note-title: var(--type-note-title);

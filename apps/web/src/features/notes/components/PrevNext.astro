@@ -14,13 +14,15 @@ const link = (note: NoteLike) => localizePath(`/notes/${note.slug}/`, note.data.
 <nav data-prev-next class="mt-8 grid gap-3 sm:grid-cols-2" aria-label={`${t(locale, 'note.prev')} / ${t(locale, 'note.next')}`}>
   {prev ? (
     <a href={link(prev)} class="flex flex-col gap-1 rounded-card bg-card p-4 transition-colors duration-150 hover:bg-card-hover">
-      <span class="font-mono text-meta text-muted">{t(locale, 'note.prev')} · {t(locale, 'notes.entry', { number: noteNumber(prev.data.number) })}</span>
+      <span class="font-mono text-meta text-muted">{t(locale, 'note.prev')}</span>
+      <span class="font-mono text-meta text-muted">{t(locale, 'notes.entry', { number: noteNumber(prev.data.number) })}</span>
       <span class="font-medium">{prev.data.title}</span>
     </a>
   ) : <span></span>}
   {next && (
     <a href={link(next)} class="flex flex-col gap-1 rounded-card bg-card p-4 text-right transition-colors duration-150 hover:bg-card-hover sm:col-start-2">
-      <span class="font-mono text-meta text-muted">{t(locale, 'note.next')} · {t(locale, 'notes.entry', { number: noteNumber(next.data.number) })}</span>
+      <span class="font-mono text-meta text-muted">{t(locale, 'note.next')}</span>
+      <span class="font-mono text-meta text-muted">{t(locale, 'notes.entry', { number: noteNumber(next.data.number) })}</span>
       <span class="font-medium">{next.data.title}</span>
     </a>
   )}

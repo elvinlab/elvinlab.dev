@@ -23,7 +23,7 @@ Brand tokens, fonts, colors, motion and the accessibility floor are identical in
 
 ## Avoid
 
-No gradient text on headlines, no ALL-CAPS eyebrow labels, no meta strings joined with `·`, no `→` in link text, mono only for entry numbers and code, no stock images.
+No ALL-CAPS labels on pages (the language codes ES/EN in `LangBadge` and the navbar locale switch are the only exception: they are codes, not labels). No meta strings joined with a middle dot (use spacing or separate elements). Mono is for entry numbers, dates, counts, tags, code and short labels, never sentences. Pixel is for short, large text (page titles included). No gradient text, no `→` in link text, no stock images.
 
 ## Color (semantic tokens)
 
@@ -44,18 +44,23 @@ The brand gradient (violet → cyan → pink) appears only as a 3 px strip on re
 
 Space Grotesk for body, UI and note titles, JetBrains Mono for entry numbers and code, all self-hosted via Fontsource. Two pixel faces, each with one job:
 
-- **Pixelify Sans** (`@fontsource-variable/pixelify-sans`, one variable file, weight 600) is the display face for the home hero headline and the accent-bar section titles (`SectionHeading`, so `/me` titles too). It is the core font token `pixel` (`font-pixel`, `packages/core/src/tokens/tokens.json`), so a theme can replace it. Only the Latin file is preloaded, on the home page only (~12 KB). Hero and section titles read the preset scale below (`text-hero`, `text-section`), with `text-balance` on the hero; the hero measure is a preset variable (16 ch in `full`, 22 ch from `md` in `minimal`, so the minimal hero sits on two lines on desktop).
+- **Pixelify Sans** (`@fontsource-variable/pixelify-sans`, one variable file, weight 600) is the display face for the home hero headline, the page titles of the inner pages (`PageHeader`: Experiments, Contact, Changelog; and the `/notes/` banner H1) and the accent-bar section titles (`SectionHeading`, so `/me` titles too). It is the core font token `pixel` (`font-pixel`, `packages/core/src/tokens/tokens.json`), so a theme can replace it. Only the Latin file is preloaded (~12 KB), on every page whose H1 uses it (home, `/notes/`, `/experiments/`, `/contact/`, `/changelog/` and their `/en/` twins) through a `<link slot="head" rel="preload">`, never on pages that do not use it. Hero, page and section titles read the preset scale below (`text-hero`, `text-page-title`, `text-section`), with `text-balance` on the hero; the hero measure is a preset variable (16 ch in `full`, 22 ch from `md` in `minimal`, so the minimal hero sits on two lines on desktop).
 - **Press Start 2P** stays the brand mark: navbar wordmark, retro footer signature and a larger signature on the 404 page.
 
 Rule: pixel faces are for short, large text only, never paragraphs, note prose, note titles, navigation or forms. Known caveat: the pixel `e` is less legible at large sizes; it was judged acceptable at the `minimal` hero sizes (32 / 44 px). Brand decision in [BRAND.md](BRAND.md#tipografía).
 
+### Page header
+
+`shared/ui/PageHeader.astro` is the one header of the inner pages: a pixel `<h1>` (`font-pixel text-page-title`, balanced), an optional description in the body face (`text-text-secondary`, 60ch, `text-pretty`) and an optional `icon` slot for the pixel icons of Experiments and Changelog. It sets the air: about 32 px above on phones and 40 px from `md`, 32 px below. Titles are one or two words. Contact renders it as a full-width row above its two columns so the form and the side panel start at the same top.
+
 ### Scale
 
-The scale is driven by `html[data-appearance]` and lives once in `apps/web/src/styles/type-scale.css` (web app, not `core`: it is keyed by the app-level `appearance`, while core tokens are keyed by color theme). Components use the `text-hero`, `text-section`, `text-note-title`, `text-card-title` and `text-intro` utilities, and `.prose` reads `--type-prose*`; none of them test the preset. Values are rem, so the visitor's font-size setting still scales them. Sizes are phone / from `md` (48 rem):
+The scale is driven by `html[data-appearance]` and lives once in `apps/web/src/styles/type-scale.css` (web app, not `core`: it is keyed by the app-level `appearance`, while core tokens are keyed by color theme). Components use the `text-hero`, `text-page-title`, `text-section`, `text-note-title`, `text-card-title` and `text-intro` utilities, and `.prose` reads `--type-prose*`; none of them test the preset. Values are rem, so the visitor's font-size setting still scales them. Sizes are phone / from `md` (48 rem):
 
 | Element | `minimal` | `full` (balanced since 2026-10-02) |
 | --- | --- | --- |
 | Hero (pixel face) | 32 / 44 px | 32 / 52 px |
+| Page titles (pixel face, `PageHeader`) | 26 / 32 px | 28 / 36 px |
 | Section titles (pixel face) | 20 px | 22 px |
 | Note title | 30 / 40 px | 30 / 40 px |
 | Latest-note card title | 20 / 22 px | 24 / 30 px |

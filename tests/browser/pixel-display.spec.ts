@@ -97,7 +97,64 @@ test('note page titles and prose stay Space Grotesk', async ({ page }) => {
   expect(await familyOf(page, 'article .prose p')).not.toMatch(PIXEL_FAMILY);
 });
 
-test('the notes page does not preload the pixel face', async ({ page }) => {
-  await page.goto('/notes/');
+const PIXEL_TITLE_PATHS = [
+  '/notes/',
+  '/experiments/',
+  '/en/experiments/',
+  '/contact/',
+  '/en/contact/',
+  '/changelog/',
+  '/en/changelog/',
+];
+
+for (const path of PIXEL_TITLE_PATHS) {
+  test(`the page title of ${path} is pixel, preloaded and unclipped`, async ({ page }) => {
+    await page.goto(path);
+    expect(await familyOf(page, 'main h1')).toMatch(PIXEL_FAMILY);
+    await expect(
+      page.locator('head link[rel="preload"][as="font"][href*="pixelify-sans-latin-wght-normal"]'),
+    ).toHaveCount(1);
+    // The description under the title stays in the body face.
+    expect(await familyOf(page, 'main h1 + p')).not.toMatch(PIXEL_FAMILY);
+    for (const width of WIDTHS) {
+      await page.setViewportSize({ width, height: 900 });
+      await page.evaluate(async () => {
+        await document.fonts.ready;
+      });
+      expect(await noHorizontalOverflow(page), `${path} at ${width}px`).toBe(true);
+      expect(
+        await page.locator('main h1').evaluate((el) => el.scrollWidth <= el.clientWidth),
+        `${path} at ${width}px`,
+      ).toBe(true);
+    }
+  });
+}
+
+test('the page title leaves air under the navbar and the description stays readable', async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 390, height: 900 });
+  await page.goto('/contact/');
+  const gap = await page.evaluate(() => {
+    const nav = document.querySelector('[data-site-chrome]')?.getBoundingClientRect();
+    const h1 = document.querySelector('main h1')?.getBoundingClientRect();
+    return nav && h1 ? h1.top - nav.bottom : 0;
+  });
+  expect(gap).toBeGreaterThanOrEqual(32);
+});
+
+test('the contact form and its side panel start at the same top', async ({ page }) => {
+  await page.setViewportSize({ width: 1280, height: 900 });
+  await page.goto('/contact/');
+  const tops = await page.evaluate(() => {
+    const form = document.querySelector('article form')?.getBoundingClientRect().top ?? -1;
+    const aside = document.querySelector('main aside')?.getBoundingClientRect().top ?? -2;
+    return { form, aside };
+  });
+  expect(Math.abs(tops.form - tops.aside)).toBeLessThanOrEqual(2);
+});
+
+test('pages whose title is not pixel do not preload the pixel face', async ({ page }) => {
+  await page.goto('/notes/smoke-es/');
   await expect(page.locator('head link[rel="preload"][href*="pixelify-sans"]')).toHaveCount(0);
 });

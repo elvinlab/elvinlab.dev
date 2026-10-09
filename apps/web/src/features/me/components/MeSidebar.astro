@@ -21,7 +21,7 @@ const others = groups.filter(({ group }) => !group.layer && !group.folded);
 const folded = groups.filter(({ group }) => !group.layer && group.folded);
 ---
 
-<div class="flex flex-col gap-4 lg:sticky lg:top-4">
+<div class="flex flex-col gap-4">
   <QuickFacts locale={locale} idPrefix="qf-side" class="hidden lg:flex" />
 
   <section class="tip-card flex flex-col gap-3 rounded-card bg-card p-5">

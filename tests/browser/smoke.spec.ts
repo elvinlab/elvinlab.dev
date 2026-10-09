@@ -282,6 +282,7 @@ test('unknown routes render the bilingual 404, not a successful page', async ({ 
   expect(response?.status()).toBe(404);
   await expect(page.getByRole('heading', { level: 1 })).toBeVisible();
   await expect(page.locator('main [lang="en"] h2')).toBeVisible();
+  await expect(page.locator('[data-subscribe]')).toHaveCount(0);
 });
 
 test('negative control: the heading check rejects a broken document', async ({ page }) => {

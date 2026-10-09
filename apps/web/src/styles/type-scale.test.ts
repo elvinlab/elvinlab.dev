@@ -24,9 +24,10 @@ const { base, md } = split(scaleCss);
 describe('type scale: full is the balanced scale', () => {
   // `full` was the pre-preset look (hero 36/60, card title 30/36, prose 18) until 2026-10-02, when
   // the owner approved a smaller scale to stop headings wrapping to 4 or 5 lines on a phone.
-  it('phone values: hero 32, section 22, note 30, card 24, intro 17, body 17', () => {
+  it('phone values: hero 32, page title 28, section 22, note 30, card 24, intro 17, body 17', () => {
     expect(base.get(FULL)).toMatchObject({
       '--type-hero': '2rem',
+      '--type-page-title': '1.75rem',
       '--type-section': '1.375rem',
       '--type-section-leading': '1.875rem',
       '--type-note-title': '1.875rem',
@@ -39,9 +40,10 @@ describe('type scale: full is the balanced scale', () => {
     });
   });
 
-  it('values from md up: hero 52, note 40, card 30, intro 19', () => {
+  it('values from md up: hero 52, page title 36, note 40, card 30, intro 19', () => {
     expect(md.get(FULL)).toEqual({
       '--type-hero': '3.25rem',
+      '--type-page-title': '2.25rem',
       '--type-note-title': '2.5rem',
       '--type-card-title': '1.875rem',
       '--type-intro': '1.1875rem',
@@ -50,9 +52,10 @@ describe('type scale: full is the balanced scale', () => {
 });
 
 describe('type scale: minimal is the calm scale', () => {
-  it('phone values: hero 32, section 20, note 30, card 20, intro 17, body 17', () => {
+  it('phone values: hero 32, page title 26, section 20, note 30, card 20, intro 17, body 17', () => {
     expect(base.get(MINIMAL)).toMatchObject({
       '--type-hero': '2rem',
+      '--type-page-title': '1.625rem',
       '--type-section': '1.25rem',
       '--type-section-leading': '1.75rem',
       '--type-note-title': '1.875rem',
@@ -65,9 +68,10 @@ describe('type scale: minimal is the calm scale', () => {
     });
   });
 
-  it('values from md up: hero 44, note 40, card 22, intro 19', () => {
+  it('values from md up: hero 44, page title 32, note 40, card 22, intro 19', () => {
     expect(md.get(MINIMAL)).toEqual({
       '--type-hero': '2.75rem',
+      '--type-page-title': '2rem',
       '--type-note-title': '2.5rem',
       '--type-card-title': '1.375rem',
       '--type-intro': '1.1875rem',
@@ -98,6 +102,7 @@ describe('type scale wiring', () => {
   it('exposes every size as a Tailwind text utility that reads the runtime variable', () => {
     for (const [utility, variable] of [
       ['hero', 'hero'],
+      ['page-title', 'page-title'],
       ['section', 'section'],
       ['note-title', 'note-title'],
       ['card-title', 'card-title'],

@@ -38,7 +38,7 @@ export const MARKS_CSS =
   '.mb{position:relative;display:inline-flex;align-items:center;gap:.5rem;min-width:44px;min-height:44px;padding:.5rem .875rem;border:1.5px solid var(--color-pink);border-radius:var(--radius-pill);background:var(--color-card);color:var(--color-text);font:.8125rem var(--font-mono);text-align:left;cursor:pointer;transition:background-color .15s}' +
   '.mb:hover{background:var(--color-chip)}' +
   '.mt{position:relative;display:inline-flex}' +
-  '.mx{position:absolute;left:0;top:calc(100% + .5rem);z-index:5;width:max-content;max-width:min(18rem,calc(100vw - 2rem));padding:.5rem .75rem;border:1px solid var(--color-divider);border-radius:var(--radius-inner);background:var(--color-card);color:var(--color-text-secondary);font:.8125rem/1.4 var(--font-mono);visibility:hidden}' +
+  '.mx{position:absolute;left:0;top:calc(100% + .5rem);z-index:5;width:max-content;max-width:min(15rem,calc(100vw - 3rem));padding:.5rem .75rem;border:1px solid var(--color-divider);border-radius:var(--radius-inner);background:var(--color-card);color:var(--color-text-secondary);font:.8125rem/1.4 var(--font-mono);visibility:hidden}' +
   '.mx:before{content:"";position:absolute;inset:-.6rem 0 auto;height:.6rem}' +
   '[data-marks-card]:not(:has([data-r])){display:none}' +
   '.mk[data-v=h] .mx,.mk[data-v=c] .mx{top:auto;bottom:calc(100% + .5rem)}' +

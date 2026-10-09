@@ -333,6 +333,7 @@ export const CHECKS: readonly CheckDef[] = [
   e2e({ file: 'me-hero-tips.spec.ts', covers: ME }),
   e2e({ file: 'me-photo.spec.ts', covers: ME }),
   e2e({ file: 'mobile-ux.spec.ts', covers: EVERY_PAGE, responsive: true }),
+  e2e({ file: 'no-horizontal-overflow.spec.ts', covers: EVERY_PAGE }),
   e2e({ file: 'note-share.spec.ts', covers: NOTE_PAGE }),
   e2e({ file: 'note-translations.spec.ts', covers: NOTE_PAGE }),
   e2e({ file: 'notes-layout.spec.ts', covers: NOTE_PAGE, responsive: true }),

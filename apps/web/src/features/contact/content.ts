@@ -1,11 +1,18 @@
 import type { ContactFormStrings } from './client/form.ts';
 
+/** What the island needs on top of the shared form strings: the required note and the failed-submit summary. */
+export type ContactFormCopy = ContactFormStrings & {
+  requiredNote: string;
+  /** Announced politely after a failed submit; `{count}` is replaced with the number of invalid fields. */
+  invalidSummary: { one: string; other: string };
+};
+
 export type ContactContent = {
   pageTitle: string;
   pageDescription: string;
   noscript: string;
   linkedin: string;
-  form: ContactFormStrings;
+  form: ContactFormCopy;
   aside: { title: string; items: string[]; privacyLabel: string };
 };
 
@@ -66,6 +73,8 @@ export function buildContactContent(): Record<'es' | 'en', ContactContent> {
             'No se pudo enviar tu mensaje. Revisa los datos e inténtalo de nuevo en un momento.',
           network: 'No hay conexión con el servidor. Inténtalo de nuevo.',
         },
+        requiredNote: 'Todos los campos son obligatorios.',
+        invalidSummary: { one: 'Revisa 1 campo', other: 'Revisa {count} campos' },
         verifying: 'Verificando que eres una persona…',
         unavailable: 'El formulario aún no está disponible. Vuelve pronto.',
       },
@@ -123,6 +132,8 @@ export function buildContactContent(): Record<'es' | 'en', ContactContent> {
           rejected: 'Your message could not be sent. Check the details and try again in a moment.',
           network: 'Could not reach the server. Please try again.',
         },
+        requiredNote: 'All fields are required.',
+        invalidSummary: { one: 'Check 1 field', other: 'Check {count} fields' },
         verifying: 'Verifying that you are a person…',
         unavailable: 'The form is not available yet. Please check back soon.',
       },

@@ -357,4 +357,17 @@ describe('buildContactContent', () => {
       }
     }
   });
+
+  it('says every field is required and summarizes failed submits, in both locales', () => {
+    expect(content.es.form.requiredNote).toBe('Todos los campos son obligatorios.');
+    expect(content.en.form.requiredNote).toBe('All fields are required.');
+    expect(content.es.form.invalidSummary.one).toBe('Revisa 1 campo');
+    expect(content.es.form.invalidSummary.other).toBe('Revisa {count} campos');
+    expect(content.en.form.invalidSummary.one).toBe('Check 1 field');
+    expect(content.en.form.invalidSummary.other).toBe('Check {count} fields');
+    for (const locale of ['es', 'en'] as const) {
+      expect(content[locale].form.invalidSummary.other).toContain('{count}');
+      expect(content[locale].form.requiredNote).not.toContain('@');
+    }
+  });
 });

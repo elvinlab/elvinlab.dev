@@ -25,6 +25,8 @@ const COPY = {
     submit: 'Enviar mensaje',
     required: ['Escribe tu nombre.', 'Escribe tu correo.', 'Escribe un mensaje.'],
     invalidEmail: 'Revisa el formato del correo.',
+    requiredNote: 'Todos los campos son obligatorios.',
+    summary: 'Revisa 3 campos',
     unavailable: 'El formulario no está disponible por ahora. Inténtalo más tarde.',
     linkedin: 'Búscame allí.',
     placeholder: 'nombre@ejemplo.com',
@@ -37,6 +39,8 @@ const COPY = {
     submit: 'Send message',
     required: ['Enter your name.', 'Enter your email.', 'Write a message.'],
     invalidEmail: 'Check the email format.',
+    requiredNote: 'All fields are required.',
+    summary: 'Check 3 fields',
     unavailable: 'The form is not available right now. Please try again later.',
     linkedin: 'Find me there.',
     placeholder: 'name@example.com',
@@ -87,6 +91,33 @@ for (const [locale, copy] of Object.entries(COPY)) {
         await expect(page.getByLabel(label)).toHaveAttribute('aria-invalid', 'true');
       }
       await expect(page.getByLabel(copy.name)).toBeFocused();
+    });
+
+    test('marks the three fields as required and says so before the first field', async ({
+      page,
+    }) => {
+      await openForm(page, copy);
+      for (const label of [copy.name, copy.email, copy.message]) {
+        const field = page.getByLabel(label);
+        await expect(field).toHaveAttribute('aria-required', 'true');
+        await expect(field).toHaveAttribute('required', '');
+      }
+      const note = page.getByText(copy.requiredNote);
+      await expect(note).toBeVisible();
+      const noteBox = await note.boundingBox();
+      const nameBox = await page.getByLabel(copy.name).boundingBox();
+      expect(noteBox?.y ?? Number.POSITIVE_INFINITY).toBeLessThan(nameBox?.y ?? 0);
+    });
+
+    test('a failed submit announces a summary in a persistent polite live region', async ({
+      page,
+    }) => {
+      await openForm(page, copy);
+      const live = page.locator('form p[role="status"][aria-live="polite"].sr-only').first();
+      await expect(live).toHaveCount(1);
+      await expect(live).toHaveText('');
+      await page.getByRole('button', { name: copy.submit }).click();
+      await expect(live).toHaveText(copy.summary);
     });
 
     test('shows the LinkedIn link, opening in a new tab with the shared hint', async ({ page }) => {

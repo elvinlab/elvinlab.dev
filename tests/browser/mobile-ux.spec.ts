@@ -110,6 +110,16 @@ for (const phone of PHONES) {
       expect(await noHorizontalOverflow(page)).toBe(true);
     });
 
+    test('tag chips, sidebar links and the notes index keep a 44 px hit area', async ({ page }) => {
+      await page.goto('/notes/');
+      const chips = page.locator('a.rounded-pill.bg-chip');
+      expect(await chips.count()).toBeGreaterThan(0);
+      expect(await hasTapArea(chips.first()), 'first link chip').toBe(true);
+      const rss = page.locator('main a[href="/rss.xml"]').first();
+      await expect(rss).toBeVisible();
+      expect(await hasTapArea(rss), 'RSS link').toBe(true);
+    });
+
     test('footer links, "all notes" and the banner toggle have a 44 px hit area', async ({
       page,
     }) => {

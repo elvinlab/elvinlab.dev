@@ -110,3 +110,24 @@ for (const { path, now, nowDate, nowFocus, retired, pillars, notebook, hiring } 
     });
   });
 }
+
+test.describe('home hero action and language cue', () => {
+  test('shows a profile link in the hero on phones only', async ({ page }) => {
+    await page.setViewportSize({ width: 390, height: 844 });
+    await page.goto('/');
+    const cta = page.locator('[data-home-hero] a[href="/me/"]');
+    await expect(cta).toBeVisible();
+    await page.setViewportSize({ width: 1280, height: 900 });
+    await expect(cta).toBeHidden();
+    await expect(page.locator('aside a[href="/me/"]')).toBeVisible();
+  });
+
+  test('notes the language of the notes on /en/ and does not call Spanish notes foreign on /', async ({
+    page,
+  }) => {
+    await page.goto('/en/');
+    await expect(page.getByText('Notes written in Spanish.')).toBeVisible();
+    await page.goto('/');
+    await expect(page.getByText('Notas escritas en español.')).toHaveCount(0);
+  });
+});
