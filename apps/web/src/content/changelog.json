@@ -579,7 +579,7 @@
     "date": "2026-10-11",
     "category": "changed",
     "title": "A new typeface: IBM Plex Sans",
-    "description": "Body text, navigation and note titles now use IBM Plex Sans instead of Space Grotesk. The pixel headlines, the monospaced labels and the layout stay the same. To keep pages fast, only the body font is preloaded; the monospaced font loads on demand."
+    "description": "Body text, navigation and note titles now use IBM Plex Sans instead of Space Grotesk. The pixel headlines, the monospaced labels and the layout stay the same. To keep pages fast, the fonts load on demand instead of being preloaded."
   },
   "reading-mode-css-scope": {
     "date": "2026-10-11",

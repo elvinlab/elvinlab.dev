@@ -1,9 +1,12 @@
 import { expect, test } from '@playwright/test';
 
-/** The body font every page preloads. JetBrains Mono is deliberately not preloaded (it competes with
- * the body font for the LCP text on note pages); Press Start 2P and the non-Latin subsets stay lazy. */
-const BODY_FONTS = [/ibm-plex-sans-latin-wght-normal.*\.woff2$/];
-const MONO_FONT = /jetbrains-mono-latin-wght-normal.*\.woff2$/;
+/** Neither big face is preloaded: each one sat on the critical path of the simulated LCP and cost the
+ * note page and /me/ their margin against the 2500 ms gate. They load on demand (`font-display: swap`). */
+const BODY_FONTS: RegExp[] = [];
+const BIG_FONTS = [
+  /ibm-plex-sans-latin-wght-normal.*\.woff2$/,
+  /jetbrains-mono-latin-wght-normal.*\.woff2$/,
+];
 /** Pixelify Sans is preloaded wherever an H1 uses it (home hero, notes banner, `PageHeader`); never elsewhere. */
 const PIXEL_FONT = /pixelify-sans-latin-wght-normal.*\.woff2$/;
 const PAGES = [
@@ -46,7 +49,8 @@ for (const { path, preloads: expectedPreloads } of PAGES) {
       );
 
     expect(preloads).toHaveLength(expectedPreloads.length);
-    for (const preload of preloads) expect(preload.href).not.toMatch(MONO_FONT);
+    for (const preload of preloads)
+      for (const big of BIG_FONTS) expect(preload.href).not.toMatch(big);
     for (const [index, pattern] of expectedPreloads.entries()) {
       const preload = preloads[index];
       expect(preload?.href).toMatch(pattern);
