@@ -598,5 +598,11 @@
     "category": "changed",
     "title": "Text no longer jumps when the font finishes loading",
     "description": "On a first visit the page used to show a system font for a moment and then shift when IBM Plex Sans arrived, wrapping titles onto another line on phones. A size-matched stand-in font now takes the same space, so nothing above the fold moves, and the font rules are a little lighter in every page."
+  },
+  "experiments-screenshots-refresh": {
+    "date": "2026-10-11",
+    "category": "changed",
+    "title": "Fresh screenshots in the experiments gallery",
+    "description": "The pictures of elvinlab.dev and of the agentic-dev-setup note on the experiments page and on /me now show the current design: the new home headline, the lab-paper banner, the decision record next to the note title and the new typeface."
   }
 }
