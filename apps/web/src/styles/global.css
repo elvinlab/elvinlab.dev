@@ -193,9 +193,7 @@ html {
     background: transparent;
   }
   [data-printable] [data-banner] canvas,
-  [data-printable] .banner-grid,
-  [data-printable] .banner-stars,
-  [data-printable] .banner-glow {
+  [data-printable] .banner-grid {
     display: none;
   }
 }

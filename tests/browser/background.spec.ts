@@ -1,6 +1,6 @@
 import { expect, type Page, test } from '@playwright/test';
 
-test('the background picker cycles galaxy -> cursor-waves -> off at runtime, no reload', async ({
+test('the background picker cycles galaxy -> cursor-waves -> off at runtime, no reload, from the paper default', async ({
   browser,
 }) => {
   // Effects are intentionally inert under prefers-reduced-motion (the project default); override
@@ -11,6 +11,14 @@ test('the background picker cycles galaxy -> cursor-waves -> off at runtime, no 
   const picker = page.getByRole('button', { name: /cambiar fondo|change background/i });
   const stored = () => page.evaluate(() => localStorage.getItem('background'));
 
+  // The owner default is the static paper ('off'): nothing stored and no effect running yet.
+  expect(await stored()).toBeNull();
+  await expect(page.locator('[data-background]')).not.toBeVisible();
+
+  await picker.click();
+  expect(await stored()).toBe('galaxy');
+  await expect(page.locator('[data-background]')).toBeVisible();
+
   await picker.click();
   expect(await stored()).toBe('cursor-waves');
   await expect(page.locator('[data-background]')).toBeVisible();
@@ -18,10 +26,6 @@ test('the background picker cycles galaxy -> cursor-waves -> off at runtime, no 
   await picker.click();
   expect(await stored()).toBe('off');
   await expect(page.locator('[data-background]')).not.toBeVisible();
-
-  await picker.click();
-  expect(await stored()).toBe('galaxy');
-  await expect(page.locator('[data-background]')).toBeVisible();
   await context.close();
 });
 
@@ -32,8 +36,13 @@ test('the background choice persists across reloads', async ({ browser }) => {
   const picker = page.getByRole('button', { name: /cambiar fondo|change background/i });
   await picker.click();
   await picker.click();
-  expect(await page.evaluate(() => localStorage.getItem('background'))).toBe('off');
+  expect(await page.evaluate(() => localStorage.getItem('background'))).toBe('cursor-waves');
 
+  await page.reload();
+  await expect(page.locator('[data-background]')).toBeVisible();
+
+  await picker.click();
+  expect(await page.evaluate(() => localStorage.getItem('background'))).toBe('off');
   await page.reload();
   await expect(page.locator('[data-background]')).not.toBeVisible();
   await context.close();
@@ -72,10 +81,25 @@ test('regression: cycling many times never loses the WebGL context (one context 
   await page.waitForTimeout(200);
 
   expect(messages).toEqual([]);
-  // Settled on a known state (20 clicks, 3-state cycle starting from galaxy -> off at i=19).
-  expect(await page.evaluate(() => localStorage.getItem('background'))).toBe('off');
+  // Settled on a known state (20 clicks of the 3-state cycle starting from the 'off' default end on cursor-waves).
+  expect(await page.evaluate(() => localStorage.getItem('background'))).toBe('cursor-waves');
   await context.close();
 });
+
+/** Computed state of the paper layer and its two pseudo-elements (ruler, crosses). */
+const paperState = (page: Page) =>
+  page.evaluate(() => {
+    const paper = document.querySelector('.banner-grid') as Element;
+    const style = getComputedStyle(paper);
+    return {
+      paperDisplay: style.display,
+      paperBackground: style.backgroundImage,
+      paperAnimation: style.animationName,
+      rulerAnimation: getComputedStyle(paper, '::before').animationName,
+      crossesAnimation: getComputedStyle(paper, '::after').animationName,
+      legacyLayers: document.querySelectorAll('.banner-stars, .banner-glow').length,
+    };
+  });
 
 type BackgroundProbe = { webgl2Attempts: number; animationFrames: number };
 
@@ -114,29 +138,30 @@ test('coarse-pointer touch devices keep the static background without starting W
 
   const state = await page.evaluate(() => {
     const canvas = document.querySelector('[data-background]');
-    const stars = document.querySelector('.banner-stars');
-    if (!canvas || !stars) throw new Error('Expected background canvas and static stars');
+    const paper = document.querySelector('.banner-grid');
+    if (!canvas || !paper) throw new Error('Expected background canvas and the paper layer');
     return {
       coarsePointer: matchMedia('(pointer: coarse)').matches,
       canvasDisplay: getComputedStyle(canvas).display,
-      starsDisplay: getComputedStyle(stars).display,
-      starsBackground: getComputedStyle(stars).backgroundImage,
-      starsAnimation: getComputedStyle(stars).animationName,
       probe: (window as unknown as Window & { __backgroundProbe: BackgroundProbe })
         .__backgroundProbe,
     };
   });
+  const paper = await paperState(page);
 
   expect(state.coarsePointer).toBe(true);
   expect(state.canvasDisplay).toBe('none');
-  expect(state.starsDisplay).not.toBe('none');
-  expect(state.starsBackground).toContain('radial-gradient');
-  expect(state.starsAnimation).toBe('none');
+  expect(paper.paperDisplay).not.toBe('none');
+  expect(paper.paperBackground).toContain('linear-gradient');
+  expect(paper.paperAnimation).toBe('none');
+  expect(paper.legacyLayers).toBe(0);
   expect(state.probe).toEqual({ webgl2Attempts: 0, animationFrames: 0 });
   await context.close();
 });
 
-test('fine-pointer desktop keeps the animated WebGL background', async ({ browser }) => {
+test('the default background is the static paper: no WebGL, no animation, no stars or glows', async ({
+  browser,
+}) => {
   const context = await browser.newContext({
     isMobile: false,
     hasTouch: false,
@@ -146,6 +171,40 @@ test('fine-pointer desktop keeps the animated WebGL background', async ({ browse
   const page = await context.newPage();
   await page.addInitScript(instrumentBackground);
   await page.goto('/');
+  await page.waitForTimeout(300);
+
+  const state = await page.evaluate(() => ({
+    finePointer: matchMedia('(pointer: fine)').matches,
+    canvasDisplay: getComputedStyle(document.querySelector('[data-background]') as Element).display,
+    probe: (window as unknown as Window & { __backgroundProbe: BackgroundProbe }).__backgroundProbe,
+  }));
+
+  const paper = await paperState(page);
+
+  expect(state.finePointer).toBe(true);
+  expect(state.canvasDisplay).toBe('none');
+  expect(paper.paperDisplay).not.toBe('none');
+  expect(paper.paperAnimation).toBe('none');
+  expect(paper.rulerAnimation).toBe('none');
+  expect(paper.crossesAnimation).toBe('none');
+  expect(paper.legacyLayers).toBe(0);
+  expect(state.probe.webgl2Attempts).toBe(0);
+  await context.close();
+});
+
+test('fine-pointer desktop runs the animated WebGL background once the visitor picks galaxy', async ({
+  browser,
+}) => {
+  const context = await browser.newContext({
+    isMobile: false,
+    hasTouch: false,
+    reducedMotion: 'no-preference',
+    viewport: { width: 1280, height: 900 },
+  });
+  const page = await context.newPage();
+  await page.addInitScript(instrumentBackground);
+  await page.addInitScript(() => localStorage.setItem('background', 'galaxy'));
+  await page.goto('/');
   await page.waitForFunction(
     () =>
       (window as unknown as Window & { __backgroundProbe: BackgroundProbe }).__backgroundProbe
@@ -154,12 +213,10 @@ test('fine-pointer desktop keeps the animated WebGL background', async ({ browse
 
   const state = await page.evaluate(() => {
     const canvas = document.querySelector('[data-background]');
-    const stars = document.querySelector('.banner-stars');
-    if (!canvas || !stars) throw new Error('Expected background canvas and static stars');
+    if (!canvas) throw new Error('Expected background canvas');
     return {
       finePointer: matchMedia('(pointer: fine)').matches,
       canvasDisplay: getComputedStyle(canvas).display,
-      starsAnimation: getComputedStyle(stars).animationName,
       probe: (window as unknown as Window & { __backgroundProbe: BackgroundProbe })
         .__backgroundProbe,
     };
@@ -167,7 +224,6 @@ test('fine-pointer desktop keeps the animated WebGL background', async ({ browse
 
   expect(state.finePointer).toBe(true);
   expect(state.canvasDisplay).not.toBe('none');
-  expect(state.starsAnimation).toBe('banner-twinkle');
   expect(state.probe.webgl2Attempts).toBeGreaterThan(0);
   expect(state.probe.animationFrames).toBeGreaterThan(1);
   await context.close();

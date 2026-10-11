@@ -168,7 +168,7 @@ La identidad es "laboratorio de IA sobre fondo oscuro": pocos elementos, siempre
 | Motivo | Qué es | Dónde va |
 | --- | --- | --- |
 | Gradiente de marca | Violeta → cian → rosa | Nombre, años de la línea de tiempo, bordes activos, barra de 4 px al pie de los banners |
-| Grilla de fondo | Cuadrícula de 32 px, casi invisible | Fondos de banners y hero |
+| Papel de laboratorio (decidido 2026-10-10) | Cuadrícula fina de 16 px con línea mayor cada 80 px, regla de marcas en el borde izquierdo y tres cruces de registro; un solo tono (el del texto, con poca opacidad), estático y sin brillos ni estrellas | Fondo por defecto de todos los banners. La galaxia y las olas WebGL siguen disponibles en el selector del navbar |
 | Red de nodos con pulsos | Nodos conectados; los datos viajan por las líneas | Banner principal, diagramas de arquitectura |
 | Borde con luz | Un tramo de gradiente recorre el borde de la tarjeta | Tarjetas destacadas (máx. una fila por página) |
 | Resplandor | Gradiente radial en una esquina | Tarjetas y hero; nunca sombras duras |

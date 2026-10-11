@@ -100,7 +100,8 @@ export const siteConfig = {
     category: 'Announcements',
     categoryId: 'DIC_kwDOUvCLAM4DG1yT',
   },
-  background: { galaxy: true, cursorWaves: false },
+  // Default is the static lab paper (no effect); visitors can still pick galaxy or waves in the navbar.
+  background: { galaxy: false, cursorWaves: false },
   // Footprint button on notes (animation, per-browser cap, counter threshold): docs/CONFIGURATION.md.
   marks: { animation: 'stamp', maxPerVisitor: 50, showCountFrom: 5 },
   recruiter: {

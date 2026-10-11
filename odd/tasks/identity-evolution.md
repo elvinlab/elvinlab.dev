@@ -61,7 +61,11 @@ Visual identity surfaces of `apps/web` and `packages/core` tokens, the two desig
 
 - 2026-10-10 hero cleanup (T1 closed): removed the home kicker, turned the slogan pills off with `home.heroPills: false`, expanded banner `clamp(440px, 56vh, 520px)` (504 px at the test viewport, was 594), tests and docs updated. Evidence: typecheck, vitest (styles, config: 185 passed), e2e quick on calm-pages, home-sections, pixel-display, mobile-ux, smoke, performance, and 360 px on calm-pages, mobile-ux, smoke, home-sections. One intermittent failure of `calm-pages` "the note header keeps date and reading time" in a six-spec batch; it passed alone and in two reruns of the whole file. Not re-run: `check:page-weight` (the change only removes markup), a11y, Lighthouse.
 
+- 2026-10-10 banner background (T3 background part): owner picked "lab paper" (option 1 of 3). Static CSS paper in `Banner.astro` (16 px minor and 80 px major grid, left ruler, three registration crosses, ink from `--color-text` at low alpha), stars and glows removed, owner default `background: { galaxy: false, cursorWaves: false }`; galaxy and waves stay in the picker. Route: delegated writer, parent reviewed renders (home dark, light, 390 dark). Evidence: typecheck, lint, vitest (web 368, core 37), e2e quick on six specs (106 passed, 1 skipped), 360 px on background, calm-pages, a11y (55 passed), `check:page-weight` 0 FAIL (style margin on `/` is 238 B), `docs:config` unchanged. The writer saw one reading-mode test fail once because it assumed the galaxy default; fixed. Not verified: contrast (lines about 5 and 10 percent alpha, behind all text), Lighthouse, e2e at 390 and 768, the other six screenshots.
+
 ## Open items
+
+- The navbar background button now shows its "off" icon (a circle with a slash) by default, which can read as "disabled". Decide whether to change that icon or the cycle order.
 
 - The kicker "elvinlab / lab notes" also appears in the `/notes/` banner (not touched).
 - T2 home hierarchy, T3 dark-theme background and body type pairing are not started. Owner has not decided on them.
