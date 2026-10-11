@@ -67,6 +67,8 @@ Visual identity surfaces of `apps/web` and `packages/core` tokens, the two desig
 
 - 2026-10-10 notes index kicker removed (`/notes/` banner "elvinlab / lab notes"), plus the dead `notes.eyebrow` i18n keys and an unused import. While running the related specs two stale expectations from my earlier commits surfaced and were fixed: `mobile-ux` "background picker icon" expected a circle in the off state (the icon is a grid now) and `type-scale` pinned the latest-note title to the card step (it is the note-title step since the home lost its cards). The earlier touch-scoped runs had not included those specs. Full `test:e2e:quick` (1280 px) afterwards: 549 passed, 13 skipped, 0 failed (1.8 min), including the `/contact/` axe test that had flaked in batches. Not run: 390 and 768 px projects, Lighthouse.
 
+- 2026-10-11 typeface (T3, last piece): owner picked IBM Plex Sans (option 1 of 3) and authorized installing `@fontsource-variable/ibm-plex-sans` 5.3.0; `@fontsource-variable/space-grotesk` removed. Route: delegated writer, parent reviewed screenshots (note 1440, /me 1440, home 1440). The writer's whole-stack run found two problems: `test:white-label` failed because my earlier commit `5e6e250` leaked `html[data-reading]` CSS into `calm-layout.css` (fixed in `83c5877`), and Lighthouse LCP on the note page was 2582 to 2588 ms (gate 2500) because Plex Latin is 46 KB versus 22 KB. Measured fix: stop preloading JetBrains Mono (LCP 2261 to 2437, CLS 0.015). Final tree: full `test:lighthouse` exit 0, `test:e2e:quick` 549 passed. Ledger entry added.
+
 ## Open items
 
 - The page-weight style budget on `/` has about 190 B of margin left; any new utility on the home needs `check:page-weight`.

@@ -1,7 +1,7 @@
 /**
  * The two subscription emails as pure functions: HTML (table layout, inline CSS, system fonts) plus
  * a plain-text twin. No framework or provider imports; the caller passes every owner-specific value.
- * Email clients cannot load web fonts, so the page's Press Start 2P and Space Grotesk do not appear.
+ * Email clients cannot load web fonts, so the page's Press Start 2P and IBM Plex Sans do not appear.
  */
 import type { SubscribeLocale } from './ports.ts';
 

@@ -12,7 +12,7 @@ const sample: Tokens = {
     'lab-light': { scheme: 'light', colors: { page: '#ffffff', 'text-secondary': '#333333' } },
   },
   radius: { card: '16px' },
-  fonts: { display: "'Space Grotesk', sans-serif" },
+  fonts: { display: "'IBM Plex Sans', sans-serif" },
 };
 
 describe('renderTokensCss', () => {
@@ -35,7 +35,7 @@ describe('renderTokensCss', () => {
     const css = renderTokensCss(sample);
 
     expect(css).toContain('  --ui-radius-card: 16px;');
-    expect(css).toContain("  --ui-font-display: 'Space Grotesk', sans-serif;");
+    expect(css).toContain("  --ui-font-display: 'IBM Plex Sans', sans-serif;");
   });
 
   it('maps every token to a Tailwind theme variable that reads the runtime variable', () => {

@@ -72,7 +72,7 @@ packages/core/   → @elvinlab/core: tokens, themes, i18n (presentation-only)
 
 ## Brand and safety rules that affect code
 
-- Fonts: Space Grotesk + JetBrains Mono, self-hosted via Fontsource; never a runtime CDN.
+- Fonts: IBM Plex Sans + JetBrains Mono (plus the Pixelify Sans and Press Start 2P pixel faces), self-hosted via Fontsource; never a runtime CDN.
 - Every animation must stop under `prefers-reduced-motion`.
 - Brand changes go to `docs/BRAND.md` first, then to each surface.
 - Don't announce projects that don't exist yet; never name or link private repositories.

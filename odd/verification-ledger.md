@@ -147,3 +147,20 @@ Owner decision: skip the full battery ("quita demasiado tiempo, solo lo esencial
 Not re-run, by owner decision: `pnpm verify --run` (the registry in `odd/verification-state.json` reflects the full battery of `f59a459`, 336 s, 55 checks; the changelog commit is not recorded), dev cold start, JS budget, Lighthouse (the changelog pages are not in `lighthouserc.json`), and the wider e2e batch. The CI on `main` re-runs everything before the deploy.
 
 Release 13 (`30ccbf9`, 2026-10-07): CI run 37656030923 ran the whole stack on `main` (static, e2e x4, lighthouse x2, checks, deploy and smoke check): all green. The checks listed above as "not re-run, by owner decision" were covered by that run.
+
+## Identity evolution candidate: lab-paper banner, hero, home hierarchy and IBM Plex Sans (parent and writers, 2026-10-10 to 2026-10-11)
+
+The typeface swap changes a dependency, so it ran the whole stack once (writer), then the parent re-ran the parts the later changes touched.
+
+| Check | Result |
+| --- | --- |
+| `pnpm typecheck` / `pnpm lint` | 0 errors / clean (477 files). |
+| `pnpm test` (all vitest) | 1312 passed. |
+| `pnpm depcruise`, `pnpm docs:config` | no violations, up to date. |
+| `pnpm --filter web build`, `pnpm check:js-budget`, `pnpm check:page-weight` | ok, pass, all 26 pages within budget. |
+| `pnpm test:white-label` | passed after moving the `html[data-reading]` rules from `calm-layout.css` to `reading-mode.css` (it failed before: commit `5e6e250` leaked them into global CSS). |
+| `pnpm test:e2e` (3 viewports, writer, before dropping the JetBrains preload) | 1158 passed, 528 skipped, 0 failed. |
+| `pnpm test:e2e:quick` (1280 px, parent, final tree) | 549 passed, 13 skipped, 0 failed (1.8 min). |
+| `pnpm test:lighthouse` (10 URLs, 3 runs, final tree) | exit 0, every gate passes. Worst LCP: `/notes/smoke-es/` 2412 ms, `/` 2266 ms, `/en/` 2341 ms; CLS 0 except 0.014 on the note page. |
+
+Findings worth keeping: with both fonts preloaded the note page LCP was about 2585 ms (gate 2500, reproduced twice: 2582 and 2588); dropping the JetBrains Mono preload gave 2261 to 2437 ms. The axe contrast test on `/contact/` (dark) failed twice only in batched runs and passed alone 4 of 4 times; it did not fail in the final full runs. Not run: the 390 and 768 px e2e projects after the final tree, `pnpm verify --run --record` (the registry in `odd/verification-state.json` was not updated), dev cold start. The CI on `main` re-runs everything on the push, which is the owner's decision.

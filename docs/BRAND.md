@@ -111,8 +111,8 @@ Inconsistencia a resolver: en modo claro el banner usa `#c9c3ee` como borde y la
 
 | Rol | Familia | Pesos | Tamaños en uso |
 | --- | --- | --- | --- |
-| Display (títulos de nota y de tarjeta) | Space Grotesk | 700 | 24–27 px títulos; 58–64 px nombre en los banners |
-| Texto | Space Grotesk | 400, 500 | 16–18 px |
+| Display (títulos de nota y de tarjeta) | IBM Plex Sans | 700 | 24–27 px títulos; 58–64 px nombre en los banners |
+| Texto | IBM Plex Sans | 400, 500 | 16–18 px |
 | Mono (números de nota, prompts, código) | JetBrains Mono | 400, 600, 700 | 12–16 px; en el sitio no se usa para etiquetas en mayúsculas |
 | Display pixelado (titular del hero, títulos de página, títulos de sección) | Pixelify Sans | 600 (variable) | Según el preset `appearance`: `minimal` hero 32 px en teléfono y 44 px desde `md`, títulos de página 26 / 32 px, títulos de sección 20 px; `full` (el de este sitio desde 2026-10-02, escala reducida y aprobada ese día) hero 32 px en teléfono y 52 px desde `md`, títulos de página 28 / 36 px, títulos de sección 22 px |
 | Favicon | Terminal de Linux pixelada (ventana gris azulado con tres puntos, prompt `>` cian y cursor rosa), 16×16 píxeles, sin el violeta saturado | Pestaña del navegador (`favicon.svg` y `favicon.ico`) |
@@ -130,7 +130,7 @@ Todas desde [Fontsource](https://fontsource.org), autoalojadas; nunca desde un C
 
 - **Dónde va:** el titular del hero de la home, los títulos de página (Experimentos, Contacto, Changelog y el H1 del banner de Notas; una o dos palabras) y los títulos de sección con barra de acento (también los de `/me`).
 - **Dónde nunca va:** párrafos, prosa de las notas, títulos de nota, navbar, formularios ni código. Regla general: las caras pixeladas son solo para texto corto y grande.
-- **Press Start 2P** sigue siendo la marca (wordmark del navbar, firma del footer, 404); Space Grotesk sigue siendo el texto y la interfaz; JetBrains Mono, el código y los números de nota.
+- **Press Start 2P** sigue siendo la marca (wordmark del navbar, firma del footer, 404); IBM Plex Sans (desde 2026-10-11, antes Space Grotesk) es el texto y la interfaz; JetBrains Mono, el código y los números de nota.
 - **Límite conocido:** la `e` pixelada pierde legibilidad en tamaños grandes. Con la escala `minimal` (hero de 32 y 44 px) se juzgó aceptable en una revisión visual; en `full` (36 y 60 px) el límite sigue vigente.
 
 ### Variantes accesibles

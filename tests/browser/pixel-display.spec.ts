@@ -91,7 +91,7 @@ for (const width of WIDTHS) {
   }
 }
 
-test('note page titles and prose stay Space Grotesk', async ({ page }) => {
+test('note page titles and prose stay IBM Plex Sans', async ({ page }) => {
   await page.goto('/notes/smoke-es/');
   expect(await familyOf(page, 'main h1')).not.toMatch(PIXEL_FAMILY);
   expect(await familyOf(page, 'article .prose p')).not.toMatch(PIXEL_FAMILY);

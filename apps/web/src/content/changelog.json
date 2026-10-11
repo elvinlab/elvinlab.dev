@@ -574,5 +574,11 @@
     "category": "changed",
     "title": "A calmer home with fewer boxes",
     "description": "The latest note, the notebook list and the Now block now sit directly on the page instead of in separate cards, divided by space and a dotted line, so the latest note clearly leads. The decision record stays boxed as the one highlighted piece. The four-pillars strip is hidden on the home."
+  },
+  "ibm-plex-sans": {
+    "date": "2026-10-11",
+    "category": "changed",
+    "title": "A new typeface: IBM Plex Sans",
+    "description": "Body text, navigation and note titles now use IBM Plex Sans instead of Space Grotesk. The pixel headlines, the monospaced labels and the layout stay the same. To keep pages fast, only the body font is preloaded; the monospaced font loads on demand."
   }
 }

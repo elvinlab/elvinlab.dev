@@ -171,7 +171,7 @@ The exact commands are in [recipe 6.14](CONFIGURATION.en.md#614-email-subscripti
 ## 8. The emails
 
 - **HTML plus plain text**, with a table layout, which is what email clients support.
-- **System fonts.** Clients do not load web fonts, so neither Space Grotesk nor Press Start 2P appear.
+- **System fonts.** Clients do not load web fonts, so neither IBM Plex Sans nor Press Start 2P appear.
 - **Light by default, with a dark override** (`prefers-color-scheme: dark`) for clients that honor it.
 - **Logo** at `/email/logo.png`, served from the site itself.
 - **Local preview without sending anything:** `mise exec -- node --import ./apps/web/scripts/register-alias.mjs apps/web/scripts/preview-email.ts` writes the HTML and text files with sample data into the git-ignored `.email-preview/` folder. Details in [`TESTING.md`](TESTING.md#email-previews).
