@@ -58,7 +58,7 @@ describe('calm layout: full is exactly the pre-preset look', () => {
 
   it('leaves the home banner props at today values (the cap does not touch them)', () => {
     expect(homeSource).toContain('height="150px"');
-    expect(homeSource).toContain('expandedHeight="clamp(520px, 66vh, 620px)"');
+    expect(homeSource).toContain('expandedHeight="clamp(440px, 56vh, 520px)"');
     expect(homeSource).toContain('compactExpandedHeight="29rem"');
   });
 });

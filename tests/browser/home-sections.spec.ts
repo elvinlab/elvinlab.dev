@@ -12,7 +12,8 @@ type Preset = 'minimal' | 'full';
 /** Whether each preset-driven section is on (`HOME_PRESETS` in `shared/config/appearance.ts`). */
 const PRESET_SECTIONS: Record<Preset, { heroPills: boolean; pillars: boolean }> = {
   minimal: { heroPills: false, pillars: false },
-  full: { heroPills: true, pillars: true },
+  // This site switches the hero pills off through `home.heroPills` in site.config.ts.
+  full: { heroPills: false, pillars: true },
 };
 
 const presetOf = async (page: Page): Promise<Preset> => {

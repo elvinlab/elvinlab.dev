@@ -18,7 +18,7 @@ La línea de posicionamiento es una sola y se usa igual en todas partes: **Full-
 | --- | --- | --- |
 | Posicionamiento | Full-stack engineer building with AI agents. | Titular del README, titular de LinkedIn, `<title>`, JSON-LD, imagen OG y tarjeta del autor |
 | Titular del hero (decidido 2026-10-10) | Construyo con agentes de IA y escribo lo que sale mal. Sublínea: Cada decisión queda en una nota: qué probé, qué descarté y por qué. (EN: I build with AI agents and write down what goes wrong. / Every decision becomes a note: what I tried, what I dropped and why.) | Hero del inicio. Claves `home.headline` y `home.intro`; el posicionamiento ya no es el titular del hero |
-| Sublínea | Clean architecture · Fast systems · Production-ready cloud | Bajo el titular |
+| Sublínea | Clean architecture · Fast systems · Production-ready cloud | Ya no se muestra bajo el titular del hero (desde 2026-10-10 este sitio apaga las píldoras con `home.heroPills`); sigue disponible para forks |
 | Bio corta (máx. 160 caracteres) | Full-stack Software Engineer · AI agents & workflows · Clean architecture · Performance. Writing at elvinlab.dev | Bio de GitHub, X |
 | Roles rotativos | Full-Stack Engineering · AI Agents & Workflows · Software Architecture · Performance & Optimization | Banner animado, hero del sitio |
 

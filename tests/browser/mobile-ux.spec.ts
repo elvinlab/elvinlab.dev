@@ -165,8 +165,8 @@ test.describe('desktop pointer', () => {
     await page.goto('/');
     const preset = await page.evaluate(() => document.documentElement.dataset['appearance']);
     // `minimal` caps it at clamp(360px, 48vh, 460px): 432 px at 900 px of viewport height.
-    // `full` keeps clamp(520px, 66vh, 620px): 594 px (`src/styles/calm-layout.css`, DESIGN.md).
-    const expected = { minimal: 432, full: 594 }[preset ?? ''];
+    // `full` uses clamp(440px, 56vh, 520px): 504 px (`src/styles/calm-layout.css`, DESIGN.md).
+    const expected = { minimal: 432, full: 504 }[preset ?? ''];
     if (expected === undefined) throw new Error(`unknown appearance: ${preset}`);
     expect((await boxOf(page.locator('[data-banner]'))).height).toBe(expected);
   });

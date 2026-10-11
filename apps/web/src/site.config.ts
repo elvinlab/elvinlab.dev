@@ -37,7 +37,9 @@ export const siteConfig = {
   appearance: 'full',
   // The Projects grid stays off the home for now (the home is Lighthouse-gated and unchanged by the
   // experiments release); `/experiments/` and `/me` show the experiments.
-  home: { experiments: false },
+  // The hero pills were three slogans that the pillars section already says; the hero keeps the
+  // headline, one line and the avatar.
+  home: { experiments: false, heroPills: false },
   // What the owner is focused on: the sidebar "Now" card of the home (one to three rows, dated).
   // Bump `updatedAt` (YYYY-MM-DD) when the rows change; remove the whole block to hide the card.
   now: {

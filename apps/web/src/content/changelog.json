@@ -556,5 +556,11 @@
     "category": "changed",
     "title": "The author's face moves into the home hero",
     "description": "On tablet and desktop the drawn avatar, name and role now sit at the right of the home banner, centered over the sidebar card. When you collapse the banner the photo returns to the author card, so it is always visible once, and it eases in softly (no motion with reduced-motion). Phones are unchanged."
+  },
+  "home-hero-simpler": {
+    "date": "2026-10-10",
+    "category": "changed",
+    "title": "A simpler home hero",
+    "description": "The small \"elvinlab / lab notes\" label above the headline and the three slogan chips below it are gone, and the banner is about 90 px shorter on desktop, so the latest note starts higher on the page."
   }
 }
