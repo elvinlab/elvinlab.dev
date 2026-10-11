@@ -580,5 +580,11 @@
     "category": "changed",
     "title": "A new typeface: IBM Plex Sans",
     "description": "Body text, navigation and note titles now use IBM Plex Sans instead of Space Grotesk. The pixel headlines, the monospaced labels and the layout stay the same. To keep pages fast, only the body font is preloaded; the monospaced font loads on demand."
+  },
+  "reading-mode-css-scope": {
+    "date": "2026-10-11",
+    "category": "fixed",
+    "title": "Reading mode styles no longer ship when the feature is off",
+    "description": "For sites built from this template with reading mode switched off, the rules that keep the decision record in one column are no longer included in every page. They load only with the reading mode, so the white-label check passes again."
   }
 }
