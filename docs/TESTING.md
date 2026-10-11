@@ -164,6 +164,41 @@ with the new `measured` and date, and say why in the commit and in the changelog
 to make a failing run pass without a measured reason. The check runs in CI next to `check:js-budget`
 and in `pnpm verify` (family `page-weight`, planned for any change that can alter built pages).
 
+### Content-aware notes budgets (2026-10-11)
+
+Publishing notes must not require raising the HTML ceiling on every release. The original absolute
+ceiling mixed the fixed page shell with variable editorial content; notes 004–007 exposed this in
+CI run `38170913722`. The rules are now:
+
+- **Note detail:** `htmlBytes` limits the HTML outside the rendered MDX body. `NotePage.astro`
+  surrounds only the `.prose` article-body block with two inert `<template>` boundaries (`data-page-weight-start`
+  and `data-page-weight-end`). The collector counts their UTF-8 body bytes as `articleHtmlBytes`.
+  A longer article increases its own allowance, while the fixed shell still has a 117000 B ceiling.
+  `articleBytes` caps the body at 65536 B (64 KiB). Missing, reversed or duplicate boundaries fail
+  the check; rebuilding is required after changing the template. Do not move navigation, shared
+  chrome or styles inside these boundaries to exempt them from the shell check.
+- **Notes index:** allowance is `htmlBytes + htmlBytesPerNote * notesCount`, using actual
+  `<article data-note-row>` elements, including zero rows for an empty index. The shell budget is
+  88200 B and each row allows 4000 B for its title, excerpt, links, filter metadata and contribution
+  to the sidebar taxonomy. The total also has a hard `maxHtmlBytes` ceiling of 180000 B; when the
+  listing approaches that ceiling, paginate or simplify it instead of raising it automatically.
+- **Independent gates:** every inline style byte still counts against the unchanged CSS ceiling,
+  including styles in an article. JavaScript gzip and Lighthouse thresholds are unchanged.
+  Content allowances do not exempt scripts, CSS, images or performance checks. Lighthouse's
+  synthetic notes do not measure every real article, so unusually large code blocks or images
+  still need a direct measurement of that real page.
+
+The report prints total HTML, the effective ceiling, and either article bytes or the note count.
+`--suggest` uses the measured fixed shell for these types; it preserves the distinction instead of
+folding new editorial content back into the shell baseline. In the JSON `measured.htmlBytes` is the
+shell baseline; `totalHtmlBytes` records the full page for context. Do not copy a suggested number
+without inspecting what changed.
+
+Checks added: longer articles and more rows pass with the same shell; CSS and shell growth,
+overlong articles, excessive index size, and absent/malformed boundaries fail. Other page types
+retain the existing absolute-HTML behavior. Follow `docs/NOTES.md` when publishing: build and run
+both size checks before releasing, then let main CI run all gates and verify the deployed version.
+
 ### The note-page LCP gate is sensitive to a few bytes
 
 > **Correction and fix (2026-10-05).** The sizes in this section (about 98 KB of HTML and 52 KB of inline CSS, later 94 KB and 48 KB) are from `wc -c` on the **real** build (`apps/web/dist`). The Lighthouse gate did not measure that page: its fixture (`fixture-preview.ts`, built through `createFixtureWorkspace`) inlined the layout stylesheet **twice** because the workspace did not copy the root `.gitignore` (the gate's own report showed a 126,930 byte note document against about 94 KB in production, and 14 `@font-face` rules against 7). `createFixtureWorkspace` now copies `.gitignore` (test in `fixture-workspace.test.ts`). Re-measured with `pnpm test:lighthouse` after the fix, worst of three runs: `/notes/smoke-es/` document 123.5 to 80.6 KB and LCP 2414 to **2264 ms** (margin to the 2500 ms budget about 86 to about 236 ms); `/` 2368 to 2216 ms; `/contact/` 2259 to 1810 ms; performance score 97 to 99 on all six URLs. The LCP numbers and byte boundaries in the table and the headroom paragraph below were measured on the doubled fixture, so they are **outdated**: the one-round-trip boundary now sits at different byte counts and has to be re-measured before relying on "a few hundred bytes". Why a missing `.gitignore` doubles the sheet is not traced (the build tooling reads it); the cause was found by changing one file of the workspace at a time.

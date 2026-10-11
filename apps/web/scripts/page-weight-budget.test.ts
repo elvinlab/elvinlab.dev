@@ -5,12 +5,14 @@ import { dirname, join } from 'node:path';
 import { afterEach, describe, expect, it } from 'vitest';
 
 import {
+  articleContentBytes,
   type Budgets,
   classifyPage,
   collectPageWeights,
   evaluatePages,
   formatReport,
   inlineStyleBytes,
+  noteRowCount,
   suggestBudgets,
 } from './page-weight-budget.ts';
 
@@ -71,6 +73,78 @@ describe('inlineStyleBytes', () => {
 });
 
 describe('evaluatePages', () => {
+  const contentBudgets: Budgets = {
+    types: {
+      note: {
+        why: 'bounded shell and article',
+        styleBytes: 500,
+        htmlBytes: 900,
+        articleBytes: 2000,
+      },
+      'notes-index': {
+        why: 'bounded listing',
+        styleBytes: 500,
+        htmlBytes: 900,
+        htmlBytesPerNote: 100,
+        maxHtmlBytes: 3000,
+      },
+    },
+  };
+
+  it('allows a longer article while the fixed HTML shell stays the same', () => {
+    expect(
+      evaluatePages(
+        [
+          { path: '/notes/a/', styleBytes: 500, htmlBytes: 1000, articleHtmlBytes: 100 },
+          { path: '/notes/b/', styleBytes: 500, htmlBytes: 2900, articleHtmlBytes: 2000 },
+        ],
+        contentBudgets,
+      ).failures,
+    ).toEqual([]);
+  });
+
+  it('still rejects shell, CSS and oversized article regressions', () => {
+    const result = evaluatePages(
+      [
+        { path: '/notes/shell/', styleBytes: 500, htmlBytes: 1001, articleHtmlBytes: 100 },
+        { path: '/notes/css/', styleBytes: 501, htmlBytes: 1000, articleHtmlBytes: 100 },
+        { path: '/notes/body/', styleBytes: 500, htmlBytes: 2100, articleHtmlBytes: 2001 },
+      ],
+      contentBudgets,
+    );
+    expect(result.failures).toHaveLength(3);
+    expect(formatReport(result)).toContain('article 2001 / 2000 B (+1 B)');
+  });
+
+  it('scales the index allowance with new notes but retains an absolute ceiling', () => {
+    expect(
+      evaluatePages(
+        [
+          { path: '/notes/', styleBytes: 500, htmlBytes: 1000, notesCount: 1 },
+          { path: '/notes/', styleBytes: 500, htmlBytes: 2900, notesCount: 20 },
+        ],
+        contentBudgets,
+      ).failures,
+    ).toEqual([]);
+    expect(
+      evaluatePages(
+        [
+          { path: '/notes/', styleBytes: 500, htmlBytes: 1001, notesCount: 1 },
+          { path: '/notes/', styleBytes: 500, htmlBytes: 3001, notesCount: 100 },
+        ],
+        contentBudgets,
+      ).failures,
+    ).toHaveLength(2);
+  });
+
+  it('fails closed if a build is missing the content measurements', () => {
+    expect(() =>
+      evaluatePages([{ path: '/notes/a/', styleBytes: 1, htmlBytes: 1 }], contentBudgets),
+    ).toThrow(/markers/);
+    expect(() =>
+      evaluatePages([{ path: '/notes/', styleBytes: 1, htmlBytes: 1 }], contentBudgets),
+    ).toThrow(/row count/);
+  });
   it('passes a page within both budgets and reports the numbers', () => {
     const result = evaluatePages([{ path: '/', styleBytes: 1000, htmlBytes: 2000 }], BUDGETS);
     expect(result.failures).toEqual([]);
@@ -113,6 +187,39 @@ describe('evaluatePages', () => {
   });
 });
 
+describe('article content measurements', () => {
+  it('counts UTF-8 bytes of the body without exempting surrounding markup', () => {
+    expect(
+      articleContentBytes(
+        '<style>x</style><template data-page-weight-start></template><p>á</p><template data-page-weight-end></template><footer>y</footer>',
+      ),
+    ).toBe(Buffer.byteLength('<p>á</p>'));
+    expect(
+      articleContentBytes(
+        '<template data-page-weight-start=""></template><template data-page-weight-end=""></template>',
+      ),
+    ).toBe(0);
+    expect(articleContentBytes('<p>no article</p>')).toBeUndefined();
+  });
+
+  it.each([
+    '<template data-page-weight-start></template>',
+    '<template data-page-weight-end></template>',
+    '<template data-page-weight-end></template><template data-page-weight-start></template>',
+    '<template data-page-weight-start></template><template data-page-weight-start></template><template data-page-weight-end></template>',
+  ])('rejects malformed or duplicate boundaries: %s', (html) => {
+    expect(() => articleContentBytes(html)).toThrow(/Invalid/);
+  });
+
+  it('counts actual index rows rather than labels and filter selectors', () => {
+    expect(
+      noteRowCount(
+        '<p>data-note-row</p><article data-note-row class="x"></article><article data-note-row=""></article><div data-note-row></div>',
+      ),
+    ).toBe(2);
+  });
+});
+
 describe('formatReport', () => {
   it('prints every page, marks failures and names the overshoot', () => {
     const result = evaluatePages(
@@ -132,6 +239,25 @@ describe('formatReport', () => {
 });
 
 describe('collectPageWeights', () => {
+  it('collects article boundaries and actual index rows from built files', () => {
+    const root = mkdtempSync(join(tmpdir(), 'page-weight-content-'));
+    temporaryDirectories.push(root);
+    const noteDirectory = join(root, 'notes/a');
+    mkdirSync(noteDirectory, { recursive: true });
+    writeFileSync(
+      join(noteDirectory, 'index.html'),
+      '<template data-page-weight-start></template><div class="prose"><p>á</p></div><template data-page-weight-end></template>',
+    );
+    writeFileSync(
+      join(root, 'notes/index.html'),
+      '<article data-note-row></article><article data-note-row></article>',
+    );
+    const pages = collectPageWeights(root);
+    expect(pages.find((page) => page.path === '/notes/a/')?.articleHtmlBytes).toBe(
+      Buffer.byteLength('<div class="prose"><p>á</p></div>'),
+    );
+    expect(pages.find((page) => page.path === '/notes/')?.notesCount).toBe(2);
+  });
   it('reads every index.html and the root 404.html of a build and measures them', () => {
     const root = mkdtempSync(join(tmpdir(), 'page-weight-'));
     temporaryDirectories.push(root);
@@ -154,6 +280,31 @@ describe('collectPageWeights', () => {
 });
 
 describe('suggestBudgets', () => {
+  it('suggests the fixed shell rather than absorbing article or listing growth', () => {
+    expect(
+      suggestBudgets(
+        [
+          { path: '/notes/a/', styleBytes: 100, htmlBytes: 1500, articleHtmlBytes: 1000 },
+          { path: '/notes/', styleBytes: 100, htmlBytes: 1500, notesCount: 10 },
+        ],
+        0.04,
+        {
+          types: {
+            note: { why: 'article', styleBytes: 100, htmlBytes: 500, articleBytes: 2000 },
+            'notes-index': {
+              why: 'listing',
+              styleBytes: 100,
+              htmlBytes: 500,
+              htmlBytesPerNote: 100,
+            },
+          },
+        },
+      ),
+    ).toEqual({
+      note: { styleBytes: 200, htmlBytes: 600 },
+      'notes-index': { styleBytes: 200, htmlBytes: 600 },
+    });
+  });
   it('takes the largest page of each type plus the headroom, rounded up to 100 B', () => {
     const suggested = suggestBudgets(
       [
