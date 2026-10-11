@@ -25,7 +25,7 @@ Brand tokens, fonts, colors, motion and the accessibility floor are identical in
 
 ## Avoid
 
-No ALL-CAPS labels on pages (the language codes ES/EN in `LangBadge` and the navbar locale switch are the only exception: they are codes, not labels). No meta strings joined with a middle dot (use spacing or separate elements). Mono is for entry numbers, dates, counts, tags, code and short labels, never sentences. Pixel is for short, large text (page titles included). No gradient text, no `→` in link text, no stock images.
+No ALL-CAPS labels on pages (the language codes ES/EN in `LangBadge` and the navbar locale switch are the only exception: they are codes, not labels). No meta strings joined with a middle dot (use spacing or separate elements). The one exception is the document title: `<title>`, `og:title` and the image alt text that mirrors it read "Page · elvinlab.dev" with a middle dot (decided 2026-10-11, one place in `Seo.astro`, pinned by `link-previews.spec.ts`); never an em dash as a separator in titles, labels or UI strings. Mono is for entry numbers, dates, counts, tags, code and short labels, never sentences. Pixel is for short, large text (page titles included). No gradient text, no `→` in link text, no stock images.
 
 ## Color (semantic tokens)
 
