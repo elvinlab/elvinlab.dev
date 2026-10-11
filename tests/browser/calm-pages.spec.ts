@@ -247,7 +247,7 @@ test('the decision record follows the preset spacing and keeps every label', asy
   expect(order).toBeGreaterThan(0);
 });
 
-test('the decision record sits in the banner from md up and inline in the article below it', async ({
+test('the decision record sits in the banner from lg up and inline in the article below it', async ({
   page,
 }, testInfo) => {
   await page.goto('/notes/smoke-es/');
