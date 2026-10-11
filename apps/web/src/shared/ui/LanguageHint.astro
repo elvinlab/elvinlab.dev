@@ -12,22 +12,22 @@ type Props = { locale: Locale; translations?: Record<string, string> | undefined
 
 const { locale, translations } = Astro.props;
 // Notes are Spanish-only unless translated: without a translation the link goes to the other home.
+// The copy is the same either way and short enough for one line at 360 px.
 const alternates = LOCALES.locales
   .filter((other) => other !== locale)
   .map((other) => {
-    const { href, kind } = resolveLocaleTarget({
+    const { href } = resolveLocaleTarget({
       pathname: Astro.url.pathname,
       current: locale,
       target: other,
       translations,
       locales: LOCALES,
     });
-    const home = kind === 'home-fallback';
     return {
       locale: other,
       href,
-      text: t(other, home ? 'language.hint.home' : 'language.hint'),
-      action: t(other, home ? 'language.hint.home.action' : 'language.hint.action'),
+      text: t(other, 'language.hint'),
+      action: t(other, 'language.hint.action'),
       dismiss: t(other, 'language.hint.dismiss'),
     };
   });

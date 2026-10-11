@@ -1,5 +1,5 @@
 ---
-/** Compact notebook row (number, title, language, date) for the home notebook index. */
+/** Compact notebook row (number, title, language, date) for the home notebook index. Below md the title wraps and the date sits under it; from md up the date and the badge share the right column. */
 import { localizePath } from '@elvinlab/core';
 
 import LangBadge from '@/features/notes/components/LangBadge.astro';
@@ -18,9 +18,9 @@ const href = localizePath(`/notes/${note.slug}/`, data.lang, LOCALES);
   class="group grid grid-cols-[56px_1fr_auto] items-center gap-3 border-t border-dashed border-divider py-3 transition-colors duration-150 hover:bg-card-hover md:rounded-inner md:px-2"
 >
   <span class="font-mono text-sm text-muted">{noteNumber(data.number)}</span>
-  <span class="min-w-0 truncate font-medium transition-colors duration-150 group-hover:text-primary">{data.title}</span>
-  <span class="flex items-center gap-2 text-sm text-muted">
-    <time datetime={data.pubDate.toISOString()} class="hidden sm:inline">{formatDate(data.pubDate, locale)}</time>
+  <span class="line-clamp-2 min-w-0 font-medium transition-colors duration-150 group-hover:text-primary md:truncate">{data.title}</span>
+  <span class="contents gap-2 text-sm text-muted md:flex">
+    <time datetime={data.pubDate.toISOString()} class="col-start-2">{formatDate(data.pubDate, locale)}</time>
     <LangBadge lang={data.lang} />
   </span>
 </a>

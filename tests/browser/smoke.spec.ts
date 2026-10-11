@@ -81,9 +81,12 @@ for (const { locale, path } of [
         exact: true,
       }),
     ).toHaveCount(0);
-    await expect(
-      hiringCard.getByRole('link', { name: locale === 'es' ? 'Ver mi perfil' : 'Open my profile' }),
-    ).toHaveAttribute('href', locale === 'es' ? '/me/' : '/en/me/');
+    // The profile button shows from md up; below md the hero button (data-hero-cta) carries it.
+    const profileLink = hiringCard.locator(`a[href="${locale === 'es' ? '/me/' : '/en/me/'}"]`);
+    await expect(profileLink).toHaveCount(1);
+    const wide = await page.evaluate(() => window.matchMedia('(min-width: 768px)').matches);
+    if (wide) await expect(profileLink).toBeVisible();
+    else await expect(page.locator('[data-hero-cta]')).toBeVisible();
     // The CV link exists now (one Drive PDF per language, see cv-and-credentials.spec.ts).
     await expect(
       hiringCard.getByRole('link', { name: locale === 'es' ? 'Ver CV' : 'View CV' }),
