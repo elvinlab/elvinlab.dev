@@ -19,7 +19,6 @@ import { LOCALES, type Locale, t } from '@/shared/i18n/index.ts';
 import Banner from '@/shared/layout/Banner.astro';
 import BaseLayout from '@/shared/layout/BaseLayout.astro';
 import { profileCardPath } from '@/shared/seo/og.ts';
-import Card from '@/shared/ui/Card.astro';
 import SectionHeading from '@/shared/ui/SectionHeading.astro';
 import SocialIcon from '@/shared/ui/SocialIcon.astro';
 
@@ -44,21 +43,21 @@ const bio = site.identity.bio[locale];
   title={site.identity.name}
   {...(bio ? { description: bio } : {})}
   ogImage={profileCardPath(locale)}
-  ogImageAlt={`${site.identity.name} — ${site.identity.role[locale]}`}
+  ogImageAlt={`${site.identity.name} · ${site.identity.role[locale]}`}
   printable
   noindex={!site.features.me}
 >
-  <Banner slot="banner" height="clamp(420px, 52vh, 520px)" locale={locale}>
+  <Banner slot="banner" height="clamp(420px, 52vh, 520px)">
     <BackgroundCanvas slot="background" />
     <MeHero locale={locale} />
   </Banner>
 
-  <div class="flex flex-col gap-4">
+  <div class="flex flex-col gap-10">
     <QuickFacts locale={locale} idPrefix="qf-main" class="lg:hidden" />
     <AtAGlance locale={locale} />
 
     {experiments.length > 0 && (
-      <Card as="section" id="experiments" class="flex scroll-mt-24 flex-col gap-2">
+      <section id="experiments" class="flex scroll-mt-24 flex-col gap-3 border-t border-dashed border-divider pt-10">
         <SectionHeading text={t(locale, 'me.experiments')} />
         <ol class="divide-y divide-dashed divide-divider">
           {experiments.map((experiment, i) => <li><ExperimentRow experiment={experiment} locale={locale} index={i + 1} /></li>)}
@@ -69,21 +68,21 @@ const bio = site.identity.bio[locale];
             {t(locale, 'me.experiments.more.cta')}<SocialIcon name="arrow-right" />
           </a>
         </div>
-      </Card>
+      </section>
     )}
 
     <WhatIBring locale={locale} />
     <ExperienceTimeline locale={locale} entries={experience} />
 
     {hasNotes && notes.length > 0 && (
-      <Card as="section" class="flex flex-col gap-2 !p-7 md:!px-9">
+      <section class="flex flex-col gap-3 border-t border-dashed border-divider pt-10">
         <div class="flex flex-wrap items-baseline justify-between gap-3">
           <SectionHeading text={t(locale, 'me.notes.title')} />
           <a href="/notes/" class="relative text-sm text-primary underline decoration-dashed underline-offset-4 after:absolute after:-inset-x-2 after:-inset-y-3 print:hidden">{t(locale, 'home.allNotes')}</a>
         </div>
         <p class="text-sm text-muted">{t(locale, 'me.notes.subtitle')}</p>
         <div>{notes.map((note) => <NoteIndexRow note={note} locale={locale} />)}</div>
-      </Card>
+      </section>
     )}
 
     <CertificatesByYear locale={locale} credentials={credentials} />

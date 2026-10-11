@@ -135,6 +135,58 @@ for (const phone of PHONES) {
         expect(await hasTapArea(link), `footer link ${await link.textContent()}`).toBe(true);
       }
     });
+
+    test('the home notebook rows show a date under the title', async ({ page }) => {
+      await page.goto('/');
+      const rows = page.locator('a[href^="/notes/"]', { has: page.locator('time') }).filter({
+        has: page.locator('span.font-mono'),
+      });
+      expect(await rows.count()).toBeGreaterThanOrEqual(1);
+      for (let index = 0; index < (await rows.count()); index += 1) {
+        const row = rows.nth(index);
+        const time = await boxOf(row.locator('time'));
+        const title = await boxOf(row.locator('span.font-medium'));
+        await expect(row.locator('time')).toBeVisible();
+        expect(time.y, 'date sits below the title').toBeGreaterThanOrEqual(
+          title.y + title.height - 1,
+        );
+        expect(title.height, 'title wraps to two lines at most').toBeLessThanOrEqual(2 * 28);
+      }
+    });
+
+    test('the hiring card does not repeat the hero profile button', async ({ page }) => {
+      await page.goto('/');
+      await expect(page.locator('[data-hero-cta]')).toBeVisible();
+      const hiringCard = page.locator('section', {
+        has: page.getByRole('heading', { name: '¿Contratando?' }),
+      });
+      await expect(hiringCard.locator('[data-recruiter-status]')).toBeVisible();
+      await expect(hiringCard.locator('a[href="/me/"]')).toBeHidden();
+      await expect(hiringCard.getByRole('link', { name: 'Ver CV' })).toBeVisible();
+    });
+
+    test('footer links wrap inline in at most three rows', async ({ page }) => {
+      await page.goto('/');
+      const tops = await page
+        .locator('footer a')
+        .evaluateAll((links) => [
+          ...new Set(links.map((link) => Math.round(link.getBoundingClientRect().top))),
+        ]);
+      expect(tops.length).toBeLessThanOrEqual(3);
+    });
+
+    test('the language suggestion fits on one line', async ({ page }) => {
+      await page.addInitScript(() => {
+        Object.defineProperty(navigator, 'languages', { configurable: true, get: () => ['en'] });
+      });
+      await page.goto('/privacy/');
+      const hint = page.locator('[data-language-hint="en"]');
+      await expect(hint).toBeVisible();
+      const box = await boxOf(hint);
+      expect(box.height, 'one line: the 44 px dismiss button sets the height').toBeLessThanOrEqual(
+        MIN_TARGET + 2,
+      );
+    });
   });
 }
 

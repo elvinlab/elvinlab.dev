@@ -6,6 +6,7 @@ import { localizePath } from '@elvinlab/core';
 
 import { LOCALES, type Locale, t } from '@/shared/i18n/index.ts';
 import BaseLayout from '@/shared/layout/BaseLayout.astro';
+import PageHeader from '@/shared/ui/PageHeader.astro';
 
 type Props = { locale: Locale; kind: 'confirm' | 'unsubscribe' };
 
@@ -14,9 +15,10 @@ const title = t(locale, `subscribe.${kind}.title`);
 const notesHref = localizePath('/notes/', locale, LOCALES);
 ---
 
-<BaseLayout locale={locale} path={`/subscribe/${kind}/`} title={title} noindex>
+<BaseLayout locale={locale} path={`/subscribe/${kind}/`} title={title} noindex pixelTitle>
+  <PageHeader slot="banner" title={title} />
   <article
-    class="group/card mx-auto mt-10 flex w-full max-w-lg flex-col items-center gap-4 rounded-control border border-dashed border-divider bg-card p-6 text-center md:mt-14 md:p-8"
+    class="group/card mx-auto flex w-full max-w-lg flex-col items-center gap-4 rounded-control border border-dashed border-divider bg-card p-6 text-center md:p-8"
     data-subscribe-page
     data-state="idle"
     data-kind={kind}
@@ -28,7 +30,6 @@ const notesHref = localizePath('/notes/', locale, LOCALES);
     <svg aria-hidden="true" focusable="false" width="54" height="42" viewBox="0 0 9 7" class="hidden [shape-rendering:crispEdges] group-data-[state=idle]/card:block motion-safe:transition-transform motion-safe:duration-200 motion-safe:[transition-timing-function:steps(2,end)] motion-safe:group-hover/card:-translate-y-1 motion-safe:group-focus-within/card:-translate-y-1"><path class="fill-pink" d="M0 0h9v1H0zM0 1h1v1H0zM8 1h1v1H8zM0 2h1v1H0zM8 2h1v1H8zM0 3h1v1H0zM8 3h1v1H8zM0 4h1v1H0zM8 4h1v1H8zM0 5h1v1H0zM8 5h1v1H8zM0 6h9v1H0z"></path><path class="fill-pink" d="M1 1h1v1H1zM7 1h1v1H7zM2 2h1v1H2zM6 2h1v1H6zM3 3h1v1H3zM5 3h1v1H5zM4 4h1v1H4z"></path><path class="fill-chip" d="M2 1h5v1H2zM1 2h1v1H1zM3 2h3v1H3zM7 2h1v1H7zM1 3h2v1H1zM4 3h1v1H4zM6 3h2v1H6zM1 4h3v1H1zM5 4h3v1H5zM1 5h7v1H1z"></path></svg>
     <svg aria-hidden="true" focusable="false" width="54" height="42" viewBox="0 0 9 7" class="hidden [shape-rendering:crispEdges] group-data-[state=done]/card:block"><path class="fill-pink" d="M7 1h1v1H7zM6 2h1v1H6zM1 3h1v1H1zM5 3h1v1H5zM2 4h1v1H2zM4 4h1v1H4zM3 5h1v1H3z"></path></svg>
     <svg aria-hidden="true" focusable="false" width="54" height="42" viewBox="0 0 9 7" class="hidden [shape-rendering:crispEdges] group-data-[state=invalid]/card:block"><path class="fill-pink" d="M4 0h1v4H4zM4 6h1v1H4z"></path></svg>
-    <h1 class="font-display text-2xl font-bold tracking-tight">{title}</h1>
     <p class="text-text-secondary" data-explain>{t(locale, `subscribe.${kind}.body`)}</p>
     <button type="button" data-go class="h-11 rounded-control bg-button px-5 font-medium text-white hover:bg-button/90 hover:translate-y-px active:translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-50 motion-reduce:transition-none">
       {t(locale, `subscribe.${kind}.button`)}

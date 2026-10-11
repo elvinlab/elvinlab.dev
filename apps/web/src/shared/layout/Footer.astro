@@ -15,9 +15,10 @@ type Props = { locale: Locale; subscribeCta?: boolean; subscribeLink?: boolean }
 
 const { locale, subscribeCta = false, subscribeLink = false } = Astro.props;
 const year = new Date().getFullYear();
-// 44 px tall hit area; -mx-3 cancels the px-3 so the text keeps its column alignment under md.
+// 44 px tall hit area. On phones the links wrap inline in one row; the row's -mx-3 cancels the px-3 so the
+// first link's text keeps the column alignment.
 const footerLink =
-  '-mx-3 flex h-11 items-center rounded-control px-3 text-sm text-text-secondary transition-colors duration-150 hover:bg-card-hover hover:text-text md:mx-0';
+  'flex h-11 items-center rounded-control px-3 text-sm text-text-secondary transition-colors duration-150 hover:bg-card-hover hover:text-text';
 ---
 
 <footer data-site-footer class="mt-16 animate-fade-in-up border-t border-dashed border-divider py-8 [animation-delay:250ms]">
@@ -29,7 +30,7 @@ const footerLink =
       </p>
       <p class="text-sm text-muted">© {year} {site.identity.name}</p>
     </div>
-    <div class="flex flex-col md:flex-row md:items-center md:justify-end md:gap-1">
+    <div class="-mx-3 flex flex-wrap md:mx-0 md:flex-row md:items-center md:justify-end md:gap-1">
       <a
         href={locale === 'es' ? '/privacy/' : '/en/privacy/'}
         class={footerLink}
@@ -59,7 +60,7 @@ const footerLink =
         </a>
       )}
       {site.socials.length > 0 && (
-        <ul aria-label={t(locale, 'footer.social')} class="-mx-3 flex flex-wrap gap-1 md:mx-0">
+        <ul aria-label={t(locale, 'footer.social')} class="flex flex-wrap gap-1">
           {site.socials.map((social) => (
             <li>
               <a

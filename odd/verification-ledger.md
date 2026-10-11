@@ -183,3 +183,25 @@ Notes: before the changelog stamp, `/changelog/page/2/` and `/en/changelog/page/
 ### Release 16, first CI run failed (2026-10-11, run 38118267154): deploy skipped, fixed forward
 
 The CI ran what the local closing run had not: `e2e (2)` failed on `chromium-768` `marks.spec.ts` ("an unavailable store ... shifts nothing beyond the reserved box": 68 px against 60) because from 768 px the note banner was content-driven by the title column; fixed by moving the decision record into the banner from `lg` (1024 px) instead of `md`. Full `pnpm test:e2e` (all projects) afterwards: 1164 passed, 540 skipped, 0 failed (3.6 min). Lighthouse failed on `/notes/smoke-es/` (LCP 2429, 2431, 2579 ms; performance 0.94 once) and `/en/me/` (LCP 2122, 2501, 2503 ms), both by the usual thin margin of this gate; locally after the `lg` change the same URLs measure 2263-2268 ms and 2118-2120 ms (the `lg:` utilities already existed, so the inline CSS shrank). The local Lighthouse runs are about 150 to 380 ms faster than the CI runner, so margin there stays thin.
+\n
+### Release 16 deployed (2026-10-11, run 38160032169)
+
+Release commit `88527c4` (tree equal to `develop`). CI: static, e2e (4 shards, all projects), lighthouse (2 shards), checks and deploy all green; production `/version.txt` = `88527c4`. The earlier two runs (38118267154, 38118950321) were blocked by the gates and fixed forward as described in the plan. Local evidence before the push: `pnpm lint`, `pnpm test:e2e:quick performance.spec.ts pixel-display.spec.ts` (45 passed), vitest `src/content src/styles src/shared` (372 passed), Lighthouse on `/`, `/me/`, `/notes/smoke-es/` (worst LCP 1971, 2115, 2266 ms). Not re-run locally for this last commit: the full e2e matrix and `test:white-label` (the CI ran both).
+
+## Release 17 candidate: the rest of the redesign (parent, 2026-10-11), NOT pushed
+
+Content since release 16 (`88527c4`): metric-matched fallback font, refreshed experiment screenshots, compact paper banner on every page, `/me` flattened, middle dot in titles, home on phones, tablet sidebar grid, softer light paper, darker light muted text, quieter phone author card. Ran sequentially on the tree at `164ae98` plus the grid fix below; every command exit 0 except the e2e matrix.
+
+| Check | Result |
+| --- | --- |
+| lint, typecheck, `pnpm test` (all vitest), `docs:config`, `depcruise` | clean, 0 errors, passed, up to date, no violations. |
+| build, `check:js-budget`, `check:page-weight` | ok, pass, 27 pages within budget (changelog pages within their raised budget). |
+| `test:white-label`, `check:dev-cold-start`, `changelog:audit` | passed, passed (7 routes), every feat/fix/perf commit has an entry. |
+| `pnpm test:e2e` (all projects, 3 viewports) | 1220 passed, 619 skipped, 6 failed (see below). |
+| `pnpm test:lighthouse` (10 URLs x 3 runs) | exit 0, every gate passes. Worst LCP per URL (ms): `/contact/` and `/en/contact/` 1813, `/en/` 1970, `/` 1972, `/subscribe/` 1965, `/notes/` 2116, `/en/me/` 2116, `/me/` 2190, `/notes/smoke-es/` 2266, `/experiments/` 2343. CLS 0 except 0.006 (`/en/me/`) and 0.014 (note). |
+
+The 6 e2e failures and what was done:
+- `home-marks.spec.ts` at `chromium-768` (4, `/` and `/en/`): REAL. With the footprint card on (the spec mocks the marks API) the new tablet aside grid `repeat(auto-fit,minmax(14rem,1fr))` made the page 5 px wider than the viewport. Fixed by `minmax(15rem,1fr)` (same size, no extra bytes); `home-marks` and `home-sections` then passed at 768, 360 and 1280. The writer of that change only ran six specs at 360 and 768; this spec was not among them.
+- `font-swap.spec.ts` at `chromium-1280` (2, the note page at 820 and 390 px): intermittent under load; it passed alone twice right after (6 of 6). Third time it was seen failing only in a batch.
+
+`/experiments/` LCP runs were 2343, 1966, 1968 ms (FCP 1968, 1520, 1368): bimodal run-to-run noise; before the banner work it measured 2273 ms in the worst case, so the thin spot is the same as before. The CI runs about 150 to 380 ms slower than local, so `/experiments/`, `/me/`, `/en/me/` and `/notes/smoke-es/` are the pages to watch in the next CI run. Not run for this candidate: nothing skipped, but the CI re-runs everything on the push.

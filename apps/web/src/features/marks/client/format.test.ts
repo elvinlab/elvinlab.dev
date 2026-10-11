@@ -4,7 +4,7 @@ import { describeMarks, type MarksStrings } from './format.ts';
 
 const strings: MarksStrings = {
   button: 'Dejé mi huella',
-  hint: 'Sé de los primeros en dejar tu huella',
+  hint: 'Sé el primero en dejar tu huella',
   countOne: '1 huella',
   countMany: '{n} huellas',
   thanks: '¡Gracias por pasar!',

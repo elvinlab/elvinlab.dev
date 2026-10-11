@@ -6,17 +6,33 @@
    The site is Spanish and English, so `latin` (Spanish accents included) and `latin-ext` are enough;
    any other character falls back to the system font. The rules are copied unchanged from each
    package's `index.css` (family, weight range, swap, unicode ranges, variable woff2), only the
-   `src` path points at the installed package. To support another alphabet, copy its block from the
-   package and extend `fonts.test.ts`. Press Start 2P (the footer signature) keeps its own import. */
+   `src` path points at the installed package, and the default `font-style: normal` and the
+   `format()` hint are dropped (every browser that loads woff2 sniffs it): about 280 B less in every page, which pays for the
+   fallback below. To support another alphabet, copy its block from the package and extend
+   `fonts.test.ts`. Press Start 2P (the footer signature) keeps its own import. */
+
+/* Metric-matched fallback, so the swap to Plex Sans moves nothing. Arial (Liberation Sans on Linux) scaled
+   toward Plex's measured average glyph width, 1000 px, over a Spanish and English sample: Plex 400
+   461.88, 500 470.9, 600 476.7, 700 482.8 against Arial 458.79 (synthetic bold adds almost no width).
+   Matching 400 alone (100.67%) leaves bold titles 3.6% narrow, so the factor is 102%: body text 1.3%
+   wide, titles and nav within 2.3%. Ascent 1.025 and descent 0.275 divided by 1.02 -> 100.49% and
+   26.96%. Plex has no line gap, so the Arial one is not overridden. JetBrains Mono has no fallback
+   face: Courier-metric fonts already match its 600-unit advance, and the extra rule did not fit the
+   page-weight budgets. */
+@font-face {
+  font-family: "IBM Plex Sans Fallback";
+  src: local("Arial"), local("Liberation Sans");
+  size-adjust: 102%;
+  ascent-override: 100.49%;
+  descent-override: 26.96%;
+}
 
 /* ibm-plex-sans-latin-ext-wght-normal */
 @font-face {
   font-family: "IBM Plex Sans Variable";
-  font-style: normal;
   font-display: swap;
   font-weight: 100 700;
-  src: url(../../node_modules/@fontsource-variable/ibm-plex-sans/files/ibm-plex-sans-latin-ext-wght-normal.woff2)
-    format("woff2-variations");
+  src: url(../../node_modules/@fontsource-variable/ibm-plex-sans/files/ibm-plex-sans-latin-ext-wght-normal.woff2);
   unicode-range:
     U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
 }
@@ -24,11 +40,9 @@
 /* ibm-plex-sans-latin-wght-normal */
 @font-face {
   font-family: "IBM Plex Sans Variable";
-  font-style: normal;
   font-display: swap;
   font-weight: 100 700;
-  src: url(../../node_modules/@fontsource-variable/ibm-plex-sans/files/ibm-plex-sans-latin-wght-normal.woff2)
-    format("woff2-variations");
+  src: url(../../node_modules/@fontsource-variable/ibm-plex-sans/files/ibm-plex-sans-latin-wght-normal.woff2);
   unicode-range:
     U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
 }
@@ -36,11 +50,9 @@
 /* jetbrains-mono-latin-ext-wght-normal */
 @font-face {
   font-family: "JetBrains Mono Variable";
-  font-style: normal;
   font-display: swap;
   font-weight: 100 800;
-  src: url(../../node_modules/@fontsource-variable/jetbrains-mono/files/jetbrains-mono-latin-ext-wght-normal.woff2)
-    format("woff2-variations");
+  src: url(../../node_modules/@fontsource-variable/jetbrains-mono/files/jetbrains-mono-latin-ext-wght-normal.woff2);
   unicode-range:
     U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
 }
@@ -48,11 +60,9 @@
 /* jetbrains-mono-latin-wght-normal */
 @font-face {
   font-family: "JetBrains Mono Variable";
-  font-style: normal;
   font-display: swap;
   font-weight: 100 800;
-  src: url(../../node_modules/@fontsource-variable/jetbrains-mono/files/jetbrains-mono-latin-wght-normal.woff2)
-    format("woff2-variations");
+  src: url(../../node_modules/@fontsource-variable/jetbrains-mono/files/jetbrains-mono-latin-wght-normal.woff2);
   unicode-range:
     U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
 }
@@ -60,11 +70,9 @@
 /* pixelify-sans-latin-ext-wght-normal */
 @font-face {
   font-family: "Pixelify Sans Variable";
-  font-style: normal;
   font-display: swap;
   font-weight: 400 700;
-  src: url(../../node_modules/@fontsource-variable/pixelify-sans/files/pixelify-sans-latin-ext-wght-normal.woff2)
-    format("woff2-variations");
+  src: url(../../node_modules/@fontsource-variable/pixelify-sans/files/pixelify-sans-latin-ext-wght-normal.woff2);
   unicode-range:
     U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
 }
@@ -72,11 +80,9 @@
 /* pixelify-sans-latin-wght-normal */
 @font-face {
   font-family: "Pixelify Sans Variable";
-  font-style: normal;
   font-display: swap;
   font-weight: 400 700;
-  src: url(../../node_modules/@fontsource-variable/pixelify-sans/files/pixelify-sans-latin-wght-normal.woff2)
-    format("woff2-variations");
+  src: url(../../node_modules/@fontsource-variable/pixelify-sans/files/pixelify-sans-latin-wght-normal.woff2);
   unicode-range:
     U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
 }

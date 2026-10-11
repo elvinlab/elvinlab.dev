@@ -35,8 +35,8 @@
   --ui-radius-control: 12px;
   --ui-radius-inner: 4px;
   --ui-radius-pill: 9999px;
-  --ui-font-display: 'IBM Plex Sans Variable', 'IBM Plex Sans', system-ui, sans-serif;
-  --ui-font-body: 'IBM Plex Sans Variable', 'IBM Plex Sans', system-ui, sans-serif;
+  --ui-font-display: 'IBM Plex Sans Variable', 'IBM Plex Sans Fallback', 'IBM Plex Sans', system-ui, sans-serif;
+  --ui-font-body: 'IBM Plex Sans Variable', 'IBM Plex Sans Fallback', 'IBM Plex Sans', system-ui, sans-serif;
   --ui-font-mono: 'JetBrains Mono Variable', 'JetBrains Mono', ui-monospace, monospace;
   --ui-font-retro: 'Press Start 2P', ui-monospace, monospace;
   --ui-font-pixel: 'Pixelify Sans Variable', 'Pixelify Sans', ui-monospace, monospace;
@@ -73,7 +73,7 @@
   --ui-banner: #e4e0fb;
   --ui-text: #0d1117;
   --ui-text-secondary: #30363d;
-  --ui-muted: #57606a;
+  --ui-muted: #4f5862;
   --ui-primary: #6d28d9;
   --ui-cyan: #155e75;
   --ui-pink: #be185d;

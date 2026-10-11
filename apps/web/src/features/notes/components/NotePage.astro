@@ -66,7 +66,7 @@ const readingLabel = t(locale, 'notes.readingTime', { min: readingMinutes(entry.
 <BaseLayout locale={locale} path={path} title={data.title} description={data.description} translated={false} {...(alternates.length > 0 && { alternates })} translations={translations} article={{ pubDate: data.pubDate, updatedDate: data.updatedDate, tags: data.tags }} ogImage={noteCardPath(entry.id)}>
   <ReadingMode slot="head" part="boot" locale={locale} />
   <ReadingProgress slot="banner" />
-  <Banner slot="banner" height="360px" locale={locale}>
+  <Banner slot="banner" height="360px">
     <BackgroundCanvas slot="background" />
     <div data-banner-split class="lg:grid lg:grid-cols-[minmax(0,1fr)_26rem] lg:items-end lg:gap-12">
       <div>

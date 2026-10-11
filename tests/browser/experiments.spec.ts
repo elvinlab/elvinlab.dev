@@ -76,8 +76,8 @@ for (const { path, heading, live, code } of PAGES) {
 
 test.describe('pagination and head of the list (two entries: a single page)', () => {
   for (const [path, title, pager] of [
-    ['/experiments/', 'Experimentos — ', /Paginación de experimentos/],
-    ['/en/experiments/', 'Experiments — ', /Experiments pagination/],
+    ['/experiments/', 'Experimentos · ', /Paginación de experimentos/],
+    ['/en/experiments/', 'Experiments · ', /Experiments pagination/],
   ] as const) {
     test(`${path} has a title, a self canonical, hreflang alternates and no pager`, async ({
       page,

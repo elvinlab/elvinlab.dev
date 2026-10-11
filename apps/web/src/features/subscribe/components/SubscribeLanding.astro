@@ -1,8 +1,8 @@
 ---
 /**
  * The page to send to someone: `/subscribe/` and `/en/subscribe/`. A stranger's first impression,
- * so it is calm: a pixel envelope (the one accent), a short headline in the pixel display face, the
- * same form as the footer band, three short value points and the latest note as proof the blog is
+ * so it is calm: the compact lab-paper header (`PageHeader`: pixel headline and one line; the pixel
+ * envelope was dropped because the banner is the accent now), the same form as the footer band, three short value points and the latest note as proof the blog is
  * real. The footer band does not render here (`showSubscribeCta` excludes `/subscribe/*`).
  */
 import { getCollection } from 'astro:content';
@@ -14,9 +14,9 @@ import { integrations, isEnabled, site } from '@/shared/config/index.ts';
 import { LOCALES, type Locale, t } from '@/shared/i18n/index.ts';
 import BaseLayout from '@/shared/layout/BaseLayout.astro';
 import { isSubscribeFormShown } from '@/shared/subscribe/availability.ts';
-import PixelEnvelope from '@/shared/subscribe/PixelEnvelope.astro';
 import SubscribeForm from '@/shared/subscribe/SubscribeForm.astro';
 import { subscribeRootAttributes } from '@/shared/subscribe/subscribe-root.ts';
+import PageHeader from '@/shared/ui/PageHeader.astro';
 
 type Props = { locale: Locale };
 
@@ -41,13 +41,8 @@ const showForm = isSubscribeFormShown(site.features, integrations.turnstileSiteK
   description={t(locale, 'subscribe.page.description')}
 >
   <link slot="head" rel="preload" as="font" type="font/woff2" href={pixelifySansLatin} crossorigin />
-  <div class="mx-auto mt-8 flex w-full max-w-[40rem] flex-col gap-8 md:mt-12 md:gap-10" data-subscribe-landing>
-    <header class="group/hero flex flex-col items-start gap-3">
-      <PixelEnvelope width={45} height={35} class="motion-safe:transition-transform motion-safe:duration-200 motion-safe:[transition-timing-function:steps(2,end)] motion-safe:group-hover/hero:-translate-y-1 motion-safe:group-focus-within/hero:-translate-y-1" />
-      <h1 class="max-w-hero font-pixel text-hero font-semibold leading-[1.1] text-balance">{t(locale, 'subscribe.page.title')}</h1>
-      <p class="max-w-[52ch] text-intro leading-relaxed text-text-secondary">{t(locale, 'subscribe.page.subtitle')}</p>
-    </header>
-
+  <PageHeader slot="banner" title={t(locale, 'subscribe.page.title')} description={t(locale, 'subscribe.page.subtitle')} />
+  <div class="flex w-full max-w-[40rem] flex-col gap-8 md:gap-10" data-subscribe-landing>
     {showForm && (
       <section
         {...subscribeRootAttributes(locale)}

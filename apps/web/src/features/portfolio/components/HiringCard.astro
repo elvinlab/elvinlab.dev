@@ -42,8 +42,9 @@ const chips = (tags.length > 0 ? tags : [headline]).filter((chip) => chip !== ''
   )}
   <p class="text-sm text-text-secondary">{t(locale, 'recruiter.experience')}: {t(locale, 'recruiter.years', { years })}</p>
   <div class="flex flex-col gap-2">
+    {/* Below md the hero already carries this button (data-hero-cta), so the card keeps the status and the CV link. */}
     {isEnabled('me') && (
-      <a href={localizePath('/me/', locale, LOCALES)} class="flex h-11 items-center justify-center rounded-control bg-button px-4 font-medium text-white active:scale-96">
+      <a href={localizePath('/me/', locale, LOCALES)} class="hidden h-11 items-center justify-center rounded-control bg-button px-4 font-medium text-white active:scale-96 md:flex">
         {t(locale, 'recruiter.openProfile')}
       </a>
     )}

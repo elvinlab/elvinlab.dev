@@ -16,7 +16,7 @@ const NONE: ExperimentsCssParts = {
 describe('experimentsCss', () => {
   it('always carries the header and nothing of the parts that do not render', () => {
     const css = experimentsCss(NONE);
-    expect(css).toContain('.xp-header');
+    expect(css).toContain('.xp-page');
     for (const absent of [
       '.xp-piece',
       '.xp-media',

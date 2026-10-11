@@ -592,5 +592,47 @@
     "category": "fixed",
     "title": "The header fits on one row on tablets",
     "description": "With the new typeface the Spanish header spilled onto a second row between 768 and 820 px wide. The spacing is tighter there so it stays on one row, and the caption under the author photo on the home page now wraps instead of being cut off."
+  },
+  "font-swap-no-jump": {
+    "date": "2026-10-11",
+    "category": "changed",
+    "title": "Text no longer jumps when the font finishes loading",
+    "description": "On a first visit the page used to show a system font for a moment and then shift when IBM Plex Sans arrived, wrapping titles onto another line on phones. A size-matched stand-in font now takes the same space, so nothing above the fold moves, and the font rules are a little lighter in every page."
+  },
+  "experiments-screenshots-refresh": {
+    "date": "2026-10-11",
+    "category": "changed",
+    "title": "Fresh screenshots in the experiments gallery",
+    "description": "The pictures of elvinlab.dev and of the agentic-dev-setup note on the experiments page and on /me now show the current design: the new home headline, the lab-paper banner, the decision record next to the note title and the new typeface."
+  },
+  "paper-banner-everywhere": {
+    "date": "2026-10-11",
+    "category": "changed",
+    "title": "The paper banner on every page",
+    "description": "Experiments, contact, the changelog, privacy, terms, the subscribe pages and the 404 now open with the same compact lab-paper banner as the home, the notes and /me, with the page title in it. The subscribe page lost its pixel envelope, and banners that never expand no longer load the expand button script."
+  },
+  "me-flat-sections": {
+    "date": "2026-10-11",
+    "category": "changed",
+    "title": "A calmer profile page",
+    "description": "On /me the sections now sit directly on the page instead of in separate cards, divided by a dotted line. \"What I bring\" is a plain list without icons or tiles, and the three at-a-glance facts are quiet rows instead of big numbers. The sidebar keeps its cards."
+  },
+  "title-separator-dot": {
+    "date": "2026-10-11",
+    "category": "changed",
+    "title": "A dot instead of a long dash in page titles",
+    "description": "Browser tabs and link previews now read \"Elvin González · elvinlab.dev\" instead of using a long dash between the page and the site name."
+  },
+  "home-phone-polish": {
+    "date": "2026-10-11",
+    "category": "fixed",
+    "title": "A tidier home page on phones",
+    "description": "On phones the notebook list shows the date under each title (titles wrap to two lines instead of being cut), the hiring card no longer repeats the \"View profile\" button of the top of the page, the footer links sit in rows instead of one per line, and the language strip is one short line that reads the same on every page. The footprint hint now reads \"Be the first to leave your mark\"."
+  },
+  "tablet-sidebar-light-contrast": {
+    "date": "2026-10-11",
+    "category": "changed",
+    "title": "Tablet sidebar, a softer light theme and a quieter author card",
+    "description": "On tablets the author, hiring and footprint cards on the home sit side by side (two columns, never wider than the screen) instead of as wide empty boxes. In the light theme the paper grid is fainter behind the headline and secondary text is a little darker for easier reading. On phones the author card is a compact row with a small photo."
   }
 }

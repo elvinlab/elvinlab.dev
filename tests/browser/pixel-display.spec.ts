@@ -105,6 +105,13 @@ const PIXEL_TITLE_PATHS = [
   '/en/contact/',
   '/changelog/',
   '/en/changelog/',
+  '/privacy/',
+  '/en/privacy/',
+  '/terms/',
+  '/en/terms/',
+  '/subscribe/',
+  '/en/subscribe/',
+  '/nope/',
 ];
 
 for (const path of PIXEL_TITLE_PATHS) {
