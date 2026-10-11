@@ -543,7 +543,7 @@
     "date": "2026-10-11",
     "category": "changed",
     "title": "The decision record now sits next to the note title",
-    "description": "On a note page, from tablet width up, the decision record (context, decision, outcome) appears in the banner to the right of the title instead of below it, so the summary is visible before the first scroll. On phones it stays above the note body, and reading mode keeps it there at every width."
+    "description": "On a note page, from desktop width up (1024 px), the decision record (context, decision, outcome) appears in the banner to the right of the title instead of below it, so the summary is visible before the first scroll. On phones it stays above the note body, and reading mode keeps it there at every width."
   },
   "home-hero-headline": {
     "date": "2026-10-11",
