@@ -3,6 +3,7 @@ number: 2
 title: "Claude piensa, los modelos baratos teclean: mi entorno multi-agente por US$20 al mes"
 description: "Un orquestador de pago decide y revisa; modelos gratuitos y uno local ejecutan. Así enruto el trabajo con herdr, OpenCode, OmniRoute, Ollama y Engram."
 pubDate: 2026-10-01
+updatedDate: 2026-10-11
 lang: es
 category: agentes-ia
 tags: [agentes-ia, herdr, opencode, ollama, engram]
@@ -93,7 +94,7 @@ De la parte de agentes, además, salió una regla que apliqué en este mismo sit
 - **Los secretos nunca tocan git.** Se leen de variables de entorno, y las claves se respaldan en un archivo cifrado con `age`.
 - **Solo localhost.** La puerta de enlace se enlaza a `127.0.0.1` y exige clave de API. Sin túneles.
 - **"Local" significa enrutado a local, no sellado.** El modelo local se alcanza a través de OmniRoute, así que la garantía de privacidad vive en el enrutamiento y no en el cliente.
-- **Los humanos siguen al mando.** Los modelos baratos nunca envían código sin revisar.
+- **Los humanos siguen al mando.** Nada sale de mi máquina sin que Claude revise el diff. Como cuento en [la nota 007](/notes/ahorrar-tokens/), los modelos baratos ya pueden hacer commit solos con `--auto`, pero el push y el deploy les están denegados.
 - **Todo es reconstruible.** Scripts idempotentes de arranque, restauración y parches devuelven una máquina nueva a este estado.
 
 ## Probarlo

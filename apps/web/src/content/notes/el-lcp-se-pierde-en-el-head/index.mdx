@@ -1,0 +1,193 @@
+---
+number: 5
+title: "337 bytes de CSS y un LCP reprobado: el rendimiento de mi sitio se decide en el head"
+description: "Por qué cada KB de CSS antes del primer pintado me cuesta de 8 a 11 ms, y cómo dejé de pagar por estilos que la página ni siquiera muestra."
+pubDate: 2026-10-11
+lang: es
+category: decisiones
+tags: [rendimiento, lcp, css, lighthouse, astro]
+decision:
+  context: "337 bytes de CSS hicieron fallar el control de LCP (2.586 ms contra un límite de 2.500) y otra vez falló por 13 ms. Cada KB de CSS en el head costaba de 8 a 11 ms bajo 4G simulado."
+  decision: "Enviar el CSS de cada componente solo en las páginas donde se muestra, con un presupuesto de peso por tipo de página. Descarté la hoja de estilos externa: su peor caso empeoró."
+  outcome: "/experiments/ pasó de 70,5 a 60,8 KB de CSS y su peor LCP de 2.271 a 2.122 ms. Después, dejar de precargar dos fuentes que suman 87 KB bajó la página de nota de 2.588 a 2.266 ms."
+---
+
+## 337 bytes que reprobaron el control
+
+El 2 de octubre agregué una tarjeta pequeña a la página de cada nota, la tarjeta "Now". El control de rendimiento la rechazó.
+
+El control que falló mide el LCP, y el límite que le puse es 2.500 ms. Antes de la tarjeta, la página medía 2.434 ms. Con la tarjeta, 2.586 ms. La diferencia en el código eran **337 bytes de CSS**: cuatro clases nuevas de Tailwind.
+
+Rehice la tarjeta reutilizando clases que el sitio ya tenía. Visualmente quedó idéntica. El CSS creció 43 bytes en lugar de 337, y el LCP volvió a 2.413 ms.
+
+```txt title="la misma tarjeta, tres versiones"
+commit    tarjeta                          CSS en línea    LCP
+3c83905   sin tarjeta                      52.423 B        2.434 ms
+f6bb257   con 4 clases nuevas              52.760 B        2.586 ms  ✗
+14fa586   reutilizando clases existentes   52.466 B        2.413 ms
+```
+
+Una tarjeta idéntica, dos resultados distintos: el rendimiento de mi sitio no se estaba decidiendo donde parecía. Esta nota cuenta qué descubrí, qué probé, qué descarté y qué regla me quedó.
+
+## Primero, qué es el LCP (en cristiano)
+
+**LCP** son las siglas de *Largest Contentful Paint*: el momento en que aparece en pantalla lo más grande de la página, normalmente el título o la imagen principal. Es la métrica que mejor responde a la pregunta de quien visita: "¿ya cargó?". Google la usa como una de sus señales de calidad, y por debajo de 2,5 segundos se considera buena.
+
+Para medirla uso Lighthouse, la herramienta de Chrome, en un laboratorio que simula un teléfono con 4G lento: unos 1,6 Mbps y 150 ms de ida y vuelta por cada viaje de red. Es pesimista a propósito. Si mi sitio carga bien ahí, carga bien casi en cualquier lado.
+
+El CI corre Lighthouse tres veces por página y se queda con **el peor resultado**. No el promedio. Si una de tres pasa de 2.500 ms, el release no sale.
+
+## El LCP de mi sitio es texto, y aun así tarda
+
+Lo primero fue abrir los reportes de Lighthouse. El elemento que marcaba el LCP en todas las páginas era **texto**: un título. Y el desglose decía algo raro.
+
+```txt title="de qué está hecho el LCP en mis páginas"
+espera para empezar a descargar el elemento   0 ms
+tiempo de descarga del elemento               0 ms
+espera para poder pintarlo                    1.650 a 1.960 ms
+```
+
+El texto ya estaba en el HTML; no había nada que descargar. Todo el tiempo era espera para pintar. ¿Y qué espera el navegador antes de pintar? Que termine de llegar el `<head>`, la parte de arriba del HTML donde van los estilos.
+
+Mi sitio está hecho con Astro y mete todo el CSS dentro de cada página, en el `<head>`. Es una decisión a propósito: así el navegador no tiene que pedir un archivo aparte antes de pintar. Pero tiene una consecuencia directa: **cada byte de CSS se descarga antes de que aparezca la primera letra**.
+
+Medido en mis páginas, eso cuesta entre **8 y 11 ms por KB**. Lo comprobé comparando páginas parecidas:
+
+- `/contact/`, con 52,9 KB de CSS: 2.114 ms.
+- `/experiments/`, con 70,5 KB de CSS: 2.268 ms.
+
+Los 154 ms de diferencia coinciden con los 17,5 KB de CSS propio de `/experiments/`. Hay otro detalle que lo empeora: el servidor del laboratorio no comprime, y los datos viajan por TCP en tandas que crecen de a poco. Unos cientos de bytes de más pueden obligar a un viaje de ida y vuelta extra, y en 4G lento cada viaje son 150 ms. Eso explica cómo 337 bytes se convirtieron en 152 ms.
+
+> Los bytes debajo de lo que se ve al abrir la página casi no cuestan. Los bytes en el head y en la parte de arriba son los caros.
+
+Tengo la prueba de la otra mitad de esa frase: cuando agregué el bloque de proyectos, sumé 28 KB de imágenes diferidas y tarjetas más abajo, y el LCP no se movió.
+
+## El fixture que medía una página que no existe
+
+Antes de seguir recortando, me tocó desconfiar de mi propia regla. El 5 de octubre apareció algo que no cuadraba: el reporte de Lighthouse decía que la página de nota pesaba 126.930 bytes. En producción pesaba unos 94 KB.
+
+Lighthouse no mide la página que publico. Mide un *fixture*: una copia del sitio construida en una carpeta aislada, para que las pruebas no dependan de mi entorno. Y esa copia tenía el CSS **dos veces**. Se notaba en el mismo reporte: 14 reglas `@font-face` donde producción tiene 7.
+
+La causa apareció cambiando un archivo de la copia a la vez: la carpeta aislada no copiaba el `.gitignore` de la raíz. Sin ese archivo, el build metía la hoja de estilos dos veces en cada página. Todavía no sé exactamente por qué un `.gitignore` provoca eso; lo que sí sé es que, al copiarlo, el problema desapareció.
+
+```txt title="antes y después de copiar un .gitignore (peor de tres corridas)"
+                     antes        después
+/notes/smoke-es/     2.414 ms     2.264 ms   (documento: 123,5 → 80,6 KB)
+/                    2.368 ms     2.216 ms
+/contact/            2.259 ms     1.810 ms
+puntaje Lighthouse   97           99
+```
+
+Eso cambia la lectura de la primera escena. Los 337 bytes de la tarjeta "Now" eran reales, pero los medí sobre una página inflada. Durante tres días cuidé márgenes calculados contra una página que nadie visitaba. Agregué un test para que la copia siempre lleve el `.gitignore`, y marqué como desactualizados los números viejos en la documentación en lugar de borrarlos.
+
+## Por qué descarté la hoja de estilos externa
+
+El 7 de octubre el CI volvió a fallar, esta vez en `/experiments/`. Las tres corridas dieron 2.289, 2.436 y 2.513 ms. La peor se pasó por **13 ms**. Repetí el mismo job y pasó. Es decir: mi margen era más chico que el ruido del propio CI.
+
+La solución que cualquiera propondría es sacar el CSS a un archivo aparte. El navegador lo descarga una vez, lo guarda en caché y no lo vuelve a pedir en la siguiente página. En Astro es una línea:
+
+```ts title="astro.config.ts"
+// Lo que tengo: todo el CSS dentro de cada página
+build: { inlineStylesheets: 'always' },
+
+// Lo que probé: Astro decide y saca el CSS grande a un archivo aparte
+build: { inlineStylesheets: 'auto' },
+```
+
+Lo probé con tres corridas por página, en la misma máquina y con el mismo fixture:
+
+```txt title="CSS en línea contra hoja externa (LCP, tres corridas)"
+página          en línea (antes)    hoja externa
+/contact/       2.114 a 2.263       1.815, 2.121, 2.125
+/experiments/   2.271 a 2.273       2.120, 2.430, 2.436
+/me/            2.347 a 2.428       2.275, 2.284, 2.289
+```
+
+A primera vista parece mejor en dos de tres páginas. Pero mira `/experiments/`: una corrida de 2.120 y dos de más de 2.400. Los resultados se partían en dos grupos con unos 300 ms entre ellos. Y como mi CI se queda con el peor de tres, en la página que me importaba **empeoraba**: 2.436 contra 2.273 ms.
+
+Lo descarté y dejé `'always'`. Lo que pierdo es la caché entre páginas: quien navega por varias notas descarga el CSS común en cada una. Lo acepto porque el control mide una primera visita, sin nada en caché, y ahí la hoja externa no fue más rápida de forma confiable: una petición extra antes de pintar costó más que repetir el CSS en cada página.
+
+## Enviar el CSS solo donde se renderiza
+
+Si no podía mover el CSS, tenía que mandar menos. Desarmé el CSS de `/experiments/` para ver de qué estaba hecho:
+
+```txt title="los 70,5 KB de CSS de /experiments/"
+CSS compartido del sitio              47,9 KB
+reglas propias de la página           12,4 KB
+kit de listados                        2,9 KB
+tarjetas compactas                     2,2 KB
+@font-face                             2,4 KB
+restos con alcance de componente       2,6 KB
+```
+
+Ahí estaban los bytes desperdiciados. La página tiene hoy dos experimentos, los dos destacados. Eso significa que las tarjetas compactas, el paginador, el selector de orden y el resumen del listado **no aparecen**. Pero su CSS se enviaba igual: unos 5 KB, unos 45 ms de espera por estilos de cosas que nadie ve.
+
+Había un segundo gasto escondido. Astro aísla el CSS de cada componente agregando un atributo a cada selector, algo como `[data-astro-cid-x7k2]`. Es útil para que los estilos no choquen, pero se repite en cada regla. Solo esos atributos sumaban 4.375 bytes en `/experiments/`.
+
+El cambio fue que cada componente entregue su CSS como texto, con un prefijo propio en las clases (`xp-`, `xc-`, `lk-`) en lugar de los atributos, y que ese texto solo entre en la página **si el componente se muestra**. Si no hay paginador, no hay CSS de paginador. Le pasé el cambio a un agente con una especificación precisa, y la medición se repitió por separado antes de aceptarlo.
+
+```txt title="/experiments/ antes y después"
+                         antes        después
+CSS en línea             70.462 B     60.801 B
+reglas propias           12.362 B      7.919 B
+atributos de alcance      4.375 B        350 B
+peor LCP (3 corridas)    2.271 ms     2.122 ms
+```
+
+El peor caso quedó **377 ms bajo el límite**, contra un ruido de CI que había visto subir unos 240 ms. La página se ve igual: comparé capturas antes y después, y probé una versión con 30 experimentos falsos para confirmar que el paginador y las tarjetas compactas siguen funcionando cuando sí aparecen.
+
+## Un presupuesto que falla antes que Lighthouse
+
+Lighthouse es lento y ruidoso. Me avisa cuando ya es tarde: después de un build completo, tres corridas por página y, a veces, un falso fallo por 13 ms. Quería algo que fallara antes, sin ruido y en segundos.
+
+Así nació `pnpm check:page-weight`. Lee las páginas ya construidas y mide dos cosas por tipo de página: cuánto CSS va en línea y cuánto pesa el HTML. Cada tipo tiene un límite igual a lo medido más un 4 %, y una frase que explica por qué ese límite.
+
+```json title="apps/web/scripts/page-weight-budget.json (extracto)"
+{
+  "headroom": 0.04,
+  "types": {
+    "experiments": {
+      "why": "Two featured pieces; the CSS of compact cards, pager, sort switch and gallery ships only where it renders.",
+      "styleBytes": 63300,
+      "htmlBytes": 98200
+    }
+  }
+}
+```
+
+El chequeo no mide milisegundos, mide bytes. Los bytes no tienen ruido: si alguien agrega 3 KB de CSS a la portada, falla siempre, en la máquina de cualquiera, sin esperar a Lighthouse. Corre en el CI junto al presupuesto de 30 KiB de JavaScript por página que conté en [la primera nota](/notes/como-construi-este-sitio/).
+
+El costo es que cada cambio grande de diseño me obliga a tocar ese archivo y justificar el nuevo número. Prefiero eso a que la tarjeta "Now" de turno vuelva a tumbar un release.
+
+## La fuente que también viajaba en el head
+
+Creí que la regla ya estaba aprendida. Unos días después cambié la tipografía del sitio, de Space Grotesk a IBM Plex Sans, y el control volvió a fallar. Esta vez no fue CSS.
+
+La fuente se *precargaba*: una etiqueta en el `<head>` le dice al navegador que la descargue de inmediato, antes de saber si la necesita, para que el texto aparezca ya con su letra. Space Grotesk pesaba unos 22 KB. IBM Plex Sans pesa 46 KB. Y también precargaba JetBrains Mono, la fuente monoespaciada de las etiquetas pequeñas, con otros 41 KB. Con las dos, la página de nota midió entre 2.582 y 2.588 ms en local.
+
+Quité primero la precarga de JetBrains Mono, la menos visible, y la nota bajó a un rango de 2.261 a 2.437 ms. En local alcanzaba. En el CI, no: el release del 11 de octubre falló dos veces, con `/me/` en 2.510 y 2.513 ms y la nota en 2.580 ms. El runner del CI mide entre 150 y 380 ms más lento que mi máquina, así que un margen que en local se ve cómodo allá desaparece.
+
+La segunda corrección fue dejar de precargar las dos fuentes grandes. Solo se sigue precargando la fuente pixelada de unos 12 KB, en las páginas cuyo título la usa.
+
+```txt title="peor LCP en local, antes y después de quitar las dos precargas"
+                     con las dos precargas    sin precargas
+página de nota       2.582 a 2.588 ms         1.818 a 2.266 ms
+/me/                 -                        1.665 a 2.115 ms
+portada              -                        1.556 a 1.971 ms
+```
+
+Antes de quedarme con eso probé una alternativa más suave: mantener la precarga pero con `fetchpriority="low"`, para que el navegador la descargara sin prisa. El peor caso de la nota quedó en 2.271 ms, prácticamente igual que antes. Lo descarté: era la misma espera con una etiqueta más.
+
+Esta decisión también tiene costo. Sin precarga, en una primera visita el texto puede aparecer un instante con una letra del sistema antes de que llegue Plex. Para que ese cambio no moviera nada, agregué una fuente de respaldo ajustada a las medidas de Plex: Arial escalada al 102 %, con su altura sobre y bajo la línea ajustada a medidas tomadas de Plex. En un teléfono de 390 px, el primer párrafo de una nota se movía 37,5 px cuando llegaba la fuente; ahora se mueve 0. El CLS de la página de nota bajó de 0,025 a 0,0148.
+
+> Una precarga también son bytes antes del primer pintado. La regla de arriba aplicaba a las fuentes y yo no la había mirado ahí.
+
+## Lo que sigue apretado
+
+No todo está resuelto. En la última medición completa, con tres corridas por página, `/experiments/` dio 2.343, 1.966 y 1.968 ms: el mismo comportamiento en dos grupos que vi con la hoja externa, y otra vez el peor caso es el que cuenta. La página de nota quedó en 2.266 ms y `/me/` en 2.190 ms. Con el CI entre 150 y 380 ms más lento, son las páginas que miro primero en cada release.
+
+En la página de nota ya tengo el siguiente candidato: el registro de decisión se escribe dos veces en el HTML, unos 1,3 KB. No lo voy a cambiar sin medirlo primero, igual que hice con `/experiments/` y con las fuentes.
+
+Lo que me quedó de todo esto es una regla que ya está escrita en la guía de diseño del sitio: **los bytes arriba son caros, los de abajo son baratos**. Mi sitio casi no tiene JavaScript y su LCP es texto, y aun así unos cientos de bytes de estilos, o una fuente precargada de más, bastaban para reprobar el control.
+
+Si tu sitio también mete el CSS en línea, te invito a hacer la cuenta: abre la página que más te importa, mide cuántos KB hay en el `<head>` y multiplícalos por 8. Cuéntame en los comentarios cuánto te dio y si te sorprendió.

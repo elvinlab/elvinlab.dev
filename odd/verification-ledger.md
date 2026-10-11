@@ -205,3 +205,7 @@ The 6 e2e failures and what was done:
 - `font-swap.spec.ts` at `chromium-1280` (2, the note page at 820 and 390 px): intermittent under load; it passed alone twice right after (6 of 6). Third time it was seen failing only in a batch.
 
 `/experiments/` LCP runs were 2343, 1966, 1968 ms (FCP 1968, 1520, 1368): bimodal run-to-run noise; before the banner work it measured 2273 ms in the worst case, so the thin spot is the same as before. The CI runs about 150 to 380 ms slower than local, so `/experiments/`, `/me/`, `/en/me/` and `/notes/smoke-es/` are the pages to watch in the next CI run. Not run for this candidate: nothing skipped, but the CI re-runs everything on the push.
+
+### Release 17 deployed (2026-10-11, run 38169618321)
+
+Release commit `f9467c5`. CI: static, e2e (4 shards, all projects), lighthouse (2 shards), checks and deploy all green on the first attempt, no reruns; production `/version.txt` = `f9467c5`. The local candidate verification above (full 3-viewport e2e after the `home-marks` fix, full Lighthouse, white-label, cold start) matched the CI result. The pages flagged as thin (`/experiments/`, `/me/`, `/en/me/`, `/notes/smoke-es/`) passed their CI Lighthouse gate. Known intermittent specs did not fail in this run.
