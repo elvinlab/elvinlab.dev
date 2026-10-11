@@ -550,5 +550,11 @@
     "category": "changed",
     "title": "A new headline on the home page",
     "description": "The home hero now says what the site is for in plain words: \"I build with AI agents and write down what goes wrong\", followed by one line about the notes. The professional title stays in the author card, the search previews and the profile page. On desktop the headline sits on two wider lines."
+  },
+  "home-hero-avatar": {
+    "date": "2026-10-10",
+    "category": "changed",
+    "title": "The author's face moves into the home hero",
+    "description": "On tablet and desktop the drawn avatar, name and role now sit at the right of the home banner, centered over the sidebar card. When you collapse the banner the photo returns to the author card, so it is always visible once, and it eases in softly (no motion with reduced-motion). Phones are unchanged."
   }
 }

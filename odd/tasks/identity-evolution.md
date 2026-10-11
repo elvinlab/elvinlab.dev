@@ -55,6 +55,15 @@ Visual identity surfaces of `apps/web` and `packages/core` tokens, the two desig
 
 - 2026-10-10: live mode needed a manual fallback (the helper's scaffold matched the wrong file by generic classes) and a token refresh after a helper restart (`live-inject --port 8400`). `.impeccable/` is excluded locally in `.git/info/exclude`; the helper also created an untracked `apps/web/.gitignore` that is NOT part of the work.
 
+- 2026-10-10 `5e6e250` feat(notes): decision record beside the note title (T0).
+- 2026-10-10 `c0b2433` feat(home): new hero headline "Construyo con agentes de IA y escribo lo que sale mal." (owner picked option A of four) with its own i18n keys; desktop measure 24ch (two lines), phone hero 29rem; BRAND.md records it. Evidence: typecheck, lint, vitest (styles, i18n, content), e2e quick plus 360 px for calm-pages, mobile-ux, pixel-display, home-sections, type-scale, smoke.
+- 2026-10-10 home hero avatar (owner picked "your avatar in the hero" to use the empty right half): figure at the right from `md`, centered over the sidebar column from `lg`, inside `[data-hero-content]`; sidebar card hides its photo from `md` while the banner is expanded and shows it again when collapsed; both ease in with `fade-in-up`. Route: delegated writer, parent fixed the smoke locator and restored the large card photo, reviewed renders at 1440 (expanded and collapsed) and 390. Evidence: typecheck, lint, e2e quick (145 passed) and 360 px (27 passed), `check:page-weight` all 26 pass (style margin on `/` is about 358 B), LCP element stays the h1 (dev-server measurement). Not re-run: a11y, Lighthouse, e2e at 390 and 768 projects.
+
+## Open items
+
+- T1 (rest of the hero): kicker "elvinlab / lab notes" (the skill bans kickers), the three slogan pills and the empty top of the banner are untouched.
+- T2 home hierarchy, T3 dark-theme background and body type pairing are not started. Owner has not decided on them.
+
 ## Next step
 
-Ask the owner for a new direction for the home hero and the dark-theme background (nebula and grid), then T2 and T3.
+Ask the owner what to tackle next (nebula and grid background, slogan pills and kicker, or the card hierarchy of the home), then release only with explicit authorization.

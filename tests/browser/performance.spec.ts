@@ -62,7 +62,7 @@ for (const { path, preloads: expectedPreloads } of PAGES) {
 
 test('the home profile photo is served as an optimized, dimensioned image', async ({ page }) => {
   await page.goto('/');
-  const avatar = page.locator('img[alt="Elvin González"]');
+  const avatar = page.locator('[data-hero-content] img[alt="Elvin González"]');
   await avatar.scrollIntoViewIfNeeded();
   await expect(avatar).toBeVisible();
 
