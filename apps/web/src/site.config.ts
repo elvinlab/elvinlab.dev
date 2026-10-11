@@ -37,7 +37,10 @@ export const siteConfig = {
   appearance: 'full',
   // The Projects grid stays off the home for now (the home is Lighthouse-gated and unchanged by the
   // experiments release); `/experiments/` and `/me` show the experiments.
-  home: { experiments: false },
+  // The hero pills were three slogans that the pillars section already says; the hero keeps the
+  // headline, one line and the avatar.
+  // The pillars strip repeated the headline, so it is off too (brand decision 2026-10-10, reversible).
+  home: { experiments: false, heroPills: false, pillars: false },
   // What the owner is focused on: the sidebar "Now" card of the home (one to three rows, dated).
   // Bump `updatedAt` (YYYY-MM-DD) when the rows change; remove the whole block to hide the card.
   now: {
@@ -98,7 +101,8 @@ export const siteConfig = {
     category: 'Announcements',
     categoryId: 'DIC_kwDOUvCLAM4DG1yT',
   },
-  background: { galaxy: true, cursorWaves: false },
+  // Default is the static lab paper (no effect); visitors can still pick galaxy or waves in the navbar.
+  background: { galaxy: false, cursorWaves: false },
   // Footprint button on notes (animation, per-browser cap, counter threshold): docs/CONFIGURATION.md.
   marks: { animation: 'stamp', maxPerVisitor: 50, showCountFrom: 5 },
   recruiter: {

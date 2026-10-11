@@ -11,18 +11,18 @@ describe('fonts.css', () => {
   it('declares only the latin and latin-ext subsets of the three variable families', () => {
     const files = rules.map(file).sort();
     expect(files).toEqual([
+      'ibm-plex-sans-latin-ext-wght-normal',
+      'ibm-plex-sans-latin-wght-normal',
       'jetbrains-mono-latin-ext-wght-normal',
       'jetbrains-mono-latin-wght-normal',
       'pixelify-sans-latin-ext-wght-normal',
       'pixelify-sans-latin-wght-normal',
-      'space-grotesk-latin-ext-wght-normal',
-      'space-grotesk-latin-wght-normal',
     ]);
   });
 
   it('keeps the family names, variable weights, swap and unicode ranges the site relies on', () => {
     expect(new Set(rules.map(family))).toEqual(
-      new Set(['JetBrains Mono Variable', 'Pixelify Sans Variable', 'Space Grotesk Variable']),
+      new Set(['IBM Plex Sans Variable', 'JetBrains Mono Variable', 'Pixelify Sans Variable']),
     );
     for (const rule of rules) {
       expect(rule).toMatch(/font-display:\s*swap/);

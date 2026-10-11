@@ -30,8 +30,6 @@ html[data-reading] .reading-exit {
 }
 html[data-reading] [data-site-notice],
 html[data-reading] [data-banner] .banner-grid,
-html[data-reading] [data-banner] .banner-stars,
-html[data-reading] [data-banner] .banner-glow,
 html[data-reading] [data-banner] canvas,
 html[data-reading] [data-banner] [data-banner-fade],
 html[data-reading] [data-banner-toggle],
@@ -75,4 +73,16 @@ html[data-reading] .prose {
 /* The article card is flattened, so the next block needs more room to read as a separate thing. */
 html[data-reading] [data-prev-next] {
   margin-top: 2.5rem;
+}
+/* The decision record sits in the banner from md up; reading mode keeps one calm column, so the
+   banner copy steps aside and the inline copy returns at every width. These rules live here, not in
+   calm-layout.css, so a site with features.readingMode off never ships `html[data-reading]` CSS. */
+html[data-reading] [data-banner-split] {
+  display: block;
+}
+html[data-reading] [data-record-banner] {
+  display: none;
+}
+html[data-reading] [data-record-inline] {
+  display: block;
 }

@@ -171,7 +171,7 @@ Los comandos exactos están en la [receta 6.14](CONFIGURATION.md#614-suscripció
 ## 8. Los correos
 
 - **HTML más texto plano**, con diseño de tablas, que es lo que los clientes de correo soportan.
-- **Fuentes del sistema.** Los clientes no cargan fuentes web, así que no aparecen Space Grotesk ni Press Start 2P.
+- **Fuentes del sistema.** Los clientes no cargan fuentes web, así que no aparecen IBM Plex Sans ni Press Start 2P.
 - **Claro por defecto, con una versión oscura** (`prefers-color-scheme: dark`) para los clientes que la respetan.
 - **Logo** en `/email/logo.png`, servido desde el propio sitio.
 - **Vista previa local sin enviar nada:** `mise exec -- node --import ./apps/web/scripts/register-alias.mjs apps/web/scripts/preview-email.ts` escribe los HTML y textos con datos de ejemplo en la carpeta `.email-preview/` (ignorada por git). Detalle en [`TESTING.md`](TESTING.md#email-previews).

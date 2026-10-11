@@ -538,5 +538,59 @@
     "category": "fixed",
     "title": "Small screens and accessibility fixes from a design audit",
     "description": "Experiments, /me and the home no longer scroll sideways on narrow phones or at 1024 px. Tags, category and sidebar links have a 44 px tap area, the header wraps instead of overflowing at large font sizes, the contact form marks its fields as required and announces how many need attention, the /me sidebar no longer sticks, and the 404 page no longer shows the subscribe form."
+  },
+  "note-banner-decision-record": {
+    "date": "2026-10-11",
+    "category": "changed",
+    "title": "The decision record now sits next to the note title",
+    "description": "On a note page, from tablet width up, the decision record (context, decision, outcome) appears in the banner to the right of the title instead of below it, so the summary is visible before the first scroll. On phones it stays above the note body, and reading mode keeps it there at every width."
+  },
+  "home-hero-headline": {
+    "date": "2026-10-11",
+    "category": "changed",
+    "title": "A new headline on the home page",
+    "description": "The home hero now says what the site is for in plain words: \"I build with AI agents and write down what goes wrong\", followed by one line about the notes. The professional title stays in the author card, the search previews and the profile page. On desktop the headline sits on two wider lines."
+  },
+  "home-hero-avatar": {
+    "date": "2026-10-11",
+    "category": "changed",
+    "title": "The author's face moves into the home hero",
+    "description": "On tablet and desktop the drawn avatar, name and role now sit at the right of the home banner, centered over the sidebar card. When you collapse the banner the photo returns to the author card, so it is always visible once, and it eases in softly (no motion with reduced-motion). Phones are unchanged."
+  },
+  "home-hero-simpler": {
+    "date": "2026-10-11",
+    "category": "changed",
+    "title": "A simpler home hero",
+    "description": "The small \"elvinlab / lab notes\" label above the headline (on the home and on the notes page, plus the small line above the subscribe page title) and the three slogan chips below it are gone, and the banner is about 90 px shorter on desktop, so the latest note starts higher on the page."
+  },
+  "lab-paper-background": {
+    "date": "2026-10-11",
+    "category": "changed",
+    "title": "The banner background is now lab paper",
+    "description": "The default banner background is a static technical notebook: a fine grid, a ruler of measuring ticks on the left edge and three registration crosses, in a single ink tone. The violet and cyan glows and the twinkling stars are gone. The galaxy and the cursor waves are still one click away in the navbar background button, which shows a grid icon while the paper is active."
+  },
+  "home-fewer-boxes": {
+    "date": "2026-10-11",
+    "category": "changed",
+    "title": "A calmer home with fewer boxes",
+    "description": "The latest note, the notebook list and the Now block now sit directly on the page instead of in separate cards, divided by space and a dotted line, so the latest note clearly leads. The decision record stays boxed as the one highlighted piece. The four-pillars strip is hidden on the home."
+  },
+  "ibm-plex-sans": {
+    "date": "2026-10-11",
+    "category": "changed",
+    "title": "A new typeface: IBM Plex Sans",
+    "description": "Body text, navigation and note titles now use IBM Plex Sans instead of Space Grotesk. The pixel headlines, the monospaced labels and the layout stay the same. To keep pages fast, only the body font is preloaded; the monospaced font loads on demand."
+  },
+  "reading-mode-css-scope": {
+    "date": "2026-10-11",
+    "category": "fixed",
+    "title": "Reading mode styles no longer ship when the feature is off",
+    "description": "For sites built from this template with reading mode switched off, the rules that keep the decision record in one column are no longer included in every page. They load only with the reading mode, so the white-label check passes again."
+  },
+  "tablet-header-one-row": {
+    "date": "2026-10-11",
+    "category": "fixed",
+    "title": "The header fits on one row on tablets",
+    "description": "With the new typeface the Spanish header spilled onto a second row between 768 and 820 px wide. The spacing is tighter there so it stays on one row, and the caption under the author photo on the home page now wraps instead of being cut off."
   }
 }

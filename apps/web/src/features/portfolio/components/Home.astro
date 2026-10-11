@@ -3,6 +3,7 @@
  * pillars, the Now card, and a sidebar with the author card, the recruiter card and the footprint card. Each of those
  * sections follows `homeSections` (appearance preset plus `home` overrides) and renders nothing
  * when it is off; the sidebar column only exists while at least one of its cards is on. */
+import { Image } from 'astro:assets';
 import { getCollection } from 'astro:content';
 import { localizePath } from '@elvinlab/core';
 import pixelifySansLatin from '@fontsource-variable/pixelify-sans/files/pixelify-sans-latin-wght-normal.woff2?url';
@@ -22,6 +23,7 @@ import { homeSections, isEnabled, site } from '@/shared/config/index.ts';
 import { LOCALES, type Locale, t } from '@/shared/i18n/index.ts';
 import Banner from '@/shared/layout/Banner.astro';
 import BaseLayout from '@/shared/layout/BaseLayout.astro';
+import { resolveAvatar } from '@/shared/lib/avatar.ts';
 
 type Props = { locale: Locale };
 
@@ -38,6 +40,9 @@ const showNow = homeSections.now && site.now !== undefined;
 const hasSidebar =
   homeSections.authorCard || homeSections.hiringCard || homeSections.marks;
 
+const avatar = resolveAvatar(site.identity.avatar);
+const initials = site.identity.name.split(' ').slice(0, 2).map((part) => part[0]).join('');
+
 const experiments = homeSections.experiments
   ? sortExperiments(await getCollection('experiments')).map((entry) => entry.data)
   : [];
@@ -45,30 +50,47 @@ const experiments = homeSections.experiments
 
 <BaseLayout locale={locale} path="/">
   <link slot="head" rel="preload" as="font" type="font/woff2" href={pixelifySansLatin} crossorigin />
-  <Banner slot="banner" height="150px" expandedHeight="clamp(520px, 66vh, 620px)" compactExpandedHeight="28rem" locale={locale} expandable>
+  <Banner slot="banner" height="150px" expandedHeight="clamp(440px, 56vh, 520px)" compactExpandedHeight="29rem" locale={locale} expandable>
     <BackgroundCanvas slot="background" />
-    <div data-hero-content data-home-hero class="flex flex-col">
-      <p class="font-mono text-sm text-cyan">{t(locale, 'notes.eyebrow', { handle: site.identity.handle })}</p>
-      <h1 class="mt-3 max-w-hero font-pixel text-hero font-semibold leading-[1.1] text-balance">
-        {site.identity.role[locale]}<span aria-hidden="true" class="ml-1 inline-block h-3 w-2.5 bg-pink align-baseline md:h-4"></span>
-      </h1>
-      <p class="mt-4 max-w-[52ch] text-intro leading-relaxed text-text-secondary">{t(locale, 'home.intro')}</p>
-      {homeSections.heroPills && (
-        <ul class="mt-5 hidden flex-wrap gap-2 md:flex">
-          {pills.map((pill) => (
-            <li class="rounded-pill bg-chip px-3 py-1.5 text-sm text-text-secondary">{pill}</li>
-          ))}
-        </ul>
-      )}
-      {isEnabled('me') && (
-        <a data-hero-cta href={localizePath('/me/', locale, LOCALES)} class="mt-2.5 inline-flex h-11 items-center justify-center self-start rounded-control bg-button px-4 font-medium text-white active:scale-96 md:hidden">
-          {t(locale, 'recruiter.openProfile')}
-        </a>
-      )}
+    <div data-hero-content data-home-hero class="flex flex-col md:grid md:grid-cols-[minmax(0,1fr)_auto] lg:grid-cols-[minmax(0,1fr)_280px] md:items-end md:gap-12">
+      <div class="flex flex-col">
+        <h1 class="max-w-hero font-pixel text-hero font-semibold leading-[1.1] text-balance">
+          {t(locale, 'home.headline')}<span aria-hidden="true" class="ml-1 inline-block h-3 w-2.5 bg-pink align-baseline md:h-4"></span>
+        </h1>
+        <p class="mt-4 max-w-[52ch] text-intro leading-relaxed text-text-secondary">{t(locale, 'home.intro')}</p>
+        {homeSections.heroPills && (
+          <ul class="mt-5 hidden flex-wrap gap-2 md:flex">
+            {pills.map((pill) => (
+              <li class="rounded-pill bg-chip px-3 py-1.5 text-sm text-text-secondary">{pill}</li>
+            ))}
+          </ul>
+        )}
+        {isEnabled('me') && (
+          <a data-hero-cta href={localizePath('/me/', locale, LOCALES)} class="mt-2.5 inline-flex h-11 items-center justify-center self-start rounded-control bg-button px-4 font-medium text-white active:scale-96 md:hidden">
+            {t(locale, 'recruiter.openProfile')}
+          </a>
+        )}
+      </div>
+      <figure class="hidden animate-fade-in-up md:block md:w-56 lg:w-auto lg:text-center">
+        <div class="size-56 overflow-hidden lg:mx-auto rounded-card bg-gradient-to-br from-primary/25 to-cyan/15">
+          {avatar ? (
+            // Lazy: hidden below md, and the h1 block is the LCP element above it.
+            <Image src={avatar} alt={site.identity.name} format="webp" quality={80} class="size-full object-cover" loading="lazy" decoding="async" />
+          ) : (
+            <div class="grid size-full place-items-center font-display text-5xl font-bold text-primary" aria-hidden="true">
+              {initials}
+            </div>
+          )}
+        </div>
+        <figcaption class="mt-3 flex flex-col gap-0.5">
+          <span class="font-display text-lg font-bold">{site.identity.name}</span>
+          <span class="text-sm text-balance text-text-secondary">{site.identity.role[locale]}</span>
+        </figcaption>
+      </figure>
     </div>
   </Banner>
 
-  <div class="flex flex-col gap-8">
+  <div class="flex flex-col gap-10">
     {hasNotes && latest && <LatestNote locale={locale} slug={latest.slug} data={latest.data} body={latest.body} />}
     {homeSections.notebookIndex && hasNotes && rest.length > 0 && <NotebookIndex locale={locale} notes={rest.slice(0, 5)} />}
     {homeSections.experiments && <ExperimentsGrid locale={locale} experiments={experiments} />}

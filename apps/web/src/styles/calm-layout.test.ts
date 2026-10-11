@@ -39,9 +39,9 @@ describe('calm layout: full is exactly the pre-preset look', () => {
     });
   });
 
-  it('keeps the hero measure at 16ch on every width', () => {
+  it('keeps the hero measure at 16ch on phones and widens it to 24ch from md', () => {
     expect(base.get(FULL)).toMatchObject({ '--hero-measure': '16ch' });
-    expect(md.get(FULL)).toMatchObject({ '--hero-measure': '16ch' });
+    expect(md.get(FULL)).toMatchObject({ '--hero-measure': '24ch' });
   });
 
   it('keeps the decision record as it was (p-5, gap-5, 14 px text, 13 px labels)', () => {
@@ -58,8 +58,8 @@ describe('calm layout: full is exactly the pre-preset look', () => {
 
   it('leaves the home banner props at today values (the cap does not touch them)', () => {
     expect(homeSource).toContain('height="150px"');
-    expect(homeSource).toContain('expandedHeight="clamp(520px, 66vh, 620px)"');
-    expect(homeSource).toContain('compactExpandedHeight="28rem"');
+    expect(homeSource).toContain('expandedHeight="clamp(440px, 56vh, 520px)"');
+    expect(homeSource).toContain('compactExpandedHeight="29rem"');
   });
 });
 

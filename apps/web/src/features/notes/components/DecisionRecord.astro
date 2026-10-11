@@ -1,17 +1,32 @@
 ---
-/** The context / decision / outcome summary shown before a note's body. Its type and spacing
- * come from the `--record-*` variables of `calm-layout.css`, so the preset makes it compact. */
+/** The context / decision / outcome summary of a note. Its type and spacing come from the
+ * `--record-*` variables of `calm-layout.css`, so the preset makes it compact. `inline` (default)
+ * opens the article body; `banner` is a stacked panel that sits beside the title from md up. */
 import { type Locale, t } from '@/shared/i18n/index.ts';
 
 type Props = {
   locale: Locale;
   decision: { context: string; decision: string; outcome: string };
+  variant?: 'inline' | 'banner';
 };
 
-const { locale, decision } = Astro.props;
+const { locale, decision, variant = 'inline' } = Astro.props;
 const fields = ['context', 'decision', 'outcome'] as const;
 ---
 
+{variant === 'banner' ? (
+  <section class="rounded-inner border border-dashed border-divider bg-page/60 p-(--record-pad)" aria-label={t(locale, 'note.decision.title')}>
+    <h2 class="sr-only">{t(locale, 'note.decision.title')}</h2>
+    <div class="flex flex-col gap-3.5">
+      {fields.map((field) => (
+        <div class="flex flex-col gap-1">
+          <span class="font-mono text-(length:--record-label) text-cyan">{t(locale, `note.decision.${field}`)}</span>
+          <p class="min-w-0 text-(length:--record-body) leading-relaxed text-text-secondary [overflow-wrap:anywhere]">{decision[field]}</p>
+        </div>
+      ))}
+    </div>
+  </section>
+) : (
 <section class="rounded-inner bg-banner p-(--record-pad)" aria-label={t(locale, 'note.decision.title')}>
   <h2 class="mb-(--record-title-gap) font-mono text-(length:--record-title) text-cyan">{t(locale, 'note.decision.title')}</h2>
   <div class="grid grid-cols-1 gap-(--record-gap) md:grid-cols-3 md:gap-0">
@@ -23,3 +38,4 @@ const fields = ['context', 'decision', 'outcome'] as const;
     ))}
   </div>
 </section>
+)}

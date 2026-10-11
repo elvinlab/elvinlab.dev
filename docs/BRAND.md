@@ -16,12 +16,15 @@ La línea de posicionamiento es una sola y se usa igual en todas partes: **Full-
 
 | Pieza | Texto canónico (en inglés) | Dónde se usa |
 | --- | --- | --- |
-| Posicionamiento | Full-stack engineer building with AI agents. | Titular del README, hero del sitio, titular de LinkedIn |
-| Sublínea | Clean architecture · Fast systems · Production-ready cloud | Bajo el titular |
+| Posicionamiento | Full-stack engineer building with AI agents. | Titular del README, titular de LinkedIn, `<title>`, JSON-LD, imagen OG y tarjeta del autor |
+| Titular del hero (decidido 2026-10-10) | Construyo con agentes de IA y escribo lo que sale mal. Sublínea: Cada decisión queda en una nota: qué probé, qué descarté y por qué. (EN: I build with AI agents and write down what goes wrong. / Every decision becomes a note: what I tried, what I dropped and why.) | Hero del inicio. Claves `home.headline` y `home.intro`; el posicionamiento ya no es el titular del hero |
+| Sublínea | Clean architecture · Fast systems · Production-ready cloud | Ya no se muestra bajo el titular del hero (desde 2026-10-10 este sitio apaga las píldoras con `home.heroPills`); sigue disponible para forks |
 | Bio corta (máx. 160 caracteres) | Full-stack Software Engineer · AI agents & workflows · Clean architecture · Performance. Writing at elvinlab.dev | Bio de GitHub, X |
 | Roles rotativos | Full-Stack Engineering · AI Agents & Workflows · Software Architecture · Performance & Optimization | Banner animado, hero del sitio |
 
 ### Los cuatro pilares
+
+> Desde 2026-10-10 el inicio ya no muestra la sección de pilares (`home.pillars: false`): repetía lo que dice el titular. Siguen siendo la referencia de contenido y se pueden volver a encender.
 
 1. **AI Agents & Workflows** — orquestación multi-agente, routing de modelos, memoria persistente. Prueba: [`agentic-dev-setup`](https://github.com/elvinlab/agentic-dev-setup).
 2. **Software Architecture** — límites claros, dominios desacoplados, código predecible.
@@ -108,13 +111,13 @@ Inconsistencia a resolver: en modo claro el banner usa `#c9c3ee` como borde y la
 
 | Rol | Familia | Pesos | Tamaños en uso |
 | --- | --- | --- | --- |
-| Display (títulos de nota y de tarjeta) | Space Grotesk | 700 | 24–27 px títulos; 58–64 px nombre en los banners |
-| Texto | Space Grotesk | 400, 500 | 16–18 px |
+| Display (títulos de nota y de tarjeta) | IBM Plex Sans | 700 | 24–27 px títulos; 58–64 px nombre en los banners |
+| Texto | IBM Plex Sans | 400, 500 | 16–18 px |
 | Mono (números de nota, prompts, código) | JetBrains Mono | 400, 600, 700 | 12–16 px; en el sitio no se usa para etiquetas en mayúsculas |
 | Display pixelado (titular del hero, títulos de página, títulos de sección) | Pixelify Sans | 600 (variable) | Según el preset `appearance`: `minimal` hero 32 px en teléfono y 44 px desde `md`, títulos de página 26 / 32 px, títulos de sección 20 px; `full` (el de este sitio desde 2026-10-02, escala reducida y aprobada ese día) hero 32 px en teléfono y 52 px desde `md`, títulos de página 28 / 36 px, títulos de sección 22 px |
 | Favicon | Terminal de Linux pixelada (ventana gris azulado con tres puntos, prompt `>` cian y cursor rosa), 16×16 píxeles, sin el violeta saturado | Pestaña del navegador (`favicon.svg` y `favicon.ico`) |
 | Banda de suscripción | Formulario de correo con borde punteado de 1 px (como las líneas divisorias), sobre pixelado rosa (9×7) como único acento, etiqueta visible y botón violeta que se hunde 1 px al pulsar; el sobre da un salto de dos pasos solo al pasar el cursor o enfocar | Footer de todas las páginas cuando la suscripción está activa, salvo `/subscribe/*`, `/me` y `/contact/` (que ya tiene su propio formulario); es el único lugar de la suscripción; sin sombras duras, sin bucle, quieta con `prefers-reduced-motion` |
-| Página de suscripción | Primera impresión de quien recibe el enlace: sobre pixelado rosa (9×7) como único acento, eyebrow mono en gris, titular corto en la fuente de pantalla (el uso permitido: texto corto y grande), subtítulo en la fuente de texto, el mismo formulario de la banda en una tarjeta de borde punteado de 1 px, tres puntos de valor con viñetas cuadradas grises (no una cuadrícula de tarjetas) y la última nota publicada en su idioma; sin imágenes de stock, cifras que caduquen, testimonios ni urgencia | `/subscribe/` y `/en/subscribe/`; la banda del footer no aparece aquí; indexable y en el sitemap; el sobre salta dos pasos solo al pasar el cursor o enfocar; sin sombras duras, sin bucle, quieta con `prefers-reduced-motion` |
+| Página de suscripción | Primera impresión de quien recibe el enlace: sobre pixelado rosa (9×7) como único acento (sin rótulo sobre el titular desde 2026-10-11), titular corto en la fuente de pantalla (el uso permitido: texto corto y grande), subtítulo en la fuente de texto, el mismo formulario de la banda en una tarjeta de borde punteado de 1 px, tres puntos de valor con viñetas cuadradas grises (no una cuadrícula de tarjetas) y la última nota publicada en su idioma; sin imágenes de stock, cifras que caduquen, testimonios ni urgencia | `/subscribe/` y `/en/subscribe/`; la banda del footer no aparece aquí; indexable y en el sitemap; el sobre salta dos pasos solo al pasar el cursor o enfocar; sin sombras duras, sin bucle, quieta con `prefers-reduced-motion` |
 | Páginas de confirmar y darse de baja | Comparten el aspecto de la banda: tarjeta centrada con borde punteado de 1 px, un icono pixelado rosa como único acento (sobre mientras espera, check al terminar, exclamación si el enlace no es válido o no está disponible), título en la fuente de pantalla, botón violeta y enlace discreto a las notas; el sobre da el mismo salto de dos pasos | `/subscribe/confirm/` y `/subscribe/unsubscribe/` (es y en); sin sombras duras ni gradientes, sin bucle, quieta con `prefers-reduced-motion` |
 | Botón de volver arriba | Cuadrado de 44 px, borde discontinuo de 1 px como la banda de suscripción, fondo de tarjeta y una flecha pixelada rosa (rejilla de 9x9 celdas a 2 px, el único acento), sin sombras duras | Todas las páginas, abajo a la derecha con 16 px de margen; solo aparece pasados unos 800 px al subir (misma lógica que la barra) y se oculta al bajar o arriba del todo; sobre el pie de página nunca tapa un control; la flecha salta dos pasos hacia arriba al pasar el cursor o enfocar (por pasos, sin bucle) y aparece y desaparece por pasos; sin movimiento con `prefers-reduced-motion`; oculto al imprimir; se esconde solo unos 2,5 s después de dejar de hacer scroll (salvo si está en uso o al final de la página, sobre el footer) |
 | Experimentos: detalles pixelados | Solo en `/experiments/` (nunca en `/me`): matraz pixelado rosa (9×9, `crispEdges`) antes del título como único acento rosa de la cabecera; esquinas del marco de la captura con barras cuadradas de 3 px y brazos de 14 px; flecha pixelada (9×9) en el botón del caso y al final de cada tarjeta compacta; punto de estado cuadrado de 8×8; cambio de captura por pasos (`steps(4, end)`, unos 280 ms) con la miniatura activa marcada con contorno violeta; brillo suave del destacado, sin tramado. Retirados el 2026-10-07 por ruido visual (decisión del propietario, ver `docs/DESIGN.md`): índices `01`/`02` huecos, tramado de ajedrez sobre el brillo, divisores de cuadrados con etiqueta `02 / 03`, iconos junto a Problema/Mi parte/Resultado, muesca bajo la miniatura, estrella cian de la portada tipográfica (ya no existe: una entrada sin imagen no lleva imagen falsa) y esquinas y cuadrícula de las tarjetas compactas. Permitidos porque siguen las reglas de los iconos pixelados existentes (rejilla pequeña, bordes nítidos, rosa como único acento, sin sombras duras, sin parpadeo, Press Start 2P fuera) | Página de experimentos |
@@ -127,7 +130,7 @@ Todas desde [Fontsource](https://fontsource.org), autoalojadas; nunca desde un C
 
 - **Dónde va:** el titular del hero de la home, los títulos de página (Experimentos, Contacto, Changelog y el H1 del banner de Notas; una o dos palabras) y los títulos de sección con barra de acento (también los de `/me`).
 - **Dónde nunca va:** párrafos, prosa de las notas, títulos de nota, navbar, formularios ni código. Regla general: las caras pixeladas son solo para texto corto y grande.
-- **Press Start 2P** sigue siendo la marca (wordmark del navbar, firma del footer, 404); Space Grotesk sigue siendo el texto y la interfaz; JetBrains Mono, el código y los números de nota.
+- **Press Start 2P** sigue siendo la marca (wordmark del navbar, firma del footer, 404); IBM Plex Sans (desde 2026-10-11, antes Space Grotesk) es el texto y la interfaz; JetBrains Mono, el código y los números de nota.
 - **Límite conocido:** la `e` pixelada pierde legibilidad en tamaños grandes. Con la escala `minimal` (hero de 32 y 44 px) se juzgó aceptable en una revisión visual; en `full` (36 y 60 px) el límite sigue vigente.
 
 ### Variantes accesibles
@@ -167,7 +170,7 @@ La identidad es "laboratorio de IA sobre fondo oscuro": pocos elementos, siempre
 | Motivo | Qué es | Dónde va |
 | --- | --- | --- |
 | Gradiente de marca | Violeta → cian → rosa | Nombre, años de la línea de tiempo, bordes activos, barra de 4 px al pie de los banners |
-| Grilla de fondo | Cuadrícula de 32 px, casi invisible | Fondos de banners y hero |
+| Papel de laboratorio (decidido 2026-10-10) | Cuadrícula fina de 16 px con línea mayor cada 80 px, regla de marcas en el borde izquierdo y tres cruces de registro; un solo tono (el del texto, con poca opacidad), estático y sin brillos ni estrellas | Fondo por defecto de todos los banners. La galaxia y las olas WebGL siguen disponibles en el selector del navbar |
 | Red de nodos con pulsos | Nodos conectados; los datos viajan por las líneas | Banner principal, diagramas de arquitectura |
 | Borde con luz | Un tramo de gradiente recorre el borde de la tarjeta | Tarjetas destacadas (máx. una fila por página) |
 | Resplandor | Gradiente radial en una esquina | Tarjetas y hero; nunca sombras duras |

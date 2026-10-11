@@ -24,7 +24,7 @@ const href = localizePath(`/notes/${slug}/`, data.lang, LOCALES);
 const readingLabel = t(locale, 'notes.readingTime', { min: readingMinutes(body) });
 ---
 
-<section data-card-link class="relative flex flex-col gap-5 rounded-card bg-card p-6 transition-colors duration-150 hover:bg-card-hover md:p-8">
+<section data-card-link class="relative flex flex-col gap-5">
   <div class="flex flex-wrap items-center justify-between gap-2">
     <span class="flex items-center gap-2 font-mono text-sm">
       <span class="text-pink">{t(locale, 'notes.entry', { number: noteNumber(data.number) })}</span>
@@ -37,7 +37,7 @@ const readingLabel = t(locale, 'notes.readingTime', { min: readingMinutes(body) 
     </span>
   </div>
 
-  <h2 class="font-display text-card-title font-bold leading-tight">
+  <h2 class="font-display text-note-title font-bold leading-tight">
     <a href={href} class="transition-colors duration-150 after:absolute after:inset-0 hover:text-primary">{data.title}</a>
   </h2>
 

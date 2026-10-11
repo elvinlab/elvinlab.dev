@@ -45,6 +45,9 @@ for (const { path, toggle, exit } of NOTES) {
       // What the reader came for stays: title, body, comments and prev/next.
       await expect(page.locator('[data-banner] h1')).toBeVisible();
       await expect(page.locator('.prose')).toBeVisible();
+      // The decision record shows once, inline, whatever the width (the banner copy steps aside).
+      await expect(page.locator('[data-banner] section[aria-label]')).toBeHidden();
+      await expect(page.locator('[data-article] section[aria-label]')).toBeVisible();
       await expect(page.locator('[data-comments]')).toHaveCount(1);
 
       await page.reload();
@@ -131,6 +134,8 @@ test('pauses the background effect while reading and restores it afterwards', as
 }) => {
   const context = await browser.newContext({ reducedMotion: 'no-preference' });
   const page = await context.newPage();
+  // The owner default is the static paper, so the effect runs only after the visitor picked one.
+  await page.addInitScript(() => localStorage.setItem('background', 'galaxy'));
   const inlineDisplay = () =>
     page.locator('[data-background]').evaluate((node) => (node as HTMLElement).style.display);
 
@@ -146,7 +151,7 @@ test('pauses the background effect while reading and restores it afterwards', as
   expect(await inlineDisplay()).toBe('');
   await expect(page.locator('[data-background]')).toBeVisible();
   // Reading mode never overwrites the visitor's chosen background.
-  expect(await page.evaluate(() => localStorage.getItem('background'))).toBeNull();
+  expect(await page.evaluate(() => localStorage.getItem('background'))).toBe('galaxy');
   await context.close();
 });
 

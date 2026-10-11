@@ -57,15 +57,15 @@ const FULL_PAGE_BANNERS: Record<string, number> = {
 };
 /**
  * Expanded home banner by preset, then project. `minimal`: clamp(360px, 48vh, 460px) at 900 px is
- * 432 px on desktop, 24rem on a phone. `full`: clamp(520px, 66vh, 620px) is 594 px on desktop,
- * 28rem on a phone.
+ * 432 px on desktop, 24rem on a phone. `full`: clamp(440px, 56vh, 520px) is 504 px on desktop,
+ * 29rem on a phone (the four-line pixel headline needs more than the old 28rem).
  */
 const HOME_BANNER: Record<Preset, { desktop: number; phone: number }> = {
   minimal: { desktop: 432, phone: 384 },
-  full: { desktop: 594, phone: 448 },
+  full: { desktop: 504, phone: 464 },
 };
-/** Lines the pixel hero wraps to on desktop: `minimal` widens the measure to 22ch (two lines). */
-const HERO_LINES: Record<Preset, number> = { minimal: 2, full: 3 };
+/** Lines the pixel hero wraps to on desktop: both presets widen the measure (22ch minimal, 24ch full) to two lines. */
+const HERO_LINES: Record<Preset, number> = { minimal: 2, full: 2 };
 /**
  * Decision record, in px: `--record-*` of `calm-layout.css`. `phoneGap` is the stacked row gap.
  */
@@ -194,6 +194,10 @@ test('the home hero wraps to the lines of its preset on desktop', async ({ page 
 test('the decision record follows the preset spacing and keeps every label', async ({
   page,
 }, testInfo) => {
+  test.skip(
+    testInfo.project.name !== 'chromium-360',
+    'the inline record shows below md only; the banner copy is checked in the next test',
+  );
   await page.goto('/notes/smoke-es/');
   const expected = RECORD[await presetOf(page)];
   const record = page.locator('article section[aria-label]').first();
@@ -219,13 +223,9 @@ test('the decision record follows the preset spacing and keeps every label', asy
     padding: expected.padding,
     blocks: 3,
   });
-  if (testInfo.project.name === 'chromium-360') {
-    // On a phone the three blocks stay stacked (`minimal` spaces them 14 px, `full` 20 px).
-    expect(sizes.columns).toBe(1);
-    expect(sizes.gap).toBe(expected.phoneGap);
-  } else {
-    expect(sizes.columns).toBe(3);
-  }
+  // On a phone the three blocks stay stacked (`minimal` spaces them 14 px, `full` 20 px).
+  expect(sizes.columns).toBe(1);
+  expect(sizes.gap).toBe(expected.phoneGap);
   await expect(record.locator('h2')).toHaveCount(1);
   // Sentence case, never ALL-CAPS: the title and the three field labels keep their authored case.
   const labels = record.locator('div > div > span');
@@ -247,6 +247,33 @@ test('the decision record follows the preset spacing and keeps every label', asy
   expect(order).toBeGreaterThan(0);
 });
 
+test('the decision record sits in the banner from md up and inline in the article below it', async ({
+  page,
+}, testInfo) => {
+  await page.goto('/notes/smoke-es/');
+  const inBanner = page.locator('[data-banner] section[aria-label]');
+  const inArticle = page.locator('[data-article] section[aria-label]');
+  await expect(inBanner).toHaveCount(1);
+  await expect(inArticle).toHaveCount(1);
+  if (testInfo.project.name === 'chromium-360') {
+    await expect(inArticle).toBeVisible();
+    await expect(inBanner).toBeHidden();
+    return;
+  }
+  await expect(inBanner).toBeVisible();
+  await expect(inArticle).toBeHidden();
+  // Three stacked fields, labelled as in the inline record, to the right of the title block.
+  await expect(inBanner.locator('span')).toHaveCount(3);
+  await expect(inBanner.locator('p')).toHaveCount(3);
+  const record = await inBanner.boundingBox();
+  const title = await page.locator('[data-banner] h1').boundingBox();
+  const banner = await page.locator('[data-banner]').boundingBox();
+  if (!record || !title || !banner) throw new Error('missing box');
+  expect(record.x).toBeGreaterThanOrEqual(title.x + title.width);
+  expect(record.y).toBeGreaterThanOrEqual(banner.y);
+  expect(record.y + record.height).toBeLessThanOrEqual(banner.y + banner.height);
+});
+
 test('the note header keeps date and reading time, and the preset places badge, author and tags', async ({
   page,
 }) => {
@@ -255,7 +282,7 @@ test('the note header keeps date and reading time, and the preset places badge, 
   const header = page.locator('[data-banner]');
   await expect(header.locator('time')).toHaveCount(1);
   await expect(header).toContainText(/\d+ min/);
-  const meta = header.locator('[data-banner-inner] p').last();
+  const meta = header.locator('time').locator('..');
   const foot = page.locator('article > div').last();
   const badge = /^es$/i;
   if (preset === 'minimal') {

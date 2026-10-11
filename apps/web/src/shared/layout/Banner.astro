@@ -1,7 +1,7 @@
 ---
 /**
- * Full-bleed banner: the brand grid and corner glows over the banner surface, with an optional
- * animated background passed through the `background` slot. When `expandable`, a glass toggle lets
+ * Full-bleed banner: a static "lab paper" (fine grid, ruler ticks and registration crosses) over the
+ * banner surface, with an optional animated background passed through the `background` slot. When `expandable`, a glass toggle lets
  * the visitor grow or shrink the background height (remembered per visitor); the content never moves.
  * Every banner blends its bottom edge into the page through the same 120 px gradient, drawn by the
  * server-rendered markup and CSS only (no script), so the first paint of every page is already right.
@@ -37,8 +37,6 @@ const {
   data-expanded={expandable ? true : undefined}
 >
   <div class="banner-grid absolute inset-0 -z-20" aria-hidden="true"></div>
-  <div class="banner-stars absolute inset-0 -z-20" aria-hidden="true"></div>
-  <div class="banner-glow absolute inset-0 -z-20 motion-reduce:opacity-100" aria-hidden="true"></div>
   <slot name="background" />
   <div aria-hidden="true" class="pointer-events-none absolute inset-x-0 bottom-0 z-0 h-[120px] bg-gradient-to-b from-transparent to-page" data-banner-fade></div>
   <div data-banner-inner class="relative z-10 mx-auto flex h-full min-h-[inherit] max-w-[1200px] flex-col justify-end px-4">
@@ -101,49 +99,59 @@ const {
       transition: none;
     }
   }
+  /* Lab paper: one ink, no animation, no glow. A minor line every 16 px, a stronger major line every
+     80 px (every fifth), all in the text color at low alpha so the ink follows the theme. The mask fades the grid toward the edges but keeps a strip on the left for
+     the ruler. Everything is decorative; the layer and its pseudo-elements are hidden in reading mode
+     and print through the `.banner-grid` rules in `reading-mode.css` and `global.css`. */
   .banner-grid {
-    background-image:
-      linear-gradient(var(--color-grid) 1px, transparent 1px),
-      linear-gradient(90deg, var(--color-grid) 1px, transparent 1px);
-    background-size: 32px 32px;
-    mask-image: radial-gradient(ellipse at center, black, transparent 78%);
-  }
-  .banner-glow {
+    --ink: color-mix(in srgb, var(--color-text) 32%, transparent);
+    --minor: color-mix(in srgb, var(--color-text) 5%, transparent);
+    --major: color-mix(in srgb, var(--color-text) 10%, transparent);
+    --mark: linear-gradient(var(--ink), var(--ink));
     background:
-      radial-gradient(40% 60% at 15% 20%, var(--color-glow-violet), transparent 70%),
-      radial-gradient(40% 60% at 85% 30%, var(--color-glow-cyan), transparent 70%);
+      linear-gradient(var(--major) 1px, transparent 1px) 0 0 / 80px 80px,
+      linear-gradient(90deg, var(--major) 1px, transparent 1px) 0 0 / 80px 80px,
+      linear-gradient(var(--minor) 1px, transparent 1px) 0 0 / 16px 16px,
+      linear-gradient(90deg, var(--minor) 1px, transparent 1px) 0 0 / 16px 16px;
+    mask-image:
+      linear-gradient(#000, #000),
+      radial-gradient(ellipse at center, #000 35%, rgb(0 0 0 / 0.4) 100%);
+    mask-size: 12px 100%, auto;
+    mask-position: left top, center;
+    mask-repeat: no-repeat;
   }
-  /* CSS starfield: a resilient base that always shows, even if the WebGL shader can't run.
-     Colors come from tokens, so it reads on both themes; the shader layers richer motion on top. */
-  .banner-stars {
-    --star: color-mix(in srgb, var(--color-primary) 55%, transparent);
-    --star-cyan: color-mix(in srgb, var(--color-cyan) 55%, transparent);
-    background-image:
-      radial-gradient(1.2px 1.2px at 12% 22%, var(--star), transparent),
-      radial-gradient(1px 1px at 47% 65%, var(--star), transparent),
-      radial-gradient(1.4px 1.4px at 78% 34%, var(--star-cyan), transparent),
-      radial-gradient(1px 1px at 63% 18%, var(--star), transparent),
-      radial-gradient(1.2px 1.2px at 88% 72%, var(--star), transparent),
-      radial-gradient(1px 1px at 32% 48%, var(--star-cyan), transparent),
-      radial-gradient(1px 1px at 8% 78%, var(--star), transparent),
-      radial-gradient(1.3px 1.3px at 55% 88%, var(--star), transparent);
-    background-repeat: repeat;
-    background-size: 240px 200px;
-    animation: banner-twinkle 4s ease-in-out infinite;
+  /* Vertical ruler on the left edge: a 6 px tick every 16 px, a 12 px tick every 80 px. */
+  .banner-grid::before {
+    content: '';
+    position: absolute;
+    inset: 0 auto 0 0;
+    width: 12px;
+    background:
+      repeating-linear-gradient(var(--ink) 0 1px, transparent 1px 80px) left top / 12px 100% no-repeat,
+      repeating-linear-gradient(var(--ink) 0 1px, transparent 1px 16px) left top / 6px 100% no-repeat;
   }
-  @keyframes banner-twinkle {
-    50% {
-      opacity: 0.55;
+  /* Registration crosses (13 px, 1 px strokes) on major-grid intersections: upper left, upper right and
+     mid right. The box is as wide as the last whole 80 px column, so right-anchored crosses land on
+     the grid at any width. Without `round()` support the crosses are simply omitted. */
+  @supports (width: round(down, 100px, 80px)) {
+    .banner-grid::after {
+      content: '';
+      position: absolute;
+      inset: 0 auto 0 0;
+      width: round(down, 100%, 80px);
+      background:
+        var(--mark) left 234px top 80px / 13px 1px no-repeat,
+        var(--mark) left 240px top 74px / 1px 13px no-repeat,
+        var(--mark) right 153px top 80px / 13px 1px no-repeat,
+        var(--mark) right 159px top 74px / 1px 13px no-repeat,
+        var(--mark) right 73px top 240px / 13px 1px no-repeat,
+        var(--mark) right 79px top 234px / 1px 13px no-repeat;
     }
-  }
-  @media (prefers-reduced-motion: reduce) {
-    .banner-stars {
-      animation: none;
-    }
-  }
-  @media (pointer: coarse) {
-    .banner-stars {
-      animation: none;
+    /* On a phone the hero text reaches the mid-right spot, so that cross is dropped there. */
+    @media (max-width: 767px) {
+      .banner-grid::after {
+        background-size: 13px 1px, 1px 13px, 13px 1px, 1px 13px, 0 0, 0 0;
+      }
     }
   }
 </style>

@@ -12,7 +12,8 @@ type Preset = 'minimal' | 'full';
 /** Whether each preset-driven section is on (`HOME_PRESETS` in `shared/config/appearance.ts`). */
 const PRESET_SECTIONS: Record<Preset, { heroPills: boolean; pillars: boolean }> = {
   minimal: { heroPills: false, pillars: false },
-  full: { heroPills: true, pillars: true },
+  // This site switches the hero pills and the pillars off through `home` in site.config.ts.
+  full: { heroPills: false, pillars: false },
 };
 
 const presetOf = async (page: Page): Promise<Preset> => {
@@ -80,7 +81,8 @@ for (const { path, now, nowDate, nowFocus, retired, pillars, notebook, hiring } 
 
     test('keeps the author card, the recruiter card and the notebook index', async ({ page }) => {
       await page.goto(path);
-      await expect(page.locator('img[alt="Elvin González"]')).toBeVisible();
+      // Wide screens show the photo in the hero and the sidebar card drops it (see the avatar test).
+      await expect(page.locator('aside').getByText('Elvin González')).toBeVisible();
       await expect(page.getByRole('heading', { name: hiring })).toBeVisible();
       await expect(page.getByRole('heading', { name: notebook })).toBeVisible();
     });
@@ -122,6 +124,52 @@ test.describe('home hero action and language cue', () => {
     await expect(page.locator('aside a[href="/me/"]')).toBeVisible();
   });
 
+  test('shows the avatar in the hero from md up and in the author card on phones only', async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width: 1280, height: 900 });
+    await page.goto('/');
+    const heroFigure = page.locator('[data-hero-content] figure');
+    const heroAvatar = heroFigure.locator('img[alt="Elvin González"]');
+    await expect(heroAvatar).toBeVisible();
+    const h1Box = await page.locator('[data-home-hero] h1').boundingBox();
+    const figureBox = await heroFigure.boundingBox();
+    if (!h1Box || !figureBox) throw new Error('hero h1 and figure must be laid out');
+    expect(figureBox.x).toBeGreaterThanOrEqual(h1Box.x + h1Box.width);
+    await expect(heroFigure.locator('figcaption')).toContainText('Elvin González');
+    await expect(page.locator('aside img[alt="Elvin González"]')).toBeHidden();
+
+    await page.setViewportSize({ width: 360, height: 800 });
+    await expect(heroFigure).toBeHidden();
+    await expect(page.locator('aside img[alt="Elvin González"]')).toBeVisible();
+  });
+
+  for (const width of [1280, 1440]) {
+    test(`centers the hero avatar on the author card column at ${width} px`, async ({ page }) => {
+      await page.setViewportSize({ width, height: 900 });
+      await page.goto('/');
+      const avatar = await page.locator('[data-hero-content] figure img').boundingBox();
+      const card = await page.locator('aside section').first().boundingBox();
+      if (!avatar || !card) throw new Error('hero avatar and author card must be laid out');
+      const center = (box: { x: number; width: number }) => box.x + box.width / 2;
+      expect(Math.abs(center(avatar) - center(card))).toBeLessThanOrEqual(1);
+    });
+  }
+
+  test('moves the avatar from the hero to the author card while the banner is collapsed', async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width: 1280, height: 900 });
+    await page.goto('/');
+    const heroAvatar = page.locator('[data-hero-content] img[alt="Elvin González"]');
+    const cardAvatar = page.locator('aside img[alt="Elvin González"]');
+    await expect(heroAvatar).toBeVisible();
+    await expect(cardAvatar).toBeHidden();
+    await page.locator('[data-banner-toggle]').click();
+    await expect(heroAvatar).toBeHidden();
+    await expect(cardAvatar).toBeVisible();
+  });
+
   test('notes the language of the notes on /en/ and does not call Spanish notes foreign on /', async ({
     page,
   }) => {
@@ -129,5 +177,25 @@ test.describe('home hero action and language cue', () => {
     await expect(page.getByText('Notes written in Spanish.')).toBeVisible();
     await page.goto('/');
     await expect(page.getByText('Notas escritas en español.')).toHaveCount(0);
+  });
+
+  test('keeps the main column on the page background and only the decision record boxed', async ({
+    page,
+  }) => {
+    await page.goto('/');
+    const TRANSPARENT = 'rgba(0, 0, 0, 0)';
+    const background = (selector: string) =>
+      page
+        .locator(selector)
+        .first()
+        .evaluate((el) => getComputedStyle(el).backgroundColor);
+    const latest = 'section[data-card-link]';
+    expect(await background(latest)).toBe(TRANSPARENT);
+    expect(await background('main section:has(> div > h2 + a[href="/notes/"])')).toBe(TRANSPARENT);
+    expect(await background(`${latest} section`)).not.toBe(TRANSPARENT);
+    const link = page.locator(`${latest} h2 a`);
+    const href = await link.getAttribute('href');
+    await link.click();
+    await expect(page).toHaveURL(new RegExp(`${href}$`));
   });
 });

@@ -3,7 +3,7 @@
  * Mounts the banner background: one canvas, running the visitor's chosen effect (persisted in
  * localStorage via `BackgroundPicker`) or the owner's default from `site.config` when the visitor
  * has none. Purely decorative: it does nothing under prefers-reduced-motion, without WebGL2, or
- * when the resolved choice is 'off', so the banner's static grid, glows and CSS starfield remain
+ * when the resolved choice is 'off', so the banner's static lab-paper grid remains
  * the fallback. Swaps effects live, in place, without a page reload (`BackgroundPicker` dispatches
  * a `background-change` event this script listens for).
  */
@@ -70,7 +70,7 @@ import { site } from '@/shared/config/index.ts';
 
     const run = (choice: BackgroundChoice): void => {
       stop();
-      // 'off' hides the canvas so the banner's CSS starfield fallback shows through underneath.
+      // 'off' hides the canvas so the banner's lab-paper grid shows through underneath.
       canvas.style.display = choice === 'off' ? 'none' : '';
       if (choice === 'off') return;
       if (!gl) {

@@ -43,8 +43,8 @@ export const t = createTranslator({
       'backtotop.label': 'Volver arriba',
       'banner.expand': 'Expandir el fondo',
       'banner.collapse': 'Achicar el fondo',
-      'home.intro':
-        'Documento las decisiones detrás de lo que construyo: qué probé, qué descarté y por qué.',
+      'home.headline': 'Construyo con agentes de IA y escribo lo que sale mal.',
+      'home.intro': 'Cada decisión queda en una nota: qué probé, qué descarté y por qué.',
       'home.pill.1': 'Clean architecture',
       'home.pill.2': 'Sistemas rápidos',
       'home.pill.3': 'Cloud listo para producción',
@@ -170,7 +170,6 @@ export const t = createTranslator({
       'notFound.title': 'Página no encontrada',
       'notFound.body': 'Esta página no existe o se movió.',
       'notFound.home': 'Volver al inicio',
-      'notes.eyebrow': '{handle} / lab notes',
       'notes.title': 'Lab Notes',
       'notes.subtitle':
         'Decisiones de ingeniería documentadas: contexto, qué elegí y qué pasó después.',
@@ -219,7 +218,6 @@ export const t = createTranslator({
       'subscribe.page.metaTitle': 'Suscríbete a las notas',
       'subscribe.page.description':
         'Recibe por correo cada nota nueva de Lab Notes: las decisiones detrás de lo que construyo, sin relleno y sin ruido.',
-      'subscribe.page.eyebrow': 'Lab Notes por correo',
       'subscribe.page.title': 'Lo que construyo, en tu correo.',
       'subscribe.page.subtitle':
         'Documento las decisiones detrás de lo que construyo: qué probé, qué descarté y por qué. Sin relleno y sin ruido.',
@@ -314,8 +312,8 @@ export const t = createTranslator({
       'backtotop.label': 'Back to top',
       'banner.expand': 'Expand the background',
       'banner.collapse': 'Collapse the background',
-      'home.intro':
-        'I write down the decisions behind what I build: what I tried, what I dropped and why.',
+      'home.headline': 'I build with AI agents and write down what goes wrong.',
+      'home.intro': 'Every decision becomes a note: what I tried, what I dropped and why.',
       'home.pill.1': 'Clean architecture',
       'home.pill.2': 'Fast systems',
       'home.pill.3': 'Production-ready cloud',
@@ -438,7 +436,6 @@ export const t = createTranslator({
       'notFound.title': 'Page not found',
       'notFound.body': 'This page does not exist or has moved.',
       'notFound.home': 'Back to home',
-      'notes.eyebrow': '{handle} / lab notes',
       'notes.title': 'Lab Notes',
       'notes.subtitle':
         'Engineering decisions, documented: the context, what I chose and what happened.',
@@ -486,7 +483,6 @@ export const t = createTranslator({
       'subscribe.page.metaTitle': 'Subscribe to the notes',
       'subscribe.page.description':
         'Get every new Lab Notes post by email: the decisions behind what I build, with no filler and no noise.',
-      'subscribe.page.eyebrow': 'Lab Notes by email',
       'subscribe.page.title': 'What I build, in your inbox.',
       'subscribe.page.subtitle':
         'I write down the decisions behind what I build: what I tried, what I dropped and why. No filler, no noise.',

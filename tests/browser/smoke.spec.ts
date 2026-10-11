@@ -62,7 +62,10 @@ for (const { locale, path } of [
     await expect(navbarBrand.locator('.animate-blink')).toHaveCount(0);
     await expect(page.locator('[data-banner-fade]')).toHaveCSS('height', '120px');
 
-    await expect(page.locator('img[alt="Elvin González"][src$=".webp"]')).toBeVisible();
+    // The photo sits in the hero from md up and in the sidebar card on phones: exactly one is visible.
+    await expect(
+      page.locator('img[alt="Elvin González"][src$=".webp"]').filter({ visible: true }),
+    ).toHaveCount(1);
 
     const hiringCard = page.locator('section', {
       has: page.getByRole('heading', { name: locale === 'es' ? '¿Contratando?' : 'Hiring?' }),

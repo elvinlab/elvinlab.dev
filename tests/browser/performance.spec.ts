@@ -1,10 +1,9 @@
 import { expect, test } from '@playwright/test';
 
-/** The two body fonts every page needs; Press Start 2P and the non-Latin subsets stay lazy. */
-const BODY_FONTS = [
-  /space-grotesk-latin-wght-normal.*\.woff2$/,
-  /jetbrains-mono-latin-wght-normal.*\.woff2$/,
-];
+/** The body font every page preloads. JetBrains Mono is deliberately not preloaded (it competes with
+ * the body font for the LCP text on note pages); Press Start 2P and the non-Latin subsets stay lazy. */
+const BODY_FONTS = [/ibm-plex-sans-latin-wght-normal.*\.woff2$/];
+const MONO_FONT = /jetbrains-mono-latin-wght-normal.*\.woff2$/;
 /** Pixelify Sans is preloaded wherever an H1 uses it (home hero, notes banner, `PageHeader`); never elsewhere. */
 const PIXEL_FONT = /pixelify-sans-latin-wght-normal.*\.woff2$/;
 const PAGES = [
@@ -47,6 +46,7 @@ for (const { path, preloads: expectedPreloads } of PAGES) {
       );
 
     expect(preloads).toHaveLength(expectedPreloads.length);
+    for (const preload of preloads) expect(preload.href).not.toMatch(MONO_FONT);
     for (const [index, pattern] of expectedPreloads.entries()) {
       const preload = preloads[index];
       expect(preload?.href).toMatch(pattern);
@@ -62,7 +62,7 @@ for (const { path, preloads: expectedPreloads } of PAGES) {
 
 test('the home profile photo is served as an optimized, dimensioned image', async ({ page }) => {
   await page.goto('/');
-  const avatar = page.locator('img[alt="Elvin González"]');
+  const avatar = page.locator('[data-hero-content] img[alt="Elvin González"]');
   await avatar.scrollIntoViewIfNeeded();
   await expect(avatar).toBeVisible();
 

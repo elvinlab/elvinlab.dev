@@ -44,7 +44,7 @@
 @media (min-width: 48rem) {
   :root,
   [data-appearance="full"] {
-    --hero-measure: 16ch;
+    --hero-measure: 24ch;
   }
 
   [data-appearance="minimal"] {

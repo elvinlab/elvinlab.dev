@@ -18,7 +18,7 @@ const isInternal = (href: string) => href.startsWith('/');
 ---
 
 {now && (
-  <section data-now-card class="flex flex-col gap-3 rounded-card bg-card p-5">
+  <section data-now-card class="flex flex-col gap-3 border-t border-dashed border-divider pt-10">
     <div class="flex flex-col gap-1">
       <h2 class="font-display text-base font-bold">{t(locale, 'now.title')}</h2>
       <p class="text-meta text-muted">{t(locale, 'now.updated', { date: formatNowDate(now.updatedAt, locale) })}</p>

@@ -40,15 +40,15 @@ const { href: otherHref, kind: otherKind } = resolveLocaleTarget({
 });
 const switchLabel = t(locale, otherKind === 'home-fallback' ? 'language.switch.home' : 'language.switch');
 const linkClass =
-  'flex h-11 items-center rounded-control px-3 font-medium transition-colors duration-150 hover:bg-card-hover aria-[current=page]:text-primary';
+  'flex h-11 items-center rounded-control px-3 md:px-2 font-medium transition-colors duration-150 hover:bg-card-hover aria-[current=page]:text-primary';
 ---
 
 <header data-navbar class="animate-fade-in-up transition-transform duration-300 will-change-transform">
   <nav
     aria-label={t(locale, 'nav.label')}
-    class="relative flex min-h-18 flex-wrap items-center gap-x-1 rounded-b-card bg-card/70 px-3 backdrop-blur-md md:gap-2 md:px-4"
+    class="relative flex min-h-18 flex-wrap items-center gap-x-1 rounded-b-card bg-card/70 px-3 backdrop-blur-md md:gap-1 md:px-3"
   >
-    <a href={localizePath('/', locale, LOCALES)} class="group mr-auto flex h-11 min-w-0 items-center gap-2 rounded-control px-1 font-retro text-xs md:px-2">
+    <a href={localizePath('/', locale, LOCALES)} class="group mr-auto flex h-11 min-w-0 items-center gap-2 rounded-control px-1 font-retro text-xs">
       <BrandMark />{site.identity.handle}
     </a>
 

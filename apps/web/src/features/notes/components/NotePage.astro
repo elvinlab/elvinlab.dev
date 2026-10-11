@@ -68,26 +68,33 @@ const readingLabel = t(locale, 'notes.readingTime', { min: readingMinutes(entry.
   <ReadingProgress slot="banner" />
   <Banner slot="banner" height="360px" locale={locale}>
     <BackgroundCanvas slot="background" />
-    <p class="font-mono text-sm text-muted">
-      <a href={localizePath('/notes/', 'es', LOCALES)} class="hover:text-primary">{t(locale, 'note.breadcrumb')}</a>
-      <span class="mx-1">/</span><a href={tagHref(data.category)} class="hover:text-primary">{data.category}</a>
-    </p>
-    <div class="mt-3 flex items-center gap-2">
-      <span class="font-mono text-sm text-pink">{t(locale, 'notes.entry', { number: noteNumber(data.number) })}</span>
-      {secondaryMetaSlot === 'header' && <LangBadge lang={data.lang} />}
+    <div data-banner-split class="md:grid md:grid-cols-[minmax(0,1fr)_26rem] md:items-end md:gap-12">
+      <div>
+        <p class="font-mono text-sm text-muted">
+          <a href={localizePath('/notes/', 'es', LOCALES)} class="hover:text-primary">{t(locale, 'note.breadcrumb')}</a>
+          <span class="mx-1">/</span><a href={tagHref(data.category)} class="hover:text-primary">{data.category}</a>
+        </p>
+        <div class="mt-3 flex items-center gap-2">
+          <span class="font-mono text-sm text-pink">{t(locale, 'notes.entry', { number: noteNumber(data.number) })}</span>
+          {secondaryMetaSlot === 'header' && <LangBadge lang={data.lang} />}
+      </div>
+      <h1 class="mt-2 max-w-[22ch] font-display text-note-title font-bold leading-tight">{data.title}</h1>
+      <p class="mt-3 flex flex-wrap gap-x-3 gap-y-1 font-mono text-sm text-muted">
+        {secondaryMetaSlot === 'header' && <span class="whitespace-nowrap">{site.identity.name}</span>}
+        <time class="whitespace-nowrap" datetime={data.pubDate.toISOString()}>{formatDate(data.pubDate, locale)}</time>
+        <span class="whitespace-nowrap">{readingLabel}</span>
+      </p>
+      <MarkSection slug={entry.id} locale={locale} variant="header" />
+      </div>
+      <div data-record-banner class="hidden md:block">
+        <DecisionRecord locale={locale} decision={data.decision} variant="banner" />
+      </div>
     </div>
-    <h1 class="mt-2 max-w-[22ch] font-display text-note-title font-bold leading-tight">{data.title}</h1>
-    <p class="mt-3 flex flex-wrap gap-x-3 gap-y-1 font-mono text-sm text-muted">
-      {secondaryMetaSlot === 'header' && <span class="whitespace-nowrap">{site.identity.name}</span>}
-      <time class="whitespace-nowrap" datetime={data.pubDate.toISOString()}>{formatDate(data.pubDate, locale)}</time>
-      <span class="whitespace-nowrap">{readingLabel}</span>
-    </p>
-    <MarkSection slug={entry.id} locale={locale} variant="header" />
   </Banner>
 
   <article data-article class="flex flex-col gap-8 rounded-card bg-card p-6 md:p-10">
     <ReadingMode part="toggle" locale={locale} />
-    <DecisionRecord locale={locale} decision={data.decision} />
+    <div data-record-inline class="md:hidden"><DecisionRecord locale={locale} decision={data.decision} /></div>
     <div class="prose"><Content /></div>
 
     <div class="flex flex-col gap-3 border-t border-dashed border-divider pt-6">
