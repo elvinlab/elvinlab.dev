@@ -69,15 +69,35 @@ Visual identity surfaces of `apps/web` and `packages/core` tokens, the two desig
 
 - 2026-10-11 typeface (T3, last piece): owner picked IBM Plex Sans (option 1 of 3) and authorized installing `@fontsource-variable/ibm-plex-sans` 5.3.0; `@fontsource-variable/space-grotesk` removed. Route: delegated writer, parent reviewed screenshots (note 1440, /me 1440, home 1440). The writer's whole-stack run found two problems: `test:white-label` failed because my earlier commit `5e6e250` leaked `html[data-reading]` CSS into `calm-layout.css` (fixed in `83c5877`), and Lighthouse LCP on the note page was 2582 to 2588 ms (gate 2500) because Plex Latin is 46 KB versus 22 KB. Measured fix: stop preloading JetBrains Mono (LCP 2261 to 2437, CLS 0.015). Final tree: full `test:lighthouse` exit 0, `test:e2e:quick` 549 passed. Ledger entry added.
 
-## Open items
+## Open items (visual audit of 2026-10-11, 20 routes x 4 views; not blocking the release)
 
-- The page-weight style budget on `/` has about 190 B of margin left; any new utility on the home needs `check:page-weight`.
+Source: two read-only reviewers looked at 80 full-page screenshots (dark and light at 1440, dark at 390 and 820). The two P1 findings (header wraps to two rows at 820 px in Spanish; hero avatar caption clipped and under the collapse button at md to lg) are being fixed before the release and are listed here only for the record. Everything below is pending.
 
-- DONE 2026-10-10: the navbar background button showed a circle with a slash for its "off" state, which read as "disabled". It is now a grid icon (the lab paper), checked in dark and light at 3x; the e2e specs only use the stored values, so none changed.
-- Flaky: `a11y.spec.ts` "/contact/ has no axe violations (elvinlab-dark)" (axe `color-contrast` on `.hover\:bg-button\/90`) failed in two batched runs of several specs (3.5 s) and passed 4 of 4 times alone (0.9 s). Not caused by this work (the contact page was not touched); likely a hover transition caught mid-way under load. Not investigated further; worth a look before relying on a green CI.
+Content and consistency
+- **P1-content, Experiments gallery screenshots are stale:** the carousel slides on `/experiments/` (and `/me` thumbnails) show the pre-redesign home (starfield, old headline, kicker, Space Grotesk). Retake them from the current build; on phones they are illegible at about 330 px, crop tighter; slides are always the Spanish UI even on `/en/`; thumbnails 2 to 4 are nearly invisible in dark. See docs/PORTFOLIO.md for how they are produced.
+- **Inner pages left behind:** `/experiments/`, `/contact/`, `/changelog/`, `/privacy/`, `/terms/` have no lab-paper banner, only a bare title (about 60 px under the nav; privacy and terms about 30 px, plain bold instead of the pixel face, 680 px column with dead space). Give them the compact `/notes/` banner or at least the grid, and one shared page header.
+- **`/me` still reads templated:** every section is a boxed card; "Que aporto" is a 3-up strip of identical tiles with stock line icons, plus a second 3-up stats strip. Flatten to dashed-hairline sections like the home; turn "Que aporto" into a plain list.
+- **`/subscribe/`:** the content column is off the page grid (starts at x=400 at 1440, x=90 at 820 while header and footer start at 136 and 16); the pixel envelope above the title is decoration the redesign removed elsewhere.
 
-- The kicker "elvinlab / lab notes" also appears in the `/notes/` banner (not touched).
-- T2 home hierarchy, T3 dark-theme background and body type pairing are not started. Owner has not decided on them.
+Layout
+- **Note banner at 820 px:** the title column is about 300 px and wraps to 6 lines beside a wide decision-record box. Change the ratio (title about 55 percent, record about 45) or keep the record below the title until about 900 px.
+- **Home on phones:** the notebook list loses its dates and truncates titles ("Claude piensa, los modelos bara..."); allow two-line titles with the date under them like `/notes/`. The hero CTA "Ver mi perfil" duplicates the Hiring card button. Footer links stack one per row (about 6 rows); the language strip wraps to two lines and its wording differs between pages.
+- **Home sidebar at 768 to 1023 px:** author, hiring and footprint cards stack as wide boxes with short content; a 2 or 3 column grid would fit. At desktop there is about 600 px of empty sidebar under the three cards; the "Deje mi huella" caption orphans "huella" at 11 px.
+- **Note pages:** the "Notas relacionadas" block repeats the previous or next note; a note title can break as "multi-/agente" (use text-wrap balance); large gap between the banner and the article card. Phone note pages were reviewed only at their top and bottom (9,000 to 12,500 px tall); the middle was not read.
+- **`/changelog/` (ES):** entry text is about 150 characters per line; cap near 75 ch.
+- **`/notes/` index:** boxed sidebar cards and search while the home is flat; the ES/EN badge sits under the date and makes a ragged column.
+
+Colour and contrast
+- Light theme: the lab-paper grid is on the strong side behind the hero headline (soften the line alpha by about 30 percent); the 11 px mono captions on lavender are the weakest contrast.
+- Dark theme: the decision-record box barely differs from the page background and its dashed dividers are very faint, so it does not read as "the one boxed piece"; raise the surface or border by one step.
+
+Checked and NOT a bug (do not re-raise)
+- "Notas escritas en ingles" above the Cuaderno list is accurate: the list really contains English notes. The role line in English on Spanish pages is the configured positioning line (BRAND.md keeps it identical everywhere). `/en/notes/` is 404 by design. The Astro dev toolbar pill in the screenshots is a dev-only artifact.
+
+Process
+- `pnpm changelog:audit` flags `83c5877` (fix of the reading-mode CSS scope) because its entry landed in the next commit (`docs(changelog)`), not in the same one. The audit works per commit and is not run by CI; the entry exists. History was not rewritten.
+- Flaky: axe `color-contrast` on `/contact/` (dark), failed only in batched runs.
+- The page-weight style budget on `/` has under 200 B of margin.
 
 ## Next step
 

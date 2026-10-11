@@ -164,3 +164,18 @@ The typeface swap changes a dependency, so it ran the whole stack once (writer),
 | `pnpm test:lighthouse` (10 URLs, 3 runs, final tree) | exit 0, every gate passes. Worst LCP: `/notes/smoke-es/` 2412 ms, `/` 2266 ms, `/en/` 2341 ms; CLS 0 except 0.014 on the note page. |
 
 Findings worth keeping: with both fonts preloaded the note page LCP was about 2585 ms (gate 2500, reproduced twice: 2582 and 2588); dropping the JetBrains Mono preload gave 2261 to 2437 ms. The axe contrast test on `/contact/` (dark) failed twice only in batched runs and passed alone 4 of 4 times; it did not fail in the final full runs. Not run: the 390 and 768 px e2e projects after the final tree, `pnpm verify --run --record` (the registry in `odd/verification-state.json` was not updated), dev cold start. The CI on `main` re-runs everything on the push, which is the owner's decision.
+
+## Release 16 candidate: identity evolution, final tree (parent, 2026-10-11)
+
+Run on the tree that is published (`develop` at the changelog stamp commit), sequentially, all exit 0.
+
+| Check | Result |
+| --- | --- |
+| `pnpm typecheck` / `pnpm lint` | 0 errors / clean (477 files). |
+| `pnpm test` (all vitest) | 122 files, 1312 tests passed. |
+| `pnpm docs:config`, `pnpm test:white-label`, `pnpm check:dev-cold-start` | up to date, passed, 7 routes rendered with no late dependency discovery. |
+| `pnpm --filter web build`, `pnpm check:js-budget`, `pnpm check:page-weight` | ok, pass, all 26 pages within budget (changelog pages 56,059 of 56,500 B style; `/changelog/page/2/` 107,997 of 110,000 B html). |
+| `pnpm test:e2e:quick` (1280 px) | 555 passed, 13 skipped, 0 failed (1.8 min). |
+| `node apps/web/scripts/run-lighthouse-ci.ts --url / --url /en/ --url /notes/smoke-es/` | exit 0. Worst LCP: `/` 2265 ms, `/en/` 2342 ms, `/notes/smoke-es/` 2411 ms; CLS 0 (0.014 on the note page); performance 0.95 to 0.98. |
+
+Notes: before the changelog stamp, `/changelog/page/2/` and `/en/changelog/page/2/` were over their html budget by about 3 KB because the unreleased entries had distinct days (2026-10-10 and 2026-10-11) and created one more release day; the stamp put them all on 2026-10-11 and the budget passes with about 2 KB of margin, so adding many more entries per day will need a budget review. `pnpm changelog:audit` still flags `83c5877` (fix of the reading-mode CSS scope): its entry exists but landed in the next commit; the audit works per commit and CI does not run it. Not run: the 390 and 768 px e2e projects, `pnpm verify --run --record` (the registry in `odd/verification-state.json` was not updated). The CI on `main` re-runs the whole stack before the deploy.
