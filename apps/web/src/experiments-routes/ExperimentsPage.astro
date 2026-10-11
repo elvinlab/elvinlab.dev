@@ -78,16 +78,14 @@ const css = experimentsCss({
   {paged && <link slot="head" rel="prev" href={pageUrl(page - 1)} />}
   {page < pages.length && <link slot="head" rel="next" href={pageUrl(page + 1)} />}
   <style is:inline set:html={css} />
-  <div class="xp-header">
-    <PageHeader title={t(locale, 'experiments.title')} description={intro}>
+  <PageHeader slot="banner" title={t(locale, 'experiments.title')} description={intro}>
       <svg slot="icon" class="xp-flask" viewBox="0 0 9 9" shape-rendering="crispEdges" fill="currentColor" aria-hidden="true" focusable="false"><rect x="2" y="0" width="5" height="1"></rect><rect x="3" y="1" width="1" height="3"></rect><rect x="5" y="1" width="1" height="3"></rect><rect x="2" y="4" width="1" height="1"></rect><rect x="6" y="4" width="1" height="1"></rect><rect x="1" y="5" width="1" height="3"></rect><rect x="7" y="5" width="1" height="3"></rect><rect x="2" y="6" width="5" height="2"></rect><rect x="1" y="8" width="7" height="1"></rect></svg>
-    </PageHeader>
     {lab.length > 0 && (
       <ul class="xp-lab" aria-hidden="true">
         {lab.map((word) => <li>{word}</li>)}
       </ul>
     )}
-  </div>
+  </PageHeader>
   <section class="xp-page">
     {experiments.length === 0 ? (
       <p class="xp-empty">{t(locale, 'experiments.empty')}</p>

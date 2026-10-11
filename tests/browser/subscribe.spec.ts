@@ -643,20 +643,6 @@ for (const locale of ['es', 'en'] as const) {
       });
     });
 
-    test('the envelope hops on hover only with motion allowed', async ({ page }) => {
-      const envelope = page.locator('[data-subscribe-landing] header svg');
-      await page.goto(copy.path);
-      await envelope.hover();
-      await page.waitForTimeout(400);
-      expect(await envelope.evaluate((el) => getComputedStyle(el).translate)).toBe('none');
-      await page.emulateMedia({ reducedMotion: 'no-preference' });
-      await page.mouse.move(0, 0);
-      await envelope.hover();
-      await expect
-        .poll(() => envelope.evaluate((el) => getComputedStyle(el).translate))
-        .not.toBe('none');
-    });
-
     for (const theme of THEMES) {
       test(`has no axe violations (${theme})`, async ({ page }) => {
         await stubThirdParties(page);

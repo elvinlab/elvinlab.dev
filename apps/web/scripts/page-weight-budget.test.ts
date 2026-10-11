@@ -41,7 +41,9 @@ describe('classifyPage', () => {
     ['/contact/', 'contact'],
     ['/en/contact/', 'contact'],
     ['/subscribe/', 'subscribe'],
-    ['/subscribe/confirm/', 'default'],
+    ['/subscribe/confirm/', 'result'],
+    ['/en/subscribe/unsubscribe/', 'result'],
+    ['/404/', 'result'],
     ['/notes/', 'notes-index'],
     ['/en/notes/', 'notes-index'],
     ['/notes/smoke-es/', 'note'],
@@ -130,7 +132,7 @@ describe('formatReport', () => {
 });
 
 describe('collectPageWeights', () => {
-  it('reads every index.html of a build and measures it', () => {
+  it('reads every index.html and the root 404.html of a build and measures them', () => {
     const root = mkdtempSync(join(tmpdir(), 'page-weight-'));
     temporaryDirectories.push(root);
     const write = (relative: string, html: string): void => {
@@ -140,10 +142,12 @@ describe('collectPageWeights', () => {
     };
     write('index.html', '<style>abc</style>');
     write('en/me/index.html', '<style>de</style><style>f</style>');
-    write('404.html', '<style>ignored</style>');
+    write('404.html', '<style>xy</style>');
+    write('notes/404.html', '<style>ignored</style>');
     const pages = collectPageWeights(root);
     expect(pages).toEqual([
       { path: '/', styleBytes: 3, htmlBytes: 18 },
+      { path: '/404/', styleBytes: 2, htmlBytes: 17 },
       { path: '/en/me/', styleBytes: 3, htmlBytes: 33 },
     ]);
   });

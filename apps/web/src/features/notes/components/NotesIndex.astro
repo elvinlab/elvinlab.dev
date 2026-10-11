@@ -33,7 +33,7 @@ const tags = [...new Set(sortNotes(notes).flatMap((note) => note.data.tags))];
 ---
 
 <BaseLayout locale={locale} path="/notes/" title={t(locale, 'notes.title')} noindex={noindex} translated={false} pixelTitle>
-  <Banner slot="banner" height="320px" locale={locale}>
+  <Banner slot="banner" height="320px">
     <BackgroundCanvas slot="background" />
     <h1 class="font-pixel text-hero font-semibold leading-[1.1] text-balance">
       {t(locale, 'notes.title')}<span aria-hidden="true" class="ml-1 inline-block h-3 w-2 bg-pink align-baseline md:h-4"></span>

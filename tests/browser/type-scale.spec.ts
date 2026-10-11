@@ -110,7 +110,17 @@ test('the home computes the scale of its preset', async ({ page }, testInfo) => 
 test('the inner pages compute the page-title step of their preset', async ({ page }, testInfo) => {
   const expected = SCALES[expectedPreset()][testInfo.project.name];
   if (!expected) throw new Error('unreachable: skipped in beforeEach');
-  for (const path of ['/experiments/', '/contact/', '/changelog/', '/en/contact/']) {
+  for (const path of [
+    '/experiments/',
+    '/contact/',
+    '/changelog/',
+    '/privacy/',
+    '/terms/',
+    '/subscribe/',
+    '/subscribe/confirm/',
+    '/nope/',
+    '/en/contact/',
+  ]) {
     await page.goto(path);
     expect(await fontSize(page.locator('main h1')), path).toBe(expected.pageTitle);
   }

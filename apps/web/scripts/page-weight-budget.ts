@@ -17,6 +17,7 @@ export type PageType =
   | 'changelog'
   | 'contact'
   | 'subscribe'
+  | 'result'
   | 'notes-index'
   | 'note'
   | 'default';
@@ -64,6 +65,14 @@ export function classifyPage(path: string): PageType {
   if (segments[0] === 'en') segments.shift();
   const [first, second, ...rest] = segments;
   if (first === undefined) return 'home';
+  // The 404 page and the confirm and unsubscribe results: one short card under the compact banner.
+  if (first === '404') return 'result';
+  if (
+    first === 'subscribe' &&
+    (second === 'confirm' || second === 'unsubscribe') &&
+    rest.length === 0
+  )
+    return 'result';
   // `/changelog/` and its later pages `/changelog/page/N/`.
   if (first === 'changelog' && (second === undefined || second === 'page')) return 'changelog';
   if (second === undefined) {
@@ -85,23 +94,30 @@ export function inlineStyleBytes(html: string): number {
   return total;
 }
 
-function listIndexFiles(directory: string): string[] {
+function listIndexFiles(directory: string, root = directory): string[] {
   const files: string[] = [];
   for (const entry of readdirSync(directory, { withFileTypes: true })) {
     const path = join(directory, entry.name);
-    if (entry.isDirectory()) files.push(...listIndexFiles(path));
-    else if (entry.isFile() && entry.name === 'index.html') files.push(path);
+    if (entry.isDirectory()) files.push(...listIndexFiles(path, root));
+    else if (
+      entry.isFile() &&
+      (entry.name === 'index.html' || (entry.name === '404.html' && directory === root))
+    )
+      files.push(path);
   }
   return files;
 }
 
-/** Measures every `**\/index.html` of a build (`dist/client`), sorted by URL path. */
+/** Measures every `**\/index.html` and the root `404.html` of a build (`dist/client`), sorted by URL path. */
 export function collectPageWeights(clientRoot: string): PageWeight[] {
   const root = resolve(clientRoot);
   return listIndexFiles(root)
     .map((file) => {
       const html = readFileSync(file);
-      const directory = relative(root, file).split(sep).slice(0, -1).join('/');
+      const parts = relative(root, file).split(sep);
+      // `404.html` is the one page that is not an `index.html`: it answers every unknown path.
+      const directory =
+        parts[parts.length - 1] === '404.html' ? '404' : parts.slice(0, -1).join('/');
       return {
         path: directory === '' ? '/' : `/${directory}/`,
         styleBytes: inlineStyleBytes(html.toString('utf8')),

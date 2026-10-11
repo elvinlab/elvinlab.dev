@@ -32,13 +32,13 @@
       }
     },
     "changelog": {
-      "why": "Release days grouped by kind, 4 days per page (page 1 opens the 2 newest); the flat list was about 130 KB, and the page CSS ships only here.",
-      "styleBytes": 56500,
-      "htmlBytes": 110000,
+      "why": "Release days grouped by kind, 4 days per page (page 1 opens the 2 newest); the flat list was about 130 KB, and the page CSS ships only here. The compact lab-paper banner of the inner pages adds about 2.2 KB of CSS (this page's sheet did not carry the banner styles) and 2.9 KB of HTML.",
+      "styleBytes": 58700,
+      "htmlBytes": 113000,
       "measured": {
-        "styleBytes": 54304,
-        "htmlBytes": 105715,
-        "date": "2026-10-07"
+        "styleBytes": 58255,
+        "htmlBytes": 110833,
+        "date": "2026-10-11"
       }
     },
     "contact": {
@@ -79,6 +79,16 @@
         "styleBytes": 58561,
         "htmlBytes": 125374,
         "date": "2026-10-07"
+      }
+    },
+    "result": {
+      "why": "One short card under the compact banner (404, confirm and unsubscribe, es and en): budget is the measured value rounded up to 100 B, so these small pages stay tight.",
+      "styleBytes": 54300,
+      "htmlBytes": 79100,
+      "measured": {
+        "styleBytes": 54245,
+        "htmlBytes": 79045,
+        "date": "2026-10-11"
       }
     },
     "default": {

@@ -35,12 +35,6 @@ const HEADER = `
     flex-direction: column;
     gap: 3rem;
   }
-  .xp-header {
-    display: flex;
-    align-items: flex-end;
-    justify-content: space-between;
-    gap: 2rem;
-  }
   /* The pixel flask before the title: the single pink accent of the header, a 9 x 9 grid with crisp edges. */
   .xp-flask {
     flex-shrink: 0;

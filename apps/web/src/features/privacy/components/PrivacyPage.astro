@@ -9,6 +9,7 @@ import { isSubscribeActive } from '@/features/subscribe/index.ts';
 import { isEnabled, site } from '@/shared/config/index.ts';
 import type { Locale } from '@/shared/i18n/index.ts';
 import BaseLayout from '@/shared/layout/BaseLayout.astro';
+import PageHeader from '@/shared/ui/PageHeader.astro';
 
 type Props = {
   locale: Locale;
@@ -27,13 +28,9 @@ const content = buildPrivacyContent({
 })[locale];
 ---
 
-<BaseLayout locale={locale} path="/privacy/" title={content.pageTitle} description={content.pageDescription}>
+<BaseLayout locale={locale} path="/privacy/" title={content.pageTitle} description={content.pageDescription} pixelTitle>
+  <PageHeader slot="banner" title={content.pageTitle} description={content.pageDescription} />
   <article class="max-w-[68ch]">
-    <header class="mb-8">
-      <h1 class="text-3xl font-bold tracking-tight">{content.pageTitle}</h1>
-      <p class="mt-2 text-muted">{content.pageDescription}</p>
-    </header>
-
     {content.sections.map((section) => (
       <section id={section.id} class="mb-10">
         <h2 class="mb-3 text-xl font-semibold">{section.title}</h2>

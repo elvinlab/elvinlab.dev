@@ -19,17 +19,25 @@ const PAGES = [
   '/notes/',
   '/notes/smoke-es/',
   '/me/',
+  '/experiments/',
   '/contact/',
   '/privacy/',
   '/terms/',
   '/changelog/',
+  '/subscribe/',
+  '/subscribe/confirm/',
+  '/subscribe/unsubscribe/',
   '/en/',
   '/en/notes/smoke-en/',
   '/en/me/',
+  '/en/experiments/',
   '/en/contact/',
   '/en/privacy/',
   '/en/terms/',
   '/en/changelog/',
+  '/en/subscribe/',
+  '/en/subscribe/confirm/',
+  '/en/subscribe/unsubscribe/',
   '/nope/',
 ];
 /** The pages that render a banner: the blend must be on every one of them. */
@@ -38,9 +46,26 @@ const BANNER_PAGES = [
   '/notes/',
   '/notes/smoke-es/',
   '/me/',
+  '/experiments/',
+  '/contact/',
+  '/privacy/',
+  '/terms/',
+  '/changelog/',
+  '/subscribe/',
+  '/subscribe/confirm/',
+  '/subscribe/unsubscribe/',
   '/en/',
   '/en/notes/smoke-en/',
   '/en/me/',
+  '/en/experiments/',
+  '/en/contact/',
+  '/en/privacy/',
+  '/en/terms/',
+  '/en/changelog/',
+  '/en/subscribe/',
+  '/en/subscribe/confirm/',
+  '/en/subscribe/unsubscribe/',
+  '/nope/',
 ];
 const THEMES = ['elvinlab-dark', 'elvinlab-light'];
 const FADE_HEIGHT = 120;
@@ -48,12 +73,23 @@ const FADE_HEIGHT = 120;
 const PAGE_BANNER_CAP = 240;
 /**
  * `full` keeps the height each page asks for: notes index 320 px, note 360 px, `/me`
- * `clamp(420px, 52vh, 520px)`, which is 468 px at the 900 px viewport height of every project.
+ * `clamp(420px, 52vh, 520px)`, which is 468 px at the 900 px viewport height of every project. The
+ * compact inner-page header (`PageHeader`: every page that is not the home, `/me/`, `/notes/` or a note) asks for
+ * `clamp(176px, 22vh, 232px)`, which is 198 px at that height.
  */
+const INNER_BANNER = 198;
 const FULL_PAGE_BANNERS: Record<string, number> = {
   '/notes/': 320,
   '/notes/smoke-es/': 360,
   '/me/': 468,
+  '/experiments/': INNER_BANNER,
+  '/contact/': INNER_BANNER,
+  '/changelog/': INNER_BANNER,
+  '/privacy/': INNER_BANNER,
+  '/terms/': INNER_BANNER,
+  '/subscribe/': INNER_BANNER,
+  '/subscribe/confirm/': INNER_BANNER,
+  '/nope/': INNER_BANNER,
 };
 /**
  * Expanded home banner by preset, then project. `minimal`: clamp(360px, 48vh, 460px) at 900 px is
@@ -170,7 +206,7 @@ test('the banners follow the height caps of the preset', async ({ page }, testIn
   const expected = HOME_BANNER[preset];
   const home = (await page.locator('[data-banner]').boundingBox())?.height ?? 0;
   expect(home).toBe(testInfo.project.name === 'chromium-1280' ? expected.desktop : expected.phone);
-  for (const path of ['/notes/', '/notes/smoke-es/', '/me/']) {
+  for (const path of Object.keys(FULL_PAGE_BANNERS)) {
     await page.goto(path);
     const minHeight = await page
       .locator('[data-banner]')

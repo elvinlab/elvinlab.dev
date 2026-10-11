@@ -7,7 +7,7 @@ const BIG_FONTS = [
   /ibm-plex-sans-latin-wght-normal.*\.woff2$/,
   /jetbrains-mono-latin-wght-normal.*\.woff2$/,
 ];
-/** Pixelify Sans is preloaded wherever an H1 uses it (home hero, notes banner, `PageHeader`); never elsewhere. */
+/** Pixelify Sans is preloaded wherever an H1 uses it (home hero, notes banner, `PageHeader`: experiments, contact, changelog, privacy, terms); never elsewhere. */
 const PIXEL_FONT = /pixelify-sans-latin-wght-normal.*\.woff2$/;
 const PAGES = [
   { path: '/', preloads: [...BODY_FONTS, PIXEL_FONT] },
@@ -19,6 +19,8 @@ const PAGES = [
   { path: '/en/contact/', preloads: [...BODY_FONTS, PIXEL_FONT] },
   { path: '/changelog/', preloads: [...BODY_FONTS, PIXEL_FONT] },
   { path: '/en/changelog/', preloads: [...BODY_FONTS, PIXEL_FONT] },
+  { path: '/privacy/', preloads: [...BODY_FONTS, PIXEL_FONT] },
+  { path: '/en/terms/', preloads: [...BODY_FONTS, PIXEL_FONT] },
   { path: '/notes/smoke-es/', preloads: BODY_FONTS },
 ];
 /** The raw profile photo is a 59 KB PNG; the optimized variant must be far below that. */

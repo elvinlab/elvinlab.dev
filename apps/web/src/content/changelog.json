@@ -604,5 +604,11 @@
     "category": "changed",
     "title": "Fresh screenshots in the experiments gallery",
     "description": "The pictures of elvinlab.dev and of the agentic-dev-setup note on the experiments page and on /me now show the current design: the new home headline, the lab-paper banner, the decision record next to the note title and the new typeface."
+  },
+  "paper-banner-everywhere": {
+    "date": "2026-10-11",
+    "category": "changed",
+    "title": "The paper banner on every page",
+    "description": "Experiments, contact, the changelog, privacy, terms, the subscribe pages and the 404 now open with the same compact lab-paper banner as the home, the notes and /me, with the page title in it. The subscribe page lost its pixel envelope, and banners that never expand no longer load the expand button script."
   }
 }
