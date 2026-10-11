@@ -69,6 +69,21 @@ Visual identity surfaces of `apps/web` and `packages/core` tokens, the two desig
 
 - 2026-10-11 typeface (T3, last piece): owner picked IBM Plex Sans (option 1 of 3) and authorized installing `@fontsource-variable/ibm-plex-sans` 5.3.0; `@fontsource-variable/space-grotesk` removed. Route: delegated writer, parent reviewed screenshots (note 1440, /me 1440, home 1440). The writer's whole-stack run found two problems: `test:white-label` failed because my earlier commit `5e6e250` leaked `html[data-reading]` CSS into `calm-layout.css` (fixed in `83c5877`), and Lighthouse LCP on the note page was 2582 to 2588 ms (gate 2500) because Plex Latin is 46 KB versus 22 KB. Measured fix: stop preloading JetBrains Mono (LCP 2261 to 2437, CLS 0.015). Final tree: full `test:lighthouse` exit 0, `test:e2e:quick` 549 passed. Ledger entry added.
 
+## Release 16 status (2026-10-11 night): NOT deployed, production still on 87e25cc
+
+`main` is at `ddc91cc` (release commits `425665a` and `ddc91cc`, both built with `commit-tree` from `develop`). The CI gates blocked the deploy, as designed, so production is unchanged (`/version.txt` = `87e25cc`).
+
+- Run 38118267154 (`425665a`): failed on `e2e (2)` (`chromium-768` `marks.spec.ts`, 68 px shift: the note banner was content-driven at 768 px) and Lighthouse LCP. The e2e part was fixed forward (record in the banner from `lg`, `70badab`; full `pnpm test:e2e` 1164 passed locally).
+- Run 38118950321 (`ddc91cc`): `e2e (3)` `back-to-top.spec.ts:201` failed once and passed on rerun (intermittent). `lighthouse (1)` failed twice on the same two URLs: `/me/` LCP 2437, 2510, 2058 then 2145, 2513, 2434 ms and `/notes/smoke-es/` 2580, 2427, 2274 ms (gate 2500, pessimistic of 3 runs; performance 0.94 once). The same URLs measure 2118 to 2268 ms locally, so the CI runner is about 150 to 380 ms slower and one run in three lands over the gate. Before this work the ledger had `/me/` at 2419-2430 in CI.
+- Cause (inference, consistent with the earlier measurement that dropping the JetBrains preload saved about 300 ms): the Plex Latin file is 46 KB (Space Grotesk was 22 KB) and the note and /me pages sit on a TCP round-trip boundary, so the gate lost 100 to 150 ms of margin.
+
+Options for the next session (the owner decides; never relax the 2500 ms gate):
+1. Keep Plex and shrink it: subset the variable font to the 400-700 weight range (needs fonttools and a committed woff2, a change to the self-hosting convention) or use static Plex weights (400 and 600 only).
+2. Keep Plex, stop preloading it, and add a metric-matched fallback (`size-adjust` and ascent/descent overrides) so the swap does not move text; validate CLS.
+3. Revert the typeface to Space Grotesk (revert `a747f40`; the docs, tokens, tests and the package change come back together) and release the rest of the redesign now.
+4. Spend the margin elsewhere: the decision record is rendered twice in the note DOM (about 1.3 KB) and could be rendered once.
+Every option needs a CI cycle of about 8 minutes; measure locally with `node apps/web/scripts/run-lighthouse-ci.ts --url /me/ --url /notes/smoke-es/` and expect the CI to be 150 to 380 ms worse.
+
 ## Open items (visual audit of 2026-10-11, 20 routes x 4 views; not blocking the release)
 
 Source: two read-only reviewers looked at 80 full-page screenshots (dark and light at 1440, dark at 390 and 820). The two P1 findings (header wraps to two rows at 820 px in Spanish; hero avatar caption clipped and under the collapse button at md to lg) are being fixed before the release and are listed here only for the record. Everything below is pending.
