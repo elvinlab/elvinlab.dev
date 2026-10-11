@@ -567,7 +567,7 @@
     "date": "2026-10-10",
     "category": "changed",
     "title": "The banner background is now lab paper",
-    "description": "The default banner background is a static technical notebook: a fine grid, a ruler of measuring ticks on the left edge and three registration crosses, in a single ink tone. The violet and cyan glows and the twinkling stars are gone. The galaxy and the cursor waves are still one click away in the navbar background button."
+    "description": "The default banner background is a static technical notebook: a fine grid, a ruler of measuring ticks on the left edge and three registration crosses, in a single ink tone. The violet and cyan glows and the twinkling stars are gone. The galaxy and the cursor waves are still one click away in the navbar background button, which shows a grid icon while the paper is active."
   },
   "home-fewer-boxes": {
     "date": "2026-10-10",

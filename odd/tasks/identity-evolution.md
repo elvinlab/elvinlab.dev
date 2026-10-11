@@ -69,7 +69,8 @@ Visual identity surfaces of `apps/web` and `packages/core` tokens, the two desig
 
 - The page-weight style budget on `/` has about 190 B of margin left; any new utility on the home needs `check:page-weight`.
 
-- The navbar background button now shows its "off" icon (a circle with a slash) by default, which can read as "disabled". Decide whether to change that icon or the cycle order.
+- DONE 2026-10-10: the navbar background button showed a circle with a slash for its "off" state, which read as "disabled". It is now a grid icon (the lab paper), checked in dark and light at 3x; the e2e specs only use the stored values, so none changed.
+- Flaky: `a11y.spec.ts` "/contact/ has no axe violations (elvinlab-dark)" (axe `color-contrast` on `.hover\:bg-button\/90`) failed in two batched runs of several specs (3.5 s) and passed 4 of 4 times alone (0.9 s). Not caused by this work (the contact page was not touched); likely a hover transition caught mid-way under load. Not investigated further; worth a look before relying on a green CI.
 
 - The kicker "elvinlab / lab notes" also appears in the `/notes/` banner (not touched).
 - T2 home hierarchy, T3 dark-theme background and body type pairing are not started. Owner has not decided on them.
