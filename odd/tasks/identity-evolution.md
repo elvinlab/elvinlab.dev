@@ -79,7 +79,7 @@ How the two blocked runs were resolved
 - Trade-off to know: with no font preload and `font-display: swap`, a first visit can show a system font for a moment before Plex or JetBrains Mono swap in. A metric-matched fallback (`@font-face` with `size-adjust` and ascent/descent overrides) would hide the swap; not done (pending, listed below).
 
 Still open from this release
-- Add the metric-matched fallback for IBM Plex Sans (and check CLS) so the swap is invisible; cheaper than shrinking the font.
+- DONE (commit after release 16, not yet released): metric-matched fallback `IBM Plex Sans Fallback` (size-adjust 102%, ascent 100.49%, descent 26.96%); note h1 at 390 px went from +61.8% width and a 37.5 px paragraph shift to -0.6% and 0; JetBrains Mono has no fallback (page-weight budget); Lighthouse note-page CLS 0.025 to 0.0148, LCP unchanged; pages about 60 B lighter. Evidence: typecheck, lint, vitest (web 369, core 38), e2e quick on six specs plus the new `font-swap.spec.ts` (95 passed), `check:page-weight` all 26 within budget. Not re-run: the full e2e matrix and white-label (the CI does).
 - The note-page LCP margin in CI stays thin (runs at 2274 to 2580 ms were seen with the old preloads); the decision record is rendered twice in the note DOM (about 1.3 KB), a candidate to render once.
 - `develop` was not pushed to `origin`; only `main` was (release commits). The docs commits after `88527c4` live only in local `develop`.
 

@@ -95,6 +95,21 @@ describe('default pixel display font token', () => {
   });
 });
 
+describe('default text font tokens', () => {
+  const json: unknown = JSON.parse(readFileSync(new URL('./tokens.json', import.meta.url), 'utf8'));
+  const tokens = parseTokens(json);
+
+  it('puts a metric-matched fallback between the Plex web font and the system stack', () => {
+    const sans =
+      "'IBM Plex Sans Variable', 'IBM Plex Sans Fallback', 'IBM Plex Sans', system-ui, sans-serif";
+    expect(tokens.fonts['display']).toBe(sans);
+    expect(tokens.fonts['body']).toBe(sans);
+    expect(tokens.fonts['mono']).toBe(
+      "'JetBrains Mono Variable', 'JetBrains Mono', ui-monospace, monospace",
+    );
+  });
+});
+
 describe('committed tokens.css', () => {
   it('matches the output generated from tokens.json', () => {
     const json: unknown = JSON.parse(

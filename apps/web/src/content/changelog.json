@@ -592,5 +592,11 @@
     "category": "fixed",
     "title": "The header fits on one row on tablets",
     "description": "With the new typeface the Spanish header spilled onto a second row between 768 and 820 px wide. The spacing is tighter there so it stays on one row, and the caption under the author photo on the home page now wraps instead of being cut off."
+  },
+  "font-swap-no-jump": {
+    "date": "2026-10-11",
+    "category": "changed",
+    "title": "Text no longer jumps when the font finishes loading",
+    "description": "On a first visit the page used to show a system font for a moment and then shift when IBM Plex Sans arrived, wrapping titles onto another line on phones. A size-matched stand-in font now takes the same space, so nothing above the fold moves, and the font rules are a little lighter in every page."
   }
 }
