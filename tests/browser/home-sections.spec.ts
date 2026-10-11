@@ -199,3 +199,34 @@ test.describe('home hero action and language cue', () => {
     await expect(page).toHaveURL(new RegExp(`${href}$`));
   });
 });
+
+test.describe('home sidebar cards by width', () => {
+  const lefts = (page: Page) =>
+    page
+      .locator('aside > div > *')
+      .evaluateAll((cards) => cards.map((card) => (card as HTMLElement).offsetLeft));
+
+  test('lays the cards out in columns on tablets (820 px)', async ({ page }) => {
+    await page.setViewportSize({ width: 820, height: 1000 });
+    await page.goto('/');
+    const xs = await lefts(page);
+    expect(xs.length).toBeGreaterThanOrEqual(2);
+    expect(new Set(xs).size).toBeGreaterThanOrEqual(2);
+  });
+
+  test('stacks the cards in one column on phones (390 px)', async ({ page }) => {
+    await page.setViewportSize({ width: 390, height: 844 });
+    await page.goto('/');
+    expect(new Set(await lefts(page)).size).toBe(1);
+  });
+
+  test('keeps the sidebar beside the content with stacked cards at 1280 px', async ({ page }) => {
+    await page.setViewportSize({ width: 1280, height: 900 });
+    await page.goto('/');
+    expect(new Set(await lefts(page)).size).toBe(1);
+    const main = await page.locator('[data-main-grid] > div').first().boundingBox();
+    const aside = await page.locator('aside').first().boundingBox();
+    if (!main || !aside) throw new Error('main column and aside must be laid out');
+    expect(aside.x).toBeGreaterThan(main.x + main.width - 1);
+  });
+});

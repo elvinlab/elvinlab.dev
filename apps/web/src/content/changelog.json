@@ -628,5 +628,11 @@
     "category": "fixed",
     "title": "A tidier home page on phones",
     "description": "On phones the notebook list shows the date under each title (titles wrap to two lines instead of being cut), the hiring card no longer repeats the \"View profile\" button of the top of the page, the footer links sit in rows instead of one per line, and the language strip is one short line that reads the same on every page. The footprint hint now reads \"Be the first to leave your mark\"."
+  },
+  "tablet-sidebar-light-contrast": {
+    "date": "2026-10-11",
+    "category": "changed",
+    "title": "Tablet sidebar, a softer light theme and a quieter author card",
+    "description": "On tablets the author, hiring and footprint cards on the home sit side by side instead of as wide empty boxes. In the light theme the paper grid is fainter behind the headline and secondary text is a little darker for easier reading. On phones the author card is a compact row with a small photo."
   }
 }

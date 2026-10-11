@@ -102,7 +102,7 @@ const experiments = homeSections.experiments
 
   {hasSidebar && (
     <Fragment slot="aside">
-      <div class="flex flex-col gap-4">
+      <div class="flex flex-col gap-4 md:grid md:grid-cols-[repeat(auto-fit,minmax(14rem,1fr))] lg:flex">
         {homeSections.authorCard && <AuthorCard locale={locale} />}
         {homeSections.hiringCard && <HiringCard locale={locale} />}
         {homeSections.marks && (

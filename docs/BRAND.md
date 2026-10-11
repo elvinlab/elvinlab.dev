@@ -102,7 +102,7 @@ Estos valores son el tema por defecto, `theme-elvinlab`, no constantes. `@elvinl
 | `surface.start` | `#0f0b1f` | `#faf8ff` |
 | `surface.end` | `#0a1220` | `#f2fbfe` |
 | `text.primary` | `#e6edf3` | `#0d1117` |
-| `text.muted` | `#8b949e` | `#57606a` |
+| `text.muted` | `#8b949e` | `#4f5862` |
 | `border` | `#30284d` | `#c9c3ee` |
 
 Inconsistencia a resolver: en modo claro el banner usa `#c9c3ee` como borde y las tarjetas `#d8d0f5`. Propuesta: unificar en `#c9c3ee`.
@@ -144,7 +144,7 @@ Los colores de marca se mantienen, pero el texto y los rellenos usan estas varia
 | Cian (texto) | `#22d3ee` | `#155e75` | `#06b6d4` y `#0e7490` fallan sobre banner claro (AA 4.5:1) |
 | Rosa (texto, cursor) | `#ec4899` | `#be185d` | Contraste sobre fondo claro |
 | Texto secundario | `#c3c9d4` | `#30363d` | Jerarquía legible |
-| Silenciado | `#8b949e` | `#57606a` | ≥4.5:1 sobre tarjeta |
+| Silenciado | `#8b949e` | `#4f5862` | ≥5,6:1 sobre cualquier superficie clara (era `#57606a`, oscurecido el 2026-10-11) |
 | Tarjeta | `#121022` | `#ffffff` | Superficie sin bordes |
 | Página | `#07070f` | `#eef0ff` | Fondo |
 

@@ -35,7 +35,7 @@ No ALL-CAPS labels on pages (the language codes ES/EN in `LangBadge` and the nav
 | card | `#121022` | `#ffffff` | Cards and navbar (no borders) |
 | text | `#eceff4` | `#0d1117` | Body text |
 | text-75 | `#c3c9d4` | `#30363d` | Secondary text |
-| muted | `#8b949e` | `#57606a` | Meta (≥4.5:1 on card) |
+| muted | `#8b949e` | `#4f5862` | Meta (≥4.5:1 on card; the light value was `#57606a` until 2026-10-11 and is now ≥5.6:1 on every light surface, pinned by `contrast.test.ts`) |
 | primary | `#a78bfa` | `#6d28d9` | Links, accent bars, icons |
 | button | `#7c3aed` | `#7c3aed` | Fills behind white text (5.7:1) |
 | cyan / pink | `#22d3ee` / `#ec4899` | `#155e75` / `#be185d` | Prompt, cursor, retro signature |
