@@ -56,15 +56,3 @@
 @theme inline {
   --container-hero: var(--hero-measure);
 }
-
-/* Reading mode (`html[data-reading]`, reading-mode.css) keeps one calm column: the banner copy of
-   the decision record steps aside and the inline copy returns at every width. */
-html[data-reading] [data-banner-split] {
-  display: block;
-}
-html[data-reading] [data-record-banner] {
-  display: none;
-}
-html[data-reading] [data-record-inline] {
-  display: block;
-}
