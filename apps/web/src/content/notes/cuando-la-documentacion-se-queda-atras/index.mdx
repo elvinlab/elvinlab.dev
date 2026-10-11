@@ -1,0 +1,142 @@
+---
+number: 4
+title: "Cuando la documentación se queda atrás: los puntos de control que puse para que no mienta"
+description: "Un seguimiento desactualizado casi me hace rehacer trabajo. Una regla antes de cada commit, tests y un registro de lo verificado me obligan a revisarlo."
+pubDate: 2026-10-11
+lang: es
+category: agentes-ia
+tags: [agentes-ia, documentacion, testing, verificacion, engram]
+decision:
+  context: "El seguimiento del sitio decía que el formulario de contacto estaba pendiente un día después de terminarlo, y un agente casi lo reconstruye. Recordar actualizar la documentación no bastaba."
+  decision: "Poner puntos de control: una regla antes de cada commit, tests que fallan si la guía no coincide con el código y un registro de qué se verificó y qué no. Descarté confiar en acordarme."
+  outcome: "Las tablas de configuración ya no pueden desviarse sin romper un test. Aun así, el 2 de octubre tres guías seguían hablando de un staging que había quitado el día anterior."
+---
+
+## El documento que mentía por omisión
+
+El 30 de septiembre terminé la interfaz del formulario de contacto. El 1 de octubre le pedí a un agente "empezar" esa misma interfaz, porque el seguimiento del proyecto decía que estaba pendiente. El agente le creyó al documento, y estuvo a punto de reconstruir algo que ya existía. Lo conté con detalle en [la nota anterior](/notes/vibe-coding-o-especificar-primero/), y ahí cerré con una frase incómoda: una documentación desactualizada es peor que no tener documentación.
+
+Esta nota empieza donde terminó aquella. No quiero volver a contar el susto, quiero contar qué hice después.
+
+Lo primero fue entender por qué el agente le creyó. No fue un error del modelo. El documento estaba escrito con la misma seguridad que el resto: fechas, commits, estados. Nada en el texto avisaba que esa línea tenía un día de atraso. Un agente lee un documento viejo con la misma confianza que uno nuevo, y yo también.
+
+## Por qué no basta con prometer que lo actualizo
+
+Mi primera reacción fue la obvia: "la próxima vez lo actualizo". Pero esa promesa ya la había hecho, y no se cumplió por una razón simple. El código cambia en el commit. La documentación cambia "después". Y después, en un día con muchos commits y varios agentes trabajando, nunca llega.
+
+```txt title="dónde se separan el código y el documento"
+commit  ──►  el código cambia        (obligatorio: si no, no hay commit)
+        ──►  el documento cambia     (opcional: depende de que me acuerde)
+                    │
+                    └──►  un día después, alguien lee el documento
+```
+
+El problema no era de disciplina, era de diseño. Mientras actualizar la documentación dependa de que me acuerde, va a fallar justo en los días con más cambios, que son los días en que más importa.
+
+> Si actualizar la documentación depende de acordarme, la documentación va a fallar justo cuando el proyecto cambia más rápido.
+
+Así que la decisión no fue escribir mejor. Fue poner puntos de control: momentos en los que el flujo me obliga, a mí o al agente, a preguntar si lo que estoy haciendo afecta lo que ya está escrito.
+
+## Una regla antes de cada commit
+
+El primer punto de control nació justo después del susto. En la configuración global de mis agentes hay una regla que se activa cada vez que se va a hacer un commit. Antes de confirmarlo, el agente tiene que hacer tres cosas:
+
+1. **Revisar el changelog**: si el cambio lo ve un visitante o alguien que use el repo, lleva entrada.
+2. **Actualizar la documentación** que el cambio vuelve falsa.
+3. **Dejar el siguiente paso listo** para la próxima sesión.
+
+El rastro del tercer punto está en el historial: el mismo 1 de octubre, horas después de la corrección, hay un commit llamado "next-session handoff" que agrega al seguimiento lo que sigue. Ya no termino una sesión con el estado en mi cabeza; lo termino escrito, para que la sesión siguiente, mía o de un agente, no tenga que adivinar.
+
+Esta regla no la cumplo yo, la cumple el agente, y eso es justo lo que quiero. El agente no se cansa a las once de la noche ni piensa "esto lo documento mañana". Si la regla está en su configuración, la aplica en cada commit, incluso en los aburridos.
+
+## Cuando la documentación sale del código
+
+La regla ayuda, pero sigue dependiendo de que alguien lea, entienda y edite. Hay documentación que no tiene por qué depender de eso: la que describe algo que ya está en el código.
+
+La configuración del sitio es el mejor ejemplo. Cada ajuste vive en un schema con su descripción, y `pnpm docs:config` genera las tablas de las guías de configuración y de notas, además de `.env.example` y `.dev.vars.example`. Las tablas van entre marcadores, y al escribir esto hay 18 bloques generados así.
+
+```txt title="docs/CONFIGURATION.md"
+<!-- docs:start ... -->
+  (tabla generada desde el schema: no se edita a mano)
+<!-- docs:end ... -->
+```
+
+Lo importante no es el generador, es el test que lo acompaña. Si una guía, `.env.example` o `.dev.vars.example` no coincide con el código, el test falla. Si un campo del schema no tiene descripción, también falla. Y otro test exige que cada guía en español tenga su gemela en inglés, con la misma estructura y enlaces que resuelvan.
+
+Esto ya me salvó de algo concreto. Cuando cambié el sitio al preset de apariencia `full`, un agente adaptó las pruebas e2e y agregó una variable nueva, `FIXTURE_APPEARANCE`. No la registró. El test del registro de variables lo atrapó antes de que llegara a ningún lado, porque el agente no había corrido la suite completa. Nadie tuvo que acordarse de nada.
+
+> La documentación que se puede generar desde el código no se escribe: se genera, y un test se asegura de que nadie la edite a mano.
+
+De cómo uso los tests para guiar el trabajo, no solo para atrapar desviaciones, quiero escribir una nota aparte. Aquí me basta con esto: un test es el único documento que avisa cuando deja de ser verdad.
+
+## Engram: la memoria que pregunta qué afecta esto
+
+El tercer punto de control no vive en el repo, vive en la memoria. Uso Engram como memoria compartida entre Claude Code y los agentes de OpenCode, como conté en [la nota sobre mi entorno multi-agente](/notes/agentic-dev-setup/). Ahí guardo decisiones, convenciones y comportamientos que valen para la etapa en la que está el proyecto.
+
+Engram no solo recuerda. Cuando lo que estoy haciendo contradice lo que recuerda, pregunta.
+
+El caso más claro me pasó con mi propio entorno. Mi configuración enruta el trabajo: Claude decide y revisa, y herdr delega las tareas simples a agentes de OpenCode con modelos gratuitos. Esa regla de enrutamiento vive en archivos de configuración global, y cuando las herramientas se actualizan, a veces se pierde. Una vez faltó `~/.config/agent-routing/active.env`, y herdr siguió delegando, pero con el modelo por defecto de OpenCode, sin usar los modelos baratos. Nada fallaba, nada avisaba.
+
+Engram lo notó por contraste. Su memoria decía que ese trabajo lo hacía un agente con un perfil concreto, y lo que estaba pasando no coincidía. La pregunta fue directa: aquí dice que esto lo hace un agente, ¿qué está pasando? De ahí salió [`restore.sh`](https://github.com/elvinlab/agentic-dev-setup/blob/main/home/.config/agent-routing/restore.sh), un script que vuelve a poner el enrutamiento, los hooks y el estilo de salida cada vez que una reinstalación los pisa.
+
+### Lo que dejé de copiar en Engram
+
+Al principio le pedía más que eso. Mi protocolo de trabajo copiaba en Engram el archivo de seguimiento de cada tarea (`odd/tasks/<feature>.md`) al terminar cada tarea. Eran dos copias del mismo estado: una en git y otra en la memoria.
+
+El 10 de octubre lo quité. Desde entonces, el `CLAUDE.md` del repo dice que el archivo de seguimiento en git es la única fuente de verdad, que no se copia a Engram, y que Engram guarda solo decisiones o trampas que el repo no tiene escritas. El motivo quedó en la misma regla: reescribir la copia costaba miles de tokens de salida en cada tarea y no agregaba nada.
+
+Visto desde esta nota, había algo más. Una copia del estado es una copia más que se puede quedar atrás. Engram sirve para lo que el repo no sabe, no para repetir lo que el repo ya dice.
+
+## El registro que no me deja decir "verificado"
+
+El punto de control en el que más confío llegó el 5 de octubre, y no es un documento que alguien escriba con cuidado: es uno que no puede exagerar.
+
+La regla está en `CLAUDE.md` y en la guía de pruebas: verificar lo que toca un cambio, no toda la batería cada vez, y dejarlo anotado. `pnpm verify` lee qué archivos cambiaron y dice qué comprobaciones los cubren y por qué; con `--run` las corre. El registro de verificación (`odd/verification-ledger.md`) guarda dos cosas: el último commit en el que cada familia de comprobaciones pasó, y una fila por cada cambio verificado, con lo que se corrió y lo que no.
+
+La parte importante es la segunda columna. Una comprobación que no se volvió a correr no se puede reportar como verificada. Se escribe así:
+
+```txt title="cómo se reporta lo que no se corrió"
+not re-run: untouched since <sha>
+```
+
+Y la herramienta no le cree a la historia de commits, le cree a los archivos. Cada comprobación tiene su alcance, y su huella es un hash de la ruta y el contenido de cada archivo de ese alcance. Si un solo byte cambió desde la última vez que pasó, está vencida y se vuelve a correr.
+
+Esto ya me mostró su valor de la forma menos cómoda. En el release del 11 de octubre, el registro decía con todas sus letras qué no había corrido en local: las pruebas e2e a 390 y 768 px. El CI falló justo ahí, en una prueba a 768 px que medía 68 px de movimiento contra un límite de 60. En el release siguiente, ese mismo día, pasó algo parecido: quien hizo un cambio solo había corrido seis specs a 360 y 768 px, y el registro lo dejó escrito; la que falló no estaba entre esas seis.
+
+En ninguno de los dos casos el registro evitó el fallo. Lo que hizo fue más útil para esta nota: no dijo que algo estaba probado cuando no lo estaba, y por eso supe en segundos dónde mirar.
+
+```txt title="cuatro puntos de control, cuatro momentos distintos"
+antes del commit     →  regla global          →  ¿este cambio vuelve falso algún documento?
+en cada test         →  docs:config           →  ¿la guía coincide con el código?
+en cada verificación →  pnpm verify + ledger  →  ¿qué se corrió de verdad y qué no?
+en cada sesión       →  Engram                →  ¿esto contradice algo que ya decidí?
+```
+
+## Lo que todavía se escapa
+
+Me gustaría decir que con esto la documentación ya no se queda atrás. No es así, y tengo el caso con fecha.
+
+El 1 de octubre simplifiqué el CI. Estaba corriendo pruebas en local, en `develop`, en `main` y en producción, y esa repetición atrasaba mucho el desarrollo. Además, ni los tokens ni los minutos de GitHub Actions son gratis: los dos tienen límite, y hay que optimizarlos. Quité el staging y las previews por PR; el detalle de ese cambio está en [cómo construí este sitio](/notes/como-construi-este-sitio/). La regla de antes de cada commit ya estaba activa, y Engram ya tenía guardado cómo quería trabajar en esta etapa temprana.
+
+El cambio actualizó lo que estaba en su alcance: el workflow, el `CLAUDE.md` y un ADR nuevo. Pero el 2 de octubre, una revisión encontró esto:
+
+```txt title="lo que seguía diciendo la documentación un día después"
+docs/CONVENTIONS.md        → filas de staging, release por PR y previews por PR
+docs/TESTING.md            → "PR previews and branch deploys"
+docs/CONFIGURATION.md      → "intentional on previews" (en español y en inglés)
+CLAUDE.md                  → un release con `git merge develop` que ya no funcionaba
+```
+
+El último es el más grave. `CLAUDE.md` es lo primero que lee un agente al entrar al repo, y le estaba dando instrucciones para un release que fallaba porque `main` y `develop` ya tenían historiales separados.
+
+Lo mismo pasó ese 2 de octubre con el preset de apariencia. Cuando cambié a `full`, la marca, el diseño, la guía de configuración y un comentario en el código seguían diciendo que el sitio usaba `minimal`. Y nueve specs e2e asumían `minimal`, así que 16 resultados se rompieron. Esos los atrapó el test. Los documentos en prosa, no.
+
+La lección es incómoda pero clara. Los puntos de control atrapan lo que está cerca del cambio: el archivo que el agente toca, la tabla que sale del schema, la decisión que Engram recuerda. Lo que vive lejos, en una guía que nadie abrió durante ese cambio, se sigue escapando. La regla pregunta "¿este cambio vuelve falso algún documento?", pero solo puede responder con los documentos que conoce.
+
+## Lo que me llevo
+
+No creo que exista una documentación que nunca se quede atrás. Lo que sí puedo hacer es acortar cuánto tiempo pasa atrasada y quién se da cuenta. Antes, me daba cuenta yo, cuando un agente estaba a punto de rehacer algo. Ahora, en los casos que conté aquí, se dio cuenta un test o una memoria, antes de que el error llegara a producción.
+
+Y cuando algo se escapa, la corrección queda escrita con fecha, en el mismo documento, explicando qué decía y por qué dejó de ser verdad. No borro lo viejo; lo tacho y explico. Así la próxima sesión sabe que ese documento ya mintió una vez y lo lee con más cuidado.
+
+Me queda una pregunta que no he resuelto: ¿cómo detectan ustedes la documentación que vive lejos del cambio, esa guía que nadie abre hasta que alguien la necesita? Si tienen un truco, o un documento viejo que les costó caro, cuéntenmelo en los comentarios.
