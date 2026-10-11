@@ -633,6 +633,6 @@
     "date": "2026-10-11",
     "category": "changed",
     "title": "Tablet sidebar, a softer light theme and a quieter author card",
-    "description": "On tablets the author, hiring and footprint cards on the home sit side by side instead of as wide empty boxes. In the light theme the paper grid is fainter behind the headline and secondary text is a little darker for easier reading. On phones the author card is a compact row with a small photo."
+    "description": "On tablets the author, hiring and footprint cards on the home sit side by side (two columns, never wider than the screen) instead of as wide empty boxes. In the light theme the paper grid is fainter behind the headline and secondary text is a little darker for easier reading. On phones the author card is a compact row with a small photo."
   }
 }
