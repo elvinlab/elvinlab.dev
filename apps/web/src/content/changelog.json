@@ -610,5 +610,11 @@
     "category": "changed",
     "title": "The paper banner on every page",
     "description": "Experiments, contact, the changelog, privacy, terms, the subscribe pages and the 404 now open with the same compact lab-paper banner as the home, the notes and /me, with the page title in it. The subscribe page lost its pixel envelope, and banners that never expand no longer load the expand button script."
+  },
+  "me-flat-sections": {
+    "date": "2026-10-11",
+    "category": "changed",
+    "title": "A calmer profile page",
+    "description": "On /me the sections now sit directly on the page instead of in separate cards, divided by a dotted line. \"What I bring\" is a plain list without icons or tiles, and the three at-a-glance facts are quiet rows instead of big numbers. The sidebar keeps its cards."
   }
 }

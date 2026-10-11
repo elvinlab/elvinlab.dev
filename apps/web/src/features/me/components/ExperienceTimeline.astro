@@ -6,7 +6,6 @@ import { tagLabel } from '@/features/me/lib/tag-label.ts';
 import type { Experience } from '@/features/me/schema.ts';
 import { LOCALES, type Locale, t } from '@/shared/i18n/index.ts';
 import { pickLocale } from '@/shared/lib/localized.ts';
-import Card from '@/shared/ui/Card.astro';
 import Chip from '@/shared/ui/Chip.astro';
 import SectionHeading from '@/shared/ui/SectionHeading.astro';
 
@@ -19,7 +18,7 @@ const period = (e: Experience) => `${e.start} — ${e.end ?? t(locale, 'me.prese
 ---
 
 {sorted.length > 0 && (
-  <Card as="section" class="flex flex-col gap-5 !p-7 md:!px-9">
+  <section class="flex flex-col gap-5 border-t border-dashed border-divider pt-10">
     <SectionHeading text={t(locale, 'me.experience')} />
     <ol class="flex flex-col">
       {sorted.map((entry, index) => (
@@ -42,5 +41,5 @@ const period = (e: Experience) => `${e.start} — ${e.end ?? t(locale, 'me.prese
         </li>
       ))}
     </ol>
-  </Card>
+  </section>
 )}
