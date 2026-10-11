@@ -561,7 +561,7 @@
     "date": "2026-10-10",
     "category": "changed",
     "title": "A simpler home hero",
-    "description": "The small \"elvinlab / lab notes\" label above the headline and the three slogan chips below it are gone, and the banner is about 90 px shorter on desktop, so the latest note starts higher on the page."
+    "description": "The small \"elvinlab / lab notes\" label above the headline (on the home and on the notes page) and the three slogan chips below it are gone, and the banner is about 90 px shorter on desktop, so the latest note starts higher on the page."
   },
   "lab-paper-background": {
     "date": "2026-10-10",

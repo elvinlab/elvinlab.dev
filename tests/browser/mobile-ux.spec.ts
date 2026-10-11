@@ -182,10 +182,9 @@ test.describe('background picker icon', () => {
     for (let step = 0; step < 3; step += 1) {
       const visible = picker.locator('svg:not(.hidden)');
       await expect(visible).toHaveCount(1);
-      // The light-theme icon is a circle surrounded by rays; the picker must not reuse that shape.
-      expect(await visible.locator('circle').count(), `state ${step}`).toBe(
-        (await visible.getAttribute('data-icon')) === 'off' ? 1 : 0,
-      );
+      // The light-theme icon is a circle surrounded by rays; no picker state may use a circle
+      // (the paper state is a grid, the old crossed circle read as "disabled").
+      expect(await visible.locator('circle').count(), `state ${step}`).toBe(0);
       await picker.click();
     }
   });

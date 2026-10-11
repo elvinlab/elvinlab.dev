@@ -101,8 +101,9 @@ test('the home computes the scale of its preset', async ({ page }, testInfo) => 
   if (!expected) throw new Error('unreachable: skipped in beforeEach');
   expect(await fontSize(page.locator('[data-home-hero] h1'))).toBe(expected.hero);
   expect(await fontSize(page.locator('main h2:has(> span.bg-primary)'))).toBe(expected.section);
+  // The latest note leads the home on the note-title step (it is no longer a card, see DESIGN.md).
   expect(await fontSize(page.locator('main h2:has(> a[href*="/notes/"])'))).toBe(
-    expected.cardTitle,
+    expected.noteTitle,
   );
 });
 
