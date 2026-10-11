@@ -252,3 +252,22 @@ for (const phone of PHONES) {
     expect((text?.y ?? 0) + (text?.height ?? 0)).toBeLessThanOrEqual(button?.y ?? 0);
   });
 }
+
+/** A single header row is about 72 px; a wrapped row is 92 px or more. */
+const MAX_SINGLE_ROW_HEADER = 80;
+
+test.describe('tablet header', () => {
+  for (const width of [768, 820, 1023]) {
+    for (const path of ['/', '/en/']) {
+      test(`${path} header stays on one row at ${width}px`, async ({ page }) => {
+        await page.setViewportSize({ width, height: 1000 });
+        await page.goto(path);
+        const { height } = await page.locator('[data-navbar] nav').evaluate((nav) => {
+          const rect = nav.getBoundingClientRect();
+          return { height: rect.height };
+        });
+        expect(height).toBeLessThan(MAX_SINGLE_ROW_HEADER);
+      });
+    }
+  }
+});
