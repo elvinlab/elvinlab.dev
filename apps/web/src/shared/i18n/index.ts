@@ -43,8 +43,8 @@ export const t = createTranslator({
       'backtotop.label': 'Volver arriba',
       'banner.expand': 'Expandir el fondo',
       'banner.collapse': 'Achicar el fondo',
-      'home.intro':
-        'Documento las decisiones detrás de lo que construyo: qué probé, qué descarté y por qué.',
+      'home.headline': 'Construyo con agentes de IA y escribo lo que sale mal.',
+      'home.intro': 'Cada decisión queda en una nota: qué probé, qué descarté y por qué.',
       'home.pill.1': 'Clean architecture',
       'home.pill.2': 'Sistemas rápidos',
       'home.pill.3': 'Cloud listo para producción',
@@ -314,8 +314,8 @@ export const t = createTranslator({
       'backtotop.label': 'Back to top',
       'banner.expand': 'Expand the background',
       'banner.collapse': 'Collapse the background',
-      'home.intro':
-        'I write down the decisions behind what I build: what I tried, what I dropped and why.',
+      'home.headline': 'I build with AI agents and write down what goes wrong.',
+      'home.intro': 'Every decision becomes a note: what I tried, what I dropped and why.',
       'home.pill.1': 'Clean architecture',
       'home.pill.2': 'Fast systems',
       'home.pill.3': 'Production-ready cloud',

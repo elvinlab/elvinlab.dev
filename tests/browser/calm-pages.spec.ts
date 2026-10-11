@@ -58,14 +58,14 @@ const FULL_PAGE_BANNERS: Record<string, number> = {
 /**
  * Expanded home banner by preset, then project. `minimal`: clamp(360px, 48vh, 460px) at 900 px is
  * 432 px on desktop, 24rem on a phone. `full`: clamp(520px, 66vh, 620px) is 594 px on desktop,
- * 28rem on a phone.
+ * 29rem on a phone (the four-line pixel headline needs more than the old 28rem).
  */
 const HOME_BANNER: Record<Preset, { desktop: number; phone: number }> = {
   minimal: { desktop: 432, phone: 384 },
-  full: { desktop: 594, phone: 448 },
+  full: { desktop: 594, phone: 464 },
 };
-/** Lines the pixel hero wraps to on desktop: `minimal` widens the measure to 22ch (two lines). */
-const HERO_LINES: Record<Preset, number> = { minimal: 2, full: 3 };
+/** Lines the pixel hero wraps to on desktop: both presets widen the measure (22ch minimal, 24ch full) to two lines. */
+const HERO_LINES: Record<Preset, number> = { minimal: 2, full: 2 };
 /**
  * Decision record, in px: `--record-*` of `calm-layout.css`. `phoneGap` is the stacked row gap.
  */

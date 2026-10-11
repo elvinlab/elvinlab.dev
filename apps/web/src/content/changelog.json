@@ -544,5 +544,11 @@
     "category": "changed",
     "title": "The decision record now sits next to the note title",
     "description": "On a note page, from tablet width up, the decision record (context, decision, outcome) appears in the banner to the right of the title instead of below it, so the summary is visible before the first scroll. On phones it stays above the note body, and reading mode keeps it there at every width."
+  },
+  "home-hero-headline": {
+    "date": "2026-10-10",
+    "category": "changed",
+    "title": "A new headline on the home page",
+    "description": "The home hero now says what the site is for in plain words: \"I build with AI agents and write down what goes wrong\", followed by one line about the notes. The professional title stays in the author card, the search previews and the profile page. On desktop the headline sits on two wider lines."
   }
 }
