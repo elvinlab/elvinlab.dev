@@ -621,7 +621,7 @@
     "date": "2026-10-11",
     "category": "changed",
     "title": "A dot instead of a long dash in page titles",
-    "description": "Browser tabs and link previews now read \"Elvin González · elvinlab.dev\" instead of using a long dash between the page and the site name."
+    "description": "Browser tabs and link previews now read \"Elvin Gonz\u00e1lez \u00b7 elvinlab.dev\" instead of using a long dash between the page and the site name."
   },
   "home-phone-polish": {
     "date": "2026-10-11",
@@ -646,5 +646,11 @@
     "category": "changed",
     "title": "Page-size baseline for seven published notes",
     "description": "Recalibrated only the HTML size guard for the seven-note index and the longer new articles, using the production build and the usual 4% margin. CSS, JavaScript and Lighthouse performance limits are unchanged."
+  },
+  "notes-content-aware-guard": {
+    "date": "2026-10-11",
+    "category": "fixed",
+    "title": "Publishing notes no longer trips a fixed HTML limit",
+    "description": "The size check now budgets article text separately from the fixed page shell and scales the notes index by its actual row count. Article and index ceilings still catch excessive growth; CSS, JavaScript and Lighthouse limits stay unchanged. The publishing and testing guides explain the rule."
   }
 }

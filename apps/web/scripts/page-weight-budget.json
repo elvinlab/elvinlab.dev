@@ -62,24 +62,31 @@
       }
     },
     "notes-index": {
-      "why": "Seven published notes instead of three, with their excerpts, category/tag links and filter metadata. Measured in CI run 38170913722; HTML receives the standard 4% headroom. The CSS ceiling is unchanged.",
+      "why": "Fixed index shell plus 4000 HTML bytes per published note (rows, filter metadata and category/tag links). A 180000 B absolute ceiling requires pagination at larger scales; CSS remains independently bounded.",
       "styleBytes": 55600,
-      "htmlBytes": 117300,
+      "htmlBytes": 88200,
       "measured": {
         "styleBytes": 54136,
-        "htmlBytes": 112772,
+        "htmlBytes": 84772,
+        "totalHtmlBytes": 112772,
+        "notesCount": 7,
         "date": "2026-10-11"
-      }
+      },
+      "htmlBytesPerNote": 4000,
+      "maxHtmlBytes": 180000
     },
     "note": {
-      "why": "Notes 004–007 add longer prose and code examples; the largest is /notes/el-lcp-se-pierde-en-el-head/ at 138411 B in CI run 38170913722. HTML receives the standard 4% headroom; CSS, JavaScript and Lighthouse limits remain unchanged.",
+      "why": "Fixed note shell excludes the rendered MDX body, measured between inert template boundaries. Article content has a separate 64 KiB ceiling; CSS, JavaScript and Lighthouse gates remain independent.",
       "styleBytes": 61000,
-      "htmlBytes": 144000,
+      "htmlBytes": 117000,
       "measured": {
         "styleBytes": 60215,
-        "htmlBytes": 138411,
+        "htmlBytes": 112464,
+        "totalHtmlBytes": 138497,
+        "articleHtmlBytes": 26706,
         "date": "2026-10-11"
-      }
+      },
+      "articleBytes": 65536
     },
     "result": {
       "why": "One short card under the compact banner (404, confirm and unsubscribe, es and en): budget is the measured value rounded up to 100 B, so these small pages stay tight.",
