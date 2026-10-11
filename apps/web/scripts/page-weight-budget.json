@@ -62,23 +62,23 @@
       }
     },
     "notes-index": {
-      "why": "Listing of note cards: site stylesheet only. Every category and tag is a link to the filtered index, which costs about 4 KB of HTML.",
+      "why": "Seven published notes instead of three, with their excerpts, category/tag links and filter metadata. Measured in CI run 38170913722; HTML receives the standard 4% headroom. The CSS ceiling is unchanged.",
       "styleBytes": 55600,
-      "htmlBytes": 99600,
+      "htmlBytes": 117300,
       "measured": {
-        "styleBytes": 53393,
-        "htmlBytes": 95705,
-        "date": "2026-10-08"
+        "styleBytes": 54136,
+        "htmlBytes": 112772,
+        "date": "2026-10-11"
       }
     },
     "note": {
-      "why": "Note pages: article typography, share card and footprint button; the note-page LCP gate moves with a few hundred bytes (docs/TESTING.md).",
+      "why": "Notes 004–007 add longer prose and code examples; the largest is /notes/el-lcp-se-pierde-en-el-head/ at 138411 B in CI run 38170913722. HTML receives the standard 4% headroom; CSS, JavaScript and Lighthouse limits remain unchanged.",
       "styleBytes": 61000,
-      "htmlBytes": 130400,
+      "htmlBytes": 144000,
       "measured": {
-        "styleBytes": 58561,
-        "htmlBytes": 125374,
-        "date": "2026-10-07"
+        "styleBytes": 60215,
+        "htmlBytes": 138411,
+        "date": "2026-10-11"
       }
     },
     "result": {
