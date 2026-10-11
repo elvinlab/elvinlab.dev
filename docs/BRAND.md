@@ -24,6 +24,8 @@ La línea de posicionamiento es una sola y se usa igual en todas partes: **Full-
 
 ### Los cuatro pilares
 
+> Desde 2026-10-10 el inicio ya no muestra la sección de pilares (`home.pillars: false`): repetía lo que dice el titular. Siguen siendo la referencia de contenido y se pueden volver a encender.
+
 1. **AI Agents & Workflows** — orquestación multi-agente, routing de modelos, memoria persistente. Prueba: [`agentic-dev-setup`](https://github.com/elvinlab/agentic-dev-setup).
 2. **Software Architecture** — límites claros, dominios desacoplados, código predecible.
 3. **Full-Stack Engineering** — de punta a punta y sin casarse con un framework.

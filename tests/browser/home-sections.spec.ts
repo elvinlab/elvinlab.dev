@@ -12,8 +12,8 @@ type Preset = 'minimal' | 'full';
 /** Whether each preset-driven section is on (`HOME_PRESETS` in `shared/config/appearance.ts`). */
 const PRESET_SECTIONS: Record<Preset, { heroPills: boolean; pillars: boolean }> = {
   minimal: { heroPills: false, pillars: false },
-  // This site switches the hero pills off through `home.heroPills` in site.config.ts.
-  full: { heroPills: false, pillars: true },
+  // This site switches the hero pills and the pillars off through `home` in site.config.ts.
+  full: { heroPills: false, pillars: false },
 };
 
 const presetOf = async (page: Page): Promise<Preset> => {
@@ -177,5 +177,25 @@ test.describe('home hero action and language cue', () => {
     await expect(page.getByText('Notes written in Spanish.')).toBeVisible();
     await page.goto('/');
     await expect(page.getByText('Notas escritas en español.')).toHaveCount(0);
+  });
+
+  test('keeps the main column on the page background and only the decision record boxed', async ({
+    page,
+  }) => {
+    await page.goto('/');
+    const TRANSPARENT = 'rgba(0, 0, 0, 0)';
+    const background = (selector: string) =>
+      page
+        .locator(selector)
+        .first()
+        .evaluate((el) => getComputedStyle(el).backgroundColor);
+    const latest = 'section[data-card-link]';
+    expect(await background(latest)).toBe(TRANSPARENT);
+    expect(await background('main section:has(> div > h2 + a[href="/notes/"])')).toBe(TRANSPARENT);
+    expect(await background(`${latest} section`)).not.toBe(TRANSPARENT);
+    const link = page.locator(`${latest} h2 a`);
+    const href = await link.getAttribute('href');
+    await link.click();
+    await expect(page).toHaveURL(new RegExp(`${href}$`));
   });
 });

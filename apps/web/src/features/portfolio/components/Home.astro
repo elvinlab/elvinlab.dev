@@ -90,7 +90,7 @@ const experiments = homeSections.experiments
     </div>
   </Banner>
 
-  <div class="flex flex-col gap-8">
+  <div class="flex flex-col gap-10">
     {hasNotes && latest && <LatestNote locale={locale} slug={latest.slug} data={latest.data} body={latest.body} />}
     {homeSections.notebookIndex && hasNotes && rest.length > 0 && <NotebookIndex locale={locale} notes={rest.slice(0, 5)} />}
     {homeSections.experiments && <ExperimentsGrid locale={locale} experiments={experiments} />}

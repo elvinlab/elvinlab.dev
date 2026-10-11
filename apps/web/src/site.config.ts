@@ -39,7 +39,8 @@ export const siteConfig = {
   // experiments release); `/experiments/` and `/me` show the experiments.
   // The hero pills were three slogans that the pillars section already says; the hero keeps the
   // headline, one line and the avatar.
-  home: { experiments: false, heroPills: false },
+  // The pillars strip repeated the headline, so it is off too (brand decision 2026-10-10, reversible).
+  home: { experiments: false, heroPills: false, pillars: false },
   // What the owner is focused on: the sidebar "Now" card of the home (one to three rows, dated).
   // Bump `updatedAt` (YYYY-MM-DD) when the rows change; remove the whole block to hide the card.
   now: {
