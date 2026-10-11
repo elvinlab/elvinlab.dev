@@ -616,5 +616,11 @@
     "category": "changed",
     "title": "A calmer profile page",
     "description": "On /me the sections now sit directly on the page instead of in separate cards, divided by a dotted line. \"What I bring\" is a plain list without icons or tiles, and the three at-a-glance facts are quiet rows instead of big numbers. The sidebar keeps its cards."
+  },
+  "title-separator-dot": {
+    "date": "2026-10-11",
+    "category": "changed",
+    "title": "A dot instead of a long dash in page titles",
+    "description": "Browser tabs and link previews now read \"Elvin González · elvinlab.dev\" instead of using a long dash between the page and the site name."
   }
 }

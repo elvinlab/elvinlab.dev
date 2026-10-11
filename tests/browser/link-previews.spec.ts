@@ -33,13 +33,13 @@ for (const { path, slug, title, locale } of NOTES) {
         'content',
         'elvinlab.dev',
       );
-      await expect(page).toHaveTitle(`${title} — elvinlab.dev`);
+      await expect(page).toHaveTitle(`${title} · elvinlab.dev`);
 
       const image = `https://elvinlab.dev/og/notes/${slug}.png`;
       await expect(meta(page, 'property', 'og:image')).toHaveAttribute('content', image);
       await expect(meta(page, 'name', 'twitter:image')).toHaveAttribute('content', image);
       // The card shows the title and the domain, so the alt text names both.
-      const alt = `${title} — elvinlab.dev`;
+      const alt = `${title} · elvinlab.dev`;
       await expect(meta(page, 'property', 'og:image:alt')).toHaveAttribute('content', alt);
       await expect(meta(page, 'name', 'twitter:image:alt')).toHaveAttribute('content', alt);
       await expect(meta(page, 'name', 'twitter:card')).toHaveAttribute(
@@ -108,7 +108,7 @@ for (const { path, locale, card, bio } of [
       );
       await expect(meta(page, 'property', 'og:title')).toHaveAttribute(
         'content',
-        'Elvin González — elvinlab.dev',
+        'Elvin González · elvinlab.dev',
       );
       await expect(meta(page, 'property', 'og:description')).toHaveAttribute(
         'content',

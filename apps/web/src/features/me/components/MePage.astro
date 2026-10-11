@@ -43,7 +43,7 @@ const bio = site.identity.bio[locale];
   title={site.identity.name}
   {...(bio ? { description: bio } : {})}
   ogImage={profileCardPath(locale)}
-  ogImageAlt={`${site.identity.name} — ${site.identity.role[locale]}`}
+  ogImageAlt={`${site.identity.name} · ${site.identity.role[locale]}`}
   printable
   noindex={!site.features.me}
 >
