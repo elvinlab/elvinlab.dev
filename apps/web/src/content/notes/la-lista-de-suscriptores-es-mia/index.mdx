@@ -1,0 +1,184 @@
+---
+number: 6
+title: "Mis suscriptores viven en mi base de datos, no en un servicio de newsletter"
+description: "Cómo armé la suscripción por correo de Lab Notes con mi propia lista, doble confirmación y un proveedor que puedo cambiar sin migrar a nadie."
+pubDate: 2026-10-11
+lang: es
+category: decisiones
+tags: [suscripcion, correo, cloudflare-d1, arquitectura, privacidad]
+decision:
+  context: "La única forma de seguir el blog era RSS: la gente leía una nota y no volvía. Quería avisar por correo de cada nota nueva sin que la lista quedara atrapada en un proveedor."
+  decision: "La lista vive en Cloudflare D1 y Resend envía detrás de un puerto que puedo cambiar. Doble confirmación y baja propia. Descarté las campañas de Resend: la lista habría vivido en dos lugares."
+  outcome: "Del ADR a producción en 11 horas. Plan gratis: 100 correos al día, 30 reservados como tope para confirmaciones. Tres fallos en producción el primer día, ninguno mandó un correo duplicado."
+---
+
+## Una visita no es un lector
+
+Cuando publiqué las primeras notas, la única forma de seguir Lab Notes era RSS. RSS funciona, pero solo para quien ya usa un lector de RSS. El resultado era predecible: alguien llegaba por un enlace, leía una nota, y ahí terminaba la relación. Una visita, no un lector.
+
+Lo que quería era lo que hace cualquier blog que se toma en serio a su audiencia: que quien lee una nota pueda dejar su correo y enterarse cuando sale la siguiente. Es la forma más simple de que la página no se quede en una visita y la gente vuelva a leer.
+
+El camino obvio era un servicio de newsletter. Te dan el formulario, guardan la lista, mandan los correos y gestionan las bajas. Pero había una pregunta que no me dejaba tranquilo: ¿de quién es la lista?
+
+## Si la lista es mía, el proveedor se puede cambiar
+
+Pensemos en una agenda de contactos. Si mi agenda la guarda la empresa de mensajería, cambiar de empresa significa pedirles que me devuelvan mis contactos, en el formato que ellos quieran, con las bajas que ellos registraron. Si la agenda es mía, cambiar de mensajero es solo darle la agenda a otro.
+
+Con una lista de suscriptores pasa lo mismo. Lo que más vale de un blog con el tiempo no son los correos que se mandan, sino las personas que dijeron "sí, avísame". Eso es lo que no quería alquilar.
+
+Así que la regla quedó desde el principio, antes de escribir código:
+
+> La lista vive en mi base de datos. El proveedor de correo es un enchufe: si mañana lo cambio, nadie tiene que volver a suscribirse.
+
+No vengo de una mala experiencia con un proveedor. Es una buena práctica de marketing y de arquitectura a la vez: el activo que más crece es el que tiene que estar en mi casa.
+
+## Por qué no usé las campañas de Resend
+
+Ya usaba Resend para el formulario de contacto, así que era el candidato natural para mandar correos. Resend ofrece dos formas de hacerlo, y la decisión importante de esta nota fue elegir entre ellas.
+
+**Opción A: sus campañas (Broadcasts).** Copio los suscriptores confirmados a una "audiencia" de Resend y él manda la campaña. El plan gratis incluye 1.000 contactos de marketing y la página de precios no menciona un tope diario para campañas.
+
+**Opción B: mi propia lista y su API normal de envío.** Yo decido a quién mandar y Resend solo entrega. Acepta hasta 100 correos por llamada y encabezados propios. El plan gratis permite 3.000 correos al mes y **100 al día**.
+
+La opción A se veía más cómoda, pero tenía un problema de fondo: la lista iba a vivir en dos lugares. Si alguien se daba de baja desde el enlace de Resend, yo tenía que enterarme por un webhook para reflejarlo en mi base, y en la documentación que pude leer no encontré confirmado ese evento. Una lista desincronizada tiene un fallo concreto: mandarle correo a alguien que pidió que no. Eso es justo lo que este diseño existe para evitar.
+
+Elegí la B. El precio quedó claro desde el ADR: con el plan gratis, una nota llega como máximo a 100 personas por día. Hoy eso no es un problema; si algún día lo es, un plan pago levanta el tope sin cambiar una línea de código.
+
+## Mi base de datos manda, el proveedor obedece
+
+La lista vive en **Cloudflare D1**, la base de datos SQLite que ya usaba el sitio para otra función. Una tabla, `subscribers`, con el correo, el estado (`pending`, `confirmed` o `unsubscribed`), el idioma y las fechas.
+
+El dominio, que es la parte del código que decide quién se suscribe y a quién se le manda qué, nunca habla con Resend ni con D1 directamente. Habla con dos "puertos": interfaces que dicen *qué* necesita, no *quién* lo hace.
+
+```txt title="quién habla con quién"
+formulario ──► dominio (reglas de suscripción)
+                 │
+                 ├──► SubscriberRepository ──► D1       (la lista: fuente de verdad)
+                 │
+                 └──► SubscriptionMailer   ──► Resend   (solo entrega correos)
+```
+
+Lo que el dominio le pide al cartero cabe en dos funciones:
+
+```ts title="features/subscribe/ports.ts"
+export interface SubscriptionMailer {
+  sendConfirmation(mail: ConfirmationMail): Promise<void>;
+  sendNote(messages: readonly NoteMail[], idempotencyKey: string): Promise<void>;
+}
+```
+
+Cambiar de proveedor es escribir otro archivo que cumpla esa interfaz. Y no lo digo de palabra: las pruebas del dominio corren con un cartero falso que guarda los correos en memoria. Si el dominio funciona con un cartero de mentira, funciona con cualquier cartero de verdad.
+
+## Nadie entra sin decir que sí dos veces
+
+Un formulario de correo tiene un riesgo obvio: cualquiera puede escribir la dirección de otra persona. Por eso la suscripción es de **doble confirmación** (*double opt-in*): escribes tu correo, te llega un enlace, y solo cuando lo confirmas pasas a recibir notas. Las filas `pending` nunca reciben nada.
+
+Algunos detalles que importan más de lo que parece:
+
+- **El enlace no se guarda tal cual.** Es un valor aleatorio de 32 bytes; en la base solo queda su huella (un hash SHA-256). Si alguien leyera la base, no podría confirmar a nadie.
+- **Vence en 48 horas y se usa una sola vez.**
+- **El enlace no confirma: abre una página con un botón.** Muchos servicios de correo abren los enlaces solos para revisar si son peligrosos. Si confirmar fuera "abrir el enlace", un escáner podría suscribir a alguien que nunca hizo clic. Con un botón, hace falta una persona.
+- **El formulario no delata a nadie.** Si escribes un correo que ya está en la lista, la respuesta es la misma que para uno nuevo. Nadie puede usar el formulario para averiguar quién está suscrito.
+
+Los registros `pending` que nadie confirma se borran solos a los 7 días, la próxima vez que alguien se suscribe.
+
+## Darse de baja también es mío
+
+Si la lista es mía, la baja tiene que ser mía también. Cada correo de nota lleva un enlace para darse de baja que apunta a mi sitio, no al del proveedor, y la baja cambia la fila en D1 al instante. Así mi base siempre sabe quién se fue, mande quien mande.
+
+El enlace está **firmado**: lleva el identificador del suscriptor y una firma HMAC hecha con un secreto que solo conoce el servidor. Nadie puede fabricar el enlace de otra persona, y no necesito guardar un token por suscriptor. Como con la confirmación, el enlace abre una página con un botón, para que ningún escáner dé de baja a nadie.
+
+Aquí hubo algo que descarté: la **baja de un clic** (RFC 8058), la que muestran Gmail y otros clientes junto al remitente. Ese clic llega a tu servidor como un formulario sin el encabezado `Origin`, y Astro, con su protección `security.checkOrigin`, lo rechaza con un 403. Lo vi en la vista previa. Apagar esa protección debilitaría todos los formularios del sitio por una comodidad. Así que el encabezado `List-Unsubscribe` apunta a la página humana, y la baja de un clic queda pendiente para cuando el volumen la haga obligatoria.
+
+## 100 correos al día y un atacante imaginario
+
+El límite de 100 correos diarios de Resend es para **todo**: confirmaciones y notas comparten la misma bolsa. Eso abre un ataque bastante aburrido pero real: alguien con muchas IP pide confirmaciones para direcciones inventadas, cada IP por debajo del límite por persona, y gasta los 100 correos del día. Ese día, la nota no sale.
+
+La solución fue un tope global: **como máximo 30 correos de confirmación por día**, contados en D1. El conteo se hace en una sola sentencia, para que dos solicitudes al mismo tiempo no puedan pasarse del tope:
+
+```sql title="reservar un correo de confirmación"
+INSERT INTO subscribe_quota (day, confirmations) VALUES (?1, 1)
+ON CONFLICT(day) DO UPDATE SET confirmations = confirmations + 1
+WHERE confirmations < ?2
+RETURNING confirmations
+```
+
+Si la sentencia no devuelve nada, el día ya llegó a 30 y el formulario responde un mensaje fijo, igual para todos. Las notas usan lo que quede de la bolsa, y si un envío no alcanza a todos, el comando lo dice y al día siguiente sigue donde quedó.
+
+Encima de eso están las defensas que ya tenía el formulario de contacto: Turnstile (el verificador de Cloudflare que reemplaza a los captchas), un campo trampa que solo llenan los bots, un tiempo mínimo para llenar el formulario y un límite por IP. Si falta cualquiera de esas piezas en la configuración, el formulario no se muestra. Prefiero un sitio sin suscripción a una suscripción sin defensas.
+
+### Mandar una nota es una decisión mía
+
+Publicar una nota no avisa a nadie automáticamente. Lo hago yo con un comando, y por defecto no envía nada, solo cuenta:
+
+```bash title="terminal"
+pnpm notify:note vibe-coding-o-especificar-primero          # simulacro: a cuántos llegaría
+pnpm notify:note vibe-coding-o-especificar-primero --send   # envío real
+```
+
+El comando solo manda el identificador de la nota. El título, el resumen y el enlace los arma el servidor a partir de la nota publicada, así que aunque alguien robara el token, no podría ponerle a mis lectores un texto inventado.
+
+## Lo que costaba en la página: casi nada
+
+El formulario vive en el pie de casi todas las páginas, y mi sitio tiene un presupuesto de rendimiento estricto. Cargar Turnstile en cada visita habría sido regalar milisegundos a algo que la mayoría no usa.
+
+Así que el pie solo trae el HTML y unas pocas líneas de script. El código del formulario y Turnstile se cargan la primera vez que alguien toca el campo o pasa el cursor por encima. Quien no toca el formulario nunca descarga Turnstile. El LCP de la portada en el laboratorio pasó de 2.284 a 2.290 ms: 6 ms, dentro del ruido de medición.
+
+## Lo que se rompió
+
+Escribí el ADR el 5 de octubre a las 9 de la noche y activé la suscripción en producción a las 8 de la mañana siguiente. Ese mismo día aparecieron tres problemas que ninguna prueba había visto.
+
+### Mi amigo se quedó viendo "Verificando…"
+
+Un amigo intentó suscribirse desde su teléfono y se quedó esperando para siempre. El formulario decía "Verificando…" y no pasaba nada.
+
+Configuré Turnstile en modo `interaction-only`: invisible, salvo que Cloudflare dude de ti y te pida marcar una casilla. Esa vez dudó. La casilla apareció, de unos 72 px de alto, **debajo** del botón, fuera de la vista en un teléfono. Mi amigo no la vio. Los registros del servidor confirmaron que ningún intento fallido llegó a mi Worker: todo el problema estaba en el navegador.
+
+Lo arreglé así:
+
+- Cuando Turnstile pide la casilla, el formulario lo anuncia y desplaza la pantalla hasta ella.
+- Si la verificación no termina en 25 segundos, el formulario se reinicia y ofrece reintentar.
+- Si algo falla, el mensaje muestra el código de error y apunta a `/contact`, para que nadie quede sin una forma de escribirme.
+- El tiempo mínimo para llenar el formulario bajó de 3 a 1,5 segundos.
+
+Mi amigo lo volvió a intentar desde su Android y entró sin problemas. Ese día se usaron 4 de las 30 confirmaciones.
+
+### La columna que solo recordaba una nota
+
+Para no mandar dos veces la misma nota, cada suscriptor tenía una columna `last_note` con la última nota que recibió. La regla era: mándale a quien su última nota no sea esta.
+
+El problema apareció cuando mandé notas fuera de orden. Si alguien recibía la nota 3 y después la nota 1, su `last_note` pasaba a ser la 1, y la nota 3 volvía a parecer "no recibida". Una columna no puede recordar varias notas.
+
+Lo vi en producción antes de mandar ningún duplicado. La solución fue una tabla que registra cada envío, con una llave que hace imposible repetir el mismo par:
+
+```sql title="migrations/0003_subscriber_notes.sql (extracto)"
+CREATE TABLE IF NOT EXISTS subscriber_notes (
+  subscriber_id TEXT NOT NULL REFERENCES subscribers (id) ON DELETE CASCADE,
+  slug TEXT NOT NULL,
+  sent_at INTEGER NOT NULL,
+  PRIMARY KEY (subscriber_id, slug)
+);
+```
+
+Ahora alguien recibe una nota solo si no hay una fila para esa nota y esa persona, se manden en el orden que se manden y se repita el comando las veces que sea. Las pruebas cubren justo eso: mandar A, B y otra vez A; mandar 3, 1 y 2; alguien que confirma tarde.
+
+### Las respuestas rebotaban
+
+Los correos de nota salían desde una dirección de mi dominio, pero el dominio no tenía configurado dónde recibir correo. Si un lector respondía, su mensaje rebotaba. Activé el enrutamiento de correo de Cloudflare para que las respuestas me lleguen, y de paso cambié el remitente a `Lab Notes <notes@elvinlab.dev>`.
+
+## Lo que cuesta tener la lista en casa
+
+Tener la lista en casa no es gratis. Esto es lo que pago:
+
+- **Ahora guardo datos personales.** Un correo, su estado, sus fechas y qué notas le mandé. La página `/privacy` explica qué guardo, para qué, que Resend es quien entrega, y cómo pedir que lo borre todo desde `/contact`.
+- **Lo que un servicio de newsletter da hecho, lo construí yo.** Doble confirmación, bajas, límites, plantillas de correo que se vean bien en Gmail (claro y oscuro) y Outlook, y un aviso para buscar en la pestaña Promociones. Cada pieza es código que mantengo.
+- **Pasos manuales en Cloudflare.** Las migraciones de la base, los secretos y el límite por IP los aplico yo en el panel; el código nunca los toca.
+- **El tope de 100 correos diarios.** Con la lista actual no se nota. Con una lista grande, una nota tardaría días en llegar a todos.
+
+Al cierre de ese primer día había 4 personas confirmadas. Es poco, y está bien: no construí esto por la cantidad de hoy, sino para que, cuando la lista crezca, siga siendo mía.
+
+## Si llegaste hasta aquí
+
+Esa es la idea entera: una visita se convierte en lector cuando tiene una forma de volver, y esa forma no debería depender de un proveedor que no controlo.
+
+Si quieres enterarte de la próxima nota, el formulario está al pie de esta página o en `/subscribe/`. Y si manejas tu propia lista, cuéntame en los comentarios qué te hizo elegir entre un servicio y tu propia base, o qué se te rompió a ti el primer día.

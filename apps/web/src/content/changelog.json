@@ -634,5 +634,11 @@
     "category": "changed",
     "title": "Tablet sidebar, a softer light theme and a quieter author card",
     "description": "On tablets the author, hiring and footprint cards on the home sit side by side (two columns, never wider than the screen) instead of as wide empty boxes. In the light theme the paper grid is fainter behind the headline and secondary text is a little darker for easier reading. On phones the author card is a compact row with a small photo."
+  },
+  "notes-004-007": {
+    "date": "2026-10-11",
+    "category": "added",
+    "title": "Four new Lab Notes: 004 to 007",
+    "description": "Notes on keeping documentation honest (checkpoints, pnpm verify and the verification ledger), the CSS and font bytes that decide LCP, a subscriber list that lives in my own database, and how I cut agent tokens with Caveman, RTK and OpenCode --auto. Note 002 gets a one-line update on --auto."
   }
 }
