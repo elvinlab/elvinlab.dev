@@ -640,5 +640,11 @@
     "category": "added",
     "title": "Four new Lab Notes: 004 to 007",
     "description": "Notes on keeping documentation honest (checkpoints, pnpm verify and the verification ledger), the CSS and font bytes that decide LCP, a subscriber list that lives in my own database, and how I cut agent tokens with Caveman, RTK and OpenCode --auto. Note 002 gets a one-line update on --auto."
+  },
+  "notes-content-size-baseline": {
+    "date": "2026-10-11",
+    "category": "changed",
+    "title": "Page-size baseline for seven published notes",
+    "description": "Recalibrated only the HTML size guard for the seven-note index and the longer new articles, using the production build and the usual 4% margin. CSS, JavaScript and Lighthouse performance limits are unchanged."
   }
 }
