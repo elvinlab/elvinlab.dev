@@ -45,6 +45,9 @@ for (const { path, toggle, exit } of NOTES) {
       // What the reader came for stays: title, body, comments and prev/next.
       await expect(page.locator('[data-banner] h1')).toBeVisible();
       await expect(page.locator('.prose')).toBeVisible();
+      // The decision record shows once, inline, whatever the width (the banner copy steps aside).
+      await expect(page.locator('[data-banner] section[aria-label]')).toBeHidden();
+      await expect(page.locator('[data-article] section[aria-label]')).toBeVisible();
       await expect(page.locator('[data-comments]')).toHaveCount(1);
 
       await page.reload();

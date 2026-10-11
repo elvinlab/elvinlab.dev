@@ -538,5 +538,11 @@
     "category": "fixed",
     "title": "Small screens and accessibility fixes from a design audit",
     "description": "Experiments, /me and the home no longer scroll sideways on narrow phones or at 1024 px. Tags, category and sidebar links have a 44 px tap area, the header wraps instead of overflowing at large font sizes, the contact form marks its fields as required and announces how many need attention, the /me sidebar no longer sticks, and the 404 page no longer shows the subscribe form."
+  },
+  "note-banner-decision-record": {
+    "date": "2026-10-10",
+    "category": "changed",
+    "title": "The decision record now sits next to the note title",
+    "description": "On a note page, from tablet width up, the decision record (context, decision, outcome) appears in the banner to the right of the title instead of below it, so the summary is visible before the first scroll. On phones it stays above the note body, and reading mode keeps it there at every width."
   }
 }
