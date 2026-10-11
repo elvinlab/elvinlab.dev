@@ -69,7 +69,13 @@ Visual identity surfaces of `apps/web` and `packages/core` tokens, the two desig
 
 - 2026-10-11 typeface (T3, last piece): owner picked IBM Plex Sans (option 1 of 3) and authorized installing `@fontsource-variable/ibm-plex-sans` 5.3.0; `@fontsource-variable/space-grotesk` removed. Route: delegated writer, parent reviewed screenshots (note 1440, /me 1440, home 1440). The writer's whole-stack run found two problems: `test:white-label` failed because my earlier commit `5e6e250` leaked `html[data-reading]` CSS into `calm-layout.css` (fixed in `83c5877`), and Lighthouse LCP on the note page was 2582 to 2588 ms (gate 2500) because Plex Latin is 46 KB versus 22 KB. Measured fix: stop preloading JetBrains Mono (LCP 2261 to 2437, CLS 0.015). Final tree: full `test:lighthouse` exit 0, `test:e2e:quick` 549 passed. Ledger entry added.
 
-## Release 17 status (2026-10-11 evening): PREPARED, NOT PUSHED, waiting for owner authorization
+## Release 17 status (2026-10-11): DEPLOYED, production on f9467c5
+
+Release commit `f9467c5` (built with `commit-tree` from `develop` `93c42bd`, parent `88527c4`, tree equal to `develop`, 66 files) was pushed to `main` on the owner's explicit authorization. CI run 38169618321 passed on the first attempt, no reruns: static, e2e x4, lighthouse x2, checks and deploy (smoke check included). Live check: `/version.txt` = `f9467c5`; `/`, `/en/`, `/notes/`, a note, `/me/`, `/en/me/`, `/experiments/`, `/contact/`, `/subscribe/`, `/changelog/`, `/privacy/`, `/terms/` answer 200 and the 404 page answers 404; `<title>` on `/me/` is "Elvin Gonzalez · elvinlab.dev"; `/` preloads one font (the pixel face); `/privacy/` renders the banner. Only `main` was pushed; `develop` (with the docs commits after `93c42bd`) lives only locally unless the owner asks to push it.
+
+The steps below are kept as the record of how it was done.
+
+## Release 17 publish steps (record)
 
 Production is on `88527c4` (release 16). `develop` (tip `0ff31e9` plus the commit that records this section) holds 11 unreleased commits (counted with `git log --oneline <develop sha recorded in the last release commit>..develop`; `git rev-list origin/main..develop` is meaningless because the two histories diverged): metric-matched fallback font, refreshed experiment screenshots, compact paper banner on every page (`PageHeader` renders `Banner`, `BannerToggle` split), `/me` flattened, middle dot in titles (rule in DESIGN.md), home on phones, tablet sidebar grid, softer light paper, darker light muted text (`#4f5862`), quieter phone author card, the grid overflow fix and the ledger. All changelog entries are dated 2026-10-11 (nothing to stamp). The full pre-release battery is in `odd/verification-ledger.md` ("Release 17 candidate"): everything passed, the one real e2e failure (`home-marks` at 768 px) was fixed, `font-swap.spec.ts` is intermittent.
 
