@@ -29,6 +29,10 @@ export interface PageWeight {
   styleBytes: number;
   /** Bytes of the HTML file. */
   htmlBytes: number;
+  /** Rendered article body, delimited by inert templates in NotePage. */
+  articleHtmlBytes?: number;
+  /** Actual article rows in the notes index. */
+  notesCount?: number;
 }
 
 export interface TypeBudget {
@@ -36,8 +40,22 @@ export interface TypeBudget {
   why: string;
   styleBytes: number;
   htmlBytes: number;
+  /** Additional HTML per index row; htmlBytes then limits the fixed shell. */
+  htmlBytesPerNote?: number;
+  /** Article content ceiling; htmlBytes then limits the fixed shell. */
+  articleBytes?: number;
+  /** Absolute ceiling, even when a listing has many rows. */
+  maxHtmlBytes?: number;
   /** Largest measured values of the type when the budget was set (documentation only). */
-  measured?: { styleBytes: number; htmlBytes: number; date: string };
+  measured?: {
+    styleBytes: number;
+    /** Fixed shell for content-aware budgets; total HTML otherwise. */
+    htmlBytes: number;
+    totalHtmlBytes?: number;
+    articleHtmlBytes?: number;
+    notesCount?: number;
+    date: string;
+  };
 }
 
 export interface Budgets {
@@ -48,6 +66,7 @@ export interface ReportRow extends PageWeight {
   type: PageType;
   styleBudget: number;
   htmlBudget: number;
+  articleBudget?: number;
   ok: boolean;
 }
 
@@ -94,6 +113,33 @@ export function inlineStyleBytes(html: string): number {
   return total;
 }
 
+/** Inert templates survive HTML compression and delimit only the rendered MDX body.
+ * Reject missing halves, duplicates and reversed markers rather than silently exempting HTML. */
+export function articleContentBytes(html: string): number | undefined {
+  const starts = [
+    ...html.matchAll(/<template\b[^>]*\bdata-page-weight-start(?:="")?\s*><\/template>/gi),
+  ];
+  const ends = [
+    ...html.matchAll(/<template\b[^>]*\bdata-page-weight-end(?:="")?\s*><\/template>/gi),
+  ];
+  if (starts.length === 0 && ends.length === 0) return undefined;
+  const start = starts[0];
+  const end = ends[0];
+  if (
+    starts.length !== 1 ||
+    ends.length !== 1 ||
+    !start ||
+    !end ||
+    start.index + start[0].length > end.index
+  )
+    throw new Error('Invalid article page-weight markers');
+  return Buffer.byteLength(html.slice(start.index + start[0].length, end.index));
+}
+
+export function noteRowCount(html: string): number {
+  return [...html.matchAll(/<article\b[^>]*\bdata-note-row(?:="")?(?=\s|>)[^>]*>/gi)].length;
+}
+
 function listIndexFiles(directory: string, root = directory): string[] {
   const files: string[] = [];
   for (const entry of readdirSync(directory, { withFileTypes: true })) {
@@ -118,10 +164,16 @@ export function collectPageWeights(clientRoot: string): PageWeight[] {
       // `404.html` is the one page that is not an `index.html`: it answers every unknown path.
       const directory =
         parts[parts.length - 1] === '404.html' ? '404' : parts.slice(0, -1).join('/');
+      const path = directory === '' ? '/' : `/${directory}/`;
+      const text = html.toString('utf8');
+      const type = classifyPage(path);
+      const articleHtmlBytes = type === 'note' ? articleContentBytes(text) : undefined;
       return {
-        path: directory === '' ? '/' : `/${directory}/`,
+        path,
         styleBytes: inlineStyleBytes(html.toString('utf8')),
         htmlBytes: html.byteLength,
+        ...(articleHtmlBytes !== undefined && { articleHtmlBytes }),
+        ...(type === 'notes-index' && { notesCount: noteRowCount(text) }),
       };
     })
     .sort((a, b) => a.path.localeCompare(b.path));
@@ -134,12 +186,23 @@ export function evaluatePages(pages: readonly PageWeight[], budgets: Budgets): E
     const budget = budgets.types[type] ?? budgets.types.default;
     if (!budget)
       throw new Error(`No budget for page type "${type}" and no "default" type to fall back to`);
+    if (budget.articleBytes !== undefined && page.articleHtmlBytes === undefined)
+      throw new Error(`Missing article page-weight markers on ${page.path}; rebuild the site`);
+    if (budget.htmlBytesPerNote !== undefined && page.notesCount === undefined)
+      throw new Error(`Missing note row count on ${page.path}; rebuild the site`);
+    const contentBytes = budget.articleBytes === undefined ? 0 : (page.articleHtmlBytes ?? 0);
+    const htmlBudget = Math.min(
+      budget.htmlBytes + contentBytes + (budget.htmlBytesPerNote ?? 0) * (page.notesCount ?? 0),
+      budget.maxHtmlBytes ?? Number.POSITIVE_INFINITY,
+    );
+    const contentOk = budget.articleBytes === undefined || contentBytes <= budget.articleBytes;
     return {
       ...page,
       type,
       styleBudget: budget.styleBytes,
-      htmlBudget: budget.htmlBytes,
-      ok: page.styleBytes <= budget.styleBytes && page.htmlBytes <= budget.htmlBytes,
+      htmlBudget,
+      ...(budget.articleBytes !== undefined && { articleBudget: budget.articleBytes }),
+      ok: contentOk && page.styleBytes <= budget.styleBytes && page.htmlBytes <= htmlBudget,
     };
   });
   return { rows, failures: rows.filter((row) => !row.ok) };
@@ -157,7 +220,11 @@ export function formatReport({ rows, failures }: Evaluation): string {
   const lines = rows.map(
     (row) =>
       `${row.ok ? 'PASS' : 'FAIL'}  ${row.path.padEnd(pathWidth)}  ${row.type.padEnd(typeWidth)}  ` +
-      `${metric('style', row.styleBytes, row.styleBudget)}  ${metric('html', row.htmlBytes, row.htmlBudget)}`,
+      `${metric('style', row.styleBytes, row.styleBudget)}  ${metric('html', row.htmlBytes, row.htmlBudget)}` +
+      (row.articleBudget === undefined
+        ? ''
+        : `  ${metric('article', row.articleHtmlBytes ?? 0, row.articleBudget)}`) +
+      (row.notesCount === undefined ? '' : `  notes ${row.notesCount}`),
   );
   lines.push(
     failures.length === 0
@@ -175,14 +242,20 @@ function roundUp(value: number): number {
 export function suggestBudgets(
   pages: readonly PageWeight[],
   headroom: number,
+  budgets?: Budgets,
 ): Partial<Record<PageType, { styleBytes: number; htmlBytes: number }>> {
   const largest = new Map<PageType, { styleBytes: number; htmlBytes: number }>();
   for (const page of pages) {
     const type = classifyPage(page.path);
+    const budget = budgets?.types[type];
+    const fixedHtmlBytes =
+      page.htmlBytes -
+      (budget?.articleBytes === undefined ? 0 : (page.articleHtmlBytes ?? 0)) -
+      (budget?.htmlBytesPerNote ?? 0) * (page.notesCount ?? 0);
     const current = largest.get(type) ?? { styleBytes: 0, htmlBytes: 0 };
     largest.set(type, {
       styleBytes: Math.max(current.styleBytes, page.styleBytes),
-      htmlBytes: Math.max(current.htmlBytes, page.htmlBytes),
+      htmlBytes: Math.max(current.htmlBytes, fixedHtmlBytes),
     });
   }
   return Object.fromEntries(
@@ -200,12 +273,12 @@ if (process.argv[1] && resolve(process.argv[1]) === resolve(fileURLToPath(import
   const clientRoot = resolve(import.meta.dirname, '../dist/client');
   const pages = collectPageWeights(clientRoot);
   if (pages.length === 0) throw new Error(`No built pages under ${clientRoot}: build first`);
+  const budgets = JSON.parse(
+    readFileSync(resolve(import.meta.dirname, 'page-weight-budget.json'), 'utf8'),
+  ) as Budgets;
   if (process.argv.includes('--suggest')) {
-    console.log(JSON.stringify(suggestBudgets(pages, 0.04), null, 2));
+    console.log(JSON.stringify(suggestBudgets(pages, 0.04, budgets), null, 2));
   } else {
-    const budgets = JSON.parse(
-      readFileSync(resolve(import.meta.dirname, 'page-weight-budget.json'), 'utf8'),
-    ) as Budgets;
     const evaluation = evaluatePages(pages, budgets);
     console.log(formatReport(evaluation));
     if (evaluation.failures.length > 0) process.exitCode = 1;

@@ -95,7 +95,7 @@ const readingLabel = t(locale, 'notes.readingTime', { min: readingMinutes(entry.
   <article data-article class="flex flex-col gap-8 rounded-card bg-card p-6 md:p-10">
     <ReadingMode part="toggle" locale={locale} />
     <div data-record-inline class="lg:hidden"><DecisionRecord locale={locale} decision={data.decision} /></div>
-    <div class="prose"><Content /></div>
+    <template data-page-weight-start></template><div class="prose"><Content /></div><template data-page-weight-end></template>
 
     <div class="flex flex-col gap-3 border-t border-dashed border-divider pt-6">
       <div class="flex flex-wrap items-center gap-1.5">

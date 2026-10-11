@@ -231,7 +231,7 @@ mise exec -- pnpm new-post "Why I rebuilt my site from scratch" --lang en --numb
 
 1. Mueve la carpeta: `mv apps/web/src/content/drafts/<slug> apps/web/src/content/notes/<slug>` (es un `mv` normal: `drafts/` no está en git). La URL final es `/notes/<slug>/`, igual que en el borrador.
 2. Pon en `pubDate` la fecha de publicación.
-3. Verifica: `pnpm test`, `pnpm typecheck`, `pnpm lint`, `pnpm --filter web build` y `pnpm test:e2e` (los tests de navegador usan notas de prueba aisladas: tus notas reales no entran).
+3. Verifica: `pnpm test`, `pnpm typecheck`, `pnpm lint`, `pnpm --filter web build`, `pnpm check:page-weight`, `pnpm check:js-budget` y `pnpm test:e2e` (los tests de navegador usan notas de prueba aisladas: tus notas reales no entran; los dos checks de tamaño sí revisan el build real).
 4. Revisa la tarjeta: `apps/web/dist/client/og/notes/<slug>.png`.
 5. Commit, con mensaje convencional: `feat(notes): publish "Título"`. Si quieres avisar a los visitantes, añade una entrada al `changelog.json` (guía de configuración, receta 6.4).
 6. Push a `develop` y release a `main` ([guía de configuración, sección 7](CONFIGURATION.md#7-publicar-release-y-revertir)).
@@ -239,6 +239,20 @@ mise exec -- pnpm new-post "Why I rebuilt my site from scratch" --lang en --numb
 7. Ya en producción: abre la nota, comprueba que la tarjeta se ve bien al compartir el enlace (refresca la caché con el [Facebook Sharing Debugger](https://developers.facebook.com/tools/debug/) o el [LinkedIn Post Inspector](https://www.linkedin.com/post-inspector/)) y que los comentarios cargan.
 
 ## 10. Editar o retirar una nota publicada
+
+### Tamaño al publicar
+
+Agregar una nota o alargar su texto no exige cambiar el presupuesto de HTML. `check:page-weight`
+separa el cuerpo renderizado de la estructura fija del artículo y da al índice un margen por cada
+nota publicada. CSS, JavaScript y Lighthouse conservan sus límites. El reporte muestra los bytes
+de artículo o el número de notas junto al total; detalles en
+[Content-aware notes budgets](TESTING.md#content-aware-notes-budgets-2026-10-11).
+
+Si falla `article`, revisa bloques de código y contenido especialmente largos: el cuerpo tiene un
+techo de 64 KiB de HTML renderizado. Si falla el HTML del artículo con el cuerpo dentro del límite,
+creció la estructura fija. Si el índice llega a 180000 B, necesita paginación o simplificación.
+No subas límites automáticamente ni muevas elementos de interfaz entre los marcadores de contenido.
+Para una nota con imágenes grandes o mucho código, mide también esa URL real: Lighthouse usa fixtures.
 
 - **Editar**: cambia el texto y añade `updatedDate` con la fecha de hoy (no puede ser anterior a `pubDate`). Aparece en la nota y en los metadatos.
 - **No cambies el slug** (el nombre de la carpeta): es la URL y el sitio **no tiene redirecciones**; los enlaces y los comentarios apuntan a ella.
@@ -256,6 +270,7 @@ mise exec -- pnpm new-post "Why I rebuilt my site from scratch" --lang en --numb
 - [ ] Si tiene traducción, `translationOf` apunta a una nota que también se publica.
 - [ ] Se lee bien en 360 px, en tema claro y oscuro y en modo lectura.
 - [ ] `pnpm test`, `typecheck`, `lint` y `build` pasan.
+- [ ] Después del build real, `pnpm check:page-weight` y `pnpm check:js-budget` pasan.
 - [ ] La tarjeta de `dist/client/og/notes/<slug>.png` se ve bien.
 
 ## 12. Errores frecuentes

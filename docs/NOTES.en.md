@@ -231,7 +231,7 @@ mise exec -- pnpm new-post "Why I rebuilt my site from scratch" --lang en --numb
 
 1. Move the folder: `mv apps/web/src/content/drafts/<slug> apps/web/src/content/notes/<slug>` (a plain `mv`: `drafts/` is not in git). The final URL is `/notes/<slug>/`, the same as in the draft.
 2. Put the publication date in `pubDate`.
-3. Verify: `pnpm test`, `pnpm typecheck`, `pnpm lint`, `pnpm --filter web build` and `pnpm test:e2e` (browser tests use isolated test notes: your real notes do not enter).
+3. Verify: `pnpm test`, `pnpm typecheck`, `pnpm lint`, `pnpm --filter web build`, `pnpm check:page-weight`, `pnpm check:js-budget` and `pnpm test:e2e` (browser tests use isolated test notes; the two size checks inspect the real build).
 4. Check the card: `apps/web/dist/client/og/notes/<slug>.png`.
 5. Commit, with a conventional message: `feat(notes): publish "Title"`. If you want to tell visitors, add an entry to `changelog.json` (configuration guide, recipe 6.4).
 6. Push to `develop` and release to `main` ([configuration guide, section 7](CONFIGURATION.en.md#7-releasing-and-rolling-back)).
@@ -239,6 +239,20 @@ mise exec -- pnpm new-post "Why I rebuilt my site from scratch" --lang en --numb
 7. Once in production: open the note, check that the card looks right when you share the link (refresh the cache with the [Facebook Sharing Debugger](https://developers.facebook.com/tools/debug/) or the [LinkedIn Post Inspector](https://www.linkedin.com/post-inspector/)) and that comments load.
 
 ## 10. Editing or retiring a published note
+
+### Size checks when publishing
+
+Adding notes or extending their text does not require editing the HTML budget on each release.
+`check:page-weight` budgets the rendered article body separately from the fixed page shell and
+scales the index allowance with its actual note count. CSS, JavaScript and Lighthouse thresholds
+stay unchanged. The report includes article bytes or row count next to total HTML; see
+[Content-aware notes budgets](TESTING.md#content-aware-notes-budgets-2026-10-11).
+
+If `article` fails, inspect long code blocks and content: the rendered body has a 64 KiB ceiling.
+If total note HTML fails while its body is within that limit, the fixed shell grew. If the index
+reaches 180000 B, paginate or simplify it. Do not raise ceilings automatically or move interface
+elements inside the content boundaries. Measure the actual URL for unusually large images or
+code-heavy articles: Lighthouse's synthetic notes do not cover every real article.
 
 - **Editing**: change the text and add `updatedDate` with today's date (it cannot be earlier than `pubDate`). It shows on the note and in the metadata.
 - **Do not change the slug** (the folder name): it is the URL and the site has **no redirects**; links and comments point to it.
@@ -256,6 +270,7 @@ mise exec -- pnpm new-post "Why I rebuilt my site from scratch" --lang en --numb
 - [ ] If it has a translation, `translationOf` points to a note that is published too.
 - [ ] It reads well at 360 px, in light and dark theme and in reading mode.
 - [ ] `pnpm test`, `typecheck`, `lint` and `build` pass.
+- [ ] After the real build, `pnpm check:page-weight` and `pnpm check:js-budget` pass.
 - [ ] The card in `dist/client/og/notes/<slug>.png` looks right.
 
 ## 12. Common errors
