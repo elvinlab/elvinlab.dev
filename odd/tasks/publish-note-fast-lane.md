@@ -44,5 +44,7 @@ A note is an MDX file in the repo, so publishing means a release to `main`, whic
 - T3 done: ADR 0016 (0013-0015 were taken), ADR index, NOTES(.en) summary and section 9, CONFIGURATION(.en) section 7, CLAUDE.md command, changelog entry `publish-note-fast-lane`. `pnpm lint` clean, `pnpm typecheck` 0 errors (after T1), `pnpm changelog:audit` green, dry run of `pnpm publish-note` verified against a throwaway draft. Not run (untouched scope): e2e, lighthouse, white-label, docs:config (no schema change).
 - Commits (local, not pushed): f16316f, 1e1fd33, 7d5e44b, 6ea1d2c. Assessed tier/outcome per commit: unavailable (no RDD assessment run); no review was granted or declined.
 
+- Follow-up (owner approved): `publish-note` now also runs `check:js-budget` and `check:page-weight` right after the build (a few seconds per odd/verification-timings.md) and restores the draft on failure; docs and ADR 0016 updated. Commit 9e4013c. Checks: lint clean, typecheck 0 errors, changelog:audit green, dry run prints the new step 3. The real budget run was not exercised (it needs a real draft); same commands CI runs.
+
 ## Next step
 Owner decides: push `develop`, then the first real `pnpm publish-note <slug>` is the live test of the fast lane (CI `changes` job has never run on GitHub yet).
