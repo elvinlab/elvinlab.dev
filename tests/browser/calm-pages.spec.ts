@@ -94,11 +94,12 @@ const FULL_PAGE_BANNERS: Record<string, number> = {
 /**
  * Expanded home banner by preset, then project. `minimal`: clamp(360px, 48vh, 460px) at 900 px is
  * 432 px on desktop, 24rem on a phone. `full`: clamp(440px, 56vh, 520px) is 504 px on desktop,
- * 29rem on a phone (the four-line pixel headline needs more than the old 28rem).
+ * 30rem on a phone (the four-line pixel headline plus the two-line name and role byline need more
+ * than the old 28rem and 29rem).
  */
 const HOME_BANNER: Record<Preset, { desktop: number; phone: number }> = {
   minimal: { desktop: 432, phone: 384 },
-  full: { desktop: 504, phone: 464 },
+  full: { desktop: 504, phone: 480 },
 };
 /** Lines the pixel hero wraps to on desktop: both presets widen the measure (22ch minimal, 24ch full) to two lines. */
 const HERO_LINES: Record<Preset, number> = { minimal: 2, full: 2 };
@@ -298,8 +299,9 @@ test('the decision record sits in the banner from lg up and inline in the articl
   }
   await expect(inBanner).toBeVisible();
   await expect(inArticle).toBeHidden();
-  // Three stacked fields, labelled as in the inline record, to the right of the title block.
-  await expect(inBanner.locator('span')).toHaveCount(3);
+  // Three stacked fields, labelled as in the inline record, to the right of the title block. The
+  // decorative stamp is a fourth span and is not one of the fields.
+  await expect(inBanner.locator('span:not([data-stamp])')).toHaveCount(3);
   await expect(inBanner.locator('p')).toHaveCount(3);
   const record = await inBanner.boundingBox();
   const title = await page.locator('[data-banner] h1').boundingBox();

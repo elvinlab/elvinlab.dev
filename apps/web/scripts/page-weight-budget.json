@@ -32,9 +32,9 @@
       }
     },
     "changelog": {
-      "why": "Release days grouped by kind, 4 days per page (page 1 opens the 2 newest); the flat list was about 130 KB, and the page CSS ships only here. The compact lab-paper banner of the inner pages adds about 2.2 KB of CSS (this page's sheet did not carry the banner styles) and 2.9 KB of HTML. Release of 2026-10-12: html 113000 -> 115800 (measured 115792 on page 2): each new release day pushes the oldest day of page 1 onto page 2. 2026-10-12: html 115800 -> 116600 for the native feel layer (about 190 B of safe-area, overscroll and tap CSS plus 60 B of theme-color sync script and the pressed-state classes on navbar, footer and chip links), the minimum measured need.",
-      "styleBytes": 58700,
-      "htmlBytes": 116600,
+      "why": "Release days grouped by kind, 4 days per page (page 1 opens the 2 newest); the flat list was about 130 KB, and the page CSS ships only here. The compact lab-paper banner of the inner pages adds about 2.2 KB of CSS (this page's sheet did not carry the banner styles) and 2.9 KB of HTML. Release of 2026-10-12: html 113000 -> 115800 (measured 115792 on page 2): each new release day pushes the oldest day of page 1 onto page 2. 2026-10-12: html 115800 -> 116600 for the native feel layer (about 190 B of safe-area, overscroll and tap CSS plus 60 B of theme-color sync script and the pressed-state classes on navbar, footer and chip links), the minimum measured need. 2026-10-12 (N5d): style 58700 -> 59200, html 116600 -> 117400 for the page stamp (stamp.css and stamp-corner.css inlined by PageHeader only when a page passes a stamp, about 0.6 KB of CSS and one span), measured overshoot +390 B style and +658 B html on page 2, plus about 100 B of headroom.",
+      "styleBytes": 59200,
+      "htmlBytes": 117400,
       "measured": {
         "styleBytes": 58255,
         "htmlBytes": 110833,
@@ -42,8 +42,8 @@
       }
     },
     "contact": {
-      "why": "Form page: the lightest shared head, only the site stylesheet plus the form.",
-      "styleBytes": 55100,
+      "why": "Form page: the lightest shared head, only the site stylesheet plus the form. 2026-10-12 (N5d): style 55100 -> 55200 for the page stamp (measured overshoot +9 B of site style from the Stamp utility classes), the minimum measured need plus about 90 B of headroom.",
+      "styleBytes": 55200,
       "htmlBytes": 91000,
       "measured": {
         "styleBytes": 52942,
@@ -62,9 +62,9 @@
       }
     },
     "notes-index": {
-      "why": "Fixed index shell plus 4000 HTML bytes per published note (rows, filter metadata and category/tag links). A 180000 B absolute ceiling requires pagination at larger scales; CSS remains independently bounded. 2026-10-12: html 88200 -> 88700 for the native feel layer (about 190 B of safe-area, overscroll and tap CSS plus 60 B of theme-color sync script and the pressed-state classes on navbar, footer and chip links), the minimum measured need.",
+      "why": "Fixed index shell plus 4000 HTML bytes per published note (rows, filter metadata and category/tag links). A 180000 B absolute ceiling requires pagination at larger scales; CSS remains independently bounded. 2026-10-12: html 88200 -> 88700 for the native feel layer (about 190 B of safe-area, overscroll and tap CSS plus 60 B of theme-color sync script and the pressed-state classes on navbar, footer and chip links), the minimum measured need. 2026-10-12 (N5d): html 88700 -> 89200 for the ruled-paper rows (notes-index.css, about 0.9 KB inlined in the head with two per-theme data-URI strokes, minus 38 B per row from dropping the dashed border classes), measured overshoot +410 B with 9 notes, plus about 90 B of headroom; the per-note allowance of 4000 B is unchanged because the rows got smaller, not larger.",
       "styleBytes": 55600,
-      "htmlBytes": 88700,
+      "htmlBytes": 89200,
       "measured": {
         "styleBytes": 54136,
         "htmlBytes": 84772,
@@ -76,9 +76,9 @@
       "maxHtmlBytes": 180000
     },
     "topic": {
-      "why": "Static topic page /notes/tag/<topic>/: compact paper banner, an intro and compact note rows; no script. Same stylesheet as /notes/. The fixed shell is the measured value rounded up to 100 B, plus 800 HTML bytes per listed note (a topic row is about 720 B); a 120000 B absolute ceiling requires pagination at larger scales. CSS stays independently bounded. 2026-10-12: style 54200 -> 54500, html 81000 -> 81700 for the native feel layer (about 190 B of safe-area, overscroll and tap CSS plus 60 B of theme-color sync script and the pressed-state classes on navbar, footer and chip links), the minimum measured need.",
-      "styleBytes": 54500,
-      "htmlBytes": 81700,
+      "why": "Static topic page /notes/tag/<topic>/: compact paper banner, an intro and compact note rows; no script. Same stylesheet as /notes/. The fixed shell is the measured value rounded up to 100 B, plus 800 HTML bytes per listed note (a topic row is about 720 B); a 120000 B absolute ceiling requires pagination at larger scales. CSS stays independently bounded. 2026-10-12: style 54200 -> 54500, html 81000 -> 81700 for the native feel layer (about 190 B of safe-area, overscroll and tap CSS plus 60 B of theme-color sync script and the pressed-state classes on navbar, footer and chip links), the minimum measured need. 2026-10-12 (N5d): style 54500 -> 55100, html 81700 -> 82500 for the banner stamp (stamp.css and stamp-corner.css inlined in the head, about 0.6 KB), measured overshoot +550 B style and +713 B html, plus about 100 B of headroom.",
+      "styleBytes": 55100,
+      "htmlBytes": 82500,
       "htmlBytesPerNote": 800,
       "maxHtmlBytes": 120000,
       "measured": {

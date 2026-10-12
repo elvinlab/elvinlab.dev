@@ -1,0 +1,28 @@
+/* Ruled-paper rows of the notes index (DESIGN.md, "Notes index"). Inlined by NotesIndex with
+   `?inline`, so only `/notes/` pays for it. CSS on the existing row element: no extra markup per note.
+   A background image cannot read a CSS variable, so the stroke color is written once per theme
+   (the documented exception, as in `ink-underline.css`). */
+[data-note-row] {
+  background-repeat: repeat-x;
+  background-position: 0 0;
+  background-size: 120px 4px;
+}
+[data-theme="elvinlab-dark"] [data-note-row] {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 4'%3E%3Cpath d='M0 2 C15 .6 30 3.4 45 2 S75 .8 90 2 S110 3.2 120 2' fill='none' stroke='%23fff' stroke-opacity='.22' stroke-width='1.2' vector-effect='non-scaling-stroke'/%3E%3C/svg%3E");
+}
+[data-theme="elvinlab-light"] [data-note-row] {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 4'%3E%3Cpath d='M0 2 C15 .6 30 3.4 45 2 S75 .8 90 2 S110 3.2 120 2' fill='none' stroke='%23000' stroke-opacity='.2' stroke-width='1.2' vector-effect='non-scaling-stroke'/%3E%3C/svg%3E");
+}
+/* The margin rule of a notebook: a faint pink line after the number column, wide screens only. */
+@media (min-width: 768px) {
+  [data-note-row]::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 6.75rem;
+    width: 1px;
+    background: color-mix(in srgb, var(--color-pink) 30%, transparent);
+    pointer-events: none;
+  }
+}

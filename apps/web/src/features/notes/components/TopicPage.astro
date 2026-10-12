@@ -10,6 +10,9 @@ import { LOCALES, type Locale, t } from '@/shared/i18n/index.ts';
 import Banner from '@/shared/layout/Banner.astro';
 import BaseLayout from '@/shared/layout/BaseLayout.astro';
 import { breadcrumbJsonLd, jsonLdScript } from '@/shared/seo/jsonld.ts';
+import Stamp from '@/shared/ui/Stamp.astro';
+import stampCss from '@/shared/ui/stamp.css?inline';
+import stampCornerCss from '@/shared/ui/stamp-corner.css?inline';
 
 import NoteIndexRow from './NoteIndexRow.astro';
 
@@ -28,16 +31,20 @@ const trail = breadcrumbJsonLd([
 
 <BaseLayout locale={locale} path={path} title={topic.data.title} description={topic.data.description} translated={false} pixelTitle>
   <script type="application/ld+json" is:inline slot="head" set:html={jsonLdScript(trail)} />
+  <style slot="head" is:inline set:html={stampCss + stampCornerCss} />
   <Banner slot="banner" height="320px">
     <BackgroundCanvas slot="background" />
-    <p class="font-mono text-sm text-muted">
-      <a href="/notes/" class="hover:text-primary">{t(locale, 'note.breadcrumb')}</a>
-      <span class="mx-1">/</span>{t(locale, 'notes.topics')}
-    </p>
-    <h1 class="mt-3 font-pixel text-hero font-semibold leading-[1.1] text-balance">
-      {topic.data.title}<span aria-hidden="true" class="ml-1 inline-block h-3 w-2 bg-pink align-baseline md:h-4"></span>
-    </h1>
-    <p class="mt-3 max-w-[58ch] text-lg leading-relaxed text-text-secondary">{topic.data.intro}</p>
+    <div class="relative">
+      <Stamp class="stamp-corner">{t(locale, 'stamp.topic')}</Stamp>
+      <p class="font-mono text-sm text-muted">
+        <a href="/notes/" class="hover:text-primary">{t(locale, 'note.breadcrumb')}</a>
+        <span class="mx-1">/</span>{t(locale, 'notes.topics')}
+      </p>
+      <h1 class="mt-3 font-pixel text-hero font-semibold leading-[1.1] text-balance">
+        {topic.data.title}<span aria-hidden="true" class="ml-1 inline-block h-3 w-2 bg-pink align-baseline md:h-4"></span>
+      </h1>
+      <p class="mt-3 max-w-[58ch] text-lg leading-relaxed text-text-secondary">{topic.data.intro}</p>
+    </div>
   </Banner>
 
   <section class="flex flex-col">

@@ -15,6 +15,7 @@ import Chip from '@/shared/ui/Chip.astro';
 import NoteRow from './NoteRow.astro';
 import NotesFilter from './NotesFilter.astro';
 import NotesSidebar from './NotesSidebar.astro';
+import notesIndexCss from './notes-index.css?inline';
 import StartHere from './StartHere.astro';
 
 type Props = { locale: Locale; noindex?: boolean };
@@ -41,6 +42,7 @@ const tags = [...new Set(sortNotes(notes).flatMap((note) => note.data.tags))];
 ---
 
 <BaseLayout locale={locale} path="/notes/" title={t(locale, 'notes.title')} noindex={noindex} translated={false} pixelTitle>
+  <style slot="head" is:inline set:html={notesIndexCss} />
   <Banner slot="banner" height="320px">
     <BackgroundCanvas slot="background" />
     <h1 class="font-pixel text-hero font-semibold leading-[1.1] text-balance">

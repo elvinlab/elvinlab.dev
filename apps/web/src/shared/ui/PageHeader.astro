@@ -8,23 +8,33 @@
  * Use it as `<PageHeader slot="banner" ...>`: it renders into the banner slot of `BaseLayout`, so
  * the banner sits exactly where `/notes/` puts it, under the floating navbar. The banner asks for
  * 176 to 232 px; the `appearance` preset caps it (`calm-layout.css`). Titles are one or two words.
+ * An optional `stamp` (already localized, at most 2 words and 12 characters, what the page is) adds the
+ * notebook `Stamp`: above the title on phones, over the top-right corner of the header block from `md`.
+ * Without it nothing is added; with it the page inlines `stamp.css` (a page that does not opt in pays no bytes).
  * Pages that use it pass `pixelTitle` to `BaseLayout` so the pixel file is preloaded.
  */
 import Banner from '@/shared/layout/Banner.astro';
+import Stamp from '@/shared/ui/Stamp.astro';
+import stampCss from '@/shared/ui/stamp.css?inline';
+import stampCornerCss from '@/shared/ui/stamp-corner.css?inline';
 
-type Props = { title: string; description?: string };
+type Props = { title: string; description?: string; stamp?: string };
 
-const { title, description } = Astro.props;
+const { title, description, stamp } = Astro.props;
 ---
 
+{stamp && <style is:inline set:html={stampCss + stampCornerCss} />}
 <Banner height="clamp(176px, 22vh, 232px)">
-  <div class="flex items-end justify-between gap-8">
-    <div>
-      <h1 class="flex items-center gap-2.5 font-pixel text-page-title font-semibold leading-[1.15] text-balance">
-        <slot name="icon" />{title}
-      </h1>
-      {description && <p class="mt-2 max-w-[60ch] text-pretty text-[1.0625rem] leading-[1.55] text-text-secondary">{description}</p>}
+  <div class="relative">
+    {stamp && <Stamp class="stamp-corner">{stamp}</Stamp>}
+    <div class="flex items-end justify-between gap-8">
+      <div>
+        <h1 class="flex items-center gap-2.5 font-pixel text-page-title font-semibold leading-[1.15] text-balance">
+          <slot name="icon" />{title}
+        </h1>
+        {description && <p class="mt-2 max-w-[60ch] text-pretty text-[1.0625rem] leading-[1.55] text-text-secondary">{description}</p>}
+      </div>
+      <slot />
     </div>
-    <slot />
   </div>
 </Banner>

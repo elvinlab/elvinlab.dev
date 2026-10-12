@@ -1,0 +1,15 @@
+/* Placement of a stamp in a page header or banner (PageHeader, TopicPage): above the title on phones,
+   over the top-right corner of the header block from md. In its own file, not in `stamp.css` and not
+   as Tailwind utilities, so the note pages (which inline `stamp.css`) and the site stylesheet do not
+   pay for it. The parent of the stamp is `position: relative`. */
+.stamp-corner {
+  margin-bottom: 0.75rem;
+}
+@media (min-width: 768px) {
+  .stamp-corner {
+    position: absolute;
+    top: -1.25rem;
+    right: 0;
+    margin-bottom: 0;
+  }
+}
