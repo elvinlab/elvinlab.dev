@@ -3,13 +3,14 @@ number: 9
 title: "Publicar una nota ya no cuesta un CI completo"
 description: "Publicar una nota era un release con todo el CI y nueve pasos a mano. Separé los dos problemas: un comando para los pasos y un carril rápido para el CI."
 pubDate: 2026-10-12
+updatedDate: 2026-10-12
 lang: es
 category: decisiones
 tags: [ci, verificacion, rendimiento, flujo-de-trabajo]
 decision:
   context: "Cada nota es un archivo del repo, así que publicarla era un release a main: todo el CI (más de 4 minutos en el último release) más nueve pasos manuales. Para cambiar un texto era demasiado."
   decision: "Un comando, pnpm publish-note, hace los pasos; y un carril rápido en el CI salta e2e y Lighthouse si el push solo toca notas. Descarté un CMS, editar desde la web de GitHub y programar publicaciones."
-  outcome: "El comando y el carril están en producción y probados en seco, pero el tiempo real del carril aún no lo medí: el primer push solo de notas es esta misma nota."
+  outcome: "Publicar esta nota tomó 15 s de comando y 89 s de CI, frente a 325 s del CI completo anterior (73 % menos). Su primera publicación la frenó el presupuesto de peso, y eso destapó un defecto de diseño."
 ---
 
 ## Publicar una nota era más trabajo que escribirla
@@ -78,12 +79,36 @@ Es un recorte con un costo que prefiero nombrar: si una nota usa un diseño raro
 
 **Una auditoría por commit.** La auditoría del changelog exige que la entrada viaje en el mismo commit que cada cambio de tipo `feat`. Había dejado la entrada para el final y la auditoría lo notó. Como los commits no se habían empujado todavía, integré la entrada al commit correspondiente.
 
-## Qué no sé todavía
+## El primer run, con el CI completo
 
 El run de CI que desplegó este cambio usó el CI completo, porque tocaba el propio workflow. Así quedó, con `changes` resuelto en 3 segundos y `notes-gate` saltado, que es lo correcto cuando el push no es solo de notas:
 
 ![Salida real de gh run view para el CI del release: changes en 3 segundos, static en 54 segundos, cuatro shards de e2e entre 2 min 53 s y 3 min 41 s, dos de Lighthouse de 3 min 28 s y 4 min 13 s, notes-gate saltado, checks en 3 segundos y deploy en 42 segundos, todo en verde.](./ci-del-release.png)
 
-Ese run tampoco salió limpio a la primera. Lighthouse falló en `/me/`: una de sus tres corridas midió un salto de layout de 0,31 (el límite es 0,1) y las otras dos, prácticamente cero. El release no tocaba ninguna página, así que repetí solo el job fallido y pasó todo. En la repetición, el camino más largo fueron los 4 min 13 s de Lighthouse más 42 s de deploy. No sé todavía si es un salto real e intermitente de esa página; lo dejo anotado para investigarlo. De paso, es una buena razón para el carril rápido: publicar una nota no debería depender de esa lotería.
+Ese run tampoco salió limpio a la primera. Lighthouse falló en `/me/`: una de sus tres corridas midió un salto de layout de 0,31 (el límite es 0,1) y las otras dos, prácticamente cero. El release no tocaba ninguna página, así que repetí solo el job fallido y pasó todo. En la repetición, el camino más largo fueron los 4 min 13 s de Lighthouse más 42 s de deploy. No sé todavía si es un salto real e intermitente de esa página; lo dejé como un issue del repositorio para investigarlo. De paso, es una buena razón para el carril rápido: publicar una nota no debería depender de esa lotería.
 
-Del carril rápido en sí todavía no tengo ningún tiempo, solo que la regla decide bien en seco y que el workflow pasa el linter de GitHub Actions. El primer push que solo toque notas es la publicación de esta nota. Cuando termine, anoto aquí el tiempo real, sea el que sea.
+## La primera publicación se detuvo sola
+
+Con todo eso en producción, intenté publicar esta nota con el comando. No llegó a empujar nada: el comando devolvió el borrador a `drafts/` y se detuvo. No fue por la nota. Falló la página del tema *Rendimiento y verificación*, que superó su límite de HTML por 718 bytes porque la nota entra en ese tema por sus etiquetas.
+
+El límite de esas páginas era un número fijo, mientras que el del índice de notas ya crecía con cada nota. Era el mismo defecto que ya había parchado para el índice, ahora en otra página. Subir otro número habría funcionado, y habría vuelto a pasar con la siguiente nota. En lugar de eso cambié la regla:
+
+- Las páginas de tema tienen un margen fijo más 800 bytes por cada nota que listan, bajo un techo absoluto que obliga a paginar.
+- Cada tipo de página tiene que declararse como fijo o como creciente con el contenido, y un test lo exige. Si añado un tipo nuevo sin decidirlo, falla.
+- El chequeo de tamaño imprime cuántas notas más caben. Con esta nota ya publicada: el índice aguanta unas 14 más antes de necesitar paginación, y cada tema unas 43.
+
+Lo que protege el rendimiento sigue estricto: el CSS y la estructura fija de la página no se relajaron.
+
+## Lo que medí al publicarla
+
+Esta nota fue el primer push que solo tocaba notas.
+
+![Salida real de gh run view para el CI de esta nota: static en 42 segundos, changes en 5, notes-gate en 27, e2e y Lighthouse saltados, checks en 3 segundos y deploy en 34 segundos, todo en verde.](./ci-de-la-nota.png)
+
+- **El comando:** 15 segundos desde que lo ejecuté hasta el push, con el build y los dos presupuestos de tamaño incluidos.
+- **El CI:** 89 segundos de principio a fin. El CI completo del release anterior tardó 325 segundos, así que son 73 % menos. Es una sola muestra de cada tipo y ambas cuentan la espera para arrancar los runners, así que tómalo como orden de magnitud.
+- **En producción:** la nota, su tarjeta de compartir y las imágenes (optimizadas a WebP en el build) respondieron bien, y `version.txt` coincidía con el commit.
+
+## Qué sigue sin resolver
+
+Dos cosas. La intermitencia de `/me/` sigue sin causa conocida: está en el issue y no la voy a esconder detrás de un reintento. Y todavía no tengo una política para las mediciones ruidosas del CI (Lighthouse, accesibilidad): hoy un fallo aislado bloquea el release y lo repito yo a mano. La idea es un reintento automático que deje el fallo anotado en el resumen del run, para que no se esconda.
