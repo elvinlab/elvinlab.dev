@@ -27,7 +27,7 @@ Publishing note 009 was stopped by the page-weight budget of a topic page (+718 
 ## Tasks
 - [x] **T1 — Topic pages scale by listed notes** (route: inline; trigger: verification script and one component, Tier 3). `topicNoteCount` + `data-topic-notes` marker, `topic` budget with `htmlBytesPerNote` 800 and `maxHtmlBytes` 120000, tests, changelog entry. Commit 2bce379.
 - [x] **T2 — Show the room left** (route: inline). Report line and `publish-note` output telling how many more notes each scaled type fits; warning (not failure) under 5. RED observed (6 failing: `notesRoom` missing), then 55/55 GREEN; typecheck 0 errors; a real build prints `Room left: notes-index +15 notes, topic +43 notes`.
-- [ ] **T3 — Guard test and docs** (route: inline). A test over the real `page-weight-budget.json` that every listing type declares an allowance and a ceiling; TESTING.md and ADR note on "how to add a listing page type".
+- [x] **T3 — Guard test and docs** (route: inline). A test over the real `page-weight-budget.json` that every listing type declares an allowance and a ceiling; TESTING.md section on how a page type grows and how to add a listing type (the ADR for both pieces comes with piece 2). RED observed (4 failing: constants missing), then 60/60 GREEN; typecheck and lint exit 0 (checked by exit code, after an earlier `| tail` masked a lint failure).
 - [ ] **T4 — Noisy-gate policy** (route: inline). Retry once and report flakes (Playwright and Lighthouse) in the run summary; document which gates may retry.
 - [ ] **T5 — Issue for the `/me/` CLS** (route: inline; remote write, authorized by the owner with the plan). One GitHub issue written as a delegation brief with evidence.
 
@@ -45,4 +45,4 @@ Publishing note 009 was stopped by the page-weight budget of a topic page (+718 
 - First full `pnpm verify --run`: 811 of 812 e2e passed; the one failure (axe on `/en/contact/`, dark) passed 2/2 on rerun, so it is intermittent and unrelated to this change. Not recorded in the ledger because that run was not green.
 
 ## Next step
-T3: guard test over the real budget file, and docs.
+Run the whole stack once (`pnpm verify --run --record`), then T4 (noisy-gate policy) and T5 (issue for the `/me/` CLS).

@@ -200,6 +200,37 @@ overlong articles, excessive index size, and absent/malformed boundaries fail. O
 retain the existing absolute-HTML behavior. Follow `docs/NOTES.md` when publishing: build and run
 both size checks before releasing, then let main CI run all gates and verify the deployed version.
 
+### Page types are fixed or grow with content, and the room left is visible (2026-10-12)
+
+The notes index broke on note growth (notes 004–007), then the topic pages did (note 009, +718 B
+over a fixed limit). Patching one page type at a time was the wrong shape, so the rule is now
+written once in `page-weight-budget.ts`:
+
+- **Every page type is on one side.** `CONTENT_GROWTH` lists the types whose HTML grows with the
+  content and what grows it: `notes-index` and `topic` (listed notes) and `note` (article body).
+  Every other type is in `FIXED_PAGE_TYPES` and stays strict. `/me` shows only three notes and the
+  home list is bounded, so they are fixed. Adding a type to `PAGE_TYPES` without placing it on a
+  side fails `page-weight-budget.test.ts`.
+- **A scaled budget is a fixed shell plus an allowance per listed note, under an absolute ceiling.**
+  Topic pages use `htmlBytes` 81000 B, 800 B per listed note (a row costs about 720 B) and a
+  `maxHtmlBytes` of 120000 B. The page states how many notes it lists in a `data-topic-notes`
+  attribute on `TopicPage`; do not reuse `NoteIndexRow`'s markup for the count, because the home
+  and `/me` render it too and `/me` has very little HTML headroom. The test over the real
+  `page-weight-budget.json` requires an allowance and a ceiling on each type that lists notes, and
+  forbids any content allowance on a fixed type.
+- **The limit is visible before it blocks a publish.** Each scaled row prints `room +N notes`
+  (how many more fit under the ceiling at the per-note allowance), the table ends with
+  `Room left: notes-index +15 notes, topic +43 notes`, and a row with fewer than 5 notes of room
+  gets a `WARN` line. A warning never fails the check; at zero room, paginate or simplify the
+  listing instead of raising the ceiling automatically. `pnpm publish-note` prints this report
+  because it runs the check before pushing.
+- **CSS and the fixed shell stay strict on purpose.** They are what protects the LCP, so a new
+  utility or a longer intro still has to be a conscious decision.
+
+To add a page type that lists content: add it to `PAGE_TYPES` and `CONTENT_GROWTH`, give it
+`htmlBytesPerNote` and `maxHtmlBytes` in the JSON, and make the page expose its item count the way
+`TopicPage` does.
+
 ### The note-page LCP gate is sensitive to a few bytes
 
 > **Correction and fix (2026-10-05).** The sizes in this section (about 98 KB of HTML and 52 KB of inline CSS, later 94 KB and 48 KB) are from `wc -c` on the **real** build (`apps/web/dist`). The Lighthouse gate did not measure that page: its fixture (`fixture-preview.ts`, built through `createFixtureWorkspace`) inlined the layout stylesheet **twice** because the workspace did not copy the root `.gitignore` (the gate's own report showed a 126,930 byte note document against about 94 KB in production, and 14 `@font-face` rules against 7). `createFixtureWorkspace` now copies `.gitignore` (test in `fixture-workspace.test.ts`). Re-measured with `pnpm test:lighthouse` after the fix, worst of three runs: `/notes/smoke-es/` document 123.5 to 80.6 KB and LCP 2414 to **2264 ms** (margin to the 2500 ms budget about 86 to about 236 ms); `/` 2368 to 2216 ms; `/contact/` 2259 to 1810 ms; performance score 97 to 99 on all six URLs. The LCP numbers and byte boundaries in the table and the headroom paragraph below were measured on the doubled fixture, so they are **outdated**: the one-round-trip boundary now sits at different byte counts and has to be re-measured before relying on "a few hundred bytes". Why a missing `.gitignore` doubles the sheet is not traced (the build tooling reads it); the cause was found by changing one file of the workspace at a time.

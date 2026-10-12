@@ -10,18 +10,36 @@ import { fileURLToPath } from 'node:url';
  * See `docs/TESTING.md` ("Page weight budget") and `docs/DESIGN.md` ("Page weight rule").
  */
 
-export type PageType =
-  | 'home'
-  | 'me'
-  | 'experiments'
-  | 'changelog'
-  | 'contact'
-  | 'subscribe'
-  | 'result'
-  | 'notes-index'
-  | 'note'
-  | 'topic'
-  | 'default';
+export const PAGE_TYPES = [
+  'home',
+  'me',
+  'experiments',
+  'changelog',
+  'contact',
+  'subscribe',
+  'result',
+  'notes-index',
+  'note',
+  'topic',
+  'default',
+] as const;
+
+export type PageType = (typeof PAGE_TYPES)[number];
+
+/**
+ * The page types whose HTML grows with the content, and what grows it. Every other type is fixed and
+ * stays strict. Adding a page type to `PAGE_TYPES` without deciding which side it is on fails
+ * `page-weight-budget.test.ts`, so growth is a decision made once, not a budget patched later.
+ */
+export const CONTENT_GROWTH = {
+  'notes-index': 'listed-notes',
+  topic: 'listed-notes',
+  note: 'article-body',
+} as const satisfies Partial<Record<PageType, 'listed-notes' | 'article-body'>>;
+
+export const FIXED_PAGE_TYPES: readonly PageType[] = PAGE_TYPES.filter(
+  (type) => !(type in CONTENT_GROWTH),
+);
 
 export interface PageWeight {
   /** URL path of the page, e.g. `/en/me/`. */

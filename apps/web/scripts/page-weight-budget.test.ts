@@ -1,4 +1,4 @@
-import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
+import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { dirname, join } from 'node:path';
 
@@ -7,13 +7,16 @@ import { afterEach, describe, expect, it } from 'vitest';
 import {
   articleContentBytes,
   type Budgets,
+  CONTENT_GROWTH,
   classifyPage,
   collectPageWeights,
   evaluatePages,
+  FIXED_PAGE_TYPES,
   formatReport,
   inlineStyleBytes,
   noteRowCount,
   notesRoom,
+  PAGE_TYPES,
   suggestBudgets,
 } from './page-weight-budget.ts';
 
@@ -452,5 +455,50 @@ describe('suggestBudgets', () => {
     );
     expect(suggested.note).toEqual({ styleBytes: 2100, htmlBytes: 5200 });
     expect(suggested.home).toEqual({ styleBytes: 200, htmlBytes: 200 });
+  });
+});
+
+describe('the committed budget file', () => {
+  const { types } = JSON.parse(
+    readFileSync(join(import.meta.dirname, 'page-weight-budget.json'), 'utf8'),
+  ) as Budgets;
+
+  it('decides, for every page type, whether it is fixed or grows with content', () => {
+    const grows = Object.keys(CONTENT_GROWTH);
+    expect([...grows, ...FIXED_PAGE_TYPES].sort()).toEqual([...PAGE_TYPES].sort());
+    expect(grows.filter((type) => FIXED_PAGE_TYPES.includes(type as never))).toEqual([]);
+  });
+
+  it('gives every type a budget, or lets it fall back to a default that exists', () => {
+    expect(types.default).toBeDefined();
+  });
+
+  it('declares a per-note allowance and a ceiling for each type that lists notes', () => {
+    for (const [type, growth] of Object.entries(CONTENT_GROWTH)) {
+      const budget = types[type as keyof typeof types];
+      if (growth !== 'listed-notes') continue;
+      expect(budget?.htmlBytesPerNote, `${type} needs htmlBytesPerNote`).toBeGreaterThan(0);
+      expect(budget?.maxHtmlBytes, `${type} needs a maxHtmlBytes ceiling`).toBeGreaterThan(
+        budget?.htmlBytes ?? Number.POSITIVE_INFINITY,
+      );
+    }
+  });
+
+  it('declares an article ceiling for the type that renders a note body', () => {
+    for (const [type, growth] of Object.entries(CONTENT_GROWTH)) {
+      if (growth !== 'article-body') continue;
+      expect(
+        types[type as keyof typeof types]?.articleBytes,
+        `${type} needs articleBytes`,
+      ).toBeGreaterThan(0);
+    }
+  });
+
+  it('keeps fixed types strict: no content allowance on a page that should not grow', () => {
+    for (const type of FIXED_PAGE_TYPES) {
+      const budget = types[type];
+      expect(budget?.htmlBytesPerNote, `${type} is fixed`).toBeUndefined();
+      expect(budget?.articleBytes, `${type} is fixed`).toBeUndefined();
+    }
   });
 });
