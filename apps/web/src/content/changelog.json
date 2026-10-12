@@ -654,31 +654,31 @@
     "description": "The size check now budgets article text separately from the fixed page shell and scales the notes index by its actual row count. Article and index ceilings still catch excessive growth; CSS, JavaScript and Lighthouse limits stay unchanged. The publishing and testing guides explain the rule."
   },
   "note-008": {
-    "date": "2026-10-11",
+    "date": "2026-10-12",
     "category": "added",
     "title": "New Lab Note 008: verify only what a change touches",
     "description": "How pnpm verify picks the checks a change needs (from 340 s for everything to 53 s for a note), what the import graph missed, and why CI on main still runs the whole stack. A shorter note with four images of real output."
   },
   "notes-area-polish": {
-    "date": "2026-10-11",
+    "date": "2026-10-12",
     "category": "changed",
     "title": "A calmer notes index and tidier note pages",
     "description": "The notes index has no boxes around the search and the sidebar, and the language tag now sits next to the date. On a note, \"Related notes\" no longer repeats the previous and next cards, long titles no longer break at a hyphen, inline code such as --auto stays in one piece, two-line headings are tighter, and the dashed rules in the dark theme are a little firmer."
   },
   "readability-touch-ups": {
-    "date": "2026-10-11",
+    "date": "2026-10-12",
     "category": "changed",
     "title": "Shorter changelog lines, clearer gallery thumbnails",
     "description": "Changelog entries stop at a comfortable line length instead of spanning the whole page. On phones the experiment gallery thumbnails are larger and no longer look faded. The RSS feed title uses a middle dot instead of a dash."
   },
   "notes-start-here": {
-    "date": "2026-10-11",
+    "date": "2026-10-12",
     "category": "added",
     "title": "A \"Start here\" reading path for the notes",
     "description": "The notes index opens with three hand-picked notes, each with one line on why to start there, so a visitor who is not drawn to the newest note has a way in. At the end of every note, \"Related notes\" becomes \"Keep reading\": those same entry points first, then related notes. It is static HTML, with no new JavaScript."
   },
   "notes-topic-pages": {
-    "date": "2026-10-11",
+    "date": "2026-10-12",
     "category": "added",
     "title": "Topic pages for the notes",
     "description": "Three themes (AI agents, performance and verification, this site's architecture) now have their own pages at /notes/tag/<topic>/, each with a short introduction and its notes, so search engines and readers can follow a theme. Tag chips link to the topic when there is one, and /notes/ lists the topics. Static HTML, with no new JavaScript; fork owners define topics in topics.json."

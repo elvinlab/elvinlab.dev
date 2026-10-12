@@ -32,9 +32,9 @@
       }
     },
     "changelog": {
-      "why": "Release days grouped by kind, 4 days per page (page 1 opens the 2 newest); the flat list was about 130 KB, and the page CSS ships only here. The compact lab-paper banner of the inner pages adds about 2.2 KB of CSS (this page's sheet did not carry the banner styles) and 2.9 KB of HTML.",
+      "why": "Release days grouped by kind, 4 days per page (page 1 opens the 2 newest); the flat list was about 130 KB, and the page CSS ships only here. The compact lab-paper banner of the inner pages adds about 2.2 KB of CSS (this page's sheet did not carry the banner styles) and 2.9 KB of HTML. Release of 2026-10-12: html 113000 -> 115800 (measured 115792 on page 2): each new release day pushes the oldest day of page 1 onto page 2.",
       "styleBytes": 58700,
-      "htmlBytes": 113000,
+      "htmlBytes": 115800,
       "measured": {
         "styleBytes": 58255,
         "htmlBytes": 110833,
