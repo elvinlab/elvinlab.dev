@@ -9,10 +9,12 @@ import { Comments } from '@/features/comments/index.ts';
 import { MarkSection } from '@/features/marks/index.ts';
 import DecisionRecord from '@/features/notes/components/DecisionRecord.astro';
 import LangBadge from '@/features/notes/components/LangBadge.astro';
+import noteProseCss from '@/features/notes/components/note-prose.css?inline';
 import PrevNext from '@/features/notes/components/PrevNext.astro';
 import ReadingMode from '@/features/notes/components/ReadingMode.astro';
 import ReadingProgress from '@/features/notes/components/ReadingProgress.astro';
 import RelatedNotes from '@/features/notes/components/RelatedNotes.astro';
+import recordCardCss from '@/features/notes/components/record-card.css?inline';
 import ShareCard from '@/features/notes/components/ShareCard.astro';
 import Toc from '@/features/notes/components/Toc.astro';
 import { loadTopics } from '@/features/notes/lib/load-topics.ts';
@@ -33,6 +35,7 @@ import Banner from '@/shared/layout/Banner.astro';
 import BaseLayout from '@/shared/layout/BaseLayout.astro';
 import { noteCardPath } from '@/shared/seo/og.ts';
 import Chip from '@/shared/ui/Chip.astro';
+import stampCss from '@/shared/ui/stamp.css?inline';
 
 type Props = { entry: CollectionEntry<'notes'>; locale: Locale };
 
@@ -73,6 +76,8 @@ const readingLabel = t(locale, 'notes.readingTime', { min: readingMinutes(entry.
 
 <BaseLayout locale={locale} path={path} title={data.title} description={data.description} translated={false} {...(alternates.length > 0 && { alternates })} translations={translations} article={{ pubDate: data.pubDate, updatedDate: data.updatedDate, tags: data.tags }} ogImage={noteCardPath(entry.id)}>
   <ReadingMode slot="head" part="boot" locale={locale} />
+  {/* Inlined here, minified by `?inline`: a bundled CSS import leaks into every page that reaches NotePage through the feature barrel (measured +4.3 KB of style on the home, privacy, subscribe and topic pages), while this ships only with a rendered note. */}
+  <style slot="head" is:inline set:html={noteProseCss + recordCardCss + stampCss} />
   <ReadingProgress slot="banner" />
   <Banner slot="banner" height="360px">
     <BackgroundCanvas slot="background" />
@@ -102,13 +107,13 @@ const readingLabel = t(locale, 'notes.readingTime', { min: readingMinutes(entry.
 
   <article data-article class="flex flex-col gap-8 rounded-card bg-card p-6 md:p-10">
     <ReadingMode part="toggle" locale={locale} />
-    <div data-record-inline class="lg:hidden"><DecisionRecord locale={locale} decision={data.decision} /></div>
+    <div data-record-inline class="lg:hidden"><DecisionRecord locale={locale} decision={data.decision} variant="card" /></div>
     <template data-page-weight-start></template><div class="prose"><Content /></div><template data-page-weight-end></template>
 
     <div class="flex flex-col gap-3 border-t border-dashed border-divider pt-6">
       <div class="flex flex-wrap items-center gap-1.5">
         {secondaryMetaSlot === 'foot' && <LangBadge lang={data.lang} />}
-        {data.tags.map((tag) => <Chip href={tagHref(tag, topicTags)}>#{tag}</Chip>)}
+        {data.tags.map((tag) => <Chip href={tagHref(tag, topicTags)} class="active:scale-96">#{tag}</Chip>)}
       </div>
       <p class="flex flex-wrap gap-x-3 gap-y-1 font-mono text-meta text-muted">
         {secondaryMetaSlot === 'foot' && <span class="whitespace-nowrap">{site.identity.name}</span>}

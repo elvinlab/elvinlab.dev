@@ -71,10 +71,57 @@
   }
 }
 
+/* Cross-page view transitions (DESIGN.md "Page transitions"). CSS only; unsupported browsers (Firefox)
+   and reduced motion navigate normally. The navbar is its own group, so it stays put instead of
+   re-entering on every page. The page below keeps its own staggered entrance (`animate-fade-in-up`)
+   as the one entrance, so the default root cross-fade is switched off: it would fade the LCP element's
+   whole page and stack on that entrance. Opaque layers need `normal` blending (the default
+   `plus-lighter` adds them up to white). */
+@media (prefers-reduced-motion: no-preference) {
+  @view-transition {
+    navigation: auto;
+  }
+  [data-navbar] {
+    view-transition-name: site-nav;
+  }
+  ::view-transition-group(*) {
+    animation-duration: 150ms;
+  }
+  ::view-transition-old(root),
+  ::view-transition-new(root) {
+    mix-blend-mode: normal;
+    animation: none;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-group(*),
+  ::view-transition-old(*),
+  ::view-transition-new(*) {
+    animation: none;
+  }
+}
+
 /* The header is sticky (72 px): without this offset, moving focus up the page or following an anchor
    scrolls the target under it. Matches the 6rem of `.prose h2`. */
 html {
   scroll-padding-top: 6rem;
+  /* Native feel: no scroll chaining (`contain` keeps the native bounce, `none` would not), no grey tap flash (pressed state is `active:scale-96`). */
+  overscroll-behavior: contain;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Notched screens (`viewport-fit=cover`): keep chrome and content off the cutouts. Every inset is 0 on
+   ordinary screens, so nothing moves there. */
+body {
+  padding-inline: env(safe-area-inset-left) env(safe-area-inset-right);
+}
+
+[data-navbar] {
+  padding-top: env(safe-area-inset-top);
+}
+
+[data-site-footer] {
+  padding-bottom: max(2rem, env(safe-area-inset-bottom));
 }
 
 /* Article body (design v3): 68ch measure, generous line height, dashed dividers, pink quote bar. */

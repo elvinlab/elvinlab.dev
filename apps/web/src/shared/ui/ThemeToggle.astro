@@ -27,6 +27,12 @@ const { label } = Astro.props;
 
   const root = document.documentElement;
 
+  /** Browser UI color follows the page theme; overrides both scheme-scoped tags, which stay as the no-JS fallback. */
+  const syncThemeColor = (): void => {
+    const color = getComputedStyle(root).getPropertyValue('--color-page').trim();
+    for (const meta of document.querySelectorAll('meta[name=theme-color]')) meta.setAttribute('content', color);
+  };
+
   /** Applies a theme without letting every color transition fire at once (the switch snaps). */
   const applyTheme = (name: string): void => {
     const freeze = document.createElement('style');
@@ -34,6 +40,7 @@ const { label } = Astro.props;
     document.head.append(freeze);
     root.setAttribute('data-theme', name);
     void root.offsetHeight;
+    syncThemeColor();
     requestAnimationFrame(() => freeze.remove());
   };
 
@@ -45,6 +52,7 @@ const { label } = Astro.props;
     }
   };
 
+  syncThemeColor();
   for (const button of document.querySelectorAll<HTMLButtonElement>('[data-theme-toggle]')) {
     const themes = JSON.parse(button.dataset['themes'] ?? '[]') as ThemeOption[];
     const storageKey = button.dataset['storageKey'] ?? 'theme';

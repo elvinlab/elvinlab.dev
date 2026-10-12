@@ -79,7 +79,7 @@ const preloadedFonts = pixelTitle ? [pixelifySansLatin] : [];
 <html lang={locale} data-theme={DEFAULT_THEME} data-appearance={appearance}>
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     {preloadedFonts.map((href) => (
       <link rel="preload" as="font" type="font/woff2" href={href} crossorigin />
     ))}

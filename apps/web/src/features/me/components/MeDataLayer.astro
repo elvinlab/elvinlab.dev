@@ -1,0 +1,27 @@
+---
+/** Collapsed "raw data" block of `/me`: the page's own configuration as `field / type / value` rows (native
+ * `<details>`, no script). Rows come from `buildDataRows`; nothing here is a literal. */
+import { buildDataRows } from '@/features/me/lib/data-rows.ts';
+import { site } from '@/shared/config/index.ts';
+import { type Locale, t } from '@/shared/i18n/index.ts';
+
+type Props = { locale: Locale };
+
+const { locale } = Astro.props;
+const rows = buildDataRows({ identity: site.identity, headline: site.me.headline, stack: site.me.stack }, locale);
+---
+
+<details class="border-t border-dashed border-divider pt-3 print:hidden">
+  <summary class="flex min-h-11 cursor-pointer list-none items-center gap-2 font-mono text-meta font-medium text-primary marker:hidden">
+    {t(locale, 'me.data.summary')}
+  </summary>
+  <p class="font-mono text-meta text-muted">{t(locale, 'me.data.cols')}</p>
+  <dl class="mt-2 flex flex-col gap-2 font-mono text-meta">
+    {rows.map((row) => (
+      <div class="flex flex-col">
+        <dt class="text-muted">{row.field} <span class="text-primary">{row.type}</span></dt>
+        <dd class="text-text-secondary">{row.value}</dd>
+      </div>
+    ))}
+  </dl>
+</details>

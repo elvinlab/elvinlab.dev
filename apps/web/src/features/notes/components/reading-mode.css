@@ -86,3 +86,9 @@ html[data-reading] [data-record-banner] {
 html[data-reading] [data-record-inline] {
   display: block;
 }
+/* The section numbers hung in the margin need room the one calm column does not have: they sit above
+   the heading, as on phones. The margin bar keeps its stroke. */
+html[data-reading] .prose h2::before {
+  position: static;
+  margin: 0 0 0.4rem;
+}

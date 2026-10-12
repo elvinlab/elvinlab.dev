@@ -25,10 +25,15 @@ import Banner from '@/shared/layout/Banner.astro';
 import BannerToggle from '@/shared/layout/BannerToggle.astro';
 import BaseLayout from '@/shared/layout/BaseLayout.astro';
 import { resolveAvatar } from '@/shared/lib/avatar.ts';
+import { splitMarked } from '@/shared/lib/inline-mark.ts';
+import Ink from '@/shared/ui/Ink.astro';
+import inkCss from '@/shared/ui/ink-underline.css?inline';
 
 type Props = { locale: Locale };
 
 const { locale } = Astro.props;
+// `[[...]]` in the headline copy marks the phrase that gets the ink underline (shared/lib/inline-mark.ts).
+const headline = splitMarked(t(locale, 'home.headline'));
 const pills = [t(locale, 'home.pill.1'), t(locale, 'home.pill.2'), t(locale, 'home.pill.3')];
 
 const noteEntries = isEnabled('blog') ? await getCollection('notes') : [];
@@ -49,15 +54,21 @@ const experiments = homeSections.experiments
   : [];
 ---
 
-<BaseLayout locale={locale} path="/">
+<BaseLayout locale={locale} path="/" title={site.identity.name}>
   <link slot="head" rel="preload" as="font" type="font/woff2" href={pixelifySansLatin} crossorigin />
-  <Banner slot="banner" height="150px" expandedHeight="clamp(440px, 56vh, 520px)" compactExpandedHeight="29rem" expandable>
+  {/* Inlined in the head, not bundled: a bundled import would leak into every page that reaches Home through the feature barrel. */}
+  <style slot="head" is:inline set:html={inkCss} />
+  <Banner slot="banner" height="150px" expandedHeight="clamp(440px, 56vh, 520px)" compactExpandedHeight="30rem" expandable>
     <BackgroundCanvas slot="background" />
     <BannerToggle slot="toggle" locale={locale} />
     <div data-hero-content data-home-hero class="flex flex-col md:grid md:grid-cols-[minmax(0,1fr)_auto] lg:grid-cols-[minmax(0,1fr)_280px] md:items-end md:gap-12">
       <div class="flex flex-col">
+        <p data-hero-byline class="mb-1 flex flex-col gap-0.5 md:hidden">
+          <span class="font-display text-lg font-bold">{site.identity.name}</span>
+          <span class="text-sm text-text-secondary">{site.identity.role[locale]}</span>
+        </p>
         <h1 class="max-w-hero font-pixel text-hero font-semibold leading-[1.1] text-balance">
-          {t(locale, 'home.headline')}<span aria-hidden="true" class="ml-1 inline-block h-3 w-2.5 bg-pink align-baseline md:h-4"></span>
+          {headline.map((part) => (part.marked ? <Ink inlineCss={false}>{part.text}</Ink> : part.text))}<span aria-hidden="true" class="ml-1 inline-block h-3 w-2.5 bg-pink align-baseline md:h-4"></span>
         </h1>
         <p class="mt-4 max-w-[52ch] text-intro leading-relaxed text-text-secondary">{t(locale, 'home.intro')}</p>
         {homeSections.heroPills && (

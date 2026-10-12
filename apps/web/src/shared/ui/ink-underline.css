@@ -1,0 +1,28 @@
+/* `Ink` underline strokes; see Ink.astro. Emitted once per rendered page, only where an underline is used. */
+.ink-underline {
+  padding-bottom: 0.15em;
+  background-repeat: no-repeat;
+  background-size: 100% 0.4em;
+  background-position: 0 100%;
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
+}
+[data-theme="elvinlab-dark"] .ink-underline {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 8' preserveAspectRatio='none'%3E%3Cpath d='M1 5 C20 2 40 7 60 4 S88 3 99 5' fill='none' stroke='%23ec4899' stroke-width='2.2' stroke-linecap='round' vector-effect='non-scaling-stroke'/%3E%3C/svg%3E");
+}
+[data-theme="elvinlab-light"] .ink-underline {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 8' preserveAspectRatio='none'%3E%3Cpath d='M1 5 C20 2 40 7 60 4 S88 3 99 5' fill='none' stroke='%23be185d' stroke-width='2.2' stroke-linecap='round' vector-effect='non-scaling-stroke'/%3E%3C/svg%3E");
+}
+@media (prefers-reduced-motion: no-preference) {
+  .ink-underline {
+    animation: ink-grow 700ms cubic-bezier(0.65, 0, 0.35, 1) 400ms both;
+  }
+}
+@keyframes ink-grow {
+  from {
+    background-size: 0 0.4em;
+  }
+  to {
+    background-size: 100% 0.4em;
+  }
+}

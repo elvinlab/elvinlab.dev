@@ -97,7 +97,7 @@ for (const slug of ['smoke-es', 'smoke-es-next', 'smoke-en']) {
   });
 }
 
-test('the decision record in the banner has a visible dashed border in the dark theme', async ({
+test('the decision record in the banner has a visible solid index-card border in the dark theme', async ({
   page,
 }, testInfo) => {
   test.skip(testInfo.project.name !== 'chromium-1280', 'the banner record shows from lg');
@@ -109,7 +109,8 @@ test('the decision record in the banner has a visible dashed border in the dark 
     const style = getComputedStyle(record);
     return { style: style.borderTopStyle, color: style.borderTopColor };
   });
-  expect(border?.style).toBe('dashed');
+  // Index card (DESIGN.md, "Decision record as an index card"): a 1 px solid divider, no longer dashed.
+  expect(border?.style).toBe('solid');
   // The dark divider is white at 20 percent alpha (it was 14), so the alpha channel is 0.2.
   expect(border?.color).toMatch(/rgba\(255, 255, 255, 0\.2\)/);
 });

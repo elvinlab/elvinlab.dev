@@ -1,0 +1,48 @@
+---
+/** A visible correction, lab-notebook style: the mistake struck through in ink, the right version
+ * right after it. `<del>`/`<ins>` carry the meaning; the hidden label makes a screen reader say
+ * "wrong, corrected to, right" and is localized (`notes.fix.correctedTo`, from the page locale;
+ * the `label` prop overrides it). Use it sparingly: a handful per note (DESIGN.md, ink system).
+ *
+ * The strike is a per-line background (`box-decoration-break: clone`), so it survives a wrapped
+ * phrase. A background image cannot read a CSS variable, so the stroke color is written once per
+ * theme below (`#ec4899` dark, `#be185d` light = the pink token): the documented exception to
+ * "semantic tokens only". The CSS is scoped here, so only pages that use `Fix` pay for it. */
+import { LOCALES, type Locale, t } from '@/shared/i18n/index.ts';
+
+type Props = { wrong: string; right: string; label?: string };
+
+const { wrong, right, label } = Astro.props;
+const locale = (Astro.currentLocale ?? LOCALES.defaultLocale) as Locale;
+const hidden = label ?? t(locale, 'notes.fix.correctedTo');
+---
+
+<span class="fix"><del class="fix-wrong">{wrong}</del><span class="sr-only"> {hidden} </span>{' '}<ins class="fix-right">{right}</ins></span>
+
+<style>
+  .fix-wrong {
+    color: var(--color-muted);
+    text-decoration: none;
+    padding-inline: 0.1em;
+    background-repeat: no-repeat;
+    background-size: 100% 0.5em;
+    background-position: 0 58%;
+    -webkit-box-decoration-break: clone;
+    box-decoration-break: clone;
+  }
+  :global([data-theme='elvinlab-dark']) .fix-wrong {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 10' preserveAspectRatio='none'%3E%3Cpath d='M0 6 C18 2 34 9 52 4 S86 6 100 3' fill='none' stroke='%23ec4899' stroke-width='1.8' stroke-linecap='round' vector-effect='non-scaling-stroke'/%3E%3C/svg%3E");
+  }
+  :global([data-theme='elvinlab-light']) .fix-wrong {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 10' preserveAspectRatio='none'%3E%3Cpath d='M0 6 C18 2 34 9 52 4 S86 6 100 3' fill='none' stroke='%23be185d' stroke-width='1.8' stroke-linecap='round' vector-effect='non-scaling-stroke'/%3E%3C/svg%3E");
+  }
+  .fix-right {
+    display: inline-block;
+    text-decoration: none;
+    color: var(--color-pink);
+    font-style: italic;
+    font-weight: 600;
+    transform: rotate(-1deg);
+    overflow-wrap: anywhere;
+  }
+</style>

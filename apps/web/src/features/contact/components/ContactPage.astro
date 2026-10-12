@@ -8,7 +8,7 @@ import { localizePath } from '@elvinlab/core';
 import { ContactForm } from '@/features/contact/components/ContactForm.tsx';
 import { buildContactContent } from '@/features/contact/content.ts';
 import { integrations, site } from '@/shared/config/index.ts';
-import { LOCALES, type Locale } from '@/shared/i18n/index.ts';
+import { LOCALES, type Locale, t } from '@/shared/i18n/index.ts';
 import BaseLayout from '@/shared/layout/BaseLayout.astro';
 import { externalLinkAttrs } from '@/shared/lib/external-link.ts';
 import Card from '@/shared/ui/Card.astro';
@@ -28,7 +28,7 @@ const linkedin = site.socials.find((social) => social.icon === 'linkedin');
 ---
 
 <BaseLayout locale={locale} path="/contact/" title={content.pageTitle} description={content.pageDescription} pixelTitle>
-  <PageHeader slot="banner" title={content.pageTitle} description={content.pageDescription} />
+  <PageHeader slot="banner" title={content.pageTitle} description={content.pageDescription} stamp={t(locale, 'stamp.contact')} />
   <div class="flex flex-col gap-10 lg:grid lg:grid-cols-[minmax(0,36rem)_1fr] lg:items-start lg:gap-10">
     <article>
       <ContactForm client:visible siteKey={siteKey} strings={content.form} />
