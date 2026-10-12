@@ -306,23 +306,23 @@ creció la estructura fija. Si el índice llega a 180000 B, necesita paginación
 No subas límites automáticamente ni muevas elementos de interfaz entre los marcadores de contenido.
 Para una nota con imágenes grandes o mucho código, mide también esa URL real: Lighthouse usa fixtures.
 
-- **Editar**: cambia el texto y añade `updatedDate` con la fecha de hoy (no puede ser anterior a `pubDate`). Aparece en la nota y en los metadatos.
+- **Editar**: cambia el texto y añade `updatedDate` con la fecha de hoy (no puede ser anterior a `pubDate`). Aparece en la nota y en los metadatos. `publish-note` solo publica borradores: para una edición haz commit en `develop` y libera a mano ([guía de configuración, sección 7](CONFIGURATION.md#7-publicar-release-y-revertir)). Si el push solo toca notas, igualmente usa el carril rápido.
 - **No cambies el slug** (el nombre de la carpeta): es la URL y el sitio **no tiene redirecciones**; los enlaces y los comentarios apuntan a ella.
-- **Retirar**: mueve la carpeta de vuelta a `drafts/` (deja de publicarse en el siguiente release) o bórrala. La URL pasará a dar 404.
+- **Retirar**: mueve la carpeta de vuelta a `drafts/` (deja de publicarse en el siguiente release) o bórrala. La URL pasará a dar 404. Tampoco hay comando para esto: commit y release manual.
 
 ## 11. Lista de verificación antes de publicar
 
 - [ ] Una sola decisión, empezando por el problema; números y nombres, no adjetivos.
 - [ ] `title` ≤ 90, `description` ≤ 160, cada campo de `decision` ≤ 280, máximo 5 `tags`.
 - [ ] `category` y `tags` en minúsculas con guiones y coherentes con tus otras notas.
-- [ ] `pubDate` con la fecha real, en formato `AAAA-MM-DD`.
+- [ ] `pubDate`: `publish-note` lo pone con la fecha de hoy; en la publicación manual, con la fecha real en formato `AAAA-MM-DD`.
 - [ ] Sin título `#`; secciones con `##`.
 - [ ] Todas las imágenes tienen texto alternativo, miden unos 1.600 px de ancho como máximo y no muestran datos privados.
 - [ ] Ningún repositorio privado, ningún correo, ningún proyecto que aún no exista.
 - [ ] Si tiene traducción, `translationOf` apunta a una nota que también se publica.
 - [ ] Se lee bien en 360 px, en tema claro y oscuro y en modo lectura.
-- [ ] `pnpm test`, `typecheck`, `lint` y `build` pasan.
-- [ ] Después del build real, `pnpm check:page-weight` y `pnpm check:js-budget` pasan.
+- [ ] `pnpm test`, `typecheck`, `lint` y `build` pasan (`publish-note` ya ejecuta el build; el resto es del camino manual).
+- [ ] Después del build real, `pnpm check:page-weight` y `pnpm check:js-budget` pasan. `publish-note` **no** los ejecuta: los corre el CI (`notes-gate`) después del push y, si fallan, no hay deploy. En una nota larga o con imágenes grandes, córrelos antes de publicar.
 - [ ] La tarjeta de `dist/client/og/notes/<slug>.png` se ve bien.
 
 ## 12. Errores frecuentes
@@ -338,3 +338,8 @@ Para una nota con imágenes grandes o mucho código, mide también esa URL real:
 | La imagen no se muestra | La ruta relativa es incorrecta o el archivo no está junto a `index.mdx` |
 | El build dice «says it translates … which does not exist» | `translationOf` apunta a un slug que no existe o es un borrador: publica ambas notas o quita `translationOf` |
 | La tabla se ve plana en el móvil | Las tablas no tienen estilo propio: cámbiala por una lista |
+| `publish-note` dice «run it on the develop branch» o «uncommitted changes» | Debe ejecutarse en `develop` con el árbol limpio (los borradores no cuentan: `drafts/` está ignorado). Haz commit o `stash` y repite |
+| `publish-note` dice «no draft at …» o «already exists» | El slug no coincide con una carpeta de `drafts/`, o ya existe una nota publicada con ese slug o una entrada `note-NNN` en el changelog |
+| `publish-note` dice «the build failed; the note was moved back to drafts» | Arregla el error que imprimió el build (campo o `translationOf`) y repite; no quedó nada a medias |
+| El CI de la nota corrió `e2e` y Lighthouse | El push incluía algo más que notas y changelog (por ejemplo `topics.json` o código): ese release usa todas las compuertas. Mira el resumen del job `changes` |
+| `notes-gate` falla por peso | La nota o sus imágenes superan un presupuesto (sección 10, «Tamaño al publicar»). No hubo deploy: corrige, haz commit y libera de nuevo |

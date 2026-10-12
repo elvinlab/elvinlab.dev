@@ -136,6 +136,7 @@ The contact form needs Cloudflare secrets; without them it shows the "unavailabl
 | `pnpm check:js-budget` · `pnpm test:lighthouse` | JavaScript and Lighthouse budgets |
 | `pnpm test:white-label` | Builds with another identity and looks for owner leaks |
 | `pnpm new-post "Title"` | Creates a note draft |
+| `pnpm publish-note <slug>` | Publishes a draft end to end (move, date, changelog, build, commit and release; `--dry-run`, `--no-release`) |
 | `pnpm docs:config` | Regenerates the tables in the configuration guide |
 
 All of them run with `mise exec -- pnpm ...` to use the pinned versions.

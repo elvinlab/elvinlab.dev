@@ -40,7 +40,7 @@ Verify what a change touches, and record it. Do not run the whole stack after ev
 4. **Record every run and every skip** in the task tracker and in the [verification ledger](../odd/verification-ledger.md): what ran, the result and the commit; for a skipped check, why it was safe to skip.
 5. **Never report a skipped check as verified.** Say "not re-run: untouched since `<sha>`".
 6. **Delegated writers run only the checks the parent lists** under `## Verify` in the brief, taken from the map below. A writer does not run the full suite by default, and the parent does not repeat it.
-7. **Release:** run what the ledger shows as stale, then push. CI on `main` runs the whole stack once more (`static`, `e2e`, `lighthouse`, `checks`) before it deploys, so it is the full backstop; the local run before a release is not.
+7. **Release:** run what the ledger shows as stale, then push. CI on `main` runs the whole stack once more (`static`, `e2e`, `lighthouse`, `checks`) before it deploys, so it is the full backstop; the local run before a release is not. The one exception is the notes-only fast lane ([ADR 0016](adr/0016-publish-note-command-and-notes-fast-lane.md)): a push that only touches published notes and `changelog.json`/`releases.json` skips `e2e` and `lighthouse` and runs `static`, `notes-gate` (build, JS budget, page weight) and the deploy.
 
 ### `pnpm verify`: the rule as a command
 

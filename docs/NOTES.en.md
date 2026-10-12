@@ -306,23 +306,23 @@ reaches 180000 B, paginate or simplify it. Do not raise ceilings automatically o
 elements inside the content boundaries. Measure the actual URL for unusually large images or
 code-heavy articles: Lighthouse's synthetic notes do not cover every real article.
 
-- **Editing**: change the text and add `updatedDate` with today's date (it cannot be earlier than `pubDate`). It shows on the note and in the metadata.
+- **Editing**: change the text and add `updatedDate` with today's date (it cannot be earlier than `pubDate`). It shows on the note and in the metadata. `publish-note` only publishes drafts: for an edit, commit on `develop` and release by hand ([configuration guide, section 7](CONFIGURATION.en.md#7-releasing-and-rolling-back)). If the push only touches notes it still takes the fast lane.
 - **Do not change the slug** (the folder name): it is the URL and the site has **no redirects**; links and comments point to it.
-- **Retiring**: move the folder back to `drafts/` (it stops being published on the next release) or delete it. The URL will return 404.
+- **Retiring**: move the folder back to `drafts/` (it stops being published on the next release) or delete it. The URL will return 404. There is no command for this either: commit and release by hand.
 
 ## 11. Checklist before publishing
 
 - [ ] One decision only, starting with the problem; numbers and names, not adjectives.
 - [ ] `title` ≤ 90, `description` ≤ 160, each `decision` field ≤ 280, at most 5 `tags`.
 - [ ] `category` and `tags` lowercase and hyphenated, consistent with your other notes.
-- [ ] `pubDate` with the real date, in `YYYY-MM-DD` format.
+- [ ] `pubDate`: `publish-note` sets it to today; for a manual publication, the real date in `YYYY-MM-DD` format.
 - [ ] No `#` title; sections with `##`.
 - [ ] Every image has alt text, is about 1,600 px wide at most and shows no private data.
 - [ ] No private repository, no email, no project that does not exist yet.
 - [ ] If it has a translation, `translationOf` points to a note that is published too.
 - [ ] It reads well at 360 px, in light and dark theme and in reading mode.
-- [ ] `pnpm test`, `typecheck`, `lint` and `build` pass.
-- [ ] After the real build, `pnpm check:page-weight` and `pnpm check:js-budget` pass.
+- [ ] `pnpm test`, `typecheck`, `lint` and `build` pass (`publish-note` already runs the build; the rest is for the manual way).
+- [ ] After the real build, `pnpm check:page-weight` and `pnpm check:js-budget` pass. `publish-note` does **not** run them: CI does (`notes-gate`) after the push, and if they fail there is no deploy. For a long note or large images, run them before publishing.
 - [ ] The card in `dist/client/og/notes/<slug>.png` looks right.
 
 ## 12. Common errors
@@ -338,3 +338,8 @@ code-heavy articles: Lighthouse's synthetic notes do not cover every real articl
 | The image does not show | The relative path is wrong or the file is not next to `index.mdx` |
 | The build says "says it translates ... which does not exist" | `translationOf` points to a slug that does not exist or is a draft: publish both notes or remove `translationOf` |
 | The table looks plain on a phone | Tables have no styling of their own: replace it with a list |
+| `publish-note` says "run it on the develop branch" or "uncommitted changes" | It must run on `develop` with a clean tree (drafts do not count: `drafts/` is ignored). Commit or stash and retry |
+| `publish-note` says "no draft at ..." or "already exists" | The slug does not match a folder in `drafts/`, or a published note with that slug or a `note-NNN` changelog entry already exists |
+| `publish-note` says "the build failed; the note was moved back to drafts" | Fix the error the build printed (a field or `translationOf`) and retry; nothing was left half-done |
+| The note's CI ran `e2e` and Lighthouse | The push included more than notes and the changelog (for example `topics.json` or code): that release uses every gate. Check the `changes` job summary |
+| `notes-gate` fails on weight | The note or its images exceed a budget (section 10, "Size when publishing"). There was no deploy: fix it, commit and release again |
