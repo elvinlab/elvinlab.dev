@@ -688,5 +688,11 @@
     "category": "added",
     "title": "Publishing a note is one command",
     "description": "pnpm publish-note <slug> moves the draft, dates it, adds the changelog entry, builds, checks the size budgets, commits and releases. A push that only touches notes and the changelog now skips the end-to-end and Lighthouse gates and still runs the build, the size budgets, the deploy and its smoke-check. The publishing guide and ADR 0016 explain both."
+  },
+  "page-weight-scales-with-notes": {
+    "date": "2026-10-12",
+    "category": "fixed",
+    "title": "Topic pages no longer trip a fixed size limit when a note is added",
+    "description": "The page-weight budget of a topic page now grows with the number of notes it lists, like the notes index already did, and keeps an absolute ceiling that calls for pagination. CSS and the fixed page shell stay as strict as before."
   }
 }

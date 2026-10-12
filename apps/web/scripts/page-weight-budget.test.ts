@@ -118,6 +118,41 @@ describe('evaluatePages', () => {
     expect(formatReport(result)).toContain('article 2001 / 2000 B (+1 B)');
   });
 
+  it('scales a topic page allowance with its listed notes but retains an absolute ceiling', () => {
+    const topicBudgets: Budgets = {
+      types: {
+        topic: {
+          why: 'bounded topic page',
+          styleBytes: 500,
+          htmlBytes: 900,
+          htmlBytesPerNote: 100,
+          maxHtmlBytes: 3000,
+        },
+      },
+    };
+    expect(
+      evaluatePages(
+        [
+          { path: '/notes/tag/a/', styleBytes: 500, htmlBytes: 1000, notesCount: 1 },
+          { path: '/notes/tag/b/', styleBytes: 500, htmlBytes: 2900, notesCount: 20 },
+        ],
+        topicBudgets,
+      ).failures,
+    ).toEqual([]);
+    expect(
+      evaluatePages(
+        [
+          { path: '/notes/tag/a/', styleBytes: 500, htmlBytes: 1001, notesCount: 1 },
+          { path: '/notes/tag/b/', styleBytes: 500, htmlBytes: 3001, notesCount: 100 },
+        ],
+        topicBudgets,
+      ).failures,
+    ).toHaveLength(2);
+    expect(() =>
+      evaluatePages([{ path: '/notes/tag/a/', styleBytes: 500, htmlBytes: 900 }], topicBudgets),
+    ).toThrow(/Missing note row count/);
+  });
+
   it('scales the index allowance with new notes but retains an absolute ceiling', () => {
     expect(
       evaluatePages(
@@ -259,6 +294,27 @@ describe('collectPageWeights', () => {
       Buffer.byteLength('<div class="prose"><p>á</p></div>'),
     );
     expect(pages.find((page) => page.path === '/notes/')?.notesCount).toBe(2);
+  });
+  it('reads the number of listed notes of a topic page from its marker', () => {
+    const root = mkdtempSync(join(tmpdir(), 'page-weight-topic-'));
+    temporaryDirectories.push(root);
+    const topicDirectory = join(root, 'notes/tag/rendimiento');
+    mkdirSync(topicDirectory, { recursive: true });
+    writeFileSync(
+      join(topicDirectory, 'index.html'),
+      '<div class="mt-2" data-topic-notes="4"><a></a></div>',
+    );
+    const topic = collectPageWeights(root).find((page) => page.path === '/notes/tag/rendimiento/');
+    expect(topic?.notesCount).toBe(4);
+  });
+  it('leaves the count undefined when a topic page has no marker, so evaluation can refuse it', () => {
+    const root = mkdtempSync(join(tmpdir(), 'page-weight-topic-'));
+    temporaryDirectories.push(root);
+    const topicDirectory = join(root, 'notes/tag/rendimiento');
+    mkdirSync(topicDirectory, { recursive: true });
+    writeFileSync(join(topicDirectory, 'index.html'), '<div class="mt-2"></div>');
+    const topic = collectPageWeights(root).find((page) => page.path === '/notes/tag/rendimiento/');
+    expect(topic?.notesCount).toBeUndefined();
   });
   it('reads every index.html and the root 404.html of a build and measures them', () => {
     const root = mkdtempSync(join(tmpdir(), 'page-weight-'));

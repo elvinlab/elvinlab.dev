@@ -32,7 +32,7 @@ export interface PageWeight {
   htmlBytes: number;
   /** Rendered article body, delimited by inert templates in NotePage. */
   articleHtmlBytes?: number;
-  /** Actual article rows in the notes index. */
+  /** Actual note rows listed by the page: the notes index (rows) or a topic page (its marker). */
   notesCount?: number;
 }
 
@@ -41,7 +41,7 @@ export interface TypeBudget {
   why: string;
   styleBytes: number;
   htmlBytes: number;
-  /** Additional HTML per index row; htmlBytes then limits the fixed shell. */
+  /** Additional HTML per listed note (index row or topic row); htmlBytes then limits the fixed shell. */
   htmlBytesPerNote?: number;
   /** Article content ceiling; htmlBytes then limits the fixed shell. */
   articleBytes?: number;
@@ -143,6 +143,12 @@ export function noteRowCount(html: string): number {
   return [...html.matchAll(/<article\b[^>]*\bdata-note-row(?:="")?(?=\s|>)[^>]*>/gi)].length;
 }
 
+/** Notes listed by a topic page, read from the `data-topic-notes` marker of `TopicPage`; undefined if absent. */
+export function topicNoteCount(html: string): number | undefined {
+  const match = /\bdata-topic-notes="(\d+)"/.exec(html);
+  return match?.[1] === undefined ? undefined : Number(match[1]);
+}
+
 function listIndexFiles(directory: string, root = directory): string[] {
   const files: string[] = [];
   for (const entry of readdirSync(directory, { withFileTypes: true })) {
@@ -171,12 +177,18 @@ export function collectPageWeights(clientRoot: string): PageWeight[] {
       const text = html.toString('utf8');
       const type = classifyPage(path);
       const articleHtmlBytes = type === 'note' ? articleContentBytes(text) : undefined;
+      const notesCount =
+        type === 'notes-index'
+          ? noteRowCount(text)
+          : type === 'topic'
+            ? topicNoteCount(text)
+            : undefined;
       return {
         path,
         styleBytes: inlineStyleBytes(html.toString('utf8')),
         htmlBytes: html.byteLength,
         ...(articleHtmlBytes !== undefined && { articleHtmlBytes }),
-        ...(type === 'notes-index' && { notesCount: noteRowCount(text) }),
+        ...(notesCount !== undefined && { notesCount }),
       };
     })
     .sort((a, b) => a.path.localeCompare(b.path));
