@@ -12,6 +12,10 @@
 
 .prose {
   counter-reset: note-section;
+  /* The two mask strokes are written once here: the minifier emits `mask` and `-webkit-mask`, and a
+     data URI repeated in both is the heaviest thing in this file. */
+  --note-bar: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 100' preserveAspectRatio='none'%3E%3Cpath d='M4 2 C2 20 6 38 3.5 58 S5 85 4 98' fill='none' stroke='%23000' stroke-width='3' stroke-linecap='round'/%3E%3C/svg%3E");
+  --note-rule: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 48 12'%3E%3Cpath d='M0 6 Q6 1 12 6 T24 6 T36 6 T48 6' fill='none' stroke='%23000' stroke-width='1.6' stroke-linecap='round'/%3E%3C/svg%3E");
 }
 
 /* Section numbers: the same headings, in the same order, as the table of contents (h2 only). Hung in
@@ -123,9 +127,7 @@ article .prose blockquote::before {
   left: 0;
   width: 8px;
   background: var(--color-pink);
-  mask:
-    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 100' preserveAspectRatio='none'%3E%3Cpath d='M4 2 C2 20 6 38 3.5 58 S5 85 4 98' fill='none' stroke='%23000' stroke-width='3' stroke-linecap='round'/%3E%3C/svg%3E")
-    no-repeat center / 100% 100%;
+  mask: var(--note-bar) no-repeat center / 100% 100%;
   transform: rotate(0.8deg);
 }
 
@@ -136,9 +138,7 @@ article .prose blockquote::before {
   margin: 2.5em auto;
   border: 0;
   background: color-mix(in srgb, var(--color-pink) 70%, transparent);
-  mask:
-    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 48 12'%3E%3Cpath d='M0 6 Q6 1 12 6 T24 6 T36 6 T48 6' fill='none' stroke='%23000' stroke-width='1.6' stroke-linecap='round'/%3E%3C/svg%3E")
-    repeat-x center / 48px 12px;
+  mask: var(--note-rule) repeat-x center / 48px 12px;
 }
 
 /* Paper keeps it plain: no tinted band, solid rules. */

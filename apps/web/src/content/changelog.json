@@ -760,5 +760,11 @@
     "category": "fixed",
     "title": "Home headline no longer splits awkwardly on phones",
     "description": "The underlined phrase in the home headline now stays together instead of breaking in the middle on narrow screens, so the headline reads cleanly on a phone."
+  },
+  "note-head-css-trim": {
+    "date": "2026-10-12",
+    "category": "changed",
+    "title": "Note pages load a little faster",
+    "description": "The styles every note carries in its head are about 1.6 KB smaller (reading mode styles are now minified and the hand-drawn quote bar and divider are defined once), with no visible change."
   }
 }

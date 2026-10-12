@@ -1,7 +1,7 @@
 ---
 /** Reading mode for notes, behind `features.readingMode`. One component, three parts: the `boot`
  * script for `<head>`, the `toggle` shown in the note, and the floating `exit` button. */
-import readingCss from '@/features/notes/components/reading-mode.css?raw';
+import readingCss from '@/features/notes/components/reading-mode.css?inline';
 import { readingBootScript, readingControlsScript } from '@/features/notes/lib/reading-mode.ts';
 import { isEnabled } from '@/shared/config/index.ts';
 import { type Locale, t } from '@/shared/i18n/index.ts';
