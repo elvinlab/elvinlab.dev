@@ -13,6 +13,7 @@ import {
   formatReport,
   inlineStyleBytes,
   noteRowCount,
+  notesRoom,
   suggestBudgets,
 } from './page-weight-budget.ts';
 
@@ -254,6 +255,83 @@ describe('article content measurements', () => {
         '<p>data-note-row</p><article data-note-row class="x"></article><article data-note-row=""></article><div data-note-row></div>',
       ),
     ).toBe(2);
+  });
+});
+
+describe('notesRoom', () => {
+  const budget = {
+    why: 'listing',
+    styleBytes: 500,
+    htmlBytes: 900,
+    htmlBytesPerNote: 100,
+    maxHtmlBytes: 3000,
+  };
+
+  it('counts how many more notes fit under the absolute ceiling at the per-note allowance', () => {
+    expect(
+      notesRoom({ path: '/notes/', styleBytes: 500, htmlBytes: 1000, notesCount: 3 }, budget),
+    ).toBe(20);
+  });
+
+  it('never goes below zero once the page is at or over the ceiling', () => {
+    expect(
+      notesRoom({ path: '/notes/', styleBytes: 500, htmlBytes: 3500, notesCount: 30 }, budget),
+    ).toBe(0);
+  });
+
+  it('is undefined for a page that does not scale with notes or has no ceiling', () => {
+    const page = { path: '/me/', styleBytes: 500, htmlBytes: 1000 };
+    expect(notesRoom(page, { why: 'fixed', styleBytes: 500, htmlBytes: 900 })).toBeUndefined();
+    expect(
+      notesRoom(
+        { ...page, notesCount: 2 },
+        { why: 'listing', styleBytes: 500, htmlBytes: 900, htmlBytesPerNote: 100 },
+      ),
+    ).toBeUndefined();
+  });
+});
+
+describe('room report', () => {
+  const budgets: Budgets = {
+    types: {
+      'notes-index': {
+        why: 'listing',
+        styleBytes: 500,
+        htmlBytes: 900,
+        htmlBytesPerNote: 100,
+        maxHtmlBytes: 3000,
+      },
+      topic: {
+        why: 'listing',
+        styleBytes: 500,
+        htmlBytes: 900,
+        htmlBytesPerNote: 100,
+        maxHtmlBytes: 1200,
+      },
+    },
+  };
+  const pages = [
+    { path: '/notes/', styleBytes: 500, htmlBytes: 1000, notesCount: 3 },
+    { path: '/notes/tag/a/', styleBytes: 500, htmlBytes: 1000, notesCount: 3 },
+  ];
+
+  it('puts the room of each scaled row in the evaluation and the table', () => {
+    const evaluation = evaluatePages(pages, budgets);
+    expect(evaluation.rows.map((row) => row.roomNotes)).toEqual([20, 2]);
+    expect(formatReport(evaluation)).toContain('room +20 notes');
+  });
+
+  it('warns, without failing, when a scaled type has fewer than 5 notes of room left', () => {
+    const evaluation = evaluatePages(pages, budgets);
+    expect(evaluation.failures).toEqual([]);
+    expect(evaluation.warnings.map((row) => row.path)).toEqual(['/notes/tag/a/']);
+    expect(formatReport(evaluation)).toMatch(/WARN .*\/notes\/tag\/a\/.*room \+2 notes/);
+  });
+
+  it('summarizes the tightest room per type so the limit is visible before it blocks a publish', () => {
+    expect(formatReport(evaluatePages(pages, budgets))).toContain(
+      'Room left: notes-index +20 notes, topic +2 notes',
+    );
   });
 });
 

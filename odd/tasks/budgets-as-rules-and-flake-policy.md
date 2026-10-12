@@ -25,8 +25,8 @@ Publishing note 009 was stopped by the page-weight budget of a topic page (+718 
 - Noisy gates: Playwright `retries: 1` in CI and one automatic Lighthouse re-run of a failed URL; a test that passes on retry is reported as flaky in the job summary, not hidden. Deterministic gates (typecheck, unit, budgets, build) never retry.
 
 ## Tasks
-- [ ] **T1 — Topic pages scale by listed notes** (route: inline; trigger: verification script and one component, Tier 3). `topicNoteCount` + `data-topic-notes` marker, `topic` budget with `htmlBytesPerNote` 800 and `maxHtmlBytes` 120000, tests, changelog entry. Already written and verified in the working tree; to be committed.
-- [ ] **T2 — Show the room left** (route: inline). Report line and `publish-note` output telling how many more notes each scaled type fits; warning (not failure) under 5.
+- [x] **T1 — Topic pages scale by listed notes** (route: inline; trigger: verification script and one component, Tier 3). `topicNoteCount` + `data-topic-notes` marker, `topic` budget with `htmlBytesPerNote` 800 and `maxHtmlBytes` 120000, tests, changelog entry. Commit 2bce379.
+- [x] **T2 — Show the room left** (route: inline). Report line and `publish-note` output telling how many more notes each scaled type fits; warning (not failure) under 5. RED observed (6 failing: `notesRoom` missing), then 55/55 GREEN; typecheck 0 errors; a real build prints `Room left: notes-index +15 notes, topic +43 notes`.
 - [ ] **T3 — Guard test and docs** (route: inline). A test over the real `page-weight-budget.json` that every listing type declares an allowance and a ceiling; TESTING.md and ADR note on "how to add a listing page type".
 - [ ] **T4 — Noisy-gate policy** (route: inline). Retry once and report flakes (Playwright and Lighthouse) in the run summary; document which gates may retry.
 - [ ] **T5 — Issue for the `/me/` CLS** (route: inline; remote write, authorized by the owner with the plan). One GitHub issue written as a delegation brief with evidence.
@@ -45,4 +45,4 @@ Publishing note 009 was stopped by the page-weight budget of a topic page (+718 
 - First full `pnpm verify --run`: 811 of 812 e2e passed; the one failure (axe on `/en/contact/`, dark) passed 2/2 on rerun, so it is intermittent and unrelated to this change. Not recorded in the ledger because that run was not green.
 
 ## Next step
-Commit T1, then T2.
+T3: guard test over the real budget file, and docs.

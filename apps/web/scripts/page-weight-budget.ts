@@ -68,13 +68,20 @@ export interface ReportRow extends PageWeight {
   styleBudget: number;
   htmlBudget: number;
   articleBudget?: number;
+  /** How many more listed notes fit under the absolute ceiling (scaled types with a ceiling only). */
+  roomNotes?: number;
   ok: boolean;
 }
 
 export interface Evaluation {
   rows: ReportRow[];
   failures: ReportRow[];
+  /** Passing rows whose room is nearly spent: the next paginate-or-raise decision, seen early. */
+  warnings: ReportRow[];
 }
+
+/** Fewer notes than this of room left is worth a warning (never a failure). */
+export const ROOM_WARNING_NOTES = 5;
 
 /** Notes sub-routes that are not a note page. */
 const NOT_A_NOTE = new Set(['page', 'tag', 'tags']);
@@ -194,6 +201,14 @@ export function collectPageWeights(clientRoot: string): PageWeight[] {
     .sort((a, b) => a.path.localeCompare(b.path));
 }
 
+/** How many more listed notes a scaled page fits under its absolute ceiling, at the per-note allowance
+ * (a new row costs about that much, usually a bit less). Undefined when the page does not scale or has no ceiling. */
+export function notesRoom(page: PageWeight, budget: TypeBudget): number | undefined {
+  if (budget.htmlBytesPerNote === undefined || budget.maxHtmlBytes === undefined) return undefined;
+  if (page.notesCount === undefined) return undefined;
+  return Math.max(0, Math.floor((budget.maxHtmlBytes - page.htmlBytes) / budget.htmlBytesPerNote));
+}
+
 /** Compares every page with the budget of its type; the `default` type covers the rest. */
 export function evaluatePages(pages: readonly PageWeight[], budgets: Budgets): Evaluation {
   const rows = pages.map((page): ReportRow => {
@@ -210,6 +225,7 @@ export function evaluatePages(pages: readonly PageWeight[], budgets: Budgets): E
       budget.htmlBytes + contentBytes + (budget.htmlBytesPerNote ?? 0) * (page.notesCount ?? 0),
       budget.maxHtmlBytes ?? Number.POSITIVE_INFINITY,
     );
+    const roomNotes = notesRoom(page, budget);
     const contentOk = budget.articleBytes === undefined || contentBytes <= budget.articleBytes;
     return {
       ...page,
@@ -217,10 +233,17 @@ export function evaluatePages(pages: readonly PageWeight[], budgets: Budgets): E
       styleBudget: budget.styleBytes,
       htmlBudget,
       ...(budget.articleBytes !== undefined && { articleBudget: budget.articleBytes }),
+      ...(roomNotes !== undefined && { roomNotes }),
       ok: contentOk && page.styleBytes <= budget.styleBytes && page.htmlBytes <= htmlBudget,
     };
   });
-  return { rows, failures: rows.filter((row) => !row.ok) };
+  return {
+    rows,
+    failures: rows.filter((row) => !row.ok),
+    warnings: rows.filter(
+      (row) => row.ok && row.roomNotes !== undefined && row.roomNotes < ROOM_WARNING_NOTES,
+    ),
+  };
 }
 
 function metric(label: string, value: number, budget: number): string {
@@ -229,7 +252,7 @@ function metric(label: string, value: number, budget: number): string {
 }
 
 /** A table with every page (numbers are printed even when everything passes). */
-export function formatReport({ rows, failures }: Evaluation): string {
+export function formatReport({ rows, failures, warnings }: Evaluation): string {
   const pathWidth = Math.max(4, ...rows.map((row) => row.path.length));
   const typeWidth = Math.max(4, ...rows.map((row) => row.type.length));
   const lines = rows.map(
@@ -239,8 +262,21 @@ export function formatReport({ rows, failures }: Evaluation): string {
       (row.articleBudget === undefined
         ? ''
         : `  ${metric('article', row.articleHtmlBytes ?? 0, row.articleBudget)}`) +
-      (row.notesCount === undefined ? '' : `  notes ${row.notesCount}`),
+      (row.notesCount === undefined ? '' : `  notes ${row.notesCount}`) +
+      (row.roomNotes === undefined ? '' : `  room +${row.roomNotes} notes`),
   );
+  for (const row of warnings)
+    lines.push(
+      `WARN  ${row.path}  room +${row.roomNotes} notes before ${row.type} pages need pagination or a conscious ceiling raise.`,
+    );
+  const tightest = new Map<PageType, number>();
+  for (const row of rows)
+    if (row.roomNotes !== undefined)
+      tightest.set(row.type, Math.min(tightest.get(row.type) ?? row.roomNotes, row.roomNotes));
+  if (tightest.size > 0)
+    lines.push(
+      `Room left: ${[...tightest].map(([type, room]) => `${type} +${room} notes`).join(', ')}`,
+    );
   lines.push(
     failures.length === 0
       ? `All ${rows.length} pages within their page-weight budget.`

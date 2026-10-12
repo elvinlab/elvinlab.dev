@@ -693,6 +693,6 @@
     "date": "2026-10-12",
     "category": "fixed",
     "title": "Topic pages no longer trip a fixed size limit when a note is added",
-    "description": "The page-weight budget of a topic page now grows with the number of notes it lists, like the notes index already did, and keeps an absolute ceiling that calls for pagination. CSS and the fixed page shell stay as strict as before."
+    "description": "The page-weight budget of a topic page now grows with the number of notes it lists, like the notes index already did, and keeps an absolute ceiling that calls for pagination. The size check also prints how many more notes each listing fits (15 for the notes index today) and warns when fewer than 5 are left, so the limit shows up before it blocks a publish. CSS and the fixed page shell stay as strict as before."
   }
 }
