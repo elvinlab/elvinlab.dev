@@ -27,15 +27,15 @@ Feature branch: `docs/reconcile-repo-and-github` from `4b94342`.
   - Test-first exception: passive documentation, no meaningful behavior RED; existing documentation checks provide proportional proof.
   - Runtime scenario: N/A — no runtime behavior changes.
   - Rollback boundary: documentation/task-tracker commit only.
-  - Commit: pending.
-- [ ] D2 — Reconcile existing issue briefs and verify project consistency.
+  - Commit: `ae019bd` — `docs: reconcile guides and task trackers with released state` (186 authored changed lines including this tracker).
+- [x] D2 — Reconcile existing issue briefs and verify project consistency.
   - Route: delegated direct; authenticated GitHub context and nine issue updates.
   - Targets: issue bodies #63, #64, #69, #70, #77, #85, #89, #119; title #124 T83 to T85.
   - Acceptance: preserve unresolved scope and issue state; preserve relevant historical material; update only evidence-backed stale claims; read back every mutation; project remains consistent with open issues.
   - Checks: authenticated GitHub issue/project readback, no blind mutation retry on uncertain outcome.
   - Runtime scenario: existing GitHub issue edits, not application runtime.
   - Rollback boundary: recorded prior issue values; tracker closure commit.
-  - Commit: pending.
+  - Commit: tracker closure follows `ae019bd`; remote mutation records are #892–900 with aggregate readback #901.
 
 ## Evidence and progress
 
@@ -48,9 +48,9 @@ Feature branch: `docs/reconcile-repo-and-github` from `4b94342`.
 - D1: 19 existing Markdown files corrected; 130 authored changed lines (87 additions, 43 deletions). Writer and independent verifier each observed `git diff --check` pass and 41 passing tests across `docs-quality.test.ts` and `config-docs.test.ts`. Parent structurally read back the diff; the independent rerun was the requested command spot check.
 - Native risk assessment was unassessable/high because the new tracker was untracked. An independent verifier was therefore used; it found no substantive discrepancies. RDD remains off; no native review was started.
 - D2 remote work completed and read back: bodies #63/#64/#69/#70/#77/#85/#89/#119 corrected; #124 title changed from T83 to T85. All remain open. Original title/body rollback records are Engram observations 881–889; aggregate completion evidence is #901.
-- Project inventory is unchanged and correct; #124 title propagates automatically. No status edits, closures or comments were needed. Tracker closure commit remains pending.
-- Engram mirror: initial write and full readback completed (#878); resynchronize after commit evidence.
+- Project inventory is unchanged and correct; #124 title propagates automatically. Parent independently read back #124 and all project status counts. No status edits, closures or comments were needed.
+- Engram mirror: initial write and full readback completed (#878); mirror uses this same locator/topic and is updated at task closure.
 
 ## Next step
 
-Commit the verified documentation unit, record commit identities and finish the task/memory readback. Push and PR creation are not performed.
+Reconciliation is complete. Feature branch remains local; no push, PR, merge or deployment was performed. Next implementation should use current issue briefs and preserve unfinished work, including manual SQL with no individual execution evidence.
