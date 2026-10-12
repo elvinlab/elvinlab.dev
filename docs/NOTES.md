@@ -25,10 +25,10 @@ Esta guía explica, paso a paso y con todos los detalles, cómo escribir y publi
 3. Completa el frontmatter y el **registro de decisión** (sección 3 y 4).
 4. Escribe sobre **una** decisión concreta, empezando por el problema. No hay límite de palabras: el borrador sugiere unas 500, pero una nota más larga está bien cuando la decisión lo pide (la nota 003 tiene unas 1.500).
 5. Revisa el resultado en escritorio y móvil, en tema claro y oscuro, y en modo lectura.
-6. Mueve la carpeta a `apps/web/src/content/notes/<slug>/` y pon la fecha de hoy en `pubDate`.
-7. Verifica: tests, typecheck, lint y build.
-8. Haz commit (opcional: una entrada en el changelog) y push a `develop`.
-9. Publica el release y revisa la nota en vivo (tarjeta al compartir y comentarios).
+6. Ensaya la publicación: `mise exec -- pnpm publish-note <slug> --dry-run` (no cambia nada).
+7. Publica: `mise exec -- pnpm publish-note <slug>`. Mueve la carpeta, pone la fecha de hoy, añade la entrada del changelog, compila, hace commit y release.
+8. Espera al CI: una nota usa el carril rápido (unos minutos, sin `e2e` ni Lighthouse).
+9. Revisa la nota en vivo (tarjeta al compartir y comentarios).
 
 ## 1. Qué es una nota aquí
 
@@ -266,6 +266,21 @@ mise exec -- pnpm new-post "Why I rebuilt my site from scratch" --lang en --numb
 
 ## 9. Publicar
 
+**Camino normal: un comando.** Con la nota terminada y el árbol de git limpio, en `develop`:
+
+```bash
+mise exec -- pnpm publish-note <slug> --dry-run   # ensayo: muestra los pasos y no cambia nada
+mise exec -- pnpm publish-note <slug>             # publica
+```
+
+Hace, en orden y deteniéndose en el primer fallo: mueve `drafts/<slug>` a `notes/<slug>`, pone `pubDate` con la fecha local de hoy, añade la entrada `note-NNN` al `changelog.json`, compila y comprueba los presupuestos de tamaño (el build valida el frontmatter y `translationOf`; si algo falla, la nota vuelve a `drafts/`), fecha el changelog, hace el commit `feat(notes): publish "Título"`, comprueba la auditoría del changelog, empuja `develop` y publica el release en `main`. **Ejecutarlo es tu autorización para empujar a `main`.** Con `--no-release` se detiene tras el commit local.
+
+Ese push dispara el CI por el **carril rápido para notas** ([ADR 0016](adr/0016-publish-note-command-and-notes-fast-lane.md)): si el push solo toca notas publicadas y el changelog, se saltan `e2e` y Lighthouse y corren `static`, `notes-gate` (build y presupuestos de peso) y el deploy con su smoke-check. Si el push incluye cualquier otro cambio, corre todo. Mira el run con `gh run watch`; si algo falla, no hay deploy.
+
+Después, en producción: abre la nota, comprueba que la tarjeta se ve bien al compartir el enlace (refresca la caché con el [Facebook Sharing Debugger](https://developers.facebook.com/tools/debug/) o el [LinkedIn Post Inspector](https://www.linkedin.com/post-inspector/)) y que los comentarios cargan. Si la suscripción está encendida, avisa a la lista con `SUBSCRIBE_ADMIN_TOKEN=... pnpm notify:note <slug>` (prueba en seco) y luego con `--send` (receta 6.14).
+
+**Camino manual** (si quieres pasar por todas las compuertas locales antes de liberar):
+
 1. Mueve la carpeta: `mv apps/web/src/content/drafts/<slug> apps/web/src/content/notes/<slug>` (es un `mv` normal: `drafts/` no está en git). La URL final es `/notes/<slug>/`, igual que en el borrador.
 2. Pon en `pubDate` la fecha de publicación.
 3. Verifica: `pnpm test`, `pnpm typecheck`, `pnpm lint`, `pnpm --filter web build`, `pnpm check:page-weight`, `pnpm check:js-budget` y `pnpm test:e2e` (los tests de navegador usan notas de prueba aisladas: tus notas reales no entran; los dos checks de tamaño sí revisan el build real).
@@ -291,23 +306,23 @@ creció la estructura fija. Si el índice llega a 180000 B, necesita paginación
 No subas límites automáticamente ni muevas elementos de interfaz entre los marcadores de contenido.
 Para una nota con imágenes grandes o mucho código, mide también esa URL real: Lighthouse usa fixtures.
 
-- **Editar**: cambia el texto y añade `updatedDate` con la fecha de hoy (no puede ser anterior a `pubDate`). Aparece en la nota y en los metadatos.
+- **Editar**: cambia el texto y añade `updatedDate` con la fecha de hoy (no puede ser anterior a `pubDate`). Aparece en la nota y en los metadatos. `publish-note` solo publica borradores: para una edición haz commit en `develop` y libera a mano ([guía de configuración, sección 7](CONFIGURATION.md#7-publicar-release-y-revertir)). Si el push solo toca notas, igualmente usa el carril rápido.
 - **No cambies el slug** (el nombre de la carpeta): es la URL y el sitio **no tiene redirecciones**; los enlaces y los comentarios apuntan a ella.
-- **Retirar**: mueve la carpeta de vuelta a `drafts/` (deja de publicarse en el siguiente release) o bórrala. La URL pasará a dar 404.
+- **Retirar**: mueve la carpeta de vuelta a `drafts/` (deja de publicarse en el siguiente release) o bórrala. La URL pasará a dar 404. Tampoco hay comando para esto: commit y release manual.
 
 ## 11. Lista de verificación antes de publicar
 
 - [ ] Una sola decisión, empezando por el problema; números y nombres, no adjetivos.
 - [ ] `title` ≤ 90, `description` ≤ 160, cada campo de `decision` ≤ 280, máximo 5 `tags`.
 - [ ] `category` y `tags` en minúsculas con guiones y coherentes con tus otras notas.
-- [ ] `pubDate` con la fecha real, en formato `AAAA-MM-DD`.
+- [ ] `pubDate`: `publish-note` lo pone con la fecha de hoy; en la publicación manual, con la fecha real en formato `AAAA-MM-DD`.
 - [ ] Sin título `#`; secciones con `##`.
 - [ ] Todas las imágenes tienen texto alternativo, miden unos 1.600 px de ancho como máximo y no muestran datos privados.
 - [ ] Ningún repositorio privado, ningún correo, ningún proyecto que aún no exista.
 - [ ] Si tiene traducción, `translationOf` apunta a una nota que también se publica.
 - [ ] Se lee bien en 360 px, en tema claro y oscuro y en modo lectura.
-- [ ] `pnpm test`, `typecheck`, `lint` y `build` pasan.
-- [ ] Después del build real, `pnpm check:page-weight` y `pnpm check:js-budget` pasan.
+- [ ] `pnpm test`, `typecheck`, `lint` y `build` pasan (`publish-note` ya ejecuta el build; el resto es del camino manual).
+- [ ] Después del build real, `pnpm check:page-weight` y `pnpm check:js-budget` pasan. `publish-note` ya los ejecuta justo después del build (solo unos segundos), así que una nota demasiado pesada falla antes de empujar nada; el CI (`notes-gate`) los repite.
 - [ ] La tarjeta de `dist/client/og/notes/<slug>.png` se ve bien.
 
 ## 12. Errores frecuentes
@@ -323,3 +338,8 @@ Para una nota con imágenes grandes o mucho código, mide también esa URL real:
 | La imagen no se muestra | La ruta relativa es incorrecta o el archivo no está junto a `index.mdx` |
 | El build dice «says it translates … which does not exist» | `translationOf` apunta a un slug que no existe o es un borrador: publica ambas notas o quita `translationOf` |
 | La tabla se ve plana en el móvil | Las tablas no tienen estilo propio: cámbiala por una lista |
+| `publish-note` dice «run it on the develop branch» o «uncommitted changes» | Debe ejecutarse en `develop` con el árbol limpio (los borradores no cuentan: `drafts/` está ignorado). Haz commit o `stash` y repite |
+| `publish-note` dice «no draft at …» o «already exists» | El slug no coincide con una carpeta de `drafts/`, o ya existe una nota publicada con ese slug o una entrada `note-NNN` en el changelog |
+| `publish-note` dice «the build or a size budget failed; the note was moved back to drafts» | Arregla el error que imprimió el build o el presupuesto (campo, `translationOf` o peso, sección 10) y repite; no quedó nada a medias |
+| El CI de la nota corrió `e2e` y Lighthouse | El push incluía algo más que notas y changelog (por ejemplo `topics.json` o código): ese release usa todas las compuertas. Mira el resumen del job `changes` |
+| `notes-gate` falla por peso | Poco probable (`publish-note` ya lo comprobó), pero posible en una edición manual: revisa la sección 10, «Tamaño al publicar». No hubo deploy: corrige, haz commit y libera de nuevo |

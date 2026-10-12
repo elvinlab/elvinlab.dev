@@ -51,12 +51,73 @@ jobs:
         run: |
           echo "static: $(( $(date +%s) - JOB_START ))s" >> "$GITHUB_STEP_SUMMARY"
 
+  # Notes-only fast lane (ADR 0016): when every path in the push is a published note or the
+  # changelog/release metadata, e2e and lighthouse are skipped and `notes-gate` (build + budgets)
+  # stands in. Anything else, an unknown base or an unreadable diff keeps the full stack.
+  changes:
+    name: changes
+    runs-on: ubuntu-latest
+    outputs:
+      notes_only: ${{ steps.scope.outputs.notes_only }}
+    steps:
+      - name: Decide whether the push only publishes notes
+        id: scope
+        env:
+          GH_TOKEN: ${{ github.token }}
+          BEFORE: ${{ github.event.before }}
+        run: |
+          notes_only=false
+          if [ -n "$BEFORE" ] && [ "$BEFORE" != "0000000000000000000000000000000000000000" ]; then
+            if files="$(gh api --paginate "repos/$GITHUB_REPOSITORY/compare/$BEFORE...$GITHUB_SHA" --jq '.files[].filename')" \
+              && [ -n "$files" ] && [ "$(printf '%s\n' "$files" | wc -l)" -lt 300 ] \
+              && ! printf '%s\n' "$files" | grep -qvE '^(apps/web/src/content/notes/|apps/web/src/content/(changelog|releases)\.json$)'; then
+              notes_only=true
+            fi
+          fi
+          echo "notes_only=$notes_only" >> "$GITHUB_OUTPUT"
+          echo "notes-only fast lane: $notes_only" >> "$GITHUB_STEP_SUMMARY"
+
+  # Fast-lane stand-in for e2e/lighthouse: the build validates note frontmatter and translations,
+  # and the two budgets catch a note that bloats the page. Runs only when `changes` says notes-only.
+  notes-gate:
+    name: notes-gate
+    needs: changes
+    if: ${{ needs.changes.outputs.notes_only == 'true' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Record job start
+        run: echo "JOB_START=$(date +%s)" >> "$GITHUB_ENV"
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: jdx/mise-action@2d8d4cafcbd33be2ea37d2b6f5ad595363d1f1ca # v5.1.1
+      - name: Resolve the pnpm store path
+        id: pnpm-store
+        run: echo "path=$(pnpm store path --silent)" >> "$GITHUB_OUTPUT"
+      - name: Cache the pnpm store
+        uses: actions/cache@caa296126883cff596d87d8935842f9db880ef25 # v5.1.0
+        with:
+          path: ${{ steps.pnpm-store.outputs.path }}
+          key: pnpm-store-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml') }}
+          restore-keys: pnpm-store-${{ runner.os }}-
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm --filter web build
+      - name: Check production JavaScript gzip budget
+        run: pnpm check:js-budget
+      - name: Check page weight budget (inline CSS and HTML per page type)
+        run: pnpm check:page-weight
+      - name: Job duration
+        if: always()
+        run: |
+          echo "notes-gate: $(( $(date +%s) - JOB_START ))s" >> "$GITHUB_STEP_SUMMARY"
+
   # Sharded: Playwright splits the tests across 4 runners (`--shard=N/4`), so the slowest gate is a
   # quarter of the suite. Every shard builds and checks the JS budget (cheap); the steps that only
   # inspect the build (white-label, version.txt, image optimization) run in shard 1 only. `checks`
-  # needs this whole matrix, so it still passes only if every shard does.
+  # needs this whole matrix, so it still passes only if every shard does. Skipped on the notes-only
+  # fast lane (a skipped need does not fail `checks`).
   e2e:
     name: e2e
+    needs: changes
+    if: ${{ needs.changes.outputs.notes_only != 'true' }}
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -117,6 +178,8 @@ jobs:
   # if both shards do (a matrix job's result is `failure` when any shard failed).
   lighthouse:
     name: lighthouse
+    needs: changes
+    if: ${{ needs.changes.outputs.notes_only != 'true' }}
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -157,7 +220,8 @@ jobs:
   # Stable aggregate: the ruleset requires a status named `checks`, so the name is kept.
   checks:
     name: checks
-    needs: [static, e2e, lighthouse]
+    # `changes` is listed so a failure there fails `checks` instead of silently skipping every gate.
+    needs: [static, changes, notes-gate, e2e, lighthouse]
     if: always()
     runs-on: ubuntu-latest
     steps:

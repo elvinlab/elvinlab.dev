@@ -136,6 +136,7 @@ El formulario de contacto necesita secretos de Cloudflare; sin ellos muestra el 
 | `pnpm check:js-budget` · `pnpm test:lighthouse` | Presupuestos de JavaScript y de Lighthouse |
 | `pnpm test:white-label` | Compila con otra identidad y busca filtraciones del dueño |
 | `pnpm new-post "Título"` | Crea el borrador de una nota |
+| `pnpm publish-note <slug>` | Publica un borrador de punta a punta (mueve, fecha, changelog, build, commit y release; `--dry-run`, `--no-release`) |
 | `pnpm docs:config` | Regenera las tablas de la guía de configuración |
 
 Todos se ejecutan con `mise exec -- pnpm ...` para usar las versiones fijas.

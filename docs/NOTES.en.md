@@ -25,10 +25,10 @@ This guide explains, step by step and in detail, how to write and publish a **La
 3. Fill in the frontmatter and the **decision record** (sections 3 and 4).
 4. Write on **one** concrete decision, starting with the problem. There is no word limit: the draft suggests about 500 words, but a longer note is fine when the decision needs it (note 003 has about 1,500).
 5. Check the result on desktop and phone, in light and dark theme, and in reading mode.
-6. Move the folder to `apps/web/src/content/notes/<slug>/` and put today's date in `pubDate`.
-7. Verify: tests, typecheck, lint and build.
-8. Commit (optionally add a changelog entry) and push to `develop`.
-9. Release and check the note live (share card and comments).
+6. Rehearse the publication: `mise exec -- pnpm publish-note <slug> --dry-run` (changes nothing).
+7. Publish: `mise exec -- pnpm publish-note <slug>`. It moves the folder, sets today's date, adds the changelog entry, builds, commits and releases.
+8. Wait for CI: a note takes the fast lane (a few minutes, no `e2e` or Lighthouse).
+9. Check the note live (share card and comments).
 
 ## 1. What a note is here
 
@@ -266,6 +266,21 @@ mise exec -- pnpm new-post "Why I rebuilt my site from scratch" --lang en --numb
 
 ## 9. Publishing
 
+**The normal way: one command.** With the note finished and a clean git tree, on `develop`:
+
+```bash
+mise exec -- pnpm publish-note <slug> --dry-run   # rehearsal: prints the steps and changes nothing
+mise exec -- pnpm publish-note <slug>             # publishes
+```
+
+It does the following in order and stops at the first failure: moves `drafts/<slug>` to `notes/<slug>`, sets `pubDate` to today's local date, adds the `note-NNN` entry to `changelog.json`, builds and checks the size budgets (the build validates the frontmatter and `translationOf`; if anything fails the note goes back to `drafts/`), dates the changelog, commits `feat(notes): publish "Title"`, runs the changelog audit, pushes `develop` and releases to `main`. **Running it is your authorization to push to `main`.** With `--no-release` it stops after the local commit.
+
+That push triggers CI through the **notes-only fast lane** ([ADR 0016](adr/0016-publish-note-command-and-notes-fast-lane.md)): when the push only touches published notes and the changelog, `e2e` and Lighthouse are skipped and `static`, `notes-gate` (build and weight budgets) and the deploy with its smoke-check run. If the push includes any other change, everything runs. Follow the run with `gh run watch`; if anything fails, there is no deploy.
+
+Afterwards, in production: open the note, check that the card looks right when you share the link (refresh the cache with the [Facebook Sharing Debugger](https://developers.facebook.com/tools/debug/) or the [LinkedIn Post Inspector](https://www.linkedin.com/post-inspector/)) and that comments load. If the subscription is on, tell the list with `SUBSCRIBE_ADMIN_TOKEN=... pnpm notify:note <slug>` (a dry run) and then with `--send` (recipe 6.14).
+
+**The manual way** (if you want to pass every local gate before releasing):
+
 1. Move the folder: `mv apps/web/src/content/drafts/<slug> apps/web/src/content/notes/<slug>` (a plain `mv`: `drafts/` is not in git). The final URL is `/notes/<slug>/`, the same as in the draft.
 2. Put the publication date in `pubDate`.
 3. Verify: `pnpm test`, `pnpm typecheck`, `pnpm lint`, `pnpm --filter web build`, `pnpm check:page-weight`, `pnpm check:js-budget` and `pnpm test:e2e` (browser tests use isolated test notes; the two size checks inspect the real build).
@@ -291,23 +306,23 @@ reaches 180000 B, paginate or simplify it. Do not raise ceilings automatically o
 elements inside the content boundaries. Measure the actual URL for unusually large images or
 code-heavy articles: Lighthouse's synthetic notes do not cover every real article.
 
-- **Editing**: change the text and add `updatedDate` with today's date (it cannot be earlier than `pubDate`). It shows on the note and in the metadata.
+- **Editing**: change the text and add `updatedDate` with today's date (it cannot be earlier than `pubDate`). It shows on the note and in the metadata. `publish-note` only publishes drafts: for an edit, commit on `develop` and release by hand ([configuration guide, section 7](CONFIGURATION.en.md#7-releasing-and-rolling-back)). If the push only touches notes it still takes the fast lane.
 - **Do not change the slug** (the folder name): it is the URL and the site has **no redirects**; links and comments point to it.
-- **Retiring**: move the folder back to `drafts/` (it stops being published on the next release) or delete it. The URL will return 404.
+- **Retiring**: move the folder back to `drafts/` (it stops being published on the next release) or delete it. The URL will return 404. There is no command for this either: commit and release by hand.
 
 ## 11. Checklist before publishing
 
 - [ ] One decision only, starting with the problem; numbers and names, not adjectives.
 - [ ] `title` ≤ 90, `description` ≤ 160, each `decision` field ≤ 280, at most 5 `tags`.
 - [ ] `category` and `tags` lowercase and hyphenated, consistent with your other notes.
-- [ ] `pubDate` with the real date, in `YYYY-MM-DD` format.
+- [ ] `pubDate`: `publish-note` sets it to today; for a manual publication, the real date in `YYYY-MM-DD` format.
 - [ ] No `#` title; sections with `##`.
 - [ ] Every image has alt text, is about 1,600 px wide at most and shows no private data.
 - [ ] No private repository, no email, no project that does not exist yet.
 - [ ] If it has a translation, `translationOf` points to a note that is published too.
 - [ ] It reads well at 360 px, in light and dark theme and in reading mode.
-- [ ] `pnpm test`, `typecheck`, `lint` and `build` pass.
-- [ ] After the real build, `pnpm check:page-weight` and `pnpm check:js-budget` pass.
+- [ ] `pnpm test`, `typecheck`, `lint` and `build` pass (`publish-note` already runs the build; the rest is for the manual way).
+- [ ] After the real build, `pnpm check:page-weight` and `pnpm check:js-budget` pass. `publish-note` already runs them right after the build (a few seconds), so a note that is too heavy fails before anything is pushed; CI (`notes-gate`) repeats them.
 - [ ] The card in `dist/client/og/notes/<slug>.png` looks right.
 
 ## 12. Common errors
@@ -323,3 +338,8 @@ code-heavy articles: Lighthouse's synthetic notes do not cover every real articl
 | The image does not show | The relative path is wrong or the file is not next to `index.mdx` |
 | The build says "says it translates ... which does not exist" | `translationOf` points to a slug that does not exist or is a draft: publish both notes or remove `translationOf` |
 | The table looks plain on a phone | Tables have no styling of their own: replace it with a list |
+| `publish-note` says "run it on the develop branch" or "uncommitted changes" | It must run on `develop` with a clean tree (drafts do not count: `drafts/` is ignored). Commit or stash and retry |
+| `publish-note` says "no draft at ..." or "already exists" | The slug does not match a folder in `drafts/`, or a published note with that slug or a `note-NNN` changelog entry already exists |
+| `publish-note` says "the build or a size budget failed; the note was moved back to drafts" | Fix the error the build or budget printed (a field, `translationOf` or weight, section 10) and retry; nothing was left half-done |
+| The note's CI ran `e2e` and Lighthouse | The push included more than notes and the changelog (for example `topics.json` or code): that release uses every gate. Check the `changes` job summary |
+| `notes-gate` fails on weight | Unlikely (`publish-note` already checked), but possible on a manual edit: see section 10, "Size when publishing". There was no deploy: fix it, commit and release again |

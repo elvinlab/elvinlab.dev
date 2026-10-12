@@ -25,6 +25,7 @@ mise exec -- pnpm depcruise     # architecture boundaries (.dependency-cruiser.c
 mise exec -- pnpm check:dev-cold-start # cold `astro dev` in an isolated workspace: no blank page or late dependency reload
 mise exec -- pnpm changelog:audit   # feat/fix/perf commits since the last release that have no changelog entry
 mise exec -- pnpm changelog:stamp   # date the unreleased entries with the release day (--date, --dry-run)
+mise exec -- pnpm publish-note <slug>  # publish a drafted note end to end: move, date, changelog, build, commit, push, release to main (--dry-run, --no-release); notes-only pushes take the CI fast lane (ADR 0016)
 mise exec -- pnpm docs:config      # regenerate the tables of docs/CONFIGURATION*.md and docs/NOTES*.md and the .env/.dev.vars examples
 
 mise exec -- pnpm --filter web dev          # Astro dev server (workerd runtime)

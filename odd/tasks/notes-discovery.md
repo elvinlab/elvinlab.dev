@@ -29,3 +29,5 @@ Gaps: test fixtures carry no startHere, so e2e covers only the fallback; flagged
 T84 (writer, delegated, 2026-10-12): lint, typecheck, whole-web vitest (1373), build, page-weight (35 pages; new `topic` budget style 54200 / html 84800 = measured rounded up), js-budget, white-label, depcruise, docs:config, e2e quick whole twice (623 passed; only font-swap failed, passes alone), topic/tag-filter/card-links re-run after last edit (23 passed), Lighthouse local /notes/ and /notes/tag/pruebas/ all assertions pass. RED on topics.test.ts and tagHref; jsonld/schema tests written alongside.
 Bytes: note pages +33..+98 B (longer chip hrefs); /notes/ +1835 B (119915 / 120200 budget); topic pages ~83-85 KB, same stylesheet. fixture-workspace.ts changed (full-wide script): topics fixture swapped in for fixture builds.
 Owner approved the three intros verbatim (2026-10-12).
+
+Released in 5912ab9 (release 18, 2026-10-12): T83 and T84 live; issues #121 and #122 closed. Lighthouse margin on /notes/smoke-es/ stays with #119.
