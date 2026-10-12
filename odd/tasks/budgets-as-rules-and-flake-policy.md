@@ -44,5 +44,8 @@ Publishing note 009 was stopped by the page-weight budget of a topic page (+718 
 - Done before this file existed (T1 content): RED observed on the topic-marker test, then 49/49 GREEN in `page-weight-budget.test.ts`; `pnpm typecheck` 0 errors after fixing an `exactOptionalPropertyTypes` error that `pnpm verify` caught; budgets pass on a real build (topic pages 84025/84200, 83348/83400, 84816/85000 with 5 notes).
 - First full `pnpm verify --run`: 811 of 812 e2e passed; the one failure (axe on `/en/contact/`, dark) passed 2/2 on rerun, so it is intermittent and unrelated to this change. Not recorded in the ledger because that run was not green.
 
+- Whole stack once, after piece 1: `pnpm verify --stale --run --record` green, 12 of 12 checks (lint, typecheck, depcruise, docs:config, unit, build, js-budget, page-weight, white-label, cold start, 43 e2e specs, Lighthouse on 11 URLs), 367 s, recorded in `odd/verification-state.json`. The axe failure on `/en/contact/` did not recur.
+- Commits (local, not pushed): 2bce379 (T1), fd348c5 (T2), 69ee568 (T3). Review assessment: not run (RDD tier unassessed for these local commits; recorded as unavailable, not as low).
+
 ## Next step
-Run the whole stack once (`pnpm verify --run --record`), then T4 (noisy-gate policy) and T5 (issue for the `/me/` CLS).
+Owner decides: release piece 1 to main (full CI, since code changes) so that Note 009 can then go out alone through the notes-only fast lane. After that, T4 (noisy-gate policy) and T5 (issue for the `/me/` CLS).
