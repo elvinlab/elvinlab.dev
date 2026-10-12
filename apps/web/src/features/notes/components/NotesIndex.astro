@@ -4,6 +4,7 @@ import { getCollection } from 'astro:content';
 
 import { BackgroundCanvas } from '@/features/backgrounds/index.ts';
 import { groupByYear, readingMinutes, sortNotes } from '@/features/notes/lib/notes.ts';
+import { assertStartHere, selectStartHere } from '@/features/notes/lib/start-here.ts';
 import { type Locale, t } from '@/shared/i18n/index.ts';
 import Banner from '@/shared/layout/Banner.astro';
 import BaseLayout from '@/shared/layout/BaseLayout.astro';
@@ -11,6 +12,7 @@ import BaseLayout from '@/shared/layout/BaseLayout.astro';
 import NoteRow from './NoteRow.astro';
 import NotesFilter from './NotesFilter.astro';
 import NotesSidebar from './NotesSidebar.astro';
+import StartHere from './StartHere.astro';
 
 type Props = { locale: Locale; noindex?: boolean };
 
@@ -22,6 +24,8 @@ const notes = entries.map((entry) => ({
   data: entry.data,
   readingMinutes: readingMinutes(entry.body ?? ''),
 }));
+assertStartHere(notes);
+const startHere = selectStartHere(notes, locale);
 const groups = groupByYear(notes);
 
 const categoryCounts = new Map<string, number>();
@@ -42,6 +46,7 @@ const tags = [...new Set(sortNotes(notes).flatMap((note) => note.data.tags))];
   </Banner>
 
   <div class="flex flex-col gap-6">
+    <StartHere locale={locale} notes={startHere} />
     <NotesFilter locale={locale} />
 
     {groups.length === 0 && <p class="text-text-secondary">{t(locale, 'notes.empty')}</p>}

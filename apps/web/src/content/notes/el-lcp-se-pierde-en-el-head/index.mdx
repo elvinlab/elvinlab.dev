@@ -6,6 +6,8 @@ pubDate: 2026-10-11
 lang: es
 category: decisiones
 tags: [rendimiento, lcp, css, lighthouse, astro]
+startHere: 3
+startHereNote: "Un caso concreto con números: cómo 337 bytes de CSS reprobaron el LCP."
 decision:
   context: "337 bytes de CSS hicieron fallar el control de LCP (2.586 ms contra un límite de 2.500) y otra vez falló por 13 ms. Cada KB de CSS en el head costaba de 8 a 11 ms bajo 4G simulado."
   decision: "Enviar el CSS de cada componente solo en las páginas donde se muestra, con un presupuesto de peso por tipo de página. Descarté la hoja de estilos externa: su peor caso empeoró."

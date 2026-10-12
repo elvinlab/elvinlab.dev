@@ -670,5 +670,11 @@
     "category": "changed",
     "title": "Shorter changelog lines, clearer gallery thumbnails",
     "description": "Changelog entries stop at a comfortable line length instead of spanning the whole page. On phones the experiment gallery thumbnails are larger and no longer look faded. The RSS feed title uses a middle dot instead of a dash."
+  },
+  "notes-start-here": {
+    "date": "2026-10-11",
+    "category": "added",
+    "title": "A \"Start here\" reading path for the notes",
+    "description": "The notes index opens with three hand-picked notes, each with one line on why to start there, so a visitor who is not drawn to the newest note has a way in. At the end of every note, \"Related notes\" becomes \"Keep reading\": those same entry points first, then related notes. It is static HTML, with no new JavaScript."
   }
 }

@@ -61,6 +61,23 @@ export function noteSchema() {
         .max(5)
         .default([])
         .describe('Up to five kebab-case tags.'),
+      startHere: z
+        .union([z.literal(1), z.literal(2), z.literal(3)])
+        .optional()
+        .meta({
+          description:
+            'Marks the note as a start-here entry point and sets its order (1 to 3). Each value can be used once per language; requires `startHereNote`.',
+          'x-type': '1 | 2 | 3',
+        }),
+      startHereNote: z
+        .string()
+        .trim()
+        .min(1)
+        .max(120)
+        .optional()
+        .describe(
+          'One line saying why to start with this note (max 120 characters); required when `startHere` is set.',
+        ),
       decision: z
         .object({
           context: summary.describe('What forced a decision (max 280 characters).'),
@@ -68,6 +85,10 @@ export function noteSchema() {
           outcome: summary.describe('What happened next (max 280 characters).'),
         })
         .describe('Decision record shown before the text: context, decision and outcome.'),
+    })
+    .refine((note) => note.startHere === undefined || note.startHereNote !== undefined, {
+      path: ['startHereNote'],
+      message: 'startHereNote is required when startHere is set',
     })
     .refine((note) => !note.updatedDate || note.updatedDate >= note.pubDate, {
       path: ['updatedDate'],

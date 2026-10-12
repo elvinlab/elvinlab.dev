@@ -22,4 +22,10 @@ export {
   sortNotes,
 } from './lib/notes.ts';
 export { buildRssFeed, escapeXml, type FeedNote } from './lib/rss.ts';
+export {
+  assertStartHere,
+  continueReading,
+  type StartHereNote,
+  selectStartHere,
+} from './lib/start-here.ts';
 export { type NoteData, noteSchema } from './schema.ts';

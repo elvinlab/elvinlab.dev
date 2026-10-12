@@ -75,6 +75,8 @@ It is the block between `---` at the top of the file. The site validates it at b
 | `translationOf` | `string` | no |  | Slug of the same note in the other language. One side is enough (the link works both ways). Both notes then point at each other with hreflang and the language switch goes to the translation. The target must be published too, or the build fails. |
 | `category` | `string` | yes |  | One category in kebab-case (for example `decisiones`); shown above the title and used to group the index. |
 | `tags` | `string[] (max 5)` | no | `[]` | Up to five kebab-case tags. |
+| `startHere` | `1 \| 2 \| 3` | no |  | Marks the note as a start-here entry point and sets its order (1 to 3). Each value can be used once per language; requires `startHereNote`. |
+| `startHereNote` | `string (max 120)` | no |  | One line saying why to start with this note (max 120 characters); required when `startHere` is set. |
 | `decision` | `object` | yes |  | Decision record shown before the text: context, decision and outcome. |
 | `decision.context` | `string (max 280)` | yes |  | What forced a decision (max 280 characters). |
 | `decision.decision` | `string (max 280)` | yes |  | What you chose and what you ruled out (max 280 characters). |
@@ -106,9 +108,25 @@ Details that avoid mistakes:
 - **`pubDate`**: `YYYY-MM-DD` format (the draft writes it unquoted). Two notes with the same date are ordered by number (the higher number first).
 - **`number`**: the first note is 1. A translation reuses the original's number.
 - **`category`**: just one, lowercase and hyphenated. There is no closed list; **keep using the same ones** you already have (the ones in the index sidebar) so they group well.
-- **`tags`**: up to five, lowercase and hyphenated. They are used to compute the "related notes".
+- **`tags`**: up to five, lowercase and hyphenated. They are used to compute "Keep reading".
+- **`startHere` and `startHereNote`**: optional, set together. They mark the note as an entry point (section 3.1).
 - **`updatedDate`**: only when you make a relevant edit to a published note (section 10).
 - **`translationOf`**: the slug of the same note in the other language (section 8). Setting it on one of the two notes is enough.
+
+### 3.1. "Start here" notes
+
+`/notes/` opens with a "Start here" block of three notes, and the end of every note shows "Keep reading": those same notes first (unless the reader just saw them as previous/next), then related ones. They are chosen with two fields in the note itself:
+
+```yaml
+startHere: 2
+startHereNote: "My thesis: understand and write down the intent before asking an AI for code."
+```
+
+- `startHere` is the order: `1`, `2` or `3`, each used once per language. `startHereNote` is the one-line reason (at most 120 characters) and is required whenever `startHere` is set.
+- With fewer than three flagged in a language, the most recent notes of that language fill the rest (and the build prints a warning). The block is never empty and never stale.
+- The build **fails** on a duplicate `startHere` in the same language, a missing reason, or a value outside 1 to 3.
+- **How to choose**: a note that works as a way in for someone who does not know the site: the overview, the thesis and one concrete case with numbers. Publishing an ordinary note needs no change; review the flags only when a better entry point appears (in practice, every few notes).
+- To change a flag, remove `startHere` and `startHereNote` from the old note and set them on the new one; if you retire a flagged note, the block fills itself.
 
 ## 4. The decision record
 
@@ -203,7 +221,7 @@ When you publish a note **you do not have to do anything else** for this:
 
 - It shows up in the **index** (grouped by year) with its language badge, and the "Notes" menu entry appears with the first published note.
 - **Reading time** (at 220 words per minute) and **date** in the header.
-- **Side table of contents** with the `##` sections, **share buttons** (copy link, X, WhatsApp and LinkedIn: plain links with no third-party script; X and WhatsApp pre-fill the message with the note title) and **related notes**: those in the same language sharing tags (weighted double) or category; up to three show.
+- **Side table of contents** with the `##` sections, **share buttons** (copy link, X, WhatsApp and LinkedIn: plain links with no third-party script; X and WhatsApp pre-fill the message with the note title) and **"Keep reading"**: up to three notes in the same language, first those flagged "Start here", then those sharing tags (weighted double) or category; it never repeats the current note or the previous and next ones.
 - **Previous / Next** between notes of the same language.
 - If the note has a translation: **`hreflang`** between both and a direct **language switch** (section 8).
 - **Comments and reactions** (if Giscus is configured): the thread is tied to the note's path.

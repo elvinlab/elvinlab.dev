@@ -75,6 +75,8 @@ Es el bloque entre `---` al inicio del archivo. El sitio lo valida al compilar: 
 | `translationOf` | `string` | no |  | Slug of the same note in the other language. One side is enough (the link works both ways). Both notes then point at each other with hreflang and the language switch goes to the translation. The target must be published too, or the build fails. |
 | `category` | `string` | yes |  | One category in kebab-case (for example `decisiones`); shown above the title and used to group the index. |
 | `tags` | `string[] (max 5)` | no | `[]` | Up to five kebab-case tags. |
+| `startHere` | `1 \| 2 \| 3` | no |  | Marks the note as a start-here entry point and sets its order (1 to 3). Each value can be used once per language; requires `startHereNote`. |
+| `startHereNote` | `string (max 120)` | no |  | One line saying why to start with this note (max 120 characters); required when `startHere` is set. |
 | `decision` | `object` | yes |  | Decision record shown before the text: context, decision and outcome. |
 | `decision.context` | `string (max 280)` | yes |  | What forced a decision (max 280 characters). |
 | `decision.decision` | `string (max 280)` | yes |  | What you chose and what you ruled out (max 280 characters). |
@@ -107,8 +109,24 @@ Detalles que evitan errores:
 - **`number`**: la primera nota es 1. Una traducción reutiliza el número del original.
 - **`category`**: una sola, en minúsculas con guiones. No hay una lista cerrada; **mantén las mismas** que ya usas (las que ves en la barra lateral del índice) para que agrupen bien.
 - **`tags`**: hasta cinco, en minúsculas con guiones. Se usan para calcular las «notas relacionadas».
+- **`startHere` y `startHereNote`**: opcionales, van juntos. Marcan la nota como puerta de entrada (sección 3.1).
 - **`updatedDate`**: solo cuando editas una nota ya publicada de forma relevante (sección 10).
 - **`translationOf`**: el slug de la misma nota en el otro idioma (sección 8). Con indicarlo en una de las dos notas basta.
+
+### 3.1. Notas «Empieza aquí»
+
+`/notes/` abre con un bloque «Empieza aquí» de tres notas, y al final de cada nota «Sigue leyendo» muestra primero esas mismas notas (si el lector no las acaba de ver en anterior/siguiente) y después las relacionadas. Se eligen con dos campos en la propia nota:
+
+```yaml
+startHere: 2
+startHereNote: "Mi tesis: entender y escribir la intención antes de pedirle código a la IA."
+```
+
+- `startHere` es el orden: `1`, `2` o `3`, sin repetir dentro de un mismo idioma. `startHereNote` es la razón en una línea (máximo 120 caracteres) y es obligatoria si hay `startHere`.
+- Si hay menos de tres marcadas en un idioma, el resto se completa con las notas más recientes de ese idioma (y el build avisa con un `warning`). El bloque nunca queda vacío ni desactualizado.
+- El build **falla** si hay un `startHere` repetido en el mismo idioma, si falta la razón o si el valor no está entre 1 y 3.
+- **Cómo elegir**: una nota que sirva de puerta de entrada a quien no conoce el sitio: la visión de conjunto, la tesis y un caso concreto con números. No hace falta tocar nada al publicar una nota normal; revisa las marcas solo cuando salga una nota mejor como entrada (en la práctica, cada pocas notas).
+- Para cambiar una marca, quita `startHere` y `startHereNote` de la nota anterior y ponlos en la nueva; si retiras una nota marcada, el bloque se completa solo.
 
 ## 4. El registro de decisión
 
@@ -203,7 +221,7 @@ Al publicar una nota **no tienes que hacer nada más** para esto:
 
 - Aparece en el **índice** (agrupada por año) con su insignia de idioma, y la entrada «Notas» del menú aparece con la primera nota publicada.
 - **Tiempo de lectura** (a 220 palabras por minuto) y **fecha** en el encabezado.
-- **Índice lateral** con las secciones `##`, **botones de compartir** (copiar enlace, X, WhatsApp y LinkedIn: enlaces simples sin ningún script de terceros; X y WhatsApp rellenan el mensaje con el título de la nota) y **notas relacionadas**: las del mismo idioma que comparten etiquetas (pesan el doble) o categoría; salen hasta tres.
+- **Índice lateral** con las secciones `##`, **botones de compartir** (copiar enlace, X, WhatsApp y LinkedIn: enlaces simples sin ningún script de terceros; X y WhatsApp rellenan el mensaje con el título de la nota) y **«Sigue leyendo»**: hasta tres notas del mismo idioma, primero las marcadas como «Empieza aquí» y luego las que comparten etiquetas (pesan el doble) o categoría; nunca repite la nota actual ni la anterior y la siguiente.
 - **Anterior / Siguiente** entre notas del mismo idioma.
 - Si la nota tiene traducción: **`hreflang`** entre ambas y el **cambio de idioma** directo (sección 8).
 - **Comentarios y reacciones** (si Giscus está configurado): el hilo se asocia a la ruta de la nota.

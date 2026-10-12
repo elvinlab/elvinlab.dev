@@ -22,9 +22,9 @@ import {
   formatDate,
   noteNumber,
   readingMinutes,
-  relatedNotes,
   sortNotes,
 } from '@/features/notes/lib/notes.ts';
+import { assertStartHere, continueReading } from '@/features/notes/lib/start-here.ts';
 import { translationAlternates, translationsOf } from '@/features/notes/lib/translations.ts';
 import { site } from '@/shared/config/index.ts';
 import { LOCALES, type Locale, t } from '@/shared/i18n/index.ts';
@@ -43,7 +43,8 @@ const tocHeadings = headings.filter((heading) => heading.depth === 2).map((h) =>
 const all = (await getCollection('notes')).map((item) => ({ slug: item.id, data: item.data }));
 const sameLang = sortNotes(all.filter((note) => note.data.lang === data.lang));
 const { prev, next } = adjacentNotes(sameLang, entry.id);
-const related = relatedNotes(
+assertStartHere(all);
+const related = continueReading(
   all,
   { slug: entry.id, data },
   3,
