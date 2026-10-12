@@ -69,7 +69,9 @@ if (dryRun) {
   console.log('Dry run, nothing changed. It would:');
   console.log(`  1. move drafts/${slug} to notes/${slug} and set pubDate to ${today}`);
   console.log(`  2. add the changelog entry "${key}"`);
-  console.log('  3. build the site (validates the frontmatter and translations)');
+  console.log(
+    '  3. build the site (validates frontmatter and translations) and check the size budgets',
+  );
   console.log('  4. stamp the changelog, commit on develop and run the changelog audit');
   console.log(
     release
@@ -86,11 +88,16 @@ writeFileSync(changelogPath, `${JSON.stringify({ ...changelog, [key]: entry }, n
 
 try {
   run('pnpm', ['--filter', 'web', 'build']);
+  // The same two budgets CI's notes-gate runs, so a heavy note fails here and not after the push.
+  run('pnpm', ['check:js-budget']);
+  run('pnpm', ['check:page-weight']);
 } catch {
-  // Put the draft back so the failed build leaves nothing half-published.
+  // Put the draft back so a failed check leaves nothing half-published.
   renameSync(noteDir, draftDir);
   writeFileSync(changelogPath, `${JSON.stringify(changelog, null, 2)}\n`);
-  fail('the build failed; the note was moved back to drafts. Fix the error above and retry.');
+  fail(
+    'the build or a size budget failed; the note was moved back to drafts. Fix the error above and retry.',
+  );
 }
 
 run('pnpm', ['changelog:stamp']);

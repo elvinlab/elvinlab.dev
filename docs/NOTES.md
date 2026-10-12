@@ -273,7 +273,7 @@ mise exec -- pnpm publish-note <slug> --dry-run   # ensayo: muestra los pasos y 
 mise exec -- pnpm publish-note <slug>             # publica
 ```
 
-Hace, en orden y deteniéndose en el primer fallo: mueve `drafts/<slug>` a `notes/<slug>`, pone `pubDate` con la fecha local de hoy, añade la entrada `note-NNN` al `changelog.json`, compila (el build valida el frontmatter y `translationOf`; si falla, la nota vuelve a `drafts/`), fecha el changelog, hace el commit `feat(notes): publish "Título"`, comprueba la auditoría del changelog, empuja `develop` y publica el release en `main`. **Ejecutarlo es tu autorización para empujar a `main`.** Con `--no-release` se detiene tras el commit local.
+Hace, en orden y deteniéndose en el primer fallo: mueve `drafts/<slug>` a `notes/<slug>`, pone `pubDate` con la fecha local de hoy, añade la entrada `note-NNN` al `changelog.json`, compila y comprueba los presupuestos de tamaño (el build valida el frontmatter y `translationOf`; si algo falla, la nota vuelve a `drafts/`), fecha el changelog, hace el commit `feat(notes): publish "Título"`, comprueba la auditoría del changelog, empuja `develop` y publica el release en `main`. **Ejecutarlo es tu autorización para empujar a `main`.** Con `--no-release` se detiene tras el commit local.
 
 Ese push dispara el CI por el **carril rápido para notas** ([ADR 0016](adr/0016-publish-note-command-and-notes-fast-lane.md)): si el push solo toca notas publicadas y el changelog, se saltan `e2e` y Lighthouse y corren `static`, `notes-gate` (build y presupuestos de peso) y el deploy con su smoke-check. Si el push incluye cualquier otro cambio, corre todo. Mira el run con `gh run watch`; si algo falla, no hay deploy.
 
@@ -322,7 +322,7 @@ Para una nota con imágenes grandes o mucho código, mide también esa URL real:
 - [ ] Si tiene traducción, `translationOf` apunta a una nota que también se publica.
 - [ ] Se lee bien en 360 px, en tema claro y oscuro y en modo lectura.
 - [ ] `pnpm test`, `typecheck`, `lint` y `build` pasan (`publish-note` ya ejecuta el build; el resto es del camino manual).
-- [ ] Después del build real, `pnpm check:page-weight` y `pnpm check:js-budget` pasan. `publish-note` **no** los ejecuta: los corre el CI (`notes-gate`) después del push y, si fallan, no hay deploy. En una nota larga o con imágenes grandes, córrelos antes de publicar.
+- [ ] Después del build real, `pnpm check:page-weight` y `pnpm check:js-budget` pasan. `publish-note` ya los ejecuta justo después del build (solo unos segundos), así que una nota demasiado pesada falla antes de empujar nada; el CI (`notes-gate`) los repite.
 - [ ] La tarjeta de `dist/client/og/notes/<slug>.png` se ve bien.
 
 ## 12. Errores frecuentes
@@ -340,6 +340,6 @@ Para una nota con imágenes grandes o mucho código, mide también esa URL real:
 | La tabla se ve plana en el móvil | Las tablas no tienen estilo propio: cámbiala por una lista |
 | `publish-note` dice «run it on the develop branch» o «uncommitted changes» | Debe ejecutarse en `develop` con el árbol limpio (los borradores no cuentan: `drafts/` está ignorado). Haz commit o `stash` y repite |
 | `publish-note` dice «no draft at …» o «already exists» | El slug no coincide con una carpeta de `drafts/`, o ya existe una nota publicada con ese slug o una entrada `note-NNN` en el changelog |
-| `publish-note` dice «the build failed; the note was moved back to drafts» | Arregla el error que imprimió el build (campo o `translationOf`) y repite; no quedó nada a medias |
+| `publish-note` dice «the build or a size budget failed; the note was moved back to drafts» | Arregla el error que imprimió el build o el presupuesto (campo, `translationOf` o peso, sección 10) y repite; no quedó nada a medias |
 | El CI de la nota corrió `e2e` y Lighthouse | El push incluía algo más que notas y changelog (por ejemplo `topics.json` o código): ese release usa todas las compuertas. Mira el resumen del job `changes` |
-| `notes-gate` falla por peso | La nota o sus imágenes superan un presupuesto (sección 10, «Tamaño al publicar»). No hubo deploy: corrige, haz commit y libera de nuevo |
+| `notes-gate` falla por peso | Poco probable (`publish-note` ya lo comprobó), pero posible en una edición manual: revisa la sección 10, «Tamaño al publicar». No hubo deploy: corrige, haz commit y libera de nuevo |

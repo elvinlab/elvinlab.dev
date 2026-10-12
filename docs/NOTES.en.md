@@ -273,7 +273,7 @@ mise exec -- pnpm publish-note <slug> --dry-run   # rehearsal: prints the steps 
 mise exec -- pnpm publish-note <slug>             # publishes
 ```
 
-It does the following in order and stops at the first failure: moves `drafts/<slug>` to `notes/<slug>`, sets `pubDate` to today's local date, adds the `note-NNN` entry to `changelog.json`, builds (the build validates the frontmatter and `translationOf`; if it fails the note goes back to `drafts/`), dates the changelog, commits `feat(notes): publish "Title"`, runs the changelog audit, pushes `develop` and releases to `main`. **Running it is your authorization to push to `main`.** With `--no-release` it stops after the local commit.
+It does the following in order and stops at the first failure: moves `drafts/<slug>` to `notes/<slug>`, sets `pubDate` to today's local date, adds the `note-NNN` entry to `changelog.json`, builds and checks the size budgets (the build validates the frontmatter and `translationOf`; if anything fails the note goes back to `drafts/`), dates the changelog, commits `feat(notes): publish "Title"`, runs the changelog audit, pushes `develop` and releases to `main`. **Running it is your authorization to push to `main`.** With `--no-release` it stops after the local commit.
 
 That push triggers CI through the **notes-only fast lane** ([ADR 0016](adr/0016-publish-note-command-and-notes-fast-lane.md)): when the push only touches published notes and the changelog, `e2e` and Lighthouse are skipped and `static`, `notes-gate` (build and weight budgets) and the deploy with its smoke-check run. If the push includes any other change, everything runs. Follow the run with `gh run watch`; if anything fails, there is no deploy.
 
@@ -322,7 +322,7 @@ code-heavy articles: Lighthouse's synthetic notes do not cover every real articl
 - [ ] If it has a translation, `translationOf` points to a note that is published too.
 - [ ] It reads well at 360 px, in light and dark theme and in reading mode.
 - [ ] `pnpm test`, `typecheck`, `lint` and `build` pass (`publish-note` already runs the build; the rest is for the manual way).
-- [ ] After the real build, `pnpm check:page-weight` and `pnpm check:js-budget` pass. `publish-note` does **not** run them: CI does (`notes-gate`) after the push, and if they fail there is no deploy. For a long note or large images, run them before publishing.
+- [ ] After the real build, `pnpm check:page-weight` and `pnpm check:js-budget` pass. `publish-note` already runs them right after the build (a few seconds), so a note that is too heavy fails before anything is pushed; CI (`notes-gate`) repeats them.
 - [ ] The card in `dist/client/og/notes/<slug>.png` looks right.
 
 ## 12. Common errors
@@ -340,6 +340,6 @@ code-heavy articles: Lighthouse's synthetic notes do not cover every real articl
 | The table looks plain on a phone | Tables have no styling of their own: replace it with a list |
 | `publish-note` says "run it on the develop branch" or "uncommitted changes" | It must run on `develop` with a clean tree (drafts do not count: `drafts/` is ignored). Commit or stash and retry |
 | `publish-note` says "no draft at ..." or "already exists" | The slug does not match a folder in `drafts/`, or a published note with that slug or a `note-NNN` changelog entry already exists |
-| `publish-note` says "the build failed; the note was moved back to drafts" | Fix the error the build printed (a field or `translationOf`) and retry; nothing was left half-done |
+| `publish-note` says "the build or a size budget failed; the note was moved back to drafts" | Fix the error the build or budget printed (a field, `translationOf` or weight, section 10) and retry; nothing was left half-done |
 | The note's CI ran `e2e` and Lighthouse | The push included more than notes and the changelog (for example `topics.json` or code): that release uses every gate. Check the `changes` job summary |
-| `notes-gate` fails on weight | The note or its images exceed a budget (section 10, "Size when publishing"). There was no deploy: fix it, commit and release again |
+| `notes-gate` fails on weight | Unlikely (`publish-note` already checked), but possible on a manual edit: see section 10, "Size when publishing". There was no deploy: fix it, commit and release again |

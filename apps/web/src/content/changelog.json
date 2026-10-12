@@ -687,6 +687,6 @@
     "date": "2026-10-12",
     "category": "added",
     "title": "Publishing a note is one command",
-    "description": "pnpm publish-note <slug> moves the draft, dates it, adds the changelog entry, builds, commits and releases. A push that only touches notes and the changelog now skips the end-to-end and Lighthouse gates and still runs the build, the size budgets, the deploy and its smoke-check. The publishing guide and ADR 0016 explain both."
+    "description": "pnpm publish-note <slug> moves the draft, dates it, adds the changelog entry, builds, checks the size budgets, commits and releases. A push that only touches notes and the changelog now skips the end-to-end and Lighthouse gates and still runs the build, the size budgets, the deploy and its smoke-check. The publishing guide and ADR 0016 explain both."
   }
 }
