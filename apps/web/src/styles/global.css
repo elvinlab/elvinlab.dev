@@ -71,6 +71,36 @@
   }
 }
 
+/* Cross-page view transitions (DESIGN.md "Page transitions"). CSS only; unsupported browsers (Firefox)
+   and reduced motion navigate normally. The navbar is its own group, so it stays put instead of
+   re-entering on every page. The page below keeps its own staggered entrance (`animate-fade-in-up`)
+   as the one entrance, so the default root cross-fade is switched off: it would fade the LCP element's
+   whole page and stack on that entrance. Opaque layers need `normal` blending (the default
+   `plus-lighter` adds them up to white). */
+@media (prefers-reduced-motion: no-preference) {
+  @view-transition {
+    navigation: auto;
+  }
+  [data-navbar] {
+    view-transition-name: site-nav;
+  }
+  ::view-transition-group(*) {
+    animation-duration: 150ms;
+  }
+  ::view-transition-old(root),
+  ::view-transition-new(root) {
+    mix-blend-mode: normal;
+    animation: none;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-group(*),
+  ::view-transition-old(*),
+  ::view-transition-new(*) {
+    animation: none;
+  }
+}
+
 /* The header is sticky (72 px): without this offset, moving focus up the page or following an anchor
    scrolls the target under it. Matches the 6rem of `.prose h2`. */
 html {

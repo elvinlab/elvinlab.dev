@@ -748,5 +748,11 @@
     "category": "changed",
     "title": "Page stamps and a ruled notes index",
     "description": "Experiments, Changelog, Contact and the topic pages now carry a small tilted pink stamp that says what the page is (ON TEST, LOG, WRITE ME, INDEX), above the title on phones and over the corner of the header on wide screens. The notes list is ruled like lab paper: a hand-drawn line between entries and, on wide screens, a faint pink margin rule. Stamps and rules are static decoration, hidden from screen readers, and the stamp lands once only when motion is allowed."
+  },
+  "page-transitions": {
+    "date": "2026-10-12",
+    "category": "added",
+    "title": "Pages hand over smoothly",
+    "description": "Moving between pages in Chrome, Edge and Safari now keeps the navigation bar still while the page below changes, instead of the whole bar flickering back in on every click. It is pure CSS with no script, it never runs on the first visit, and it switches off when your system asks for reduced motion. Firefox does not support it yet and simply browses normally."
   }
 }

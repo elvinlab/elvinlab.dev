@@ -116,21 +116,32 @@ Rewritten on 2026-10-12. The old rule ("stepped only", no page transitions) is r
 - **Pixel register (stepped).** Pixel and retro elements (pixel headline details, the cursor block, the Press Start 2P wordmark, the pixel icons, the experiments gallery dissolve) keep `steps(4, end)` motion.
 - **Eased register (everything else).** Named tokens, never a literal curve in a component: `--ease-out: cubic-bezier(0.22, 1, 0.36, 1)` (entrances, ink, transitions), `--ease-in-out: cubic-bezier(0.65, 0, 0.35, 1)` (round-trip state changes), and durations 150 ms (feedback), 300 ms (entrance, transitions) and 700 ms (ink drawing). State transitions stay on named properties only, never `all`.
 - Rules that stay in both registers: every animation stops or shows its final state under `prefers-reduced-motion`; no JavaScript for motion (30 KiB JS gzip budget); one entrance choreography per page; anything that can be the LCP element animates `transform` only, never opacity; nothing may change layout (CLS); no looping decoration (the existing banner pulses are not extended).
-- Onload: `animate-fade-in-up` 300 ms, staggered (navbar 0, sidebar 100, content 150, footer 250 ms). It is the page's one entrance; a page transition must not double it up.
+- Onload: `animate-fade-in-up` 300 ms, staggered (sidebar 100, content 150, footer 250 ms; since 2026-10-12 the navbar has no entrance, it persists through the page transition instead). It is the page's one entrance; a page transition must not double it up.
 - Press: `scale(0.96)` (`active:scale-96`) with the 150 ms feedback duration.
 - Theme switch suppresses transitions for one frame.
 - The background picker in the navbar is hidden, with CSS only, under a coarse pointer and under `prefers-reduced-motion`, the two conditions where `BackgroundCanvas` never runs an effect, so it never offers a change the visitor cannot see; a narrow desktop window keeps it because width does not stop the effect.
 
-### Page transitions (allowed since 2026-10-12)
+### Page transitions (shipped 2026-10-12, task N4)
 
-Replaces "Page transitions: none". CSS only, through cross-document `@view-transition { navigation: auto }`; no client router, no View Transitions API script. Hover and keyboard-focus prefetch (Astro `prefetch`, `hover` strategy, tap on slow or data-saver connections) stays and helps them.
+Replaces "Page transitions: none". CSS only, in `global.css`, through cross-document `@view-transition { navigation: auto }`; no client router, no View Transitions API script. Hover and keyboard-focus prefetch (Astro `prefetch`, `hover` strategy, tap on slow or data-saver connections) stays and helps them.
 
-- **Fallback:** it must degrade to an ordinary page load. Firefox is treated as unsupported (caniuse lists it as partial and unspecified); navigation stays fully correct without transitions.
-- **LCP:** never cross-fade the LCP element. Override the default root cross-fade (`::view-transition-old(root)` and `::view-transition-new(root)`) with a transform or clip animation.
-- **Reduced motion:** the global `*` reset does not reach view-transition pseudo-elements, so they get their own `prefers-reduced-motion` rule (`animation: none`).
-- **Names:** `view-transition-name` values are unique per page and must not outlive the snapshot, so a bfcache restore never reuses a stale name. How to remove them without JavaScript is an open point for the implementation task (N4); if it cannot be done in CSS, the item stays out of scope rather than adding script weight.
-- **No double entrance:** `animate-fade-in-up` must not run on top of a transition; the transition replaces it on navigated loads.
-- Last in the rollout order (see the signature plan), because it carries the highest LCP, CLS and double-entrance risk.
+What shipped:
+
+- **Opt-in only with motion allowed.** `@view-transition` and everything below live inside `@media (prefers-reduced-motion: no-preference)`, so reduced-motion visitors get ordinary navigation. A `reduce` block also sets `animation: none` on `::view-transition-group(*)`, `-old(*)` and `-new(*)` as defense in depth (the global `*` reset does not reach those pseudo-elements).
+- **Persistent chrome.** The navbar (`[data-navbar]`) is `view-transition-name: site-nav`, so it stays where it is and cross-fades with itself (the current-page highlight changes) instead of re-entering on every click. Only that one static name exists, unique per page. The footer is not named: it is part of the page below and keeps its entrance. No per-note or per-row names (that needs per-note markup or script), no shared title morph, no banner morph (banner heights differ per page: CLS risk).
+- **Root override.** The default root cross-fade is switched off (`::view-transition-old/new(root)`: `animation: none`, `mix-blend-mode: normal`; opaque layers blended with the default `plus-lighter` would add up to white). The page below keeps its own staggered `animate-fade-in-up` as the one entrance. The group duration is 150 ms.
+- **No double entrance, how.** A first attempt dropped `animate-fade-in-up` with `html:active-view-transition .animate-fade-in-up { animation: none }` (the pseudo-class does match on the new document's first style). It failed on measurement: when the transition ends the pseudo-class stops matching, `animation-name` changes from `none` back to `fade-in-up` and the entrance restarts (4 `animationstart` events at about 415 ms). Detecting cross-document support in CSS is not possible today (`@supports at-rule(@view-transition)` is Chrome 148 and Firefox 157 only; `view-transition-class` and `:active-view-transition` also exist in Firefox 144+ which has no cross-document support). So the transition does not animate the page at all; the entrance is untouched, the navbar lost its own entrance (it persists instead), and the e2e test `view-transitions.spec.ts` proves the entrance count is the same on a navigated load as on a cold load.
+- **LCP and CLS.** Transitions never run on a cold load. No opacity animation was added; the named navbar is not the LCP element. Mobile Lighthouse (local, 1 run): `/` LCP 1552 ms, CLS 0; `/notes/smoke-es/` LCP 2267 ms, CLS 0.015.
+- **bfcache and history.** The name is static CSS, never set by script, and unique per page, so a restored page cannot carry a stale name. In Chromium a back/forward traversal fires `pagereveal` with a view transition (the same nav-only effect); the Playwright run did not restore from bfcache (`pageshow.persisted` was false), so the bfcache case itself is not verified, only the traversal.
+- **Language switch** (ES to EN is a normal navigation to another path) transitions like any link; the **theme toggle** is in place, has no navigation and no view transition, and keeps its one-frame transition suppression.
+- Cost: about 470 B of site stylesheet on every page; page-weight budgets raised by the measured need (see `apps/web/scripts/page-weight-budget.json`).
+
+Browser support (checked 2026-10-12):
+
+- Verified (MDN browser-compat-data `css/at-rules/view-transition.json`, https://github.com/mdn/browser-compat-data, and Chrome's guide https://developer.chrome.com/docs/web-platform/view-transitions/cross-document): Chrome and Edge 126+, Safari and iOS Safari 18.2+. `pagereveal` is Chrome 124+, Safari 18.2+.
+- Verified: Firefox has no cross-document support (BCD `false`, tracked at https://bugzil.la/1860854). caniuse lists Firefox 144+ as supported only for the same-document View Transitions API (https://caniuse.com/view-transitions), which is a different feature; this is why the "partial" there is misleading for this design.
+- Firefox is treated as unsupported and browses normally; browsers that do not know the rule ignore it.
+- Assumed, not tested here: Safari rendering (only Chromium was exercised), and the visual quality of the navbar hand-over (no frame sequence was recorded).
 
 ## Notebook ink system (decided 2026-10-12)
 
