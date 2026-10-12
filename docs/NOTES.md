@@ -226,7 +226,7 @@ Dos componentes opcionales dan al texto el aspecto de un cuaderno de laboratorio
 
 ```mdx
 import Fix from '@/features/notes/components/Fix.astro';
-import Ink from '@/features/notes/components/Ink.astro';
+import Ink from '@/shared/ui/Ink.astro';
 
 Corrí <Fix wrong="pnpm run publish" right="pnpm publish-note" /> y no existía.
 Lo que me llevo: <Ink>un error corregido en voz alta enseña más</Ink>.

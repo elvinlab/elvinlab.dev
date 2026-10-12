@@ -226,7 +226,7 @@ Two optional components give the text a lab-notebook look. Import them at the to
 
 ```mdx
 import Fix from '@/features/notes/components/Fix.astro';
-import Ink from '@/features/notes/components/Ink.astro';
+import Ink from '@/shared/ui/Ink.astro';
 
 I ran <Fix wrong="pnpm run publish" right="pnpm publish-note" /> and it did not exist.
 What I take away: <Ink>a mistake corrected out loud teaches more</Ink>.

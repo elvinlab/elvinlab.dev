@@ -1,0 +1,31 @@
+---
+/** A hand-drawn underline or circle that draws itself once on load (CSS only). Under reduced
+ * motion the stroke is shown fully drawn. The SVG is decorative (`aria-hidden`) and the text stays
+ * selectable. Density: a handful per page, one per screen block (DESIGN.md, ink system).
+ *
+ * `underline` may wrap over several lines (a per-line background, `box-decoration-break: clone`).
+ * `circle` is for SHORT phrases only: it never wraps (`nowrap`) and its stroke stays inside the
+ * line box, so it cannot touch the line above on a wrapped heading.
+ *
+ * A background image cannot read a CSS variable, so the underline color is written once per theme
+ * (`#ec4899` dark, `#be185d` light = the pink token): the documented exception to "semantic tokens
+ * only". The CSS lives in `ink-underline.css` and `ink-circle.css` and is inlined by the component, once per page, through
+ * `ink-once.ts`: a bundled or scoped style would leak into every page that reaches `Ink` through a
+ * feature barrel (the home is exported with `/me/` and `/experiments/`), so only a page that
+ * renders an `Ink` pays for it. */
+import circleCss from '@/shared/ui/ink-circle.css?inline';
+import { claimInkCss } from '@/shared/ui/ink-once.ts';
+import underlineCss from '@/shared/ui/ink-underline.css?inline';
+
+/** `inlineCss={false}` is for a page that puts `ink-underline.css` in its own `<head>` (the home does, so no
+ * `<style>` element sits inside the `<h1>`). */
+type Props = { variant?: 'underline' | 'circle'; inlineCss?: boolean };
+
+const { variant = 'underline', inlineCss = true } = Astro.props;
+const emitCss = inlineCss && claimInkCss(Astro.request, variant);
+const css = variant === 'circle' ? circleCss : underlineCss;
+---
+
+{emitCss && <style is:inline set:html={css} />}<span class:list={['ink', `ink-${variant}`]}><slot />{variant === 'circle' && (
+  <svg class="ink-svg" viewBox="0 0 100 40" preserveAspectRatio="none" aria-hidden="true" focusable="false"><path d="M52 3 C20 2 3 12 5 23 C7 35 38 38 66 36 C92 33 99 22 90 12 C82 5 62 3 40 5" pathLength="1" /></svg>
+)}</span>

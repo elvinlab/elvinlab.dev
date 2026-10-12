@@ -2,9 +2,9 @@
   "headroom": 0.04,
   "types": {
     "home": {
-      "why": "Hero is text: LCP follows the head bytes (about 8-9 ms per raw KB in the lab); the home is the heaviest first screen. 2026-10-12: html 101400 -> 101900 for the native feel layer (about 190 B of safe-area, overscroll and tap CSS plus 60 B of theme-color sync script and the pressed-state classes on navbar, footer and chip links), the minimum measured need.",
-      "styleBytes": 58500,
-      "htmlBytes": 101900,
+      "why": "Hero is text: LCP follows the head bytes (about 8-9 ms per raw KB in the lab); the home is the heaviest first screen. 2026-10-12: html 101400 -> 101900 for the native feel layer (about 190 B of safe-area, overscroll and tap CSS plus 60 B of theme-color sync script and the pressed-state classes on navbar, footer and chip links), the minimum measured need. 2026-10-12: style 58500 -> 59000, html 101900 -> 102900 for the headline ink underline (about 0.5 KB of inline underline CSS in the head, two data-URI strokes included, plus the span and the marker split; the circle CSS is not shipped on the home), measured overshoot +492 B style and +950 B html.",
+      "styleBytes": 59000,
+      "htmlBytes": 102900,
       "measured": {
         "styleBytes": 56211,
         "htmlBytes": 97419,

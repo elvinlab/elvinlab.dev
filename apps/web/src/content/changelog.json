@@ -736,5 +736,11 @@
     "category": "changed",
     "title": "The decision record is now an index card with a stamp",
     "description": "On every note the context, decision and outcome summary looks like a paper index card with a ruled header and a pink DECISION stamp over its corner. On large screens the card sits pinned beside the title with a very slight tilt; on phones it is a lighter, level card inside the article. The stamp lands once and stays still under reduced motion, and screen readers skip it because the card already has its own title."
+  },
+  "home-headline-ink": {
+    "date": "2026-10-12",
+    "category": "changed",
+    "title": "The home headline underlines what goes wrong",
+    "description": "The key phrase of the home headline now has a hand-drawn pink underline that draws itself once after the page loads and stays still under reduced motion. The text does not move, and the phrase is chosen in the site copy with double square brackets, so a fork can move it or drop it."
   }
 }
