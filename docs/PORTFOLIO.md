@@ -48,6 +48,7 @@ me: {
 - **Disponibilidad:** `recruiter.status` es el rótulo corto («Colaboraciones y proyectos») y `recruiter.lookingFor` la línea de la barra lateral. `recruiter.available: false` oculta la línea entera.
 - **CV:** `recruiter.cvUrl` acepta una URL (https) o una por idioma. Sin CV, el botón no aparece.
 - **Stack:** cada grupo de `me.stack` lleva `label`, `items` y, opcionalmente, `icon`, `hint` (la frase del tooltip) y `layer`. Los grupos con `layer: true` se dibujan como capas numeradas del producto (por ejemplo datos, backend, frontend, cloud) unidas por una línea vertical; ponlos primero. Los grupos sin `layer` (IA, calidad, proyectos) cruzan las capas y van debajo; con `folded: true` quedan dentro de un bloque plegado "Más herramientas" (sin JavaScript) para que el stack sea corto. Para mantener `/me` rápido, evita añadir íconos o tooltips por cada herramienta.
+- **Datos en bruto:** bajo el stack, `/me` muestra un bloque plegado (`<details>`, sin JavaScript) con los datos de la propia página como filas `campo / tipo / valor`. Se genera solo desde `identity` (nombre, handle, rol, ubicación, año de inicio), `me.headline` y `me.stack` en el idioma activo; no hay nada que configurar y no se muestra ninguna clave que no esté en esos campos.
 - **Fotos:** `identity.avatar` y `identity.photo` son nombres de archivo dentro de `apps/web/src/assets/`.
 
 ## 3. Agregar o editar un experimento

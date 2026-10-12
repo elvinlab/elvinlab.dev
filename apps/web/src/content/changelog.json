@@ -706,5 +706,11 @@
     "category": "changed",
     "title": "The home names its author on phones",
     "description": "On narrow screens the hero now shows the name and role above the headline, and the home page title includes the name, so a first-time visitor knows whose site it is without scrolling."
+  },
+  "me-raw-data-layer": {
+    "date": "2026-10-12",
+    "category": "added",
+    "title": "A raw-data layer on /me",
+    "description": "Under the stack, /me now has a collapsed block that shows the page's own data as field, type and value rows (name, role, start year, one row per stack group), generated from the site configuration in the active language. A native details element: no JavaScript, keyboard operable, hidden when printing."
   }
 }

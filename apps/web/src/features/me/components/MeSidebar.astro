@@ -3,6 +3,7 @@
  * "let's talk" card. Stack groups and the contact card carry an icon and a hover/focus explanation. */
 import { localizePath } from '@elvinlab/core';
 
+import MeDataLayer from '@/features/me/components/MeDataLayer.astro';
 import QuickFacts from '@/features/me/components/QuickFacts.astro';
 import StackGroup from '@/features/me/components/StackGroup.astro';
 import { isEnabled, site } from '@/shared/config/index.ts';
@@ -58,6 +59,7 @@ const folded = groups.filter(({ group }) => !group.layer && group.folded);
         </div>
       </details>
     )}
+    <MeDataLayer locale={locale} />
   </section>
 
   {isEnabled('contact') && (

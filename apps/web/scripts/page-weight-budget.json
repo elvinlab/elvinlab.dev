@@ -12,13 +12,13 @@
       }
     },
     "me": {
-      "why": "Recruiter page: hero photo plus experience blocks, the numbered layer rail and the folded more-tools block of the full-stack story, and 44 px hit areas; its LCP margin is the thinnest after /experiments/.",
+      "why": "Recruiter page: hero photo plus experience blocks, the numbered layer rail and the folded more-tools block of the full-stack story, and 44 px hit areas; its LCP margin is the thinnest after /experiments/. 2026-10-12: html 119700 -> 122900 for the collapsed raw-data layer (about 3.2 KB of field / type / value rows rendered from config, no script); the style budget is unchanged because the block reuses existing utility classes.",
       "styleBytes": 55712,
-      "htmlBytes": 119700,
+      "htmlBytes": 122900,
       "measured": {
         "styleBytes": 55712,
-        "htmlBytes": 119668,
-        "date": "2026-10-11"
+        "htmlBytes": 122854,
+        "date": "2026-10-12"
       }
     },
     "experiments": {
