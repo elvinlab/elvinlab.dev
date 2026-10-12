@@ -718,5 +718,11 @@
     "category": "added",
     "title": "A more native feel on phones",
     "description": "The site now fills notched screens without hiding content under the cutout, stops scroll chaining, removes the grey tap flash, and presses controls in (navbar, footer links, chips, note rows) so taps feel immediate. The browser bar color also follows the theme toggle, not only the system scheme. No JavaScript added for motion."
+  },
+  "notes-ink-components": {
+    "date": "2026-10-12",
+    "category": "added",
+    "title": "Ink components for notes: struck-through fixes and hand-drawn marks",
+    "description": "Notes can now show a mistake struck through with its correction beside it (Fix) and underline or circle a phrase by hand (Ink), the lab-notebook signature of the site. The correction keeps real del/ins semantics with a hidden label in the note's language, the strokes draw once and appear already drawn under reduced motion, and the styles load only on pages that use them. Authoring guide in docs/NOTES.en.md."
   }
 }

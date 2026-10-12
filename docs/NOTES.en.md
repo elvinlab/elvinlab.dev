@@ -161,7 +161,7 @@ A good sign: if someone reads only these three sentences, they understand the de
 
 ## 5. Writing the body
 
-The body is **Markdown with MDX**. The site defines no custom components, so stay with standard Markdown.
+The body is **Markdown with MDX**. Stay with standard Markdown; the only custom pieces are the two ink components below ("Notebook ink").
 
 **Structure**
 
@@ -215,6 +215,24 @@ Tips, measured on a test note:
 
 - To another note: `/notes/other-slug/`. To an external site: the full URL.
 - Never link private repositories or write an email.
+
+**Notebook ink (`Fix` and `Ink`)**
+
+Two optional components give the text a lab-notebook look. Import them at the top of `index.mdx`, right after the frontmatter:
+
+```mdx
+import Fix from '@/features/notes/components/Fix.astro';
+import Ink from '@/features/notes/components/Ink.astro';
+
+I ran <Fix wrong="pnpm run publish" right="pnpm publish-note" /> and it did not exist.
+What I take away: <Ink>a mistake corrected out loud teaches more</Ink>.
+My motto: <Ink variant="circle">I write down what goes wrong</Ink>.
+```
+
+- `Fix` shows the struck-through mistake with the correction next to it. For screen readers it reads "wrong, corrected to, right" (in Spanish, "corregido a"): it uses `<del>` and `<ins>` plus a hidden label taken from the note's language. Pass `label="..."` only if you need different wording.
+- `Ink` underlines by hand (it may wrap over several lines). `variant="circle"` rings the phrase: **only for short single-line phrases**, because it never wraps.
+- **Density:** at most one ink effect per screen block and a handful per note; more and it stops being a signature and becomes decoration.
+- The strokes are decorative (`aria-hidden`), never change the text, draw once and, under "reduce motion", appear already drawn. Nothing else to set up: the CSS ships only on pages that use the components.
 
 ## 6. Seeing the result
 

@@ -139,8 +139,8 @@ Replaces "Page transitions: none". CSS only, through cross-document `@view-trans
 - **Density:** at most one ink effect per screen block and a handful per page; more reads as a template in reverse.
 - **Semantics:** ink is decorative and `aria-hidden`. The correction keeps its meaning with `<del>` and `<ins>` plus a visually hidden label localized through i18n (`sr-only`, never hardcoded Spanish).
 - **LCP:** ink never changes the text of an LCP element; only the stroke animates (700 ms, `--ease-out`, transform or stroke offset, never opacity of the text).
-- **Shapes:** a circle only for short single-line phrases (it grazes the line above on a wrapped heading).
-- **CSS home:** component CSS is scoped to the component, not `global.css`, so only pages that use it pay the bytes. The CSS budget impact is measured and recorded (the prototype in `global.css` cost about 3 KB on every page; `/me/` and topic pages have about 0 B of headroom).
+- **Shapes:** a circle only for short single-line phrases: it is `nowrap` and its SVG stays inside the line box (no vertical overhang), so it cannot touch the line above on a wrapped heading. The underline may wrap (per-line background, `box-decoration-break: clone`).
+- **CSS home:** `Fix.astro` and `Ink.astro` carry their own scoped `<style>`; the per-theme stroke colors are `:global([data-theme=...])` rules in the same files (still no `global.css` bytes). Verified in a production build (2026-10-12): the rules are inlined only in pages that render the component (a note with both gained about 3.6 KB of HTML including markup; `/me/` and `/notes/` were byte-identical). In `astro dev` the scoped CSS of components used inside draft MDX did not appear; that is a dev-server quirk, not a production defect. Screen-reader label: `notes.fix.correctedTo`, from `Astro.currentLocale`. Tests: `tests/browser/ink.spec.ts` against the `smoke-es` and `smoke-en` fixture notes.
 - **Stamps:** the bounded all-caps exception in Avoid; text such as FUNCIONÓ, FALLÓ, PENDIENTE comes from i18n.
 
 ## Native feel layer (decided 2026-10-12)

@@ -161,7 +161,7 @@ Una buena señal: si alguien lee solo estas tres frases, entiende la decisión. 
 
 ## 5. Escribir el cuerpo
 
-El cuerpo es **Markdown con MDX**. El sitio no define componentes propios, así que quédate en Markdown estándar.
+El cuerpo es **Markdown con MDX**. Quédate en Markdown estándar; las únicas piezas propias son los dos componentes de tinta de más abajo («Tinta de cuaderno»).
 
 **Estructura**
 
@@ -215,6 +215,24 @@ Consejos, medidos con una nota de prueba:
 
 - A otra nota: `/notes/otro-slug/`. A un sitio externo: la URL completa.
 - Nunca enlaces repositorios privados ni escribas un correo.
+
+**Tinta de cuaderno (`Fix` e `Ink`)**
+
+Dos componentes opcionales dan al texto el aspecto de un cuaderno de laboratorio. Se importan al principio del `index.mdx`, justo después del frontmatter:
+
+```mdx
+import Fix from '@/features/notes/components/Fix.astro';
+import Ink from '@/features/notes/components/Ink.astro';
+
+Corrí <Fix wrong="pnpm run publish" right="pnpm publish-note" /> y no existía.
+Lo que me llevo: <Ink>un error corregido en voz alta enseña más</Ink>.
+Mi lema: <Ink variant="circle">escribo lo que sale mal</Ink>.
+```
+
+- `Fix` muestra el error tachado y la corrección al lado. Para lectores de pantalla dice «error, corregido a, corrección» (en inglés, «corrected to»): usa `<del>` e `<ins>` y una etiqueta oculta que sale del idioma de la nota. Solo pasa `label="..."` si necesitas otra redacción.
+- `Ink` subraya a mano (puede ocupar varias líneas). `variant="circle"` rodea la frase: **solo para frases cortas de una línea**, porque nunca se parte en dos líneas.
+- **Densidad:** como máximo un efecto de tinta por bloque de pantalla y un puñado por nota; si no, deja de ser una firma y se vuelve adorno.
+- Los trazos son decorativos (`aria-hidden`), no cambian el texto, se dibujan una vez y, con «reducir movimiento», aparecen ya dibujados. No hace falta tocar nada más: el CSS viaja solo en las páginas que usan los componentes.
 
 ## 6. Ver el resultado
 

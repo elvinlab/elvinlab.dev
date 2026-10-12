@@ -174,6 +174,7 @@ export const t = createTranslator({
       'notes.subtitle':
         'Decisiones de ingeniería documentadas: contexto, qué elegí y qué pasó después.',
       'notes.search': 'Buscar notas',
+      'notes.fix.correctedTo': 'corregido a',
       'notes.filter.all': 'Todas',
       'notes.filter.es': 'ES',
       'notes.filter.en': 'EN',
@@ -442,6 +443,7 @@ export const t = createTranslator({
       'notes.subtitle':
         'Engineering decisions, documented: the context, what I chose and what happened.',
       'notes.search': 'Search notes',
+      'notes.fix.correctedTo': 'corrected to',
       'notes.filter.all': 'All',
       'notes.filter.es': 'ES',
       'notes.filter.en': 'EN',

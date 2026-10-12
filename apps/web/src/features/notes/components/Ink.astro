@@ -1,0 +1,86 @@
+---
+/** A hand-drawn underline or circle that draws itself once on load (CSS only). Under reduced
+ * motion the stroke is shown fully drawn. The SVG is decorative (`aria-hidden`) and the text stays
+ * selectable. Density: a handful per page, one per screen block (DESIGN.md, ink system).
+ *
+ * `underline` may wrap over several lines (a per-line background, `box-decoration-break: clone`).
+ * `circle` is for SHORT phrases only: it never wraps (`nowrap`) and its stroke stays inside the
+ * line box, so it cannot touch the line above on a wrapped heading.
+ *
+ * A background image cannot read a CSS variable, so the underline color is written once per theme
+ * (`#ec4899` dark, `#be185d` light = the pink token): the documented exception to "semantic tokens
+ * only". The CSS is scoped here, so only pages that use `Ink` pay for it. */
+type Props = { variant?: 'underline' | 'circle' };
+
+const { variant = 'underline' } = Astro.props;
+---
+
+<span class:list={['ink', `ink-${variant}`]}><slot />{variant === 'circle' && (
+  <svg class="ink-svg" viewBox="0 0 100 40" preserveAspectRatio="none" aria-hidden="true" focusable="false"><path d="M52 3 C20 2 3 12 5 23 C7 35 38 38 66 36 C92 33 99 22 90 12 C82 5 62 3 40 5" pathLength="1" /></svg>
+)}</span>
+
+<style>
+  .ink-underline {
+    padding-bottom: 0.15em;
+    background-repeat: no-repeat;
+    background-size: 100% 0.4em;
+    background-position: 0 100%;
+    -webkit-box-decoration-break: clone;
+    box-decoration-break: clone;
+  }
+  :global([data-theme='elvinlab-dark']) .ink-underline {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 8' preserveAspectRatio='none'%3E%3Cpath d='M1 5 C20 2 40 7 60 4 S88 3 99 5' fill='none' stroke='%23ec4899' stroke-width='2.2' stroke-linecap='round' vector-effect='non-scaling-stroke'/%3E%3C/svg%3E");
+  }
+  :global([data-theme='elvinlab-light']) .ink-underline {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 8' preserveAspectRatio='none'%3E%3Cpath d='M1 5 C20 2 40 7 60 4 S88 3 99 5' fill='none' stroke='%23be185d' stroke-width='2.2' stroke-linecap='round' vector-effect='non-scaling-stroke'/%3E%3C/svg%3E");
+  }
+  .ink-circle {
+    position: relative;
+    display: inline-block;
+    white-space: nowrap;
+    padding-inline: 0.1em;
+  }
+  /* Vertical inset 0: the ellipse stays inside the line box, so it never grazes a neighbouring line. */
+  .ink-svg {
+    position: absolute;
+    inset: 0 -0.4em;
+    width: calc(100% + 0.8em);
+    height: 100%;
+    overflow: visible;
+    pointer-events: none;
+  }
+  .ink-svg path {
+    fill: none;
+    stroke: var(--color-pink);
+    stroke-width: 2.5px;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    vector-effect: non-scaling-stroke;
+    stroke-dasharray: 1;
+    stroke-dashoffset: 0;
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .ink-svg path {
+      animation: ink-draw 700ms cubic-bezier(0.65, 0, 0.35, 1) 400ms both;
+    }
+    .ink-underline {
+      animation: ink-grow 700ms cubic-bezier(0.65, 0, 0.35, 1) 400ms both;
+    }
+  }
+  @keyframes ink-draw {
+    from {
+      stroke-dashoffset: 1;
+    }
+    to {
+      stroke-dashoffset: 0;
+    }
+  }
+  @keyframes ink-grow {
+    from {
+      background-size: 0 0.4em;
+    }
+    to {
+      background-size: 100% 0.4em;
+    }
+  }
+</style>

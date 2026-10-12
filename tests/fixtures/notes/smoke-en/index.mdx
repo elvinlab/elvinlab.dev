@@ -13,6 +13,9 @@ decision:
   outcome: "Private drafts never enter test output."
 ---
 
+import Fix from '@/features/notes/components/Fix.astro';
+import Ink from '@/features/notes/components/Ink.astro';
+
 ## Fixture section
 
 This synthetic note exercises the production content pipeline.
@@ -22,3 +25,9 @@ const fixture = 'isolated';
 ```
 
 See the [reference page](https://example.org/reference) for details.
+
+## Ink fixture
+
+I ran <Fix wrong="pnpm run publish" right="pnpm publish-note" /> first. A hand-drawn <Ink>underline</Ink> and a short <Ink variant="circle">circle</Ink> on one line.
+
+A long phrase: <Fix wrong="the build takes about four seconds and never fails in production in any way" right="the build takes forty seconds and failed twice this week without warning" />.
