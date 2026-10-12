@@ -1,0 +1,161 @@
+/* The lab-notebook treatment of every note's prose (DESIGN.md, "Notebook ink system"). It applies to
+   any note, old or new, with zero edits to its content: CSS only, no markup, no script. Imported by
+   NotePage.astro alone, so only note pages pay for these bytes (never global.css).
+
+   Every ornament degrades to plain prose: without counters, the shadow, the masks or the stroke
+   images the text is the same text. A background image cannot read CSS variables, so the two
+   per-theme strokes (links, strike) are written once per theme as custom properties; `#ec4899`
+   dark and `#be185d` light are the pink token, the documented exception to "semantic tokens only".
+   Everything else (marker band, counter, margin bar, rule) reads the pink token. Selectors carry one
+   extra element or class so they win over the plain `.prose` rules in global.css whatever the
+   bundle order. */
+
+.prose {
+  counter-reset: note-section;
+}
+
+/* Section numbers: the same headings, in the same order, as the table of contents (h2 only). Hung in
+   the margin from md (the article has 40 px of padding there), above the heading on phones. */
+.prose h2 {
+  counter-increment: note-section;
+  position: relative;
+}
+.prose h2::before {
+  content: counter(note-section, decimal-leading-zero);
+  /* The empty alternative keeps the number out of the heading's accessible name; the line above is the fallback for browsers without alt text. */
+  /* biome-ignore lint/suspicious/noDuplicateProperties: progressive enhancement */
+  content: counter(note-section, decimal-leading-zero) / "";
+  display: block;
+  margin-bottom: 0.4rem;
+  font-family: var(--font-mono);
+  font-size: 0.8125rem;
+  font-weight: 500;
+  line-height: 1;
+  letter-spacing: 0.04em;
+  color: var(--color-pink);
+}
+@media (min-width: 48rem) {
+  .prose h2::before {
+    position: absolute;
+    top: 0.65em;
+    right: 100%;
+    margin: 0 0.75rem 0 0;
+  }
+}
+
+/* Marker highlight: a soft band over the lower part of bold text. An inset shadow follows each line
+   fragment with `box-decoration-break: clone`, and reads the token (no raw hex, no gradient). */
+.prose strong {
+  padding-inline: 0.12em;
+  border-radius: 0.15em 0.4em 0.2em 0.35em;
+  box-shadow: inset 0 -0.42em 0 color-mix(in srgb, var(--color-pink) 24%, transparent);
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
+}
+
+[data-theme="elvinlab-dark"] .prose {
+  --note-underline: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 8' preserveAspectRatio='none'%3E%3Cpath d='M1 5 C20 2 40 7 60 4 S88 3 99 5' fill='none' stroke='%23ec4899' stroke-width='1.6' stroke-linecap='round' vector-effect='non-scaling-stroke'/%3E%3C/svg%3E");
+  --note-strike: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 10' preserveAspectRatio='none'%3E%3Cpath d='M0 6 C18 2 34 9 52 4 S86 6 100 3' fill='none' stroke='%23ec4899' stroke-width='1.8' stroke-linecap='round' vector-effect='non-scaling-stroke'/%3E%3C/svg%3E");
+}
+[data-theme="elvinlab-light"] .prose {
+  --note-underline: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 8' preserveAspectRatio='none'%3E%3Cpath d='M1 5 C20 2 40 7 60 4 S88 3 99 5' fill='none' stroke='%23be185d' stroke-width='1.6' stroke-linecap='round' vector-effect='non-scaling-stroke'/%3E%3C/svg%3E");
+  --note-strike: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 10' preserveAspectRatio='none'%3E%3Cpath d='M0 6 C18 2 34 9 52 4 S86 6 100 3' fill='none' stroke='%23be185d' stroke-width='1.8' stroke-linecap='round' vector-effect='non-scaling-stroke'/%3E%3C/svg%3E");
+}
+
+/* Links in running text get a hand-drawn underline (links in headings and the table of contents are
+   untouched). It is static; on hover and keyboard focus it is drawn again (250 ms, the `--ease-out`
+   curve of DESIGN.md). Focus rings and hit areas are not changed. */
+.prose :is(p, li, blockquote, td, dd) a {
+  padding-bottom: 0.1em;
+  text-decoration: none;
+  background-image: var(--note-underline);
+  background-repeat: no-repeat;
+  background-size: 100% 0.32em;
+  background-position: 0 100%;
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .prose :is(p, li, blockquote, td, dd) a:is(:hover, :focus-visible) {
+    animation: prose-underline 250ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+}
+@keyframes prose-underline {
+  from {
+    background-size: 0 0.32em;
+  }
+  to {
+    background-size: 100% 0.32em;
+  }
+}
+
+/* Markdown `~~text~~` is a `<del>`: the same ink strike as the `Fix` component, which keeps its own
+   `.fix-wrong` / `.fix-right` rules and is excluded here so nothing is styled twice. */
+.prose del:not(.fix-wrong) {
+  padding-inline: 0.1em;
+  color: var(--color-muted);
+  text-decoration: none;
+  background-image: var(--note-strike);
+  background-repeat: no-repeat;
+  background-size: 100% 0.5em;
+  background-position: 0 58%;
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
+}
+.prose ins:not(.fix-right) {
+  color: var(--color-pink);
+  font-style: italic;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+/* Margin note: the pink bar is a hand stroke (an SVG mask painted with the token, so one image
+   serves both themes), slightly irregular and tilted. */
+article .prose blockquote {
+  position: relative;
+  padding-left: 1.5rem;
+  border-left: 0;
+}
+article .prose blockquote::before {
+  content: "";
+  position: absolute;
+  inset-block: 0.1em;
+  left: 0;
+  width: 8px;
+  background: var(--color-pink);
+  mask:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 100' preserveAspectRatio='none'%3E%3Cpath d='M4 2 C2 20 6 38 3.5 58 S5 85 4 98' fill='none' stroke='%23000' stroke-width='3' stroke-linecap='round'/%3E%3C/svg%3E")
+    no-repeat center / 100% 100%;
+  transform: rotate(0.8deg);
+}
+
+/* Section break: a wavy hand-drawn line, centered, with generous air. */
+.prose hr {
+  width: min(100%, 12rem);
+  height: 12px;
+  margin: 2.5em auto;
+  border: 0;
+  background: color-mix(in srgb, var(--color-pink) 70%, transparent);
+  mask:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 48 12'%3E%3Cpath d='M0 6 Q6 1 12 6 T24 6 T36 6 T48 6' fill='none' stroke='%23000' stroke-width='1.6' stroke-linecap='round'/%3E%3C/svg%3E")
+    repeat-x center / 48px 12px;
+}
+
+/* Paper keeps it plain: no tinted band, solid rules. */
+@media print {
+  .prose strong {
+    box-shadow: none;
+  }
+  article .prose blockquote {
+    border-left: 3px solid currentcolor;
+  }
+  article .prose blockquote::before {
+    display: none;
+  }
+  .prose hr {
+    height: 0;
+    border-top: 1px solid currentcolor;
+    background: none;
+    mask: none;
+  }
+}

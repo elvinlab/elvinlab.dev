@@ -216,6 +216,10 @@ Tips, measured on a test note:
 - To another note: `/notes/other-slug/`. To an external site: the full URL.
 - Never link private repositories or write an email.
 
+**What every note gets automatically, and the `~~strike~~` convention**
+
+Without touching the content, every note (existing and future) looks like a lab notebook: `##` headings carry a pink mono number (`01`, `02`, the same as the sidebar table of contents, hung in the margin from medium screens and above the heading on phones), **bold text** gets a soft marker band, links in running text are underlined by hand (and redrawn on hover or focus), the `>` quote is a margin note with an irregular stroke, and `---` is a wavy line. And `~~text~~` in Markdown strikes a mistake in ink (`<del>`), the same as `Fix`: use it to strike with no import. It is all CSS, honors "reduce motion", reading mode puts the numbers above the heading, and on paper everything falls back to plain rules.
+
 **Notebook ink (`Fix` and `Ink`)**
 
 Two optional components give the text a lab-notebook look. Import them at the top of `index.mdx`, right after the frontmatter:

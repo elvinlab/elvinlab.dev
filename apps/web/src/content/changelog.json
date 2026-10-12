@@ -724,5 +724,11 @@
     "category": "added",
     "title": "Ink components for notes: struck-through fixes and hand-drawn marks",
     "description": "Notes can now show a mistake struck through with its correction beside it (Fix) and underline or circle a phrase by hand (Ink), the lab-notebook signature of the site. The correction keeps real del/ins semantics with a hidden label in the note's language, the strokes draw once and appear already drawn under reduced motion, and the styles load only on pages that use them. Authoring guide in docs/NOTES.en.md."
+  },
+  "notes-notebook-prose": {
+    "date": "2026-10-12",
+    "category": "added",
+    "title": "Every note now looks like a lab notebook",
+    "description": "All notes, old and new, get a hand-made look automatically: numbered section headings that match the table of contents, a soft marker band on bold text, hand-drawn link underlines that redraw on hover, struck-through mistakes in plain Markdown, margin-note quotes and wavy section breaks. It is CSS only, respects reduced motion and reading mode, and prints plain."
   }
 }

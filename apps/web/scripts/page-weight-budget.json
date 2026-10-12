@@ -89,9 +89,9 @@
       }
     },
     "note": {
-      "why": "Fixed note shell excludes the rendered MDX body, measured between inert template boundaries. Article content has a separate 64 KiB ceiling; CSS, JavaScript and Lighthouse gates remain independent.",
-      "styleBytes": 61000,
-      "htmlBytes": 117000,
+      "why": "Fixed note shell excludes the rendered MDX body, measured between inert template boundaries. Article content has a separate 64 KiB ceiling; CSS, JavaScript and Lighthouse gates remain independent. 2026-10-12: style 61000 -> 65400, html 117000 -> 118600 for the automatic notebook treatment of the prose (note-prose.css, 4501 B minified and inlined once per note: section counters, marker band, ink underline and strike, margin bar, wavy rule, four per-theme data-URI strokes), the measured minimum plus about 100 B of headroom; the stylesheet is inlined with ?inline because a bundled import leaked +4.3 KB into every page that reaches NotePage through the feature barrel.",
+      "styleBytes": 65400,
+      "htmlBytes": 118600,
       "measured": {
         "styleBytes": 60215,
         "htmlBytes": 112464,

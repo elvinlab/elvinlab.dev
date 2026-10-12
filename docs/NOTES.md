@@ -216,6 +216,10 @@ Consejos, medidos con una nota de prueba:
 - A otra nota: `/notes/otro-slug/`. A un sitio externo: la URL completa.
 - Nunca enlaces repositorios privados ni escribas un correo.
 
+**Lo que toda nota recibe sola, y la convención `~~tachado~~`**
+
+Sin tocar el contenido, todas las notas (las existentes y las futuras) se ven como cuaderno de laboratorio: los títulos `##` llevan un número rosa en mono (`01`, `02`, igual que el índice de la barra lateral, colgado en el margen desde pantallas medianas y encima del título en móvil), el **texto en negrita** lleva un marcador suave, los enlaces del texto se subrayan a mano (y se redibujan al pasar el ratón o con el foco), la cita `>` es una nota al margen con trazo irregular y `---` es una línea ondulada. Y `~~texto~~` en Markdown tacha un error con tinta (`<del>`), igual que `Fix`: úsalo para tachar sin importar nada. Todo es CSS, respeta «reducir movimiento», el modo lectura pone los números encima del título y en papel todo vuelve a líneas simples.
+
 **Tinta de cuaderno (`Fix` e `Ink`)**
 
 Dos componentes opcionales dan al texto el aspecto de un cuaderno de laboratorio. Se importan al principio del `index.mdx`, justo después del frontmatter:
