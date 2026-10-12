@@ -621,7 +621,7 @@
     "date": "2026-10-11",
     "category": "changed",
     "title": "A dot instead of a long dash in page titles",
-    "description": "Browser tabs and link previews now read \"Elvin Gonz\u00e1lez \u00b7 elvinlab.dev\" instead of using a long dash between the page and the site name."
+    "description": "Browser tabs and link previews now read \"Elvin González · elvinlab.dev\" instead of using a long dash between the page and the site name."
   },
   "home-phone-polish": {
     "date": "2026-10-11",
@@ -658,5 +658,11 @@
     "category": "added",
     "title": "New Lab Note 008: verify only what a change touches",
     "description": "How pnpm verify picks the checks a change needs (from 340 s for everything to 53 s for a note), what the import graph missed, and why CI on main still runs the whole stack. A shorter note with four images of real output."
+  },
+  "notes-area-polish": {
+    "date": "2026-10-11",
+    "category": "changed",
+    "title": "A calmer notes index and tidier note pages",
+    "description": "The notes index has no boxes around the search and the sidebar, and the language tag now sits next to the date. On a note, \"Related notes\" no longer repeats the previous and next cards, long titles no longer break at a hyphen, inline code such as --auto stays in one piece, two-line headings are tighter, and the dashed rules in the dark theme are a little firmer."
   }
 }

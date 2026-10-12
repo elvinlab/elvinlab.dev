@@ -147,6 +147,16 @@ describe('relatedNotes', () => {
     const slugs = relatedNotes(notes, current, 2).map((n) => n.slug);
     expect(slugs).toEqual(['shares-two', 'shares-one']);
   });
+
+  it('skips notes already shown as previous or next and returns fewer', () => {
+    const slugs = relatedNotes(notes, current, 5, ['shares-two']).map((n) => n.slug);
+    expect(slugs).toEqual(['shares-one', 'shares-category']);
+  });
+
+  it('returns nothing when every candidate is excluded', () => {
+    const all = ['shares-two', 'shares-one', 'shares-category'];
+    expect(relatedNotes(notes, current, 5, all)).toEqual([]);
+  });
 });
 
 describe('formatDate', () => {

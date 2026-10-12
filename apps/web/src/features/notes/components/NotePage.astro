@@ -43,7 +43,12 @@ const tocHeadings = headings.filter((heading) => heading.depth === 2).map((h) =>
 const all = (await getCollection('notes')).map((item) => ({ slug: item.id, data: item.data }));
 const sameLang = sortNotes(all.filter((note) => note.data.lang === data.lang));
 const { prev, next } = adjacentNotes(sameLang, entry.id);
-const related = relatedNotes(all, { slug: entry.id, data }, 3);
+const related = relatedNotes(
+  all,
+  { slug: entry.id, data },
+  3,
+  [prev?.slug, next?.slug].filter((slug): slug is string => slug !== undefined),
+);
 
 // Notes translated into another language: hreflang alternates, and the language switch goes there.
 const group = translationsOf(all, entry.id);
@@ -78,7 +83,7 @@ const readingLabel = t(locale, 'notes.readingTime', { min: readingMinutes(entry.
           <span class="font-mono text-sm text-pink">{t(locale, 'notes.entry', { number: noteNumber(data.number) })}</span>
           {secondaryMetaSlot === 'header' && <LangBadge lang={data.lang} />}
       </div>
-      <h1 class="mt-2 max-w-[22ch] font-display text-note-title font-bold leading-tight">{data.title}</h1>
+      <h1 class="mt-2 max-w-[25ch] font-display text-note-title font-bold leading-tight text-balance">{data.title}</h1>
       <p class="mt-3 flex flex-wrap gap-x-3 gap-y-1 font-mono text-sm text-muted">
         {secondaryMetaSlot === 'header' && <span class="whitespace-nowrap">{site.identity.name}</span>}
         <time class="whitespace-nowrap" datetime={data.pubDate.toISOString()}>{formatDate(data.pubDate, locale)}</time>
