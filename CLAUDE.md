@@ -42,6 +42,8 @@ CI runs the production JavaScript gzip budget, Playwright/a11y/theme checks, whi
 
 Read `docs/PLAN.md`, `docs/BRAND.md` (both in Spanish; decisions in them are settled), `docs/DESIGN.md`, `docs/CONVENTIONS.md` and `docs/adr/` before any work. To change a setting, secret, dependency or release, follow `docs/CONFIGURATION.md`; to edit the `/me` profile or add an experiment, `docs/PORTFOLIO.md`; to write a note, `docs/NOTES.md` (each has an English twin, `*.en.md`). Their reference tables are generated from the code: after changing a schema or `shared/config/env-vars.ts`, run `pnpm docs:config`.
 
+`docs/NOTES.md` (twin `NOTES.en.md`) also carries the visual authoring guide for notes (what the notebook design gives every note automatically, `Fix`/`Ink`, density rules, budgets, previewing and the pre-publish checklist, section 5 and 11): follow it whenever you create or edit a note.
+
 ## What this repo is
 
 - Portfolio at `elvinlab.dev` plus the blog **Lab Notes — by an eternal junior** at `/notes`, and a recruiter page at `/me`.

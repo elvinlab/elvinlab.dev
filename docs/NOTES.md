@@ -10,6 +10,7 @@ Esta guía explica, paso a paso y con todos los detalles, cómo escribir y publi
 - [3. El frontmatter, campo por campo](#3-el-frontmatter-campo-por-campo)
 - [4. El registro de decisión](#4-el-registro-de-decisión)
 - [5. Escribir el cuerpo](#5-escribir-el-cuerpo)
+  - [5.1 Lo que toda nota recibe sola](#51-lo-que-toda-nota-recibe-sola) · [5.2 `Fix` e `Ink`](#52-lo-que-haces-a-mano-fix-e-ink) · [5.3 Cuál usar](#53-cuál-usar) · [5.4 Escribir para el diseño](#54-escribir-para-el-diseño) · [5.5 Presupuestos](#55-qué-puede-hacer-quien-escribe-con-los-presupuestos) · [5.6 Ejemplo completo](#56-ejemplo-completo)
 - [6. Ver el resultado](#6-ver-el-resultado)
 - [7. Qué hace el sitio por ti](#7-qué-hace-el-sitio-por-ti)
 - [8. Traducir una nota](#8-traducir-una-nota)
@@ -23,7 +24,7 @@ Esta guía explica, paso a paso y con todos los detalles, cómo escribir y publi
 1. Crea el borrador: `mise exec -- pnpm new-post "Título de la nota"`.
 2. Arranca el sitio: `mise exec -- pnpm --filter web dev` y abre `http://localhost:4321/notes/<slug>/` (los borradores solo existen en desarrollo).
 3. Completa el frontmatter y el **registro de decisión** (sección 3 y 4).
-4. Escribe sobre **una** decisión concreta, empezando por el problema. No hay límite de palabras: el borrador sugiere unas 500, pero una nota más larga está bien cuando la decisión lo pide (la nota 003 tiene unas 1.500).
+4. Escribe sobre **una** decisión concreta, empezando por el problema (la sección 5 dice qué hace el diseño de cuaderno por ti y qué haces a mano). No hay límite de palabras: el borrador sugiere unas 500, pero una nota más larga está bien cuando la decisión lo pide (la nota 003 tiene unas 1.500).
 5. Revisa el resultado en escritorio y móvil, en tema claro y oscuro, y en modo lectura.
 6. Ensaya la publicación: `mise exec -- pnpm publish-note <slug> --dry-run` (no cambia nada).
 7. Publica: `mise exec -- pnpm publish-note <slug>`. Mueve la carpeta, pone la fecha de hoy, añade la entrada del changelog, compila, hace commit y release.
@@ -159,9 +160,17 @@ Son tres frases de **máximo 280 caracteres** cada una; se muestran en tres colu
 
 Una buena señal: si alguien lee solo estas tres frases, entiende la decisión. Una mala: adjetivos sin datos («una solución mucho mejor»).
 
+**Cómo escribirlo bien.** El registro se dibuja como una ficha con el sello **DECISIÓN** (5.1) y es lo primero que lee quien llega, así que trátalo como diseño, no como metadato:
+
+- Cada campo es **una o dos frases, 280 caracteres como máximo** (si te pasas, el build falla). Entre 120 y 200 se lee mejor en la ficha, donde los tres campos van apilados.
+- Solo texto plano: el Markdown no se interpreta ahí (ni negrita, ni enlaces, ni saltos de línea). En YAML usa comillas dobles y escapa cualquier comilla doble interior.
+- `context` es la fuerza que te hizo decidir, no la historia previa. `decision` es la elección **y** lo que descartaste. `outcome` es lo que pasó, con una cifra o una fecha; si aún no lo sabes, di qué vas a medir en lugar de inventar un resultado.
+- El texto del sello lo fija el sitio (DECISIÓN / DECISION); no lo escribes ni lo cambias.
+- Escribe el registro al final (o revísalo al final) para que sus cifras coincidan con el cuerpo, y en el idioma de la propia nota, nunca copiado del otro idioma.
+
 ## 5. Escribir el cuerpo
 
-El cuerpo es **Markdown con MDX**. Quédate en Markdown estándar; las únicas piezas propias son los dos componentes de tinta de más abajo («Tinta de cuaderno»).
+El cuerpo es **Markdown con MDX**. Quédate en Markdown estándar; las únicas piezas propias son los dos componentes de tinta (5.2). **Lee de 5.1 a 5.6 antes de la primera línea**: dicen qué te da el diseño de cuaderno sin esfuerzo, qué debes hacer a mano, los límites y cómo comprobar la nota.
 
 **Estructura**
 
@@ -216,27 +225,180 @@ Consejos, medidos con una nota de prueba:
 - A otra nota: `/notes/otro-slug/`. A un sitio externo: la URL completa.
 - Nunca enlaces repositorios privados ni escribas un correo.
 
-**Lo que toda nota recibe sola, y la convención `~~tachado~~`**
+### 5.1. Lo que toda nota recibe sola
 
-Sin tocar el contenido, todas las notas (las existentes y las futuras) se ven como cuaderno de laboratorio: los títulos `##` llevan un número rosa en mono (`01`, `02`, igual que el índice de la barra lateral, colgado en el margen desde pantallas medianas y encima del título en móvil), el **texto en negrita** lleva un marcador suave, los enlaces del texto se subrayan a mano (y se redibujan al pasar el ratón o con el foco), la cita `>` es una nota al margen con trazo irregular y `---` es una línea ondulada. Y `~~texto~~` en Markdown tacha un error con tinta (`<del>`), igual que `Fix`: úsalo para tachar sin importar nada. Todo es CSS, respeta «reducir movimiento», el modo lectura pone los números encima del título y en papel todo vuelve a líneas simples.
+Una nota es una página de cuaderno de laboratorio. Sin tocar el contenido, todas las notas (las existentes y las futuras) reciben lo siguiente. Todo es CSS (`note-prose.css`, `record-card.css`, `stamp.css`), así que no hay nada que importar ni configurar:
 
-**Tinta de cuaderno (`Fix` e `Ink`)**
+| Tú escribes | La persona lectora ve |
+| --- | --- |
+| `## Sección` | Un número rosa en mono (`01`, `02`, ...) colgado en el margen izquierdo desde `md` y encima del título en móvil. El número es la posición entre los títulos `##` y coincide con el índice lateral. `###` no se numera. |
+| `**negrita**` | Un marcador rosa suave sobre la parte baja del texto, repintado en cada línea si se parte. |
+| Un enlace en el texto corrido | Un subrayado hecho a mano, que se redibuja al pasar el ratón o con el foco del teclado. |
+| `~~texto~~` | Un error tachado con tinta (`<del>`), el mismo tachado que dibuja `Fix`. Un `<ins>` escrito a mano sale en cursiva rosa. |
+| `> cita` | Una nota al margen: barra rosa con trazo irregular. |
+| `---` | Una línea ondulada hecha a mano. |
+| El frontmatter `decision` | Una ficha de archivo con el sello **DECISIÓN** (DECISION en inglés). En el banner desde `lg`, con una ligera inclinación; en el artículo (móvil, modo lectura), una tarjeta más ligera y a nivel. |
 
-Dos componentes opcionales dan al texto el aspecto de un cuaderno de laboratorio. Se importan al principio del `index.mdx`, justo después del frontmatter:
+Comportamiento del que no tienes que ocuparte:
+
+- **Los dos temas**: los trazos y el sello tienen un color para el tema claro y otro para el oscuro.
+- **Reducir movimiento**: el redibujado del subrayado, el aterrizaje del sello y los trazos de tinta no se animan; todo aparece en su estado final.
+- **Modo lectura**: una sola columna tranquila; los números siguen encima del título, los adornos se calman y la tarjeta de decisión queda sobre el texto.
+- **Impresión**: la banda y las máscaras vuelven a líneas simples.
+- **Accesibilidad**: el número de sección y el sello son decorativos; no forman parte del nombre accesible del título.
+
+Límite conocido de la numeración: el contador CSS numera **todos** los `h2` del artículo, pero el índice lateral lista solo los títulos `##` del Markdown. Un `<h2>` escrito a mano dentro de un componente MDX recibiría número y no tendría entrada en el índice. Escribe las secciones solo con `##`.
+
+Como la negrita y los enlaces ya se ven diseñados, **usa la negrita con medida** (un término clave, no una frase entera): cinco frases en negrita en una pantalla parecen un rotulador gastado.
+
+### 5.2. Lo que haces a mano: `Fix` e `Ink`
+
+Dos componentes opcionales. Se importan al principio del `index.mdx`, justo después del frontmatter. Las dos rutas son distintas a propósito (`Ink` lo comparte la home; `Fix` pertenece a la feature de notas):
 
 ```mdx
 import Fix from '@/features/notes/components/Fix.astro';
 import Ink from '@/shared/ui/Ink.astro';
+```
 
+| Pieza | Props | Muestra |
+| --- | --- | --- |
+| `<Fix wrong="..." right="..." />` | `wrong` (texto, obligatorio), `right` (texto, obligatorio), `label` (texto, opcional) | El error tachado con tinta y la corrección al lado (cursiva rosa). Semántica: `<del>` e `<ins>`, más una etiqueta oculta para lectores de pantalla: «error, corregido a, corrección». |
+| `<Ink>frase</Ink>` | `variant`: `underline` (por defecto) o `circle` | Un subrayado a mano (puede partirse en varias líneas) o un círculo alrededor de la frase (nunca se parte). Decorativo, `aria-hidden`. |
+
+Los dos se usan en línea, dentro de un párrafo (los trazos se dibujan una vez y salen completos con «reducir movimiento»). Fragmentos para copiar:
+
+```mdx
 Corrí <Fix wrong="pnpm run publish" right="pnpm publish-note" /> y no existía.
 Lo que me llevo: <Ink>un error corregido en voz alta enseña más</Ink>.
 Mi lema: <Ink variant="circle">escribo lo que sale mal</Ink>.
 ```
 
-- `Fix` muestra el error tachado y la corrección al lado. Para lectores de pantalla dice «error, corregido a, corrección» (en inglés, «corrected to»): usa `<del>` e `<ins>` y una etiqueta oculta que sale del idioma de la nota. Solo pasa `label="..."` si necesitas otra redacción.
-- `Ink` subraya a mano (puede ocupar varias líneas). `variant="circle"` rodea la frase: **solo para frases cortas de una línea**, porque nunca se parte en dos líneas.
-- **Densidad:** como máximo un efecto de tinta por bloque de pantalla y un puñado por nota; si no, deja de ser una firma y se vuelve adorno.
-- Los trazos son decorativos (`aria-hidden`), no cambian el texto, se dibujan una vez y, con «reducir movimiento», aparecen ya dibujados. No hace falta tocar nada más: el CSS viaja solo en las páginas que usan los componentes.
+```mdx
+I ran <Fix wrong="pnpm run publish" right="pnpm publish-note" /> and it did not exist.
+What I take away: <Ink>a mistake corrected out loud teaches more</Ink>.
+My motto: <Ink variant="circle">I write down what goes wrong</Ink>.
+```
+
+- La etiqueta oculta de `Fix` sale del idioma de la nota (`corregido a` / `corrected to`). Pasa `label="..."` solo si necesitas otra redacción; entonces **escríbela tú en el idioma de la nota**, porque el valor no se traduce.
+- No los anides ni envuelvas un párrafo entero. No los pongas dentro de un título `##`: el texto del título alimenta el índice y el ancla, y esa combinación no la cubre ningún test.
+
+### 5.3. Cuál usar
+
+| Qué quieres marcar | Usa |
+| --- | --- |
+| Un error que corregiste, con la versión correcta al lado | `Fix` |
+| Un error que solo quieres tachar, sin mostrar reemplazo | `~~tachado~~` (sin importar nada) |
+| Una frase clave de la nota | `Ink` subrayado |
+| Una frase corta de una sola línea, el «lema» de la nota | `Ink variant="circle"` |
+| Énfasis en un término | `**negrita**` (la banda de marcador es automática) |
+| Un aparte o la idea clave | `> cita` |
+| Un cambio de tema dentro de una sección | `---` |
+
+Reglas:
+
+- **Densidad**: como máximo un efecto de tinta (`Fix`, `Ink`) por bloque de pantalla y un puñado por nota. Más, y es el aspecto de plantilla al revés. La negrita, los enlaces, las citas y las líneas ya vienen diseñados; cuentan para el juicio «¿esta página se ve cargada?», no para una cuota aparte.
+- **El círculo, solo para frases cortas de una línea.** Nunca se parte; una frase larga se desborda o se corta. Ante la duda, subrayado.
+- **Nada de tinta para decorar.** Marca lo que quien lee debe recordar o el error del que trata la nota.
+- **Nada en títulos** ni en nada que cambie la primera pantalla de la nota: el título de la nota (`h1`, del frontmatter) es el elemento LCP y de todos modos no admite tinta.
+
+### 5.4. Escribir para el diseño
+
+- **Los títulos se leen con un número delante.** `## Por qué dejé X` se ve como `01 Por qué dejé X`; un título que es una frase larga con comas parece un párrafo junto al número rosa. Cortos, concretos, una idea. No los numeres tú (`## 2. ...`): el número es automático y saldrían dos.
+- **La primera pantalla es el título, la firma, la tarjeta de decisión (o, en escritorio, el banner) y el primer párrafo.** El H1 de la nota es el elemento LCP. Empieza con un párrafo sencillo que plantee el problema; pon imágenes, bloques de código grandes y tablas después de la primera `##`.
+- **El registro de decisión es parte de la página, no metadato.** Es lo primero que se lee y se dibuja como tarjeta con sello. Mantenlo coherente con el cuerpo: las cifras de `outcome` deben ser las del texto; si editas uno, edita el otro (sección 4).
+- **Bloques de código y tablas.** El código usa Expressive Code (título, marcas de línea, botón de copiar); los bloques largos son la causa habitual de una nota demasiado pesada (5.5). Las tablas no tienen estilo de cuaderno: prefiere una lista y, si usas una tabla, mírala en 360 px.
+- **Imágenes**: reglas en el bloque Imágenes de arriba (texto alternativo, unos 1.600 px de ancho, sin datos privados, nunca antes de la primera sección).
+- **Las citas** son notas al margen, no citas destacadas de un artículo ajeno: úsalas para la idea clave con tus palabras.
+
+### 5.5. Qué puede hacer quien escribe con los presupuestos
+
+Toda nota ya lleva unos 61 KB de CSS en línea en su cabecera (el aspecto de cuaderno, la tarjeta de decisión, el sello, el modo lectura). Además:
+
+- **Compuerta LCP**: menos de 2500 ms en móvil, el peor de tres runs. La página de nota está en torno a 2,27 a 2,42 s, así que el margen es de unos 80 ms y unos cientos de bytes de CSS en la cabecera pueden romperlo ([TESTING.md](TESTING.md)). Quien escribe no puede añadir CSS a la cabecera, pero el contenido pesado en la primera pantalla (una imagen grande o un bloque de código antes de la primera sección) mueve el LCP. Lighthouse mide notas sintéticas de prueba, no la tuya, y el carril rápido de notas se lo salta: la disciplina es tuya.
+- **Peso de página** (`pnpm check:page-weight`, [reglas](TESTING.md#content-aware-notes-budgets-2026-10-11)): el cuerpo renderizado del artículo tiene su propio techo (64 KiB de HTML) y su propio margen, mientras que la estructura de la página y el CSS conservan techos fijos. Un texto más largo no consume el presupuesto de la estructura; los bloques de código largos y las tablas grandes son lo que empuja al artículo.
+- **La tinta cuesta bytes solo donde se usa.** `Fix` lleva su CSS acotado e `Ink` mete su CSS en línea una vez por página y variante, así que una nota que no usa ninguno no paga nada, y una que usa los dos midió unos 3,6 KB de HTML incluyendo el marcado. El techo de estilo de una nota se comparte con el CSS de cuaderno, así que **la primera nota que use `Fix` o `Ink` debe ejecutar `pnpm check:page-weight` antes que nada** (ninguna nota publicada los usa todavía).
+- **Si `check:page-weight` falla tras añadir una nota**: lee la línea que falló. `article` por encima de 64 KiB: recorta código y contenido. HTML total por encima del techo de la estructura con el artículo dentro de su límite: creció la estructura, no tu texto (para y avisa a la persona propietaria). `style` por encima de su techo justo tras añadir `Fix`/`Ink`: es el CSS de la tinta; quita uno de los componentes o avisa. Nunca subas un techo para que una nota pase; la sección 10 tiene los detalles.
+
+### 5.6. Ejemplo completo
+
+Una nota compacta que usa cada pieza una vez. Primero en español; el gemelo en inglés sigue con la misma estructura. Guárdala como `apps/web/src/content/drafts/<slug>/index.mdx` (`pnpm new-post` ya escribe el frontmatter) y adáptala:
+
+````mdx
+---
+number: 12
+title: "Dejé de revisar a mano el peso de cada nota"
+description: "Un presupuesto de peso en el build me ahorró la revisión manual, pero falló la primera vez."
+pubDate: 2026-10-20
+lang: es
+category: decisiones
+tags: [rendimiento, ci]
+decision:
+  context: "Cada nota nueva podía romper el presupuesto de peso y lo descubría en el CI."
+  decision: "Comprobar el peso en el build local antes de publicar, en vez de revisarlo a ojo."
+  outcome: "La primera nota larga falló en 4 s en local en lugar de en un CI de 5 minutos."
+---
+
+import Fix from '@/features/notes/components/Fix.astro';
+import Ink from '@/shared/ui/Ink.astro';
+
+Publiqué una nota larga y el CI rechazó el despliegue por peso. No era la primera vez.
+
+## El problema
+
+Revisaba el tamaño <Fix wrong="a ojo" right="con una cifra" /> solo cuando algo fallaba.
+
+> Una revisión que depende de acordarme no es una revisión.
+
+## La decisión
+
+Moví la comprobación al build local. Lo importante: <Ink>un fallo barato y temprano vale más que uno caro y tarde</Ink>.
+
+---
+
+## El resultado
+
+Lo que antes era ~~un CI de cinco minutos~~ un aviso de cuatro segundos.
+````
+
+````mdx
+---
+number: 12
+title: "I stopped checking each note's weight by hand"
+description: "A page-weight budget in the build saved me the manual check, but it failed the first time."
+pubDate: 2026-10-20
+lang: en
+category: decisions
+tags: [performance, ci]
+translationOf: deje-de-revisar-a-mano-el-peso-de-cada-nota
+decision:
+  context: "Every new note could break the weight budget and I only found out in CI."
+  decision: "Check the weight in the local build before publishing instead of eyeballing it."
+  outcome: "The first long note failed in 4 s locally instead of in a 5-minute CI run."
+---
+
+import Fix from '@/features/notes/components/Fix.astro';
+import Ink from '@/shared/ui/Ink.astro';
+
+I published a long note and CI rejected the deploy over weight. It was not the first time.
+
+## The problem
+
+I checked the size <Fix wrong="by eye" right="with a number" /> only when something failed.
+
+> A check that depends on me remembering is not a check.
+
+## The decision
+
+I moved the check into the local build. What matters: <Ink>a cheap, early failure beats an expensive, late one</Ink>.
+
+---
+
+## The result
+
+What used to be ~~a five-minute CI run~~ a four-second warning.
+````
+
+Las claves del frontmatter coinciden con el esquema (sección 3): `translationOf` es el slug en kebab-case de la otra nota, y esa nota debe estar publicada también. En una nota de un solo idioma no pongas `translationOf`; una traducción reutiliza el `number` del original.
 
 ## 6. Ver el resultado
 
@@ -255,6 +417,14 @@ Dos cosas que **no** verás en desarrollo:
 
 - **La tarjeta al compartir**: se genera al compilar. Para verla, publica la nota (sección 9), ejecuta `mise exec -- pnpm --filter web build` y abre `apps/web/dist/client/og/notes/<slug>.png`.
 - **Comentarios reales**: la sección carga Giscus de verdad. **No publiques comentarios de prueba desde `localhost`**: crearían un hilo real en el repositorio.
+
+### 6.1. Borradores y el servidor de desarrollo
+
+- `apps/web/src/content/drafts/` está ignorado por git y solo carga en `astro dev`: un borrador nunca se compila ni se despliega.
+- **Una carpeta de borrador recién creada puede no aparecer** en el servidor de desarrollo en marcha. Edita y guarda una segunda vez el `index.mdx` de dentro (cualquier cambio pequeño) y recarga; si sigue sin salir, reinicia el servidor. (Se observó una vez al prototipar: el borrador nuevo devolvía 404 hasta guardar su archivo otra vez; la causa no está rastreada.)
+- **Un servidor roto tras comandos pesados.** Un 500, un error `file does not exist ... deps_ssr` o una página en blanco después de ejecutar un build, los tests u otro comando pesado con `dev` encendido significa que la caché de Vite compartida en `node_modules/.vite` quedó obsoleta: detén el servidor y arráncalo de nuevo. No ejecutes `build`, `typecheck` ni e2e con el servidor encendido.
+- **`Fix` puede verse sin estilo en desarrollo.** El CSS acotado de un componente usado dentro de un MDX de borrador no lo emite `astro dev` (una rareza del servidor de desarrollo; el build de producción sí lo emite, está verificado), así que el tachado puede faltar mientras escribes. `Ink` y el aspecto automático de cuaderno son CSS en línea normal y esta rareza no les afecta (no se ha vuelto a verificar en desarrollo). Para ver el resultado real de una nota con `Fix`, ejecuta `mise exec -- pnpm publish-note <slug> --no-release` (mueve el borrador, hace commit local en `develop`, no empuja nada), luego `mise exec -- pnpm --filter web build` y `mise exec -- pnpm --filter web preview`.
+- Orden para revisar el aspecto: la primera pantalla a 360 px (título, ficha de decisión, primer párrafo), luego una sección con cada efecto de tinta en tema claro y oscuro, y por último el modo lectura.
 
 ## 7. Qué hace el sitio por ti
 
@@ -284,6 +454,8 @@ mise exec -- pnpm new-post "Why I rebuilt my site from scratch" --lang en --numb
 - Enlázalas con `translationOf`: en la traducción pon el slug del original (o al revés; **con un lado basta**, funciona en los dos sentidos). Con tres idiomas o más, todas quedan en el mismo grupo.
 - Entonces las dos notas se declaran mutuamente con `hreflang` (más `x-default`, que apunta a la versión en el idioma por defecto), y el **cambio de idioma del menú** y la **sugerencia de idioma** llevan directamente a la traducción en lugar de a la home del otro idioma. Una nota sin traducción sigue llevando a la home.
 - Los **slugs pueden ser distintos** en cada idioma (`por-que-descarte-x` y `why-i-dropped-x`).
+- **El diseño de cuaderno sigue al idioma.** El sello (`stamp.decision`: DECISIÓN / DECISION) y la etiqueta oculta de `Fix` (`notes.fix.correctedTo`: `corregido a` / `corrected to`) salen de i18n según el idioma de la página, así que una nota en inglés bajo `/en/` recibe las inglesas sin trabajo extra. Un `label` propio no se traduce: escríbelo en el idioma de cada nota. El registro de decisión, las cadenas de `Fix` y las frases de `Ink` son tu texto en cada idioma.
+- **Marca blanca.** Una nota no debe escribir a fuego la identidad de la persona propietaria en componentes ni importaciones: el nombre del autor, la firma y la tarjeta al compartir salen de `site.config.ts`. En la prosa usa la primera persona; nunca escribas el correo (sección 1).
 - Si `translationOf` apunta a una nota que no existe (por ejemplo, un borrador sin publicar), **el build falla** con el nombre de las notas: publica las dos juntas o quita `translationOf` hasta entonces. También falla si una nota se traduce a sí misma, si la traducción está en el mismo idioma o si dos notas del mismo idioma quedan en un grupo.
 
 ## 9. Publicar
@@ -341,7 +513,13 @@ Para una nota con imágenes grandes o mucho código, mide también esa URL real:
 - [ ] Sin título `#`; secciones con `##`.
 - [ ] Todas las imágenes tienen texto alternativo, miden unos 1.600 px de ancho como máximo y no muestran datos privados.
 - [ ] Ningún repositorio privado, ningún correo, ningún proyecto que aún no exista.
-- [ ] Si tiene traducción, `translationOf` apunta a una nota que también se publica.
+- [ ] Si tiene traducción, `translationOf` apunta a una nota que también se publica, y cada idioma tiene su propio registro de decisión escrito en ese idioma.
+- [ ] Registro de decisión: `context`, `decision` y `outcome` completos, cada uno de 280 caracteres como máximo, en texto plano, y sus cifras coinciden con el cuerpo (sección 4).
+- [ ] Las secciones usan solo `##` (nunca un `<h2>` a mano), son cortas y no llevan números escritos a mano.
+- [ ] Tinta dentro de la regla de densidad: como máximo un efecto por bloque de pantalla y un puñado por nota; todo `Fix` tiene `wrong` y `right`; cada `circle` es una frase corta de una línea; las importaciones usan exactamente `@/features/notes/components/Fix.astro` y `@/shared/ui/Ink.astro`; la negrita se usa con medida.
+- [ ] Nada pesado en la primera pantalla: la primera sección es texto, las imágenes y el código grande van después.
+- [ ] Si es la primera nota que usa `Fix` o `Ink`, se leyó línea a línea el resultado de `pnpm check:page-weight` (5.5) y se vio la nota en el build de producción, no solo en desarrollo (6.1).
+- [ ] Existe la entrada del changelog: `publish-note` añade `note-NNN` (categoría `added`, título «New Lab Note NNN: Título»; mira `note-009` en `changelog.json`); en el camino manual, escríbela tú.
 - [ ] Se lee bien en 360 px, en tema claro y oscuro y en modo lectura.
 - [ ] `pnpm test`, `typecheck`, `lint` y `build` pasan (`publish-note` ya ejecuta el build; el resto es del camino manual).
 - [ ] Después del build real, `pnpm check:page-weight` y `pnpm check:js-budget` pasan. `publish-note` ya los ejecuta justo después del build (solo unos segundos), así que una nota demasiado pesada falla antes de empujar nada; el CI (`notes-gate`) los repite.
@@ -364,4 +542,9 @@ Para una nota con imágenes grandes o mucho código, mide también esa URL real:
 | `publish-note` dice «no draft at …» o «already exists» | El slug no coincide con una carpeta de `drafts/`, o ya existe una nota publicada con ese slug o una entrada `note-NNN` en el changelog |
 | `publish-note` dice «the build or a size budget failed; the note was moved back to drafts» | Arregla el error que imprimió el build o el presupuesto (campo, `translationOf` o peso, sección 10) y repite; no quedó nada a medias |
 | El CI de la nota corrió `e2e` y Lighthouse | El push incluía algo más que notas y changelog (por ejemplo `topics.json` o código): ese release usa todas las compuertas. Mira el resumen del job `changes` |
+| Un borrador nuevo no aparece en `astro dev` | Edita y guarda su `index.mdx` una segunda vez y recarga; si sigue sin salir, reinicia el servidor (6.1) |
+| `astro dev` da 500 o una página en blanco tras un build o los tests | La caché de Vite compartida quedó obsoleta: reinicia el servidor (6.1) |
+| El tachado de `Fix` no se ve en desarrollo | Rareza del servidor con el CSS acotado en MDX de borrador: comprueba el build de producción (6.1) |
+| El número de una sección no coincide con el índice, o un título muestra dos números | Un `<h2>` a mano dentro de un componente se numera pero no se lista, o escribiste un número en el texto del `##` (5.1) |
+| `style` falla justo tras añadir `Fix` o `Ink` | Es el CSS de la tinta: quita un componente o avisa a la persona propietaria; no subas el techo (5.5) |
 | `notes-gate` falla por peso | Poco probable (`publish-note` ya lo comprobó), pero posible en una edición manual: revisa la sección 10, «Tamaño al publicar». No hubo deploy: corrige, haz commit y libera de nuevo |

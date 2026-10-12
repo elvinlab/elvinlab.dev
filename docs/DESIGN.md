@@ -145,6 +145,7 @@ Browser support (checked 2026-10-12):
 
 ## Notebook ink system (decided 2026-10-12)
 
+- **For whoever writes a note:** what a note gets automatically, how to use `Fix` and `Ink`, the density rule, the budgets a writer can affect and the pre-publish checklist are explained as an authoring guide in [NOTES.en.md, section 5](NOTES.en.md#5-writing-the-body) (Spanish: [NOTES.md](NOTES.md#5-escribir-el-cuerpo)). This section is the design rationale; that guide is the how-to.
 - **Color:** semantic tokens only; pink is the single accent of a block, primary otherwise; never a raw hex in a component. Explicit exception: a `background-image` SVG cannot read CSS variables, so its per-theme stroke colors are written there and documented in the component.
 - **No gradients and no glow** on anything new.
 - **Density:** at most one ink effect per screen block and a handful per page; more reads as a template in reverse.
