@@ -2,9 +2,9 @@
   "headroom": 0.04,
   "types": {
     "home": {
-      "why": "Hero is text: LCP follows the head bytes (about 8-9 ms per raw KB in the lab); the home is the heaviest first screen.",
+      "why": "Hero is text: LCP follows the head bytes (about 8-9 ms per raw KB in the lab); the home is the heaviest first screen. 2026-10-12: html 101400 -> 101900 for the native feel layer (about 190 B of safe-area, overscroll and tap CSS plus 60 B of theme-color sync script and the pressed-state classes on navbar, footer and chip links), the minimum measured need.",
       "styleBytes": 58500,
-      "htmlBytes": 101400,
+      "htmlBytes": 101900,
       "measured": {
         "styleBytes": 56211,
         "htmlBytes": 97419,
@@ -12,9 +12,9 @@
       }
     },
     "me": {
-      "why": "Recruiter page: hero photo plus experience blocks, the numbered layer rail and the folded more-tools block of the full-stack story, and 44 px hit areas; its LCP margin is the thinnest after /experiments/. 2026-10-12: html 119700 -> 122900 for the collapsed raw-data layer (about 3.2 KB of field / type / value rows rendered from config, no script); the style budget is unchanged because the block reuses existing utility classes.",
-      "styleBytes": 55712,
-      "htmlBytes": 122900,
+      "why": "Recruiter page: hero photo plus experience blocks, the numbered layer rail and the folded more-tools block of the full-stack story, and 44 px hit areas; its LCP margin is the thinnest after /experiments/. 2026-10-12: html 119700 -> 122900 for the collapsed raw-data layer (about 3.2 KB of field / type / value rows rendered from config, no script); the style budget is unchanged because the block reuses existing utility classes. 2026-10-12: style 55712 -> 56000, html 122900 -> 123600 for the native feel layer (about 190 B of safe-area, overscroll and tap CSS plus 60 B of theme-color sync script and the pressed-state classes on navbar, footer and chip links), the minimum measured need.",
+      "styleBytes": 56000,
+      "htmlBytes": 123600,
       "measured": {
         "styleBytes": 55712,
         "htmlBytes": 122854,
@@ -32,9 +32,9 @@
       }
     },
     "changelog": {
-      "why": "Release days grouped by kind, 4 days per page (page 1 opens the 2 newest); the flat list was about 130 KB, and the page CSS ships only here. The compact lab-paper banner of the inner pages adds about 2.2 KB of CSS (this page's sheet did not carry the banner styles) and 2.9 KB of HTML. Release of 2026-10-12: html 113000 -> 115800 (measured 115792 on page 2): each new release day pushes the oldest day of page 1 onto page 2.",
+      "why": "Release days grouped by kind, 4 days per page (page 1 opens the 2 newest); the flat list was about 130 KB, and the page CSS ships only here. The compact lab-paper banner of the inner pages adds about 2.2 KB of CSS (this page's sheet did not carry the banner styles) and 2.9 KB of HTML. Release of 2026-10-12: html 113000 -> 115800 (measured 115792 on page 2): each new release day pushes the oldest day of page 1 onto page 2. 2026-10-12: html 115800 -> 116600 for the native feel layer (about 190 B of safe-area, overscroll and tap CSS plus 60 B of theme-color sync script and the pressed-state classes on navbar, footer and chip links), the minimum measured need.",
       "styleBytes": 58700,
-      "htmlBytes": 115800,
+      "htmlBytes": 116600,
       "measured": {
         "styleBytes": 58255,
         "htmlBytes": 110833,
@@ -62,9 +62,9 @@
       }
     },
     "notes-index": {
-      "why": "Fixed index shell plus 4000 HTML bytes per published note (rows, filter metadata and category/tag links). A 180000 B absolute ceiling requires pagination at larger scales; CSS remains independently bounded.",
+      "why": "Fixed index shell plus 4000 HTML bytes per published note (rows, filter metadata and category/tag links). A 180000 B absolute ceiling requires pagination at larger scales; CSS remains independently bounded. 2026-10-12: html 88200 -> 88700 for the native feel layer (about 190 B of safe-area, overscroll and tap CSS plus 60 B of theme-color sync script and the pressed-state classes on navbar, footer and chip links), the minimum measured need.",
       "styleBytes": 55600,
-      "htmlBytes": 88200,
+      "htmlBytes": 88700,
       "measured": {
         "styleBytes": 54136,
         "htmlBytes": 84772,
@@ -76,9 +76,9 @@
       "maxHtmlBytes": 180000
     },
     "topic": {
-      "why": "Static topic page /notes/tag/<topic>/: compact paper banner, an intro and compact note rows; no script. Same stylesheet as /notes/. The fixed shell is the measured value rounded up to 100 B, plus 800 HTML bytes per listed note (a topic row is about 720 B); a 120000 B absolute ceiling requires pagination at larger scales. CSS stays independently bounded.",
-      "styleBytes": 54200,
-      "htmlBytes": 81000,
+      "why": "Static topic page /notes/tag/<topic>/: compact paper banner, an intro and compact note rows; no script. Same stylesheet as /notes/. The fixed shell is the measured value rounded up to 100 B, plus 800 HTML bytes per listed note (a topic row is about 720 B); a 120000 B absolute ceiling requires pagination at larger scales. CSS stays independently bounded. 2026-10-12: style 54200 -> 54500, html 81000 -> 81700 for the native feel layer (about 190 B of safe-area, overscroll and tap CSS plus 60 B of theme-color sync script and the pressed-state classes on navbar, footer and chip links), the minimum measured need.",
+      "styleBytes": 54500,
+      "htmlBytes": 81700,
       "htmlBytesPerNote": 800,
       "maxHtmlBytes": 120000,
       "measured": {
@@ -102,9 +102,9 @@
       "articleBytes": 65536
     },
     "result": {
-      "why": "One short card under the compact banner (404, confirm and unsubscribe, es and en): budget is the measured value rounded up to 100 B, so these small pages stay tight.",
-      "styleBytes": 54300,
-      "htmlBytes": 79100,
+      "why": "One short card under the compact banner (404, confirm and unsubscribe, es and en): budget is the measured value rounded up to 100 B, so these small pages stay tight. 2026-10-12: style 54300 -> 54500, html 79100 -> 79600 for the native feel layer (about 190 B of safe-area, overscroll and tap CSS plus 60 B of theme-color sync script and the pressed-state classes on navbar, footer and chip links), the minimum measured need.",
+      "styleBytes": 54500,
+      "htmlBytes": 79600,
       "measured": {
         "styleBytes": 54245,
         "htmlBytes": 79045,

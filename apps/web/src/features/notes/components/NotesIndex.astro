@@ -54,7 +54,7 @@ const tags = [...new Set(sortNotes(notes).flatMap((note) => note.data.tags))];
     {topics.length > 0 && (
       <nav aria-label={t(locale, 'notes.topics')} class="flex flex-wrap items-center gap-1.5">
         <span class="font-mono text-sm text-muted">{t(locale, 'notes.topics')}</span>
-        {topics.map(({ topic }) => <Chip href={topicHref(topic.slug)}>{topic.data.title}</Chip>)}
+        {topics.map(({ topic }) => <Chip href={topicHref(topic.slug)} class="active:scale-96">{topic.data.title}</Chip>)}
       </nav>
     )}
     <NotesFilter locale={locale} />

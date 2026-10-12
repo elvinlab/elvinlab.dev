@@ -147,11 +147,11 @@ Replaces "Page transitions: none". CSS only, through cross-document `@view-trans
 
 The goal is the motion and touch feel of an app, built without JavaScript. The honest limit: on the web this is feel, not native performance.
 
-- `viewport-fit=cover` with `env(safe-area-inset-*)` padding on the navbar, footer and back-to-top button.
-- `overscroll-behavior` to stop scroll chaining where it feels wrong.
-- `-webkit-tap-highlight-color: transparent` plus a visible `:active` feedback (`active:scale-96`) on every tappable control, with 44 px touch targets kept.
-- `theme-color` follows the in-page theme toggle, not only the OS scheme.
-- Optional, to decide later: a web app manifest with `apple-touch-icon`. No service worker (cache risk with `_headers` and prefetch).
+- `viewport-fit=cover` with `env(safe-area-inset-*)` padding: `body` takes the left and right insets, the navbar the top one, the footer the bottom one (`max(2rem, inset)`) and back-to-top the bottom one (`global.css`, `BackToTop.astro`). Every inset is 0 on ordinary screens, so nothing moves there.
+- `overscroll-behavior: contain` on `html` stops scroll chaining and keeps the native bounce.
+- `-webkit-tap-highlight-color: transparent` on `html` plus a visible `:active` feedback (`active:scale-96`, a feedback transform that the global reduced-motion block shortens to 0.01 ms) on the navbar links and toggles, footer links, standalone chips, back-to-top and note rows (the whole row presses, so chips inside a row do not add their own); 44 px touch targets kept. Each new utility costs bytes on all pages, so reuse `active:scale-96`.
+- `theme-color` follows the in-page theme toggle: the `ThemeToggle` script copies the computed `--color-page` into every `theme-color` meta on load and on each switch. The two `prefers-color-scheme` tags stay as the no-JS fallback. Evidence: `tests/browser/native-feel.spec.ts`.
+- Still pending the owner: a web app manifest with `apple-touch-icon`. No service worker (cache risk with `_headers` and prefetch).
 
 ## Signature plan per page (ranked intent)
 

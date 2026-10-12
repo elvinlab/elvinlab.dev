@@ -712,5 +712,11 @@
     "category": "added",
     "title": "A raw-data layer on /me",
     "description": "Under the stack, /me now has a collapsed block that shows the page's own data as field, type and value rows (name, role, start year, one row per stack group), generated from the site configuration in the active language. A native details element: no JavaScript, keyboard operable, hidden when printing."
+  },
+  "native-feel-layer": {
+    "date": "2026-10-12",
+    "category": "added",
+    "title": "A more native feel on phones",
+    "description": "The site now fills notched screens without hiding content under the cutout, stops scroll chaining, removes the grey tap flash, and presses controls in (navbar, footer links, chips, note rows) so taps feel immediate. The browser bar color also follows the theme toggle, not only the system scheme. No JavaScript added for motion."
   }
 }

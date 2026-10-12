@@ -108,7 +108,7 @@ const readingLabel = t(locale, 'notes.readingTime', { min: readingMinutes(entry.
     <div class="flex flex-col gap-3 border-t border-dashed border-divider pt-6">
       <div class="flex flex-wrap items-center gap-1.5">
         {secondaryMetaSlot === 'foot' && <LangBadge lang={data.lang} />}
-        {data.tags.map((tag) => <Chip href={tagHref(tag, topicTags)}>#{tag}</Chip>)}
+        {data.tags.map((tag) => <Chip href={tagHref(tag, topicTags)} class="active:scale-96">#{tag}</Chip>)}
       </div>
       <p class="flex flex-wrap gap-x-3 gap-y-1 font-mono text-meta text-muted">
         {secondaryMetaSlot === 'foot' && <span class="whitespace-nowrap">{site.identity.name}</span>}
