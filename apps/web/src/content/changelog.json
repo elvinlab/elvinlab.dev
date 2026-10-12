@@ -700,5 +700,11 @@
     "category": "added",
     "title": "New Lab Note 009: Publicar una nota ya no cuesta un CI completo",
     "description": "Publicar una nota era un release con todo el CI y nueve pasos a mano. Separé los dos problemas: un comando para los pasos y un carril rápido para el CI."
+  },
+  "home-mobile-byline": {
+    "date": "2026-10-12",
+    "category": "changed",
+    "title": "The home names its author on phones",
+    "description": "On narrow screens the hero now shows the name and role above the headline, and the home page title includes the name, so a first-time visitor knows whose site it is without scrolling."
   }
 }

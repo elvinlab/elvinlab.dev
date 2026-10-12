@@ -49,13 +49,17 @@ const experiments = homeSections.experiments
   : [];
 ---
 
-<BaseLayout locale={locale} path="/">
+<BaseLayout locale={locale} path="/" title={site.identity.name}>
   <link slot="head" rel="preload" as="font" type="font/woff2" href={pixelifySansLatin} crossorigin />
   <Banner slot="banner" height="150px" expandedHeight="clamp(440px, 56vh, 520px)" compactExpandedHeight="29rem" expandable>
     <BackgroundCanvas slot="background" />
     <BannerToggle slot="toggle" locale={locale} />
     <div data-hero-content data-home-hero class="flex flex-col md:grid md:grid-cols-[minmax(0,1fr)_auto] lg:grid-cols-[minmax(0,1fr)_280px] md:items-end md:gap-12">
       <div class="flex flex-col">
+        <p data-hero-byline class="mb-1flex flex-col gap-0.5 md:hidden">
+          <span class="font-display text-lg font-bold">{site.identity.name}</span>
+          <span class="text-sm text-text-secondary">{site.identity.role[locale]}</span>
+        </p>
         <h1 class="max-w-hero font-pixel text-hero font-semibold leading-[1.1] text-balance">
           {t(locale, 'home.headline')}<span aria-hidden="true" class="ml-1 inline-block h-3 w-2.5 bg-pink align-baseline md:h-4"></span>
         </h1>
