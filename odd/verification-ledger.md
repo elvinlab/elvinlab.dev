@@ -209,3 +209,7 @@ The 6 e2e failures and what was done:
 ### Release 17 deployed (2026-10-11, run 38169618321)
 
 Release commit `f9467c5`. CI: static, e2e (4 shards, all projects), lighthouse (2 shards), checks and deploy all green on the first attempt, no reruns; production `/version.txt` = `f9467c5`. The local candidate verification above (full 3-viewport e2e after the `home-marks` fix, full Lighthouse, white-label, cold start) matched the CI result. The pages flagged as thin (`/experiments/`, `/me/`, `/en/me/`, `/notes/smoke-es/`) passed their CI Lighthouse gate. Known intermittent specs did not fail in this run.
+
+### Release 18 deployed (2026-10-12, run 38276546818)
+
+Release commit `5912ab9`. Local battery before the release (delegated, GREEN): lint, typecheck, vitest (1373), depcruise, docs:config, build, page-weight (37 pages), js-budget, white-label, full e2e (1289 passed; one `font-swap` intermittent, since fixed in `7269237`), full Lighthouse (11 URLs, worst LCP 2344 ms on `/experiments/`), dev cold start, changelog audit. CI: static, e2e (4 shards) and lighthouse (2 shards); `lighthouse (1)` failed once (performance score under 0.95 on `/notes/smoke-es/`), the re-run of the failed job passed, deploy green. Production `/version.txt` = `5912ab9`; `/notes/`, two topic pages and `/rss.xml` answer 200. Not re-run since the release: nothing in the shipped tree changed after `26adb42`.
