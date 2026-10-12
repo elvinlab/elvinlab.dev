@@ -369,6 +369,20 @@ export const CHECKS: readonly CheckDef[] = [
   e2e({ file: 'subscribe.spec.ts', covers: NOTE_PAGE, helpers: true, responsive: true }),
   e2e({ file: 'theme.spec.ts', covers: EVERY_PAGE }),
   e2e({ file: 'type-scale.spec.ts', covers: [...NOTE_PAGE, ...HOME], responsive: true }),
+  // Notebook identity and motion: each spec sets its own viewports, so only the home byline varies by project.
+  e2e({ file: 'decision-record.spec.ts', covers: NOTE_PAGE }),
+  e2e({ file: 'home-byline.spec.ts', covers: HOME, responsive: true }),
+  e2e({ file: 'home-ink.spec.ts', covers: HOME }),
+  e2e({ file: 'ink.spec.ts', covers: NOTE_PAGE }),
+  e2e({ file: 'me-data-layer.spec.ts', covers: ME }),
+  e2e({ file: 'native-feel.spec.ts', covers: [...HOME, ...NOTES] }),
+  e2e({ file: 'note-prose.spec.ts', covers: NOTE_PAGE }),
+  e2e({ file: 'notes-index-ruled.spec.ts', covers: [...NOTES, ...SUBSCRIBE] }),
+  e2e({
+    file: 'page-stamps.spec.ts',
+    covers: [...EXPERIMENTS, ...CHANGELOG, ...CONTACT, ...LEGAL, ...SUBSCRIBE, ...NOTES],
+  }),
+  e2e({ file: 'view-transitions.spec.ts', covers: EVERY_PAGE }),
 
   lighthouse('/', HOME),
   lighthouse('/en/', HOME),

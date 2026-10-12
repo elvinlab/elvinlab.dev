@@ -93,6 +93,10 @@ The single source of truth is [`apps/web/scripts/verification-map.ts`](../apps/w
 | Client JavaScript, islands, scripts, client dependencies | `build` then `check:js-budget`, the area's e2e, `check:dev-cold-start` if a dependency was added | |
 | Anything that changes the HTML or CSS bytes of a gated URL (styles, layout, head or SEO tags, fonts, note or home or contact markup) | `check:page-weight` after `build`, `test:lighthouse` and the area's e2e; compare the document size and the worst LCP with the ledger | Lighthouse if no page the gate loads changed |
 | Notes pages and what they render (`NotePage`, share panel, marks, prose styles) | the notes specs (`notes-layout`, `notes-tag-filter`, `notes-start-here`, `notes-topics`, `note-share`, `link-previews`, `note-translations`, `reading-mode`, `calm-pages`, `card-links`, `focus-not-obscured`, `marks`) and `a11y.spec.ts` | contact, home and `/me` specs |
+| Notebook identity (`Ink`, `Stamp`, `Fix`, `note-prose.css`, `record-card.css`, `DecisionRecord`) | `ink`, `note-prose`, `decision-record` and `page-stamps` specs, then the notes specs above; `home-ink` and `home-byline` when the home headline or byline changed | contact and `/me` specs |
+| Notes index rows (`NoteRow`, `notes-index.css`) | `notes-index-ruled`, `card-links`, `native-feel` (a stretched-link row must press with a tint, never a transform) | home and `/me` specs |
+| Cross-page transitions, native feel (`global.css` view-transition rules, safe-area, `theme-color`) | `view-transitions`, `native-feel`, then a wide change: the whole stack once | |
+| `/me` data layer (`features/me`) | `me-data-layer.spec.ts` with the other `/me` specs | notes specs |
 | Contact (`features/contact`, `ContactForm`) | `contact.spec.ts`, the contact unit tests, `check:js-budget` | notes specs |
 | Header, navbar, footer, `BaseLayout`, global CSS | a wide change: the whole stack once | |
 | `tests/**` only | the changed specs | the application checks |

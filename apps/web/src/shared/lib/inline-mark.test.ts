@@ -51,12 +51,15 @@ describe('home headline', () => {
     for (const locale of LOCALES.locales) {
       const [phrase, sentence] = expected[locale];
       const raw = t(locale, 'home.headline');
+      // The copy holds non-breaking spaces inside the marked phrase (so the underline never splits
+      // awkwardly on phones); compare the words, not the space kind.
+      const plain = (text: string) => text.replaceAll('\u00a0', ' ');
       expect(
         splitMarked(raw)
           .filter((s) => s.marked)
-          .map((s) => s.text),
+          .map((s) => plain(s.text)),
       ).toEqual([phrase]);
-      expect(stripMarks(raw)).toBe(sentence);
+      expect(plain(stripMarks(raw))).toBe(sentence);
     }
   });
 

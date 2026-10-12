@@ -2,7 +2,7 @@
 /**
  * Inline label pill (category, tag). Renders a link when `href` is set; the link keeps its small
  * look but its hit area grows to 44 px through an invisible pseudo-element (WCAG 2.5.8 target size).
- * Standalone chip links pass `active:scale-96`; inside a pressable card the card already presses.
+ * Standalone chip links pass `active:scale-96`; inside a stretched-link card the card presses with a tint instead (a transform would move its edge from under the pointer).
  */
 type Props = { href?: string; class?: string };
 

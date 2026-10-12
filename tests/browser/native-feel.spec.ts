@@ -91,15 +91,27 @@ test('tappable controls show pressed feedback', async ({ page }) => {
   }
 });
 
-test('a note row presses as a whole', async ({ page }) => {
+test('a stretched-link note row presses with a tint and never changes geometry', async ({
+  page,
+}) => {
   await page.goto('/notes/');
   const row = page.locator('[data-note-row]').first();
   const link = row.locator('h3 a');
+  await row.scrollIntoViewIfNeeded();
+  const before = await row.boundingBox();
   const box = await link.boundingBox();
-  if (!box) throw new Error('link has no box');
+  if (!before || !box) throw new Error('row or link has no box');
   await page.mouse.move(box.x + 4, box.y + box.height / 2);
   await page.mouse.down();
-  const pressed = await row.evaluate((element) => getComputedStyle(element).scale);
+  const pressed = await row.evaluate((element) => {
+    const style = getComputedStyle(element);
+    return { scale: style.scale, transform: style.transform, tint: style.backgroundColor };
+  });
+  const during = await row.boundingBox();
   await page.mouse.up();
-  expect(pressed).not.toBe('none');
+  // A transform would pull the card edge away from the pointer and lose clicks there.
+  expect(pressed.scale).toBe('none');
+  expect(pressed.transform).toBe('none');
+  expect(during).toEqual(before);
+  expect(pressed.tint).not.toBe('rgba(0, 0, 0, 0)');
 });

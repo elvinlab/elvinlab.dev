@@ -13,6 +13,11 @@
 [data-theme="elvinlab-light"] [data-note-row] {
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 4'%3E%3Cpath d='M0 2 C15 .6 30 3.4 45 2 S75 .8 90 2 S110 3.2 120 2' fill='none' stroke='%23000' stroke-opacity='.2' stroke-width='1.2' vector-effect='non-scaling-stroke'/%3E%3C/svg%3E");
 }
+/* Pressed feedback is a tint, never a transform: the title link is stretched over the whole row, so a
+   scale would move the edge out from under the pointer and the click would be lost there. */
+[data-note-row]:active {
+  background-color: var(--color-chip);
+}
 /* The margin rule of a notebook: a faint pink line after the number column, wide screens only. */
 @media (min-width: 768px) {
   [data-note-row]::before {

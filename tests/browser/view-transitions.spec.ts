@@ -12,6 +12,7 @@ test.beforeEach(({ browserName: _browserName }, testInfo) => {
 declare global {
   interface Window {
     __vt?: boolean;
+    __revealed?: string;
     __entrances?: number;
   }
 }
@@ -21,6 +22,7 @@ const instrument = (page: Page) =>
   page.addInitScript(() => {
     window.__entrances = 0;
     addEventListener('pagereveal', (event) => {
+      window.__revealed = location.pathname;
       window.__vt = Boolean((event as Event & { viewTransition?: unknown }).viewTransition);
     });
     addEventListener('animationstart', (event) => {
@@ -30,7 +32,15 @@ const instrument = (page: Page) =>
     });
   });
 
-const viewTransition = (page: Page) => page.evaluate(() => window.__vt);
+/**
+ * Reads whether the new document's `pagereveal` carried a view transition. `toHaveURL` passes at
+ * commit, before the new document has revealed (and the old document still holds its own value),
+ * so wait until `pagereveal` ran for `path` before reading.
+ */
+const viewTransition = async (page: Page, path: string) => {
+  await expect.poll(() => page.evaluate(() => window.__revealed)).toBe(path);
+  return page.evaluate(() => window.__vt);
+};
 
 const motion = async (page: Page) => {
   await page.emulateMedia({ reducedMotion: 'no-preference' });
@@ -44,7 +54,7 @@ test('an internal link navigates through a view transition when motion is allowe
   await page.goto('/');
   await page.getByRole('link', { name: 'Notas' }).first().click();
   await expect(page).toHaveURL(/\/notes\/$/);
-  expect(await viewTransition(page)).toBe(true);
+  expect(await viewTransition(page, '/notes/')).toBe(true);
 });
 
 test('switching language navigates through a view transition and lands on the other locale', async ({
@@ -54,7 +64,7 @@ test('switching language navigates through a view transition and lands on the ot
   await page.goto('/');
   await page.locator('a[hreflang="en"]').first().click();
   await expect(page).toHaveURL(/\/en\/$/);
-  expect(await viewTransition(page)).toBe(true);
+  expect(await viewTransition(page, '/en/')).toBe(true);
 });
 
 test('reduced motion navigates normally, with no view transition', async ({ page }) => {
@@ -63,7 +73,7 @@ test('reduced motion navigates normally, with no view transition', async ({ page
   await page.goto('/');
   await page.getByRole('link', { name: 'Notas' }).first().click();
   await expect(page).toHaveURL(/\/notes\/$/);
-  expect(await viewTransition(page)).toBe(false);
+  expect(await viewTransition(page, '/notes/')).toBe(false);
 });
 
 test('the opt-in rule only exists under no-preference and the pseudo-elements stop under reduce', async ({
@@ -120,7 +130,7 @@ test('the page keeps one entrance: same on a navigated load as on a cold load, n
   await page.goto('/');
   await page.getByRole('link', { name: 'Notas' }).first().click();
   await expect(page).toHaveURL(/\/notes\/$/);
-  expect(await viewTransition(page)).toBe(true);
+  expect(await viewTransition(page, '/notes/')).toBe(true);
   await page.waitForTimeout(1000);
   // Not doubled: the transition adds no second entrance on top of the page's own.
   expect(await page.evaluate(() => window.__entrances)).toBe(cold);

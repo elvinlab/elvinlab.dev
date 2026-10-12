@@ -754,5 +754,11 @@
     "category": "added",
     "title": "Pages hand over smoothly",
     "description": "Moving between pages in Chrome, Edge and Safari now keeps the navigation bar still while the page below changes, instead of the whole bar flickering back in on every click. It is pure CSS with no script, it never runs on the first visit, and it switches off when your system asks for reduced motion. Firefox does not support it yet and simply browses normally."
+  },
+  "home-headline-wrap": {
+    "date": "2026-10-12",
+    "category": "fixed",
+    "title": "Home headline no longer splits awkwardly on phones",
+    "description": "The underlined phrase in the home headline now stays together instead of breaking in the middle on narrow screens, so the headline reads cleanly on a phone."
   }
 }

@@ -69,9 +69,17 @@ test('wide screens draw a margin rule beside the number column, phones do not', 
   expect(narrow).toBe('none');
 });
 
-test('the row keeps its pressed feedback', async ({ page }) => {
+test('the row keeps its pressed feedback, as a tint and not a transform', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 900 });
   await page.goto('/notes/');
-  const cls = await page.locator('[data-note-row]').first().getAttribute('class');
-  expect(cls).toContain('active:scale-96');
+  const row = page.locator('[data-note-row]').first();
+  const box = await row.locator('h3 a').boundingBox();
+  if (!box) throw new Error('title link has no box');
+  const resting = await row.evaluate((el) => getComputedStyle(el).backgroundColor);
+  await page.mouse.move(box.x + 4, box.y + box.height / 2);
+  await page.mouse.down();
+  const pressed = await row.evaluate((el) => getComputedStyle(el).backgroundColor);
+  await page.mouse.up();
+  expect(pressed).not.toBe(resting);
+  expect(pressed).not.toBe('rgba(0, 0, 0, 0)');
 });

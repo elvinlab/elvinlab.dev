@@ -106,7 +106,7 @@ for (const theme of THEMES) {
   test(`prose links draw an ink underline in ${theme}`, async ({ page }) => {
     await page.goto(ES);
     await setTheme(page, theme);
-    const link = '.prose p a[href="https://example.org/prose"]';
+    const link = '.prose p a[href="https://example.net/prose"]';
     await expect.poll(() => style(page, link, 'background-image')).toContain('url(');
     expect(await style(page, link, 'text-decoration-line')).toBe('none');
   });
@@ -122,7 +122,7 @@ for (const theme of THEMES) {
 
 test('the stroke colors differ per theme', async ({ page }) => {
   await page.goto(ES);
-  const link = '.prose p a[href="https://example.org/prose"]';
+  const link = '.prose p a[href="https://example.net/prose"]';
   await setTheme(page, 'elvinlab-dark');
   await expect.poll(() => style(page, link, 'background-image')).toContain('%23ec4899');
   await setTheme(page, 'elvinlab-light');
@@ -215,7 +215,7 @@ test('the English note gets the same treatment', async ({ page }) => {
 test('under reduced motion the link underline is static and nothing animates', async ({ page }) => {
   await page.emulateMedia({ reducedMotion: 'reduce' });
   await page.goto(ES);
-  const link = page.locator('.prose p a[href="https://example.org/prose"]');
+  const link = page.locator('.prose p a[href="https://example.net/prose"]');
   await link.hover();
   const state = await link.evaluate((el) => ({
     animation: getComputedStyle(el).animationName,
@@ -236,7 +236,7 @@ test('under reduced motion the link underline is static and nothing animates', a
 test('with motion allowed the link underline grows on hover', async ({ page }) => {
   await page.emulateMedia({ reducedMotion: 'no-preference' });
   await page.goto(ES);
-  const link = page.locator('.prose p a[href="https://example.org/prose"]');
+  const link = page.locator('.prose p a[href="https://example.net/prose"]');
   await expect.poll(() => link.evaluate((el) => getComputedStyle(el).animationName)).toBe('none');
   await link.hover();
   await expect
