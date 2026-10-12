@@ -10,18 +10,36 @@ import { fileURLToPath } from 'node:url';
  * See `docs/TESTING.md` ("Page weight budget") and `docs/DESIGN.md` ("Page weight rule").
  */
 
-export type PageType =
-  | 'home'
-  | 'me'
-  | 'experiments'
-  | 'changelog'
-  | 'contact'
-  | 'subscribe'
-  | 'result'
-  | 'notes-index'
-  | 'note'
-  | 'topic'
-  | 'default';
+export const PAGE_TYPES = [
+  'home',
+  'me',
+  'experiments',
+  'changelog',
+  'contact',
+  'subscribe',
+  'result',
+  'notes-index',
+  'note',
+  'topic',
+  'default',
+] as const;
+
+export type PageType = (typeof PAGE_TYPES)[number];
+
+/**
+ * The page types whose HTML grows with the content, and what grows it. Every other type is fixed and
+ * stays strict. Adding a page type to `PAGE_TYPES` without deciding which side it is on fails
+ * `page-weight-budget.test.ts`, so growth is a decision made once, not a budget patched later.
+ */
+export const CONTENT_GROWTH = {
+  'notes-index': 'listed-notes',
+  topic: 'listed-notes',
+  note: 'article-body',
+} as const satisfies Partial<Record<PageType, 'listed-notes' | 'article-body'>>;
+
+export const FIXED_PAGE_TYPES: readonly PageType[] = PAGE_TYPES.filter(
+  (type) => !(type in CONTENT_GROWTH),
+);
 
 export interface PageWeight {
   /** URL path of the page, e.g. `/en/me/`. */
@@ -32,7 +50,7 @@ export interface PageWeight {
   htmlBytes: number;
   /** Rendered article body, delimited by inert templates in NotePage. */
   articleHtmlBytes?: number;
-  /** Actual article rows in the notes index. */
+  /** Actual note rows listed by the page: the notes index (rows) or a topic page (its marker). */
   notesCount?: number;
 }
 
@@ -41,7 +59,7 @@ export interface TypeBudget {
   why: string;
   styleBytes: number;
   htmlBytes: number;
-  /** Additional HTML per index row; htmlBytes then limits the fixed shell. */
+  /** Additional HTML per listed note (index row or topic row); htmlBytes then limits the fixed shell. */
   htmlBytesPerNote?: number;
   /** Article content ceiling; htmlBytes then limits the fixed shell. */
   articleBytes?: number;
@@ -68,13 +86,20 @@ export interface ReportRow extends PageWeight {
   styleBudget: number;
   htmlBudget: number;
   articleBudget?: number;
+  /** How many more listed notes fit under the absolute ceiling (scaled types with a ceiling only). */
+  roomNotes?: number;
   ok: boolean;
 }
 
 export interface Evaluation {
   rows: ReportRow[];
   failures: ReportRow[];
+  /** Passing rows whose room is nearly spent: the next paginate-or-raise decision, seen early. */
+  warnings: ReportRow[];
 }
+
+/** Fewer notes than this of room left is worth a warning (never a failure). */
+export const ROOM_WARNING_NOTES = 5;
 
 /** Notes sub-routes that are not a note page. */
 const NOT_A_NOTE = new Set(['page', 'tag', 'tags']);
@@ -143,6 +168,12 @@ export function noteRowCount(html: string): number {
   return [...html.matchAll(/<article\b[^>]*\bdata-note-row(?:="")?(?=\s|>)[^>]*>/gi)].length;
 }
 
+/** Notes listed by a topic page, read from the `data-topic-notes` marker of `TopicPage`; undefined if absent. */
+export function topicNoteCount(html: string): number | undefined {
+  const match = /\bdata-topic-notes="(\d+)"/.exec(html);
+  return match?.[1] === undefined ? undefined : Number(match[1]);
+}
+
 function listIndexFiles(directory: string, root = directory): string[] {
   const files: string[] = [];
   for (const entry of readdirSync(directory, { withFileTypes: true })) {
@@ -171,15 +202,29 @@ export function collectPageWeights(clientRoot: string): PageWeight[] {
       const text = html.toString('utf8');
       const type = classifyPage(path);
       const articleHtmlBytes = type === 'note' ? articleContentBytes(text) : undefined;
+      const notesCount =
+        type === 'notes-index'
+          ? noteRowCount(text)
+          : type === 'topic'
+            ? topicNoteCount(text)
+            : undefined;
       return {
         path,
         styleBytes: inlineStyleBytes(html.toString('utf8')),
         htmlBytes: html.byteLength,
         ...(articleHtmlBytes !== undefined && { articleHtmlBytes }),
-        ...(type === 'notes-index' && { notesCount: noteRowCount(text) }),
+        ...(notesCount !== undefined && { notesCount }),
       };
     })
     .sort((a, b) => a.path.localeCompare(b.path));
+}
+
+/** How many more listed notes a scaled page fits under its absolute ceiling, at the per-note allowance
+ * (a new row costs about that much, usually a bit less). Undefined when the page does not scale or has no ceiling. */
+export function notesRoom(page: PageWeight, budget: TypeBudget): number | undefined {
+  if (budget.htmlBytesPerNote === undefined || budget.maxHtmlBytes === undefined) return undefined;
+  if (page.notesCount === undefined) return undefined;
+  return Math.max(0, Math.floor((budget.maxHtmlBytes - page.htmlBytes) / budget.htmlBytesPerNote));
 }
 
 /** Compares every page with the budget of its type; the `default` type covers the rest. */
@@ -198,6 +243,7 @@ export function evaluatePages(pages: readonly PageWeight[], budgets: Budgets): E
       budget.htmlBytes + contentBytes + (budget.htmlBytesPerNote ?? 0) * (page.notesCount ?? 0),
       budget.maxHtmlBytes ?? Number.POSITIVE_INFINITY,
     );
+    const roomNotes = notesRoom(page, budget);
     const contentOk = budget.articleBytes === undefined || contentBytes <= budget.articleBytes;
     return {
       ...page,
@@ -205,10 +251,17 @@ export function evaluatePages(pages: readonly PageWeight[], budgets: Budgets): E
       styleBudget: budget.styleBytes,
       htmlBudget,
       ...(budget.articleBytes !== undefined && { articleBudget: budget.articleBytes }),
+      ...(roomNotes !== undefined && { roomNotes }),
       ok: contentOk && page.styleBytes <= budget.styleBytes && page.htmlBytes <= htmlBudget,
     };
   });
-  return { rows, failures: rows.filter((row) => !row.ok) };
+  return {
+    rows,
+    failures: rows.filter((row) => !row.ok),
+    warnings: rows.filter(
+      (row) => row.ok && row.roomNotes !== undefined && row.roomNotes < ROOM_WARNING_NOTES,
+    ),
+  };
 }
 
 function metric(label: string, value: number, budget: number): string {
@@ -217,7 +270,7 @@ function metric(label: string, value: number, budget: number): string {
 }
 
 /** A table with every page (numbers are printed even when everything passes). */
-export function formatReport({ rows, failures }: Evaluation): string {
+export function formatReport({ rows, failures, warnings }: Evaluation): string {
   const pathWidth = Math.max(4, ...rows.map((row) => row.path.length));
   const typeWidth = Math.max(4, ...rows.map((row) => row.type.length));
   const lines = rows.map(
@@ -227,8 +280,21 @@ export function formatReport({ rows, failures }: Evaluation): string {
       (row.articleBudget === undefined
         ? ''
         : `  ${metric('article', row.articleHtmlBytes ?? 0, row.articleBudget)}`) +
-      (row.notesCount === undefined ? '' : `  notes ${row.notesCount}`),
+      (row.notesCount === undefined ? '' : `  notes ${row.notesCount}`) +
+      (row.roomNotes === undefined ? '' : `  room +${row.roomNotes} notes`),
   );
+  for (const row of warnings)
+    lines.push(
+      `WARN  ${row.path}  room +${row.roomNotes} notes before ${row.type} pages need pagination or a conscious ceiling raise.`,
+    );
+  const tightest = new Map<PageType, number>();
+  for (const row of rows)
+    if (row.roomNotes !== undefined)
+      tightest.set(row.type, Math.min(tightest.get(row.type) ?? row.roomNotes, row.roomNotes));
+  if (tightest.size > 0)
+    lines.push(
+      `Room left: ${[...tightest].map(([type, room]) => `${type} +${room} notes`).join(', ')}`,
+    );
   lines.push(
     failures.length === 0
       ? `All ${rows.length} pages within their page-weight budget.`

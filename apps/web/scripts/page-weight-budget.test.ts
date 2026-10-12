@@ -1,4 +1,4 @@
-import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
+import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { dirname, join } from 'node:path';
 
@@ -7,12 +7,16 @@ import { afterEach, describe, expect, it } from 'vitest';
 import {
   articleContentBytes,
   type Budgets,
+  CONTENT_GROWTH,
   classifyPage,
   collectPageWeights,
   evaluatePages,
+  FIXED_PAGE_TYPES,
   formatReport,
   inlineStyleBytes,
   noteRowCount,
+  notesRoom,
+  PAGE_TYPES,
   suggestBudgets,
 } from './page-weight-budget.ts';
 
@@ -116,6 +120,41 @@ describe('evaluatePages', () => {
     );
     expect(result.failures).toHaveLength(3);
     expect(formatReport(result)).toContain('article 2001 / 2000 B (+1 B)');
+  });
+
+  it('scales a topic page allowance with its listed notes but retains an absolute ceiling', () => {
+    const topicBudgets: Budgets = {
+      types: {
+        topic: {
+          why: 'bounded topic page',
+          styleBytes: 500,
+          htmlBytes: 900,
+          htmlBytesPerNote: 100,
+          maxHtmlBytes: 3000,
+        },
+      },
+    };
+    expect(
+      evaluatePages(
+        [
+          { path: '/notes/tag/a/', styleBytes: 500, htmlBytes: 1000, notesCount: 1 },
+          { path: '/notes/tag/b/', styleBytes: 500, htmlBytes: 2900, notesCount: 20 },
+        ],
+        topicBudgets,
+      ).failures,
+    ).toEqual([]);
+    expect(
+      evaluatePages(
+        [
+          { path: '/notes/tag/a/', styleBytes: 500, htmlBytes: 1001, notesCount: 1 },
+          { path: '/notes/tag/b/', styleBytes: 500, htmlBytes: 3001, notesCount: 100 },
+        ],
+        topicBudgets,
+      ).failures,
+    ).toHaveLength(2);
+    expect(() =>
+      evaluatePages([{ path: '/notes/tag/a/', styleBytes: 500, htmlBytes: 900 }], topicBudgets),
+    ).toThrow(/Missing note row count/);
   });
 
   it('scales the index allowance with new notes but retains an absolute ceiling', () => {
@@ -222,6 +261,83 @@ describe('article content measurements', () => {
   });
 });
 
+describe('notesRoom', () => {
+  const budget = {
+    why: 'listing',
+    styleBytes: 500,
+    htmlBytes: 900,
+    htmlBytesPerNote: 100,
+    maxHtmlBytes: 3000,
+  };
+
+  it('counts how many more notes fit under the absolute ceiling at the per-note allowance', () => {
+    expect(
+      notesRoom({ path: '/notes/', styleBytes: 500, htmlBytes: 1000, notesCount: 3 }, budget),
+    ).toBe(20);
+  });
+
+  it('never goes below zero once the page is at or over the ceiling', () => {
+    expect(
+      notesRoom({ path: '/notes/', styleBytes: 500, htmlBytes: 3500, notesCount: 30 }, budget),
+    ).toBe(0);
+  });
+
+  it('is undefined for a page that does not scale with notes or has no ceiling', () => {
+    const page = { path: '/me/', styleBytes: 500, htmlBytes: 1000 };
+    expect(notesRoom(page, { why: 'fixed', styleBytes: 500, htmlBytes: 900 })).toBeUndefined();
+    expect(
+      notesRoom(
+        { ...page, notesCount: 2 },
+        { why: 'listing', styleBytes: 500, htmlBytes: 900, htmlBytesPerNote: 100 },
+      ),
+    ).toBeUndefined();
+  });
+});
+
+describe('room report', () => {
+  const budgets: Budgets = {
+    types: {
+      'notes-index': {
+        why: 'listing',
+        styleBytes: 500,
+        htmlBytes: 900,
+        htmlBytesPerNote: 100,
+        maxHtmlBytes: 3000,
+      },
+      topic: {
+        why: 'listing',
+        styleBytes: 500,
+        htmlBytes: 900,
+        htmlBytesPerNote: 100,
+        maxHtmlBytes: 1200,
+      },
+    },
+  };
+  const pages = [
+    { path: '/notes/', styleBytes: 500, htmlBytes: 1000, notesCount: 3 },
+    { path: '/notes/tag/a/', styleBytes: 500, htmlBytes: 1000, notesCount: 3 },
+  ];
+
+  it('puts the room of each scaled row in the evaluation and the table', () => {
+    const evaluation = evaluatePages(pages, budgets);
+    expect(evaluation.rows.map((row) => row.roomNotes)).toEqual([20, 2]);
+    expect(formatReport(evaluation)).toContain('room +20 notes');
+  });
+
+  it('warns, without failing, when a scaled type has fewer than 5 notes of room left', () => {
+    const evaluation = evaluatePages(pages, budgets);
+    expect(evaluation.failures).toEqual([]);
+    expect(evaluation.warnings.map((row) => row.path)).toEqual(['/notes/tag/a/']);
+    expect(formatReport(evaluation)).toMatch(/WARN .*\/notes\/tag\/a\/.*room \+2 notes/);
+  });
+
+  it('summarizes the tightest room per type so the limit is visible before it blocks a publish', () => {
+    expect(formatReport(evaluatePages(pages, budgets))).toContain(
+      'Room left: notes-index +20 notes, topic +2 notes',
+    );
+  });
+});
+
 describe('formatReport', () => {
   it('prints every page, marks failures and names the overshoot', () => {
     const result = evaluatePages(
@@ -259,6 +375,27 @@ describe('collectPageWeights', () => {
       Buffer.byteLength('<div class="prose"><p>á</p></div>'),
     );
     expect(pages.find((page) => page.path === '/notes/')?.notesCount).toBe(2);
+  });
+  it('reads the number of listed notes of a topic page from its marker', () => {
+    const root = mkdtempSync(join(tmpdir(), 'page-weight-topic-'));
+    temporaryDirectories.push(root);
+    const topicDirectory = join(root, 'notes/tag/rendimiento');
+    mkdirSync(topicDirectory, { recursive: true });
+    writeFileSync(
+      join(topicDirectory, 'index.html'),
+      '<div class="mt-2" data-topic-notes="4"><a></a></div>',
+    );
+    const topic = collectPageWeights(root).find((page) => page.path === '/notes/tag/rendimiento/');
+    expect(topic?.notesCount).toBe(4);
+  });
+  it('leaves the count undefined when a topic page has no marker, so evaluation can refuse it', () => {
+    const root = mkdtempSync(join(tmpdir(), 'page-weight-topic-'));
+    temporaryDirectories.push(root);
+    const topicDirectory = join(root, 'notes/tag/rendimiento');
+    mkdirSync(topicDirectory, { recursive: true });
+    writeFileSync(join(topicDirectory, 'index.html'), '<div class="mt-2"></div>');
+    const topic = collectPageWeights(root).find((page) => page.path === '/notes/tag/rendimiento/');
+    expect(topic?.notesCount).toBeUndefined();
   });
   it('reads every index.html and the root 404.html of a build and measures them', () => {
     const root = mkdtempSync(join(tmpdir(), 'page-weight-'));
@@ -318,5 +455,50 @@ describe('suggestBudgets', () => {
     );
     expect(suggested.note).toEqual({ styleBytes: 2100, htmlBytes: 5200 });
     expect(suggested.home).toEqual({ styleBytes: 200, htmlBytes: 200 });
+  });
+});
+
+describe('the committed budget file', () => {
+  const { types } = JSON.parse(
+    readFileSync(join(import.meta.dirname, 'page-weight-budget.json'), 'utf8'),
+  ) as Budgets;
+
+  it('decides, for every page type, whether it is fixed or grows with content', () => {
+    const grows = Object.keys(CONTENT_GROWTH);
+    expect([...grows, ...FIXED_PAGE_TYPES].sort()).toEqual([...PAGE_TYPES].sort());
+    expect(grows.filter((type) => FIXED_PAGE_TYPES.includes(type as never))).toEqual([]);
+  });
+
+  it('gives every type a budget, or lets it fall back to a default that exists', () => {
+    expect(types.default).toBeDefined();
+  });
+
+  it('declares a per-note allowance and a ceiling for each type that lists notes', () => {
+    for (const [type, growth] of Object.entries(CONTENT_GROWTH)) {
+      const budget = types[type as keyof typeof types];
+      if (growth !== 'listed-notes') continue;
+      expect(budget?.htmlBytesPerNote, `${type} needs htmlBytesPerNote`).toBeGreaterThan(0);
+      expect(budget?.maxHtmlBytes, `${type} needs a maxHtmlBytes ceiling`).toBeGreaterThan(
+        budget?.htmlBytes ?? Number.POSITIVE_INFINITY,
+      );
+    }
+  });
+
+  it('declares an article ceiling for the type that renders a note body', () => {
+    for (const [type, growth] of Object.entries(CONTENT_GROWTH)) {
+      if (growth !== 'article-body') continue;
+      expect(
+        types[type as keyof typeof types]?.articleBytes,
+        `${type} needs articleBytes`,
+      ).toBeGreaterThan(0);
+    }
+  });
+
+  it('keeps fixed types strict: no content allowance on a page that should not grow', () => {
+    for (const type of FIXED_PAGE_TYPES) {
+      const budget = types[type];
+      expect(budget?.htmlBytesPerNote, `${type} is fixed`).toBeUndefined();
+      expect(budget?.articleBytes, `${type} is fixed`).toBeUndefined();
+    }
   });
 });
