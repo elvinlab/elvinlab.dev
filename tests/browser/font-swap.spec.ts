@@ -8,6 +8,18 @@ import { expect, type Page, type Route, test } from '@playwright/test';
  * The woff2 requests of the two faces are held until the test releases them, the layout is measured
  * in the fallback, then again once `document.fonts.ready` resolves. Set `FONT_SWAP_BASELINE=1` to
  * drop the fallback faces from the stacks and see how much the swap moves without them.
+ *
+ * Nothing but the fonts may change the layout between the two measurements. The footprint widget
+ * (`marks`) renders a reserved row while its read is in flight and then reveals its button or, when
+ * the read fails, removes itself. The fixture preview has no database, so that read answers 503 at a
+ * moment that depends on machine load, and under load it landed between the two measurements (a
+ * 60 px drop above the paragraph). The read is therefore answered with a fixed payload and the
+ * widget is waited on until it settled, before the first measurement.
+ *
+ * The same goes for the pixel faces (the header wordmark is Press Start 2P, the page titles
+ * Pixelify Sans): they are lazy and not part of this contract, but their swap (a 38 px wider
+ * wordmark) used to land between the measurements under load. They are loaded up front so that only
+ * the two held faces swap.
  */
 const HELD_FONTS = '**/*{ibm-plex-sans,jetbrains-mono}-latin-wght-normal*.woff2';
 const BASELINE = process.env['FONT_SWAP_BASELINE'] === '1';
@@ -63,6 +75,15 @@ for (const [path, width] of PAGES.flatMap((p) => WIDTHS.map((w) => [p, w] as con
     const plexSeen = new Promise<void>((resolve) => {
       plexRequested = resolve;
     });
+    await page.route(
+      (url) => url.pathname.includes('/_actions/marks.get/'),
+      (route) =>
+        route.fulfill({
+          status: 200,
+          contentType: 'application/json+devalue',
+          body: JSON.stringify([{ total: 1 }, 12]),
+        }),
+    );
     await page.route(HELD_FONTS, async (route) => {
       if (released) return route.continue();
       held.push(route);
@@ -71,6 +92,17 @@ for (const [path, width] of PAGES.flatMap((p) => WIDTHS.map((w) => [p, w] as con
 
     await page.goto(path, { waitUntil: 'domcontentloaded' });
     await plexSeen;
+    await page.evaluate(() =>
+      Promise.all([
+        document.fonts.load('16px "Press Start 2P"'),
+        document.fonts.load('16px "Pixelify Sans Variable"'),
+      ]),
+    );
+    // Every footprint instance is revealed once its read answered: its final layout.
+    await page.waitForFunction(() => {
+      const marks = [...document.querySelectorAll('[data-marks]')];
+      return marks.length > 0 && marks.every((mark) => mark.hasAttribute('data-r'));
+    });
     await page.evaluate(
       () => new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve))),
     );
