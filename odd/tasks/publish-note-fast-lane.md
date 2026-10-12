@@ -9,7 +9,7 @@ A note is an MDX file in the repo, so publishing means a release to `main`, whic
 ## Scope
 - T1: `publish-note` command (pure helpers + thin CLI), `pnpm publish-note`.
 - T2: notes-only fast lane in `.github/workflows/ci.yml`.
-- T3: docs (NOTES, CONFIGURATION, both languages), ADR 0013, CLAUDE.md command list, changelog entry.
+- T3: docs (NOTES, CONFIGURATION, both languages), ADR 0016, CLAUDE.md command list, changelog entry.
 - Out of scope: CMS or database for notes, scheduled publishing, newsletter send (`notify:note` stays manual).
 
 ## Constraints
@@ -25,9 +25,9 @@ A note is an MDX file in the repo, so publishing means a release to `main`, whic
 - Fast lane: a `changes` job asks the GitHub compare API for the files in the push; `notes_only` is true when every path is under `apps/web/src/content/notes/` or is `changelog.json` / `releases.json`. Then `e2e` and `lighthouse` are skipped (a skipped need passes `checks`), and a `notes-gate` job runs build + `check:js-budget` + `check:page-weight`. Anything else, an unknown `before`, or 300+ files keeps the full stack.
 
 ## Tasks
-- [x] **T1 — `publish-note` command** (route: inline; trigger: new script with git/release logic, Tier 3, tests beside it). Pure module `publish-note-plan.ts` + test, thin CLI `publish-note.ts`, wiring in both `package.json` files. Commit 657b4ca. RED observed (module missing), then 10/10 GREEN; `pnpm typecheck` 0 errors, `pnpm lint` clean. Review assessment: not run (RDD tier not assessed for this local tooling commit; recorded as unavailable, not as low).
+- [x] **T1 — `publish-note` command** (route: inline; trigger: new script with git/release logic, Tier 3, tests beside it). Pure module `publish-note-plan.ts` + test, thin CLI `publish-note.ts`, wiring in both `package.json` files. Commit f16316f (changelog entry folded in by fixup so changelog:audit passes). RED observed (module missing), then 10/10 GREEN; `pnpm typecheck` 0 errors, `pnpm lint` clean. Review assessment: not run (RDD tier not assessed for this local tooling commit; recorded as unavailable, not as low).
 - [x] **T2 — Notes-only CI fast lane** (route: inline; trigger: production workflow, Tier 3). `changes` job, `if` on `e2e`/`lighthouse`, `notes-gate` job, `checks` needs updated. Exception to test-first: YAML has no runnable RED; checked with `actionlint` (clean) and the path rule exercised with GNU grep on six inputs (note+changelog and note+image: notes-only; note+css, topics.json, `notes-evil.ts`, `ci.yml`: full). Found and closed one hole: `changes` is in `checks` needs, so a failed detection fails the gate instead of skipping every gate. Gotcha: in this dev shell `grep` is a function that resolves to `rg`, so shell snippets must be tested with `/usr/bin/grep`. Not exercised end to end: the first real notes-only push to `main` is the live test (owner decides when).
-- [ ] **T3 — Docs, ADR 0013, changelog** (route: inline or delegated Tier 2 after T1/T2 land; bilingual twins must agree). NOTES(.en).md steps 6-9, CONFIGURATION(.en).md section 7, ADR 0013, CLAUDE.md commands, changelog entry.
+- [ ] **T3 — Docs, ADR 0016, changelog** (route: inline; trigger: none fired, docs depend on the behavior just built so briefing a Tier 2 worker cost as much as writing them; bilingual twins written together). NOTES(.en).md steps 6-9, CONFIGURATION(.en).md section 7, ADR 0013, CLAUDE.md commands, changelog entry.
 
 ## Acceptance Criteria
 - `pnpm publish-note <slug> --dry-run` prints every step and changes nothing.
@@ -41,5 +41,8 @@ A note is an MDX file in the repo, so publishing means a release to `main`, whic
 ## Progress and evidence
 - Explored: new-post/scaffold-note layout, ci.yml jobs, CONFIGURATION section 7 release steps, ADR 0012.
 
+- T3 done: ADR 0016 (0013-0015 were taken), ADR index, NOTES(.en) summary and section 9, CONFIGURATION(.en) section 7, CLAUDE.md command, changelog entry `publish-note-fast-lane`. `pnpm lint` clean, `pnpm typecheck` 0 errors (after T1), `pnpm changelog:audit` green, dry run of `pnpm publish-note` verified against a throwaway draft. Not run (untouched scope): e2e, lighthouse, white-label, docs:config (no schema change).
+- Commits (local, not pushed): f16316f, 1e1fd33, 7d5e44b, 6ea1d2c. Assessed tier/outcome per commit: unavailable (no RDD assessment run); no review was granted or declined.
+
 ## Next step
-T1: write the failing tests for `publish-note-plan.ts`.
+Owner decides: push `develop`, then the first real `pnpm publish-note <slug>` is the live test of the fast lane (CI `changes` job has never run on GitHub yet).
