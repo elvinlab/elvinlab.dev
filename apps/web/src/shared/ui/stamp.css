@@ -1,0 +1,36 @@
+/* Rubber-stamp look; see Stamp.astro. Inlined by the pages that render a stamp. */
+.stamp {
+  display: inline-block;
+  padding: 0.125rem 0.5rem;
+  border: 2px solid currentColor;
+  border-radius: 0.25rem;
+  background: var(--color-card);
+  font-family: var(--font-mono);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  line-height: 1.4;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+  pointer-events: none;
+  user-select: none;
+  transform: rotate(-6deg);
+}
+.stamp-pink {
+  color: var(--color-pink);
+}
+.stamp-primary {
+  color: var(--color-primary);
+}
+@media (prefers-reduced-motion: no-preference) {
+  .stamp {
+    animation: stamp-land 300ms cubic-bezier(0.22, 1, 0.36, 1) 250ms backwards;
+  }
+}
+@keyframes stamp-land {
+  from {
+    transform: scale(1.12) rotate(-10deg);
+  }
+  to {
+    transform: scale(1) rotate(-6deg);
+  }
+}

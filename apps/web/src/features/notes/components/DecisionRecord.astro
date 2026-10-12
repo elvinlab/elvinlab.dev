@@ -1,13 +1,16 @@
 ---
 /** The context / decision / outcome summary of a note. Its type and spacing come from the
  * `--record-*` variables of `calm-layout.css`, so the preset makes it compact. `inline` (default)
- * opens the article body; `banner` is a stacked panel that sits beside the title from md up. */
+ * is the flat box of the home; `banner` is the index card pinned beside the title from lg up and
+ * `card` the lighter, level one that opens the article body on narrower screens. Both cards carry the
+ * pink stamp and need `record-card.css` (NotePage inlines it). */
 import { type Locale, t } from '@/shared/i18n/index.ts';
+import Stamp from '@/shared/ui/Stamp.astro';
 
 type Props = {
   locale: Locale;
   decision: { context: string; decision: string; outcome: string };
-  variant?: 'inline' | 'banner';
+  variant?: 'inline' | 'banner' | 'card';
 };
 
 const { locale, decision, variant = 'inline' } = Astro.props;
@@ -15,12 +18,26 @@ const fields = ['context', 'decision', 'outcome'] as const;
 ---
 
 {variant === 'banner' ? (
-  <section class="rounded-inner border border-dashed border-divider bg-page/60 p-(--record-pad)" aria-label={t(locale, 'note.decision.title')}>
-    <h2 class="sr-only">{t(locale, 'note.decision.title')}</h2>
+  <section class="record-card record-card-banner" aria-label={t(locale, 'note.decision.title')}>
+    <Stamp class="record-stamp">{t(locale, 'stamp.decision')}</Stamp>
+    <h2 class="record-head font-mono text-(length:--record-title) text-muted">{t(locale, 'note.decision.title')}</h2>
     <div class="flex flex-col gap-3.5">
       {fields.map((field) => (
         <div class="flex flex-col gap-1">
           <span class="font-mono text-(length:--record-label) text-cyan">{t(locale, `note.decision.${field}`)}</span>
+          <p class="min-w-0 text-(length:--record-body) leading-relaxed text-text-secondary [overflow-wrap:anywhere]">{decision[field]}</p>
+        </div>
+      ))}
+    </div>
+  </section>
+) : variant === 'card' ? (
+  <section class="record-card record-card-inline" aria-label={t(locale, 'note.decision.title')}>
+    <Stamp class="record-stamp">{t(locale, 'stamp.decision')}</Stamp>
+    <h2 class="record-head font-mono text-(length:--record-title) text-muted">{t(locale, 'note.decision.title')}</h2>
+    <div class="grid grid-cols-1 gap-(--record-gap) md:grid-cols-3 md:gap-0">
+      {fields.map((field, index) => (
+        <div class:list={['flex flex-col gap-1.5 md:px-(--record-col-pad)', index > 0 && 'border-t border-dashed border-divider pt-(--record-gap) md:border-t-0 md:border-l md:pt-0', index === 0 && 'md:pl-0']}>
+          <span class="font-mono text-(length:--record-label) text-muted">{t(locale, `note.decision.${field}`)}</span>
           <p class="min-w-0 text-(length:--record-body) leading-relaxed text-text-secondary [overflow-wrap:anywhere]">{decision[field]}</p>
         </div>
       ))}

@@ -1,0 +1,20 @@
+---
+/** A rubber-stamp tag, the notebook's bounded all-caps exception (BRAND.md, DESIGN.md "Notebook
+ * ink system"): a framed mono 600 label at 13 px or more, at most two words and 12 characters,
+ * tilted a few degrees. The text arrives through the slot and must come from i18n (it is already
+ * capitalized there, nothing here transforms the case). The stamp is decorative reinforcement of a
+ * label that exists elsewhere, so it is `aria-hidden`; place it with a class from the parent
+ * (`absolute` over a corner, for instance), since the component owns the look and not the position.
+ *
+ * `tone` picks the ink: `pink` (default) or `primary`. Both are semantic tokens. The entrance
+ * "lands" once (300 ms, transform only, never opacity, no layout shift) and is off under
+ * `prefers-reduced-motion`. The look lives in `stamp.css`, not in a scoped `<style>`: a component
+ * reached through a feature barrel (as the decision record is) would ship its scoped CSS to every
+ * page that imports the barrel. A page that renders a stamp inlines `stamp.css?inline` in its head
+ * (NotePage does), so only that page pays for it. */
+type Props = { tone?: 'pink' | 'primary'; class?: string };
+
+const { tone = 'pink', class: className } = Astro.props;
+---
+
+<span data-stamp class:list={['stamp', `stamp-${tone}`, className]} aria-hidden="true"><slot /></span>

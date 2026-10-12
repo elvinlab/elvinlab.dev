@@ -730,5 +730,11 @@
     "category": "added",
     "title": "Every note now looks like a lab notebook",
     "description": "All notes, old and new, get a hand-made look automatically: numbered section headings that match the table of contents, a soft marker band on bold text, hand-drawn link underlines that redraw on hover, struck-through mistakes in plain Markdown, margin-note quotes and wavy section breaks. It is CSS only, respects reduced motion and reading mode, and prints plain."
+  },
+  "note-decision-card": {
+    "date": "2026-10-12",
+    "category": "changed",
+    "title": "The decision record is now an index card with a stamp",
+    "description": "On every note the context, decision and outcome summary looks like a paper index card with a ruled header and a pink DECISION stamp over its corner. On large screens the card sits pinned beside the title with a very slight tilt; on phones it is a lighter, level card inside the article. The stamp lands once and stays still under reduced motion, and screen readers skip it because the card already has its own title."
   }
 }

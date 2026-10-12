@@ -1,0 +1,31 @@
+/* The decision record as an index card (DESIGN.md, "Decision record"). Loaded with `?inline` by
+   NotePage, not imported: a bundled stylesheet reached through the feature barrel would ship to
+   every page, and the home renders the flat `inline` variant of the record without this look.
+   Semantic tokens only, no gradients, no glow, no shadow. */
+.record-card {
+  position: relative;
+  border: 1px solid var(--color-divider);
+  border-radius: var(--radius-inner);
+  padding: var(--record-pad);
+}
+/* Ruled header under the title: the line of an index card. */
+.record-card .record-head {
+  margin-bottom: var(--record-title-gap);
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid var(--color-divider);
+}
+/* Banner: a card pinned to the banner with a very slight tilt (only from lg, where it is shown). */
+.record-card-banner {
+  background: var(--color-card);
+  rotate: -0.6deg;
+}
+/* In content on phones: a lighter card, level, so a tilt can never push the page wider. */
+.record-card-inline {
+  background: transparent;
+}
+/* The stamp hangs over the top-right corner of the card. */
+.record-stamp {
+  position: absolute;
+  top: -0.875rem;
+  right: 0.75rem;
+}
