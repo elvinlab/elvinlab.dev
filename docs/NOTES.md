@@ -25,10 +25,10 @@ Esta guía explica, paso a paso y con todos los detalles, cómo escribir y publi
 3. Completa el frontmatter y el **registro de decisión** (sección 3 y 4).
 4. Escribe sobre **una** decisión concreta, empezando por el problema. No hay límite de palabras: el borrador sugiere unas 500, pero una nota más larga está bien cuando la decisión lo pide (la nota 003 tiene unas 1.500).
 5. Revisa el resultado en escritorio y móvil, en tema claro y oscuro, y en modo lectura.
-6. Mueve la carpeta a `apps/web/src/content/notes/<slug>/` y pon la fecha de hoy en `pubDate`.
-7. Verifica: tests, typecheck, lint y build.
-8. Haz commit (opcional: una entrada en el changelog) y push a `develop`.
-9. Publica el release y revisa la nota en vivo (tarjeta al compartir y comentarios).
+6. Ensaya la publicación: `mise exec -- pnpm publish-note <slug> --dry-run` (no cambia nada).
+7. Publica: `mise exec -- pnpm publish-note <slug>`. Mueve la carpeta, pone la fecha de hoy, añade la entrada del changelog, compila, hace commit y release.
+8. Espera al CI: una nota usa el carril rápido (unos minutos, sin `e2e` ni Lighthouse).
+9. Revisa la nota en vivo (tarjeta al compartir y comentarios).
 
 ## 1. Qué es una nota aquí
 
@@ -265,6 +265,21 @@ mise exec -- pnpm new-post "Why I rebuilt my site from scratch" --lang en --numb
 - Si `translationOf` apunta a una nota que no existe (por ejemplo, un borrador sin publicar), **el build falla** con el nombre de las notas: publica las dos juntas o quita `translationOf` hasta entonces. También falla si una nota se traduce a sí misma, si la traducción está en el mismo idioma o si dos notas del mismo idioma quedan en un grupo.
 
 ## 9. Publicar
+
+**Camino normal: un comando.** Con la nota terminada y el árbol de git limpio, en `develop`:
+
+```bash
+mise exec -- pnpm publish-note <slug> --dry-run   # ensayo: muestra los pasos y no cambia nada
+mise exec -- pnpm publish-note <slug>             # publica
+```
+
+Hace, en orden y deteniéndose en el primer fallo: mueve `drafts/<slug>` a `notes/<slug>`, pone `pubDate` con la fecha local de hoy, añade la entrada `note-NNN` al `changelog.json`, compila (el build valida el frontmatter y `translationOf`; si falla, la nota vuelve a `drafts/`), fecha el changelog, hace el commit `feat(notes): publish "Título"`, comprueba la auditoría del changelog, empuja `develop` y publica el release en `main`. **Ejecutarlo es tu autorización para empujar a `main`.** Con `--no-release` se detiene tras el commit local.
+
+Ese push dispara el CI por el **carril rápido para notas** ([ADR 0016](adr/0016-publish-note-command-and-notes-fast-lane.md)): si el push solo toca notas publicadas y el changelog, se saltan `e2e` y Lighthouse y corren `static`, `notes-gate` (build y presupuestos de peso) y el deploy con su smoke-check. Si el push incluye cualquier otro cambio, corre todo. Mira el run con `gh run watch`; si algo falla, no hay deploy.
+
+Después, en producción: abre la nota, comprueba que la tarjeta se ve bien al compartir el enlace (refresca la caché con el [Facebook Sharing Debugger](https://developers.facebook.com/tools/debug/) o el [LinkedIn Post Inspector](https://www.linkedin.com/post-inspector/)) y que los comentarios cargan. Si la suscripción está encendida, avisa a la lista con `SUBSCRIBE_ADMIN_TOKEN=... pnpm notify:note <slug>` (prueba en seco) y luego con `--send` (receta 6.14).
+
+**Camino manual** (si quieres pasar por todas las compuertas locales antes de liberar):
 
 1. Mueve la carpeta: `mv apps/web/src/content/drafts/<slug> apps/web/src/content/notes/<slug>` (es un `mv` normal: `drafts/` no está en git). La URL final es `/notes/<slug>/`, igual que en el borrador.
 2. Pon en `pubDate` la fecha de publicación.

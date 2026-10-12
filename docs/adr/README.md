@@ -40,3 +40,4 @@ Short (≤40 lines each).
 | [0013](./0013-footprints-on-notes-d1.md) | Footprints on notes: an anonymous counter in Cloudflare D1 | Accepted |
 | [0014](./0014-email-subscription-d1-list-resend-port.md) | Email subscription: the list lives in D1, the mail provider behind a port | Accepted |
 | [0015](./0015-images-live-in-the-repository.md) | Images live in the repository; Cloudflare R2 is the documented way out | Accepted |
+| [0016](./0016-publish-note-command-and-notes-fast-lane.md) | One-command note publishing and a notes-only CI fast lane | Accepted |

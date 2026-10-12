@@ -25,10 +25,10 @@ This guide explains, step by step and in detail, how to write and publish a **La
 3. Fill in the frontmatter and the **decision record** (sections 3 and 4).
 4. Write on **one** concrete decision, starting with the problem. There is no word limit: the draft suggests about 500 words, but a longer note is fine when the decision needs it (note 003 has about 1,500).
 5. Check the result on desktop and phone, in light and dark theme, and in reading mode.
-6. Move the folder to `apps/web/src/content/notes/<slug>/` and put today's date in `pubDate`.
-7. Verify: tests, typecheck, lint and build.
-8. Commit (optionally add a changelog entry) and push to `develop`.
-9. Release and check the note live (share card and comments).
+6. Rehearse the publication: `mise exec -- pnpm publish-note <slug> --dry-run` (changes nothing).
+7. Publish: `mise exec -- pnpm publish-note <slug>`. It moves the folder, sets today's date, adds the changelog entry, builds, commits and releases.
+8. Wait for CI: a note takes the fast lane (a few minutes, no `e2e` or Lighthouse).
+9. Check the note live (share card and comments).
 
 ## 1. What a note is here
 
@@ -265,6 +265,21 @@ mise exec -- pnpm new-post "Why I rebuilt my site from scratch" --lang en --numb
 - If `translationOf` points to a note that does not exist (for example an unpublished draft), **the build fails** naming the notes: publish both together or remove `translationOf` until then. It also fails if a note translates itself, if the translation is in the same language or if two notes of the same language end up in one group.
 
 ## 9. Publishing
+
+**The normal way: one command.** With the note finished and a clean git tree, on `develop`:
+
+```bash
+mise exec -- pnpm publish-note <slug> --dry-run   # rehearsal: prints the steps and changes nothing
+mise exec -- pnpm publish-note <slug>             # publishes
+```
+
+It does the following in order and stops at the first failure: moves `drafts/<slug>` to `notes/<slug>`, sets `pubDate` to today's local date, adds the `note-NNN` entry to `changelog.json`, builds (the build validates the frontmatter and `translationOf`; if it fails the note goes back to `drafts/`), dates the changelog, commits `feat(notes): publish "Title"`, runs the changelog audit, pushes `develop` and releases to `main`. **Running it is your authorization to push to `main`.** With `--no-release` it stops after the local commit.
+
+That push triggers CI through the **notes-only fast lane** ([ADR 0016](adr/0016-publish-note-command-and-notes-fast-lane.md)): when the push only touches published notes and the changelog, `e2e` and Lighthouse are skipped and `static`, `notes-gate` (build and weight budgets) and the deploy with its smoke-check run. If the push includes any other change, everything runs. Follow the run with `gh run watch`; if anything fails, there is no deploy.
+
+Afterwards, in production: open the note, check that the card looks right when you share the link (refresh the cache with the [Facebook Sharing Debugger](https://developers.facebook.com/tools/debug/) or the [LinkedIn Post Inspector](https://www.linkedin.com/post-inspector/)) and that comments load. If the subscription is on, tell the list with `SUBSCRIBE_ADMIN_TOKEN=... pnpm notify:note <slug>` (a dry run) and then with `--send` (recipe 6.14).
+
+**The manual way** (if you want to pass every local gate before releasing):
 
 1. Move the folder: `mv apps/web/src/content/drafts/<slug> apps/web/src/content/notes/<slug>` (a plain `mv`: `drafts/` is not in git). The final URL is `/notes/<slug>/`, the same as in the draft.
 2. Put the publication date in `pubDate`.

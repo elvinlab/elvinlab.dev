@@ -51,7 +51,7 @@ jobs:
         run: |
           echo "static: $(( $(date +%s) - JOB_START ))s" >> "$GITHUB_STEP_SUMMARY"
 
-  # Notes-only fast lane (ADR 0013): when every path in the push is a published note or the
+  # Notes-only fast lane (ADR 0016): when every path in the push is a published note or the
   # changelog/release metadata, e2e and lighthouse are skipped and `notes-gate` (build + budgets)
   # stands in. Anything else, an unknown base or an unreadable diff keeps the full stack.
   changes:
