@@ -1,5 +1,7 @@
 # Reading mode for notes and legal pages
 
+2026-10-12 reconciliation: release `ce5bdeb` matches the audited local tree. Existing [CI run 38322066089](https://github.com/elvinlab/elvinlab.dev/actions/runs/38322066089) passed its required gates and deploy. This is existing CI evidence, not a new local run. Issue #101 is closed; this feature has shipped.
+
 ## Objective and authorization
 On 2026-10-01 the user asked for (1) a reading mode for notes, on mobile and desktop, with less noise, (2) policy and privacy pages so the site is not penalized, and then to release everything together to `main` with nothing left pending. They added that the reading mode activation must be a toggle in the central config. Local commits on `feat/reading-mode-and-legal`, push to `develop`, then the release to `main` under the repo's direct-push flow.
 
@@ -17,7 +19,7 @@ The article starts at 538 px: site notice, navbar, a 360 px banner with the grid
 - [x] R1 — Flag `features.readingMode` + conditional privacy wording (schema, fixtures, tests first).
 - [x] R2 — Reading mode UI (e2e spec already written and RED), white-label inert assertion, `docs/DESIGN.md`.
 - [x] L1 — Terms page ES/EN, footer link, sitemap, verified wording for cookies/analytics.
-- [ ] R3 — Changelog, full suites, release to `main`, verify production.
+- [x] R3 — Delivered; issue #101 is closed. Preserve the historical verification below and use the reconciliation note for current release/CI evidence.
 
 ## Acceptance criteria
 - With the flag on: toggle works on ES and EN notes, persists, exits two ways, removes the listed noise, no axe violations in both themes, no overflow at 360 px, wider text column on a phone; other pages never show the mode.
@@ -29,7 +31,7 @@ The article starts at 538 px: site notice, navbar, a 360 px banner with the grid
 R1 done: RED (flag missing in schema, privacy wording), then GREEN; flag `features.readingMode` added to schema, `site.config.ts` (on), the alternative white-label fixture (off) and every test fixture; privacy lists the preference (five) only when the flag is on.
 R2 done: RED (e2e spec written first: 51 tests across 360/768/1280, ES/EN, axe in both themes, plus two WebGL pause tests and the boot-script and controls-script unit tests), then GREEN (51 e2e, 33 notes unit tests), stable over repeated runs. Visual check on the real build: on a 390 px phone the note text starts at 380 px (was 538 px), no banner effects, 19 px text and 20 px gutters; desktop is a centered 720 px column. Self-inflicted slips caught by checks: an assertion measured styles at once despite the site's global transitions (now waits), a wrong expectation that the desktop column gets wider (it is narrower on purpose), an over-escaped regex in the white-label check (now validated against a flag-on page), and a bundled script/CSS that shipped with the flag off (now inline and emitted only when on). Measured cost with the flag on: note pages JS 9.13 to 9.67 KiB gzip, CSS about 0.7 KiB gzip only on notes; with the flag off nothing ships (white-label asserts it). Lighthouse is verified in the final run before the release.
 L1 done: RED (terms content module missing, 2 new privacy tests, e2e for pages, footer, sitemap and cookies), then GREEN (terms and privacy content 22 tests; legal and cookies e2e 21 across three widths; the terms pages added to the axe list). Sources checked first: Cloudflare Web Analytics FAQ, overview, data-metrics and data-origin-and-collection pages and the Turnstile FAQ. Verified statements used: Web Analytics does not log query strings and "does not track individual end users across our customers' Internet properties"; Turnstile "processes only the data strictly necessary". NOT stated by Cloudflare for either service: cookies or client-side storage, so no page claims the providers are cookie-free; the privacy page only says the site's own code sets no cookies, and `cookies.spec.ts` proves it in a browser with every third-party origin stubbed. Terms speak in the owner's voice (they reserve the option to moderate comments and say the rest of the content is not offered for reuse): the owner must read them. Findings left for the owner: (1) the public repo `elvinlab/elvinlab.dev` has no license file (GitHub reports none), which matters because the design base is meant to be shared; (2) `identity.role.es` is English text; (3) no cookie banner decision can be certified from here: only first-party behavior is verifiable.
-Next step: R3 (changelog done above, full suites incl. Lighthouse, commit, release to `main`, verify production).
+Next step: maintain reading-mode accessibility and legal configuration; release is no longer pending. No new manual production check is claimed.
 
 Engram mirror: `odd/reading-mode-legal/tasks`.
 

@@ -76,7 +76,7 @@ This is how work goes here: every task is an *issue* written as a delegation bri
 | Layer | Technology | What it is used for |
 | --- | --- | --- |
 | Framework | **Astro 7** + MDX | Prerendered pages, MDX content and islands only where needed |
-| Interface | **Tailwind CSS 4**, **Preact 10**, **TypeScript 6** (strict) | Styles with semantic tokens; a single island (the contact form) |
+| Interface | **Tailwind CSS 4**, **Preact 11**, **TypeScript 6** (strict) | Styles with semantic tokens; a single island (the contact form) |
 | Content | **Content Collections** with **Zod 4**, **Expressive Code** | MDX notes and JSON validated at build time; code blocks with frames and copy |
 | SEO and sharing | Sitemap, RSS, JSON-LD, **Sharp**, **Satori** | Metadata, optimized images and one share card per note |
 | Typography and graphics | IBM Plex Sans, JetBrains Mono, Pixelify Sans, Press Start 2P (Fontsource) and custom **WebGL2** | Self-hosted fonts and animated banner backgrounds, no libraries |
@@ -103,7 +103,7 @@ This is how work goes here: every task is an *issue* written as a delegation bri
 
 The CI verifies all of this; if something fails, there is no deploy:
 
-- **Mobile Lighthouse** ≥ 95 in performance, accessibility, best practices and SEO; LCP ≤ 2.5 s and CLS ≤ 0.1.
+- **Mobile Lighthouse** ≥ 95 in all four categories; LCP ≤ 2.5 s and CLS ≤ 0.1. The synthetic `/notes/smoke-es/` fixture alone allows performance ≥ 93 and LCP ≤ 2.6 s; the other categories and budgets stay unchanged ([testing](docs/TESTING.md)).
 - **JavaScript** ≤ 30 KiB (gzip) per page.
 - **Accessibility with axe** (WCAG 2 A, AA and 2.1 AA) in light and dark theme and at 360, 768 and 1280 px.
 - Over **400 unit tests** and over **320 e2e** tests in a browser.

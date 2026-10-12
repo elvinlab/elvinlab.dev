@@ -1,5 +1,7 @@
 # README, central configuration and the guides
 
+2026-10-12 reconciliation: release `ce5bdeb` matches the audited local tree. Existing [CI run 38322066089](https://github.com/elvinlab/elvinlab.dev/actions/runs/38322066089) passed its required gates and deploy. This is existing CI evidence, not a new local run. Issue #94 is closed; the original release TODO is no longer pending. No new browser/manual production check was performed for this reconciliation.
+
 ## Objective and authorization
 On 2026-10-01 the user asked to (1) rewrite the README and make it nice, (2) centralize and document how the site is configured and updated, in code and in one guide linked from the README, and, after the evaluation, approved moving every site setting into the one config file; plus (3) READMEs in Spanish by default with English support and (4) a detailed guide on creating a note. Local commits on `docs/readme-and-configuration`, push to `develop`; the release to `main` is a separate step (the README on `main` is what GitHub shows).
 
@@ -23,7 +25,7 @@ The README is a stub that still says "Foundation phase". Settings are spread ove
 - [x] C4 — `docs/CONFIGURATION` (ES/EN): map of where things live, generated reference, how to update everything, deploy and release, troubleshooting.
 - [x] C5 — `docs/NOTES` (ES/EN): detailed guide to creating a note, verified against the real pipeline.
 - [x] C6 — README (ES default, EN) with screenshots, and pointers in code headers, `CLAUDE.md` and `AGENTS.md`.
-- [ ] C7 — Full verification, release to `main`, production check.
+- [x] C7 — Delivered; issue #94 is closed. Earlier local verification is preserved below; current release/CI evidence is recorded in the reconciliation note.
 
 ## Acceptance criteria
 - Changing the analytics token, the Turnstile key or a legal date is a one-line edit in `site.config.ts`; env still overrides.
@@ -42,6 +44,6 @@ C2-C6 done (2026-10-01). Evidence: 454 unit tests, typecheck/lint/depcruise clea
 - C4/C5: `docs/CONFIGURATION(.en).md` and `docs/NOTES(.en).md`. Facts were checked before being written: gitignore exceptions, the tokens command, Dependabot, per-language page trees, related-notes scoring, reading time, and a probe note built in an isolated workspace (relative images become WebP with width/height, tables, task lists, footnotes and Expressive Code title/marker/ins all render). Turnstile test keys verified in Cloudflare's docs.
 - C6: README (ES default) and README.en.md with a banner, home screenshots in dark and light, a note and the mobile reading mode (WebP, 32-56 KB each, from a real build), the philosophy, the agentic-dev-setup section (verified against that repo's README), the technology table with major versions, commands, structure and the docs index. Pointers added to `site.config.ts`, `astro.config.ts`, `wrangler.jsonc`, `ci.yml` and `CLAUDE.md`.
 Findings: (1) `translationOf` is accepted by the schema but nothing reads it (notes are always rendered with no hreflang alternates and the language switch goes to the other home), and `cover` is not displayed either; both are documented as reserved instead of promising behavior. The old schema comment claimed `translationOf` drove hreflang: corrected. (2) The repository has no LICENSE; README and the guides say so plainly. (3) Slips caught by the checks: a wrong expectation about row naming, unused imports after an edit that did not apply, `ls` denied by the user's tooling rule (replaced by `fd`/`eza`), and the project's own lint rule asking for the `@/` alias (the loader was built for exactly that).
-Next step: C7, release to `main` and production check.
+Next step: maintain the bilingual guides and generated-reference drift checks as configuration evolves.
 
 Engram mirror: `odd/docs-and-config/tasks`.

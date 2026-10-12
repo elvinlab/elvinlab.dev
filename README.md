@@ -76,7 +76,7 @@ Así se trabaja aquí: cada tarea es un *issue* escrito como un brief de delegac
 | Capa | Tecnología | Para qué se usa |
 | --- | --- | --- |
 | Framework | **Astro 7** + MDX | Páginas prerenderizadas, contenido en MDX e islas solo donde hacen falta |
-| Interfaz | **Tailwind CSS 4**, **Preact 10**, **TypeScript 6** (estricto) | Estilos con tokens semánticos; una sola isla (el formulario de contacto) |
+| Interfaz | **Tailwind CSS 4**, **Preact 11**, **TypeScript 6** (estricto) | Estilos con tokens semánticos; una sola isla (el formulario de contacto) |
 | Contenido | **Content Collections** con **Zod 4**, **Expressive Code** | Notas MDX y JSON validados al compilar; bloques de código con marcos y copiar |
 | SEO y compartir | Sitemap, RSS, JSON-LD, **Sharp**, **Satori** | Metadatos, imágenes optimizadas y una tarjeta al compartir por nota |
 | Tipografía y gráficos | IBM Plex Sans, JetBrains Mono, Pixelify Sans, Press Start 2P (Fontsource) y **WebGL2** propio | Fuentes autoalojadas y fondos animados del banner, sin librerías |
@@ -103,7 +103,7 @@ Así se trabaja aquí: cada tarea es un *issue* escrito como un brief de delegac
 
 Todo esto lo verifica el CI; si algo falla, no hay despliegue:
 
-- **Lighthouse móvil** ≥ 95 en rendimiento, accesibilidad, buenas prácticas y SEO; LCP ≤ 2,5 s y CLS ≤ 0,1.
+- **Lighthouse móvil** ≥ 95 en las cuatro categorías; LCP ≤ 2,5 s y CLS ≤ 0,1. Solo la nota sintética `/notes/smoke-es/` admite rendimiento ≥ 93 y LCP ≤ 2,6 s; las demás categorías y presupuestos no cambian ([pruebas](docs/TESTING.md)).
 - **JavaScript** ≤ 30 KiB (gzip) por página.
 - **Accesibilidad con axe** (WCAG 2 A, AA y 2.1 AA) en tema claro y oscuro y en 360, 768 y 1280 px.
 - Más de **400 tests unitarios** y más de **320 e2e** en navegador.

@@ -15,7 +15,7 @@ The repository keeps only references to images (key, alt, caption, dimensions). 
 4. **Seam:** every access already goes through one helper (`shared/lib/experiment-image.ts`); the loader checks existence at build time (HEAD request or manifest), so a missing object still fails the build.
 5. **Upload workflow:** a small documented command (`wrangler r2 object put` or a script) plus a checklist (privacy, size, format); no secrets in the repo; CI needs no write credential (public read only).
 6. **Migration:** upload the current files (`assets/experiments/**`), switch the references, delete the files from the working tree. Git history keeps the old blobs (about 0.6 MB): no history rewrite (destructive, not worth it).
-7. **Docs and records:** new ADR 0016 (supersedes 0015), `docs/PORTFOLIO.md` upload steps, `docs/DESIGN.md` image policy update, `docs/CONFIGURATION*.md` for `images.baseUrl`, changelog, verification map (the build now depends on the network: decide the CI behavior if the bucket is unreachable).
+7. **Docs and records:** a new ADR using the next free number (supersedes 0015; 0016 already covers note publishing), `docs/PORTFOLIO.md` upload steps, `docs/DESIGN.md` image policy update, `docs/CONFIGURATION*.md` for `images.baseUrl`, changelog, verification map (the build now depends on the network: decide the CI behavior if the bucket is unreachable).
 
 ## Remote operations that need the owner's explicit authorization (each time: destination, operation, credential/session)
 
@@ -37,7 +37,7 @@ Nothing remote is done before that authorization; local code, schema, docs and t
 
 - No image original under `apps/web/src/assets/experiments/` or `education/` in the working tree; references resolve from `images.baseUrl`.
 - Builds, `pnpm verify --run`, white-label and Lighthouse pass; a missing object fails the build with a clear message.
-- ADR 0016 written, ADR 0015 marked superseded, docs and changelog updated.
+- New R2 ADR written with the next free number, ADR 0015 marked superseded, docs and changelog updated.
 
 ## Suggested timing
 

@@ -1,8 +1,18 @@
 # Verification ledger
 
+## Current release evidence (2026-10-12)
+
+2026-10-12 reconciliation: release `ce5bdeb` matches the audited local tree. Existing [CI run 38322066089](https://github.com/elvinlab/elvinlab.dev/actions/runs/38322066089) passed its required gates and deploy. This is existing CI evidence, not a new local run.
+
+- The CI run provides current release proof for static checks, browser shards, Lighthouse shards, required checks and deploy. It does not convert earlier failed/partial local runs into new local passes.
+- Current Lighthouse note-fixture exception: performance ≥ 0.93 and LCP ≤ 2600 ms only on `/notes/smoke-es/`; other paths remain ≥ 0.95 and ≤ 2500 ms. Follow-up: #119.
+- The seeded per-family table and measurements below are historical local evidence, not the latest CI baseline. Consult the current release run and scope fingerprints in `odd/verification-state.json` before deciding whether local checks need rerunning.
+- This reconciliation changes passive documentation only; its focused documentation checks are recorded in the reconciliation task tracker, not as an application-wide verification run.
+
+
 The repository rule is in [`docs/TESTING.md`](../docs/TESTING.md), section "Touch-scoped verification": verify what a change touches, record it, and do not repeat a check whose scope was untouched since its last green entry. Update this file in the same commit as the change it records.
 
-## Last green commit per check family
+## Historical local seed: last green commit per check family (2026-10-05)
 
 A check is **stale** when files in its scope changed after its last green commit: `git diff --name-only <sha>..HEAD -- <scope>` prints something. Seeded on 2026-10-05 from the records of that day (commits are exact where a run was made on a clean commit; the Lighthouse and e2e rows were run on the working tree of that commit).
 

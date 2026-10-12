@@ -34,7 +34,7 @@ packages/core/     → @elvinlab/core: tokens, themes, i18n (presentation-only)
 Personal data (name, bio, posts, experience, colors, favicon, socials) lives **only** in configuration (`apps/web/src/site.config.ts`) and content collections. The visual system (layout, motion, motifs) stays in code.
 
 ### Hexagonal ports/adapters
-Only where infrastructure exists (`contact`). No premature abstraction.
+Only where infrastructure exists: `contact` isolates mail delivery and verification providers; `marks` isolates its D1 store; `subscribe` isolates persistence and mail delivery. Domains depend on ports, with provider adapters wired at the feature boundary. No premature abstraction; `packages/core` remains presentation-only.
 
 ---
 
@@ -106,7 +106,7 @@ Only where infrastructure exists (`contact`). No premature abstraction.
 |--------|------------|
 | Unit/Integration | **Strict TDD** with Vitest (from T06). |
 | E2E | Playwright + axe (implemented in T17). |
-| Performance budgets | Lighthouse: mobile ≥95, LCP < 2.5 s, CLS < 0.1, ≤30 KB JS on pages without islands. |
+| Performance budgets | Lighthouse: mobile categories ≥95, LCP ≤ 2.5 s, CLS ≤ 0.1. Only `/notes/smoke-es/` allows performance ≥93 and LCP ≤ 2.6 s; other categories remain ≥95. Production JS ≤30 KiB gzip, including islands (see `docs/TESTING.md`). |
 
 ---
 

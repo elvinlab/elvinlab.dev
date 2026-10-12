@@ -1,5 +1,7 @@
 # Feature: email subscription to new notes (issue #78, T50)
 
+Current status (2026-10-12): subscription and the delivery ledger have shipped; migration 0003 was applied before release `41a31af`, with a recorded 0-recipient dry run. The dated authorization and owner-step notes below describe their original sessions, not authorization to repeat database or email operations. No DB or email work was performed during this reconciliation.
+
 ## Objective
 Visitors subscribe by email to hear about each new note. The list is owned by the site (Cloudflare D1); the mail provider (Resend) sits behind a port. Design and the open sending decision: `docs/adr/0014-email-subscription-d1-list-resend-port.md`.
 
@@ -117,10 +119,10 @@ Dry run first (4 confirmed Spanish subscribers had never received a note; pool 9
 ## Progress 2026-10-06: delivery ledger so a note can never be sent twice (bounded writer, not committed)
 - Found in production: `last_note` remembers one slug, so after note 1 went out, note 3 would have been re-sent to the same people. Fix: migration `0003_subscriber_notes.sql` (table `subscriber_notes`, PK `(subscriber_id, slug)`, `ON DELETE CASCADE`, backfill from `last_note`); `listUnnotified` and `countUnnotified` use `NOT EXISTS` on it; `markNotified(ids, slug, now)` inserts the rows and still writes `last_note`. ADR 0014 section, `/privacy` sentence (ES and EN, `privacyUpdated` 2026-10-06), SUBSCRIPTION and CONFIGURATION docs (es/en), changelog `subscriber-notes-ledger`.
 - Tests: domain (A,B,A once; order 3,1,2; late confirmer; daily-cap resume; pending and unsubscribed never recorded) and D1 adapter tests over the real migrations 0002 then 0003 (backfill, cascade with `PRAGMA foreign_keys = ON`, bound parameters). Checks: see the coordinator handoff.
-- [ ] Owner step 1: apply 0003 to the remote database: `cd apps/web && mise exec -- pnpm exec wrangler d1 migrations apply elvinlab-dev-db --remote` (applies the pending ones only).
-- [ ] Owner step 2: after 0003, run once (records that note 3 also reached the four confirmed subscribers and the one who later unsubscribed; the backfill only knows note 1):
+- [x] Owner step 1: 0003 already applied before release `41a31af` (see `elvinlab-site.md`, 2026-10-06). Historical command, not a pending operation: `cd apps/web && mise exec -- pnpm exec wrangler d1 migrations apply elvinlab-dev-db --remote` (applies the pending ones only).
+- [ ] Historical owner step 2: the individual manual backfill command below has no separately recorded execution evidence. Release `41a31af` recorded a dry run with 0 recipients; do not infer that this SQL was executed or rerun it during documentation reconciliation:
   `INSERT OR IGNORE INTO subscriber_notes (subscriber_id, slug, sent_at) SELECT id, 'vibe-coding-o-especificar-primero', COALESCE(confirmed_at, created_at, 0) FROM subscribers WHERE status IN ('confirmed','unsubscribed');`
-- [ ] Owner step 3: release (the code that reads the new table must not run before 0003 exists), then a dry run for note 3 must say 0 recipients.
+- [x] Owner step 3: released as `41a31af`; the recorded dry run for `vibe-coding-o-especificar-primero` returned 0 recipients (nothing sent).
 
 ## Progress 2026-10-06: shareable subscription page (bounded writer, not committed)
 - Added `/subscribe/` and `/en/subscribe/` (`features/subscribe/components/SubscribeLanding.astro`, routes `subscribe-routes/index.astro` and `en-index.astro`, registered in `integrations/subscribe-routes.ts`, so they exist only with the blog and `features.subscribe` on). The band was split: `shared/subscribe/SubscribeForm.astro` (form, stub script, privacy link; `variant` band or page), `PixelEnvelope.astro` and `subscribe-root.ts` (the `data-*` root attributes); the footer band keeps every selector and text key.

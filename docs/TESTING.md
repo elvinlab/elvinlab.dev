@@ -14,8 +14,9 @@ and serves it with Astro preview. It checks home, notes, note detail, contact pa
 For a faster loop while iterating, `mise exec -- pnpm test:e2e:quick` runs the same checks at 1280
 pixels only, and a spec path narrows it further (`pnpm test:e2e:quick tests/browser/smoke.spec.ts`).
 Each run pays about 9 seconds of fixed cost (workspace copy, build, preview). Run the full
-`pnpm test:e2e` (all three viewports) once before closing a change. Workers default to half of the
-available cores, so the full suite takes about 73 seconds on a 12-core machine (107 seconds at 2 workers).
+`pnpm test:e2e` (all three viewports) once before closing a change. Current configuration (`playwright.config.ts`) uses `workers: '100%'` and `retries: 0`, locally and in CI.
+The 73-second full-suite measurement on a 12-core machine (107 seconds at 2 workers)
+was recorded on 2026-10-02 with the then-current half-core setting; it is not a current timing promise.
 
 Fixtures live in `tests/fixtures/notes`, outside publishable content. Drafts, secrets and existing
 build output are excluded from the temporary copy; source configuration and tokens are never edited.
@@ -121,8 +122,12 @@ mise exec -- pnpm test:lighthouse
 The JavaScript budget checks every production-built HTML page, including inline scripts, local
 transitive imports, and island modules (`component-url`/`renderer-url`) and their imports, at no more than 30 KiB gzip. Lighthouse uses a separate temporary production
 build with synthetic English and Spanish note fixtures, emulates mobile, and checks all four
-categories at 95 or higher plus LCP < 2500 ms, CLS < 0.1 and TBT < 200 ms. Three runs are
+categories at 95 or higher plus LCP ≤ 2500 ms, CLS ≤ 0.1 and TBT ≤ 200 ms. Three runs are
 aggregated pessimistically so one bad run cannot be hidden by a better one.
+The `assertMatrix` in `lighthouserc.json` has one owner-approved exception (2026-10-12):
+`/notes/smoke-es/` allows performance ≥ 93 and LCP ≤ 2600 ms; accessibility, best practices,
+SEO, CLS and TBT stay unchanged. Every other gated URL retains performance ≥ 95 and LCP ≤ 2500 ms.
+Reducing note-page weight and restoring its original thresholds remains open in issue #119.
 
 Lighthouse reports are written locally to `.lighthouseci/` (ignored by Git); the configuration
 does not upload them. CI runs every browser, white-label and performance gate in the `checks` job,
@@ -244,7 +249,9 @@ Lighthouse measures a fixture served by `astro preview`, which does **not** comp
 simulated slow 4G (about 1.6 Mbps, 150 ms round trip). The note page is about 98 KB of HTML, of which
 about 52 KB is inline CSS (the whole site stylesheet is inlined in every page), and it sits right at a
 TCP slow-start round-trip boundary: a few hundred more bytes cost one extra round trip, about 150 ms,
-and the LCP budget is 2500 ms with only about 90 ms to spare.
+and the LCP budget at the time was 2500 ms with only about 90 ms to spare.
+This is historical measurement evidence: since 2026-10-12 the note fixture alone uses
+2600 ms / performance ≥ 93; see the current Quality budgets section above and follow-up #119.
 
 Measured on 2026-10-02 on `/notes/smoke-es/` (worst of three runs; same machine, same fixture):
 
