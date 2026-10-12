@@ -1,30 +1,31 @@
 import { expect, test } from '@playwright/test';
 
-// The fixture notes all carry the `testing` category and tag, so the matching set is every row and
-// an unknown tag matches none; the per-row `data-tags` attribute proves the rule behind both.
+// The fixture notes all carry the `testing` category and tag, so that filter matches every row and
+// an unknown tag matches none; the per-row `data-tags` attribute proves the rule behind both. The
+// tag `testing` belongs to the fixture topic, so its chips link to the topic page; `sin-tema` (on
+// one note) belongs to no topic, so its chip keeps linking to the filter.
 
 const visibleRows = (page: import('@playwright/test').Page) =>
   page.locator('[data-note-row]:visible');
 
 test('clicking a tag chip on the index filters the rows and shows the notice', async ({ page }) => {
   await page.goto('/notes/');
-  const total = await page.locator('[data-note-row]').count();
-  expect(total).toBeGreaterThan(0);
+  expect(await page.locator('[data-note-row]').count()).toBeGreaterThan(0);
 
   await page.locator('[data-note-row] a[href^="/notes/?tag="]').first().click();
-  await expect(page).toHaveURL(/\/notes\/\?tag=testing$/);
+  await expect(page).toHaveURL(/\/notes\/\?tag=sin-tema$/);
 
   const notice = page.locator('[data-notes-tag-notice]');
   await expect(notice).toBeVisible();
   await expect(notice).toHaveAttribute('role', 'status');
-  await expect(notice).toContainText('#testing');
+  await expect(notice).toContainText('#sin-tema');
 
   const rows = visibleRows(page);
-  await expect(rows).toHaveCount(total);
+  await expect(rows).toHaveCount(1);
   for (const tags of await rows.evaluateAll((els) =>
     els.map((el) => (el as HTMLElement).dataset['tags'] ?? ''),
   )) {
-    expect(tags.split('|')).toContain('testing');
+    expect(tags.split('|')).toContain('sin-tema');
   }
 });
 
@@ -63,11 +64,19 @@ test('the tag value from the URL is shown as text, never as markup', async ({ pa
   await expect(page.locator('#x')).toHaveCount(0);
 });
 
-test('a tag chip on a note page links to the filtered index', async ({ page }) => {
-  await page.goto('/notes/smoke-es/');
-  const chip = page.locator('[data-article] a[href="/notes/?tag=testing"]');
+test('a tag chip without a topic on a note page links to the filtered index', async ({ page }) => {
+  await page.goto('/notes/smoke-es-next/');
+  const chip = page.locator('[data-article] a[href="/notes/?tag=sin-tema"]');
   await expect(chip).toBeVisible();
-  await expect(chip).toContainText('#testing');
+  await expect(chip).toContainText('#sin-tema');
+});
+
+test('/notes/?tag= keeps its canonical on /notes/', async ({ page }) => {
+  await page.goto('/notes/?tag=testing');
+  await expect(page.locator('link[rel="canonical"]')).toHaveAttribute(
+    'href',
+    /^https?:\/\/[^/]+\/notes\/$/,
+  );
 });
 
 test('the year count follows the visible rows', async ({ page }) => {

@@ -513,7 +513,7 @@ const GALLERY = `
     color: var(--color-muted);
     font-variant-numeric: tabular-nums;
   }
-  /* Small thumbnails (80 x 50 at most): four of them plus gaps fit a 390 px phone; they shrink below 360 px instead of overflowing. */
+  /* Thumbnails: 80 x 50 at most on wide screens; under 640 px they share the row (4:3, up to 104 px wide) so four never wrap. */
   .xp-thumbs {
     display: flex;
     gap: 0.5rem;
@@ -526,8 +526,15 @@ const GALLERY = `
     min-width: 0;
     aspect-ratio: 8 / 5;
     border-radius: var(--radius-inner);
-    opacity: 0.6;
+    opacity: 0.85;
     cursor: pointer;
+  }
+  @media (max-width: 639px) {
+    .xp-thumb {
+      flex: 1 1 0;
+      max-width: 6.5rem;
+      aspect-ratio: 4 / 3;
+    }
   }
   .xp-thumb img {
     display: block;

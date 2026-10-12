@@ -1,6 +1,6 @@
 # Identity evolution: less "AI-looking", more authored
 
-Status: in progress (started 2026-10-10). Branch: `develop` (project rule: work directly on `develop`).
+Status: DONE and released (started 2026-10-10; released as releases 16 and 17 on 2026-10-11; what stays open is the follow-up list in "Open items"). Branch: `develop` (project rule: work directly on `develop`).
 
 ## Objective
 
@@ -33,11 +33,11 @@ White-label (semantic tokens only, no hex in components), `packages/core` stays 
 Route per task: parent (Tier 3, design judgment); tests or docs may go to a worker. Planning heuristic about 400 changed lines per task.
 
 - [x] T0 Note page: decision record moves into the banner to the right of the title from `md` up (owner picked this composition from live variant 2, for notes, not for home). Route: delegated writer (2+ non-trivial files), parent reviewed diff and rendered result at 1440 and 390 px. Evidence: typecheck, lint, vitest (notes, styles: 89 passed), e2e quick (calm-pages, reading-mode, notes-layout, no-horizontal-overflow: 62 passed, 1 skipped), `check:page-weight` all PASS (note html headroom as low as about 840 B on `vibe-coding-o-especificar-primero`). Not re-run: e2e at 390 and 768 projects, a11y, Lighthouse.
-- [ ] T1 Hero banner (home): the three live variants (evidence headline, asymmetric record, log index) were shown on 2026-10-10 and NONE was accepted for the home; home is unchanged. Needs a new direction and a new round.
-- [ ] T2 Home hierarchy: one dominant block, fewer equal cards, cut repeated slogan sections (pills, pillars). Live variants.
-- [ ] T3 Dark theme surface and accent hierarchy; body/display type pairing (Space Grotesk is the detector hit).
-- [ ] T4 Update `docs/BRAND.md`, `docs/DESIGN.md` (and English twins where they exist), changelog entry in `apps/web/src/content/changelog.json`, fix pinned tests.
-- [ ] T5 Touch-scoped verification (`pnpm verify`), record in `odd/verification-ledger.md`, report skips as "not re-run".
+- [x] T1 (closed the same day: new headline, avatar in the hero, kicker and pills removed, see the log) Hero banner (home): the three live variants (evidence headline, asymmetric record, log index) were shown on 2026-10-10 and NONE was accepted for the home; home is unchanged. Needs a new direction and a new round.
+- [x] T2 (done: home without cards, pillars off, see the log) Home hierarchy: one dominant block, fewer equal cards, cut repeated slogan sections (pills, pillars). Live variants.
+- [x] T3 (done: lab-paper background and IBM Plex Sans; the dark decision-record contrast stays open) Dark theme surface and accent hierarchy; body/display type pairing (Space Grotesk is the detector hit).
+- [x] T4 (done) Update `docs/BRAND.md`, `docs/DESIGN.md` (and English twins where they exist), changelog entry in `apps/web/src/content/changelog.json`, fix pinned tests.
+- [x] T5 (done: full-wide batteries in the ledger) Touch-scoped verification (`pnpm verify`), record in `odd/verification-ledger.md`, report skips as "not re-run".
 
 ## Authorized scope
 
@@ -72,6 +72,8 @@ Visual identity surfaces of `apps/web` and `packages/core` tokens, the two desig
 ## Release 17 status (2026-10-11): DEPLOYED, production on f9467c5
 
 Release commit `f9467c5` (built with `commit-tree` from `develop` `93c42bd`, parent `88527c4`, tree equal to `develop`, 66 files) was pushed to `main` on the owner's explicit authorization. CI run 38169618321 passed on the first attempt, no reruns: static, e2e x4, lighthouse x2, checks and deploy (smoke check included). Live check: `/version.txt` = `f9467c5`; `/`, `/en/`, `/notes/`, a note, `/me/`, `/en/me/`, `/experiments/`, `/contact/`, `/subscribe/`, `/changelog/`, `/privacy/`, `/terms/` answer 200 and the 404 page answers 404; `<title>` on `/me/` is "Elvin Gonzalez · elvinlab.dev"; `/` preloads one font (the pixel face); `/privacy/` renders the banner. Only `main` was pushed; `develop` (with the docs commits after `93c42bd`) lives only locally unless the owner asks to push it.
+
+After this release the owner published Lab Notes 004 to 007 and updated 002 (PRs #111 to #113 and three releases `289eaa4`, `4c83352`, `c26c91a`, see `odd/tasks/notes-release-2026-10-11.md`); production is now on `c26c91a`, the first two of those release pushes were blocked by the page-weight gate and fixed forward in the same afternoon.
 
 The steps below are kept as the record of how it was done.
 

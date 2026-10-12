@@ -1,5 +1,5 @@
 ---
-/** Sidebar widget listing notes related to the current one. */
+/** Sidebar "keep reading" widget: start-here notes first, then related ones (see `continueReading`). */
 import { localizePath } from '@elvinlab/core';
 
 import { type NoteLike, noteNumber } from '@/features/notes/lib/notes.ts';
@@ -12,7 +12,7 @@ const { locale, notes } = Astro.props;
 
 {notes.length > 0 && (
   <section class="flex flex-col gap-3 rounded-card bg-card p-5">
-    <h2 class="font-display text-base font-bold">{t(locale, 'note.related')}</h2>
+    <h2 class="font-display text-base font-bold">{t(locale, 'note.continue')}</h2>
     <ul class="flex flex-col gap-3">
       {notes.map((note) => (
         <li>

@@ -13,11 +13,11 @@
     },
     "me": {
       "why": "Recruiter page: hero photo plus experience blocks, the numbered layer rail and the folded more-tools block of the full-stack story, and 44 px hit areas; its LCP margin is the thinnest after /experiments/.",
-      "styleBytes": 55700,
+      "styleBytes": 55712,
       "htmlBytes": 119700,
       "measured": {
-        "styleBytes": 55665,
-        "htmlBytes": 119636,
+        "styleBytes": 55712,
+        "htmlBytes": 119668,
         "date": "2026-10-11"
       }
     },
@@ -32,9 +32,9 @@
       }
     },
     "changelog": {
-      "why": "Release days grouped by kind, 4 days per page (page 1 opens the 2 newest); the flat list was about 130 KB, and the page CSS ships only here. The compact lab-paper banner of the inner pages adds about 2.2 KB of CSS (this page's sheet did not carry the banner styles) and 2.9 KB of HTML.",
+      "why": "Release days grouped by kind, 4 days per page (page 1 opens the 2 newest); the flat list was about 130 KB, and the page CSS ships only here. The compact lab-paper banner of the inner pages adds about 2.2 KB of CSS (this page's sheet did not carry the banner styles) and 2.9 KB of HTML. Release of 2026-10-12: html 113000 -> 115800 (measured 115792 on page 2): each new release day pushes the oldest day of page 1 onto page 2.",
       "styleBytes": 58700,
-      "htmlBytes": 113000,
+      "htmlBytes": 115800,
       "measured": {
         "styleBytes": 58255,
         "htmlBytes": 110833,
@@ -74,6 +74,16 @@
       },
       "htmlBytesPerNote": 4000,
       "maxHtmlBytes": 180000
+    },
+    "topic": {
+      "why": "Static topic page /notes/tag/<topic>/: compact paper banner, an intro and compact note rows; no script. Same stylesheet as /notes/. Budget is the measured value rounded up to 100 B, so a new utility or a longer intro shows up.",
+      "styleBytes": 54200,
+      "htmlBytes": 84800,
+      "measured": {
+        "styleBytes": 54183,
+        "htmlBytes": 84795,
+        "date": "2026-10-11"
+      }
     },
     "note": {
       "why": "Fixed note shell excludes the rendered MDX body, measured between inert template boundaries. Article content has a separate 64 KiB ceiling; CSS, JavaScript and Lighthouse gates remain independent.",

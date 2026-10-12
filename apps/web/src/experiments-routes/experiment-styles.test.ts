@@ -68,4 +68,11 @@ describe('experimentsCss', () => {
     expect(css).toContain('@keyframes xp-rise');
     expect(css).toContain('prefers-reduced-motion:no-preference');
   });
+
+  it('keeps idle gallery thumbnails readable on touch and larger on phones', () => {
+    const css = experimentsCss({ ...NONE, pieces: true, media: true, gallery: true });
+    expect(css).toMatch(/\.xp-thumb\{[^}]*opacity:0\.85/);
+    expect(css).not.toContain('opacity:0.6;');
+    expect(css).toMatch(/@media \(max-width:639px\)\{\.xp-thumb\{[^}]*aspect-ratio:4 \/ 3/);
+  });
 });

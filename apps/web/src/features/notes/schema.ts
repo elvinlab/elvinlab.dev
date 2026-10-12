@@ -61,6 +61,23 @@ export function noteSchema() {
         .max(5)
         .default([])
         .describe('Up to five kebab-case tags.'),
+      startHere: z
+        .union([z.literal(1), z.literal(2), z.literal(3)])
+        .optional()
+        .meta({
+          description:
+            'Marks the note as a start-here entry point and sets its order (1 to 3). Each value can be used once per language; requires `startHereNote`.',
+          'x-type': '1 | 2 | 3',
+        }),
+      startHereNote: z
+        .string()
+        .trim()
+        .min(1)
+        .max(120)
+        .optional()
+        .describe(
+          'One line saying why to start with this note (max 120 characters); required when `startHere` is set.',
+        ),
       decision: z
         .object({
           context: summary.describe('What forced a decision (max 280 characters).'),
@@ -69,10 +86,52 @@ export function noteSchema() {
         })
         .describe('Decision record shown before the text: context, decision and outcome.'),
     })
+    .refine((note) => note.startHere === undefined || note.startHereNote !== undefined, {
+      path: ['startHereNote'],
+      message: 'startHereNote is required when startHere is set',
+    })
     .refine((note) => !note.updatedDate || note.updatedDate >= note.pubDate, {
       path: ['updatedDate'],
       message: 'updatedDate must not be earlier than pubDate',
     });
 }
+
+/**
+ * One entry of `src/content/topics.json`, keyed by the topic slug (the key becomes the URL
+ * `/notes/tag/<slug>/`). Several raw note tags can map to one topic. The length limits of
+ * `description` and `intro` are enforced by the build guard (`assertTopics`), which also reports
+ * tags that no note carries, duplicate slugs and slugs that take a route.
+ */
+export function topicSchema() {
+  return z.object({
+    title: z
+      .string()
+      .trim()
+      .min(1)
+      .max(60)
+      .describe('Topic name: the page `<h1>` and its title (max 60 characters).'),
+    description: z
+      .string()
+      .trim()
+      .min(1)
+      .describe('Meta description of the topic page (max 160 characters, checked at build).'),
+    intro: z
+      .string()
+      .trim()
+      .min(1)
+      .optional()
+      .describe(
+        'Short unique introduction shown on the topic page, 40 to 80 words, checked at build. Without it the topic has no page.',
+      ),
+    tags: z
+      .array(z.string().regex(kebab))
+      .min(1)
+      .describe(
+        'Raw note tags that belong to this topic. A note belongs to it when any of its tags is listed; every listed tag must exist in some note.',
+      ),
+  });
+}
+
+export type TopicData = z.infer<ReturnType<typeof topicSchema>>;
 
 export type NoteData = z.infer<ReturnType<typeof noteSchema>>;

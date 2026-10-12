@@ -12,6 +12,12 @@ updates:
       # @astrojs/check supports TypeScript ^5 || ^6 only; drop this when it supports 7.
       - dependency-name: "typescript"
         update-types: ["version-update:semver-major"]
+      # Node is pinned to 24 in .mise.toml; the types must describe the runtime we ship and test on.
+      - dependency-name: "@types/node"
+        update-types: ["version-update:semver-major"]
+      # satori 0.44 breaks the share-card layouts (issue #120); remove this rule when that issue is closed.
+      - dependency-name: "satori"
+        update-types: ["version-update:semver-minor", "version-update:semver-major"]
     commit-message:
       prefix: "chore(deps)"
 

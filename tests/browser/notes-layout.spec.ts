@@ -65,3 +65,51 @@ test('an image in the body of a note is framed like the site cards and never wid
   expect(frame?.outlineWidth).toBe('1px');
   expect(frame?.width).toBeLessThanOrEqual((frame?.column ?? 0) + 0.5);
 });
+
+test('on the notes index the language badge sits on the same row as the date', async ({ page }) => {
+  await page.goto('/notes/');
+  const row = page.locator('[data-note-row]').first();
+  const date = await row.locator('time').boundingBox();
+  const badge = await row.locator('time + span').boundingBox();
+  expect(date).not.toBeNull();
+  expect(badge).not.toBeNull();
+  const dateMid = (date?.y ?? 0) + (date?.height ?? 0) / 2;
+  const badgeMid = (badge?.y ?? 0) + (badge?.height ?? 0) / 2;
+  expect(Math.abs(dateMid - badgeMid)).toBeLessThanOrEqual(4);
+  expect(badge?.x ?? 0).toBeGreaterThan((date?.x ?? 0) + (date?.width ?? 0) - 1);
+});
+
+for (const slug of ['smoke-es', 'smoke-es-next', 'smoke-en']) {
+  test(`the related notes of ${slug} never repeat the previous or next note`, async ({ page }) => {
+    await page.goto(`/notes/${slug}/`);
+    const hrefs = (selector: string) =>
+      page
+        .locator(selector)
+        .evaluateAll((links) =>
+          links
+            .map((link) => link.getAttribute('href') ?? '')
+            .filter((href) => /^\/(en\/)?notes\/[^/?#]+\/$/.test(href)),
+        );
+    const shown = await hrefs('[data-prev-next] a');
+    const related = await hrefs('aside a');
+    for (const href of related) expect(shown).not.toContain(href);
+    expect(related).not.toContain(`/notes/${slug}/`);
+  });
+}
+
+test('the decision record in the banner has a visible dashed border in the dark theme', async ({
+  page,
+}, testInfo) => {
+  test.skip(testInfo.project.name !== 'chromium-1280', 'the banner record shows from lg');
+  await page.addInitScript(() => localStorage.setItem('theme', 'elvinlab-dark'));
+  await page.goto('/notes/smoke-es/');
+  const border = await page.evaluate(() => {
+    const record = document.querySelector('[data-record-banner] section');
+    if (!record) return null;
+    const style = getComputedStyle(record);
+    return { style: style.borderTopStyle, color: style.borderTopColor };
+  });
+  expect(border?.style).toBe('dashed');
+  // The dark divider is white at 20 percent alpha (it was 14), so the alpha channel is 0.2.
+  expect(border?.color).toMatch(/rgba\(255, 255, 255, 0\.2\)/);
+});

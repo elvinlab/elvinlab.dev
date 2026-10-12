@@ -69,15 +69,22 @@ export function adjacentNotes<T extends NoteLike>(
   return { next: sorted[index - 1], prev: sorted[index + 1] };
 }
 
-/** Notes in the same language sharing tags or category, ranked by shared-tag count then category. */
+/** Notes in the same language sharing tags or category, ranked by shared-tag count then category.
+ * `exclude` lists slugs already shown elsewhere on the page (the previous and next cards). */
 export function relatedNotes<T extends NoteLike>(
   notes: readonly T[],
   current: NoteLike,
   limit: number,
+  exclude: readonly string[] = [],
 ): T[] {
   const tags = new Set(current.data.tags);
   return notes
-    .filter((note) => note.slug !== current.slug && note.data.lang === current.data.lang)
+    .filter(
+      (note) =>
+        note.slug !== current.slug &&
+        note.data.lang === current.data.lang &&
+        !exclude.includes(note.slug),
+    )
     .map((note) => {
       const sharedTags = note.data.tags.filter((tag) => tags.has(tag)).length;
       const sharedCategory = note.data.category === current.data.category ? 1 : 0;

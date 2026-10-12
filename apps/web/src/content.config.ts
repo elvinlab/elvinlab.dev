@@ -4,7 +4,7 @@ import { file, glob } from 'astro/loaders';
 import { changelogSchema, releaseSchema } from '@/features/changelog/index.ts';
 import { credentialSchema } from '@/features/credentials/index.ts';
 import { experienceSchema } from '@/features/me/index.ts';
-import { noteSchema } from '@/features/notes/index.ts';
+import { noteSchema, topicSchema } from '@/features/notes/index.ts';
 import { experimentSchema } from '@/features/portfolio/index.ts';
 
 // Drafts live in the git-ignored `content/drafts/` and only load in dev, so they never ship.
@@ -19,6 +19,12 @@ const notes = defineCollection({
     generateId: ({ entry }) => entry.split('/')[1] ?? entry,
   }),
   schema: noteSchema(),
+});
+
+// Note topics (static pages `/notes/tag/<topic>/`): a keyed JSON file, the key is the URL slug.
+const topics = defineCollection({
+  loader: file('./src/content/topics.json'),
+  schema: topicSchema(),
 });
 
 // Portfolio experiments: a keyed JSON file, one entry per project (keys become ids).
@@ -48,4 +54,12 @@ const experience = defineCollection({
   schema: experienceSchema(),
 });
 
-export const collections = { notes, experiments, credentials, experience, changelog, releases };
+export const collections = {
+  notes,
+  topics,
+  experiments,
+  credentials,
+  experience,
+  changelog,
+  releases,
+};

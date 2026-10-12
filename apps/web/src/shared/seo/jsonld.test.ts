@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { blogPostingJsonLd, jsonLdScript, personJsonLd } from './jsonld.ts';
+import { blogPostingJsonLd, breadcrumbJsonLd, jsonLdScript, personJsonLd } from './jsonld.ts';
 
 const site = {
   url: 'https://example.dev',
@@ -62,6 +62,27 @@ describe('blogPostingJsonLd', () => {
       pubDate: new Date('2026-09-20T00:00:00Z'),
     });
     expect(post).not.toHaveProperty('image');
+  });
+});
+
+describe('breadcrumbJsonLd', () => {
+  it('lists the trail in order with 1-based positions and absolute URLs', () => {
+    const trail = breadcrumbJsonLd([
+      { name: 'Inicio', url: 'https://example.dev/' },
+      { name: 'Notas', url: 'https://example.dev/notes/' },
+      { name: 'Tema', url: 'https://example.dev/notes/tag/tema/' },
+    ]);
+    expect(trail['@type']).toBe('BreadcrumbList');
+    expect(trail['itemListElement']).toEqual([
+      { '@type': 'ListItem', position: 1, name: 'Inicio', item: 'https://example.dev/' },
+      { '@type': 'ListItem', position: 2, name: 'Notas', item: 'https://example.dev/notes/' },
+      {
+        '@type': 'ListItem',
+        position: 3,
+        name: 'Tema',
+        item: 'https://example.dev/notes/tag/tema/',
+      },
+    ]);
   });
 });
 

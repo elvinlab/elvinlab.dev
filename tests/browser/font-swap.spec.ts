@@ -26,7 +26,7 @@ const measure = (page: Page): Promise<Layout> =>
     const paragraph = document.querySelector('main p');
     const h1 = document.querySelector('h1');
     if (!paragraph || !h1) throw new Error('missing main paragraph or h1');
-    // The h1 box can be capped by `max-w-[22ch]`, and `ch` follows the font's "0" width, so the
+    // The h1 box can be capped by a `max-w-[..ch]`, and `ch` follows the font's "0" width, so the
     // text itself is measured, not the box.
     const range = document.createRange();
     range.selectNodeContents(h1);

@@ -110,6 +110,17 @@ export function dropUnavailableProjectNotes(web: string, availableNotes: readonl
   writeFileSync(file, `${JSON.stringify(projects, null, 2)}\n`);
 }
 
+/**
+ * A fixture build holds only the fixture notes, so the owner's `topics.json` (which names tags of
+ * the published notes) would fail the topic guard. The copy takes the fixture topics file instead
+ * (`tests/fixtures/topics.json`, next to the notes folder), or an empty list when there is none.
+ */
+export function useFixtureTopics(web: string, fixtureTopics: string): void {
+  const target = join(web, 'src/content/topics.json');
+  if (existsSync(fixtureTopics)) cpSync(fixtureTopics, target);
+  else writeFileSync(target, '{}\n');
+}
+
 /** Copies only build inputs; fixture builds never write into publishable content or local drafts. */
 export function createFixtureWorkspace(source: string, fixtures: string) {
   const root = mkdtempSync(join(tmpdir(), 'elvinlab-verification-'));
@@ -146,6 +157,7 @@ export function createFixtureWorkspace(source: string, fixtures: string) {
       force: false,
       errorOnExist: true,
     });
+    useFixtureTopics(web, join(fixtures, '..', 'topics.json'));
     dropUnavailableProjectNotes(
       web,
       readdirSync(fixtures, { withFileTypes: true })

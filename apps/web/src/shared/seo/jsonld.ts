@@ -65,6 +65,22 @@ export function blogPostingJsonLd(input: BlogPostingInput): Record<string, unkno
   };
 }
 
+/** schema.org BreadcrumbList for a page: `items` run from the home to the page itself. */
+export function breadcrumbJsonLd(
+  items: readonly { name: string; url: string }[],
+): Record<string, unknown> {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: items.map((item, index) => ({
+      '@type': 'ListItem',
+      position: index + 1,
+      name: item.name,
+      item: item.url,
+    })),
+  };
+}
+
 /** Serializes a JSON-LD object for a <script> tag, escaping `<` so it can't break out or inject. */
 export function jsonLdScript(data: unknown): string {
   return JSON.stringify(data).replaceAll('<', '\\u003c').replaceAll('>', '\\u003e');

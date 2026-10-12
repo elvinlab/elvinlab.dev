@@ -15,9 +15,14 @@ import Chip from '@/shared/ui/Chip.astro';
 
 import LangBadge from './LangBadge.astro';
 
-type Props = { note: NoteLike & { readingMinutes: number }; locale: Locale };
+type Props = {
+  note: NoteLike & { readingMinutes: number };
+  locale: Locale;
+  /** Raw tag to topic slug: a mapped tag links to its topic page instead of the filter. */
+  topics?: ReadonlyMap<string, string>;
+};
 
-const { note, locale } = Astro.props;
+const { note, locale, topics } = Astro.props;
 const { data } = note;
 const href = localizePath(`/notes/${note.slug}/`, data.lang, LOCALES);
 ---
@@ -39,14 +44,16 @@ const href = localizePath(`/notes/${note.slug}/`, data.lang, LOCALES);
     <p class="text-sm leading-relaxed text-text-secondary">{data.description}</p>
     <div class="flex flex-wrap items-center gap-1.5">
       {secondaryMetaSlot === 'foot' && <LangBadge lang={data.lang} />}
-      <Chip href={tagHref(data.category)} class="relative z-10">{data.category}</Chip>
-      {visibleTags(data.tags, data.category).map((tag) => <Chip href={tagHref(tag)} class="relative z-10">#{tag}</Chip>)}
+      <Chip href={tagHref(data.category, topics)} class="relative z-10">{data.category}</Chip>
+      {visibleTags(data.tags, data.category).map((tag) => <Chip href={tagHref(tag, topics)} class="relative z-10">#{tag}</Chip>)}
     </div>
   </div>
 
   <div class="col-start-2 flex items-center gap-3 text-sm text-muted md:col-start-3 md:flex-col md:items-end md:gap-1 md:pt-1 md:text-right">
-    <time datetime={data.pubDate.toISOString()}>{formatDate(data.pubDate, locale)}</time>
+    <span class="flex items-center gap-2">
+      <time datetime={data.pubDate.toISOString()}>{formatDate(data.pubDate, locale)}</time>
+      {secondaryMetaSlot === 'header' && <LangBadge lang={data.lang} />}
+    </span>
     <span class="whitespace-nowrap">{t(locale, 'notes.readingTime', { min: note.readingMinutes })}</span>
-    {secondaryMetaSlot === 'header' && <LangBadge lang={data.lang} />}
   </div>
 </article>

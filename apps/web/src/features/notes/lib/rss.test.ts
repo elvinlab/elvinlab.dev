@@ -33,4 +33,10 @@ describe('buildRssFeed', () => {
     expect(xml).toContain('<rss version="2.0"');
     expect(xml).toContain('<pubDate>Sun, 20 Sep 2026 00:00:00 GMT</pubDate>');
   });
+
+  it('titles the feed without an em dash', () => {
+    const xml = buildRssFeed({ ...base, locale: 'es', notes });
+    expect(xml).toContain('<title>example.dev · Lab Notes</title>');
+    expect(xml).not.toContain('\u2014');
+  });
 });

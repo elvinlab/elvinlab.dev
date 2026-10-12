@@ -106,11 +106,13 @@ describe('isHiddenFromSitemap', () => {
     expect(isHiddenFromSitemap('/notes/', features)).toBe(true);
     expect(isHiddenFromSitemap('/notes/x/', features)).toBe(true);
     expect(isHiddenFromSitemap('/en/notes/x/', features)).toBe(true);
+    expect(isHiddenFromSitemap('/notes/tag/agentes-de-ia/', features)).toBe(true);
   });
 
   it('keeps notes URLs when blog is on', () => {
     expect(isHiddenFromSitemap('/notes/x/', allOn)).toBe(false);
     expect(isHiddenFromSitemap('/en/notes/x/', allOn)).toBe(false);
+    expect(isHiddenFromSitemap('/notes/tag/agentes-de-ia/', allOn)).toBe(false);
   });
 
   it('always hides the noindex subscription pages and their English twins', () => {
