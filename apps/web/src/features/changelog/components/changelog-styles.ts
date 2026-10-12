@@ -160,6 +160,7 @@ export const CHANGELOG_CSS = minifyCss(`
   }
   .cl-t {
     margin: 0;
+    max-width: 68ch;
     font-weight: 500;
     line-height: 1.45;
     color: var(--color-text);
@@ -167,6 +168,7 @@ export const CHANGELOG_CSS = minifyCss(`
   }
   .cl-d {
     margin: 0.25rem 0 0;
+    max-width: 68ch;
     font-size: 0.9375rem;
     line-height: 1.55;
     color: var(--color-text-secondary);

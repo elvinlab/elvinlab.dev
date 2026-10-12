@@ -664,5 +664,11 @@
     "category": "changed",
     "title": "A calmer notes index and tidier note pages",
     "description": "The notes index has no boxes around the search and the sidebar, and the language tag now sits next to the date. On a note, \"Related notes\" no longer repeats the previous and next cards, long titles no longer break at a hyphen, inline code such as --auto stays in one piece, two-line headings are tighter, and the dashed rules in the dark theme are a little firmer."
+  },
+  "readability-touch-ups": {
+    "date": "2026-10-11",
+    "category": "changed",
+    "title": "Shorter changelog lines, clearer gallery thumbnails",
+    "description": "Changelog entries stop at a comfortable line length instead of spanning the whole page. On phones the experiment gallery thumbnails are larger and no longer look faded. The RSS feed title uses a middle dot instead of a dash."
   }
 }
