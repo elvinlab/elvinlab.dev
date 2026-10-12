@@ -8,6 +8,7 @@ Source of truth for how elvinlab.dev looks and moves (design v3, "lab notebook")
 - Identity comes from the subject: a lab and its notebook. Notes are numbered entries (`Note 003`), each summarized by a **decision record**: context, decision, outcome. On a note page from `lg` (1024 px) up the record sits in the banner to the right of the title (a dashed panel, fields stacked); on phones and in reading mode it stays above the body.
 - **One bold element:** the full-bleed banner with a large pixel-face display headline over a static lab-paper background (fine grid, measuring ticks on the left edge, three registration crosses, one ink hue, no glows or stars; `Banner.astro`). The live cursor-reactive WebGL2 effects (galaxy, cursor-waves) are visitor choices in the navbar picker, not the default (`background` is `{ galaxy: false, cursorWaves: false }` in `site.config.ts`). Pink block accents are small and static across the home, navbar, about page, notes index and footer. Everything else stays quiet.
 - **The author is in the hero:** from `md` up the home banner shows the drawn avatar with the name and role at the right (14 rem, centered over the sidebar column from `lg`), inside `[data-hero-content]`. The sidebar author card hides its photo from `md` up while the banner is expanded and shows it again when the visitor collapses the banner, so the photo is visible exactly once; each one eases in with `fade-in-up`. Phones keep the photo in the card.
+- **Signature, the lab notebook (decided 2026-10-12):** the tagline "I write down what goes wrong" is visible design: a struck-through mistake with its correction (`Fix`), hand-drawn ink underlines and circles (`Ink`), stamps and margin notes. Reason: a review called the site template-like (identical dark cards with a violet glow). Rules in [Notebook ink system](#notebook-ink-system-decided-2026-10-12); brand side in [BRAND.md](BRAND.md#firma-el-cuaderno-de-laboratorio-decidido-2026-10-12). The data-to-screen raw-data block stays on `/me` only. Glow is not part of the evolved identity: the existing violet glow tokens stay until the owner removes them, with no new use.
 - **Fewer boxes (decided 2026-10-10):** the home main column (latest note, notebook index, "Now") sits directly on the page background, separated by space and a dashed hairline; the only boxes are the decision record, the three sidebar cards and the newsletter band. The `/notes/` index follows the same pattern since 2026-10-12: the search field container and the four sidebar blocks (author, categories, tags, RSS) are flat, separated by dashed hairlines, and each row keeps the language badge on the date row. The latest note is still one clickable block (`data-card-link`) and its title turns primary on hover instead of a background change.
 - Varied hierarchy instead of identical cards: the latest entry is large, older entries are index rows, experiments are full-width exhibition pieces (`ExperimentPiece`), and (in the `full` preset) the four pillars share one strip.
 - Mechanics from [Fuwari](https://github.com/saicaca/fuwari) (MIT): grid, measurements, sidebar, motion timing. Identity is ours.
@@ -25,7 +26,7 @@ Brand tokens, fonts, colors, motion and the accessibility floor are identical in
 
 ## Avoid
 
-No ALL-CAPS labels on pages (the language codes ES/EN in `LangBadge` and the navbar locale switch are the only exception: they are codes, not labels). No meta strings joined with a middle dot (use spacing or separate elements). The one exception is the document title: `<title>`, `og:title` and the image alt text that mirrors it read "Page · elvinlab.dev" with a middle dot (decided 2026-10-11, one place in `Seo.astro`, pinned by `link-previews.spec.ts`); never an em dash as a separator in titles, labels or UI strings. Mono is for entry numbers, dates, counts, tags, code and short labels, never sentences. Pixel is for short, large text (page titles included). No gradient text, no `→` in link text, no stock images.
+No ALL-CAPS labels on pages. Two bounded exceptions: the language codes ES/EN in `LangBadge` and the navbar locale switch (codes, not labels), and, since 2026-10-12, the notebook stamp (see the ink system): mono 600, 13 px or more, at most two words and 12 characters, only inside the stamp component. No new glows, no new gradients, no looping decoration (2026-10-12). No meta strings joined with a middle dot (use spacing or separate elements). The one exception is the document title: `<title>`, `og:title` and the image alt text that mirrors it read "Page · elvinlab.dev" with a middle dot (decided 2026-10-11, one place in `Seo.astro`, pinned by `link-previews.spec.ts`); never an em dash as a separator in titles, labels or UI strings. Mono is for entry numbers, dates, counts, tags, code and short labels, never sentences. Pixel is for short, large text (page titles included). No gradient text, no `→` in link text, no stock images.
 
 ## Color (semantic tokens)
 
@@ -110,12 +111,51 @@ Shared by both presets: prose line height 1.75 inside a 68 ch measure (16 px min
 
 ## Motion
 
-- Onload: fade-in-up 300 ms, staggered (navbar 0, sidebar 100, content 150, footer 250 ms).
-- Page transitions: none. Navigation is a normal full page load (no View Transitions, no client router); hover and keyboard-focus prefetch (Astro `prefetch`, `hover` strategy, tap on slow or data-saver connections) makes it feel instant without prefetching links nobody shows interest in.
-- Press: `scale(0.96)`; state transitions ≤150 ms on named properties only.
+Rewritten on 2026-10-12. The old rule ("stepped only", no page transitions) is replaced because the owner wants fluid, purposeful motion and an app feel; the brand is meant to evolve, so the change is recorded here instead of worked around. Two registers:
+
+- **Pixel register (stepped).** Pixel and retro elements (pixel headline details, the cursor block, the Press Start 2P wordmark, the pixel icons, the experiments gallery dissolve) keep `steps(4, end)` motion.
+- **Eased register (everything else).** Named tokens, never a literal curve in a component: `--ease-out: cubic-bezier(0.22, 1, 0.36, 1)` (entrances, ink, transitions), `--ease-in-out: cubic-bezier(0.65, 0, 0.35, 1)` (round-trip state changes), and durations 150 ms (feedback), 300 ms (entrance, transitions) and 700 ms (ink drawing). State transitions stay on named properties only, never `all`.
+- Rules that stay in both registers: every animation stops or shows its final state under `prefers-reduced-motion`; no JavaScript for motion (30 KiB JS gzip budget); one entrance choreography per page; anything that can be the LCP element animates `transform` only, never opacity; nothing may change layout (CLS); no looping decoration (the existing banner pulses are not extended).
+- Onload: `animate-fade-in-up` 300 ms, staggered (navbar 0, sidebar 100, content 150, footer 250 ms). It is the page's one entrance; a page transition must not double it up.
+- Press: `scale(0.96)` (`active:scale-96`) with the 150 ms feedback duration.
 - Theme switch suppresses transitions for one frame.
-- Everything stops under `prefers-reduced-motion`.
 - The background picker in the navbar is hidden, with CSS only, under a coarse pointer and under `prefers-reduced-motion`, the two conditions where `BackgroundCanvas` never runs an effect, so it never offers a change the visitor cannot see; a narrow desktop window keeps it because width does not stop the effect.
+
+### Page transitions (allowed since 2026-10-12)
+
+Replaces "Page transitions: none". CSS only, through cross-document `@view-transition { navigation: auto }`; no client router, no View Transitions API script. Hover and keyboard-focus prefetch (Astro `prefetch`, `hover` strategy, tap on slow or data-saver connections) stays and helps them.
+
+- **Fallback:** it must degrade to an ordinary page load. Firefox is treated as unsupported (caniuse lists it as partial and unspecified); navigation stays fully correct without transitions.
+- **LCP:** never cross-fade the LCP element. Override the default root cross-fade (`::view-transition-old(root)` and `::view-transition-new(root)`) with a transform or clip animation.
+- **Reduced motion:** the global `*` reset does not reach view-transition pseudo-elements, so they get their own `prefers-reduced-motion` rule (`animation: none`).
+- **Names:** `view-transition-name` values are unique per page and must not outlive the snapshot, so a bfcache restore never reuses a stale name. How to remove them without JavaScript is an open point for the implementation task (N4); if it cannot be done in CSS, the item stays out of scope rather than adding script weight.
+- **No double entrance:** `animate-fade-in-up` must not run on top of a transition; the transition replaces it on navigated loads.
+- Last in the rollout order (see the signature plan), because it carries the highest LCP, CLS and double-entrance risk.
+
+## Notebook ink system (decided 2026-10-12)
+
+- **Color:** semantic tokens only; pink is the single accent of a block, primary otherwise; never a raw hex in a component. Explicit exception: a `background-image` SVG cannot read CSS variables, so its per-theme stroke colors are written there and documented in the component.
+- **No gradients and no glow** on anything new.
+- **Density:** at most one ink effect per screen block and a handful per page; more reads as a template in reverse.
+- **Semantics:** ink is decorative and `aria-hidden`. The correction keeps its meaning with `<del>` and `<ins>` plus a visually hidden label localized through i18n (`sr-only`, never hardcoded Spanish).
+- **LCP:** ink never changes the text of an LCP element; only the stroke animates (700 ms, `--ease-out`, transform or stroke offset, never opacity of the text).
+- **Shapes:** a circle only for short single-line phrases (it grazes the line above on a wrapped heading).
+- **CSS home:** component CSS is scoped to the component, not `global.css`, so only pages that use it pay the bytes. The CSS budget impact is measured and recorded (the prototype in `global.css` cost about 3 KB on every page; `/me/` and topic pages have about 0 B of headroom).
+- **Stamps:** the bounded all-caps exception in Avoid; text such as FUNCIONÓ, FALLÓ, PENDIENTE comes from i18n.
+
+## Native feel layer (decided 2026-10-12)
+
+The goal is the motion and touch feel of an app, built without JavaScript. The honest limit: on the web this is feel, not native performance.
+
+- `viewport-fit=cover` with `env(safe-area-inset-*)` padding on the navbar, footer and back-to-top button.
+- `overscroll-behavior` to stop scroll chaining where it feels wrong.
+- `-webkit-tap-highlight-color: transparent` plus a visible `:active` feedback (`active:scale-96`) on every tappable control, with 44 px touch targets kept.
+- `theme-color` follows the in-page theme toggle, not only the OS scheme.
+- Optional, to decide later: a web app manifest with `apple-touch-icon`. No service worker (cache risk with `_headers` and prefetch).
+
+## Signature plan per page (ranked intent)
+
+Later tasks follow this order. 1. Note page: margin note and stamp for the decision record. 2. `Fix` and `Ink` available in all prose. 3. Home hero: ink on one word of the headline (stroke only, the text is the LCP). 4. Notes index: ruled-paper rows. 5. `/me`: ink tag by the portrait. 6. One shared stamp in `PageHeader` for topic, changelog, contact and experiments. 7. Changelog `fixed` entries show the correction with `Fix`. 8. Cross-page transitions last.
 
 ## Accessibility floor
 

@@ -82,7 +82,7 @@ Los valores salen tal cual de los generadores del perfil (`tools/banner.py` y `t
 Estos valores son el tema por defecto, `theme-elvinlab`, no constantes. `@elvinlab/core` se usará para que otros creen blogs y landings con este estilo, así que marca, colores y tipografías deben poder reemplazarse en un solo archivo.
 
 - Los componentes solo leen variables semánticas (`var(--brand-primary)`, `var(--surface)`), nunca un hex directo.
-- Lo que se comparte es el lenguaje visual (grilla, pulsos, bordes con luz, resplandores); lo que cambia es la identidad (colores, fuentes, logo).
+- Lo que se comparte es el lenguaje visual (grilla, pulsos, bordes con luz, tinta de cuaderno); lo que cambia es la identidad (colores, fuentes, logo).
 
 ### Color de marca
 
@@ -113,7 +113,7 @@ Inconsistencia a resolver: en modo claro el banner usa `#c9c3ee` como borde y la
 | --- | --- | --- | --- |
 | Display (títulos de nota y de tarjeta) | IBM Plex Sans | 700 | 24–27 px títulos; 58–64 px nombre en los banners |
 | Texto | IBM Plex Sans | 400, 500 | 16–18 px |
-| Mono (números de nota, prompts, código) | JetBrains Mono | 400, 600, 700 | 12–16 px; en el sitio no se usa para etiquetas en mayúsculas |
+| Mono (números de nota, prompts, código) | JetBrains Mono | 400, 600, 700 | 12–16 px; en el sitio no se usa para etiquetas en mayúsculas (única excepción: el sello, ver [Firma: el cuaderno de laboratorio](#firma-el-cuaderno-de-laboratorio-decidido-2026-10-12)) |
 | Display pixelado (titular del hero, títulos de página, títulos de sección) | Pixelify Sans | 600 (variable) | Según el preset `appearance`: `minimal` hero 32 px en teléfono y 44 px desde `md`, títulos de página 26 / 32 px, títulos de sección 20 px; `full` (el de este sitio desde 2026-10-02, escala reducida y aprobada ese día) hero 32 px en teléfono y 52 px desde `md`, títulos de página 28 / 36 px, títulos de sección 22 px |
 | Favicon | Terminal de Linux pixelada (ventana gris azulado con tres puntos, prompt `>` cian y cursor rosa), 16×16 píxeles, sin el violeta saturado | Pestaña del navegador (`favicon.svg` y `favicon.ico`) |
 | Banda de suscripción | Formulario de correo con borde punteado de 1 px (como las líneas divisorias), sobre pixelado rosa (9×7) como único acento, etiqueta visible y botón violeta que se hunde 1 px al pulsar; el sobre da un salto de dos pasos solo al pasar el cursor o enfocar | Footer de todas las páginas cuando la suscripción está activa, salvo `/subscribe/*`, `/me` y `/contact/` (que ya tiene su propio formulario); es el único lugar de la suscripción; sin sombras duras, sin bucle, quieta con `prefers-reduced-motion` |
@@ -157,15 +157,23 @@ Los colores de marca se mantienen, pero el texto y los rellenos usan estas varia
 | `radius.pill` | 9999 px (pastillas, badges) | En uso |
 | `space.*` | Base 4 px: 4 · 8 · 12 · 16 · 24 · 32 · 48 · 64 | Propuesto (24 y 32 ya se usan) |
 | `grid.size` | 32 px, línea 0.5 px al 35 % | En uso |
-| `glow.opacity` | 0.16–0.28 (gradiente radial, sin sombras duras) | En uso |
-| `motion.pulse` | 4 s lineal, infinito | En uso |
+| `glow.opacity` | 0.16–0.28 (gradiente radial, sin sombras duras) | Congelado desde 2026-10-12: el resplandor no forma parte de la identidad evolucionada; sin usos nuevos. Los tokens siguen hasta que el propietario decida retirarlos |
+| `motion.pulse` | 4 s lineal, infinito | En uso (pulsos de datos del banner); la decoración en bucle no se amplía |
 | `motion.border` | 7 s lineal (luz que recorre el borde) | En uso |
 | `motion.blink` | 1 s por pasos (cursor) | Sin uso visible; los acentos de cursor son estáticos en todas las páginas |
-| `motion.reduce` | Todas las animaciones se detienen con `prefers-reduced-motion` | Obligatorio |
+| `ease.out` | `cubic-bezier(0.22, 1, 0.36, 1)` | Decidido 2026-10-12: curva de entradas, tinta y transiciones (registro suave) |
+| `ease.in-out` | `cubic-bezier(0.65, 0, 0.35, 1)` | Decidido 2026-10-12: cambios de estado de ida y vuelta |
+| `duration.feedback` | 150 ms | Decidido 2026-10-12: respuesta al toque o al cursor |
+| `duration.enter` | 300 ms | Decidido 2026-10-12: entradas y transiciones de página |
+| `duration.ink` | 700 ms | Decidido 2026-10-12: trazo de tinta que se dibuja |
+| `motion.stepped` | `steps(4, end)` | Solo para el registro pixelado (detalles pixelados, cursor, wordmark); desde 2026-10-12 ya no es la regla de todo el sitio |
+| `motion.reduce` | Todas las animaciones se detienen o muestran su estado final con `prefers-reduced-motion` | Obligatorio |
+
+**Dos registros de movimiento (decidido 2026-10-12).** Antes, todo el movimiento nuevo avanzaba por pasos. El propietario quiere animaciones fluidas y una sensación de app: (a) los elementos pixelados o retro (detalles del titular pixelado, cursor, wordmark, iconos pixelados) conservan el movimiento por pasos `steps(4, end)`; (b) todo lo demás usa movimiento suave con los tokens `ease.*` y `duration.*` de arriba. Siguen igual: sin JavaScript para animar, una sola coreografía de entrada por página, nada cambia el layout, y ninguna decoración en bucle nueva. Reglas completas en [DESIGN.md](DESIGN.md#motion).
 
 ## Motivos visuales y reglas de uso
 
-La identidad es "laboratorio de IA sobre fondo oscuro": pocos elementos, siempre los mismos, con movimiento sutil.
+La identidad es "laboratorio de IA sobre fondo oscuro" y, desde 2026-10-12, un cuaderno de laboratorio: pocos elementos, siempre los mismos, con movimiento sutil y fluido.
 
 | Motivo | Qué es | Dónde va |
 | --- | --- | --- |
@@ -173,16 +181,17 @@ La identidad es "laboratorio de IA sobre fondo oscuro": pocos elementos, siempre
 | Papel de laboratorio (decidido 2026-10-10) | Cuadrícula fina de 16 px con línea mayor cada 80 px, regla de marcas en el borde izquierdo y tres cruces de registro; un solo tono (el del texto, con poca opacidad), estático y sin brillos ni estrellas | Fondo por defecto de todos los banners. La galaxia y las olas WebGL siguen disponibles en el selector del navbar |
 | Red de nodos con pulsos | Nodos conectados; los datos viajan por las líneas | Banner principal, diagramas de arquitectura |
 | Borde con luz | Un tramo de gradiente recorre el borde de la tarjeta | Tarjetas destacadas (máx. una fila por página) |
-| Resplandor | Gradiente radial en una esquina | Tarjetas y hero; nunca sombras duras |
+| Resplandor | Gradiente radial en una esquina | Congelado (2026-10-12): lo existente se queda, sin usos nuevos; nunca sombras duras |
 | Prompt de terminal | `// comentario`, `>` y cursor rosa estático | Saludo y títulos técnicos; el acento es discreto y no parpadea |
 | Icono de marca | La terminal pixelada del favicon, 32 px en la barra y 16 px en el footer (cada celda de la cuadrícula de 16 mide un número entero de píxeles), junto al nombre | Barra de navegación y footer; estático en reposo (el parpadeo se descartó porque robaba el foco), y solo al pasar el cursor o enfocar se inclina unos grados; sin movimiento con `prefers-reduced-motion`. El corazón 8-bit rosa queda solo en el botón de huella, cuyas animaciones avanzan por pasos |
+| Tinta de cuaderno (decidido 2026-10-12) | Error tachado con la corrección al lado, subrayados y círculos a mano, sellos y notas al margen | Ver [Firma: el cuaderno de laboratorio](#firma-el-cuaderno-de-laboratorio-decidido-2026-10-12) |
 | Firma retro | Abanico arriba y GIFs de los 90 al pie | Solo README de GitHub y footer del sitio |
 
 ### Sí
 
 - Un solo acento dominante por bloque; el gradiente completo solo en piezas protagonistas.
 - Mismo componente en oscuro y claro, cambiando solo tokens de superficie y texto.
-- Sin etiquetas en mayúsculas en el sitio (solo los códigos de idioma ES/EN); JetBrains Mono para números de nota, fechas, contadores, etiquetas cortas y código, nunca frases; sin cadenas de metadatos unidas con punto medio. Las tarjetas del perfil de GitHub (SVG) tienen sus propias reglas; títulos de nota y de tarjeta en Space Grotesk; titular del hero y títulos de sección en Pixelify Sans.
+- Sin etiquetas en mayúsculas en el sitio (solo los códigos de idioma ES/EN y, desde 2026-10-12, el sello del cuaderno); JetBrains Mono para números de nota, fechas, contadores, etiquetas cortas y código, nunca frases; sin cadenas de metadatos unidas con punto medio. Las tarjetas del perfil de GitHub (SVG) tienen sus propias reglas; títulos de nota y de tarjeta en Space Grotesk; titular del hero y títulos de sección en Pixelify Sans.
 - Capturas propias de los proyectos, nunca imágenes de stock.
 
 ### No
@@ -191,6 +200,33 @@ La identidad es "laboratorio de IA sobre fondo oscuro": pocos elementos, siempre
 - Nada de tablas con bordes grises como elemento de diseño.
 - Nada de estadísticas automáticas de terceros que puedan congelarse o caerse.
 - Nada de animaciones que no respeten `prefers-reduced-motion`.
+- Nada de resplandores ni gradientes nuevos, ni decoración en bucle nueva (2026-10-12).
+
+## Firma: el cuaderno de laboratorio (decidido 2026-10-12)
+
+**Decisión.** La frase "escribo lo que sale mal" se vuelve diseño visible: el sitio se lee como un cuaderno de laboratorio. **Motivo:** una reseña lo calificó de plantilla y olvidable (tarjetas oscuras idénticas con resplandor violeta); la firma debe salir del tema del sitio, no de efectos genéricos. La capa "datos a pantalla" queda solo en `/me` (bloque de datos plegado).
+
+| Pieza | Qué es | Reglas |
+| --- | --- | --- |
+| `Fix` | Un error tachado (`<del>`) con la corrección al lado (`<ins>`) | Etiqueta oculta visualmente para lectores de pantalla, traducida por i18n, nunca español fijo en el componente |
+| `Ink` | Subrayado o círculo dibujado a mano sobre una palabra o frase | Decorativo y `aria-hidden`; el círculo solo para frases cortas de una línea; nunca cambia el texto de un elemento LCP (solo anima el trazo) |
+| Sello | Etiqueta corta enmarcada y ladeada: FUNCIONÓ, FALLÓ, PENDIENTE | Ver la decisión de mayúsculas abajo |
+| Nota al margen | Comentario breve junto al texto, en la fuente de texto o mono corto | Una por bloque como máximo |
+
+**Sellos y mayúsculas (decisión).** La regla "sin etiquetas en mayúsculas" tiene una **excepción acotada y explícita: el sello**. Se compone en JetBrains Mono 600 a 13 px o más, en mayúsculas, y solo dentro del componente de sello: máximo dos palabras y 12 caracteres, siempre con borde. **Motivo:** un sello de goma se reconoce por las mayúsculas y el marco; en minúsculas parece una etiqueta más. Fuera del sello la regla sigue intacta, y los sellos nunca sustituyen a las etiquetas de interfaz.
+
+**Reglas de tinta.**
+
+- Los colores salen solo de tokens semánticos: el rosa es el único acento de un bloque; si no, el primario. Nunca un hex en un componente. Excepción documentada: un SVG en `background-image` no puede leer variables CSS, así que ahí se escribe el color del trazo por tema.
+- Sin gradientes ni resplandor en nada nuevo.
+- Densidad: como máximo un efecto de tinta por bloque de pantalla y un puñado por página; si no, el cuaderno se vuelve plantilla al revés.
+- El CSS de cada componente es local al componente (no a `global.css`), para que solo paguen los bytes las páginas que lo usan; el impacto en el presupuesto de CSS se mide y se anota.
+
+**Plan por página (intención de diseño, por prioridad).** 1. Página de nota: nota al margen y sello para el registro de decisión. 2. `Fix` e `Ink` disponibles en toda la prosa. 3. Inicio: tinta sobre una palabra del titular (solo el trazo; el texto es el LCP). 4. Índice de notas: filas de papel rayado. 5. `/me`: etiqueta de tinta junto al retrato. 6. Un sello compartido en `PageHeader` para temas, changelog, contacto y experimentos. 7. Changelog: las entradas `fixed` muestran la corrección con `Fix`. 8. Transiciones entre páginas, al final.
+
+**Sensación de app (decidido 2026-10-12).** Se busca el tacto y el movimiento de una app, sin JavaScript; **no** el rendimiento nativo: en la web "sensación de app nativa" significa movimiento y tacto, nunca velocidad nativa. Detalle técnico en [DESIGN.md](DESIGN.md#native-feel-layer-decided-2026-10-12).
+
+- [ ] Decidir más adelante: manifiesto web con `apple-touch-icon` (opcional). Sin service worker (riesgo de caché con `_headers` y prefetch).
 
 ## Plan de sincronización
 
