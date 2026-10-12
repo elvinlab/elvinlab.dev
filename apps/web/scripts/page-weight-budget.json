@@ -75,6 +75,16 @@
       "htmlBytesPerNote": 4000,
       "maxHtmlBytes": 180000
     },
+    "topic": {
+      "why": "Static topic page /notes/tag/<topic>/: compact paper banner, an intro and compact note rows; no script. Same stylesheet as /notes/. Budget is the measured value rounded up to 100 B, so a new utility or a longer intro shows up.",
+      "styleBytes": 54200,
+      "htmlBytes": 84800,
+      "measured": {
+        "styleBytes": 54183,
+        "htmlBytes": 84795,
+        "date": "2026-10-11"
+      }
+    },
     "note": {
       "why": "Fixed note shell excludes the rendered MDX body, measured between inert template boundaries. Article content has a separate 64 KiB ceiling; CSS, JavaScript and Lighthouse gates remain independent.",
       "styleBytes": 61000,

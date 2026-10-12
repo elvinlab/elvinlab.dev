@@ -20,6 +20,7 @@ export type PageType =
   | 'result'
   | 'notes-index'
   | 'note'
+  | 'topic'
   | 'default';
 
 export interface PageWeight {
@@ -100,6 +101,8 @@ export function classifyPage(path: string): PageType {
     if (first === 'notes') return 'notes-index';
     return 'default';
   }
+  // `/notes/tag/<topic>/`: a static topic page, about the size of the notes index.
+  if (first === 'notes' && second === 'tag' && rest.length === 1) return 'topic';
   if (first === 'notes' && rest.length === 0 && !NOT_A_NOTE.has(second)) return 'note';
   return 'default';
 }

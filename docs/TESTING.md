@@ -92,7 +92,7 @@ The single source of truth is [`apps/web/scripts/verification-map.ts`](../apps/w
 | A feature's UI (`features/<x>/components`) | its unit tests, the e2e specs of that area, `a11y.spec.ts` for its page, `typecheck` | specs of other areas |
 | Client JavaScript, islands, scripts, client dependencies | `build` then `check:js-budget`, the area's e2e, `check:dev-cold-start` if a dependency was added | |
 | Anything that changes the HTML or CSS bytes of a gated URL (styles, layout, head or SEO tags, fonts, note or home or contact markup) | `check:page-weight` after `build`, `test:lighthouse` and the area's e2e; compare the document size and the worst LCP with the ledger | Lighthouse if no page the gate loads changed |
-| Notes pages and what they render (`NotePage`, share panel, marks, prose styles) | the notes specs (`notes-layout`, `notes-tag-filter`, `note-share`, `link-previews`, `note-translations`, `reading-mode`, `calm-pages`, `card-links`, `focus-not-obscured`, `marks`) and `a11y.spec.ts` | contact, home and `/me` specs |
+| Notes pages and what they render (`NotePage`, share panel, marks, prose styles) | the notes specs (`notes-layout`, `notes-tag-filter`, `notes-start-here`, `notes-topics`, `note-share`, `link-previews`, `note-translations`, `reading-mode`, `calm-pages`, `card-links`, `focus-not-obscured`, `marks`) and `a11y.spec.ts` | contact, home and `/me` specs |
 | Contact (`features/contact`, `ContactForm`) | `contact.spec.ts`, the contact unit tests, `check:js-budget` | notes specs |
 | Header, navbar, footer, `BaseLayout`, global CSS | a wide change: the whole stack once | |
 | `tests/**` only | the changed specs | the application checks |
@@ -140,6 +140,7 @@ budget in `apps/web/scripts/page-weight-budget.json`:
 | `changelog` | `/changelog/`, `/changelog/page/N/` and their `/en/` twins (days grouped by kind, 4 days per page; its CSS ships only there) |
 | `contact`, `subscribe` | `/contact/`, `/subscribe/` and their `/en/` twins |
 | `notes-index` | `/notes/`, `/en/notes/` |
+| `topic` | `/notes/tag/<topic>/` (a static topic page; the `pruebas` fixture topic in the browser build) |
 | `note` | any `/notes/<slug>/` (the real notes and the `smoke-es` fixture note) |
 | `default` | everything else: legal, subscribe steps, paged or sorted listings |
 

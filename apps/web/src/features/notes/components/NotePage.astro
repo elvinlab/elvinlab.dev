@@ -15,6 +15,7 @@ import ReadingProgress from '@/features/notes/components/ReadingProgress.astro';
 import RelatedNotes from '@/features/notes/components/RelatedNotes.astro';
 import ShareCard from '@/features/notes/components/ShareCard.astro';
 import Toc from '@/features/notes/components/Toc.astro';
+import { loadTopics } from '@/features/notes/lib/load-topics.ts';
 import { secondaryMetaSlot } from '@/features/notes/lib/note-meta.ts';
 import { tagHref } from '@/features/notes/lib/note-tags.ts';
 import {
@@ -40,6 +41,7 @@ const { data } = entry;
 const { Content, headings } = await render(entry);
 const tocHeadings = headings.filter((heading) => heading.depth === 2).map((h) => ({ slug: h.slug, text: h.text }));
 
+const { tagMap: topicTags } = await loadTopics();
 const all = (await getCollection('notes')).map((item) => ({ slug: item.id, data: item.data }));
 const sameLang = sortNotes(all.filter((note) => note.data.lang === data.lang));
 const { prev, next } = adjacentNotes(sameLang, entry.id);
@@ -78,7 +80,7 @@ const readingLabel = t(locale, 'notes.readingTime', { min: readingMinutes(entry.
       <div>
         <p class="font-mono text-sm text-muted">
           <a href={localizePath('/notes/', 'es', LOCALES)} class="hover:text-primary">{t(locale, 'note.breadcrumb')}</a>
-          <span class="mx-1">/</span><a href={tagHref(data.category)} class="hover:text-primary">{data.category}</a>
+          <span class="mx-1">/</span><a href={tagHref(data.category, topicTags)} class="hover:text-primary">{data.category}</a>
         </p>
         <div class="mt-3 flex items-center gap-2">
           <span class="font-mono text-sm text-pink">{t(locale, 'notes.entry', { number: noteNumber(data.number) })}</span>
@@ -106,7 +108,7 @@ const readingLabel = t(locale, 'notes.readingTime', { min: readingMinutes(entry.
     <div class="flex flex-col gap-3 border-t border-dashed border-divider pt-6">
       <div class="flex flex-wrap items-center gap-1.5">
         {secondaryMetaSlot === 'foot' && <LangBadge lang={data.lang} />}
-        {data.tags.map((tag) => <Chip href={tagHref(tag)}>#{tag}</Chip>)}
+        {data.tags.map((tag) => <Chip href={tagHref(tag, topicTags)}>#{tag}</Chip>)}
       </div>
       <p class="flex flex-wrap gap-x-3 gap-y-1 font-mono text-meta text-muted">
         {secondaryMetaSlot === 'foot' && <span class="whitespace-nowrap">{site.identity.name}</span>}

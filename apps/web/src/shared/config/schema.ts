@@ -303,6 +303,21 @@ export const siteConfigSchema = z
       .describe(
         'Settings of the changelog (`features.changelog`). Every key is optional and falls back to its default.',
       ),
+    notes: z
+      .strictObject({
+        topicMinNotes: z
+          .int()
+          .min(1)
+          .max(20)
+          .default(2)
+          .describe(
+            'Notes a topic needs before it gets its own page (`/notes/tag/<topic>/`). A topic with fewer notes, or without an intro, is not generated, and its chips keep pointing to the filter on `/notes/`. The topics themselves live in `src/content/topics.json`.',
+          ),
+      })
+      .prefault({})
+      .describe(
+        'Settings of the notes area (`features.blog`): the static topic pages. Every key is optional and falls back to its default.',
+      ),
     recruiter: z
       .object({
         available: z

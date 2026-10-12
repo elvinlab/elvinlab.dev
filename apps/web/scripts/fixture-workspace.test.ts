@@ -96,6 +96,20 @@ it('builds with only the fixture notes, never the published ones', () => {
   workspace.cleanup();
 });
 
+it('swaps the owner topics for the fixture topics, or for none', () => {
+  const source = sourceWorkspace();
+  write(source, 'apps/web/src/content/topics.json', '{"owner-topic":{}}');
+  const without = createFixtureWorkspace(source, join(source, 'fixtures'));
+  temporary.push(without.root);
+  expect(readFileSync(join(without.web, 'src/content/topics.json'), 'utf8').trim()).toBe('{}');
+  write(source, 'topics.json', '{"fixture-topic":{}}');
+  const withFixture = createFixtureWorkspace(source, join(source, 'fixtures'));
+  temporary.push(withFixture.root);
+  expect(readFileSync(join(withFixture.web, 'src/content/topics.json'), 'utf8')).toBe(
+    '{"fixture-topic":{}}',
+  );
+});
+
 it('copies the root .gitignore: without it the build inlines the site stylesheet twice', () => {
   const source = sourceWorkspace();
   write(source, '.gitignore', 'node_modules/\ndist/\n');

@@ -128,6 +128,25 @@ startHereNote: "My thesis: understand and write down the intent before asking an
 - **How to choose**: a note that works as a way in for someone who does not know the site: the overview, the thesis and one concrete case with numbers. Publishing an ordinary note needs no change; review the flags only when a better entry point appears (in practice, every few notes).
 - To change a flag, remove `startHere` and `startHereNote` from the old note and set them on the new one; if you retire a flagged note, the block fills itself.
 
+### 3.2. Topics (static pages)
+
+Tags filter in the browser (`/notes/?tag=x`), but a filter is not a page a search engine can index. **Topics** are: `/notes/tag/<topic>/` is a static page with its own title, description, an introduction you write and the list of its notes (newest first), with breadcrumbs (`BreadcrumbList`) and a sitemap entry. They are defined in `apps/web/src/content/topics.json`, an object keyed by the URL slug:
+
+```json
+"rendimiento-y-verificacion": {
+  "title": "Rendimiento y verificación",
+  "description": "Up to 160 characters for the search engine.",
+  "intro": "Between 40 and 80 words written by you, unique to this topic.",
+  "tags": ["rendimiento", "lcp", "lighthouse", "testing"]
+}
+```
+
+- `tags` are **raw** note tags: several can point to one topic, and a note belongs to the topic when **any** of its tags is listed. A note can be in several topics. Every listed tag must exist in some note.
+- A topic has a page only when it has an `intro` and at least `notes.topicMinNotes` Spanish notes (2 by default; set it in `site.config.ts`, section 3 of `CONFIGURATION.md`). Otherwise it is not generated, it is not in the sitemap and its chips keep pointing to the filter; the build prints a warning.
+- Tag chips (on notes, on `/notes/` and in the sidebar) link to the topic page when the tag belongs to a topic that exists; if it belongs to two, the first in the file wins. `/notes/` shows a short "Topics" list so search engines reach the pages. `/notes/?tag=x` keeps working and its canonical points to `/notes/`.
+- The build **fails** when a topic lists a tag no note carries, repeats a slug, uses a reserved slug (`page`, `tag`, `tags`) or one that is not kebab-case, when `description` is over 160 characters or when `intro` is not 40 to 80 words.
+- **When to create a topic**: when several notes tell one story and you can write an introduction that says something the notes alone do not. A topic per tag is not the goal: thin pages hurt more than they help.
+
 ## 4. The decision record
 
 Three sentences of **at most 280 characters** each; they are shown in three columns before the text. It is the first thing people read, so it works as a standalone summary:

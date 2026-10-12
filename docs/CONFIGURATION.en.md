@@ -23,6 +23,7 @@ To write notes, see the separate guide: [How to create a note](NOTES.en.md). To 
 | --- | --- | --- |
 | Name, bio, role, links, languages, active features, comments, analytics, legal dates | [`apps/web/src/site.config.ts`](../apps/web/src/site.config.ts) | At build time: an invalid value breaks the build and lists every problem |
 | Notes (the blog) | `apps/web/src/content/notes/<slug>/index.mdx` (drafts in `drafts/`) | The note schema (see [the notes guide](NOTES.en.md)) |
+| Note topics (`/notes/tag/<topic>/` pages) | `apps/web/src/content/topics.json` and `notes.topicMinNotes` in [`site.config.ts`](../apps/web/src/site.config.ts) | At build time: a missing tag, a duplicate or reserved slug, or a description or intro outside its limits breaks the build (see [the notes guide](NOTES.en.md), section 3.2) |
 | Experience, certificates, experiments, changelog | `apps/web/src/content/*.json` | One schema per file (section 4); the profile and projects guide is [PORTFOLIO.en.md](PORTFOLIO.en.md) |
 | Experiments list: page size, featured limit, `/me` rows, intro and words | the `experiments` block of [`site.config.ts`](../apps/web/src/site.config.ts) | At build time (section 3) |
 | Theme colors, radii and fonts | `packages/core/src/tokens/tokens.json` | Regenerate with `pnpm --filter @elvinlab/core tokens` |
@@ -108,6 +109,8 @@ The descriptions come from the schema (`.describe()`), which is why they are in 
 | `experiments.sortFrom` | `integer (min 2, max 48)` | no | `4` | The sort switch and the alternate-sort pages exist only when the compact cards (everything that is not a big piece) number at least this many; below it the order is not worth choosing. |
 | `changelog` | `object` | no | `{}` | Settings of the changelog (`features.changelog`). Every key is optional and falls back to its default. |
 | `changelog.perPage` | `integer (min 2, max 30)` | no | `4` | Release days per page of `/changelog/`. A release is one production day, so this counts days, not entries; a second page exists only when the days exceed this number (`/changelog/page/2/`). Page 1 opens its two newest days; the rest stay collapsed. |
+| `notes` | `object` | no | `{}` | Settings of the notes area (`features.blog`): the static topic pages. Every key is optional and falls back to its default. |
+| `notes.topicMinNotes` | `integer (min 1, max 20)` | no | `2` | Notes a topic needs before it gets its own page (`/notes/tag/<topic>/`). A topic with fewer notes, or without an intro, is not generated, and its chips keep pointing to the filter on `/notes/`. The topics themselves live in `src/content/topics.json`. |
 | `recruiter` | `object` | yes |  | Recruiter card on the home page and /me. |
 | `recruiter.available` | `boolean` | yes |  | Show or hide the whole availability line (not whether you are open to work). |
 | `recruiter.openToWork` | `boolean` | no | `true` | Whether you are open to work: green status dot when true, the brand accent colour when false. |

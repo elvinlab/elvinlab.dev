@@ -23,6 +23,18 @@ describe('tagHref', () => {
   });
 });
 
+describe('tagHref with topics', () => {
+  const topics = new Map([['astro', 'web']]);
+
+  it('points at the topic page when the tag maps to a topic', () => {
+    expect(tagHref('astro', topics)).toBe('/notes/tag/web/');
+  });
+
+  it('keeps the filter link for a tag without a topic', () => {
+    expect(tagHref('css', topics)).toBe('/notes/?tag=css');
+  });
+});
+
 describe('activeTag', () => {
   it('reads the tag param lower-cased and trimmed', () => {
     expect(activeTag('?tag=Astro')).toBe('astro');

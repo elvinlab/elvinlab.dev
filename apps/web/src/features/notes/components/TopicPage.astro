@@ -1,0 +1,52 @@
+---
+/** A static topic page `/notes/tag/<topic>/`: compact paper banner with the title and intro, the
+ * topic's notes newest first, and a link back to the index. Static HTML, no script. */
+import { localizePath } from '@elvinlab/core';
+
+import { BackgroundCanvas } from '@/features/backgrounds/index.ts';
+import { type ActiveTopic, topicHref } from '@/features/notes/lib/topics.ts';
+import { site } from '@/shared/config/index.ts';
+import { LOCALES, type Locale, t } from '@/shared/i18n/index.ts';
+import Banner from '@/shared/layout/Banner.astro';
+import BaseLayout from '@/shared/layout/BaseLayout.astro';
+import { breadcrumbJsonLd, jsonLdScript } from '@/shared/seo/jsonld.ts';
+
+import NoteIndexRow from './NoteIndexRow.astro';
+
+type Props = { active: ActiveTopic; locale: Locale };
+
+const { active, locale } = Astro.props;
+const { topic, notes } = active;
+const path = topicHref(topic.slug);
+const absolute = (target: string): string => new URL(target, site.url).href;
+const trail = breadcrumbJsonLd([
+  { name: t(locale, 'nav.home'), url: absolute(localizePath('/', locale, LOCALES)) },
+  { name: t(locale, 'nav.notes'), url: absolute('/notes/') },
+  { name: topic.data.title, url: absolute(path) },
+]);
+---
+
+<BaseLayout locale={locale} path={path} title={topic.data.title} description={topic.data.description} translated={false} pixelTitle>
+  <script type="application/ld+json" is:inline slot="head" set:html={jsonLdScript(trail)} />
+  <Banner slot="banner" height="320px">
+    <BackgroundCanvas slot="background" />
+    <p class="font-mono text-sm text-muted">
+      <a href="/notes/" class="hover:text-primary">{t(locale, 'note.breadcrumb')}</a>
+      <span class="mx-1">/</span>{t(locale, 'notes.topics')}
+    </p>
+    <h1 class="mt-3 font-pixel text-hero font-semibold leading-[1.1] text-balance">
+      {topic.data.title}<span aria-hidden="true" class="ml-1 inline-block h-3 w-2 bg-pink align-baseline md:h-4"></span>
+    </h1>
+    <p class="mt-3 max-w-[58ch] text-lg leading-relaxed text-text-secondary">{topic.data.intro}</p>
+  </Banner>
+
+  <section class="flex flex-col">
+    <h2 class="flex items-baseline gap-3 font-display text-3xl font-bold text-primary">
+      {t(locale, 'nav.notes')}
+      <span class="font-mono text-sm text-muted">{t(locale, 'notes.count', { count: notes.length })}</span>
+    </h2>
+    <div class="mt-2">
+      {notes.map((note) => <NoteIndexRow note={note} locale={locale} />)}
+    </div>
+  </section>
+</BaseLayout>

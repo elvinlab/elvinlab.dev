@@ -682,6 +682,23 @@ describe('experiments block', () => {
   });
 });
 
+describe('notes block', () => {
+  const withNotes = (notes: unknown) => ({ ...valid, notes });
+
+  it('defaults topicMinNotes to 2 when the block is missing or empty', () => {
+    expect(parseSiteConfig(valid).notes).toEqual({ topicMinNotes: 2 });
+    expect(parseSiteConfig(withNotes({})).notes).toEqual({ topicMinNotes: 2 });
+  });
+
+  it('accepts the bounds and rejects values outside them', () => {
+    expect(parseSiteConfig(withNotes({ topicMinNotes: 1 })).notes.topicMinNotes).toBe(1);
+    expect(parseSiteConfig(withNotes({ topicMinNotes: 20 })).notes.topicMinNotes).toBe(20);
+    expect(() => parseSiteConfig(withNotes({ topicMinNotes: 0 }))).toThrow();
+    expect(() => parseSiteConfig(withNotes({ topicMinNotes: 21 }))).toThrow();
+    expect(() => parseSiteConfig(withNotes({ unknown: 1 }))).toThrow();
+  });
+});
+
 describe('changelog block', () => {
   const withChangelog = (changelog: unknown) => ({ ...valid, changelog });
 

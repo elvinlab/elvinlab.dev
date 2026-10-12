@@ -1,0 +1,8 @@
+{
+  "pruebas": {
+    "title": "Fixture checks",
+    "description": "A synthetic topic for browser checks: it groups the fixture notes that carry the testing tag.",
+    "intro": "This synthetic topic exists only inside the isolated browser-test workspace. It groups the fixture notes that carry the testing tag, so the checks can prove the topic page, the chip links, the breadcrumb data and the sitemap entry against real built output. It never ships with the site and carries no owner content, so a fork can run the same checks unchanged.",
+    "tags": ["testing"]
+  }
+}

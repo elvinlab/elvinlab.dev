@@ -1,10 +1,18 @@
+import { topicHref } from './topics.ts';
+
 /** The tags worth showing on a row: the one that repeats the category chip is dropped. */
 export function visibleTags(tags: readonly string[], category: string): string[] {
   return tags.filter((tag) => tag !== category);
 }
 
-/** Link to the notes index filtered by a tag or category. The index exists only at `/notes/`. */
-export const tagHref = (tag: string): string => `/notes/?tag=${encodeURIComponent(tag)}`;
+/**
+ * Link for a tag or category: the static topic page when `topics` (raw tag to topic slug) maps it,
+ * otherwise the notes index filtered by it. The index exists only at `/notes/`.
+ */
+export function tagHref(tag: string, topics?: ReadonlyMap<string, string>): string {
+  const topic = topics?.get(tag);
+  return topic === undefined ? `/notes/?tag=${encodeURIComponent(tag)}` : topicHref(topic);
+}
 
 /** The active tag filter from a `location.search` string: lower-cased, trimmed, or `''`. */
 export function activeTag(search: string): string {

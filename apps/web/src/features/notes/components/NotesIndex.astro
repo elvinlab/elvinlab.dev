@@ -3,11 +3,14 @@
 import { getCollection } from 'astro:content';
 
 import { BackgroundCanvas } from '@/features/backgrounds/index.ts';
+import { loadTopics } from '@/features/notes/lib/load-topics.ts';
 import { groupByYear, readingMinutes, sortNotes } from '@/features/notes/lib/notes.ts';
 import { assertStartHere, selectStartHere } from '@/features/notes/lib/start-here.ts';
+import { topicHref } from '@/features/notes/lib/topics.ts';
 import { type Locale, t } from '@/shared/i18n/index.ts';
 import Banner from '@/shared/layout/Banner.astro';
 import BaseLayout from '@/shared/layout/BaseLayout.astro';
+import Chip from '@/shared/ui/Chip.astro';
 
 import NoteRow from './NoteRow.astro';
 import NotesFilter from './NotesFilter.astro';
@@ -25,6 +28,7 @@ const notes = entries.map((entry) => ({
   readingMinutes: readingMinutes(entry.body ?? ''),
 }));
 assertStartHere(notes);
+const { active: topics, tagMap: topicTags } = await loadTopics();
 const startHere = selectStartHere(notes, locale);
 const groups = groupByYear(notes);
 
@@ -47,6 +51,12 @@ const tags = [...new Set(sortNotes(notes).flatMap((note) => note.data.tags))];
 
   <div class="flex flex-col gap-6">
     <StartHere locale={locale} notes={startHere} />
+    {topics.length > 0 && (
+      <nav aria-label={t(locale, 'notes.topics')} class="flex flex-wrap items-center gap-1.5">
+        <span class="font-mono text-sm text-muted">{t(locale, 'notes.topics')}</span>
+        {topics.map(({ topic }) => <Chip href={topicHref(topic.slug)}>{topic.data.title}</Chip>)}
+      </nav>
+    )}
     <NotesFilter locale={locale} />
 
     {groups.length === 0 && <p class="text-text-secondary">{t(locale, 'notes.empty')}</p>}
@@ -59,11 +69,11 @@ const tags = [...new Set(sortNotes(notes).flatMap((note) => note.data.tags))];
           <span class="font-mono text-sm text-muted" data-year-count>{t(locale, 'notes.count', { count: group.notes.length })}</span>
         </h2>
         <div class="mt-2">
-          {group.notes.map((note) => <NoteRow note={note} locale={locale} />)}
+          {group.notes.map((note) => <NoteRow note={note} locale={locale} topics={topicTags} />)}
         </div>
       </section>
     ))}
   </div>
 
-  <NotesSidebar slot="aside" locale={locale} categories={categories} tags={tags} />
+  <NotesSidebar slot="aside" locale={locale} categories={categories} tags={tags} topics={topicTags} />
 </BaseLayout>

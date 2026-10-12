@@ -8,6 +8,8 @@ export { default as NoteIndexRow } from './components/NoteIndexRow.astro';
 // Page-level entry components — the only way pages reach the notes feature.
 export { default as NotePage } from './components/NotePage.astro';
 export { default as NotesIndex } from './components/NotesIndex.astro';
+export { default as TopicPage } from './components/TopicPage.astro';
+export { loadTopics } from './lib/load-topics.ts';
 export { secondaryMetaSlot } from './lib/note-meta.ts';
 // Data helpers and types, part of the feature's public API.
 export {
@@ -28,4 +30,12 @@ export {
   type StartHereNote,
   selectStartHere,
 } from './lib/start-here.ts';
-export { type NoteData, noteSchema } from './schema.ts';
+export {
+  type ActiveTopic,
+  activeTopics,
+  assertTopics,
+  type TopicEntry,
+  topicHref,
+  topicTagMap,
+} from './lib/topics.ts';
+export { type NoteData, noteSchema, type TopicData, topicSchema } from './schema.ts';

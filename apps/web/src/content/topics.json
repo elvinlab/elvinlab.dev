@@ -1,0 +1,39 @@
+{
+  "agentes-de-ia": {
+    "title": "Agentes de IA",
+    "description": "Cómo trabajo con agentes de IA: orquestación, ahorro de tokens, intención antes del código y lo que me costó aprenderlo.",
+    "intro": "Cómo trabajo con agentes de IA en el día a día: qué decide un modelo de pago y qué delego en uno barato o local, cómo ahorro tokens y por qué defino la intención antes de pedir código. Son notas de práctica, con lo que me costó y lo que me falló, escritas por un junior eterno que prefiere medir antes de opinar.",
+    "tags": [
+      "agentes-ia",
+      "herdr",
+      "opencode",
+      "ollama",
+      "engram",
+      "tokens",
+      "rtk",
+      "caveman",
+      "sdd",
+      "vibe-coding"
+    ]
+  },
+  "rendimiento-y-verificacion": {
+    "title": "Rendimiento y verificación",
+    "description": "Rendimiento web y verificación: cómo unos bytes de CSS deciden el LCP y cómo compruebo solo lo que cada cambio toca.",
+    "intro": "Notas sobre medir antes de creer: cómo un puñado de bytes de CSS decidió el LCP de este sitio, cómo verifico solo lo que toca cada cambio y qué puntos de control puse para que la documentación no mienta. Cada una parte de un número real, de un presupuesto o de algo que se rompió.",
+    "tags": ["rendimiento", "lcp", "css", "lighthouse", "testing", "verificacion", "ci", "tdd"]
+  },
+  "arquitectura-de-este-sitio": {
+    "title": "Arquitectura de este sitio",
+    "description": "Las decisiones de arquitectura detrás de elvinlab.dev: Astro, Cloudflare, una lista de suscriptores propia y el head como restricción.",
+    "intro": "Las decisiones de arquitectura detrás de elvinlab.dev: del plan a producción con Astro y Cloudflare, una lista de suscriptores que vive en mi propia base de datos y el rendimiento del head como restricción de diseño. Qué elegí, qué descarté y por qué, con los trade-offs a la vista.",
+    "tags": [
+      "arquitectura",
+      "astro",
+      "cloudflare",
+      "cloudflare-d1",
+      "suscripcion",
+      "correo",
+      "privacidad"
+    ]
+  }
+}

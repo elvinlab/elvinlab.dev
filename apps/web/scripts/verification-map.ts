@@ -109,7 +109,13 @@ const GLOBAL = area(
   'apps/web/public/**',
   'packages/core/src/**',
 );
-const NOTES = area(`${SRC}/features/notes/**`, `${SRC}/blog-routes/**`, 'tests/fixtures/**');
+const NOTES = area(
+  `${SRC}/features/notes/**`,
+  `${SRC}/blog-routes/**`,
+  `${SRC}/pages/notes/**`,
+  `${SRC}/content/topics.json`,
+  'tests/fixtures/**',
+);
 const SUBSCRIBE = area(
   `${SRC}/features/subscribe/**`,
   `${SRC}/shared/subscribe/**`,
@@ -352,6 +358,7 @@ export const CHECKS: readonly CheckDef[] = [
   e2e({ file: 'notes-layout.spec.ts', covers: NOTE_PAGE, responsive: true }),
   e2e({ file: 'notes-tag-filter.spec.ts', covers: NOTE_PAGE }),
   e2e({ file: 'notes-start-here.spec.ts', covers: NOTE_PAGE }),
+  e2e({ file: 'notes-topics.spec.ts', covers: NOTE_PAGE }),
   e2e({ file: 'performance.spec.ts', covers: EVERY_PAGE }),
   e2e({ file: 'experiments.spec.ts', covers: [...EXPERIMENTS, ...ME] }),
   e2e({ file: 'font-swap.spec.ts', covers: [...NOTE_PAGE, ...HOME] }),
@@ -370,6 +377,7 @@ export const CHECKS: readonly CheckDef[] = [
   lighthouse('/experiments/', EXPERIMENTS),
   lighthouse('/notes/', [...NOTES, ...SUBSCRIBE]),
   lighthouse('/notes/smoke-es/', NOTE_PAGE),
+  lighthouse('/notes/tag/pruebas/', NOTES),
   lighthouse('/contact/', CONTACT),
   lighthouse('/en/contact/', CONTACT),
   lighthouse('/subscribe/', SUBSCRIBE),

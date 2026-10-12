@@ -128,6 +128,25 @@ startHereNote: "Mi tesis: entender y escribir la intención antes de pedirle có
 - **Cómo elegir**: una nota que sirva de puerta de entrada a quien no conoce el sitio: la visión de conjunto, la tesis y un caso concreto con números. No hace falta tocar nada al publicar una nota normal; revisa las marcas solo cuando salga una nota mejor como entrada (en la práctica, cada pocas notas).
 - Para cambiar una marca, quita `startHere` y `startHereNote` de la nota anterior y ponlos en la nueva; si retiras una nota marcada, el bloque se completa solo.
 
+### 3.2. Temas (páginas estáticas)
+
+Las etiquetas filtran en el navegador (`/notes/?tag=x`), pero un filtro no es una página que un buscador pueda indexar. Los **temas** sí: `/notes/tag/<tema>/` es una página estática con su título, su descripción, una introducción tuya y la lista de sus notas (la más reciente primero), con migas de pan (`BreadcrumbList`) y entrada en el sitemap. Se definen en `apps/web/src/content/topics.json`, un objeto cuya clave es el slug de la URL:
+
+```json
+"rendimiento-y-verificacion": {
+  "title": "Rendimiento y verificación",
+  "description": "Hasta 160 caracteres para el buscador.",
+  "intro": "Entre 40 y 80 palabras escritas por ti, únicas para este tema.",
+  "tags": ["rendimiento", "lcp", "lighthouse", "testing"]
+}
+```
+
+- `tags` son etiquetas **crudas** de las notas: varias pueden apuntar al mismo tema, y una nota pertenece al tema si **cualquiera** de sus etiquetas está en la lista. Una nota puede estar en varios temas. Todas las etiquetas listadas deben existir en alguna nota.
+- Un tema solo tiene página si tiene `intro` y al menos `notes.topicMinNotes` notas en español (2 por defecto; ajuste en `site.config.ts`, sección 3 de `CONFIGURATION.md`). Si no, no se genera, no entra en el sitemap y sus chips siguen apuntando al filtro; el build avisa con un `warning`.
+- Los chips de etiqueta (en las notas, en `/notes/` y en la barra lateral) enlazan a la página del tema cuando la etiqueta pertenece a uno que existe; si pertenece a dos, gana el primero del archivo. `/notes/` muestra la lista corta «Temas» para que los buscadores lleguen a ellas. `/notes/?tag=x` sigue funcionando y su canonical apunta a `/notes/`.
+- El build **falla** si un tema lista una etiqueta que ninguna nota tiene, repite el slug, usa un slug reservado (`page`, `tag`, `tags`) o no está en kebab-case, si `description` supera 160 caracteres o si `intro` no tiene entre 40 y 80 palabras.
+- **Cuándo crear un tema**: cuando varias notas cuentan una misma historia y puedes escribir una introducción que diga algo que las notas por separado no dicen. No hace falta un tema por etiqueta: las páginas delgadas perjudican más de lo que ayudan.
+
 ## 4. El registro de decisión
 
 Son tres frases de **máximo 280 caracteres** cada una; se muestran en tres columnas antes del texto. Es lo primero que lee la gente, así que sirve como resumen autónomo:

@@ -51,6 +51,8 @@ describe('classifyPage', () => {
     ['/notes/smoke-es/', 'note'],
     ['/en/notes/some-slug/', 'note'],
     ['/notes/page/2/', 'default'],
+    ['/notes/tag/agentes-de-ia/', 'topic'],
+    ['/notes/tag/', 'default'],
     ['/privacy/', 'default'],
     ['/changelog/', 'changelog'],
     ['/en/changelog/', 'changelog'],

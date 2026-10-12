@@ -676,5 +676,11 @@
     "category": "added",
     "title": "A \"Start here\" reading path for the notes",
     "description": "The notes index opens with three hand-picked notes, each with one line on why to start there, so a visitor who is not drawn to the newest note has a way in. At the end of every note, \"Related notes\" becomes \"Keep reading\": those same entry points first, then related notes. It is static HTML, with no new JavaScript."
+  },
+  "notes-topic-pages": {
+    "date": "2026-10-11",
+    "category": "added",
+    "title": "Topic pages for the notes",
+    "description": "Three themes (AI agents, performance and verification, this site's architecture) now have their own pages at /notes/tag/<topic>/, each with a short introduction and its notes, so search engines and readers can follow a theme. Tag chips link to the topic when there is one, and /notes/ lists the topics. Static HTML, with no new JavaScript; fork owners define topics in topics.json."
   }
 }

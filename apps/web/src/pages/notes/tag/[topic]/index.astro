@@ -1,0 +1,15 @@
+---
+import { loadTopics, TopicPage } from '@/features/notes/index.ts';
+import { site } from '@/shared/config/index.ts';
+
+// Files under `src/pages` cannot be skipped by a flag, so the pages simply do not exist with the blog off.
+export async function getStaticPaths() {
+  if (!site.features.blog) return [];
+  const { active } = await loadTopics();
+  return active.map((entry) => ({ params: { topic: entry.topic.slug }, props: { active: entry } }));
+}
+
+const { active } = Astro.props;
+---
+
+<TopicPage active={active} locale="es" />

@@ -96,4 +96,42 @@ export function noteSchema() {
     });
 }
 
+/**
+ * One entry of `src/content/topics.json`, keyed by the topic slug (the key becomes the URL
+ * `/notes/tag/<slug>/`). Several raw note tags can map to one topic. The length limits of
+ * `description` and `intro` are enforced by the build guard (`assertTopics`), which also reports
+ * tags that no note carries, duplicate slugs and slugs that take a route.
+ */
+export function topicSchema() {
+  return z.object({
+    title: z
+      .string()
+      .trim()
+      .min(1)
+      .max(60)
+      .describe('Topic name: the page `<h1>` and its title (max 60 characters).'),
+    description: z
+      .string()
+      .trim()
+      .min(1)
+      .describe('Meta description of the topic page (max 160 characters, checked at build).'),
+    intro: z
+      .string()
+      .trim()
+      .min(1)
+      .optional()
+      .describe(
+        'Short unique introduction shown on the topic page, 40 to 80 words, checked at build. Without it the topic has no page.',
+      ),
+    tags: z
+      .array(z.string().regex(kebab))
+      .min(1)
+      .describe(
+        'Raw note tags that belong to this topic. A note belongs to it when any of its tags is listed; every listed tag must exist in some note.',
+      ),
+  });
+}
+
+export type TopicData = z.infer<ReturnType<typeof topicSchema>>;
+
 export type NoteData = z.infer<ReturnType<typeof noteSchema>>;
