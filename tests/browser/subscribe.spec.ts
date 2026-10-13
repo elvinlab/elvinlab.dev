@@ -1,6 +1,7 @@
 import { expect, type Page, test } from '@playwright/test';
 
 import { describeViolations, scan } from './helpers/axe';
+import { has, liveByPath, seedTheme } from './helpers/features';
 import { stubThirdParties } from './helpers/third-party';
 
 /**
@@ -24,13 +25,16 @@ const FORM = {
   email: 'Dónde enviarte las notas',
   submit: 'Suscribirme',
   success: 'Revisa tu bandeja de entrada para confirmar la suscripción.',
-  error:
-    'No se pudo suscribir. Inténtalo más tarde o escríbeme desde la página de Contacto y te agrego a mano.',
+  // With the contact page off the messages stop pointing to it (`subscribe.errorNoContact`).
+  error: has({ flags: ['contact'] })
+    ? 'No se pudo suscribir. Inténtalo más tarde o escríbeme desde la página de Contacto y te agrego a mano.'
+    : 'No se pudo suscribir. Inténtalo más tarde.',
   capped: 'Hoy llegaron muchas solicitudes. Inténtalo de nuevo mañana.',
   rateLimited: 'Demasiados intentos seguidos. Espera un minuto y vuelve a intentarlo.',
   interactive: 'Marca la casilla de abajo para verificar que eres una persona.',
-  timeout:
-    'No pudimos verificar que eres una persona. Revisa tu conexión o desactiva bloqueadores y vuelve a intentarlo, o escríbeme desde la página de Contacto y te agrego a mano.',
+  timeout: has({ flags: ['contact'] })
+    ? 'No pudimos verificar que eres una persona. Revisa tu conexión o desactiva bloqueadores y vuelve a intentarlo, o escríbeme desde la página de Contacto y te agrego a mano.'
+    : 'No pudimos verificar que eres una persona. Revisa tu conexión o desactiva bloqueadores y vuelve a intentarlo.',
   verifying: 'Verificando…',
 };
 
@@ -115,13 +119,10 @@ const unavailable = JSON.stringify({ type: 'AstroActionError', code: 'SERVICE_UN
 const result = (value: string) => `[{"result":1},"${value}"]`;
 
 const FORM_PAGES = ['/', '/en/', '/privacy/', '/notes/', '/notes/smoke-es/'];
-const NO_FORM_PAGES = [
-  '/me/',
-  '/contact/',
-  '/en/contact/',
-  '/subscribe/confirm/',
-  '/subscribe/unsubscribe/',
-];
+const NO_FORM_PAGES = liveByPath(
+  ['/me/', '/contact/', '/en/contact/', '/subscribe/confirm/', '/subscribe/unsubscribe/'],
+  (path) => path,
+);
 const FIELD = 'footer [data-subscribe]';
 
 test.describe('form in the footer', () => {
@@ -409,7 +410,7 @@ test.describe('form in the footer', () => {
   for (const theme of THEMES) {
     test(`has no axe violations with the band (${theme})`, async ({ page }) => {
       await stubThirdParties(page);
-      await page.addInitScript((value) => localStorage.setItem('theme', value), theme);
+      await seedTheme(page, theme);
       await page.goto('/');
       await expect(page.locator('html')).toHaveAttribute('data-theme', theme);
       await expect(page.locator(FIELD).getByLabel(FORM.email)).toBeVisible();
@@ -513,7 +514,7 @@ for (const locale of ['es', 'en'] as const) {
 
       for (const theme of THEMES) {
         test(`has no axe violations (${theme})`, async ({ page }) => {
-          await page.addInitScript((value) => localStorage.setItem('theme', value), theme);
+          await seedTheme(page, theme);
           await page.goto(`${copy.path}?token=abc.def`);
           await expect(page.locator('html')).toHaveAttribute('data-theme', theme);
           await expect(page.getByRole('button', { name: copy.button })).toBeVisible();
@@ -646,7 +647,7 @@ for (const locale of ['es', 'en'] as const) {
     for (const theme of THEMES) {
       test(`has no axe violations (${theme})`, async ({ page }) => {
         await stubThirdParties(page);
-        await page.addInitScript((value) => localStorage.setItem('theme', value), theme);
+        await seedTheme(page, theme);
         await page.goto(copy.path);
         await expect(page.locator('html')).toHaveAttribute('data-theme', theme);
         await expect(page.locator(form).getByLabel(copy.label)).toBeVisible();
@@ -672,7 +673,9 @@ test.describe('footer link to the subscription page', () => {
   }) => {
     for (const [path, name, target] of [
       ['/', 'Suscribirse', '/subscribe/'],
-      ['/contact/', 'Suscribirse', '/subscribe/'],
+      ...(has({ routes: ['contact'] })
+        ? [['/contact/', 'Suscribirse', '/subscribe/'] as const]
+        : []),
       ['/en/', 'Subscribe', '/en/subscribe/'],
     ] as const) {
       await page.goto(path);

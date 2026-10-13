@@ -3,6 +3,8 @@ import { join } from 'node:path';
 
 import { expect, type Locator, type Page, test } from '@playwright/test';
 
+import { liveByPath } from './helpers/features';
+
 /**
  * The fixture build copies the real `site.config.ts`; `FIXTURE_APPEARANCE` overrides the preset of
  * the copy. The expected sizes follow the preset the page root carries (`html[data-appearance]`),
@@ -110,17 +112,20 @@ test('the home computes the scale of its preset', async ({ page }, testInfo) => 
 test('the inner pages compute the page-title step of their preset', async ({ page }, testInfo) => {
   const expected = SCALES[expectedPreset()][testInfo.project.name];
   if (!expected) throw new Error('unreachable: skipped in beforeEach');
-  for (const path of [
-    '/experiments/',
-    '/contact/',
-    '/changelog/',
-    '/privacy/',
-    '/terms/',
-    '/subscribe/',
-    '/subscribe/confirm/',
-    '/nope/',
-    '/en/contact/',
-  ]) {
+  for (const path of liveByPath(
+    [
+      '/experiments/',
+      '/contact/',
+      '/changelog/',
+      '/privacy/',
+      '/terms/',
+      '/subscribe/',
+      '/subscribe/confirm/',
+      '/nope/',
+      '/en/contact/',
+    ],
+    (p) => p,
+  )) {
     await page.goto(path);
     expect(await fontSize(page.locator('main h1')), path).toBe(expected.pageTitle);
   }

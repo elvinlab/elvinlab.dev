@@ -1,5 +1,9 @@
 import { expect, test } from '@playwright/test';
 
+import { requires } from './helpers/features';
+
+requires({ flags: ['changelog'], routes: ['changelog'] });
+
 /**
  * The changelog: release days (production days) grouped by kind in a fixed order, the two newest
  * days open on page 1, and a crawlable pager to the later pages. The content is plain HTML, so the

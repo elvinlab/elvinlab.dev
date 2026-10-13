@@ -1,5 +1,7 @@
 import { expect, type Page, test } from '@playwright/test';
 
+import { has, liveByPath } from './helpers/features';
+
 /**
  * Calm pages (M3). The fixture build copies the real `site.config.ts` (`FIXTURE_APPEARANCE`
  * overrides the preset of the copy) and every preset-driven check reads `html[data-appearance]`:
@@ -14,59 +16,65 @@ const presetOf = async (page: Page): Promise<Preset> => {
   return value;
 };
 
-const PAGES = [
-  '/',
-  '/notes/',
-  '/notes/smoke-es/',
-  '/me/',
-  '/experiments/',
-  '/contact/',
-  '/privacy/',
-  '/terms/',
-  '/changelog/',
-  '/subscribe/',
-  '/subscribe/confirm/',
-  '/subscribe/unsubscribe/',
-  '/en/',
-  '/en/notes/smoke-en/',
-  '/en/me/',
-  '/en/experiments/',
-  '/en/contact/',
-  '/en/privacy/',
-  '/en/terms/',
-  '/en/changelog/',
-  '/en/subscribe/',
-  '/en/subscribe/confirm/',
-  '/en/subscribe/unsubscribe/',
-  '/nope/',
-];
+const PAGES = liveByPath(
+  [
+    '/',
+    '/notes/',
+    '/notes/smoke-es/',
+    '/me/',
+    '/experiments/',
+    '/contact/',
+    '/privacy/',
+    '/terms/',
+    '/changelog/',
+    '/subscribe/',
+    '/subscribe/confirm/',
+    '/subscribe/unsubscribe/',
+    '/en/',
+    '/en/notes/smoke-en/',
+    '/en/me/',
+    '/en/experiments/',
+    '/en/contact/',
+    '/en/privacy/',
+    '/en/terms/',
+    '/en/changelog/',
+    '/en/subscribe/',
+    '/en/subscribe/confirm/',
+    '/en/subscribe/unsubscribe/',
+    '/nope/',
+  ],
+  (path) => path,
+);
 /** The pages that render a banner: the blend must be on every one of them. */
-const BANNER_PAGES = [
-  '/',
-  '/notes/',
-  '/notes/smoke-es/',
-  '/me/',
-  '/experiments/',
-  '/contact/',
-  '/privacy/',
-  '/terms/',
-  '/changelog/',
-  '/subscribe/',
-  '/subscribe/confirm/',
-  '/subscribe/unsubscribe/',
-  '/en/',
-  '/en/notes/smoke-en/',
-  '/en/me/',
-  '/en/experiments/',
-  '/en/contact/',
-  '/en/privacy/',
-  '/en/terms/',
-  '/en/changelog/',
-  '/en/subscribe/',
-  '/en/subscribe/confirm/',
-  '/en/subscribe/unsubscribe/',
-  '/nope/',
-];
+const BANNER_PAGES = liveByPath(
+  [
+    '/',
+    '/notes/',
+    '/notes/smoke-es/',
+    '/me/',
+    '/experiments/',
+    '/contact/',
+    '/privacy/',
+    '/terms/',
+    '/changelog/',
+    '/subscribe/',
+    '/subscribe/confirm/',
+    '/subscribe/unsubscribe/',
+    '/en/',
+    '/en/notes/smoke-en/',
+    '/en/me/',
+    '/en/experiments/',
+    '/en/contact/',
+    '/en/privacy/',
+    '/en/terms/',
+    '/en/changelog/',
+    '/en/subscribe/',
+    '/en/subscribe/confirm/',
+    '/en/subscribe/unsubscribe/',
+    '/nope/',
+  ],
+  (path) => path,
+);
 const THEMES = ['elvinlab-dark', 'elvinlab-light'];
 const FADE_HEIGHT = 120;
 /** `minimal` caps every page banner at 240 px (`--banner-page-cap`). */
@@ -184,11 +192,13 @@ test('the blend is in the served HTML, so the first paint needs no script', asyn
 });
 
 test('reading mode and the collapsed home keep a clean edge', async ({ page }) => {
-  await withTheme(page, 'elvinlab-dark', { 'reading-mode': '1' });
-  await page.goto('/notes/smoke-es/');
-  await expect(page.locator('[data-banner-fade]')).toBeHidden();
-  // The compact header has no floor: the title alone sizes it.
-  await expect(page.locator('[data-banner]')).toHaveCSS('min-height', '0px');
+  if (has({ flags: ['readingMode'] })) {
+    await withTheme(page, 'elvinlab-dark', { 'reading-mode': '1' });
+    await page.goto('/notes/smoke-es/');
+    await expect(page.locator('[data-banner-fade]')).toBeHidden();
+    // The compact header has no floor: the title alone sizes it.
+    await expect(page.locator('[data-banner]')).toHaveCSS('min-height', '0px');
+  }
 
   const collapsed = await page.context().newPage();
   await withTheme(collapsed, 'elvinlab-dark', { 'banner-expanded': '0' });
@@ -207,7 +217,7 @@ test('the banners follow the height caps of the preset', async ({ page }, testIn
   const expected = HOME_BANNER[preset];
   const home = (await page.locator('[data-banner]').boundingBox())?.height ?? 0;
   expect(home).toBe(testInfo.project.name === 'chromium-1280' ? expected.desktop : expected.phone);
-  for (const path of Object.keys(FULL_PAGE_BANNERS)) {
+  for (const path of liveByPath(Object.keys(FULL_PAGE_BANNERS), (key) => key)) {
     await page.goto(path);
     const minHeight = await page
       .locator('[data-banner]')

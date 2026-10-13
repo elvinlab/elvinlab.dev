@@ -1,5 +1,7 @@
 import { expect, type Page, test } from '@playwright/test';
 
+import { has } from './helpers/features';
+
 // Only the giscus origin is stubbed. The client script builds a frame like the real one and the
 // frame records the theme the page posts to it, so theme sync is observable end to end.
 const CLIENT_STUB = `
@@ -75,6 +77,7 @@ for (const { locale, path } of NOTES) {
     });
 
     test('follows the site theme toggle', async ({ page }) => {
+      test.skip(!has({ flags: ['themeToggle'] }), 'needs features.themeToggle');
       await page.goto(path);
       await page.locator('[data-comments]').scrollIntoViewIfNeeded();
       const frame = page.frameLocator('iframe.giscus-frame');

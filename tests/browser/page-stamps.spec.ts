@@ -1,19 +1,24 @@
 import { expect, test } from '@playwright/test';
 
+import { has, liveByPath } from './helpers/features';
+
 /**
  * One meaningful stamp in the shared page header of Experiments, Changelog and Contact, and in the
  * banner of the topic pages (DESIGN.md, "Notebook ink system", "Stamps"). The text says what the page
  * is. Pages that do not opt in (subscribe, privacy, terms) carry none.
  */
-const PAGES = [
-  ['/experiments/', 'EN PRUEBA'],
-  ['/en/experiments/', 'ON TEST'],
-  ['/changelog/', 'REGISTRO'],
-  ['/en/changelog/', 'LOG'],
-  ['/contact/', 'ESCRÍBEME'],
-  ['/en/contact/', 'WRITE ME'],
-  ['/notes/tag/pruebas/', 'ÍNDICE'],
-] as const;
+const PAGES = liveByPath(
+  [
+    ['/experiments/', 'EN PRUEBA'],
+    ['/en/experiments/', 'ON TEST'],
+    ['/changelog/', 'REGISTRO'],
+    ['/en/changelog/', 'LOG'],
+    ['/contact/', 'ESCRÍBEME'],
+    ['/en/contact/', 'WRITE ME'],
+    ['/notes/tag/pruebas/', 'ÍNDICE'],
+  ] as const,
+  ([path]) => path,
+);
 
 const WIDTHS = [360, 390, 768, 1280] as const;
 
@@ -85,6 +90,7 @@ for (const [path, text] of PAGES) {
 }
 
 test('the stamp is rotated 5 to 8 degrees and framed', async ({ page }) => {
+  test.skip(!has({ routes: ['changelog'] }), 'needs route changelog');
   await page.setViewportSize({ width: 1280, height: 900 });
   await page.goto('/changelog/');
   await page.emulateMedia({ reducedMotion: 'reduce' });

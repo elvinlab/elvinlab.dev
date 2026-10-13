@@ -1,5 +1,7 @@
 import { expect, type Page, type Route, test } from '@playwright/test';
 
+import { has } from './helpers/features';
+
 /**
  * The two big faces are not preloaded (`performance.spec.ts`), so a first visit paints in the
  * fallback and swaps once the woff2 arrives. `fonts.css` declares metric-matched fallbacks
@@ -99,10 +101,12 @@ for (const [path, width] of PAGES.flatMap((p) => WIDTHS.map((w) => [p, w] as con
       ]),
     );
     // Every footprint instance is revealed once its read answered: its final layout.
-    await page.waitForFunction(() => {
-      const marks = [...document.querySelectorAll('[data-marks]')];
-      return marks.length > 0 && marks.every((mark) => mark.hasAttribute('data-r'));
-    });
+    if (has({ flags: ['marks'] })) {
+      await page.waitForFunction(() => {
+        const marks = [...document.querySelectorAll('[data-marks]')];
+        return marks.length > 0 && marks.every((mark) => mark.hasAttribute('data-r'));
+      });
+    }
     await page.evaluate(
       () => new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve))),
     );

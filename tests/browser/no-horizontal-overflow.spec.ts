@@ -1,9 +1,14 @@
 import { expect, type Page, test } from '@playwright/test';
 
+import { liveByPath } from './helpers/features';
+
 /** WCAG 1.4.10 reflow: no page scrolls sideways at the narrowest supported widths. */
-const PATHS = ['/', '/me/', '/en/me/', '/experiments/', '/notes/', '/contact/', '/changelog/'];
+const PATHS = liveByPath(
+  ['/', '/me/', '/en/me/', '/experiments/', '/notes/', '/contact/', '/changelog/'],
+  (path) => path,
+);
 const WIDTHS = [320, 390, 768, 1024];
-const LARGE_FONT_PATHS = ['/', '/notes/', '/contact/', '/me/'];
+const LARGE_FONT_PATHS = liveByPath(['/', '/notes/', '/contact/', '/me/'], (path) => path);
 
 test.beforeEach(({ browserName: _browserName }, testInfo) => {
   test.skip(testInfo.project.name !== 'chromium-1280', 'each test sets its own viewport');

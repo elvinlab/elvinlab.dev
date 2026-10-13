@@ -1,5 +1,7 @@
 import { expect, type Locator, type Page, test } from '@playwright/test';
 
+import { has } from './helpers/features';
+
 /** Phone viewports: 360 is the narrowest supported width, 390 the design reference. */
 const PHONES = [
   { width: 360, height: 780 },
@@ -94,7 +96,9 @@ for (const phone of PHONES) {
 
     test('navbar controls are at least 44 x 44 and nothing overflows', async ({ page }) => {
       await page.goto('/');
-      for (const selector of ['[data-theme-toggle]', '[data-nav-toggle]']) {
+      for (const selector of has({ flags: ['themeToggle'] })
+        ? ['[data-theme-toggle]', '[data-nav-toggle]']
+        : ['[data-nav-toggle]']) {
         const box = await boxOf(page.locator(selector));
         expect(box.width, `${selector} width`).toBeGreaterThanOrEqual(MIN_TARGET);
         expect(box.height, `${selector} height`).toBeGreaterThanOrEqual(MIN_TARGET);

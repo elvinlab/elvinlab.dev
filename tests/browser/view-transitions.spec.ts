@@ -1,5 +1,7 @@
 import { expect, type Page, test } from '@playwright/test';
 
+import { has } from './helpers/features';
+
 /**
  * Cross-page view transitions (DESIGN.md "Page transitions"): CSS-only `@view-transition`, gated on
  * `prefers-reduced-motion: no-preference`. The suite default is `reduce`, so every motion test opts in.
@@ -155,6 +157,7 @@ test('back and forward restore the previous pages', async ({ page }) => {
 });
 
 test('the theme toggle stays in place: no navigation and no view transition', async ({ page }) => {
+  test.skip(!has({ flags: ['themeToggle'] }), 'needs features.themeToggle');
   await motion(page);
   await page.goto('/');
   const before = await page.evaluate(() => document.documentElement.dataset['theme']);

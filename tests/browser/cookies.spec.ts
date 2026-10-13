@@ -1,20 +1,25 @@
 import { expect, test } from '@playwright/test';
 
+import { liveByPath } from './helpers/features';
+
 // The privacy page says this site's own code sets no cookies. This test is what keeps that true:
 // every third-party origin is stubbed, so any cookie that shows up comes from the site itself.
-const PAGES = [
-  '/',
-  '/en/',
-  '/me/',
-  '/notes/',
-  '/notes/smoke-es/',
-  '/en/notes/smoke-en/',
-  '/contact/',
-  '/privacy/',
-  '/terms/',
-  '/changelog/',
-  '/smoke-missing-page/',
-];
+const PAGES = liveByPath(
+  [
+    '/',
+    '/en/',
+    '/me/',
+    '/notes/',
+    '/notes/smoke-es/',
+    '/en/notes/smoke-en/',
+    '/contact/',
+    '/privacy/',
+    '/terms/',
+    '/changelog/',
+    '/smoke-missing-page/',
+  ],
+  (path) => path,
+);
 
 test('the site sets no cookies of its own on any page', async ({ browser }) => {
   const context = await browser.newContext({ reducedMotion: 'no-preference' });

@@ -1,5 +1,7 @@
 import { expect, test } from '@playwright/test';
 
+import { has, liveByPath } from './helpers/features';
+
 /** Neither big face is preloaded: each one sat on the critical path of the simulated LCP and cost the
  * note page and /me/ their margin against the 2500 ms gate. They load on demand (`font-display: swap`). */
 const BODY_FONTS: RegExp[] = [];
@@ -9,20 +11,23 @@ const BIG_FONTS = [
 ];
 /** Pixelify Sans is preloaded wherever an H1 uses it (home hero, notes banner, `PageHeader`: experiments, contact, changelog, privacy, terms); never elsewhere. */
 const PIXEL_FONT = /pixelify-sans-latin-wght-normal.*\.woff2$/;
-const PAGES = [
-  { path: '/', preloads: [...BODY_FONTS, PIXEL_FONT] },
-  { path: '/en/', preloads: [...BODY_FONTS, PIXEL_FONT] },
-  { path: '/notes/', preloads: [...BODY_FONTS, PIXEL_FONT] },
-  { path: '/experiments/', preloads: [...BODY_FONTS, PIXEL_FONT] },
-  { path: '/en/experiments/', preloads: [...BODY_FONTS, PIXEL_FONT] },
-  { path: '/contact/', preloads: [...BODY_FONTS, PIXEL_FONT] },
-  { path: '/en/contact/', preloads: [...BODY_FONTS, PIXEL_FONT] },
-  { path: '/changelog/', preloads: [...BODY_FONTS, PIXEL_FONT] },
-  { path: '/en/changelog/', preloads: [...BODY_FONTS, PIXEL_FONT] },
-  { path: '/privacy/', preloads: [...BODY_FONTS, PIXEL_FONT] },
-  { path: '/en/terms/', preloads: [...BODY_FONTS, PIXEL_FONT] },
-  { path: '/notes/smoke-es/', preloads: BODY_FONTS },
-];
+const PAGES = liveByPath(
+  [
+    { path: '/', preloads: [...BODY_FONTS, PIXEL_FONT] },
+    { path: '/en/', preloads: [...BODY_FONTS, PIXEL_FONT] },
+    { path: '/notes/', preloads: [...BODY_FONTS, PIXEL_FONT] },
+    { path: '/experiments/', preloads: [...BODY_FONTS, PIXEL_FONT] },
+    { path: '/en/experiments/', preloads: [...BODY_FONTS, PIXEL_FONT] },
+    { path: '/contact/', preloads: [...BODY_FONTS, PIXEL_FONT] },
+    { path: '/en/contact/', preloads: [...BODY_FONTS, PIXEL_FONT] },
+    { path: '/changelog/', preloads: [...BODY_FONTS, PIXEL_FONT] },
+    { path: '/en/changelog/', preloads: [...BODY_FONTS, PIXEL_FONT] },
+    { path: '/privacy/', preloads: [...BODY_FONTS, PIXEL_FONT] },
+    { path: '/en/terms/', preloads: [...BODY_FONTS, PIXEL_FONT] },
+    { path: '/notes/smoke-es/', preloads: BODY_FONTS },
+  ],
+  ({ path }) => path,
+);
 /** The raw profile photo is a 59 KB PNG; the optimized variant must be far below that. */
 const RAW_AVATAR_BYTES = 59_000;
 
@@ -127,6 +132,7 @@ test.describe('prefetch', () => {
   });
 
   test('keyboard focus on an internal link prefetches its page', async ({ page }) => {
+    test.skip(!has({ routes: ['contact'] }), 'needs route contact');
     await page.goto('/', { waitUntil: 'networkidle' });
     await page.locator('[data-navbar]').getByRole('link', { name: 'Contacto' }).first().focus();
     await expect(page.locator('head link[rel="prefetch"][href$="/contact/"]')).toHaveCount(1);

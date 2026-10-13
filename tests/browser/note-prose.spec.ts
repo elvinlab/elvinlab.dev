@@ -1,5 +1,7 @@
 import { expect, type Page, test } from '@playwright/test';
 
+import { has } from './helpers/features';
+
 /** Automatic notebook treatment of note prose (DESIGN.md, "Notebook ink system"), against the fixture notes. */
 
 test.beforeEach(({ browserName: _browserName }, testInfo) => {
@@ -245,6 +247,7 @@ test('with motion allowed the link underline grows on hover', async ({ page }) =
 });
 
 test('reading mode keeps the counter inline and the ornaments quiet', async ({ page }) => {
+  test.skip(!has({ flags: ['readingMode'] }), 'needs features.readingMode');
   await page.setViewportSize({ width: 1280, height: 900 });
   await page.addInitScript(() => {
     try {

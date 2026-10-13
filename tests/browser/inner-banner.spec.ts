@@ -1,23 +1,28 @@
 import { expect, test } from '@playwright/test';
 
+import { liveByPath } from './helpers/features';
+
 /** One page of each type that wears the compact lab-paper header (`PageHeader`), in both locales. */
-const PAGES = [
-  { path: '/experiments/', title: 'Experimentos' },
-  { path: '/en/experiments/', title: 'Experiments' },
-  { path: '/contact/', title: 'Contacto' },
-  { path: '/en/contact/', title: 'Contact' },
-  { path: '/changelog/', title: 'Changelog' },
-  { path: '/en/changelog/', title: 'Changelog' },
-  { path: '/privacy/', title: 'Privacidad' },
-  { path: '/en/privacy/', title: 'Privacy' },
-  { path: '/terms/', title: 'Términos de uso' },
-  { path: '/en/terms/', title: 'Terms of use' },
-  { path: '/subscribe/', title: 'Lo que construyo, en tu correo.' },
-  { path: '/en/subscribe/', title: 'What I build, in your inbox.' },
-  { path: '/subscribe/confirm/', title: 'Confirmar suscripción' },
-  { path: '/en/subscribe/unsubscribe/', title: 'Unsubscribe' },
-  { path: '/nope/', title: 'Página no encontrada' },
-];
+const PAGES = liveByPath(
+  [
+    { path: '/experiments/', title: 'Experimentos' },
+    { path: '/en/experiments/', title: 'Experiments' },
+    { path: '/contact/', title: 'Contacto' },
+    { path: '/en/contact/', title: 'Contact' },
+    { path: '/changelog/', title: 'Changelog' },
+    { path: '/en/changelog/', title: 'Changelog' },
+    { path: '/privacy/', title: 'Privacidad' },
+    { path: '/en/privacy/', title: 'Privacy' },
+    { path: '/terms/', title: 'Términos de uso' },
+    { path: '/en/terms/', title: 'Terms of use' },
+    { path: '/subscribe/', title: 'Lo que construyo, en tu correo.' },
+    { path: '/en/subscribe/', title: 'What I build, in your inbox.' },
+    { path: '/subscribe/confirm/', title: 'Confirmar suscripción' },
+    { path: '/en/subscribe/unsubscribe/', title: 'Unsubscribe' },
+    { path: '/nope/', title: 'Página no encontrada' },
+  ],
+  ({ path }) => path,
+);
 const PRINTED = PAGES.filter(({ path }) => /\/(privacy|terms)\//.test(path));
 
 test.beforeEach(({ browserName: _browserName }, testInfo) => {

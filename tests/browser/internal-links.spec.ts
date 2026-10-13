@@ -1,11 +1,16 @@
 import { expect, test } from '@playwright/test';
 
+import { liveByPath } from './helpers/features';
+
 /**
  * Every internal link on the key pages must resolve. A link built for a locale that has no such
  * page (for example "All notes" pointing at `/en/notes/`, while the notes index only exists at
  * `/notes/`) is a 404 that no other check notices.
  */
-const PAGES = ['/', '/en/', '/me/', '/en/me/', '/notes/', '/contact/', '/en/contact/'];
+const PAGES = liveByPath(
+  ['/', '/en/', '/me/', '/en/me/', '/notes/', '/contact/', '/en/contact/'],
+  (path) => path,
+);
 
 test.beforeEach(({ browserName: _browserName }, testInfo) => {
   test.skip(testInfo.project.name !== 'chromium-1280', 'links do not depend on the viewport width');

@@ -1,16 +1,23 @@
 import { expect, test } from '@playwright/test';
 
+import { has, seedTheme } from './helpers/features';
+
 const html = (page: import('@playwright/test').Page) => page.locator('html');
 
 test('the stored theme is applied on first paint (no flash)', async ({ page }) => {
+  test.skip(
+    !has({ flags: ['themeToggle'] }),
+    'needs features.themeToggle: the stored choice is forgotten without it',
+  );
   // A stored light preference must win before paint, even though the default theme is dark.
-  await page.addInitScript(() => localStorage.setItem('theme', 'elvinlab-light'));
+  await seedTheme(page, 'elvinlab-light');
   await page.goto('/', { waitUntil: 'commit' });
   // The inline pre-paint script runs synchronously in <head>, so the attribute is already correct.
   await expect(html(page)).toHaveAttribute('data-theme', 'elvinlab-light');
 });
 
 test('the theme toggle switches and persists across reloads', async ({ page }) => {
+  test.skip(!has({ flags: ['themeToggle'] }), 'needs features.themeToggle');
   await page.goto('/');
   const before = await html(page).getAttribute('data-theme');
   await page.getByRole('button', { name: /cambiar tema|switch theme/i }).click();

@@ -1,7 +1,10 @@
 import { expect, type Page, test } from '@playwright/test';
 
 import { describeViolations, scan } from './helpers/axe';
+import { requires } from './helpers/features';
 import { stubThirdParties } from './helpers/third-party';
+
+requires({ flags: ['readingMode'], routes: ['notes'] });
 
 const NOTES = [
   { path: '/notes/smoke-es/', toggle: 'Modo lectura', exit: 'Salir del modo lectura' },

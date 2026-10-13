@@ -1,7 +1,9 @@
 import { expect, test } from '@playwright/test';
 
+import { liveByPath } from './helpers/features';
+
 /** The brand icon sits next to the wordmark in the navbar and the footer: decorative, still at rest. */
-for (const path of ['/', '/en/', '/notes/', '/contact/']) {
+for (const path of liveByPath(['/', '/en/', '/notes/', '/contact/'], (p) => p)) {
   test(`${path} shows the brand icon in the navbar and the footer, still and decorative`, async ({
     page,
   }) => {

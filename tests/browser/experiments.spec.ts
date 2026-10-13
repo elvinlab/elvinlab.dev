@@ -1,5 +1,7 @@
 import { expect, type Page, test } from '@playwright/test';
 
+import { has, seedTheme } from './helpers/features';
+
 /**
  * The experiments page and the compact experiments block on `/me`. The fixture build copies the real `experiments.json`;
  * it holds only fixture notes, so `dropUnavailableProjectNotes` removes the `note` of an entry
@@ -20,7 +22,7 @@ for (const { path } of PAGES) {
     test(`${path} featured glow stays inside 820px in ${theme}`, async ({ page }) => {
       await page.setViewportSize({ width: 820, height: 900 });
       await page.emulateMedia({ reducedMotion: 'reduce' });
-      await page.addInitScript((value) => localStorage.setItem('theme', value), theme);
+      await seedTheme(page, theme);
       await page.goto(path);
       await page.evaluate(() => document.fonts.ready);
       await expect(page.locator('html')).toHaveAttribute('data-theme', theme);
@@ -144,6 +146,7 @@ test('the second piece shows its screenshot lazily with alternative text and exp
 });
 
 test('the page title stays inside the page-title scale of the sibling pages', async ({ page }) => {
+  test.skip(!has({ routes: ['contact'] }), 'needs route contact');
   const size = async (path: string) =>
     page.goto(path).then(() =>
       page

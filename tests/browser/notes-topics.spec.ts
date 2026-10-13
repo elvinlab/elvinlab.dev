@@ -1,6 +1,7 @@
 import { expect, test } from '@playwright/test';
 
 import { describeViolations, scan } from './helpers/axe';
+import { seedTheme } from './helpers/features';
 import { stubThirdParties } from './helpers/third-party';
 
 // `tests/fixtures/topics.json` defines one topic, `pruebas`, over the tag `testing`, which both
@@ -95,7 +96,7 @@ test('an unknown topic is a 404', async ({ request }) => {
 
 for (const theme of ['elvinlab-dark', 'elvinlab-light']) {
   test(`the topic page has no axe violations (${theme})`, async ({ page }) => {
-    await page.addInitScript((t) => localStorage.setItem('theme', t), theme);
+    await seedTheme(page, theme);
     await page.goto(TOPIC);
     await expect(page.locator('html')).toHaveAttribute('data-theme', theme);
     await expect(page.getByRole('heading', { level: 1 })).toBeVisible();

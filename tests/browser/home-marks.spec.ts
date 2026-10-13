@@ -1,7 +1,10 @@
 import { expect, type Page, test } from '@playwright/test';
 
 import { describeViolations, scan } from './helpers/axe';
+import { requires, seedTheme } from './helpers/features';
 import { stubThirdParties } from './helpers/third-party';
+
+requires({ flags: ['marks'] });
 
 /**
  * The footprint card of the home page. Like marks.spec.ts, the fixture build has no D1 binding, so
@@ -146,7 +149,7 @@ for (const home of HOMES) {
 
 for (const theme of ['elvinlab-dark', 'elvinlab-light']) {
   test(`the home with the footprint card has no axe violations (${theme})`, async ({ page }) => {
-    await page.addInitScript((t) => localStorage.setItem('theme', t), theme);
+    await seedTheme(page, theme);
     await mockMarks(page, { total: 12 });
     await page.goto('/');
     await expect(page.locator('html')).toHaveAttribute('data-theme', theme);

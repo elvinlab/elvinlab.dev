@@ -1,7 +1,10 @@
 import { expect, type Locator, type Page, test } from '@playwright/test';
 
 import { describeViolations, scan } from './helpers/axe';
+import { requires, seedTheme } from './helpers/features';
 import { stubThirdParties } from './helpers/third-party';
+
+requires({ flags: ['marks'], routes: ['notes'] });
 
 /**
  * The footprint button of a note. The fixture build has no D1 binding, so the Actions are mocked
@@ -276,7 +279,7 @@ test.describe('motion', () => {
 
 for (const theme of ['elvinlab-dark', 'elvinlab-light']) {
   test(`the note with the footprint buttons has no axe violations (${theme})`, async ({ page }) => {
-    await page.addInitScript((t) => localStorage.setItem('theme', t), theme);
+    await seedTheme(page, theme);
     await mockMarks(page, { total: 12 });
     await page.goto('/notes/smoke-es/');
     await expect(page.locator('html')).toHaveAttribute('data-theme', theme);
@@ -376,7 +379,7 @@ for (const tip of PRIVACY_TIPS) {
 
 for (const theme of ['elvinlab-dark', 'elvinlab-light']) {
   test(`the open privacy tooltip has no axe violations (${theme})`, async ({ page }) => {
-    await page.addInitScript((t) => localStorage.setItem('theme', t), theme);
+    await seedTheme(page, theme);
     await mockMarks(page, { total: 12 });
     await page.goto('/notes/smoke-es/');
     await expect(page.locator('html')).toHaveAttribute('data-theme', theme);

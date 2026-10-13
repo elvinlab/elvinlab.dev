@@ -1,7 +1,7 @@
 import { expect, type Page, test } from '@playwright/test';
 
 import { describeViolations, scan } from './helpers/axe';
-import { livePages, requires } from './helpers/features';
+import { livePages, requires, seedTheme } from './helpers/features';
 import { stubThirdParties } from './helpers/third-party';
 
 const NOTES = [
@@ -156,7 +156,7 @@ for (const { path, label, experiments } of NOTES) {
 
     for (const theme of ['elvinlab-dark', 'elvinlab-light']) {
       test(`has no axe violations with the card open (${theme})`, async ({ page }) => {
-        await page.addInitScript((t) => localStorage.setItem('theme', t), theme);
+        await seedTheme(page, theme);
         await shortViewport(page);
         await page.goto(path);
         await readTo(page, 'article', 0.8);

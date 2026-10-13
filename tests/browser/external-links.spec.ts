@@ -1,6 +1,7 @@
 import { expect, test } from '@playwright/test';
 
 import { siteConfig } from '../../apps/web/src/site.config';
+import { liveByPath } from './helpers/features';
 
 /**
  * Links that leave the site open in a new tab (so the visitor keeps their place in the blog),
@@ -19,23 +20,26 @@ const OWN_DOMAIN = new URL(siteConfig.url).hostname.replace(/^www\./, '');
 
 const HINTS = { es: /se abre en una pestaña nueva/, en: /opens in a new tab/ } as const;
 
-const PAGES = [
-  '/',
-  '/en/',
-  '/me/',
-  '/en/me/',
-  '/notes/',
-  '/notes/smoke-es/',
-  '/en/notes/smoke-en/',
-  '/contact/',
-  '/en/contact/',
-  '/changelog/',
-  '/en/changelog/',
-  '/privacy/',
-  '/en/privacy/',
-  '/terms/',
-  '/en/terms/',
-];
+const PAGES = liveByPath(
+  [
+    '/',
+    '/en/',
+    '/me/',
+    '/en/me/',
+    '/notes/',
+    '/notes/smoke-es/',
+    '/en/notes/smoke-en/',
+    '/contact/',
+    '/en/contact/',
+    '/changelog/',
+    '/en/changelog/',
+    '/privacy/',
+    '/en/privacy/',
+    '/terms/',
+    '/en/terms/',
+  ],
+  (path) => path,
+);
 
 /** Pages that must show at least one external link, so the check cannot pass on an empty set. */
 const MUST_HAVE_EXTERNAL = [

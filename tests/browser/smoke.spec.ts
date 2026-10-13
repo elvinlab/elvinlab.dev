@@ -1,5 +1,7 @@
 import { expect, test } from '@playwright/test';
 
+import { liveByPath } from './helpers/features';
+
 for (const { locale, prefix, slug } of [
   { locale: 'es', prefix: '', slug: 'smoke-es' },
   { locale: 'en', prefix: '/en', slug: 'smoke-en' },
@@ -102,10 +104,13 @@ for (const { locale, path } of [
   });
 }
 
-const CONTACT_PAGES = [
-  { locale: 'es' as const, path: '/contact/' },
-  { locale: 'en' as const, path: '/en/contact/' },
-];
+const CONTACT_PAGES = liveByPath(
+  [
+    { locale: 'es' as const, path: '/contact/' },
+    { locale: 'en' as const, path: '/en/contact/' },
+  ],
+  ({ path }) => path,
+);
 
 test('locale suggestion stays in document flow and only appears for a locale mismatch', async ({
   page,
@@ -259,10 +264,13 @@ for (const { locale, path } of CONTACT_PAGES) {
   });
 }
 
-const CHANGELOG_PAGES = [
-  { locale: 'es' as const, path: '/changelog/' },
-  { locale: 'en' as const, path: '/en/changelog/' },
-];
+const CHANGELOG_PAGES = liveByPath(
+  [
+    { locale: 'es' as const, path: '/changelog/' },
+    { locale: 'en' as const, path: '/en/changelog/' },
+  ],
+  ({ path }) => path,
+);
 
 for (const { locale, path } of CHANGELOG_PAGES) {
   test(`${path} renders the changelog and is linked from the footer`, async ({ page }) => {

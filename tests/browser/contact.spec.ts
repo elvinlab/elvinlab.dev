@@ -1,5 +1,9 @@
 import { expect, type Page, test } from '@playwright/test';
 
+import { requires } from './helpers/features';
+
+requires({ flags: ['contact'], routes: ['contact'] });
+
 // Only the third-party script is stubbed; the Action runs for real. The fixture preview has no
 // Cloudflare bindings, so the Action answers SERVICE_UNAVAILABLE.
 const TURNSTILE_STUB = `

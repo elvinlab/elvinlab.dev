@@ -1,6 +1,7 @@
 import { expect, type Page, test } from '@playwright/test';
 
 import { describeViolations, scan } from './helpers/axe';
+import { has, seedTheme } from './helpers/features';
 import { stubThirdParties } from './helpers/third-party';
 
 const PAGES = ['/', '/notes/smoke-es/', '/me/', '/en/notes/smoke-en/'];
@@ -281,6 +282,7 @@ test.describe('back to top', () => {
   }
 
   test('stays clear of the reading mode exit button', async ({ page }) => {
+    test.skip(!has({ flags: ['readingMode'] }), 'needs features.readingMode');
     await page.goto('/notes/smoke-es/');
     await page.locator('[data-reading-toggle]').click();
     await expect(page.locator('[data-reading-exit]')).toBeVisible();
@@ -297,7 +299,7 @@ test.describe('back to top', () => {
 
   for (const theme of ['elvinlab-dark', 'elvinlab-light']) {
     test(`has no axe violations while shown (${theme})`, async ({ page }) => {
-      await page.addInitScript((t) => localStorage.setItem('theme', t), theme);
+      await seedTheme(page, theme);
       await page.goto('/notes/smoke-es/');
       await expect(page.locator('html')).toHaveAttribute('data-theme', theme);
       await reveal(page);

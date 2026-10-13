@@ -1,5 +1,7 @@
 import { expect, type Page, test } from '@playwright/test';
 
+import { has } from './helpers/features';
+
 test('the background picker cycles galaxy -> cursor-waves -> off at runtime, no reload, from the paper default', async ({
   browser,
 }) => {
@@ -284,7 +286,9 @@ test.describe('background picker visibility', () => {
       // The picker only runs a fine-pointer effect, so the premise is a coarse primary pointer.
       expect(await page.evaluate(() => matchMedia('(pointer: coarse)').matches)).toBe(true);
       await expect(page.locator(PICKER)).toBeHidden();
-      expect(await gapAfterThemeToggle(page, '[data-nav-toggle]')).toBe(NAVBAR_GAP_PX);
+      if (has({ flags: ['themeToggle'] })) {
+        expect(await gapAfterThemeToggle(page, '[data-nav-toggle]')).toBe(NAVBAR_GAP_PX);
+      }
       expect(
         await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth),
       ).toBe(true);
@@ -315,7 +319,9 @@ test.describe('background picker visibility', () => {
     const page = await context.newPage();
     await page.goto('/');
     await expect(page.locator(PICKER)).toBeHidden();
-    expect(await gapAfterThemeToggle(page, '[data-nav-toggle]')).toBe(NAVBAR_GAP_PX);
+    if (has({ flags: ['themeToggle'] })) {
+      expect(await gapAfterThemeToggle(page, '[data-nav-toggle]')).toBe(NAVBAR_GAP_PX);
+    }
     await context.close();
   });
 });
