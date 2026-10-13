@@ -1,6 +1,6 @@
 import { expect, type Page, test } from '@playwright/test';
 
-import { has, requires, seedTheme } from './helpers/features';
+import { has, profile, requires, seedTheme } from './helpers/features';
 import { themes } from './helpers/site';
 
 requires({ routes: ['notes'] });
@@ -74,6 +74,8 @@ test('an image in the body of a note is framed like the site cards and never wid
 });
 
 test('on the notes index the language badge sits on the same row as the date', async ({ page }) => {
+  // The calm preset (`minimal`) moves the language badge to the foot of the row on purpose.
+  test.skip(profile.appearance === 'minimal', 'the minimal preset puts the badge at the foot');
   await page.goto('/notes/');
   const row = page.locator('[data-note-row]').first();
   const date = await row.locator('time').boundingBox();

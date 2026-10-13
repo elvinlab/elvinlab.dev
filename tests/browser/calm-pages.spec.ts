@@ -110,7 +110,7 @@ const HOME_BANNER: Record<Preset, { desktop: number; phone: number }> = {
   minimal: { desktop: 432, phone: 384 },
   full: { desktop: 504, phone: 480 },
 };
-/** Lines the pixel hero wraps to on desktop: both presets widen the measure (22ch minimal, 24ch full) to two lines. */
+/** Lines the pixel hero wraps to on desktop: both presets use a 24ch measure, which keeps the headline to two lines. */
 const HERO_LINES: Record<Preset, number> = { minimal: 2, full: 2 };
 /**
  * Decision record, in px: `--record-*` of `calm-layout.css`. `phoneGap` is the stacked row gap.

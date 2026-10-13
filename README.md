@@ -126,6 +126,7 @@ Más allá de los interruptores:
 - **Secciones de la home** (`home`): pills del hero, tarjeta de autor, tarjeta de contratación, huellas, tarjeta "Now", pilares, índice del cuaderno y experimentos, cada una encendida o apagada. El preset `appearance` (`minimal` o `full`) fija el punto de partida.
 - **Colores, radios y tipografías**: `packages/core/src/tokens/tokens.json`. **Efecto del banner**: `background`. **Aviso del sitio**: `notice`.
 - **Textos**: tu nombre, bio y enlaces en `site.config.ts`; las notas y las entradas del portafolio en `apps/web/src/content/`; los textos de interfaz (ES/EN) en `apps/web/src/shared/i18n/index.ts`; privacidad y términos en sus `content.ts`.
+- **Longitud de los textos**: cada texto de la interfaz y 26 campos visibles de `site.config.ts` tienen una longitud máxima, en español e inglés, comprobada por tests, así que un texto más largo falla con su nombre en vez de desbordar. Tabla en [`docs/CONFIGURATION.md`](docs/CONFIGURATION.md#cambiar-un-texto-límites-de-longitud-español-e-inglés).
 
 Estos interruptores y secciones de la home son todo lo configurable hoy; el resto del diseño es código. La referencia completa, con cada clave y su valor por defecto, está en [`docs/CONFIGURATION.md`](docs/CONFIGURATION.md#62-activar-o-apagar-funciones).
 
@@ -204,7 +205,7 @@ Se trabaja en `develop` con push libre. El release es un push a `main`, que disp
 
 El sitio está pensado para que otra persona lo adopte reemplazando `site.config.ts`, el contenido y las imágenes de `public/`. La receta completa y su verificación están en [la guía](docs/CONFIGURATION.md#10-usar-este-sitio-como-base-para-otra-persona-white-label).
 
-> **Límite conocido (comprobado el 2026-10-12): apagar funciones rompe el e2e.** Las comprobaciones estáticas pasan con funciones apagadas, pero las pruebas de navegador de `tests/browser/` dan por hecho el conjunto de funciones y las URL de este sitio y no leen `site.config.ts`. Con seis interruptores apagados fallaron 208 de unas 790 pruebas e2e, y el CI solo despliega si pasan sus comprobaciones. Quien adopte el proyecto debe borrar o adaptar las pruebas de cada función que apague (y de cada texto de interfaz que cambie) hasta que la suite aprenda a seguir la config. Detalle en [la guía](docs/CONFIGURATION.md#10-usar-este-sitio-como-base-para-otra-persona-white-label).
+**El CI sigue tu configuración.** Apagar funciones (o cambiar un nombre, un texto o la paleta) no exige editar pruebas: las pruebas de navegador leen qué está encendido y se saltan lo que está apagado. Cuatro escenarios de adopción (`quiet`, `blog-only`, `me-only`, `bare`) corren toda la suite con `pnpm test:profiles`, y un trabajo del CI los corre sin bloquear el release. Los textos tienen límites de longitud en ambos idiomas para que no desborden. Detalle en [la guía](docs/CONFIGURATION.md#10-usar-este-sitio-como-base-para-otra-persona-white-label) y en [TESTING.md](docs/TESTING.md#the-suite-follows-the-config-adopter-profiles).
 
 ## Estado y licencia
 

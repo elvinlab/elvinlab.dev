@@ -126,6 +126,7 @@ Beyond the switches:
 - **Home sections** (`home`): hero pills, author card, hiring card, footprints, "Now" card, pillars, notebook index and experiments, each on or off. The `appearance` preset (`minimal` or `full`) sets the starting point.
 - **Colors, radii and fonts**: `packages/core/src/tokens/tokens.json`. **Banner effect**: `background`. **Site notice**: `notice`.
 - **Texts**: your name, bio and links in `site.config.ts`; notes and portfolio entries in `apps/web/src/content/`; interface texts (ES/EN) in `apps/web/src/shared/i18n/index.ts`; privacy and terms in their `content.ts`.
+- **Text lengths**: every interface text and 26 visible fields of `site.config.ts` have a maximum length, in Spanish and English, checked by tests, so a longer text fails with its name instead of overflowing. Table in [`docs/CONFIGURATION.en.md`](docs/CONFIGURATION.en.md#changing-a-text-length-limits-spanish-and-english).
 
 These switches and home sections are everything configurable today; the rest of the layout is code. The full reference, with every key and default, is in [`docs/CONFIGURATION.en.md`](docs/CONFIGURATION.en.md#62-turning-features-on-or-off).
 
@@ -204,7 +205,7 @@ Work happens on `develop` with free pushes. A release is a push to `main`, which
 
 The site is meant to be adopted by someone else by replacing `site.config.ts`, the content and the images in `public/`. The full recipe and how to verify it are in [the guide](docs/CONFIGURATION.en.md#10-using-this-site-as-a-base-for-someone-else-white-label).
 
-> **Known limit (checked on 2026-10-12): turning features off breaks the e2e suite.** The static gates (typecheck, lint, unit tests, architecture, build, JavaScript and page-weight budgets, `pnpm test:white-label`) pass with features off, but the browser specs under `tests/browser/` assume this site's feature set and URLs: they do not read `site.config.ts`. With six switches off (`readingMode`, `marks`, `contact`, `changelog`, `experimentNudge`, `themeToggle`) 208 of about 790 e2e tests failed. The CI deploys only when its gates pass, so an adopter has to delete or adapt the specs of every feature they turn off (and of every UI text they change, because the specs read some of them) until the suite learns to follow the config. Colors are safer, but `a11y.spec.ts` will flag a palette without enough contrast, on purpose.
+**The CI follows your configuration.** Switching features off (or changing a name, a text or the palette) does not require editing tests: the browser specs read what is on and skip what is off. Four adopter scenarios (`quiet`, `blog-only`, `me-only`, `bare`) run the whole suite with `pnpm test:profiles`, and a CI job runs them without blocking the release. Texts have length limits in both languages so they cannot overflow. Details in [the guide](docs/CONFIGURATION.en.md#10-using-this-site-as-a-base-for-someone-else-white-label) and [TESTING.md](docs/TESTING.md#the-suite-follows-the-config-adopter-profiles).
 
 ## Status and license
 

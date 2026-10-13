@@ -692,6 +692,14 @@ El sitio está pensado para que otra persona lo adopte **solo cambiando configur
 4. Pon tus secretos de Cloudflare (sección 6.7) y tus variables de CI (sección 7).
 5. Verifica: `pnpm test:white-label` construye el sitio con una identidad alternativa y **falla si se filtra una sola cadena del dueño original**.
 
-> **Límite conocido (comprobado el 2026-10-12): apagar funciones rompe el e2e.** Las comprobaciones estáticas (tipos, lint, pruebas unitarias, arquitectura, build, presupuestos de JavaScript y de peso, `pnpm test:white-label`) pasan con funciones apagadas, pero las pruebas de navegador de `tests/browser/` dan por hecho el conjunto de funciones y las URL de este sitio: no leen `site.config.ts`. Con seis interruptores apagados (`readingMode`, `marks`, `contact`, `changelog`, `experimentNudge`, `themeToggle`) fallaron 208 de unas 790 pruebas e2e. El CI solo despliega si pasan sus comprobaciones, así que quien adopte el proyecto debe borrar o adaptar las pruebas de cada función que apague (y de cada texto de interfaz que cambie, porque las pruebas leen algunos) hasta que la suite aprenda a seguir la config. Los colores son más seguros, pero `a11y.spec.ts` marcará una paleta sin suficiente contraste, a propósito.
+#### Qué hace el CI con tus cambios
+
+El pipeline sigue tu configuración; no deberías tener que editar pruebas para apagar cosas.
+
+- **Funciones apagadas.** Las pruebas de navegador leen qué funciones están encendidas y **se saltan** lo que está apagado, con el motivo. Cuatro escenarios de adopción corren toda la suite contra este sitio con funciones apagadas (`quiet`, `blog-only`, `me-only`, `bare`): `pnpm test:profiles` los corre en local y un trabajo del CI los corre en paralelo con el resto sin bloquear el release. Ver [TESTING.md](TESTING.md#the-suite-follows-the-config-adopter-profiles).
+- **Nombre, dominio, bio, redes y nombres de tema.** Las pruebas los leen de `site.config.ts` y de `tokens.json`; un test unitario (`pnpm test`) falla si una prueba escribe alguno a mano.
+- **Textos de la interfaz, en español e inglés.** Las pruebas los leen del diccionario, y cada texto tiene un límite de longitud para que no desborde un botón ni parta un menú: ver [6.10](#cambiar-un-texto-límites-de-longitud-español-e-inglés).
+- **Colores.** Cambiá `tokens.json`. La prueba de accesibilidad (`a11y.spec.ts`) revisa el contraste en ambos temas, así que una paleta sin suficiente contraste falla a propósito; ninguna prueba compara contra un color copiado.
+- **Lo que sí te toca.** Reemplazar el contenido y las imágenes (paso 2), poner tus secretos (paso 4) y correr la comprobación white-label (paso 5). Las pruebas de navegador construyen el sitio con sus propias notas de fixture, así que tus notas reales no tienen que coincidir con nada.
 
 Este proyecto aún no incluye un archivo de licencia; antes de que otra persona lo reutilice, define bajo qué licencia se comparte.

@@ -44,13 +44,12 @@ describe('liveLighthouseUrls', () => {
     expect(live).toContain('/me/');
   });
 
-  it('keeps the pages that are always built when everything optional is off', () => {
-    expect(paths(liveLighthouseUrls(committed, profileOf('bare')))).toEqual([
-      '/',
-      '/en/',
-      '/me/',
-      '/en/me/',
-    ]);
+  it('does not audit /me/ when its feature is off: it is noindex on purpose', () => {
+    expect(paths(liveLighthouseUrls(committed, profileOf('blog-only')))).not.toContain('/me/');
+  });
+
+  it('keeps only the home pages when everything optional is off, because /me/ is noindex without its flag', () => {
+    expect(paths(liveLighthouseUrls(committed, profileOf('bare')))).toEqual(['/', '/en/']);
   });
 
   it('fails loudly on a URL nobody decided about', () => {

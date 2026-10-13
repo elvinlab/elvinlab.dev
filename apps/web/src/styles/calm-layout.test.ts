@@ -81,7 +81,7 @@ describe('calm layout: minimal is the calm preset', () => {
 
   it('widens the hero measure from md so the pixel hero wraps to two lines', () => {
     expect(base.get(MINIMAL)).toMatchObject({ '--hero-measure': '16ch' });
-    expect(md.get(MINIMAL)).toMatchObject({ '--hero-measure': '22ch' });
+    expect(md.get(MINIMAL)).toMatchObject({ '--hero-measure': '24ch' });
   });
 
   it('compacts the decision record: tighter padding and gaps, 13 px labels, 14 px body', () => {

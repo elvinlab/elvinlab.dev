@@ -1,7 +1,7 @@
 import { expect, test } from '@playwright/test';
 
 import { has, liveByPath } from './helpers/features';
-import { escapeRegExp, site, text } from './helpers/site';
+import { escapeRegExp, site, text, themes, tokenRgb } from './helpers/site';
 
 for (const { locale, prefix, slug } of [
   { locale: 'es', prefix: '', slug: 'smoke-es' },
@@ -188,7 +188,10 @@ test('the locale suggestion is a quiet line of text, not a card', async ({ page 
   await expect(hint).toBeVisible();
   await expect(hint).toHaveCSS('background-color', 'rgba(0, 0, 0, 0)');
   await expect(hint).toHaveCSS('font-size', '13px');
-  await expect(hint.locator('a')).not.toHaveCSS('background-color', /rgb\(124, 58, 237\)/);
+  await expect(hint.locator('a')).not.toHaveCSS(
+    'background-color',
+    tokenRgb(themes.default, 'button'),
+  );
 });
 
 test('English pages never suggest switching to Spanish, whatever the browser prefers', async ({

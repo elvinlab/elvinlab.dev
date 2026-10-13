@@ -9,8 +9,10 @@ import { type E2eNeeds, type E2eProfile, missingNeeds } from './e2e-features.ts'
 export const LIGHTHOUSE_NEEDS: Readonly<Record<string, E2eNeeds>> = {
   '/': {},
   '/en/': {},
-  '/me/': {},
-  '/en/me/': {},
+  // `/me/` is always built but turns noindex without `features.me`, and Lighthouse SEO (a minimum
+  // score) fails a page that blocks itself from indexing: audit it only when it is meant to be found.
+  '/me/': { flags: ['me'] },
+  '/en/me/': { flags: ['me'] },
   '/experiments/': { routes: ['experiments'] },
   '/notes/': { routes: ['notes'] },
   '/notes/smoke-es/': { routes: ['notes'] },

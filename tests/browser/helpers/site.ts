@@ -29,7 +29,10 @@ export const identityIn = (locale: 'es' | 'en') => ({
   bio: siteConfig.identity.bio[locale] ?? '',
 });
 
-type Tokens = { defaultTheme: string; themes: Record<string, { scheme: 'dark' | 'light' }> };
+type Tokens = {
+  defaultTheme: string;
+  themes: Record<string, { scheme: 'dark' | 'light'; colors: Record<string, string> }>;
+};
 const tokens = JSON.parse(
   readFileSync(new URL('../../../packages/core/src/tokens/tokens.json', import.meta.url), 'utf8'),
 ) as Tokens;
@@ -103,3 +106,17 @@ export const nowIn = (locale: 'es' | 'en') => {
     focus: now?.items?.[0]?.text[locale] ?? '',
   };
 };
+
+/**
+ * A color of the palette as the browser reports it (`rgb(r, g, b)`), read from `tokens.json`:
+ * `tokenRgb(themes.default, 'button')`. A spec that compares against a brand color uses this, never
+ * a copied value, so a new palette keeps the comparison meaningful instead of silently empty.
+ */
+export function tokenRgb(theme: string, name: string): string {
+  const color = tokens.themes[theme]?.colors[name];
+  if (!color || !/^#[0-9a-f]{6}$/i.test(color)) {
+    throw new Error(`tokens.json has no #rrggbb color "${name}" in the theme "${theme}"`);
+  }
+  const [red, green, blue] = [1, 3, 5].map((at) => Number.parseInt(color.slice(at, at + 2), 16));
+  return `rgb(${red}, ${green}, ${blue})`;
+}

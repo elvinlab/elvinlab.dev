@@ -692,6 +692,14 @@ The site is meant to be adopted by someone else by **changing only configuration
 4. Set your Cloudflare secrets (section 6.7) and your CI variables (section 7).
 5. Verify: `pnpm test:white-label` builds the site with an alternative identity and **fails if a single string of the original owner leaks**.
 
-> **Known limit (checked on 2026-10-12): turning features off breaks the e2e suite.** The static gates (typecheck, lint, unit tests, architecture, build, JavaScript and page-weight budgets, `pnpm test:white-label`) pass with features off, but the browser specs under `tests/browser/` assume this site's feature set and URLs: they do not read `site.config.ts`. With six switches off (`readingMode`, `marks`, `contact`, `changelog`, `experimentNudge`, `themeToggle`) 208 of about 790 e2e tests failed. The CI deploys only when its gates pass, so an adopter has to delete or adapt the specs of every feature they turn off (and of every UI text they change, because the specs read some of them) until the suite learns to follow the config. Colors are safer, but `a11y.spec.ts` will flag a palette without enough contrast, on purpose.
+#### What the CI does with your changes
+
+The pipeline follows your configuration; you should not have to edit tests to switch things off.
+
+- **Features off.** The browser specs read which features are on and **skip** what is off, with the reason. Four adopter scenarios run the whole suite against this site with features switched off (`quiet`, `blog-only`, `me-only`, `bare`): `pnpm test:profiles` runs them locally, and a CI job runs them in parallel with the rest without blocking the release. See [TESTING.md](TESTING.md#the-suite-follows-the-config-adopter-profiles).
+- **Name, domain, bio, socials, theme names.** The specs read them from `site.config.ts` and `tokens.json`; a unit test (`pnpm test`) fails if a spec writes one out.
+- **Interface texts, Spanish and English.** The specs read them from the dictionary, and every text has a length limit so it cannot overflow a button or wrap a menu: see [6.10](#changing-a-text-length-limits-spanish-and-english).
+- **Colors.** Change `tokens.json`. The accessibility spec (`a11y.spec.ts`) checks contrast in both themes, so a palette without enough contrast fails on purpose; no spec compares against a copied color.
+- **What you still do.** Replace the content and the images (step 2), set your secrets (step 4) and run the white-label check (step 5). The browser specs build the site with their own fixture notes, so your real notes do not have to match anything.
 
 This project does not include a license file yet; before someone else reuses it, decide under which license it is shared.

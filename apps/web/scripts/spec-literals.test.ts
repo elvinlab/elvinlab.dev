@@ -73,8 +73,19 @@ function forbidden(): Map<string, string> {
   each('site.config me.intro', config.me?.intro, 5);
   const tokens = JSON.parse(
     readFileSync(join(root, 'packages/core/src/tokens/tokens.json'), 'utf8'),
-  ) as { themes: Record<string, unknown> };
-  for (const theme of Object.keys(tokens.themes)) add('tokens.json theme id', theme, 5);
+  ) as { themes: Record<string, { colors: Record<string, string> }> };
+  for (const [theme, definition] of Object.entries(tokens.themes)) {
+    add('tokens.json theme id', theme, 5);
+    // The palette: a spec compares against a token through `helpers/site.ts`, never a copied color.
+    for (const [name, color] of Object.entries(definition.colors)) {
+      if (!/^#[0-9a-f]{6}$/i.test(color)) continue;
+      const [red, green, blue] = [1, 3, 5].map((at) =>
+        Number.parseInt(color.slice(at, at + 2), 16),
+      );
+      add(`tokens.json ${theme} ${name}`, color, 7);
+      add(`tokens.json ${theme} ${name}`, `rgb(${red}, ${green}, ${blue})`, 7);
+    }
+  }
   // Interface texts: the static parts around `{placeholders}`, long enough to be unambiguous.
   for (const dictionary of Object.values(DICTIONARIES)) {
     for (const [key, text] of Object.entries(dictionary)) {
@@ -95,13 +106,18 @@ describe('occurs', () => {
     expect(occurs('const homePerformance = 1', 'Performance')).toBe(false);
   });
 
+  it('is applied to lines with the regex escapes removed, so a copied color in a regex is found', () => {
+    const line = String.raw`not.toHaveCSS('background-color', /rgb\(124, 58, 237\)/)`;
+    expect(occurs(line.replace(/\\([()])/g, '$1'), 'rgb(124, 58, 237)')).toBe(true);
+  });
+
   it('still finds a later real copy on the same line', () => {
     expect(occurs("PerformanceObserver('Performance')", 'Performance')).toBe(true);
   });
 });
 
 describe('browser specs and the site they test', () => {
-  it('do not copy the owner, the domain, the themes or the interface texts', () => {
+  it('do not copy the owner, the domain, the themes, the palette or the interface texts', () => {
     const values = forbidden();
     const found: string[] = [];
     for (const file of files(specDir)) {
@@ -112,7 +128,8 @@ describe('browser specs and the site they test', () => {
           const trimmed = rawLine.trim();
           if (trimmed.startsWith('//') || trimmed.startsWith('*') || trimmed.startsWith('/*'))
             return;
-          const line = rawLine.replace(/\\(['"`])/g, '$1');
+          // Undo the escapes of quotes and of regex metacharacters, so `rgb\(1, 2, 3\)` is found too.
+          const line = rawLine.replace(/\\(['"`()[\]{}.*+?^$|/-])/g, '$1');
           for (const [value, origin] of values) {
             if (occurs(line, value)) {
               found.push(`${relative(root, file)}:${index + 1} "${value}" (${origin})`);
