@@ -60,6 +60,7 @@ const groups = groupEducationByYear(current.items);
 const css = educationCss({
   timeline: groups.length > 0,
   image: current.items.some(({ data }) => data.image !== undefined),
+  cover: current.items.some(({ data }) => data.image === undefined),
   details: current.items.some(({ data }) => (data.learnings?.length ?? 0) > 0),
   head: sortOptions.length > 1,
   footer: pages.length > 1,

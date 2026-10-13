@@ -14,6 +14,8 @@ export interface EducationCssParts {
   timeline: boolean;
   /** At least one entry has a document image. */
   image: boolean;
+  /** At least one entry has no document image and shows the typographic cover instead. */
+  cover: boolean;
   /** At least one entry has learnings (the details block). */
   details: boolean;
   /** The sort switch row above the timeline. */
@@ -165,6 +167,38 @@ const IMAGE = `
   }
 `;
 
+/* The stand-in for a document that is not available yet: a framed paper with the year, the type and
+   the issuer in type only. Decorative (aria-hidden), same ratio as the real documents. */
+const COVER = `
+  .ed-cover {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    box-sizing: border-box;
+    width: 100%;
+    max-width: 28rem;
+    aspect-ratio: 4 / 3;
+    padding: 1rem 1.25rem;
+    border: 2px dashed color-mix(in srgb, var(--color-primary) 45%, transparent);
+    border-radius: var(--radius-inner);
+    color: var(--color-text-secondary);
+    font-family: var(--font-mono);
+    font-size: 0.8125rem;
+  }
+  .ed-cover-year {
+    margin: 0;
+    color: var(--color-primary);
+    font-size: 3rem;
+    line-height: 1;
+  }
+  .ed-cover-issuer {
+    margin: 0;
+    color: var(--color-text);
+    font-size: 1rem;
+    font-weight: 600;
+  }
+`;
+
 const DETAILS = `
   .ed-learned summary {
     display: flex;
@@ -210,6 +244,7 @@ export function educationCss(parts: EducationCssParts): string {
       parts.head && HEAD,
       parts.timeline && TIMELINE,
       parts.image && IMAGE,
+      parts.cover && COVER,
       parts.details && DETAILS,
       parts.footer && FOOT,
     ]

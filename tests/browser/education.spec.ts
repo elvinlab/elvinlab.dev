@@ -19,6 +19,7 @@ type Credential = {
   year: number;
   order?: number;
   learnings?: unknown[];
+  image?: unknown;
 };
 const credentials = Object.entries(
   JSON.parse(
@@ -73,7 +74,7 @@ for (const { path, locale } of PAGES) {
       const item = items.nth(index);
       await expect(item).toHaveAttribute('id', credential.id);
       await expect(item.getByRole('heading', { level: 3, name: credential.title })).toBeVisible();
-      await expect(item.getByText(credential.issuer, { exact: true })).toBeVisible();
+      await expect(item.locator('.ed-issuer')).toHaveText(credential.issuer);
       await expect(item.locator('.ed-badge')).toHaveText(
         text(locale, `education.kind.${credential.kind as 'degree' | 'certificate'}`),
       );
@@ -102,6 +103,19 @@ for (const { path, locale } of PAGES) {
     await expect(page.locator('.ed-learned')).toHaveCount(
       credentials.filter((entry) => entry.learnings?.length).length,
     );
+  });
+
+  test(`${path} shows a decorative cover only for entries without a document image`, async ({
+    page,
+  }) => {
+    await page.goto(path);
+    for (const entry of credentials) {
+      const item = page.locator(`#${entry.id}`);
+      await expect(item.locator('[data-education-cover]')).toHaveCount(entry.image ? 0 : 1);
+      await expect(item.locator('.ed-figure')).toHaveCount(entry.image ? 1 : 0);
+    }
+    const cover = page.locator('[data-education-cover]').first();
+    if (await cover.count()) await expect(cover).toHaveAttribute('aria-hidden', 'true');
   });
 
   for (const width of [360, 390]) {

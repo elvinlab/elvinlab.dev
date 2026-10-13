@@ -3,7 +3,8 @@
  * One entry of the education timeline: type badge, date as it is known (the year, or the short month
  * and the year), title, issuer, and only the optional parts the entry really has (expiry, where it
  * was applied, the document image, the verification link, the learnings in a native `<details>`).
- * Nothing is drawn for a missing field. The `id` is the anchor `/education/#<id>` that `/me` links to.
+ * Nothing is drawn for a missing field except the document slot: without an image it shows a decorative
+ * typographic cover (year, type, issuer), the stand-in for a document the owner has not provided yet. The `id` is the anchor `/education/#<id>` that `/me` links to.
  * Styles: `education-styles.ts`, emitted by `EducationPage.astro`.
  */
 import { Image } from 'astro:assets';
@@ -40,10 +41,16 @@ const image = data.image ? { src: resolveEducationImage(id, data.image.file), al
   <h3 class="ed-title">{data.title}</h3>
   <p class="ed-issuer">{data.issuer}</p>
   {applied && <p class="ed-applied"><strong>{t(locale, 'education.applied')}:</strong> {applied}</p>}
-  {image && (
+  {image ? (
     <figure class="ed-figure">
       <Image src={image.src} alt={image.alt} loading="lazy" widths={[448, 896]} sizes="(min-width: 480px) 448px, 100vw" />
     </figure>
+  ) : (
+    <div class="ed-cover" aria-hidden="true" data-education-cover>
+      <p class="ed-cover-year font-pixel">{data.year}</p>
+      <p>{t(locale, `education.kind.${data.kind}`)}</p>
+      <p class="ed-cover-issuer">{data.issuer}</p>
+    </div>
   )}
   {data.url && (
     <a class="ed-verify" href={data.url} {...externalLinkAttrs(data.url, site.url)}>
