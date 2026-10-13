@@ -77,13 +77,17 @@ test.describe('one row on a phone', () => {
           await page.goto(path);
           const nav = await page.locator('[data-navbar] nav').boundingBox();
           expect(nav?.height).toBe(BAR_HEIGHT);
+          // Only the controls this profile has: an adopter who turns the theme button off still gets one row.
           const parts = [
             page.locator('[data-navbar] nav > a').first(),
             page.locator('[data-navbar] nav > a[hreflang]').first(),
-            page.locator('[data-theme-toggle]'),
+            ...(has({ flags: ['themeToggle'] }) ? [page.locator('[data-theme-toggle]')] : []),
             page.locator('[data-nav-toggle]'),
             ...(withPicker ? [page.locator('[data-background-toggle]')] : []),
           ];
+          if (!has({ flags: ['themeToggle'] })) {
+            await expect(page.locator('[data-theme-toggle]')).toHaveCount(0);
+          }
           const centers: number[] = [];
           for (const part of parts) {
             const box = await part.boundingBox();

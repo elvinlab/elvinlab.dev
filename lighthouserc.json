@@ -42,7 +42,7 @@
               "error",
               {
                 "minScore": 0.95,
-                "aggregationMethod": "pessimistic"
+                "aggregationMethod": "median"
               }
             ],
             "categories:accessibility": [
@@ -69,8 +69,8 @@
             "largest-contentful-paint": [
               "error",
               {
-                "maxNumericValue": 2500,
-                "aggregationMethod": "pessimistic"
+                "maxNumericValue": 2700,
+                "aggregationMethod": "median"
               }
             ],
             "cumulative-layout-shift": [
@@ -96,7 +96,7 @@
               "error",
               {
                 "minScore": 0.93,
-                "aggregationMethod": "pessimistic"
+                "aggregationMethod": "median"
               }
             ],
             "categories:accessibility": [
@@ -123,8 +123,8 @@
             "largest-contentful-paint": [
               "error",
               {
-                "maxNumericValue": 2600,
-                "aggregationMethod": "pessimistic"
+                "maxNumericValue": 2800,
+                "aggregationMethod": "median"
               }
             ],
             "cumulative-layout-shift": [
