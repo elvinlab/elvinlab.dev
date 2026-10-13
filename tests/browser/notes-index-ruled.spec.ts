@@ -1,5 +1,10 @@
 import { expect, type Page, test } from '@playwright/test';
 
+import { requires } from './helpers/features';
+import { themes } from './helpers/site';
+
+requires({ routes: ['notes'] });
+
 /**
  * The notes index rows read like a lab log: a ruled-paper line between rows and a margin rule on wide
  * screens, drawn with CSS on the existing row element (DESIGN.md, "Notes index"). Height floor, numbered
@@ -9,7 +14,7 @@ test.beforeEach(({ browserName: _browserName }, testInfo) => {
   test.skip(testInfo.project.name !== 'chromium-1280', 'each test sets its own viewport');
 });
 
-const THEMES = ['elvinlab-dark', 'elvinlab-light'] as const;
+const THEMES = [themes.dark, themes.light] as const;
 
 const setTheme = (page: Page, theme: (typeof THEMES)[number]) =>
   page.evaluate((value) => {

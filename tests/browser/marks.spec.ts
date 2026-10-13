@@ -1,7 +1,11 @@
 import { expect, type Locator, type Page, test } from '@playwright/test';
 
 import { describeViolations, scan } from './helpers/axe';
+import { requires, seedTheme } from './helpers/features';
+import { text, themes } from './helpers/site';
 import { stubThirdParties } from './helpers/third-party';
+
+requires({ flags: ['marks'], routes: ['notes'] });
 
 /**
  * The footprint button of a note. The fixture build has no D1 binding, so the Actions are mocked
@@ -12,20 +16,20 @@ const NOTES = [
   {
     path: '/notes/smoke-es/',
     slug: 'smoke-es',
-    button: 'Dejé mi huella',
+    button: text('es', 'marks.button'),
     many: (n: number) => `${n} huellas`,
-    hint: 'Sé el primero en dejar tu huella',
-    cap: '¡Gracias por tus huellas!',
-    invite: '¿Te gustó? Deja tu huella',
+    hint: text('es', 'marks.hint'),
+    cap: text('es', 'marks.cap'),
+    invite: text('es', 'marks.invite'),
   },
   {
     path: '/en/notes/smoke-en/',
     slug: 'smoke-en',
-    button: 'I was here',
+    button: text('en', 'marks.button'),
     many: (n: number) => `${n} marks`,
-    hint: 'Be the first to leave your mark',
-    cap: 'Thanks for your marks!',
-    invite: 'Enjoyed it? Leave your mark',
+    hint: text('en', 'marks.hint'),
+    cap: text('en', 'marks.cap'),
+    invite: text('en', 'marks.invite'),
   },
 ] as const;
 
@@ -274,9 +278,9 @@ test.describe('motion', () => {
   });
 });
 
-for (const theme of ['elvinlab-dark', 'elvinlab-light']) {
+for (const theme of [themes.dark, themes.light]) {
   test(`the note with the footprint buttons has no axe violations (${theme})`, async ({ page }) => {
-    await page.addInitScript((t) => localStorage.setItem('theme', t), theme);
+    await seedTheme(page, theme);
     await mockMarks(page, { total: 12 });
     await page.goto('/notes/smoke-es/');
     await expect(page.locator('html')).toHaveAttribute('data-theme', theme);
@@ -290,12 +294,12 @@ for (const theme of ['elvinlab-dark', 'elvinlab-light']) {
 const PRIVACY_TIPS = [
   {
     path: '/notes/smoke-es/',
-    text: 'Anónimo: sin guardar tu IP ni datos.',
+    text: text('es', 'marks.privacy'),
     href: '/privacy/#marks',
   },
   {
     path: '/en/notes/smoke-en/',
-    text: 'Anonymous: no IP or data stored.',
+    text: text('en', 'marks.privacy'),
     href: '/en/privacy/#marks',
   },
 ] as const;
@@ -374,9 +378,9 @@ for (const tip of PRIVACY_TIPS) {
   });
 }
 
-for (const theme of ['elvinlab-dark', 'elvinlab-light']) {
+for (const theme of [themes.dark, themes.light]) {
   test(`the open privacy tooltip has no axe violations (${theme})`, async ({ page }) => {
-    await page.addInitScript((t) => localStorage.setItem('theme', t), theme);
+    await seedTheme(page, theme);
     await mockMarks(page, { total: 12 });
     await page.goto('/notes/smoke-es/');
     await expect(page.locator('html')).toHaveAttribute('data-theme', theme);

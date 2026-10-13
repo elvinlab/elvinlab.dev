@@ -1,5 +1,8 @@
 import { expect, test } from '@playwright/test';
 
+import { has, seedTheme } from './helpers/features';
+import { themes } from './helpers/site';
+
 /** Native feel layer (DESIGN.md): safe-area viewport, overscroll, tap feedback, theme-color follows the toggle. */
 
 test.beforeEach(({ browserName: _browserName }, testInfo) => {
@@ -46,6 +49,7 @@ test('with no inset the layout does not overflow horizontally', async ({ page })
 });
 
 test('theme-color follows the in-page toggle in both directions', async ({ page }) => {
+  test.skip(!has({ flags: ['themeToggle'] }), 'needs features.themeToggle');
   await page.goto('/');
   const toggle = page.getByRole('button', { name: /cambiar tema|switch theme/i });
   const pageColor = () =>
@@ -62,8 +66,10 @@ test('theme-color follows the in-page toggle in both directions', async ({ page 
 });
 
 test('theme-color matches a stored theme on first load', async ({ page }) => {
+  // The toggle script is what writes the page color into the theme-color metas.
+  test.skip(!has({ flags: ['themeToggle'] }), 'needs features.themeToggle');
   await page.emulateMedia({ colorScheme: 'dark' });
-  await page.addInitScript(() => localStorage.setItem('theme', 'elvinlab-light'));
+  await seedTheme(page, themes.light);
   await page.goto('/');
   const expected = await page.evaluate(() =>
     getComputedStyle(document.documentElement).getPropertyValue('--color-page').trim(),
@@ -75,7 +81,9 @@ test('theme-color matches a stored theme on first load', async ({ page }) => {
 test('tappable controls show pressed feedback', async ({ page }) => {
   await page.goto('/');
   const targets = [
-    page.getByRole('button', { name: /cambiar tema|switch theme/i }),
+    ...(has({ flags: ['themeToggle'] })
+      ? [page.getByRole('button', { name: /cambiar tema|switch theme/i })]
+      : []),
     page.locator('[data-navbar] a[href]').first(),
     page.locator('[data-site-footer] a[href$="/privacy/"]'),
   ];
@@ -94,6 +102,7 @@ test('tappable controls show pressed feedback', async ({ page }) => {
 test('a stretched-link note row presses with a tint and never changes geometry', async ({
   page,
 }) => {
+  test.skip(!has({ routes: ['notes'] }), 'needs the notes routes');
   await page.goto('/notes/');
   const row = page.locator('[data-note-row]').first();
   const link = row.locator('h3 a');

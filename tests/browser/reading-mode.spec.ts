@@ -1,11 +1,23 @@
 import { expect, type Page, test } from '@playwright/test';
 
 import { describeViolations, scan } from './helpers/axe';
+import { has, requires } from './helpers/features';
+import { text, themes } from './helpers/site';
 import { stubThirdParties } from './helpers/third-party';
 
+requires({ flags: ['readingMode'], routes: ['notes'] });
+
 const NOTES = [
-  { path: '/notes/smoke-es/', toggle: 'Modo lectura', exit: 'Salir del modo lectura' },
-  { path: '/en/notes/smoke-en/', toggle: 'Reading mode', exit: 'Exit reading mode' },
+  {
+    path: '/notes/smoke-es/',
+    toggle: text('es', 'reading.toggle'),
+    exit: text('es', 'reading.exit'),
+  },
+  {
+    path: '/en/notes/smoke-en/',
+    toggle: text('en', 'reading.toggle'),
+    exit: text('en', 'reading.exit'),
+  },
 ] as const;
 
 test.beforeEach(async ({ page }) => {
@@ -28,6 +40,20 @@ for (const { path, toggle, exit } of NOTES) {
       await expect(page.locator('[data-banner] canvas')).toHaveCount(1);
     });
 
+    test('keeps the toggle clear of the decision stamp on a phone', async ({ page }) => {
+      await page.setViewportSize({ width: 390, height: 844 });
+      await page.goto(path);
+      const gap = await page.evaluate(() => {
+        const toggle = document.querySelector('[data-reading-toggle]')?.getBoundingClientRect();
+        const stamp = document
+          .querySelector('[data-record-inline] .record-stamp')
+          ?.getBoundingClientRect();
+        if (!toggle || !stamp) throw new Error('toggle or stamp missing');
+        return stamp.top - toggle.bottom;
+      });
+      expect(gap).toBeGreaterThanOrEqual(16);
+    });
+
     test('removes the noise, keeps the content and survives a reload', async ({ page }) => {
       await page.goto(path);
       await toggleOf(page).click();
@@ -48,7 +74,9 @@ for (const { path, toggle, exit } of NOTES) {
       // The decision record shows once, inline, whatever the width (the banner copy steps aside).
       await expect(page.locator('[data-banner] section[aria-label]')).toBeHidden();
       await expect(page.locator('[data-article] section[aria-label]')).toBeVisible();
-      await expect(page.locator('[data-comments]')).toHaveCount(1);
+      if (has({ flags: ['comments'] })) {
+        await expect(page.locator('[data-comments]')).toHaveCount(1);
+      }
 
       await page.reload();
       expect(await isReading(page)).toBe(true);
@@ -90,7 +118,7 @@ for (const { path, toggle, exit } of NOTES) {
       expect(overflow).toBe(false);
     });
 
-    for (const theme of ['elvinlab-dark', 'elvinlab-light']) {
+    for (const theme of [themes.dark, themes.light]) {
       test(`has no axe violations in reading mode (${theme})`, async ({ page }) => {
         await page.addInitScript((t) => {
           localStorage.setItem('theme', t);
@@ -147,7 +175,7 @@ test('pauses the background effect while reading and restores it afterwards', as
   // `style.display` is only ever set by the effect runner: the effect itself was stopped.
   expect(await inlineDisplay()).toBe('none');
 
-  await page.getByRole('button', { name: 'Salir del modo lectura' }).click();
+  await page.getByRole('button', { name: text('es', 'reading.exit') }).click();
   expect(await inlineDisplay()).toBe('');
   await expect(page.locator('[data-background]')).toBeVisible();
   // Reading mode never overwrites the visitor's chosen background.

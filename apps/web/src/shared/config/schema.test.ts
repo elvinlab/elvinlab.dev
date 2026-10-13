@@ -1,5 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
+import { siteConfig } from '@/site.config.ts';
+
 import { parseSiteConfig } from './schema.ts';
 
 const valid = {
@@ -732,15 +734,20 @@ describe('experiment nudge', () => {
     expect(parseSiteConfig({ ...valid, features }).features.experimentNudge).toBe(true);
   });
 
-  it('defaults the scroll thresholds to 0.7 on notes and 0.6 on the index', () => {
-    expect(parseSiteConfig(valid).nudge).toEqual({
-      scrollThreshold: 0.7,
-      indexScrollThreshold: 0.6,
-    });
-    expect(parseSiteConfig(withNudge({})).nudge).toEqual({
-      scrollThreshold: 0.7,
-      indexScrollThreshold: 0.6,
-    });
+  it('defaults the thresholds to 0.7 on notes and 0.6 on the index, and a close to 30 days', () => {
+    const defaults = { scrollThreshold: 0.7, indexScrollThreshold: 0.6, reappearAfterDays: 30 };
+    expect(parseSiteConfig(valid).nudge).toEqual(defaults);
+    expect(parseSiteConfig(withNudge({})).nudge).toEqual(defaults);
+  });
+
+  it('takes 0 to 365 days before a closed card may return, and rejects the rest', () => {
+    expect(parseSiteConfig(withNudge({ reappearAfterDays: 0 })).nudge.reappearAfterDays).toBe(0);
+    expect(parseSiteConfig(withNudge({ reappearAfterDays: 365 })).nudge.reappearAfterDays).toBe(
+      365,
+    );
+    for (const reappearAfterDays of [-1, 366, 1.5, '30']) {
+      expect(() => parseSiteConfig(withNudge({ reappearAfterDays }))).toThrow();
+    }
   });
 
   it('accepts thresholds from 0.3 to 0.95 and rejects the rest', () => {
@@ -755,5 +762,67 @@ describe('experiment nudge', () => {
 
   it('rejects unknown keys', () => {
     expect(() => parseSiteConfig(withNudge({ delay: 5 }))).toThrow();
+  });
+});
+
+describe('text limits of the visible config fields', () => {
+  type Path = (string | number)[];
+  type Spot = { path: Path; max: number; localized: boolean };
+  const plain = (path: Path, max: number): Spot => ({ path, max, localized: false });
+  const loc = (path: Path, max: number): Spot => ({ path, max, localized: true });
+  // The limits that keep a text inside the box its layout was drawn for; see docs/CONFIGURATION.md 6.10.
+  const SPOTS: Spot[] = [
+    plain(['title'], 30),
+    loc(['description'], 160),
+    plain(['identity', 'name'], 40),
+    plain(['identity', 'handle'], 24),
+    loc(['identity', 'role'], 80),
+    loc(['identity', 'bio'], 200),
+    plain(['identity', 'location'], 50),
+    plain(['socials', 0, 'label'], 16),
+    loc(['now', 'items', 0, 'text'], 120),
+    loc(['experiments', 'intro'], 200),
+    loc(['recruiter', 'status'], 60),
+    loc(['recruiter', 'lookingFor'], 100),
+    plain(['me', 'timezone'], 16),
+    loc(['me', 'workMode'], 24),
+    loc(['me', 'languages'], 60),
+    loc(['me', 'headline'], 60),
+    loc(['me', 'pitch'], 280),
+    loc(['me', 'intro'], 120),
+    loc(['me', 'facts', 0, 'value'], 30),
+    loc(['me', 'facts', 0, 'label'], 60),
+    loc(['me', 'strengths', 0, 'title'], 48),
+    loc(['me', 'strengths', 0, 'body'], 180),
+    loc(['me', 'stack', 0, 'label'], 32),
+    loc(['me', 'stack', 0, 'hint'], 180),
+    plain(['me', 'stack', 0, 'items', 0], 24),
+    loc(['notice'], 160),
+  ];
+
+  /** The real config with one field set to a text of `length` characters (both locales when localized). */
+  function withText(spot: Spot, length: number): unknown {
+    const config = structuredClone(siteConfig) as Record<string, unknown>;
+    const text = 'x'.repeat(length);
+    const value = spot.localized ? { es: text, en: text } : text;
+    let node: Record<string | number, unknown> = config;
+    for (const key of spot.path.slice(0, -1)) {
+      node[key] = node[key] ?? {};
+      node = node[key] as Record<string | number, unknown>;
+    }
+    node[spot.path.at(-1) as string | number] = value;
+    return config;
+  }
+
+  for (const spot of SPOTS) {
+    const name = spot.path.join('.');
+    it(`${name}: accepts ${spot.max} characters and rejects ${spot.max + 1}`, () => {
+      expect(() => parseSiteConfig(withText(spot, spot.max))).not.toThrow();
+      expect(() => parseSiteConfig(withText(spot, spot.max + 1))).toThrow();
+    });
+  }
+
+  it('keeps this site within every limit', () => {
+    expect(() => parseSiteConfig(siteConfig)).not.toThrow();
   });
 });

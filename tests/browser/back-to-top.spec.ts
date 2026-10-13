@@ -1,9 +1,13 @@
 import { expect, type Page, test } from '@playwright/test';
 
 import { describeViolations, scan } from './helpers/axe';
+import { has, liveByPath, requires, seedTheme } from './helpers/features';
+import { text, themes } from './helpers/site';
 import { stubThirdParties } from './helpers/third-party';
 
-const PAGES = ['/', '/notes/smoke-es/', '/me/', '/en/notes/smoke-en/'];
+requires({ flags: ['backToTop'] });
+
+const PAGES = liveByPath(['/', '/notes/smoke-es/', '/me/', '/en/notes/smoke-en/'], (path) => path);
 const VIEWPORTS = [
   { width: 360, height: 740 },
   { width: 390, height: 844 },
@@ -77,6 +81,13 @@ const overlaps = (page: Page) =>
   });
 
 test.describe('back to top', () => {
+  test.beforeEach(({ browserName: _browserName }, testInfo) => {
+    test.skip(
+      !has({ routes: ['notes'] }) && testInfo.title !== 'has an accessible name in both languages',
+      'needs the notes routes',
+    );
+  });
+
   test('is hidden and unavailable at the top and while reading downwards', async ({ page }) => {
     await page.goto('/notes/smoke-es/');
     await expect(button(page)).toBeHidden();
@@ -96,7 +107,7 @@ test.describe('back to top', () => {
     await expect(button(page)).toBeVisible();
     await expect(button(page)).toHaveAttribute('aria-hidden', 'false');
     await expect(button(page)).toHaveJSProperty('inert', false);
-    await expect(page.getByRole('button', { name: 'Volver arriba' })).toBeVisible();
+    await expect(page.getByRole('button', { name: text('es', 'backtotop.label') })).toBeVisible();
     const box = await button(page).boundingBox();
     expect(box?.width).toBe(44);
     expect(box?.height).toBe(44);
@@ -223,8 +234,8 @@ test.describe('back to top', () => {
 
   test('has an accessible name in both languages', async ({ page }) => {
     for (const [path, name] of [
-      ['/', 'Volver arriba'],
-      ['/en/', 'Back to top'],
+      ['/', text('es', 'backtotop.label')],
+      ['/en/', text('en', 'backtotop.label')],
     ] as const) {
       await page.goto(path);
       await expect(button(page)).toHaveAttribute('aria-label', name);
@@ -269,9 +280,14 @@ test.describe('back to top', () => {
           const bottom = await page.evaluate(
             () => document.documentElement.scrollHeight - window.innerHeight,
           );
-          await scrollTo(page, bottom);
-          await scrollTo(page, bottom - up);
-          await expect(button(page)).toHaveAttribute('data-shown', '');
+          // The gesture is "deep, then a little up". On a loaded machine the two scrolls can land in
+          // one frame and the page never sees the direction change, so repeat the gesture until the
+          // button shows; what this test checks is where it sits, not how it is revealed.
+          await expect(async () => {
+            await scrollTo(page, bottom);
+            await scrollTo(page, bottom - up);
+            await expect(button(page)).toHaveAttribute('data-shown', '', { timeout: 2000 });
+          }).toPass({ timeout: 15_000 });
           expect(await overlaps(page), `${up} px above the bottom`).toEqual([]);
         }
         const box = await button(page).boundingBox();
@@ -281,6 +297,7 @@ test.describe('back to top', () => {
   }
 
   test('stays clear of the reading mode exit button', async ({ page }) => {
+    test.skip(!has({ flags: ['readingMode'] }), 'needs features.readingMode');
     await page.goto('/notes/smoke-es/');
     await page.locator('[data-reading-toggle]').click();
     await expect(page.locator('[data-reading-exit]')).toBeVisible();
@@ -295,9 +312,9 @@ test.describe('back to top', () => {
     expect(await overlaps(page)).toEqual([]);
   });
 
-  for (const theme of ['elvinlab-dark', 'elvinlab-light']) {
+  for (const theme of [themes.dark, themes.light]) {
     test(`has no axe violations while shown (${theme})`, async ({ page }) => {
-      await page.addInitScript((t) => localStorage.setItem('theme', t), theme);
+      await seedTheme(page, theme);
       await page.goto('/notes/smoke-es/');
       await expect(page.locator('html')).toHaveAttribute('data-theme', theme);
       await reveal(page);

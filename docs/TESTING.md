@@ -106,6 +106,45 @@ The single source of truth is [`apps/web/scripts/verification-map.ts`](../apps/w
 
 [`odd/verification-ledger.md`](../odd/verification-ledger.md) keeps two things: the last commit on which each check family was green, and one row per verified change. A check is **stale** when files in its scope changed after its last green commit: `git diff --name-only <sha>..HEAD -- <scope>` prints something. Update the ledger in the same commit as the change it records.
 
+## The suite follows the config (adopter profiles)
+
+Someone who adopts this project switches features off in `apps/web/src/site.config.ts`, changes a name or an interface text, and expects the pipeline to stay green. The browser specs do not assume this site's feature set: they read what the site under test has on, and skip what is off.
+
+**How it works**
+
+- `playwright.config.ts` resolves the feature set once (the real `site.config.ts` plus the overrides the fixture build applies) and exports it as `E2E_PROFILE`; every spec worker inherits it. The resolver is `apps/web/scripts/e2e-features.ts`.
+- `tests/browser/helpers/features.ts` is what a spec uses to say what it needs: `requires({ flags, routes, home })` skips a file or a `describe`, `has(...)` is a condition inside a test, `livePages` and `liveByPath` filter a table of URLs, `seedTheme` reaches a theme even when the theme button is off. A spec whose feature is off is **skipped with the reason, never failed and never deleted**.
+- `tests/browser/helpers/site.ts` is what a spec uses to read the site's own values: `site` (origin, host, title, name, handle), `identityIn(locale)`, `themes` (read from `tokens.json`), `siteConfig`, and `text(locale, key)`, which returns an interface text from the dictionary. **A spec never writes these values out.** `apps/web/scripts/spec-literals.test.ts` fails, naming file and line, when a spec contains the owner's name, domain, handle, socials, role, bio, a theme id or an interface text of 10 or more characters.
+
+**Profiles.** Four adopter scenarios, each the real config with some features switched off (`apps/web/scripts/e2e-profiles.ts`):
+
+| Profile | What is off |
+| --- | --- |
+| `quiet` | Reading mode, footprints, contact, changelog, the experiment card and the theme button |
+| `blog-only` | The portfolio (`me`, `credentials`, `experiments`), the experiment card, contact, changelog, footprints and comments |
+| `me-only` | The blog (so no notes, feed or subscription), comments, reading mode, footprints, the experiment card, contact and changelog |
+| `bare` | Every optional feature: only the home and the pages that are always built |
+
+```bash
+E2E_FEATURE_PROFILE=bare pnpm test:e2e:quick   # one profile, 1280 px
+pnpm test:profiles                             # every profile, one after the other; fails if any fails
+pnpm test:profiles me-only bare                # only the ones named
+FIXTURE_APPEARANCE=minimal pnpm test:e2e:quick # the minimal appearance preset ("full" is the default look)
+```
+
+Measured on 2026-10-13 at 1280 px on a 12-core machine: the whole suite with this site's config takes about 140 s; the profiles take 37 s (`bare`), 52 s (`me-only`), 92 s (`blog-only`) and 97 s (`quiet`). A profile run that finds the site itself broken with a feature off is a defect of the site, not of the spec: it is fixed in the site (the first runs found a dead `/rss.xml` link, a `/me` share image that was never generated, and a feed advertised in the head, all with the blog or `me` off).
+
+**In the CI** the job `profiles` runs the four profiles in parallel with `e2e` and `lighthouse`, so a profile faster than the slowest gate adds nothing to a release. It is **not a deploy gate yet**: it uses `continue-on-error` and is not in the `checks` needs, so a red profile is visible without blocking the release. To make it blocking, add `profiles` to `checks.needs` in `.github/workflows/ci.yml` and drop `continue-on-error`. It is skipped when a push touches only docs, trackers, READMEs, issue templates or content (the `changes` job decides, output `profiles_relevant`).
+
+**When you add or change something**
+
+1. A new switch: add it to the schema with `.describe()`, run `pnpm docs:config`, and decide which specs need it (`requires`/`has`). If it removes a route, add that route to `routes` in `e2e-features.ts` and use it in `routeNeeds`.
+2. A new page that exists only with a feature: it goes into the page tables through `liveByPath`/`livePages`, not into a fixed list.
+3. A new spec: read texts and owner values from `helpers/site.ts`, skip what depends on a feature with `requires`/`has`, and run `pnpm test:profiles`.
+4. A new scenario: add it to `E2E_PROFILES` (it is picked up by `pnpm test:profiles` and the CI matrix is the list in `ci.yml`).
+
+**Text limits.** Changing a Spanish or English text can overflow a button or wrap a menu. Every interface text has a length limit by key group, the same in both languages (`apps/web/src/shared/i18n/text-limits.ts`, enforced by `text-limits.test.ts`), and 26 visible fields of `site.config.ts` have `max` limits in the schema. The table and the rules are in [CONFIGURATION.md](CONFIGURATION.en.md#changing-a-text-length-limits-spanish-and-english).
+
 ## Quality budgets and CI
 
 Run the same gates as CI from the repository root:

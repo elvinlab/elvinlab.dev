@@ -1,5 +1,9 @@
 import { expect, type Page, test } from '@playwright/test';
 
+import { has, requires } from './helpers/features';
+
+requires({ flags: ['comments'] });
+
 // Only the giscus origin is stubbed. The client script builds a frame like the real one and the
 // frame records the theme the page posts to it, so theme sync is observable end to end.
 const CLIENT_STUB = `
@@ -42,6 +46,8 @@ test.beforeEach(async ({ page }) => {
 
 for (const { locale, path } of NOTES) {
   test.describe(`${locale} note comments`, () => {
+    requires({ routes: ['notes'] });
+
     test('stays idle until the section nears the viewport, then loads giscus', async ({ page }) => {
       // A short viewport keeps the section well below the lazy-load margin on load.
       await page.setViewportSize({ width: page.viewportSize()?.width ?? 1280, height: 300 });
@@ -75,6 +81,7 @@ for (const { locale, path } of NOTES) {
     });
 
     test('follows the site theme toggle', async ({ page }) => {
+      test.skip(!has({ flags: ['themeToggle'] }), 'needs features.themeToggle');
       await page.goto(path);
       await page.locator('[data-comments]').scrollIntoViewIfNeeded();
       const frame = page.frameLocator('iframe.giscus-frame');

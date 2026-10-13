@@ -43,7 +43,8 @@ const socialTitle = article && title ? title : fullTitle;
 const summary = description ?? site.description[locale] ?? site.description[LOCALES.defaultLocale] ?? site.title;
 const noteEntries = await getCollection('notes');
 const notes = noteEntries.map((entry) => ({ slug: entry.id, data: entry.data }));
-const showRss = hasPublishedNotes(notes);
+// The feed route exists only with `features.blog`: advertising it without the blog is a dead link.
+const showRss = site.features.blog && hasPublishedNotes(notes);
 const links = seoLinks({
   path,
   locale,

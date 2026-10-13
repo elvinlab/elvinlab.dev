@@ -1,5 +1,8 @@
 import { expect, type Page, test } from '@playwright/test';
 
+import { has, liveByPath, seedTheme } from './helpers/features';
+import { themes } from './helpers/site';
+
 /**
  * Calm pages (M3). The fixture build copies the real `site.config.ts` (`FIXTURE_APPEARANCE`
  * overrides the preset of the copy) and every preset-driven check reads `html[data-appearance]`:
@@ -14,60 +17,66 @@ const presetOf = async (page: Page): Promise<Preset> => {
   return value;
 };
 
-const PAGES = [
-  '/',
-  '/notes/',
-  '/notes/smoke-es/',
-  '/me/',
-  '/experiments/',
-  '/contact/',
-  '/privacy/',
-  '/terms/',
-  '/changelog/',
-  '/subscribe/',
-  '/subscribe/confirm/',
-  '/subscribe/unsubscribe/',
-  '/en/',
-  '/en/notes/smoke-en/',
-  '/en/me/',
-  '/en/experiments/',
-  '/en/contact/',
-  '/en/privacy/',
-  '/en/terms/',
-  '/en/changelog/',
-  '/en/subscribe/',
-  '/en/subscribe/confirm/',
-  '/en/subscribe/unsubscribe/',
-  '/nope/',
-];
+const PAGES = liveByPath(
+  [
+    '/',
+    '/notes/',
+    '/notes/smoke-es/',
+    '/me/',
+    '/experiments/',
+    '/contact/',
+    '/privacy/',
+    '/terms/',
+    '/changelog/',
+    '/subscribe/',
+    '/subscribe/confirm/',
+    '/subscribe/unsubscribe/',
+    '/en/',
+    '/en/notes/smoke-en/',
+    '/en/me/',
+    '/en/experiments/',
+    '/en/contact/',
+    '/en/privacy/',
+    '/en/terms/',
+    '/en/changelog/',
+    '/en/subscribe/',
+    '/en/subscribe/confirm/',
+    '/en/subscribe/unsubscribe/',
+    '/nope/',
+  ],
+  (path) => path,
+);
 /** The pages that render a banner: the blend must be on every one of them. */
-const BANNER_PAGES = [
-  '/',
-  '/notes/',
-  '/notes/smoke-es/',
-  '/me/',
-  '/experiments/',
-  '/contact/',
-  '/privacy/',
-  '/terms/',
-  '/changelog/',
-  '/subscribe/',
-  '/subscribe/confirm/',
-  '/subscribe/unsubscribe/',
-  '/en/',
-  '/en/notes/smoke-en/',
-  '/en/me/',
-  '/en/experiments/',
-  '/en/contact/',
-  '/en/privacy/',
-  '/en/terms/',
-  '/en/changelog/',
-  '/en/subscribe/',
-  '/en/subscribe/confirm/',
-  '/en/subscribe/unsubscribe/',
-  '/nope/',
-];
-const THEMES = ['elvinlab-dark', 'elvinlab-light'];
+const BANNER_PAGES = liveByPath(
+  [
+    '/',
+    '/notes/',
+    '/notes/smoke-es/',
+    '/me/',
+    '/experiments/',
+    '/contact/',
+    '/privacy/',
+    '/terms/',
+    '/changelog/',
+    '/subscribe/',
+    '/subscribe/confirm/',
+    '/subscribe/unsubscribe/',
+    '/en/',
+    '/en/notes/smoke-en/',
+    '/en/me/',
+    '/en/experiments/',
+    '/en/contact/',
+    '/en/privacy/',
+    '/en/terms/',
+    '/en/changelog/',
+    '/en/subscribe/',
+    '/en/subscribe/confirm/',
+    '/en/subscribe/unsubscribe/',
+    '/nope/',
+  ],
+  (path) => path,
+);
+const THEMES = [themes.dark, themes.light];
 const FADE_HEIGHT = 120;
 /** `minimal` caps every page banner at 240 px (`--banner-page-cap`). */
 const PAGE_BANNER_CAP = 240;
@@ -101,7 +110,7 @@ const HOME_BANNER: Record<Preset, { desktop: number; phone: number }> = {
   minimal: { desktop: 432, phone: 384 },
   full: { desktop: 504, phone: 480 },
 };
-/** Lines the pixel hero wraps to on desktop: both presets widen the measure (22ch minimal, 24ch full) to two lines. */
+/** Lines the pixel hero wraps to on desktop: both presets use a 24ch measure, which keeps the headline to two lines. */
 const HERO_LINES: Record<Preset, number> = { minimal: 2, full: 2 };
 /**
  * Decision record, in px: `--record-*` of `calm-layout.css`. `phoneGap` is the stacked row gap.
@@ -119,15 +128,12 @@ test.beforeEach(({ browserName: _browserName }, testInfo) => {
 });
 
 const withTheme = async (page: Page, theme: string, extra?: Record<string, string>) => {
-  await page.addInitScript(
-    ([stored, more]) => {
-      localStorage.setItem('theme', stored as string);
-      for (const [key, value] of Object.entries((more as Record<string, string>) ?? {})) {
-        localStorage.setItem(key, value);
-      }
-    },
-    [theme, extra ?? {}] as const,
-  );
+  // `seedTheme` also reaches the theme through the color scheme when the toggle is off, because the
+  // boot script then ignores the stored choice and follows the system preference.
+  await seedTheme(page, theme);
+  await page.addInitScript((more) => {
+    for (const [key, value] of Object.entries(more)) localStorage.setItem(key, value);
+  }, extra ?? {});
 };
 
 const noOverflow = (page: Page) =>
@@ -184,21 +190,32 @@ test('the blend is in the served HTML, so the first paint needs no script', asyn
 });
 
 test('reading mode and the collapsed home keep a clean edge', async ({ page }) => {
-  await withTheme(page, 'elvinlab-dark', { 'reading-mode': '1' });
-  await page.goto('/notes/smoke-es/');
-  await expect(page.locator('[data-banner-fade]')).toBeHidden();
-  // The compact header has no floor: the title alone sizes it.
-  await expect(page.locator('[data-banner]')).toHaveCSS('min-height', '0px');
+  if (has({ flags: ['readingMode'] })) {
+    await withTheme(page, themes.dark, { 'reading-mode': '1' });
+    await page.goto('/notes/smoke-es/');
+    await expect(page.locator('[data-banner-fade]')).toBeHidden();
+    // The compact header has no floor: the title alone sizes it.
+    await expect(page.locator('[data-banner]')).toHaveCSS('min-height', '0px');
+  }
 
   const collapsed = await page.context().newPage();
-  await withTheme(collapsed, 'elvinlab-dark', { 'banner-expanded': '0' });
+  await withTheme(collapsed, themes.dark, { 'banner-expanded': '0' });
   await collapsed.goto('/');
   await expect(collapsed.locator('[data-banner-fade]')).toBeVisible();
-  const banner = await collapsed.locator('[data-banner]').boundingBox();
-  const fade = await collapsed.locator('[data-banner-fade]').boundingBox();
-  expect(
-    Math.abs((banner?.y ?? 0) + (banner?.height ?? 0) - ((fade?.y ?? 0) + (fade?.height ?? 0))),
-  ).toBeLessThan(1);
+  // The banner collapses with a height transition: measure until it has settled (it is mid-collapse,
+  // hundreds of px off, on a loaded machine) instead of once, so the check never races the animation.
+  await expect
+    .poll(
+      async () => {
+        const banner = await collapsed.locator('[data-banner]').boundingBox();
+        const fade = await collapsed.locator('[data-banner-fade]').boundingBox();
+        return Math.abs(
+          (banner?.y ?? 0) + (banner?.height ?? 0) - ((fade?.y ?? 0) + (fade?.height ?? 0)),
+        );
+      },
+      { message: 'the fade ends where the collapsed banner ends' },
+    )
+    .toBeLessThan(1);
 });
 
 test('the banners follow the height caps of the preset', async ({ page }, testInfo) => {
@@ -207,7 +224,7 @@ test('the banners follow the height caps of the preset', async ({ page }, testIn
   const expected = HOME_BANNER[preset];
   const home = (await page.locator('[data-banner]').boundingBox())?.height ?? 0;
   expect(home).toBe(testInfo.project.name === 'chromium-1280' ? expected.desktop : expected.phone);
-  for (const path of Object.keys(FULL_PAGE_BANNERS)) {
+  for (const path of liveByPath(Object.keys(FULL_PAGE_BANNERS), (key) => key)) {
     await page.goto(path);
     const minHeight = await page
       .locator('[data-banner]')
@@ -287,6 +304,7 @@ test('the decision record follows the preset spacing and keeps every label', asy
 test('the decision record sits in the banner from lg up and inline in the article below it', async ({
   page,
 }, testInfo) => {
+  test.skip(!has({ routes: ['notes'] }), 'needs the notes routes');
   await page.goto('/notes/smoke-es/');
   const inBanner = page.locator('[data-banner] section[aria-label]');
   const inArticle = page.locator('[data-article] section[aria-label]');
@@ -315,6 +333,7 @@ test('the decision record sits in the banner from lg up and inline in the articl
 test('the note header keeps date and reading time, and the preset places badge, author and tags', async ({
   page,
 }) => {
+  test.skip(!has({ routes: ['notes'] }), 'needs the notes routes');
   await page.goto('/notes/smoke-es/');
   const preset = await presetOf(page);
   const header = page.locator('[data-banner]');

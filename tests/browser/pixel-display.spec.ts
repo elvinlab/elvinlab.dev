@@ -1,5 +1,7 @@
 import { expect, type Page, test } from '@playwright/test';
 
+import { has, liveByPath } from './helpers/features';
+
 /** Widths where the pixel headline must neither overflow nor clip. */
 const WIDTHS = [360, 390, 768, 1280];
 const HOME_PATHS = ['/', '/en/'];
@@ -26,6 +28,7 @@ for (const path of HOME_PATHS) {
     });
 
     test('every section title with the accent bar computes Pixelify Sans', async ({ page }) => {
+      test.skip(!has({ routes: ['notes'] }), 'needs the notes routes');
       await page.goto(path);
       const families = await page
         .locator('main h2:has(> span.bg-primary)')
@@ -92,27 +95,31 @@ for (const width of WIDTHS) {
 }
 
 test('note page titles and prose stay IBM Plex Sans', async ({ page }) => {
+  test.skip(!has({ routes: ['notes'] }), 'needs the notes routes');
   await page.goto('/notes/smoke-es/');
   expect(await familyOf(page, 'main h1')).not.toMatch(PIXEL_FAMILY);
   expect(await familyOf(page, 'article .prose p')).not.toMatch(PIXEL_FAMILY);
 });
 
-const PIXEL_TITLE_PATHS = [
-  '/notes/',
-  '/experiments/',
-  '/en/experiments/',
-  '/contact/',
-  '/en/contact/',
-  '/changelog/',
-  '/en/changelog/',
-  '/privacy/',
-  '/en/privacy/',
-  '/terms/',
-  '/en/terms/',
-  '/subscribe/',
-  '/en/subscribe/',
-  '/nope/',
-];
+const PIXEL_TITLE_PATHS = liveByPath(
+  [
+    '/notes/',
+    '/experiments/',
+    '/en/experiments/',
+    '/contact/',
+    '/en/contact/',
+    '/changelog/',
+    '/en/changelog/',
+    '/privacy/',
+    '/en/privacy/',
+    '/terms/',
+    '/en/terms/',
+    '/subscribe/',
+    '/en/subscribe/',
+    '/nope/',
+  ],
+  (path) => path,
+);
 
 for (const path of PIXEL_TITLE_PATHS) {
   test(`the page title of ${path} is pixel, preloaded and unclipped`, async ({ page }) => {
@@ -140,6 +147,7 @@ for (const path of PIXEL_TITLE_PATHS) {
 test('the page title leaves air under the navbar and the description stays readable', async ({
   page,
 }) => {
+  test.skip(!has({ routes: ['contact'] }), 'needs route contact');
   await page.setViewportSize({ width: 390, height: 900 });
   await page.goto('/contact/');
   const gap = await page.evaluate(() => {
@@ -151,6 +159,7 @@ test('the page title leaves air under the navbar and the description stays reada
 });
 
 test('the contact form and its side panel start at the same top', async ({ page }) => {
+  test.skip(!has({ routes: ['contact'] }), 'needs route contact');
   await page.setViewportSize({ width: 1280, height: 900 });
   await page.goto('/contact/');
   const tops = await page.evaluate(() => {
@@ -162,6 +171,7 @@ test('the contact form and its side panel start at the same top', async ({ page 
 });
 
 test('pages whose title is not pixel do not preload the pixel face', async ({ page }) => {
+  test.skip(!has({ routes: ['notes'] }), 'needs the notes routes');
   await page.goto('/notes/smoke-es/');
   await expect(page.locator('head link[rel="preload"][href*="pixelify-sans"]')).toHaveCount(0);
 });

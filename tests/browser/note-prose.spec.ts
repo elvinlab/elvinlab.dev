@@ -1,5 +1,10 @@
 import { expect, type Page, test } from '@playwright/test';
 
+import { has, requires } from './helpers/features';
+import { themes } from './helpers/site';
+
+requires({ routes: ['notes'] });
+
 /** Automatic notebook treatment of note prose (DESIGN.md, "Notebook ink system"), against the fixture notes. */
 
 test.beforeEach(({ browserName: _browserName }, testInfo) => {
@@ -9,7 +14,7 @@ test.beforeEach(({ browserName: _browserName }, testInfo) => {
 const ES = '/notes/smoke-es/';
 const EN = '/en/notes/smoke-en/';
 
-const THEMES = ['elvinlab-dark', 'elvinlab-light'] as const;
+const THEMES = [themes.dark, themes.light] as const;
 
 const setTheme = (page: Page, theme: (typeof THEMES)[number]) =>
   page.evaluate((value) => {
@@ -123,9 +128,9 @@ for (const theme of THEMES) {
 test('the stroke colors differ per theme', async ({ page }) => {
   await page.goto(ES);
   const link = '.prose p a[href="https://example.net/prose"]';
-  await setTheme(page, 'elvinlab-dark');
+  await setTheme(page, themes.dark);
   await expect.poll(() => style(page, link, 'background-image')).toContain('%23ec4899');
-  await setTheme(page, 'elvinlab-light');
+  await setTheme(page, themes.light);
   await expect.poll(() => style(page, link, 'background-image')).toContain('%23be185d');
 });
 
@@ -245,6 +250,7 @@ test('with motion allowed the link underline grows on hover', async ({ page }) =
 });
 
 test('reading mode keeps the counter inline and the ornaments quiet', async ({ page }) => {
+  test.skip(!has({ flags: ['readingMode'] }), 'needs features.readingMode');
   await page.setViewportSize({ width: 1280, height: 900 });
   await page.addInitScript(() => {
     try {

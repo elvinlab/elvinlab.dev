@@ -1,5 +1,7 @@
 import { expect, type Page, test } from '@playwright/test';
 
+import { has } from './helpers/features';
+
 /**
  * Cross-page view transitions (DESIGN.md "Page transitions"): CSS-only `@view-transition`, gated on
  * `prefers-reduced-motion: no-preference`. The suite default is `reduce`, so every motion test opts in.
@@ -50,6 +52,7 @@ const motion = async (page: Page) => {
 test('an internal link navigates through a view transition when motion is allowed', async ({
   page,
 }) => {
+  test.skip(!has({ routes: ['notes'] }), 'needs the notes routes');
   await motion(page);
   await page.goto('/');
   await page.getByRole('link', { name: 'Notas' }).first().click();
@@ -68,6 +71,7 @@ test('switching language navigates through a view transition and lands on the ot
 });
 
 test('reduced motion navigates normally, with no view transition', async ({ page }) => {
+  test.skip(!has({ routes: ['notes'] }), 'needs the notes routes');
   await page.emulateMedia({ reducedMotion: 'reduce' });
   await instrument(page);
   await page.goto('/');
@@ -121,6 +125,7 @@ test('the navbar keeps its place across pages through a stable view-transition-n
 test('the page keeps one entrance: same on a navigated load as on a cold load, none on the navbar', async ({
   page,
 }) => {
+  test.skip(!has({ routes: ['notes'] }), 'needs the notes routes');
   await motion(page);
   await page.goto('/notes/');
   await expect.poll(() => page.evaluate(() => window.__entrances)).toBeGreaterThan(0);
@@ -142,6 +147,7 @@ test('the page keeps one entrance: same on a navigated load as on a cold load, n
 });
 
 test('back and forward restore the previous pages', async ({ page }) => {
+  test.skip(!has({ routes: ['notes'] }), 'needs the notes routes');
   await motion(page);
   await page.goto('/');
   await page.getByRole('link', { name: 'Notas' }).first().click();
@@ -155,6 +161,7 @@ test('back and forward restore the previous pages', async ({ page }) => {
 });
 
 test('the theme toggle stays in place: no navigation and no view transition', async ({ page }) => {
+  test.skip(!has({ flags: ['themeToggle'] }), 'needs features.themeToggle');
   await motion(page);
   await page.goto('/');
   const before = await page.evaluate(() => document.documentElement.dataset['theme']);
@@ -166,6 +173,7 @@ test('the theme toggle stays in place: no navigation and no view transition', as
 });
 
 test('no horizontal overflow at 360 px after a transitioned navigation', async ({ page }) => {
+  test.skip(!has({ routes: ['notes'] }), 'needs the notes routes');
   await page.setViewportSize({ width: 360, height: 800 });
   await motion(page);
   await page.goto('/');

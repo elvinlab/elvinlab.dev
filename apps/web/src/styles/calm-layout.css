@@ -48,7 +48,9 @@
   }
 
   [data-appearance="minimal"] {
-    --hero-measure: 22ch;
+    /* Same measure as `full`: the headline keeps its closing phrase together (no-break spaces), so
+       a narrower one wraps it to three lines. Both presets read as two lines on desktop. */
+    --hero-measure: 24ch;
   }
 }
 

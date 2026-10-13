@@ -12,6 +12,7 @@ import { noteSchema } from '@/features/notes/schema.ts';
 import { experimentSchema } from '@/features/portfolio/schema.ts';
 import { ENV_VARS } from '@/shared/config/env-vars.ts';
 import { siteConfigSchema } from '@/shared/config/schema.ts';
+import { TEXT_LIMIT_NOTES, TEXT_LIMITS } from '@/shared/i18n/text-limits.ts';
 
 import { type DocRow, renderTable, schemaRows } from './docs-config.ts';
 
@@ -88,6 +89,18 @@ export function envExample(): string {
   return `${lines.join('\n').trimEnd()}\n`;
 }
 
+/** The length limits of the interface texts, longest first, from the table the tests enforce. */
+function textLimitsTable(): string {
+  const rows = Object.entries(TEXT_LIMITS)
+    .sort(([a, x], [b, y]) => y - x || a.localeCompare(b))
+    .map(([group, limit]) => `| \`${group}.*\` | ${limit} | ${TEXT_LIMIT_NOTES[group] ?? ''} |`);
+  return [
+    '| Key group | Limit (characters, in each language) | Where it appears |',
+    '| --- | --- | --- |',
+    ...rows,
+  ].join('\n');
+}
+
 /** Every generated block, by id. */
 export function buildDocBlocks(): Record<string, string> {
   const blocks: Record<string, string> = {};
@@ -95,6 +108,7 @@ export function buildDocBlocks(): Record<string, string> {
     blocks[id] = renderTable(schemaRows(json(schema)).rows);
   }
   blocks['env-vars'] = envTable();
+  blocks['text-limits'] = textLimitsTable();
   blocks['dev-vars-example'] = `\`\`\`ini\n${devVarsExample().trimEnd()}\n\`\`\``;
   return blocks;
 }
@@ -110,6 +124,7 @@ export const DOC_BLOCKS: Record<string, string[]> = {
     'releases',
     'env-vars',
     'dev-vars-example',
+    'text-limits',
   ],
   'docs/CONFIGURATION.en.md': [
     'site-config',
@@ -120,6 +135,7 @@ export const DOC_BLOCKS: Record<string, string[]> = {
     'releases',
     'env-vars',
     'dev-vars-example',
+    'text-limits',
   ],
   'docs/NOTES.md': ['note-frontmatter'],
   'docs/NOTES.en.md': ['note-frontmatter'],

@@ -18,6 +18,7 @@ mise exec -- pnpm test          # Vitest in every package
 mise exec -- pnpm test:e2e      # isolated production-build Playwright smoke checks (3 viewports)
 mise exec -- pnpm test:e2e:quick # same checks at 1280 px only; pass a spec path to narrow further
 mise exec -- pnpm test:white-label # build with alternate identity; reject owner-string leaks
+mise exec -- pnpm test:profiles   # e2e once per adopter profile (features off); E2E_FEATURE_PROFILE=<name> runs one
 mise exec -- pnpm check:js-budget # enforce <=30 KiB gzip JavaScript per built page
 mise exec -- pnpm test:lighthouse # mobile Lighthouse scores and Core Web Vitals; local reports only
 mise exec -- pnpm exec playwright install chromium  # one-time local browser setup

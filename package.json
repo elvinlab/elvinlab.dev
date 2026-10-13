@@ -26,6 +26,7 @@
     "notify:note": "node --import ./apps/web/scripts/register-alias.mjs apps/web/scripts/notify-subscribers.ts",
     "stress:experiments": "node apps/web/scripts/stress-experiments.ts",
     "test:lighthouse": "node apps/web/scripts/run-lighthouse-ci.ts",
+    "test:profiles": "node apps/web/scripts/run-profiles.ts",
     "check:js-budget": "node apps/web/scripts/performance-budget.ts",
     "check:page-weight": "node apps/web/scripts/page-weight-budget.ts",
     "verify": "node apps/web/scripts/verify-scope.ts"

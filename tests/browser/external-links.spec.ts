@@ -1,6 +1,8 @@
 import { expect, test } from '@playwright/test';
 
 import { siteConfig } from '../../apps/web/src/site.config';
+import { has, liveByPath } from './helpers/features';
+import { escapeRegExp, text } from './helpers/site';
 
 /**
  * Links that leave the site open in a new tab (so the visitor keeps their place in the blog),
@@ -17,25 +19,31 @@ import { siteConfig } from '../../apps/web/src/site.config';
  */
 const OWN_DOMAIN = new URL(siteConfig.url).hostname.replace(/^www\./, '');
 
-const HINTS = { es: /se abre en una pestaña nueva/, en: /opens in a new tab/ } as const;
+const HINTS = {
+  es: new RegExp(escapeRegExp(text('es', 'link.newTab'))),
+  en: new RegExp(escapeRegExp(text('en', 'link.newTab'))),
+} as const;
 
-const PAGES = [
-  '/',
-  '/en/',
-  '/me/',
-  '/en/me/',
-  '/notes/',
-  '/notes/smoke-es/',
-  '/en/notes/smoke-en/',
-  '/contact/',
-  '/en/contact/',
-  '/changelog/',
-  '/en/changelog/',
-  '/privacy/',
-  '/en/privacy/',
-  '/terms/',
-  '/en/terms/',
-];
+const PAGES = liveByPath(
+  [
+    '/',
+    '/en/',
+    '/me/',
+    '/en/me/',
+    '/notes/',
+    '/notes/smoke-es/',
+    '/en/notes/smoke-en/',
+    '/contact/',
+    '/en/contact/',
+    '/changelog/',
+    '/en/changelog/',
+    '/privacy/',
+    '/en/privacy/',
+    '/terms/',
+    '/en/terms/',
+  ],
+  (path) => path,
+);
 
 /** Pages that must show at least one external link, so the check cannot pass on an empty set. */
 const MUST_HAVE_EXTERNAL = [
@@ -131,12 +139,13 @@ test('the social links keep rel="me" next to the safety tokens', async ({ page }
 });
 
 test('a link in a note body is handled like any other', async ({ page }) => {
+  test.skip(!has({ routes: ['notes'] }), 'needs the notes routes');
   await page.goto('/notes/smoke-es/');
   const link = page.locator('article a[href^="https://example.org"]');
   await expect(link).toHaveCount(1);
   await expect(link).toHaveAttribute('target', '_blank');
   await expect(link).toHaveAttribute('rel', 'noopener noreferrer');
-  await expect(link.locator('.sr-only')).toHaveText(' (se abre en una pestaña nueva)');
+  await expect(link.locator('.sr-only')).toHaveText(` (${text('es', 'link.newTab')})`);
   // The note's own links stay in the same tab.
   const internal = page.locator('article a[href="/notes/smoke-es-next/"]');
   await expect(internal).toHaveCount(1);
@@ -144,8 +153,9 @@ test('a link in a note body is handled like any other', async ({ page }) => {
 });
 
 test('an English note announces the new tab in English', async ({ page }) => {
+  test.skip(!has({ routes: ['notes'] }), 'needs the notes routes');
   await page.goto('/en/notes/smoke-en/');
   const link = page.locator('article a[href^="https://example.org"]');
   await expect(link).toHaveCount(1);
-  await expect(link.locator('.sr-only')).toHaveText(' (opens in a new tab)');
+  await expect(link.locator('.sr-only')).toHaveText(` (${text('en', 'link.newTab')})`);
 });

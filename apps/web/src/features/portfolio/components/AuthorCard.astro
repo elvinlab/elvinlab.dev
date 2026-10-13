@@ -19,7 +19,8 @@ const initials = site.identity.name.split(' ').slice(0, 2).map((part) => part[0]
 const links = [
   ...site.socials.map((social) => ({ href: social.url, label: social.label, icon: social.icon, rel: 'me' })),
   ...(isEnabled('contact') ? [{ href: localizePath('/contact/', locale, LOCALES), label: t(locale, 'nav.contact'), icon: 'mail', rel: '' }] : []),
-  { href: '/rss.xml', label: 'RSS', icon: 'rss', rel: '' },
+  // The feed is built only with `features.blog`: without it `/rss.xml` is a 404.
+  ...(isEnabled('blog') ? [{ href: '/rss.xml', label: 'RSS', icon: 'rss', rel: '' }] : []),
 ];
 ---
 

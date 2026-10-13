@@ -44,6 +44,12 @@ export const FULL_WIDE: readonly string[] = [
   'apps/web/astro.config.ts',
   'apps/web/wrangler.jsonc',
   'apps/web/scripts/fixture-workspace.ts',
+  'apps/web/scripts/fixture-preview.ts',
+  // The adopter profiles and the resolved feature set every spec and Lighthouse URL follows.
+  'apps/web/scripts/e2e-features.ts',
+  'apps/web/scripts/e2e-profiles.ts',
+  'apps/web/scripts/lighthouse-pages.ts',
+  'tests/browser/helpers/features.ts',
   '.dependency-cruiser.cjs',
   // The verification tool itself: a bug in it invalidates what it recorded.
   'apps/web/scripts/verification-map.ts',
@@ -367,6 +373,7 @@ export const CHECKS: readonly CheckDef[] = [
     helpers: true,
     responsive: true,
   }),
+  e2e({ file: 'no-blog-feed.spec.ts', covers: [...NOTE_PAGE, ...HOME], helpers: true }),
   e2e({ file: 'font-swap.spec.ts', covers: [...NOTE_PAGE, ...HOME] }),
   e2e({ file: 'changelog.spec.ts', covers: CHANGELOG }),
   e2e({ file: 'pixel-display.spec.ts', covers: [...NOTE_PAGE, ...HOME], responsive: true }),

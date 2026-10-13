@@ -1,14 +1,32 @@
 import { expect, type Page, test } from '@playwright/test';
 
+import { has, requires, seedTheme } from './helpers/features';
+import { escapeRegExp, flagship, secondExperiment, text, themes } from './helpers/site';
+
+requires({ routes: ['experiments'] });
+
 /**
  * The experiments page and the compact experiments block on `/me`. The fixture build copies the real `experiments.json`;
  * it holds only fixture notes, so `dropUnavailableProjectNotes` removes the `note` of an entry
  * whose note is not a fixture. Case links therefore appear only when their note exists, and every
  * one that does appear must resolve.
  */
+/** The profile on the code host that owns the repositories of the experiments. */
+const REPO_OWNER_URL = `${new URL(flagship.repo ?? '').origin}/${new URL(flagship.repo ?? '').pathname.split('/')[1]}/`;
+
 const PAGES = [
-  { path: '/experiments/', heading: 'Experimentos', live: 'Ver sitio', code: 'Código' },
-  { path: '/en/experiments/', heading: 'Experiments', live: 'View site', code: 'Code' },
+  {
+    path: '/experiments/',
+    heading: text('es', 'experiments.title'),
+    live: text('es', 'experiment.live'),
+    code: text('es', 'experiment.code'),
+  },
+  {
+    path: '/en/experiments/',
+    heading: text('en', 'experiments.title'),
+    live: text('en', 'experiment.live'),
+    code: text('en', 'experiment.code'),
+  },
 ] as const;
 
 test.beforeEach(({ browserName: _browserName }, testInfo) => {
@@ -16,11 +34,11 @@ test.beforeEach(({ browserName: _browserName }, testInfo) => {
 });
 
 for (const { path } of PAGES) {
-  for (const theme of ['elvinlab-light', 'elvinlab-dark']) {
+  for (const theme of [themes.light, themes.dark]) {
     test(`${path} featured glow stays inside 820px in ${theme}`, async ({ page }) => {
       await page.setViewportSize({ width: 820, height: 900 });
       await page.emulateMedia({ reducedMotion: 'reduce' });
-      await page.addInitScript((value) => localStorage.setItem('theme', value), theme);
+      await seedTheme(page, theme);
       await page.goto(path);
       await page.evaluate(() => document.fonts.ready);
       await expect(page.locator('html')).toHaveAttribute('data-theme', theme);
@@ -40,19 +58,21 @@ for (const { path, heading, live, code } of PAGES) {
     await expect(page.getByRole('heading', { level: 1, name: heading })).toBeVisible();
     const cards = page.locator('article');
     await expect(cards).toHaveCount(2);
-    await expect(page.getByRole('heading', { level: 2, name: 'elvinlab.dev' })).toBeVisible();
-    await expect(page.getByRole('heading', { level: 2, name: 'agentic-dev-setup' })).toBeVisible();
+    await expect(page.getByRole('heading', { level: 2, name: flagship.title })).toBeVisible();
+    await expect(
+      page.getByRole('heading', { level: 2, name: secondExperiment.title }),
+    ).toBeVisible();
 
     // The live site is the site itself, so the helper keeps it in the same tab; code links are
     // external and open in a new tab without leaking the opener.
-    const site = page.getByRole('link', { name: new RegExp(`^${live}`) });
-    await expect(site).toHaveCount(1);
-    await expect(site).toHaveAttribute('href', 'https://elvinlab.dev');
-    await expect(site).not.toHaveAttribute('target', '_blank');
+    const liveLink = page.getByRole('link', { name: new RegExp(`^${live}`) });
+    await expect(liveLink).toHaveCount(1);
+    await expect(liveLink).toHaveAttribute('href', flagship.url ?? '');
+    await expect(liveLink).not.toHaveAttribute('target', '_blank');
     const repos = page.getByRole('link', { name: new RegExp(`^${code}`) });
     await expect(repos).toHaveCount(2);
     for (const repo of await repos.all()) {
-      await expect(repo).toHaveAttribute('href', /^https:\/\/github\.com\/elvinlab\//);
+      await expect(repo).toHaveAttribute('href', new RegExp(`^${escapeRegExp(REPO_OWNER_URL)}`));
       await expect(repo).toHaveAttribute('target', '_blank');
       await expect(repo).toHaveAttribute('rel', /noopener/);
     }
@@ -76,8 +96,16 @@ for (const { path, heading, live, code } of PAGES) {
 
 test.describe('pagination and head of the list (two entries: a single page)', () => {
   for (const [path, title, pager] of [
-    ['/experiments/', 'Experimentos · ', /Paginación de experimentos/],
-    ['/en/experiments/', 'Experiments · ', /Experiments pagination/],
+    [
+      '/experiments/',
+      `${text('es', 'experiments.title')} · `,
+      new RegExp(escapeRegExp(text('es', 'experiments.pager.label'))),
+    ],
+    [
+      '/en/experiments/',
+      `${text('en', 'experiments.title')} · `,
+      new RegExp(escapeRegExp(text('en', 'experiments.pager.label'))),
+    ],
   ] as const) {
     test(`${path} has a title, a self canonical, hreflang alternates and no pager`, async ({
       page,
@@ -131,19 +159,18 @@ test('the second piece shows its screenshot lazily with alternative text and exp
 }) => {
   await page.goto('/experiments/');
   const shot = page.getByRole('img', {
-    name: 'Captura de la nota que cuenta el caso de agentic-dev-setup',
+    name: secondExperiment.images[0]?.alt.es ?? '',
   });
   await expect(shot).toHaveAttribute('loading', 'lazy');
   await expect(shot).toHaveAttribute('decoding', 'async');
   await expect(shot).toHaveAttribute('width', '1280');
   await expect(shot).toHaveAttribute('height', '800');
   await page.goto('/en/experiments/');
-  await expect(
-    page.getByRole('img', { name: 'Screenshot of the elvinlab.dev home page' }),
-  ).toBeVisible();
+  await expect(page.getByRole('img', { name: flagship.images[0]?.alt.en ?? '' })).toBeVisible();
 });
 
 test('the page title stays inside the page-title scale of the sibling pages', async ({ page }) => {
+  test.skip(!has({ routes: ['contact'] }), 'needs route contact');
   const size = async (path: string) =>
     page.goto(path).then(() =>
       page
@@ -181,18 +208,18 @@ test('the gallery thumbnails never wrap, even on a phone', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto('/experiments/');
   const tops = await page
-    .locator('#elvinlab-dev label.xp-thumb')
+    .locator(`#${flagship.id} label.xp-thumb`)
     .evaluateAll((labels) => labels.map((label) => Math.round(label.getBoundingClientRect().top)));
   expect(tops).toHaveLength(4);
   expect(new Set(tops).size).toBe(1);
 });
 
-test('the featured flagship leads: elvinlab.dev comes before agentic-dev-setup', async ({
+test('the featured flagship leads: the first experiment comes before the second', async ({
   page,
 }) => {
   await page.goto('/experiments/');
   const ids = await page.locator('main article').evaluateAll((pieces) => pieces.map((p) => p.id));
-  expect(ids).toEqual(['elvinlab-dev', 'agentic-dev-setup']);
+  expect(ids).toEqual([flagship.id, secondExperiment.id]);
 });
 
 test('only the first image of the first piece is eager, every other one is lazy', async ({
@@ -210,13 +237,15 @@ test('only the first image of the first piece is eager, every other one is lazy'
 });
 
 test.describe('the gallery of an experiment with several images', () => {
-  const piece = (page: Page) => page.locator('#elvinlab-dev');
+  const piece = (page: Page) => page.locator(`#${flagship.id}`);
   const caption = (page: Page) => piece(page).locator('figcaption:visible');
 
   test('shows the first slide and works with the mouse and the arrow keys', async ({ page }) => {
     await page.goto('/experiments/');
     await expect(
-      piece(page).getByRole('group', { name: 'Capturas de elvinlab.dev' }),
+      piece(page).getByRole('group', {
+        name: text('es', 'experiment.gallery', { title: flagship.title }),
+      }),
     ).toBeVisible();
     await expect(caption(page)).toContainText('Inicio: la última nota y el perfil');
     await expect(caption(page)).toContainText('1 / 4');
@@ -231,7 +260,7 @@ test.describe('the gallery of an experiment with several images', () => {
     await expect(piece(page).locator('figure:visible')).toHaveCount(1);
 
     // Arrow keys move between radios natively.
-    await page.locator('#elvinlab-dev-shot-2').focus();
+    await page.locator(`#${flagship.id}-shot-2`).focus();
     await page.keyboard.press('ArrowRight');
     await expect(caption(page)).toContainText('3 / 4');
     await page.keyboard.press('ArrowLeft');
@@ -245,7 +274,7 @@ test.describe('the gallery of an experiment with several images', () => {
     await page.goto('/experiments/');
     await expect(piece(page).getByRole('radio')).toHaveCount(4);
     await page.keyboard.press('Tab');
-    await page.locator('#elvinlab-dev-shot-1').focus();
+    await page.locator(`#${flagship.id}-shot-1`).focus();
     await page.keyboard.press('ArrowRight');
     const ring = await piece(page)
       .locator('label.xp-thumb')
@@ -262,7 +291,7 @@ test.describe('without JavaScript', () => {
     page,
   }) => {
     await page.goto('/experiments/');
-    const piece = page.locator('#elvinlab-dev');
+    const piece = page.locator(`#${flagship.id}`);
     const caption = piece.locator('figcaption:visible');
     await expect(caption).toContainText('1 / 4');
     await piece.locator('label.xp-thumb').nth(2).click();
@@ -278,11 +307,11 @@ test('a single image is a plain figure and there is no compact tier with two fea
   await expect(single.getByRole('radio')).toHaveCount(0);
   await expect(single.locator('fieldset')).toHaveCount(0);
   await expect(single.locator('figcaption')).toContainText('La nota que cuenta el caso');
-  await expect(page.getByRole('heading', { name: 'Más experimentos' })).toHaveCount(0);
+  await expect(page.getByRole('heading', { name: text('es', 'experiments.more') })).toHaveCount(0);
   await expect(page.locator('li.xc')).toHaveCount(0);
 });
 
-for (const id of ['elvinlab-dev', 'agentic-dev-setup']) {
+for (const id of [flagship.id, secondExperiment.id]) {
   test(`#${id} lands on its piece even with content-visibility on later pieces`, async ({
     page,
   }) => {
@@ -310,18 +339,18 @@ test.describe('with reduced motion', () => {
   });
 });
 
-for (const [path, section, all, text, indexPath] of [
+for (const [path, section, all, blurb, indexPath] of [
   [
     '/me/',
-    'Experimentos recientes',
-    'Ver todos los experimentos',
+    text('es', 'me.experiments'),
+    text('es', 'me.experiments.more.cta'),
     /seguir conociendo mi trabajo/,
     '/experiments/',
   ],
   [
     '/en/me/',
-    'Recent experiments',
-    'See all experiments',
+    text('en', 'me.experiments'),
+    text('en', 'me.experiments.more.cta'),
     /keep exploring my work/,
     '/en/experiments/',
   ],
@@ -338,7 +367,7 @@ for (const [path, section, all, text, indexPath] of [
     await expect(rows).toHaveCount(2);
     await expect(rows.first()).toHaveAttribute(
       'href',
-      new RegExp(`^${indexPath}#(elvinlab-dev|agentic-dev-setup)$`),
+      new RegExp(`^${indexPath}#(${flagship.id}|${secondExperiment.id})$`),
     );
     for (const row of await rows.all()) {
       expect((await row.boundingBox())?.height ?? 0).toBeGreaterThanOrEqual(44);
@@ -357,7 +386,12 @@ for (const [path, section, all, text, indexPath] of [
       }));
     });
     const blockTop = order.find((h) => h.text === section)?.top ?? Number.NaN;
-    const bring = order.find((h) => /Qué aporto|What I bring/.test(h.text))?.top ?? Number.NaN;
+    const bring =
+      order.find((h) =>
+        new RegExp(
+          `${escapeRegExp(text('es', 'me.whatIBring'))}|${escapeRegExp(text('en', 'me.whatIBring'))}`,
+        ).test(h.text),
+      )?.top ?? Number.NaN;
     expect(blockTop).toBeLessThan(bring);
 
     // The hero has no experiments shortcut: its call to action is the closing band below the rows.
@@ -365,7 +399,7 @@ for (const [path, section, all, text, indexPath] of [
 
     // The heading carries no link; the closing call to action leads to the experiments page.
     await expect(block.locator('h2 a')).toHaveCount(0);
-    await expect(block.getByText(text)).toBeVisible();
+    await expect(block.getByText(blurb)).toBeVisible();
     const cta = block.getByRole('link', { name: all });
     await expect(cta).toHaveAttribute('href', indexPath);
     expect((await cta.boundingBox())?.height ?? 0).toBeGreaterThanOrEqual(44);
@@ -381,11 +415,13 @@ for (const [path, section, all, text, indexPath] of [
   });
 }
 
-test('the navbar lists Experiments and it leads to the experiments page', async ({ page }) => {
+test('the navbar lists the experiments link and it leads to the experiments page', async ({
+  page,
+}) => {
   await page.goto('/');
   await page
     .getByRole('navigation', { name: 'Principal' })
-    .getByRole('link', { name: 'Experimentos' })
+    .getByRole('link', { name: text('es', 'experiments.title') })
     .click();
   await expect(page).toHaveURL(/\/experiments\/$/);
 });

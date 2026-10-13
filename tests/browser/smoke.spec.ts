@@ -1,13 +1,18 @@
 import { expect, test } from '@playwright/test';
 
+import { has, liveByPath } from './helpers/features';
+import { escapeRegExp, site, text, themes, tokenRgb } from './helpers/site';
+
 for (const { locale, prefix, slug } of [
   { locale: 'es', prefix: '', slug: 'smoke-es' },
   { locale: 'en', prefix: '/en', slug: 'smoke-en' },
 ]) {
-  const paths =
+  const paths = liveByPath(
     locale === 'es'
       ? [`${prefix}/`, `${prefix}/notes/`, `${prefix}/notes/${slug}/`]
-      : [`${prefix}/`, `${prefix}/notes/${slug}/`];
+      : [`${prefix}/`, `${prefix}/notes/${slug}/`],
+    (path) => path,
+  );
 
   for (const path of paths) {
     test(`${path} renders production content`, async ({ page }) => {
@@ -35,7 +40,9 @@ for (const { locale, prefix, slug } of [
           );
         }
       } else {
-        await expect(page.locator(`a[href="${prefix}/notes/${slug}/"]`).first()).toBeVisible();
+        if (has({ routes: ['notes'] })) {
+          await expect(page.locator(`a[href="${prefix}/notes/${slug}/"]`).first()).toBeVisible();
+        }
       }
       expect(
         await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth),
@@ -55,20 +62,24 @@ for (const { locale, path } of [
     const hero = page.locator('[data-home-hero]');
     await expect(hero).toBeVisible();
     await expect(hero.locator('h1 .animate-blink')).toHaveCount(0);
-    const navbarBrand = page.locator('[data-navbar]').getByRole('link', { name: /elvinlab/ });
+    const navbarBrand = page
+      .locator('[data-navbar]')
+      .getByRole('link', { name: new RegExp(escapeRegExp(site.handle)) });
     await expect(navbarBrand).toHaveAttribute('href', locale === 'es' ? '/' : '/en/');
-    await expect(navbarBrand).toContainText('elvinlab');
+    await expect(navbarBrand).toContainText(site.handle);
     await expect(navbarBrand).toHaveClass(/font-retro/);
     await expect(navbarBrand.locator('.animate-blink')).toHaveCount(0);
     await expect(page.locator('[data-banner-fade]')).toHaveCSS('height', '120px');
 
     // The photo sits in the hero from md up and in the sidebar card on phones: exactly one is visible.
     await expect(
-      page.locator('img[alt="Elvin González"][src$=".webp"]').filter({ visible: true }),
+      page.locator(`img[alt="${site.name}"][src$=".webp"]`).filter({ visible: true }),
     ).toHaveCount(1);
 
     const hiringCard = page.locator('section', {
-      has: page.getByRole('heading', { name: locale === 'es' ? '¿Contratando?' : 'Hiring?' }),
+      has: page.getByRole('heading', {
+        name: locale === 'es' ? text('es', 'recruiter.title') : text('en', 'recruiter.title'),
+      }),
     });
     const availability = hiringCard.locator('[data-recruiter-status]');
     await expect(availability).toBeVisible();
@@ -82,11 +93,13 @@ for (const { locale, path } of [
       }),
     ).toHaveCount(0);
     // The profile button shows from md up; below md the hero button (data-hero-cta) carries it.
-    const profileLink = hiringCard.locator(`a[href="${locale === 'es' ? '/me/' : '/en/me/'}"]`);
-    await expect(profileLink).toHaveCount(1);
-    const wide = await page.evaluate(() => window.matchMedia('(min-width: 768px)').matches);
-    if (wide) await expect(profileLink).toBeVisible();
-    else await expect(page.locator('[data-hero-cta]')).toBeVisible();
+    if (has({ flags: ['me'] })) {
+      const profileLink = hiringCard.locator(`a[href="${locale === 'es' ? '/me/' : '/en/me/'}"]`);
+      await expect(profileLink).toHaveCount(1);
+      const wide = await page.evaluate(() => window.matchMedia('(min-width: 768px)').matches);
+      if (wide) await expect(profileLink).toBeVisible();
+      else await expect(page.locator('[data-hero-cta]')).toBeVisible();
+    }
     // The CV link exists now (one Drive PDF per language, see cv-and-credentials.spec.ts).
     await expect(
       hiringCard.getByRole('link', { name: locale === 'es' ? 'Ver CV' : 'View CV' }),
@@ -102,14 +115,18 @@ for (const { locale, path } of [
   });
 }
 
-const CONTACT_PAGES = [
-  { locale: 'es' as const, path: '/contact/' },
-  { locale: 'en' as const, path: '/en/contact/' },
-];
+const CONTACT_PAGES = liveByPath(
+  [
+    { locale: 'es' as const, path: '/contact/' },
+    { locale: 'en' as const, path: '/en/contact/' },
+  ],
+  ({ path }) => path,
+);
 
 test('locale suggestion stays in document flow and only appears for a locale mismatch', async ({
   page,
 }) => {
+  test.skip(!has({ flags: ['languageHint'] }), 'needs features.languageHint');
   await page.addInitScript(() => {
     Object.defineProperty(navigator, 'languages', { configurable: true, get: () => ['en'] });
   });
@@ -148,6 +165,8 @@ test('locale suggestion stays in document flow and only appears for a locale mis
   await page.reload();
   await expect(hint).toBeHidden();
 
+  // The translated-note suggestion needs the notes routes.
+  if (!has({ routes: ['notes'] })) return;
   await page.evaluate(() => localStorage.removeItem('language-hint-dismissed'));
   const spanishNote = await page.goto('/notes/smoke-es/');
   expect(spanishNote?.status()).toBe(200);
@@ -160,6 +179,7 @@ test('locale suggestion stays in document flow and only appears for a locale mis
 });
 
 test('the locale suggestion is a quiet line of text, not a card', async ({ page }) => {
+  test.skip(!has({ flags: ['languageHint'] }), 'needs features.languageHint');
   await page.addInitScript(() => {
     Object.defineProperty(navigator, 'languages', { configurable: true, get: () => ['en'] });
   });
@@ -168,7 +188,10 @@ test('the locale suggestion is a quiet line of text, not a card', async ({ page 
   await expect(hint).toBeVisible();
   await expect(hint).toHaveCSS('background-color', 'rgba(0, 0, 0, 0)');
   await expect(hint).toHaveCSS('font-size', '13px');
-  await expect(hint.locator('a')).not.toHaveCSS('background-color', /rgb\(124, 58, 237\)/);
+  await expect(hint.locator('a')).not.toHaveCSS(
+    'background-color',
+    tokenRgb(themes.default, 'button'),
+  );
 });
 
 test('English pages never suggest switching to Spanish, whatever the browser prefers', async ({
@@ -259,10 +282,13 @@ for (const { locale, path } of CONTACT_PAGES) {
   });
 }
 
-const CHANGELOG_PAGES = [
-  { locale: 'es' as const, path: '/changelog/' },
-  { locale: 'en' as const, path: '/en/changelog/' },
-];
+const CHANGELOG_PAGES = liveByPath(
+  [
+    { locale: 'es' as const, path: '/changelog/' },
+    { locale: 'en' as const, path: '/en/changelog/' },
+  ],
+  ({ path }) => path,
+);
 
 for (const { locale, path } of CHANGELOG_PAGES) {
   test(`${path} renders the changelog and is linked from the footer`, async ({ page }) => {

@@ -1,16 +1,29 @@
 import { expect, type Page, test } from '@playwright/test';
 
 import { describeViolations, scan } from './helpers/axe';
+import { livePages, requires, seedTheme } from './helpers/features';
+import { escapeRegExp, text, themes } from './helpers/site';
 import { stubThirdParties } from './helpers/third-party';
 
 const NOTES = [
-  { path: '/notes/smoke-es/', label: /Último experimento/, experiments: '/experiments/' },
-  { path: '/en/notes/smoke-en/', label: /Latest experiment/, experiments: '/en/experiments/' },
+  {
+    path: '/notes/smoke-es/',
+    label: new RegExp(escapeRegExp(text('es', 'nudge.label'))),
+    experiments: '/experiments/',
+  },
+  {
+    path: '/en/notes/smoke-en/',
+    label: new RegExp(escapeRegExp(text('en', 'nudge.label'))),
+    experiments: '/en/experiments/',
+  },
 ] as const;
 
 const STATIC_CARD = '[data-experiment-card]:not([data-nudge-floating])';
 const FLOATING = '[data-nudge-floating]';
 const OPEN = '[data-nudge-floating][data-open]';
+
+// The card needs the experiments to point to and the notes to float over; off, the file is skipped.
+requires({ flags: ['experimentNudge', 'experiments'], routes: ['notes'] });
 
 test.beforeEach(async ({ page }) => {
   await stubThirdParties(page);
@@ -99,7 +112,9 @@ for (const { path, label, experiments } of NOTES) {
       await expect(page.locator(OPEN)).toBeVisible();
       await page.locator('.nudge-close').click();
       await expect(page.locator(FLOATING)).toBeHidden();
-      expect(await page.evaluate(() => localStorage.getItem('experiment-nudge'))).toBe('1');
+      expect(await page.evaluate(() => localStorage.getItem('experiment-nudge'))).toMatch(
+        /^\d{13}$/,
+      );
       await page.reload();
       await expect(page.locator(FLOATING)).toHaveCount(0);
     });
@@ -148,9 +163,9 @@ for (const { path, label, experiments } of NOTES) {
       expect(gaps.overflow).toBe(false);
     });
 
-    for (const theme of ['elvinlab-dark', 'elvinlab-light']) {
+    for (const theme of [themes.dark, themes.light]) {
       test(`has no axe violations with the card open (${theme})`, async ({ page }) => {
-        await page.addInitScript((t) => localStorage.setItem('theme', t), theme);
+        await seedTheme(page, theme);
         await shortViewport(page);
         await page.goto(path);
         await readTo(page, 'article', 0.8);
@@ -184,7 +199,14 @@ test.describe('the notes index', () => {
 });
 
 test.describe('where the card must not appear', () => {
-  for (const path of ['/me/', '/en/me/', '/contact/', '/experiments/', '/en/experiments/']) {
+  const excluded = livePages([
+    { path: '/me/' },
+    { path: '/en/me/' },
+    { path: '/contact/', needs: { routes: ['contact'] } },
+    { path: '/experiments/', needs: { routes: ['experiments'] } },
+    { path: '/en/experiments/', needs: { routes: ['experiments'] } },
+  ] as const);
+  for (const { path } of excluded) {
     test(`${path} has no card and no floating copy`, async ({ page }) => {
       await page.goto(path);
       await expect(page.locator('[data-experiment-card]')).toHaveCount(0);

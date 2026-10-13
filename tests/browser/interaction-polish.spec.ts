@@ -1,5 +1,6 @@
 import { expect, type Locator, type Page, test } from '@playwright/test';
 
+import { has, liveByPath, requires } from './helpers/features';
 import { stubThirdParties } from './helpers/third-party';
 
 const MIN_TARGET = 44;
@@ -34,6 +35,7 @@ test.describe('code block copy button on a phone', () => {
   test.use({ viewport: PHONE, hasTouch: true, isMobile: true, deviceScaleFactor: 2 });
 
   test('every copy button is a 44 px target', async ({ page }) => {
+    test.skip(!has({ routes: ['notes'] }), 'needs the notes routes');
     await page.goto('/notes/smoke-es/');
     const buttons = page.locator('.prose .expressive-code .copy button');
     expect(await buttons.count()).toBeGreaterThanOrEqual(2);
@@ -45,6 +47,7 @@ test.describe('code block copy button on a phone', () => {
   });
 
   test('never covers code text', async ({ page }) => {
+    test.skip(!has({ routes: ['notes'] }), 'needs the notes routes');
     await page.goto('/notes/smoke-es/');
     const blocks = page.locator('.prose .expressive-code');
     expect(await blocks.count()).toBeGreaterThanOrEqual(2);
@@ -90,6 +93,8 @@ test.describe('code block copy button on a phone', () => {
 });
 
 test.describe('mobile navbar auto-hide', () => {
+  requires({ routes: ['notes'] });
+
   test.use({ viewport: PHONE, hasTouch: true, isMobile: true });
 
   /** Makes the page long enough to scroll and hides the navbar the way a reader would. */
@@ -150,16 +155,19 @@ test.describe('mobile navbar auto-hide', () => {
   });
 });
 
-for (const { path, intro } of [
-  {
-    path: '/contact/',
-    intro: '¿Una idea, una oferta o una pregunta? Escríbeme y te respondo por correo.',
-  },
-  {
-    path: '/en/contact/',
-    intro: "An idea, an offer or a question? Write to me and I'll reply by email.",
-  },
-]) {
+for (const { path, intro } of liveByPath(
+  [
+    {
+      path: '/contact/',
+      intro: '¿Una idea, una oferta o una pregunta? Escríbeme y te respondo por correo.',
+    },
+    {
+      path: '/en/contact/',
+      intro: "An idea, an offer or a question? Write to me and I'll reply by email.",
+    },
+  ],
+  ({ path }) => path,
+)) {
   test(`${path} shows its introduction once`, async ({ page }) => {
     await page.goto(path);
     const article = page.locator('main article');
@@ -177,6 +185,7 @@ test.describe('remaining hit areas on a phone', () => {
   test.use({ viewport: PHONE, hasTouch: true, isMobile: true, deviceScaleFactor: 2 });
 
   test('reading mode toggle and floating exit button have a 44 px hit area', async ({ page }) => {
+    test.skip(!has({ flags: ['readingMode'] }), 'needs features.readingMode');
     await page.goto('/notes/smoke-es/');
     const toggle = page.locator('[data-reading-toggle]');
     expect(await hasTapArea(toggle)).toBe(true);
@@ -187,6 +196,7 @@ test.describe('remaining hit areas on a phone', () => {
   test('the language suggestion link and dismiss button have a 44 px hit area', async ({
     page,
   }) => {
+    test.skip(!has({ flags: ['languageHint'] }), 'needs features.languageHint');
     await page.addInitScript(() => {
       Object.defineProperty(navigator, 'languages', { configurable: true, get: () => ['en'] });
     });

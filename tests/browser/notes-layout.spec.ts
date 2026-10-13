@@ -1,5 +1,10 @@
 import { expect, type Page, test } from '@playwright/test';
 
+import { has, profile, requires, seedTheme } from './helpers/features';
+import { themes } from './helpers/site';
+
+requires({ routes: ['notes'] });
+
 /** Vertical gap between the bottom of the article card and the top of the previous/next block. */
 const gapBelowArticle = (page: Page) =>
   page.evaluate(() => {
@@ -16,6 +21,7 @@ test('the previous/next block has room below the article', async ({ page }) => {
 });
 
 test('and more room in reading mode, where the article card is gone', async ({ page }) => {
+  test.skip(!has({ flags: ['readingMode'] }), 'needs features.readingMode');
   await page.addInitScript(() => localStorage.setItem('reading-mode', '1'));
   await page.goto('/notes/smoke-es/');
   await expect(page.locator('[data-prev-next]')).toBeVisible();
@@ -23,6 +29,7 @@ test('and more room in reading mode, where the article card is gone', async ({ p
 });
 
 test('the previous/next block keeps a gap before the discussion too', async ({ page }) => {
+  test.skip(!has({ flags: ['comments'] }), 'needs features.comments');
   await page.goto('/notes/smoke-es/');
   const gap = await page.evaluate(() => {
     const nav = document.querySelector('[data-prev-next]');
@@ -67,6 +74,8 @@ test('an image in the body of a note is framed like the site cards and never wid
 });
 
 test('on the notes index the language badge sits on the same row as the date', async ({ page }) => {
+  // The calm preset (`minimal`) moves the language badge to the foot of the row on purpose.
+  test.skip(profile.appearance === 'minimal', 'the minimal preset puts the badge at the foot');
   await page.goto('/notes/');
   const row = page.locator('[data-note-row]').first();
   const date = await row.locator('time').boundingBox();
@@ -101,7 +110,7 @@ test('the decision record in the banner has a visible solid index-card border in
   page,
 }, testInfo) => {
   test.skip(testInfo.project.name !== 'chromium-1280', 'the banner record shows from lg');
-  await page.addInitScript(() => localStorage.setItem('theme', 'elvinlab-dark'));
+  await seedTheme(page, themes.dark);
   await page.goto('/notes/smoke-es/');
   const border = await page.evaluate(() => {
     const record = document.querySelector('[data-record-banner] section');

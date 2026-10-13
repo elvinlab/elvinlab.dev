@@ -1,7 +1,11 @@
 import { expect, type Page, test } from '@playwright/test';
 
 import { describeViolations, scan } from './helpers/axe';
+import { requires, seedTheme } from './helpers/features';
+import { text, themes } from './helpers/site';
 import { stubThirdParties } from './helpers/third-party';
+
+requires({ flags: ['marks'] });
 
 /**
  * The footprint card of the home page. Like marks.spec.ts, the fixture build has no D1 binding, so
@@ -10,16 +14,16 @@ import { stubThirdParties } from './helpers/third-party';
 const HOMES = [
   {
     path: '/',
-    button: 'Dejé mi huella',
+    button: text('es', 'marks.button'),
     many: (n: number) => `${n} huellas`,
-    tip: 'Anónimo: sin guardar tu IP ni datos.',
+    tip: text('es', 'marks.privacy'),
     privacy: '/privacy/#marks',
   },
   {
     path: '/en/',
-    button: 'I was here',
+    button: text('en', 'marks.button'),
     many: (n: number) => `${n} marks`,
-    tip: 'Anonymous: no IP or data stored.',
+    tip: text('en', 'marks.privacy'),
     privacy: '/en/privacy/#marks',
   },
 ] as const;
@@ -144,9 +148,9 @@ for (const home of HOMES) {
   });
 }
 
-for (const theme of ['elvinlab-dark', 'elvinlab-light']) {
+for (const theme of [themes.dark, themes.light]) {
   test(`the home with the footprint card has no axe violations (${theme})`, async ({ page }) => {
-    await page.addInitScript((t) => localStorage.setItem('theme', t), theme);
+    await seedTheme(page, theme);
     await mockMarks(page, { total: 12 });
     await page.goto('/');
     await expect(page.locator('html')).toHaveAttribute('data-theme', theme);

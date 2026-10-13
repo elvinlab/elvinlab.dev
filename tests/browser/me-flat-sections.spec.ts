@@ -1,5 +1,7 @@
 import { expect, test } from '@playwright/test';
 
+import { escapeRegExp, text } from './helpers/site';
+
 /**
  * `/me` follows the home's "fewer boxes" pattern: the main column sits on the page background,
  * and "What I bring" is a plain list, never a grid of identical tiles.
@@ -26,10 +28,16 @@ for (const path of ['/me/', '/en/me/']) {
       }
     });
 
-    test('"What I bring" lists strengths stacked, not as a row of tiles', async ({ page }) => {
+    test('the strengths section lists strengths stacked, not as a row of tiles', async ({
+      page,
+    }) => {
       await page.goto(path);
       const items = page
-        .locator('main section', { hasText: /Qué aporto|What I bring/ })
+        .locator('main section', {
+          hasText: new RegExp(
+            `${escapeRegExp(text('es', 'me.whatIBring'))}|${escapeRegExp(text('en', 'me.whatIBring'))}`,
+          ),
+        })
         .locator('ul > li');
       const count = await items.count();
       expect(count).toBeGreaterThanOrEqual(2);

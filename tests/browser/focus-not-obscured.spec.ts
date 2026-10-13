@@ -1,11 +1,13 @@
 import { expect, type Page, test } from '@playwright/test';
 
+import { liveByPath } from './helpers/features';
+
 /**
  * WCAG 2.2 "Focus Not Obscured": the header is sticky, so moving focus up the page (Shift+Tab) must
  * not leave the focused element under it. Measured on production before the fix: the browser scrolled
  * a focused element to the viewport edge, under the 72 px header, on almost every page.
  */
-const PAGES = ['/', '/contact/', '/privacy/', '/notes/'];
+const PAGES = liveByPath(['/', '/contact/', '/privacy/', '/notes/'], (path) => path);
 const STOPS = 80;
 
 /** What covers the focused element at its top edge, or '' when nothing does. */

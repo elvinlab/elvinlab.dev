@@ -1,5 +1,8 @@
 import { expect, type Locator, type Page, test } from '@playwright/test';
 
+import { has, liveByPath } from './helpers/features';
+import { text } from './helpers/site';
+
 /** Phone viewports: 360 is the narrowest supported width, 390 the design reference. */
 const PHONES = [
   { width: 360, height: 780 },
@@ -49,6 +52,7 @@ for (const phone of PHONES) {
     test('home banner is short enough for the latest note to start near the fold', async ({
       page,
     }) => {
+      test.skip(!has({ routes: ['notes'] }), 'needs the notes routes');
       await page.addInitScript(() => {
         (window as unknown as { __cls: number }).__cls = 0;
         new PerformanceObserver((list) => {
@@ -94,7 +98,9 @@ for (const phone of PHONES) {
 
     test('navbar controls are at least 44 x 44 and nothing overflows', async ({ page }) => {
       await page.goto('/');
-      for (const selector of ['[data-theme-toggle]', '[data-nav-toggle]']) {
+      for (const selector of has({ flags: ['themeToggle'] })
+        ? ['[data-theme-toggle]', '[data-nav-toggle]']
+        : ['[data-nav-toggle]']) {
         const box = await boxOf(page.locator(selector));
         expect(box.width, `${selector} width`).toBeGreaterThanOrEqual(MIN_TARGET);
         expect(box.height, `${selector} height`).toBeGreaterThanOrEqual(MIN_TARGET);
@@ -111,6 +117,7 @@ for (const phone of PHONES) {
     });
 
     test('tag chips, sidebar links and the notes index keep a 44 px hit area', async ({ page }) => {
+      test.skip(!has({ routes: ['notes'] }), 'needs the notes routes');
       await page.goto('/notes/');
       const chips = page.locator('a.rounded-pill.bg-chip');
       expect(await chips.count()).toBeGreaterThan(0);
@@ -123,6 +130,7 @@ for (const phone of PHONES) {
     test('footer links, "all notes" and the banner toggle have a 44 px hit area', async ({
       page,
     }) => {
+      test.skip(!has({ routes: ['notes'] }), 'needs the notes routes');
       await page.goto('/');
       expect(await hasTapArea(page.locator('[data-banner-toggle]'))).toBe(true);
       expect(await hasTapArea(page.locator('a[href="/notes/"]:not([data-navbar] a)').first())).toBe(
@@ -137,6 +145,7 @@ for (const phone of PHONES) {
     });
 
     test('the home notebook rows show a date under the title', async ({ page }) => {
+      test.skip(!has({ routes: ['notes'] }), 'needs the notes routes');
       await page.goto('/');
       const rows = page.locator('a[href^="/notes/"]', { has: page.locator('time') }).filter({
         has: page.locator('span.font-mono'),
@@ -155,10 +164,11 @@ for (const phone of PHONES) {
     });
 
     test('the hiring card does not repeat the hero profile button', async ({ page }) => {
+      test.skip(!has({ flags: ['me'] }), 'needs features.me');
       await page.goto('/');
       await expect(page.locator('[data-hero-cta]')).toBeVisible();
       const hiringCard = page.locator('section', {
-        has: page.getByRole('heading', { name: '¿Contratando?' }),
+        has: page.getByRole('heading', { name: text('es', 'recruiter.title') }),
       });
       await expect(hiringCard.locator('[data-recruiter-status]')).toBeVisible();
       await expect(hiringCard.locator('a[href="/me/"]')).toBeHidden();
@@ -176,6 +186,7 @@ for (const phone of PHONES) {
     });
 
     test('the language suggestion fits on one line', async ({ page }) => {
+      test.skip(!has({ flags: ['languageHint'] }), 'needs features.languageHint');
       await page.addInitScript(() => {
         Object.defineProperty(navigator, 'languages', { configurable: true, get: () => ['en'] });
       });
@@ -194,6 +205,7 @@ test.describe('desktop pointer', () => {
   test.use({ viewport: { width: 1280, height: 900 } });
 
   test('the background picker is at least 44 x 44', async ({ browser }) => {
+    test.skip(!has({ flags: ['backgroundPicker'] }), 'needs features.backgroundPicker');
     // The picker is hidden under prefers-reduced-motion (the project default), so opt out here.
     const context = await browser.newContext({
       viewport: { width: 1280, height: 900 },
@@ -229,6 +241,7 @@ test.describe('background picker icon', () => {
   test.use({ viewport: { width: 390, height: 844 }, reducedMotion: 'no-preference' });
 
   test('never looks like the theme toggle (no sun-like circle with rays)', async ({ page }) => {
+    test.skip(!has({ flags: ['backgroundPicker'] }), 'needs features.backgroundPicker');
     await page.goto('/');
     const picker = page.locator('[data-background-toggle]');
     for (let step = 0; step < 3; step += 1) {
@@ -245,7 +258,7 @@ test.describe('background picker icon', () => {
 /** Pages that must show at least one reading-time segment (so the nowrap check cannot pass empty). */
 const WITH_READING_TIME = new Set(['/', '/notes/', '/notes/smoke-es/', '/en/']);
 
-for (const path of ['/', '/notes/', '/notes/smoke-es/', '/en/', '/me/']) {
+for (const path of liveByPath(['/', '/notes/', '/notes/smoke-es/', '/en/', '/me/'], (p) => p)) {
   test.describe(`meta text on ${path}`, () => {
     test.use({ viewport: { width: 390, height: 844 } });
 
@@ -281,7 +294,8 @@ for (const path of ['/', '/notes/', '/notes/smoke-es/', '/en/', '/me/']) {
         }
         return { segments: count, breakable: found };
       });
-      if (WITH_READING_TIME.has(path)) expect(segments).toBeGreaterThan(0);
+      if (WITH_READING_TIME.has(path) && has({ routes: ['notes'] }))
+        expect(segments).toBeGreaterThan(0);
       expect(breakable).toEqual([]);
     });
   });

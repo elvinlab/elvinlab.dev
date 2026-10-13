@@ -1,11 +1,13 @@
 import { expect, type Page, test } from '@playwright/test';
 
+import { site } from './helpers/site';
+
 /**
  * The portrait appears only on /me: the home author card keeps the cartoon avatar. Both are
  * `identity` images of the real `site.config.ts`, so the specs compare what each page serves
  * instead of hard-coding hashed file names.
  */
-const NAME = 'Elvin González';
+const NAME = site.name;
 
 test.beforeEach(({ browserName: _browserName }, testInfo) => {
   test.skip(testInfo.project.name !== 'chromium-1280', 'the image choice does not depend on width');

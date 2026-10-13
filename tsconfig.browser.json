@@ -1,5 +1,10 @@
 {
   "extends": "./tsconfig.base.json",
-  "compilerOptions": { "types": ["node"] },
+  "compilerOptions": {
+    "types": ["node"],
+    "allowImportingTsExtensions": true,
+    // The specs import the e2e profile resolver, which uses the apps/web alias.
+    "paths": { "@/*": ["./apps/web/src/*"] }
+  },
   "include": ["playwright.config.ts", "tests/browser/**/*.ts"]
 }

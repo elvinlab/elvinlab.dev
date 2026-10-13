@@ -1,5 +1,10 @@
 import { expect, test } from '@playwright/test';
 
+import { requires } from './helpers/features';
+import { site } from './helpers/site';
+
+requires({ routes: ['notes'] });
+
 /**
  * The share panel of a note: copy link plus one plain link per network. They are ordinary anchors
  * (no third-party script), they open in a new tab and each carries the canonical URL of the note.
@@ -15,13 +20,13 @@ test.beforeEach(({ browserName: _browserName }, testInfo) => {
 
 for (const { path, heading, title } of NOTES) {
   test.describe(`${path} share panel`, () => {
-    const canonical = `https://elvinlab.dev${path}`;
+    const canonical = `${site.origin}${path}`;
     const panel = (page: import('@playwright/test').Page) =>
       page.locator('section', { has: page.getByRole('heading', { name: heading }) });
 
-    test('shares to LinkedIn with the canonical URL', async ({ page }) => {
+    test('shares to the professional network with the canonical URL', async ({ page }) => {
       await page.goto(path);
-      const link = panel(page).getByRole('link', { name: /LinkedIn/ });
+      const link = panel(page).getByRole('link', { name: /linkedin/i });
       await expect(link).toHaveAttribute(
         'href',
         `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(canonical)}`,

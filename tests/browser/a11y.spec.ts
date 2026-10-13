@@ -1,27 +1,32 @@
 import { expect, test } from '@playwright/test';
 
 import { describeViolations, scan } from './helpers/axe';
+import { liveByPath, seedTheme } from './helpers/features';
+import { themes } from './helpers/site';
 import { stubThirdParties } from './helpers/third-party';
 
-const PAGES = [
-  '/',
-  '/me/',
-  '/en/me/',
-  '/experiments/',
-  '/en/experiments/',
-  '/changelog/',
-  '/en/changelog/page/2/',
-  '/notes/',
-  '/notes/smoke-es/',
-  '/privacy/',
-  '/en/privacy/',
-  '/terms/',
-  '/en/terms/',
-  '/en/',
-  '/contact/',
-  '/en/contact/',
-];
-const THEMES = ['elvinlab-dark', 'elvinlab-light'];
+const PAGES = liveByPath(
+  [
+    '/',
+    '/me/',
+    '/en/me/',
+    '/experiments/',
+    '/en/experiments/',
+    '/changelog/',
+    '/en/changelog/page/2/',
+    '/notes/',
+    '/notes/smoke-es/',
+    '/privacy/',
+    '/en/privacy/',
+    '/terms/',
+    '/en/terms/',
+    '/en/',
+    '/contact/',
+    '/en/contact/',
+  ],
+  (path) => path,
+);
+const THEMES = [themes.dark, themes.light];
 
 test.beforeEach(async ({ page }) => {
   await stubThirdParties(page);
@@ -31,7 +36,7 @@ for (const path of PAGES) {
   for (const theme of THEMES) {
     test(`${path} has no axe violations (${theme})`, async ({ page }) => {
       // Seed the theme before navigation so the pre-paint boot script applies it (no race).
-      await page.addInitScript((t) => localStorage.setItem('theme', t), theme);
+      await seedTheme(page, theme);
       await page.goto(path);
       await expect(page.locator('html')).toHaveAttribute('data-theme', theme);
       await expect(page.getByRole('heading', { level: 1 })).toBeVisible();

@@ -15,7 +15,13 @@ export const LISTING_SORTS = ['newest', 'oldest', 'title'] as const;
 export type ListingSort = (typeof LISTING_SORTS)[number];
 
 /** Text keyed by locale, e.g. `{ es: 'Hola', en: 'Hello' }`. Checked against `locales` below. */
-const localized = z.record(z.string(), z.string().trim().min(1));
+/**
+ * A visible text with a length limit, so a longer one fails the build with the field's path instead
+ * of overflowing the box its layout was drawn for (docs/CONFIGURATION.md, 6.10). Every text the
+ * visitor reads has one; limits are set from this site's values plus about 25% of room.
+ */
+const text = (max: number) => z.string().trim().min(1).max(max);
+const localizedText = (max: number) => z.record(z.string(), text(max));
 
 /**
  * The shape of `src/site.config.ts`: the one file that holds every setting of the site. Each field
@@ -27,13 +33,9 @@ export const siteConfigSchema = z
     url: httpsUrl.describe(
       'Canonical origin of the site (https). Used for canonical links, the sitemap and share images.',
     ),
-    title: z
-      .string()
-      .trim()
-      .min(1)
-      .describe('Site name: browser tab suffix, Open Graph site name and footer.'),
-    description: localized.describe(
-      'Default meta description per locale (shown in search results and link previews).',
+    title: text(30).describe('Site name: browser tab suffix, Open Graph site name and footer.'),
+    description: localizedText(160).describe(
+      'Default meta description per locale (shown in search results and link previews). Max 160 characters per locale.',
     ),
     locales: z
       .object({
@@ -51,17 +53,23 @@ export const siteConfigSchema = z
       .describe('Languages of the site.'),
     identity: z
       .object({
-        name: z.string().trim().min(1).describe('Full name of the site owner.'),
+        name: text(40).describe('Full name of the site owner.'),
         handle: z
           .string()
           .regex(/^[a-z0-9-]+$/)
+          .max(24)
           .describe('Short lowercase handle shown in the navbar and footer wordmark.'),
-        role: localized.describe('One-line professional headline per locale.'),
-        bio: localized.describe('Short bio per locale (also the description of the /me page).'),
+        role: localizedText(80).describe(
+          'One-line professional headline per locale. Max 80 characters per locale.',
+        ),
+        bio: localizedText(200).describe(
+          'Short bio per locale (also the description of the /me page). Max 200 characters per locale.',
+        ),
         location: z
           .string()
           .trim()
           .min(1)
+          .max(50)
           .optional()
           .describe('City or country shown on /me and share cards.'),
         startedYear: z
@@ -150,7 +158,9 @@ export const siteConfigSchema = z
               kind: z
                 .enum(['focus', 'building', 'exploring', 'learning'])
                 .describe('Label of the row: `focus`, `building`, `exploring` or `learning`.'),
-              text: localized.describe('What it is, per locale (the default locale is required).'),
+              text: localizedText(120).describe(
+                'What it is, per locale (the default locale is required). Max 120 characters per locale.',
+              ),
               href: siteHref
                 .optional()
                 .describe(
@@ -169,7 +179,7 @@ export const siteConfigSchema = z
     socials: z
       .array(
         z.object({
-          label: z.string().min(1).describe('Link text and accessible name.'),
+          label: text(16).describe('Link text and accessible name.'),
           url: httpsUrl.describe(
             'Profile URL (https only: an email address never belongs in public config).',
           ),
@@ -243,10 +253,10 @@ export const siteConfigSchema = z
           .describe(
             'Rows of "Recent experiments" on `/me`. Never more than `perPage`: a larger value is lowered to `perPage`, so every row links to an anchor that lives on page 1.',
           ),
-        intro: localized
+        intro: localizedText(200)
           .optional()
           .describe(
-            'Optional intro under the title of `/experiments/`, per locale (the default locale is required). Omit it to use the interface default.',
+            'Optional intro under the title of `/experiments/`, per locale (the default locale is required). Omit it to use the interface default. Max 200 characters per locale.',
           ),
         words: z
           .record(z.string(), z.array(z.string().trim().min(1).max(24)).min(1).max(6))
@@ -336,6 +346,14 @@ export const siteConfigSchema = z
           .describe(
             'The same threshold on the `/notes/` index, where visitors browse instead of read (0.3 to 0.95).',
           ),
+        reappearAfterDays: z
+          .int()
+          .min(0)
+          .max(365)
+          .default(30)
+          .describe(
+            'Days a visitor who closed the floating card does not see it again; after that it may float again once. 0 means a close lasts for good (until the browser data is cleared). The static card after the note never goes away.',
+          ),
       })
       .prefault({})
       .describe(
@@ -352,11 +370,11 @@ export const siteConfigSchema = z
           .describe(
             'Whether you are open to work: green status dot when true, the brand accent colour when false.',
           ),
-        status: localized.describe(
-          'Availability text per locale. Parts separated by " · " show as a headline plus short tags on the home card (for example "Working at Buo · open to chat"); a single part is one tag (for example "Open to work").',
+        status: localizedText(60).describe(
+          'Max 60 characters per locale. Availability text per locale. Parts separated by " · " show as a headline plus short tags on the home card (for example "Working at Buo · open to chat"); a single part is one tag (for example "Open to work").',
         ),
-        lookingFor: localized.describe(
-          'What you are open to, per locale. Shown as the availability line in the /me sidebar, below the status.',
+        lookingFor: localizedText(100).describe(
+          'Max 100 characters per locale. What you are open to, per locale. Shown as the availability line in the /me sidebar, below the status.',
         ),
         cvUrl: z
           .union([
@@ -373,29 +391,37 @@ export const siteConfigSchema = z
       .describe('Recruiter card on the home page and /me.'),
     me: z
       .object({
-        timezone: z.string().trim().min(1).describe('Display timezone, for example `UTC−6`.'),
-        workMode: localized.describe('Work mode per locale (remote, hybrid, ...).'),
-        languages: localized
+        timezone: text(16).describe('Display timezone, for example `UTC−6`.'),
+        workMode: localizedText(24).describe(
+          'Work mode per locale (remote, hybrid, ...). Max 24 characters per locale.',
+        ),
+        languages: localizedText(60)
           .optional()
           .describe(
-            'Spoken languages per locale, for example "Spanish native · English B1". Shown in the /me sidebar; omit to hide the row.',
+            'Spoken languages per locale, for example "Spanish native · English B1". Shown in the /me sidebar; omit to hide the row. Max 60 characters per locale.',
           ),
-        headline: localized
+        headline: localizedText(60)
           .optional()
           .describe(
-            'The role line under the name on /me, per locale. Omit to show `identity.role`.',
+            'The role line under the name on /me, per locale. Omit to show `identity.role`. Max 60 characters per locale.',
           ),
-        pitch: localized
+        pitch: localizedText(280)
           .optional()
           .describe(
-            'One or two sentences under the /me headline that say what you do, per locale. Omit to hide it.',
+            'One or two sentences under the /me headline that say what you do, per locale. Omit to hide it. Max 280 characters per locale.',
           ),
-        intro: localized.describe('The "what I bring" intro paragraph per locale.'),
+        intro: localizedText(120).describe(
+          'The "what I bring" intro paragraph per locale. Max 120 characters per locale.',
+        ),
         facts: z
           .array(
             z.object({
-              value: localized.describe('The highlighted value.'),
-              label: localized.describe('What the value means.'),
+              value: localizedText(30).describe(
+                'The highlighted value. Max 30 characters per locale.',
+              ),
+              label: localizedText(60).describe(
+                'What the value means. Max 60 characters per locale.',
+              ),
             }),
           )
           .min(1)
@@ -404,8 +430,8 @@ export const siteConfigSchema = z
           .array(
             z.object({
               icon: z.string().min(1).describe('Icon name of the tile.'),
-              title: localized.describe('Tile title.'),
-              body: localized.describe('Tile text.'),
+              title: localizedText(48).describe('Tile title. Max 48 characters per locale.'),
+              body: localizedText(180).describe('Tile text. Max 180 characters per locale.'),
             }),
           )
           .min(1)
@@ -413,8 +439,13 @@ export const siteConfigSchema = z
         stack: z
           .array(
             z.object({
-              label: localized.describe('Group name (Languages, Frontend, ...).'),
-              items: z.array(z.string().min(1)).min(1).describe('Tools in the group.'),
+              label: localizedText(32).describe(
+                'Group name (Languages, Frontend, ...). Max 32 characters per locale.',
+              ),
+              items: z
+                .array(z.string().min(1).max(24))
+                .min(1)
+                .describe('Tools in the group (each max 24 characters).'),
               icon: z
                 .string()
                 .min(1)
@@ -422,10 +453,10 @@ export const siteConfigSchema = z
                 .describe(
                   'Icon name shown before the group name (code, server, shield-check, cloud, bot, flask, layers, ...). Omit for no icon.',
                 ),
-              hint: localized
+              hint: localizedText(180)
                 .optional()
                 .describe(
-                  'One plain-language sentence per locale that says what the group is. Shown as a hover and focus tooltip; omit for no tooltip.',
+                  'One plain-language sentence per locale that says what the group is. Shown as a hover and focus tooltip; omit for no tooltip. Max 180 characters per locale.',
                 ),
               layer: z
                 .boolean()
@@ -582,10 +613,10 @@ export const siteConfigSchema = z
       .describe(
         'Giscus comments (GitHub Discussions). Optional: without it nothing renders even when `features.comments` is on.',
       ),
-    notice: localized
+    notice: localizedText(160)
       .optional()
       .describe(
-        'Optional site-wide notice strip per locale (for example "under construction"). Remove the key to hide it.',
+        'Optional site-wide notice strip per locale (for example "under construction"). Remove the key to hide it. Max 160 characters per locale.',
       ),
   })
   .superRefine((config, ctx) => {

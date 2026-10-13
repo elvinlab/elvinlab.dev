@@ -1,5 +1,9 @@
 import { expect, type Locator, type Page, test } from '@playwright/test';
 
+import { requires } from './helpers/features';
+
+requires({ routes: ['notes'] });
+
 /** Keyboard Tab presses allowed to reach a card before the test gives up. */
 const MAX_TABS = 80;
 /** Distance from the card's top-left corner for the "empty padding" click. */

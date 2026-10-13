@@ -2,7 +2,9 @@ import { type ChildProcess, spawn } from 'node:child_process';
 import { realpathSync } from 'node:fs';
 import { join, resolve } from 'node:path';
 
+import { E2E_FEATURE_PROFILE_ENV, profileFeatures } from './e2e-profiles.ts';
 import {
+  applyFixtureFeatures,
   createFixtureWorkspace,
   enableFixtureComments,
   enableFixtureNotice,
@@ -13,6 +15,7 @@ import {
 
 const source = resolve(import.meta.dirname, '../../..');
 const workspace = createFixtureWorkspace(source, join(source, 'tests/fixtures/notes'));
+applyFixtureFeatures(workspace.web, profileFeatures(process.env[E2E_FEATURE_PROFILE_ENV]));
 enableFixtureComments(workspace.web);
 enableFixtureNotice(workspace.web);
 enableFixtureSubscribe(workspace.web);

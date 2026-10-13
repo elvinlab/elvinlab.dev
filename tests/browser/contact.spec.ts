@@ -1,5 +1,10 @@
 import { expect, type Page, test } from '@playwright/test';
 
+import { requires } from './helpers/features';
+import { escapeRegExp, social } from './helpers/site';
+
+requires({ flags: ['contact'], routes: ['contact'] });
+
 // Only the third-party script is stubbed; the Action runs for real. The fixture preview has no
 // Cloudflare bindings, so the Action answers SERVICE_UNAVAILABLE.
 const TURNSTILE_STUB = `
@@ -70,7 +75,8 @@ async function fillValid(page: Page, copy: Copy): Promise<void> {
   await page.getByLabel(copy.message).fill('Hello world');
 }
 
-const LINKEDIN_URL = 'https://www.linkedin.com/in/elvinlab';
+const LINKEDIN = social('linkedin');
+const LINKEDIN_URL = LINKEDIN.url;
 const EMAIL_PATTERN = /[\w.+-]+@[\w-]+\.[\w.-]+/g;
 
 const isContactAction = (url: string, method: string): boolean =>
@@ -120,11 +126,15 @@ for (const [locale, copy] of Object.entries(COPY)) {
       await expect(live).toHaveText(copy.summary);
     });
 
-    test('shows the LinkedIn link, opening in a new tab with the shared hint', async ({ page }) => {
+    test('shows the professional-network link, opening in a new tab with the shared hint', async ({
+      page,
+    }) => {
       await page.goto(copy.path);
       const aside = page.locator('article').getByText(copy.linkedin);
       await expect(aside).toBeVisible();
-      const link = page.locator('article').getByRole('link', { name: /LinkedIn/ });
+      const link = page
+        .locator('article')
+        .getByRole('link', { name: new RegExp(escapeRegExp(LINKEDIN.label)) });
       await expect(link).toBeVisible();
       await expect(link).toHaveAttribute('href', LINKEDIN_URL);
       await expect(link).toHaveAttribute('target', '_blank');

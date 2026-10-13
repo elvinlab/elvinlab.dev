@@ -1,7 +1,11 @@
 import { expect, type Page, test } from '@playwright/test';
 
 import { describeViolations, scan } from './helpers/axe';
+import { has, liveByPath, requires, seedTheme } from './helpers/features';
+import { text, themes } from './helpers/site';
 import { stubThirdParties } from './helpers/third-party';
+
+requires({ routes: ['subscribe'] });
 
 /**
  * The email subscription: the form in the global footer band and the two landing pages of the emailed links.
@@ -18,52 +22,55 @@ const TURNSTILE_STUB = `
     reset() {},
   };
 `;
-const THEMES = ['elvinlab-dark', 'elvinlab-light'] as const;
+const THEMES = [themes.dark, themes.light] as const;
 
 const FORM = {
-  email: 'Dónde enviarte las notas',
-  submit: 'Suscribirme',
-  success: 'Revisa tu bandeja de entrada para confirmar la suscripción.',
-  error:
-    'No se pudo suscribir. Inténtalo más tarde o escríbeme desde la página de Contacto y te agrego a mano.',
-  capped: 'Hoy llegaron muchas solicitudes. Inténtalo de nuevo mañana.',
-  rateLimited: 'Demasiados intentos seguidos. Espera un minuto y vuelve a intentarlo.',
-  interactive: 'Marca la casilla de abajo para verificar que eres una persona.',
-  timeout:
-    'No pudimos verificar que eres una persona. Revisa tu conexión o desactiva bloqueadores y vuelve a intentarlo, o escríbeme desde la página de Contacto y te agrego a mano.',
-  verifying: 'Verificando…',
+  email: text('es', 'subscribe.email'),
+  submit: text('es', 'subscribe.submit'),
+  success: text('es', 'subscribe.success'),
+  // With the contact page off the messages stop pointing to it (`subscribe.errorNoContact`).
+  error: has({ flags: ['contact'] })
+    ? text('es', 'subscribe.error')
+    : text('es', 'subscribe.errorNoContact'),
+  capped: text('es', 'subscribe.capped'),
+  rateLimited: text('es', 'subscribe.rateLimited'),
+  interactive: text('es', 'subscribe.interactive'),
+  timeout: has({ flags: ['contact'] })
+    ? text('es', 'subscribe.timeout')
+    : text('es', 'subscribe.timeoutNoContact'),
+  verifying: text('es', 'subscribe.verifying'),
 };
 
 const LANDING = {
   es: {
     confirm: {
       path: '/subscribe/confirm/',
-      button: 'Confirmar suscripción',
+      button: text('es', 'subscribe.confirm.button'),
       done: /Listo: tu suscripción está confirmada\./,
       invalid: /Este enlace ya se usó, lo reemplazó uno más nuevo o venció/,
     },
     unsubscribe: {
       path: '/subscribe/unsubscribe/',
-      button: 'Darme de baja',
-      done: 'Listo: no recibirás más correos.',
-      invalid: 'Este enlace no es válido.',
+      button: text('es', 'subscribe.unsubscribe.button'),
+      done: text('es', 'subscribe.unsubscribe.done'),
+      invalid: text('es', 'subscribe.unsubscribe.invalid'),
     },
-    unavailable: 'No está disponible por ahora. Inténtalo más tarde.',
+    unavailable: text('es', 'subscribe.unavailable'),
   },
   en: {
     confirm: {
       path: '/en/subscribe/confirm/',
-      button: 'Confirm subscription',
+      button: text('en', 'subscribe.confirm.button'),
       done: /Done: your subscription is confirmed\./,
       invalid: /This link was already used, was replaced by a newer one, or has expired/,
     },
     unsubscribe: {
       path: '/en/subscribe/unsubscribe/',
-      button: 'Unsubscribe',
-      done: 'Done: you will not get more emails.',
-      invalid: 'This link is not valid.',
+      button: text('en', 'subscribe.unsubscribe.button'),
+      done: text('en', 'subscribe.unsubscribe.done'),
+      invalid: text('en', 'subscribe.unsubscribe.invalid'),
     },
-    unavailable: 'Not available right now. Please try again later.',
+    unavailable: text('en', 'subscribe.unavailable'),
   },
 } as const;
 
@@ -115,13 +122,10 @@ const unavailable = JSON.stringify({ type: 'AstroActionError', code: 'SERVICE_UN
 const result = (value: string) => `[{"result":1},"${value}"]`;
 
 const FORM_PAGES = ['/', '/en/', '/privacy/', '/notes/', '/notes/smoke-es/'];
-const NO_FORM_PAGES = [
-  '/me/',
-  '/contact/',
-  '/en/contact/',
-  '/subscribe/confirm/',
-  '/subscribe/unsubscribe/',
-];
+const NO_FORM_PAGES = liveByPath(
+  ['/me/', '/contact/', '/en/contact/', '/subscribe/confirm/', '/subscribe/unsubscribe/'],
+  (path) => path,
+);
 const FIELD = 'footer [data-subscribe]';
 
 test.describe('form in the footer', () => {
@@ -147,11 +151,11 @@ test.describe('form in the footer', () => {
   test('is visible in Spanish and English without horizontal overflow', async ({ page }) => {
     await page.goto('/');
     const band = page.locator(FIELD);
-    await expect(band.getByRole('heading', { name: 'Recibe las notas por correo' })).toBeVisible();
+    await expect(band.getByRole('heading', { name: text('es', 'subscribe.title') })).toBeVisible();
     await expect(band.getByLabel(FORM.email)).toBeVisible();
     await expect(band.getByRole('button', { name: FORM.submit })).toBeVisible();
     await expect(band).toContainText('aviso de algún proyecto');
-    await expect(band.getByRole('link', { name: 'Cómo se usa tu correo' })).toHaveAttribute(
+    await expect(band.getByRole('link', { name: text('es', 'subscribe.privacy') })).toHaveAttribute(
       'href',
       '/privacy/#subscribe',
     );
@@ -161,7 +165,7 @@ test.describe('form in the footer', () => {
     await page.goto('/en/');
     const en = page.locator(FIELD);
     await expect(en.getByRole('button', { name: 'Subscribe' })).toBeVisible();
-    await expect(en.getByRole('link', { name: 'How your email is used' })).toHaveAttribute(
+    await expect(en.getByRole('link', { name: text('en', 'subscribe.privacy') })).toHaveAttribute(
       'href',
       '/en/privacy/#subscribe',
     );
@@ -272,7 +276,7 @@ test.describe('form in the footer', () => {
       .toBe(true);
   });
 
-  test('pressing the button after the box was asked keeps the instruction, not "Verifying…"', async ({
+  test('pressing the button after the box was asked keeps the instruction, not the verifying text', async ({
     page,
   }) => {
     await stubTurnstile(
@@ -409,7 +413,7 @@ test.describe('form in the footer', () => {
   for (const theme of THEMES) {
     test(`has no axe violations with the band (${theme})`, async ({ page }) => {
       await stubThirdParties(page);
-      await page.addInitScript((value) => localStorage.setItem('theme', value), theme);
+      await seedTheme(page, theme);
       await page.goto('/');
       await expect(page.locator('html')).toHaveAttribute('data-theme', theme);
       await expect(page.locator(FIELD).getByLabel(FORM.email)).toBeVisible();
@@ -513,7 +517,7 @@ for (const locale of ['es', 'en'] as const) {
 
       for (const theme of THEMES) {
         test(`has no axe violations (${theme})`, async ({ page }) => {
-          await page.addInitScript((value) => localStorage.setItem('theme', value), theme);
+          await seedTheme(page, theme);
           await page.goto(`${copy.path}?token=abc.def`);
           await expect(page.locator('html')).toHaveAttribute('data-theme', theme);
           await expect(page.getByRole('button', { name: copy.button })).toBeVisible();
@@ -536,29 +540,33 @@ const PAGE = {
   es: {
     path: '/subscribe/',
     lang: 'es',
-    h1: 'Lo que construyo, en tu correo.',
+    h1: text('es', 'subscribe.page.title'),
     submit: FORM.submit,
     label: FORM.email,
-    reassurance: 'Sin spam. Tu correo se usa solo para esto. Te das de baja en un clic.',
-    privacy: ['Cómo se usa tu correo', '/privacy/#subscribe'],
+    reassurance: text('es', 'subscribe.page.reassurance'),
+    privacy: [text('es', 'subscribe.privacy'), '/privacy/#subscribe'],
     points: [
-      'Una nota, un correo.',
-      'Decisiones, no tutoriales.',
-      'De vez en cuando, un proyecto.',
+      text('es', 'subscribe.page.p1.title'),
+      text('es', 'subscribe.page.p2.title'),
+      text('es', 'subscribe.page.p3.title'),
     ],
-    latest: 'La última nota',
+    latest: text('es', 'subscribe.page.latest'),
     alternates: { es: '/subscribe/', en: '/en/subscribe/' },
   },
   en: {
     path: '/en/subscribe/',
     lang: 'en',
-    h1: 'What I build, in your inbox.',
+    h1: text('en', 'subscribe.page.title'),
     submit: 'Subscribe',
-    label: 'Where to send the notes',
-    reassurance: 'No spam. Your address is used for this only. Unsubscribe in one click.',
-    privacy: ['How your email is used', '/en/privacy/#subscribe'],
-    points: ['One note, one email.', 'Decisions, not tutorials.', 'Now and then, a project.'],
-    latest: 'The latest note',
+    label: text('en', 'subscribe.email'),
+    reassurance: text('en', 'subscribe.page.reassurance'),
+    privacy: [text('en', 'subscribe.privacy'), '/en/privacy/#subscribe'],
+    points: [
+      text('en', 'subscribe.page.p1.title'),
+      text('en', 'subscribe.page.p2.title'),
+      text('en', 'subscribe.page.p3.title'),
+    ],
+    latest: text('en', 'subscribe.page.latest'),
     alternates: { es: '/subscribe/', en: '/en/subscribe/' },
   },
 } as const;
@@ -646,7 +654,7 @@ for (const locale of ['es', 'en'] as const) {
     for (const theme of THEMES) {
       test(`has no axe violations (${theme})`, async ({ page }) => {
         await stubThirdParties(page);
-        await page.addInitScript((value) => localStorage.setItem('theme', value), theme);
+        await seedTheme(page, theme);
         await page.goto(copy.path);
         await expect(page.locator('html')).toHaveAttribute('data-theme', theme);
         await expect(page.locator(form).getByLabel(copy.label)).toBeVisible();
@@ -671,8 +679,10 @@ test.describe('footer link to the subscription page', () => {
     page,
   }) => {
     for (const [path, name, target] of [
-      ['/', 'Suscribirse', '/subscribe/'],
-      ['/contact/', 'Suscribirse', '/subscribe/'],
+      ['/', text('es', 'footer.subscribe'), '/subscribe/'],
+      ...(has({ routes: ['contact'] })
+        ? [['/contact/', text('es', 'footer.subscribe'), '/subscribe/'] as const]
+        : []),
       ['/en/', 'Subscribe', '/en/subscribe/'],
     ] as const) {
       await page.goto(path);
@@ -680,7 +690,10 @@ test.describe('footer link to the subscription page', () => {
       await expect(link, path).toHaveAttribute('href', target);
     }
     await page.goto('/');
-    await page.locator('footer').getByRole('link', { name: 'Suscribirse', exact: true }).click();
+    await page
+      .locator('footer')
+      .getByRole('link', { name: text('es', 'footer.subscribe'), exact: true })
+      .click();
     await expect(page).toHaveURL(/\/subscribe\/$/);
     await expect(page.getByRole('heading', { level: 1 })).toBeVisible();
   });
@@ -688,7 +701,9 @@ test.describe('footer link to the subscription page', () => {
   test('is not on the printable CV', async ({ page }) => {
     await page.goto('/me/');
     await expect(
-      page.locator('footer').getByRole('link', { name: 'Suscribirse', exact: true }),
+      page
+        .locator('footer')
+        .getByRole('link', { name: text('es', 'footer.subscribe'), exact: true }),
     ).toHaveCount(0);
   });
 });

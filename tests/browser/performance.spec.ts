@@ -1,5 +1,8 @@
 import { expect, test } from '@playwright/test';
 
+import { has, liveByPath } from './helpers/features';
+import { site } from './helpers/site';
+
 /** Neither big face is preloaded: each one sat on the critical path of the simulated LCP and cost the
  * note page and /me/ their margin against the 2500 ms gate. They load on demand (`font-display: swap`). */
 const BODY_FONTS: RegExp[] = [];
@@ -9,20 +12,23 @@ const BIG_FONTS = [
 ];
 /** Pixelify Sans is preloaded wherever an H1 uses it (home hero, notes banner, `PageHeader`: experiments, contact, changelog, privacy, terms); never elsewhere. */
 const PIXEL_FONT = /pixelify-sans-latin-wght-normal.*\.woff2$/;
-const PAGES = [
-  { path: '/', preloads: [...BODY_FONTS, PIXEL_FONT] },
-  { path: '/en/', preloads: [...BODY_FONTS, PIXEL_FONT] },
-  { path: '/notes/', preloads: [...BODY_FONTS, PIXEL_FONT] },
-  { path: '/experiments/', preloads: [...BODY_FONTS, PIXEL_FONT] },
-  { path: '/en/experiments/', preloads: [...BODY_FONTS, PIXEL_FONT] },
-  { path: '/contact/', preloads: [...BODY_FONTS, PIXEL_FONT] },
-  { path: '/en/contact/', preloads: [...BODY_FONTS, PIXEL_FONT] },
-  { path: '/changelog/', preloads: [...BODY_FONTS, PIXEL_FONT] },
-  { path: '/en/changelog/', preloads: [...BODY_FONTS, PIXEL_FONT] },
-  { path: '/privacy/', preloads: [...BODY_FONTS, PIXEL_FONT] },
-  { path: '/en/terms/', preloads: [...BODY_FONTS, PIXEL_FONT] },
-  { path: '/notes/smoke-es/', preloads: BODY_FONTS },
-];
+const PAGES = liveByPath(
+  [
+    { path: '/', preloads: [...BODY_FONTS, PIXEL_FONT] },
+    { path: '/en/', preloads: [...BODY_FONTS, PIXEL_FONT] },
+    { path: '/notes/', preloads: [...BODY_FONTS, PIXEL_FONT] },
+    { path: '/experiments/', preloads: [...BODY_FONTS, PIXEL_FONT] },
+    { path: '/en/experiments/', preloads: [...BODY_FONTS, PIXEL_FONT] },
+    { path: '/contact/', preloads: [...BODY_FONTS, PIXEL_FONT] },
+    { path: '/en/contact/', preloads: [...BODY_FONTS, PIXEL_FONT] },
+    { path: '/changelog/', preloads: [...BODY_FONTS, PIXEL_FONT] },
+    { path: '/en/changelog/', preloads: [...BODY_FONTS, PIXEL_FONT] },
+    { path: '/privacy/', preloads: [...BODY_FONTS, PIXEL_FONT] },
+    { path: '/en/terms/', preloads: [...BODY_FONTS, PIXEL_FONT] },
+    { path: '/notes/smoke-es/', preloads: BODY_FONTS },
+  ],
+  ({ path }) => path,
+);
 /** The raw profile photo is a 59 KB PNG; the optimized variant must be far below that. */
 const RAW_AVATAR_BYTES = 59_000;
 
@@ -68,7 +74,7 @@ for (const { path, preloads: expectedPreloads } of PAGES) {
 
 test('the home profile photo is served as an optimized, dimensioned image', async ({ page }) => {
   await page.goto('/');
-  const avatar = page.locator('[data-hero-content] img[alt="Elvin González"]');
+  const avatar = page.locator(`[data-hero-content] img[alt="${site.name}"]`);
   await avatar.scrollIntoViewIfNeeded();
   await expect(avatar).toBeVisible();
 
@@ -86,7 +92,7 @@ test('the home profile photo is served as an optimized, dimensioned image', asyn
 
 test('the /me profile photo is optimized and sized', async ({ page }) => {
   await page.goto('/me/');
-  const avatar = page.locator('img[alt="Elvin González"]');
+  const avatar = page.locator(`img[alt="${site.name}"]`);
   await expect(avatar).toBeVisible();
   await expect(avatar).toHaveAttribute('src', /\.(webp|avif)(\?.*)?$/);
   expect(Number(await avatar.getAttribute('width'))).toBeGreaterThan(0);
@@ -99,7 +105,7 @@ const ME_PORTRAIT_MAX_BYTES = 60_000;
 
 test('the /me portrait is not larger than its slot needs and is prioritized', async ({ page }) => {
   await page.goto('/me/');
-  const portrait = page.locator('img[alt="Elvin González"]');
+  const portrait = page.locator(`img[alt="${site.name}"]`);
   await expect(portrait).toBeVisible();
 
   expect(Number(await portrait.getAttribute('width'))).toBeLessThanOrEqual(ME_PORTRAIT_MAX_WIDTH);
@@ -121,12 +127,14 @@ test.describe('prefetch', () => {
   });
 
   test('hovering an internal link prefetches its page', async ({ page }) => {
+    test.skip(!has({ routes: ['notes'] }), 'needs the notes routes');
     await page.goto('/', { waitUntil: 'networkidle' });
     await page.locator('[data-navbar]').getByRole('link', { name: 'Notas' }).first().hover();
     await expect(page.locator('head link[rel="prefetch"][href$="/notes/"]')).toHaveCount(1);
   });
 
   test('keyboard focus on an internal link prefetches its page', async ({ page }) => {
+    test.skip(!has({ routes: ['contact'] }), 'needs route contact');
     await page.goto('/', { waitUntil: 'networkidle' });
     await page.locator('[data-navbar]').getByRole('link', { name: 'Contacto' }).first().focus();
     await expect(page.locator('head link[rel="prefetch"][href$="/contact/"]')).toHaveCount(1);

@@ -59,6 +59,28 @@ export function enableFixtureSubscribe(web: string): void {
 }
 
 /**
+ * Switches features in the copied site config (`features.<name>: true|false,`), so an e2e run can
+ * prove an adopter profile without touching the real config. Fails loudly when a listed feature is
+ * not in the file, because a silent miss would run the wrong profile.
+ */
+export function applyFixtureFeatures(
+  web: string,
+  features: Readonly<Record<string, boolean | undefined>>,
+): void {
+  const entries = Object.entries(features).filter(([, value]) => value !== undefined);
+  if (entries.length === 0) return;
+  const configPath = join(web, 'src/site.config.ts');
+  let config = readFileSync(configPath, 'utf8');
+  for (const [name, value] of entries) {
+    const line = new RegExp(`(\\n\\s+${name}: )(?:true|false)(,)`);
+    if (!line.test(config))
+      throw new Error(`fixture: could not find the ${name} feature to switch`);
+    config = config.replace(line, `$1${String(value)}$2`);
+  }
+  writeFileSync(configPath, config);
+}
+
+/**
  * Drops the real third-party ids (analytics token, Turnstile key) from the copied site config, so
  * fixture builds never load the Cloudflare beacon or call out to the network. Tests that need a
  * Turnstile key set it through the environment override.
