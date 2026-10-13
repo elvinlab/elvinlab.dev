@@ -10,11 +10,11 @@ import { loadExperiments } from '@/features/portfolio/lib/load-experiments.ts';
 import { isEnabled } from '@/shared/config/index.ts';
 import { LOCALES, type Locale } from '@/shared/i18n/index.ts';
 
-type Props = { locale: Locale };
+type Props = { locale: Locale; class?: string | undefined };
 
-const { locale } = Astro.props;
+const { locale, class: className } = Astro.props;
 const enabled = isEnabled('experimentNudge') && isEnabled('experiments');
 const entry = enabled ? latestExperiment(await loadExperiments(), LOCALES.defaultLocale) : undefined;
 ---
 
-{entry && <ExperimentCard entry={entry} locale={locale} />}
+{entry && <ExperimentCard entry={entry} locale={locale} class={className} />}

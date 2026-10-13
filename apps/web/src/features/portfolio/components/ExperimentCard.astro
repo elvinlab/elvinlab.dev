@@ -14,9 +14,9 @@ import { LOCALES, type Locale, t } from '@/shared/i18n/index.ts';
 import { resolveExperimentImage } from '@/shared/lib/experiment-image.ts';
 import { pickLocale } from '@/shared/lib/localized.ts';
 
-type Props = { entry: ExperimentEntry; locale: Locale };
+type Props = { entry: ExperimentEntry; locale: Locale; class?: string | undefined };
 
-const { entry, locale } = Astro.props;
+const { entry, locale, class: className } = Astro.props;
 const cover = entry.images?.[0];
 const image = cover ? resolveExperimentImage(entry.id, cover.file) : undefined;
 const href = entry.note
@@ -25,7 +25,7 @@ const href = entry.note
 const titleId = `nudge-title-${entry.id}`;
 ---
 
-<aside class="flex items-center gap-3 rounded-card border border-divider bg-card p-3" aria-label={t(locale, 'nudge.label')} data-experiment-card>
+<aside class:list={['flex items-center gap-3 rounded-card border border-divider bg-card p-3', className]} aria-label={t(locale, 'nudge.label')} data-experiment-card>
   {image && cover && (
     <Image src={image} alt={pickLocale(cover.alt, locale, LOCALES.defaultLocale)} format="webp" quality={75} width={160} height={100} widths={[160, 320]} sizes="80px" loading="lazy" decoding="async" class="h-[50px] w-20 shrink-0 rounded-control object-cover" />
   )}
