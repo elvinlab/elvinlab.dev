@@ -50,3 +50,10 @@ Parent review: re-observed typecheck, lint, depcruise, build, check:page-weight 
 - Checks observed after the last change: vitest 1602, typecheck, lint, e2e:quick education + overflow + a11y + cv-and-credentials + mobile-ux + view-transitions (161), check:page-weight 42/42, white-label, docs:config. Not run: Lighthouse, full 3-viewport e2e. The default flip and its tests were edited together (no separate RED).
 - Gotchas: (1) text of a pixel-font CSS variable written inside any file Tailwind scans (even a budget JSON) makes Tailwind emit it on every page (+24 B); (2) the white-label check now empties `credentials.json` because verification links carry the owner's handle; (3) a failed e2e leaves `test-results/` behind: remove it before measuring page weight.
 - Pending: public copy of the university document (owner), the Udemy bootcamp learnings (owner), visor `<dialog>` (X6) once documents are final.
+
+## Design critique pass (2026-10-13, owner chose: images + viewer, only /education/, top 3 findings)
+Source: impeccable critique (dual-agent: design review + detector; 23/32). Contrast and target-size doubts were measured by the parent: sort options 9.6-10.5:1, meta 6.4:1, issuer 10.8:1 (the detector's 2.14:1 was a false positive); the only element under 44 px is a 190x24 `<input>` (not verified which one).
+- [ ] E3 — P1 thumbnails unreadable and not expandable: smaller thumbnail (about 20rem) that opens a native `<dialog>` viewer with the full image (no JS: plain link to the image); Esc and a visible close button close it; focus returns to the trigger; viewer code only on `/education/` and only when an entry has an image.
+- [ ] E4 — P1 dead space beside the text on desktop: text block centered vertically against the document column (wrapper `.ed-body`, mobile order unchanged).
+- [ ] E5 — P2 "Verificar" vs "Qué aprendí" look alike: visible disclosure marker on the accordion, both targets at least 44 px, links stay underlined, the disclosure does not.
+Out of scope this pass: the typographic-cover note and rule contrast (P2), frame language shared with Experiments (P3), and the `/experiments/` findings.
