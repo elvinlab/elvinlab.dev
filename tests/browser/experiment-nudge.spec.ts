@@ -1,6 +1,7 @@
 import { expect, type Page, test } from '@playwright/test';
 
 import { describeViolations, scan } from './helpers/axe';
+import { livePages, requires } from './helpers/features';
 import { stubThirdParties } from './helpers/third-party';
 
 const NOTES = [
@@ -11,6 +12,9 @@ const NOTES = [
 const STATIC_CARD = '[data-experiment-card]:not([data-nudge-floating])';
 const FLOATING = '[data-nudge-floating]';
 const OPEN = '[data-nudge-floating][data-open]';
+
+// The card needs the experiments to point to and the notes to float over; off, the file is skipped.
+requires({ flags: ['experimentNudge', 'experiments'], routes: ['notes'] });
 
 test.beforeEach(async ({ page }) => {
   await stubThirdParties(page);
@@ -186,7 +190,14 @@ test.describe('the notes index', () => {
 });
 
 test.describe('where the card must not appear', () => {
-  for (const path of ['/me/', '/en/me/', '/contact/', '/experiments/', '/en/experiments/']) {
+  const excluded = livePages([
+    { path: '/me/' },
+    { path: '/en/me/' },
+    { path: '/contact/', needs: { routes: ['contact'] } },
+    { path: '/experiments/', needs: { routes: ['experiments'] } },
+    { path: '/en/experiments/', needs: { routes: ['experiments'] } },
+  ] as const);
+  for (const { path } of excluded) {
     test(`${path} has no card and no floating copy`, async ({ page }) => {
       await page.goto(path);
       await expect(page.locator('[data-experiment-card]')).toHaveCount(0);
