@@ -9,6 +9,7 @@
  * browser.
  */
 import ExperimentCard from '@/features/portfolio/components/ExperimentCard.astro';
+import cardCss from '@/features/portfolio/components/experiment-card.css?inline';
 import nudgeCss from '@/features/portfolio/components/nudge.css?inline';
 import { latestExperiment } from '@/features/portfolio/lib/latest-experiment.ts';
 import { loadExperiments } from '@/features/portfolio/lib/load-experiments.ts';
@@ -29,6 +30,7 @@ const enabled = isEnabled('experimentNudge') && isEnabled('experiments');
 const entry = enabled ? latestExperiment(await loadExperiments(), LOCALES.defaultLocale) : undefined;
 ---
 
+{entry && <style is:inline set:html={cardCss} />}
 {entry && !isIndex && <ExperimentCard entry={entry} locale={locale} class={className} />}
 {entry && isIndex && (
   <template data-experiment-template>
