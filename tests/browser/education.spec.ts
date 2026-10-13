@@ -29,6 +29,37 @@ const credentials = Object.entries(
   ) as Record<string, Credential>,
 ).map(([id, entry]) => ({ id, ...entry }));
 // The default order: newest first (year, then `order`, then the month descending, then the id).
+// Regression: on the alternate order the "newest" option must lead to the base page, and each option
+// must go where its label says (it used to point at the page the visitor was already on).
+for (const [base, other] of [
+  ['/education/', '/education/oldest/'],
+  ['/en/education/', '/en/education/oldest/'],
+] as const) {
+  test(`${base}: the sort options link to their own pages and switch both ways`, async ({
+    page,
+  }) => {
+    test.skip(credentials.length < 4, 'the sort switch needs at least sortFrom entries');
+    await page.goto(base);
+    const options = page.locator('.lk-sort-option');
+    await expect(options).toHaveCount(2);
+    await expect(options.nth(0)).toHaveAttribute('href', base);
+    await expect(options.nth(1)).toHaveAttribute('href', other);
+    await options.nth(1).click();
+    await expect(page).toHaveURL(new RegExp(`${other}$`));
+    await expect(page.locator('.lk-sort-option[aria-current="true"]')).toHaveAttribute(
+      'href',
+      other,
+    );
+    await expect(page.locator('.lk-sort-option').nth(0)).toHaveAttribute('href', base);
+    await page.locator('.lk-sort-option').nth(0).click();
+    await expect(page).toHaveURL(new RegExp(`${base}$`));
+    await expect(page.locator('.lk-sort-option[aria-current="true"]')).toHaveAttribute(
+      'href',
+      base,
+    );
+  });
+}
+
 const newest = [...credentials].sort(
   (a, b) =>
     b.year - a.year ||

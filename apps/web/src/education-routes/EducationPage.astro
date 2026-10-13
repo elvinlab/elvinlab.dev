@@ -11,7 +11,6 @@
 import { localizePath } from '@elvinlab/core';
 
 import {
-  EDUCATION_DEFAULT_SORT,
   type EducationSort,
   educationPath,
   groupEducationByYear,
@@ -56,7 +55,9 @@ const intro = introText(site.education.intro, locale, LOCALES.defaultLocale, t(l
 const sortOptions = offered.map((key) => ({
   key,
   label: t(locale, `listing.sort.${key}`),
-  href: href(1, key === EDUCATION_DEFAULT_SORT ? undefined : key),
+  // The key itself: `educationPath` collapses the default order to the base page (an `undefined` here
+  // would fall back to the order being viewed and the option would point at the current page).
+  href: href(1, key),
 }));
 const groups = groupEducationByYear(current.items);
 const hasImage = current.items.some(({ data }) => data.image !== undefined);
