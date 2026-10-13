@@ -472,6 +472,7 @@ const MEDIA = `
   }
   /* The image box: hairline outline, clipped zoom, square-capped pixel corner brackets (3 px bars, 14 px arms) on the frame. */
   .xp-shot {
+    --xp-arm: 14px;
     position: relative;
     color: color-mix(in srgb, var(--color-text) 38%, transparent);
   }
@@ -481,14 +482,14 @@ const MEDIA = `
     inset: -6px;
     pointer-events: none;
     background:
-      linear-gradient(currentColor, currentColor) top left / 14px 3px no-repeat,
-      linear-gradient(currentColor, currentColor) top left / 3px 14px no-repeat,
-      linear-gradient(currentColor, currentColor) top right / 14px 3px no-repeat,
-      linear-gradient(currentColor, currentColor) top right / 3px 14px no-repeat,
-      linear-gradient(currentColor, currentColor) bottom left / 14px 3px no-repeat,
-      linear-gradient(currentColor, currentColor) bottom left / 3px 14px no-repeat,
-      linear-gradient(currentColor, currentColor) bottom right / 14px 3px no-repeat,
-      linear-gradient(currentColor, currentColor) bottom right / 3px 14px no-repeat;
+      linear-gradient(currentColor, currentColor) top left / var(--xp-arm) 3px no-repeat,
+      linear-gradient(currentColor, currentColor) top left / 3px var(--xp-arm) no-repeat,
+      linear-gradient(currentColor, currentColor) top right / var(--xp-arm) 3px no-repeat,
+      linear-gradient(currentColor, currentColor) top right / 3px var(--xp-arm) no-repeat,
+      linear-gradient(currentColor, currentColor) bottom left / var(--xp-arm) 3px no-repeat,
+      linear-gradient(currentColor, currentColor) bottom left / 3px var(--xp-arm) no-repeat,
+      linear-gradient(currentColor, currentColor) bottom right / var(--xp-arm) 3px no-repeat,
+      linear-gradient(currentColor, currentColor) bottom right / 3px var(--xp-arm) no-repeat;
   }
   .xp-clip {
     position: relative;
@@ -520,17 +521,20 @@ const MEDIA = `
     min-width: 0;
     text-wrap: pretty;
   }
-  /* Hover and focus: the image grows slightly inside its frame and the brackets turn violet. */
+  /* Hover and focus: the image grows slightly inside its frame; the brackets turn primary and their arms grow 4 px in two steps (motion only; with reduced motion the color alone changes). */
   @media (prefers-reduced-motion: no-preference) {
     .xp-clip img {
       transition: transform 400ms ease-out;
     }
     .xp-shot {
-      transition: color 250ms ease-out;
+      transition: color 150ms steps(2, end);
+    }
+    .xp-shot::after {
+      transition: background-size 150ms steps(2, end);
     }
   }
   @media (hover: hover) {
-    .xp-media:hover .xp-shot {
+    .xp-shot:hover {
       color: var(--color-primary);
     }
   }
@@ -542,6 +546,12 @@ const MEDIA = `
       .xp-media:hover .xp-clip img {
         transform: scale(1.03);
       }
+      .xp-shot:hover {
+        --xp-arm: 18px;
+      }
+    }
+    .xp-media:focus-within .xp-shot {
+      --xp-arm: 18px;
     }
     .xp-media:focus-within .xp-clip img {
       transform: scale(1.03);
@@ -595,6 +605,7 @@ const GALLERY = `
     outline: 2px solid var(--color-primary);
     outline-offset: -2px;
     border-color: var(--color-primary);
+    transform: none;
   }
   .xp-radio:nth-of-type(1):focus-visible ~ .xp-thumbs > .xp-thumb:nth-child(1),
   .xp-radio:nth-of-type(2):focus-visible ~ .xp-thumbs > .xp-thumb:nth-child(2),
@@ -641,14 +652,34 @@ const GALLERY = `
     object-fit: cover;
     object-position: top;
   }
+  /* Hover and keyboard focus: the edge turns primary; with motion allowed the thumbnail also lifts 1 px (the active one stays put, see the checked rule). */
   @media (hover: hover) {
     .xp-thumb:hover {
-      border-color: var(--color-text);
+      border-color: var(--color-primary);
     }
+  }
+  .xp-radio:nth-of-type(1):focus-visible ~ .xp-thumbs > .xp-thumb:nth-child(1),
+  .xp-radio:nth-of-type(2):focus-visible ~ .xp-thumbs > .xp-thumb:nth-child(2),
+  .xp-radio:nth-of-type(3):focus-visible ~ .xp-thumbs > .xp-thumb:nth-child(3),
+  .xp-radio:nth-of-type(4):focus-visible ~ .xp-thumbs > .xp-thumb:nth-child(4) {
+    border-color: var(--color-primary);
   }
   @media (prefers-reduced-motion: no-preference) {
     .xp-thumb {
-      transition: border-color 150ms ease-out;
+      transition:
+        border-color 150ms steps(2, end),
+        transform 150ms steps(2, end);
+    }
+    @media (hover: hover) {
+      .xp-thumb:hover {
+        transform: translateY(-1px);
+      }
+    }
+    .xp-radio:nth-of-type(1):focus-visible:not(:checked) ~ .xp-thumbs > .xp-thumb:nth-child(1),
+    .xp-radio:nth-of-type(2):focus-visible:not(:checked) ~ .xp-thumbs > .xp-thumb:nth-child(2),
+    .xp-radio:nth-of-type(3):focus-visible:not(:checked) ~ .xp-thumbs > .xp-thumb:nth-child(3),
+    .xp-radio:nth-of-type(4):focus-visible:not(:checked) ~ .xp-thumbs > .xp-thumb:nth-child(4) {
+      transform: translateY(-1px);
     }
     .xp-gallery .xp-slide {
       animation: xp-fade 280ms steps(4, end);

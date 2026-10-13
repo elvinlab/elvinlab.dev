@@ -868,5 +868,11 @@
     "category": "fixed",
     "title": "The decision stamp no longer touches the navbar on notes",
     "description": "On a note, from desktop width up, the DECISION stamp on the decision record in the banner hung 14 px above its card and ended 4 px under the floating navbar. It now only grazes the card corner and keeps about 17 px of air. Tablets and phones are unchanged."
+  },
+  "experiments-hover-feedback": {
+    "date": "2026-10-13",
+    "category": "changed",
+    "title": "Clearer hover on the Experiments screenshots",
+    "description": "On the Experiments page, hovering or focusing a screenshot thumbnail now turns its edge violet and lifts it 1 px in two quick steps; the selected one stays put. Hovering or focusing the big screenshot grows the four corner brackets by 4 px and turns them violet. Nothing shifts the layout, and with reduced motion only the color changes."
   }
 }

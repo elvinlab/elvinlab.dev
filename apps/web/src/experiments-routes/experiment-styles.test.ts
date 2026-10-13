@@ -255,3 +255,86 @@ describe('experimentsCss', () => {
     });
   });
 });
+
+describe('hover feedback on the rail and the frame', () => {
+  const PIECES: ExperimentsCssParts = { ...NONE, pieces: true, media: true, gallery: true };
+  const css = experimentsCss(PIECES);
+  /** The body of the `@media (prefers-reduced-motion:no-preference)` blocks, balanced by braces. */
+  const motionBlocks = (): string[] => {
+    const blocks: string[] = [];
+    const marker = '@media (prefers-reduced-motion:no-preference){';
+    let from = css.indexOf(marker);
+    while (from !== -1) {
+      let depth = 1;
+      let index = from + marker.length;
+      while (depth > 0 && index < css.length) {
+        const char = css[index];
+        if (char === '{') depth += 1;
+        if (char === '}') depth -= 1;
+        index += 1;
+      }
+      blocks.push(css.slice(from + marker.length, index - 1));
+      from = css.indexOf(marker, index);
+    }
+    return blocks;
+  };
+
+  const outsideMotion = (): string => {
+    let rest = css;
+    for (const block of motionBlocks()) {
+      rest = rest.replace(`@media (prefers-reduced-motion:no-preference){${block}}`, '');
+    }
+    return rest;
+  };
+
+  it('turns the thumbnail edge primary on hover and on keyboard focus', () => {
+    expect(css).toMatch(
+      /@media \(hover:hover\)\{[^@]*\.xp-thumb:hover\{[^}]*border-color:var\(--color-primary\)/,
+    );
+    expect(css).toMatch(
+      /:focus-visible ~ \.xp-thumbs > \.xp-thumb:nth-child\(2\)[^{]*\{[^}]*box-shadow:/,
+    );
+  });
+
+  it('lifts a thumbnail 1 px in two steps, only with motion allowed', () => {
+    const motion = motionBlocks().join('');
+    expect(motion).toMatch(/\.xp-thumb\{transition:[^}]*transform 150ms steps\(2,\s*end\)/);
+    expect(motion).toMatch(/\.xp-thumb:hover\{transform:translateY\(-1px\)/);
+    expect(motion).toMatch(
+      /:focus-visible:not\(:checked\) ~ \.xp-thumbs > \.xp-thumb:nth-child\(1\)[^{]*\{[^}]*transform:translateY\(-1px\)/,
+    );
+    expect(outsideMotion()).not.toContain('translateY(-1px)');
+  });
+
+  it('keeps the active thumbnail in place', () => {
+    for (const nth of [1, 2, 3, 4]) {
+      expect(css).toMatch(
+        new RegExp(
+          `:checked ~ \\.xp-thumbs > \\.xp-thumb:nth-child\\(${nth}\\)[^{]*\\{[^}]*transform:none`,
+        ),
+      );
+    }
+  });
+
+  it('grows the four frame brackets and turns them primary on hover and focus-within', () => {
+    expect(css).toMatch(/\.xp-shot\{[^}]*--xp-arm:14px/);
+    expect(css).toMatch(/\.xp-shot::after\{[^}]*var\(--xp-arm\) 3px/);
+    expect(css).toMatch(/\.xp-shot:hover\{[^}]*color:var\(--color-primary\)/);
+    expect(css).toMatch(/\.xp-media:focus-within \.xp-shot\{[^}]*color:var\(--color-primary\)/);
+    const motion = motionBlocks().join('');
+    expect(motion).toMatch(/--xp-arm:18px/);
+    expect(motion).toMatch(/\.xp-shot::after\{transition:[^}]*steps\(2,\s*end\)/);
+    expect(motion).toMatch(/\.xp-shot\{transition:color 150ms steps\(2,\s*end\)/);
+    expect(outsideMotion()).not.toContain('--xp-arm:18px');
+  });
+
+  it('puts every steps() timing inside a no-preference block', () => {
+    const outside = outsideMotion();
+    expect(outside).not.toMatch(/\.xp-(thumb|shot)[^{]*\{[^}]*steps\(/);
+  });
+
+  it('adds no hex color and no hard offset shadow', () => {
+    expect(css).not.toMatch(/#[0-9a-f]{3,8}\b/i);
+    expect(css).not.toMatch(/box-shadow:\s*-?\d+px -?\d+px 0 /);
+  });
+});
