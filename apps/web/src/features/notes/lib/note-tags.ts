@@ -5,6 +5,21 @@ export function visibleTags(tags: readonly string[], category: string): string[]
   return tags.filter((tag) => tag !== category);
 }
 
+/** How many tag chips a row of the notes index shows next to the category chip. */
+export const ROW_TAG_LIMIT = 2;
+
+/**
+ * The tag chips of a row of the notes index: `visibleTags` capped at `limit`, in the author's order.
+ * The rest stay in `data-tags` (search and filter) and on the sidebar and topic pages.
+ */
+export function rowChipTags(
+  tags: readonly string[],
+  category: string,
+  limit: number = ROW_TAG_LIMIT,
+): string[] {
+  return visibleTags(tags, category).slice(0, limit);
+}
+
 /**
  * Link for a tag or category: the static topic page when `topics` (raw tag to topic slug) maps it,
  * otherwise the notes index filtered by it. The index exists only at `/notes/`.

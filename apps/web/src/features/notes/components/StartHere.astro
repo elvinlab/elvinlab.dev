@@ -1,7 +1,8 @@
 ---
-/** "Start here" block above the notes search: up to three flat rows (number, title, reading time and
- * the reason to start with that note), styled like the home notebook rows. Kept lean on purpose:
- * every byte lands on /notes/. */
+/** "Start here" strip above the notes search: one heading and up to three title-only links with their
+ * numbers (no excerpt, no chips, no reason), so the list of notes starts right below it. From md up the
+ * heading sits beside the links (tight lines for a mouse); on phones each link takes a 44 px line.
+ * Layout lives in `notes-index.css`, inlined only on /notes/. */
 import { localizePath } from '@elvinlab/core';
 
 import { noteNumber } from '@/features/notes/lib/notes.ts';
@@ -14,20 +15,20 @@ const { locale, notes } = Astro.props;
 ---
 
 {notes.length > 0 && (
-  <section class="border-b border-dashed border-divider pb-4">
-    <h2 class="font-display text-3xl font-bold text-primary">{t(locale, 'notes.startHere')}</h2>
-    <div class="mt-2">
+  <section class="ni-start">
+    <h2 class="font-display text-xl font-bold text-primary">{t(locale, 'notes.startHere')}</h2>
+    <ul>
       {notes.map((note) => (
-        <a
-          href={localizePath(`/notes/${note.slug}/`, note.data.lang, LOCALES)}
-          class="grid grid-cols-[56px_1fr_auto] gap-3 border-t border-dashed border-divider py-3 hover:bg-card-hover"
-        >
-          <span class="font-mono text-sm text-muted">{noteNumber(note.data.number)}</span>
-          <span class="font-medium">{note.data.title}</span>
-          <span class="whitespace-nowrap text-sm text-muted">{t(locale, 'notes.readingTime', { min: note.readingMinutes })}</span>
-          {note.data.startHereNote && <span class="col-start-2 text-sm text-muted">{note.data.startHereNote}</span>}
-        </a>
+        <li>
+          <a
+            href={localizePath(`/notes/${note.slug}/`, note.data.lang, LOCALES)}
+            class="font-medium transition-colors duration-150 hover:text-primary"
+          >
+            <span class="font-mono text-sm text-muted">{noteNumber(note.data.number)}</span>
+            <span>{note.data.title}</span>
+          </a>
+        </li>
       ))}
-    </div>
+    </ul>
   </section>
 )}

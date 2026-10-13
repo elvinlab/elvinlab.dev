@@ -116,7 +116,7 @@ Details that avoid mistakes:
 
 ### 3.1. "Start here" notes
 
-`/notes/` opens with a "Start here" block of three notes, and the end of every note shows "Keep reading": those same notes first (unless the reader just saw them as previous/next), then related ones. They are chosen with two fields in the note itself:
+`/notes/` opens with a compact "Start here" strip of three notes (a heading and the three titles with their numbers; the one-line reason is not shown there), and the end of every note shows "Keep reading": those same notes first (unless the reader just saw them as previous/next), then related ones. They are chosen with two fields in the note itself:
 
 ```yaml
 startHere: 2

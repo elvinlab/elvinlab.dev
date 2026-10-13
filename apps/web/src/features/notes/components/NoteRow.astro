@@ -1,6 +1,7 @@
 ---
 /**
- * One entry row in the notes index: number, title, excerpt, category and tag chips, meta column.
+ * One entry row in the notes index, a reading path: number, title, one mono meta line (date, reading time,
+ * language badge and read/continue label), excerpt, then the category chip and at most two tag chips.
  * The title is the row's only link; its `::after` stretches over the row so the whole row opens the
  * note (no script). The category and tag chips sit above that layer (`z-10`) as separate links to the
  * filtered index. The ruled line between rows and the wide-screen margin rule are CSS on this element
@@ -9,7 +10,7 @@
 import { localizePath } from '@elvinlab/core';
 
 import { secondaryMetaSlot } from '@/features/notes/lib/note-meta.ts';
-import { rowTagList, tagHref, visibleTags } from '@/features/notes/lib/note-tags.ts';
+import { rowChipTags, rowTagList, tagHref } from '@/features/notes/lib/note-tags.ts';
 import { formatDate, type NoteLike, noteNumber, searchText } from '@/features/notes/lib/notes.ts';
 import { isEnabled } from '@/shared/config/index.ts';
 import { LOCALES, type Locale, t } from '@/shared/i18n/index.ts';
@@ -37,7 +38,7 @@ const href = localizePath(`/notes/${note.slug}/`, data.lang, LOCALES);
   data-lang={data.lang}
   data-search={searchText(note)}
   data-tags={rowTagList(data.category, data.tags)}
-  class="relative grid grid-cols-[64px_1fr] gap-x-4 gap-y-2 py-5 transition-colors duration-150 hover:bg-card-hover md:grid-cols-[88px_1fr_auto] md:rounded-inner md:px-3"
+  class="relative grid grid-cols-[64px_1fr] gap-x-4 gap-y-2 py-5 transition-colors duration-150 hover:bg-card-hover md:grid-cols-[88px_1fr] md:rounded-inner md:px-3"
 >
   <span class="pt-1 font-mono text-sm text-muted">{noteNumber(data.number)}</span>
 
@@ -45,20 +46,17 @@ const href = localizePath(`/notes/${note.slug}/`, data.lang, LOCALES);
     <h3 class="text-lg font-bold leading-snug">
       <a href={href} class="transition-colors duration-150 after:absolute after:inset-0 hover:text-primary">{data.title}</a>
     </h3>
+    <div class="ni-meta font-mono text-sm text-muted">
+      <time datetime={data.pubDate.toISOString()}>{formatDate(data.pubDate, locale)}</time>
+      {secondaryMetaSlot === 'header' && <LangBadge lang={data.lang} />}
+      <span class="whitespace-nowrap">{t(locale, 'notes.readingTime', { min: note.readingMinutes })}</span>
+      <ReadingProgressMemory part="label" locale={locale} />
+    </div>
     <p class="text-sm leading-relaxed text-text-secondary">{data.description}</p>
     <div class="flex flex-wrap items-center gap-1.5">
       {secondaryMetaSlot === 'foot' && <LangBadge lang={data.lang} />}
       <Chip href={tagHref(data.category, topics)} class="relative z-10">{data.category}</Chip>
-      {visibleTags(data.tags, data.category).map((tag) => <Chip href={tagHref(tag, topics)} class="relative z-10">#{tag}</Chip>)}
+      {rowChipTags(data.tags, data.category).map((tag) => <Chip href={tagHref(tag, topics)} class="relative z-10">#{tag}</Chip>)}
     </div>
-  </div>
-
-  <div class="col-start-2 flex items-center gap-3 text-sm text-muted md:col-start-3 md:flex-col md:items-end md:gap-1 md:pt-1 md:text-right">
-    <span class="flex items-center gap-2">
-      <time datetime={data.pubDate.toISOString()}>{formatDate(data.pubDate, locale)}</time>
-      {secondaryMetaSlot === 'header' && <LangBadge lang={data.lang} />}
-    </span>
-    <span class="whitespace-nowrap">{t(locale, 'notes.readingTime', { min: note.readingMinutes })}</span>
-    <ReadingProgressMemory part="label" locale={locale} />
   </div>
 </article>

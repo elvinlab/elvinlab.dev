@@ -15,8 +15,8 @@
 - Target: the first note row title moves up by at least 200 px at both 1280 and 390 compared with today (measure before and after on the same build) and the full row stays whole-row clickable; no row exceeds 3 chips.
 
 ## Tasks
-- [ ] N1 — Row: at most 3 chips, mono meta line under the title, single content column; whole-row link, search filtering, tag filtering, reading-progress labels and focus order unchanged.
-- [ ] N2 — "Empieza aquí" as a compact strip; the list starts at least 200 px higher at 1280 and 390.
+- [x] N1 — Row: at most 3 chips, mono meta line under the title, single content column; whole-row link, search filtering, tag filtering, reading-progress labels and focus order unchanged.
+- [x] N2 — "Empieza aquí" as a compact strip; the list starts at least 200 px higher at 1280 and 390.
 
 ## Acceptance criteria
 - Only `/notes/` and `/en/notes/` change (rows are shared with topic/tag pages? then scope the change to the index, e.g. a prop or a wrapper class); home, `/me`, `/education/`, `/experiments/`, `/changelog/`, note pages look exactly as before.
@@ -26,3 +26,27 @@
 
 ## Progress and evidence
 Route: delegated writer; parent reviews the diff, re-runs checks and looks at screenshots.
+
+### Writer report (2026-10-13)
+Route: delegated writer (this document); not committed, the parent reviews and commits.
+
+Measurements (first note row title, top of the page, `a` of `h3`, production build, 9 notes, dark and light identical):
+- BEFORE: 846 px at 1280, 1154 px at 390.
+- AFTER: 636 px at 1280 (-210), 847 px at 390 (-307). Target of 200 px met at both widths.
+- e2e fixture build (3 notes, start-here rows without a reason, so shorter than production): BEFORE 738 / 738, AFTER 645 / 704. The 200 px target cannot be asserted on the fixture, so `notes-index-path.spec.ts` asserts a fixed ceiling (660 at 1280, 720 at 390) and that the position is above the recorded fixture BEFORE; the 200 px figure is the production measurement above. There is no `/en/notes/` index (404), so EN index checks do not apply.
+
+TDD: `tests/browser/notes-index-path.spec.ts` written first and run on the old code: 7 of 16 failed (mono meta line at 1280 and 390, two-column grid and empty-area click, continue label on the meta line, title-only strip, both ceilings); the chip cap, tab order, search, overflow and axe tests passed because the old layout already satisfied them (the fixture has at most 2 chips per row). The chip cap itself is covered by the unit test `rowChipTags` in `note-tags.test.ts` (4 cases). GREEN after implementation: 266 passed, 1 skipped across the 15 specs below.
+
+Implementation:
+- `lib/note-tags.ts`: `ROW_TAG_LIMIT = 2` and `rowChipTags`; `data-tags` and `data-search` untouched.
+- `NoteRow.astro`: two grid columns, title, `.ni-meta` mono line (time, badge slot `header`, reading time, progress label), excerpt, chips (category first, then at most two tags).
+- `StartHere.astro`: `section.ni-start` with the `h2` and a `ul` of title-only links with the mono number; the schema still requires `startHereNote` but the strip no longer shows it.
+- `notes-index.css`: `.ni-start` and `.ni-meta` rules. First attempt used Tailwind utilities (`md:grid-cols-[auto_1fr]`, `md:py-0.5`, `font-normal`, ...): every page grew by about 340 B of global style (42 of 42 pages over budget; the base commit passed). Moving the new layout rules into `notes-index.css` (inlined only on `/notes/`) fixed it; no font variable text was written anywhere.
+- Page weight: only `notes-index` over (style 60173 / 59750, +423 B); raised `styleBytes` to 60475 with a dated reason. Its html shrank (129347 -> 128673 B).
+- Docs: DESIGN.md (new "Notes index reading path" bullet, language badge wording), NOTES.md and NOTES.en.md (3.1), changelog entry `notes-index-reading-path`, `verification-map.ts` entry for the new spec. No existing spec needed changes.
+
+Visual review (Playwright on `astro preview`, dark and light, 1280 and 390, reduced motion; hover, search with a query, stored progress label): margin rule lines up with the number column and the ruled line; hover tint and primary title work; search shows "8 notas" and filters; "Seguir leyendo" sits at the end of the meta line. Changes made because of it: the strip first rendered as a 44 px stacked list at 1280 and gained only 135 px, so from md up it became a heading-left, links-right block with 28 px lines (mouse); phones keep 44 px lines. No other defects seen (no widows, no overflow).
+
+Checks run: biome check . (clean), typecheck (0 errors), depcruise (no violations), vitest (141 files, 1650 tests passed), `pnpm --filter web build`, check:js-budget (all pass), check:page-weight (42 of 42 within budget after the raise), test:white-label (pass), docs:config (up to date), e2e quick on notes-index-path, notes-index-ruled, notes-layout, notes-start-here, notes-tag-filter, notes-topics, reading-progress, no-horizontal-overflow, a11y, mobile-ux, home-sections, calm-pages, page-stamps, card-links, native-feel (266 passed, 1 skipped).
+
+Gaps: 360 and 768 projects, Lighthouse and the full e2e battery were not run (out of the requested scope); the strip links at md and up are 28 px high lines (the 44 px rule is kept below md); parent should review the screenshots again and commit.

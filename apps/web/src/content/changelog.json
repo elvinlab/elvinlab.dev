@@ -874,5 +874,11 @@
     "category": "changed",
     "title": "Clearer hover on the Experiments screenshots",
     "description": "On the Experiments page, hovering or focusing a screenshot thumbnail now turns its edge violet and lifts it 1 px in two quick steps; the selected one stays put. Hovering or focusing the big screenshot grows the four corner brackets by 4 px and turns them violet. Nothing shifts the layout, and with reduced motion only the color changes."
+  },
+  "notes-index-reading-path": {
+    "date": "2026-10-13",
+    "category": "changed",
+    "title": "The notes index reads as a reading path",
+    "description": "Each row on the notes index now shows the title first, then the date and the reading time on one line, the excerpt and at most three chips (the category and two tags; search still finds every tag). The Start here block is now a compact strip of three titles, so the list starts about 210 px higher on desktop and 300 px on phones."
   }
 }
