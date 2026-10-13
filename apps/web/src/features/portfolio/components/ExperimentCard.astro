@@ -1,0 +1,39 @@
+---
+/**
+ * The experiment nudge card: a small, quiet pointer to the latest experiment (thumbnail, label,
+ * title, one line of context). It is plain HTML and works with no JavaScript; the floating
+ * behaviour is a separate script that moves this same markup. The whole card is one link named by
+ * the experiment title: to its case note when it has one, else to its place on `/experiments/`.
+ * The caller decides whether to render it (`features.experimentNudge`); it ships no script or CSS.
+ */
+import { Image } from 'astro:assets';
+import { localizePath } from '@elvinlab/core';
+
+import type { ExperimentEntry } from '@/features/portfolio/index.ts';
+import { LOCALES, type Locale, t } from '@/shared/i18n/index.ts';
+import { resolveExperimentImage } from '@/shared/lib/experiment-image.ts';
+import { pickLocale } from '@/shared/lib/localized.ts';
+
+type Props = { entry: ExperimentEntry; locale: Locale };
+
+const { entry, locale } = Astro.props;
+const cover = entry.images?.[0];
+const image = cover ? resolveExperimentImage(entry.id, cover.file) : undefined;
+const href = entry.note
+  ? localizePath(`/notes/${entry.note}/`, entry.noteLang ?? LOCALES.defaultLocale, LOCALES)
+  : `${localizePath('/experiments/', locale, LOCALES)}#${entry.id}`;
+const titleId = `nudge-title-${entry.id}`;
+---
+
+<aside class="flex items-center gap-3 rounded-card border border-divider bg-card p-3" aria-label={t(locale, 'nudge.label')} data-experiment-card>
+  {image && cover && (
+    <Image src={image} alt={pickLocale(cover.alt, locale, LOCALES.defaultLocale)} format="webp" quality={75} width={160} height={100} widths={[160, 320]} sizes="80px" loading="lazy" decoding="async" class="h-[50px] w-20 shrink-0 rounded-control object-cover" />
+  )}
+  <div class="min-w-0">
+    <p class="font-mono text-meta text-muted">{t(locale, 'nudge.label')}</p>
+    <a href={href} aria-labelledby={titleId} class="block truncate text-text-secondary underline-offset-4 hover:underline">
+      <span id={titleId} class="font-display">{entry.title}</span>
+    </a>
+    <p class="line-clamp-1 text-meta text-muted">{pickLocale(entry.description, locale, LOCALES.defaultLocale)}</p>
+  </div>
+</aside>
