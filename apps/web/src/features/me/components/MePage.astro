@@ -1,11 +1,16 @@
 ---
 /** The full `/me` recruiter page for one locale: hero, at-a-glance, recent experiments, what I bring, experience,
- * latest notes, certificates by year, and a sidebar. Print-friendly. */
+ * latest notes, recent education (or certificates by year while the education page is off), and a sidebar. Print-friendly. */
 import { getCollection } from 'astro:content';
 import { localizePath } from '@elvinlab/core';
 
 import { BackgroundCanvas } from '@/features/backgrounds/index.ts';
-import { CertificatesByYear } from '@/features/credentials/index.ts';
+import {
+  CertificatesByYear,
+  EducationRecent,
+  loadEducationPages,
+  recentEducationRows,
+} from '@/features/credentials/index.ts';
 import AtAGlance from '@/features/me/components/AtAGlance.astro';
 import ExperienceTimeline from '@/features/me/components/ExperienceTimeline.astro';
 import MeHero from '@/features/me/components/MeHero.astro';
@@ -28,7 +33,11 @@ const { locale } = Astro.props;
 // The notes index exists only at `/notes/` (one index, no `/en/notes/`), so its link is not localized.
 
 const experience = (await getCollection('experience')).map((entry) => entry.data);
-const credentials = isEnabled('credentials') ? (await getCollection('credentials')).map((c) => c.data) : [];
+// The compact education block replaces the long certificates list while the education page exists.
+const educationRows = isEnabled('education')
+  ? recentEducationRows((await loadEducationPages()).pages, site.education.meRows)
+  : [];
+const credentials = isEnabled('credentials') && !isEnabled('education') ? (await getCollection('credentials')).map((c) => c.data) : [];
 const experiments = isEnabled('experiments') ? (await loadExperiments()).slice(0, experimentsSettings.meRows) : [];
 const noteEntries = isEnabled('blog') ? await getCollection('notes') : [];
 const allNotes = sortNotes(noteEntries.map((n) => ({ slug: n.id, data: n.data })));
@@ -85,7 +94,9 @@ const bio = site.identity.bio[locale];
       </section>
     )}
 
-    <CertificatesByYear locale={locale} credentials={credentials} />
+    {isEnabled('education')
+      ? <EducationRecent locale={locale} rows={educationRows} />
+      : <CertificatesByYear locale={locale} credentials={credentials} />}
   </div>
 
   <MeSidebar slot="aside" locale={locale} />

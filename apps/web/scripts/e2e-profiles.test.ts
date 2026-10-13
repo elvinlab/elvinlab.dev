@@ -60,6 +60,7 @@ describe('E2E_PROFILES', () => {
       contact: false,
       changelog: false,
       experiments: false,
+      education: false,
       subscribe: false,
       me: true,
     });

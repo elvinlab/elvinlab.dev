@@ -30,7 +30,14 @@ export function livePages<T extends { needs?: E2eNeeds }>(pages: readonly T[]): 
   return pages.filter((page) => missingNeeds(profile, page.needs ?? {}).length === 0);
 }
 
-const PATH_ROUTES = ['notes', 'contact', 'changelog', 'experiments', 'subscribe'] as const;
+const PATH_ROUTES = [
+  'notes',
+  'contact',
+  'changelog',
+  'experiments',
+  'education',
+  'subscribe',
+] as const;
 
 /** The optional route a URL path belongs to (`/en/contact/` is `contact`); none for the always-built pages. */
 export function routeNeeds(path: string): E2eNeeds {

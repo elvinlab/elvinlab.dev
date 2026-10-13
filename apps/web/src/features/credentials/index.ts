@@ -1,4 +1,5 @@
 export { default as CertificatesByYear } from './components/CertificatesByYear.astro';
+export { default as EducationRecent } from './components/EducationRecent.astro';
 export { groupCredentialsByYear } from './lib/credentials.ts';
 export {
   EDUCATION_DEFAULT_SORT,
@@ -9,6 +10,7 @@ export {
   groupEducationByYear,
   offeredEducationSorts,
   paginateEducation,
+  recentEducationRows,
   sortEducation,
 } from './lib/education.ts';
 export { loadEducationPages } from './lib/education-pages.ts';

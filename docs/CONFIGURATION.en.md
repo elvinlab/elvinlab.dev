@@ -216,7 +216,7 @@ Shown in the `/me` timeline. If you omit `end`, it is the current job. `role`, `
 
 ### Certificates and degrees — `credentials.json`
 
-Grouped by year, newest first. Only shown when `features.credentials` is on.
+They feed `/education/` (a timeline by year, oldest first; needs `features.education`) and `/me`: with `features.education` on, a block with the newest `education.meRows`; off, the long list by year, which needs `features.credentials`. How to add one: [PORTFOLIO.en.md](PORTFOLIO.en.md#6-credentials-and-education).
 
 ```json
 {
@@ -235,7 +235,7 @@ Grouped by year, newest first. Only shown when `features.credentials` is on.
 | `title` | `string (max 120)` | yes |  | Name of the certificate or degree (max 120 characters). |
 | `issuer` | `string (max 80)` | yes |  | Who issued it (max 80 characters). |
 | `kind` | `'degree' \| 'certificate' \| 'professional'` | yes |  | Whether it is a degree, a course certificate or a professional certification. |
-| `year` | `integer (min 1970)` | yes |  | Year obtained; certificates are grouped by year, newest first. |
+| `year` | `integer (min 1970)` | yes |  | Year obtained; `/education/` groups entries by year (oldest first) and `/me` shows the newest. |
 | `month` | `integer (min 1, max 12)` | no |  | Optional month (1-12) to order items within a year. |
 | `order` | `integer (min 0)` | no |  | Optional editorial position inside its year on `/education/` (lower first). Entries without it follow, ordered by id. |
 | `url` | `URL` | no |  | Verification link (https only). |
@@ -424,7 +424,8 @@ Each `features` flag switches the whole feature off: the route is not generated,
 | `blog` | Notes index, notes and RSS | With no published notes, the menu hides "Notes" and the feed. With `blog: false` no notes route, RSS feed or sitemap entry is built (the routes in `src/blog-routes/` are injected only when the flag is on, by `integrations/blog-routes.ts`) |
 | `comments` | Comments and reactions (Giscus) | Needs the `giscus` block; see 6.5 |
 | `contact` | The `/contact` form | Needs the Worker secrets; without them it fails closed |
-| `credentials` | Certificates on `/me` | |
+| `credentials` | Certificates on `/me` | With `education` on, `/me` shows the recent-education block instead of this list |
+| `education` | `/education/` page and the "Recent education" block of `/me` | Off: no route and no menu entry |
 | `experiments` | Experiments section and pages (`/experiments/`) | |
 | `changelog` | The `/changelog` page and its link | When off the route is not generated (see "What each switch does") |
 | `me` | The `/me` page (portfolio) | |
@@ -440,7 +441,8 @@ All flags live under `features` in `site.config.ts`. The interface switches (`ba
 | `blog` | Lab Notes: `/notes` index, notes and the `/rss.xml` feed | The routes (`integrations/blog-routes.ts`), the "Notes" menu entry, the feed and the sitemap entries; the home and `/me` stop reading notes | With no published notes the menu also hides "Notes". `subscribe` requires `blog` |
 | `comments` | Comments and reactions (Giscus) on notes | The component and its mention in the privacy and terms pages | Needs the `giscus` block; without it nothing renders |
 | `contact` | The `/contact` page (and `/en/contact`) and the `contact` Action | The routes (`integrations/contact-routes.ts`), the Action (answers "unavailable" without reaching any provider), the menu entry, the author card and `/me` buttons, and the sitemap entry. The privacy and terms pages stop linking to contact (they point to "the channels published on this site") and privacy loses its "Contact form" section. The subscription error messages stop mentioning the Contact page | When on, needs the Worker secrets (`CONTACT_*`) and the Turnstile key; without them it fails closed |
-| `credentials` | Certificates and degrees on `/me` | The certificates section of `/me` | |
+| `credentials` | Certificates and degrees on `/me` | The certificates section of `/me` | Ignored on `/me` while `education` is on |
+| `education` | `/education/` page (education timeline) and the "Recent education" block of `/me` | The routes (`integrations/education-routes.ts`), the "Education" menu entry, the `/me` block (the long list returns if `credentials` is on) and the sitemap entries | Reads `credentials.json`; the `education` block of `site.config.ts` tunes page, switch and rows |
 | `experiments` | Experiments section | The `/experiments/` and `/en/experiments/` routes (`integrations/experiments-routes.ts`), the menu entry, the home section and the `/me` section, and its sitemap entry | `home.experiments` also needs it |
 | `me` | The `/me` page | The "About" menu entry, the home hiring card, the notes sidebar link and the `/me` share card; the page is marked `noindex` and kept out of the sitemap | |
 | `changelog` | The `/changelog` page (and `/en/changelog`) | The routes (`integrations/changelog-routes.ts`), the footer link and the sitemap entry | |

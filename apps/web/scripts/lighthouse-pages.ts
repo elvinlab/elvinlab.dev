@@ -14,6 +14,8 @@ export const LIGHTHOUSE_NEEDS: Readonly<Record<string, E2eNeeds>> = {
   '/me/': { flags: ['me'] },
   '/en/me/': { flags: ['me'] },
   '/experiments/': { routes: ['experiments'] },
+  '/education/': { routes: ['education'] },
+  '/en/education/': { routes: ['education'] },
   '/notes/': { routes: ['notes'] },
   '/notes/smoke-es/': { routes: ['notes'] },
   '/notes/tag/pruebas/': { routes: ['notes'] },

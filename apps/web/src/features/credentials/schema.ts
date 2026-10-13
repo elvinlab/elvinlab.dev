@@ -32,7 +32,9 @@ export function credentialSchema() {
     year: z
       .int()
       .min(1970)
-      .describe('Year obtained; certificates are grouped by year, newest first.'),
+      .describe(
+        'Year obtained; `/education/` groups entries by year (oldest first) and `/me` shows the newest.',
+      ),
     month: z
       .int()
       .min(1)

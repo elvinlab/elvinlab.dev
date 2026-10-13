@@ -10,6 +10,8 @@
         "http://127.0.0.1:4323/me/",
         "http://127.0.0.1:4323/en/me/",
         "http://127.0.0.1:4323/experiments/",
+        "http://127.0.0.1:4323/education/",
+        "http://127.0.0.1:4323/en/education/",
         "http://127.0.0.1:4323/notes/",
         "http://127.0.0.1:4323/notes/smoke-es/",
         "http://127.0.0.1:4323/notes/tag/pruebas/",

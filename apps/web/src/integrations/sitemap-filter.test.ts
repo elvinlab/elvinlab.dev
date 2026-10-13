@@ -84,6 +84,30 @@ describe('isHiddenFromSitemap', () => {
     }
   });
 
+  it('hides every education page when the education feature is off, and lists them when it is on', () => {
+    for (const path of [
+      '/education/',
+      '/en/education/',
+      '/education/page/2/',
+      '/en/education/page/2/',
+    ]) {
+      expect(isHiddenFromSitemap(path, { ...allOn, education: false }), path).toBe(true);
+      expect(isHiddenFromSitemap(path, allOn), path).toBe(false);
+    }
+  });
+
+  it('never lists the alternate order of the education timeline, whatever the flags', () => {
+    for (const path of [
+      '/education/newest/',
+      '/education/newest/page/2/',
+      '/en/education/newest/',
+      '/en/education/newest/page/2/',
+    ]) {
+      expect(isHiddenFromSitemap(path, allOn), path).toBe(true);
+      expect(isHiddenFromSitemap(path, { ...allOn, education: false }), path).toBe(true);
+    }
+  });
+
   it('returns true for /changelog/ when changelog feature is off', () => {
     const features = { ...allOn, changelog: false };
     expect(isHiddenFromSitemap('/changelog/', features)).toBe(true);

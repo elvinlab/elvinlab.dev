@@ -98,3 +98,15 @@ export function educationSortParam(value: string | undefined): EducationSort {
   if (sort === undefined) throw new Error(`"${value}" is not an education sort`);
   return sort;
 }
+
+/**
+ * The newest entries for the compact block of `/me`: `rows` of them, newest first, each with the
+ * page of the default (oldest first) timeline that holds it, so its link lands on the right page.
+ */
+export function recentEducationRows<T extends EducationLike>(
+  pages: readonly ListingPage<T>[],
+  rows: number,
+): (T & { page: number })[] {
+  const placed = pages.flatMap((page) => page.items.map((item) => ({ ...item, page: page.page })));
+  return sortEducation(placed, 'newest').slice(0, Math.max(0, rows));
+}

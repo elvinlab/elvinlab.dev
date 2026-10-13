@@ -417,6 +417,8 @@ export const CHECKS: readonly CheckDef[] = [
   lighthouse('/me/', ME),
   lighthouse('/en/me/', ME),
   lighthouse('/experiments/', EXPERIMENTS),
+  lighthouse('/education/', EDUCATION),
+  lighthouse('/en/education/', EDUCATION),
   lighthouse('/notes/', [...NOTES, ...SUBSCRIBE]),
   lighthouse('/notes/smoke-es/', NOTE_PAGE),
   lighthouse('/notes/tag/pruebas/', NOTES),

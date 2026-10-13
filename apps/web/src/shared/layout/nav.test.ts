@@ -29,6 +29,7 @@ describe('navItems', () => {
       'notes',
       'experiments',
       'about',
+      'education',
       'contact',
     ]);
   });
@@ -39,6 +40,7 @@ describe('navItems', () => {
       'notes',
       'experiments',
       'about',
+      'education',
       'contact',
     ]);
   });
@@ -48,6 +50,7 @@ describe('navItems', () => {
       'home',
       'experiments',
       'about',
+      'education',
       'contact',
     ]);
   });
@@ -57,13 +60,14 @@ describe('navItems', () => {
       'home',
       'experiments',
       'about',
+      'education',
       'contact',
     ]);
   });
 
   it('hides the entries of disabled features', () => {
     const items = navItems(
-      { ...allOn, blog: false, contact: false, experiments: false },
+      { ...allOn, blog: false, contact: false, experiments: false, education: false },
       'es',
       true,
     );
@@ -73,12 +77,24 @@ describe('navItems', () => {
 
   it('hides about when me feature is off', () => {
     const items = navItems({ ...allOn, me: false }, 'es', true);
-    expect(items.map((item) => item.key)).toEqual(['home', 'notes', 'experiments', 'contact']);
+    expect(items.map((item) => item.key)).toEqual([
+      'home',
+      'notes',
+      'experiments',
+      'education',
+      'contact',
+    ]);
   });
 
   it('hides experiments when experiments feature is off', () => {
     const items = navItems({ ...allOn, experiments: false }, 'es', true);
-    expect(items.map((item) => item.key)).toEqual(['home', 'notes', 'about', 'contact']);
+    expect(items.map((item) => item.key)).toEqual([
+      'home',
+      'notes',
+      'about',
+      'education',
+      'contact',
+    ]);
   });
 
   it('preserves order when all features are on', () => {
@@ -88,6 +104,7 @@ describe('navItems', () => {
       'notes',
       'experiments',
       'about',
+      'education',
       'contact',
     ]);
   });
@@ -98,6 +115,24 @@ describe('navItems', () => {
     expect(notesItem).not.toHaveProperty('labelOverride');
     expect(notesItem?.hreflang).toBe('es');
     expect(notesItem?.localize).toBe(false);
+  });
+});
+
+describe('navItems education entry', () => {
+  it('sits between about and contact and points at the localized /education/ page', () => {
+    for (const locale of ['es', 'en'] as const) {
+      const keys = navItems(allOn, locale, true).map((item) => item.key);
+      expect(keys.indexOf('education')).toBe(keys.indexOf('about') + 1);
+      expect(keys.indexOf('contact')).toBe(keys.indexOf('education') + 1);
+      const item = navItems(allOn, locale, true).find((entry) => entry.key === 'education');
+      expect(item).toMatchObject({ path: '/education/' });
+      expect(item?.localize).not.toBe(false);
+    }
+  });
+
+  it('is hidden while features.education is off', () => {
+    const keys = navItems({ ...allOn, education: false }, 'es', true).map((item) => item.key);
+    expect(keys).not.toContain('education');
   });
 });
 

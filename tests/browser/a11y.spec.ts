@@ -12,6 +12,8 @@ const PAGES = liveByPath(
     '/en/me/',
     '/experiments/',
     '/en/experiments/',
+    '/education/',
+    '/en/education/',
     '/changelog/',
     '/en/changelog/page/2/',
     '/notes/',

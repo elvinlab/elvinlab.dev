@@ -22,6 +22,7 @@ describe('resolveE2eProfile', () => {
       contact: true,
       changelog: true,
       experiments: true,
+      education: true,
       subscribe: true,
       me: true,
     });
@@ -45,6 +46,11 @@ describe('resolveE2eProfile', () => {
       withFeatures({ contact: false, changelog: false, experiments: false }),
     );
     expect(routes).toMatchObject({ contact: false, changelog: false, experiments: false });
+  });
+
+  it('removes the education routes with features.education', () => {
+    expect(resolveE2eProfile(withFeatures({ education: false })).routes.education).toBe(false);
+    expect(resolveE2eProfile(siteConfig).routes.education).toBe(siteConfig.features.education);
   });
 
   it('keeps /me built when the flag is off: the page only turns noindex', () => {

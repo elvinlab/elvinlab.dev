@@ -39,6 +39,8 @@ for (const path of ['/me/', '/en/me/']) {
     test.skip(!has({ flags: ['credentials'] }), 'needs features.credentials');
     await page.goto(path);
     await expect(page.getByText(/sin confirmar|unconfirmed/i)).toHaveCount(0);
+    // With the education page on, /me shows only the newest rows (education.spec.ts covers them).
+    if (has({ flags: ['education'] })) return;
     for (const issuer of credentialIssuers) {
       await expect(page.getByText(issuer).first()).toBeVisible();
     }

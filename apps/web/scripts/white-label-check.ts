@@ -134,9 +134,11 @@ try {
   if (
     existsSync(join(workspace.web, 'dist/client/education')) ||
     existsSync(join(workspace.web, 'dist/client/en/education')) ||
-    /data-education-item|\.ed-timeline/.test(rawHtml)
+    /data-education-item|data-me-education|\.ed-timeline/.test(rawHtml)
   ) {
-    fail('the education timeline rendered although features.education is off');
+    fail(
+      'the education timeline rendered although features.education is off (or the /me block did)',
+    );
   }
   // The experiment nudge is off in the alternative config: no card, floating copy, script, CSS or key.
   if (

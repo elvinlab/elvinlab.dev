@@ -820,5 +820,11 @@
     "category": "added",
     "title": "Notes remember where you stopped",
     "description": "If you leave a note halfway, coming back puts you where you were. Once you read 90% of a note, the notes index, the home notebook and the latest-note card mark it as read; a note you started shows 'Continue reading'. It is all stored in your browser (nothing leaves it) and can be switched off with features.readingProgress."
+  },
+  "education-page": {
+    "date": "2026-10-13",
+    "category": "added",
+    "title": "Education page",
+    "description": "A new Education page (/education/) lists my degrees and certificates as a timeline by year, with a link in the menu. /me now shows a short Recent education block that links to each entry. Adopters can switch it off with features.education and tune it with the education block of the site config."
   }
 }

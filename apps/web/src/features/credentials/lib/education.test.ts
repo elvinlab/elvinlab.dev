@@ -6,6 +6,7 @@ import {
   groupEducationByYear,
   offeredEducationSorts,
   paginateEducation,
+  recentEducationRows,
   sortEducation,
 } from './education.ts';
 
@@ -93,5 +94,30 @@ describe('paging and sorts', () => {
     expect(paginateEducation(list, { perPage: 12, sort: 'oldest' })).toHaveLength(1);
     const pages = paginateEducation(list, { perPage: 4, sort: 'newest' });
     expect(pages.map((page) => ids(page.items))).toEqual([['f', 'd', 'c', 'b'], ['a']]);
+  });
+});
+
+describe('recentEducationRows', () => {
+  const list = [e('a', 2018), e('b', 2020), e('c', 2022), e('d', 2022, undefined, 0), e('f', 2025)];
+  const pages = paginateEducation(list, { perPage: 2, sort: 'oldest' });
+
+  it('takes the newest entries first, up to the number of rows', () => {
+    expect(recentEducationRows(pages, 3).map((row) => row.id)).toEqual(['f', 'd', 'c']);
+  });
+
+  it('carries the page of the default timeline that holds each entry', () => {
+    const rows = recentEducationRows(pages, 5);
+    expect(rows.map((row) => [row.id, row.page])).toEqual([
+      ['f', 3],
+      ['d', 2],
+      ['c', 2],
+      ['b', 1],
+      ['a', 1],
+    ]);
+  });
+
+  it('returns every entry when there are fewer than the rows asked for, and none for zero', () => {
+    expect(recentEducationRows(pages, 99)).toHaveLength(5);
+    expect(recentEducationRows(pages, 0)).toEqual([]);
   });
 });
