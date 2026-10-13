@@ -92,6 +92,26 @@ test('the stamp overlaps the top-right corner of the card', async ({ page }) => 
   expect(stamp.right).toBeGreaterThan(card.right - 80);
 });
 
+// The record sits in the banner from lg, right under the floating navbar: the stamp that hangs over
+// the card corner must leave air below the navbar, never touch it.
+for (const path of [ES, EN]) {
+  for (const width of [1024, 1280, 1536]) {
+    test(`${path} at ${width}px: the banner stamp keeps clear of the navbar`, async ({ page }) => {
+      await page.setViewportSize({ width, height: 900 });
+      await page.goto(path);
+      await page.emulateMedia({ reducedMotion: 'reduce' });
+      const gap = await page.evaluate(() => {
+        const stamp = document.querySelector('[data-record-banner] [data-stamp]');
+        const nav = document.querySelector('[data-navbar]');
+        if (!stamp || !nav) return null;
+        return stamp.getBoundingClientRect().top - nav.getBoundingClientRect().bottom;
+      });
+      expect(gap).not.toBeNull();
+      expect(gap ?? 0).toBeGreaterThanOrEqual(14);
+    });
+  }
+}
+
 test('the banner card tilts slightly; the in-content card stays level', async ({ page }) => {
   await page.setViewportSize({ width: 1280, height: 900 });
   await page.goto(ES);
