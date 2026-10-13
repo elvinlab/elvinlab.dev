@@ -778,5 +778,29 @@
     "category": "fixed",
     "title": "Reading mode button no longer crowds the decision stamp on phones",
     "description": "The button sat 6 px above the DECISIÓN stamp because of a negative bottom margin; it now keeps about 22 px of clear space. Desktop layouts were not affected."
+  },
+  "ci-follows-config": {
+    "date": "2026-10-13",
+    "category": "added",
+    "title": "The CI follows the site config",
+    "description": "Switching features off in `site.config.ts` no longer breaks the pipeline. The browser specs read which features are on and skip what is off, four adopter profiles (`quiet`, `blog-only`, `me-only`, `bare`) run the whole suite with `pnpm test:profiles` and in a CI job that does not block the release, Lighthouse audits only the pages that exist, and the specs read names, domains, texts, theme names and palette colors from the config instead of copying them."
+  },
+  "text-limits": {
+    "date": "2026-10-13",
+    "category": "added",
+    "title": "Length limits for every visible text",
+    "description": "Every interface text has a maximum length by key group, the same in Spanish and English, enforced by a test, and 26 visible fields of `site.config.ts` have a maximum length in the schema. A longer text fails with its name instead of overflowing a button or wrapping a menu. The limits are in the configuration guides."
+  },
+  "no-dead-links-without-blog": {
+    "date": "2026-10-13",
+    "category": "fixed",
+    "title": "No dead feed or share-card links when the blog or the portfolio is off",
+    "description": "With `features.blog` off the home no longer links to `/rss.xml` and no page advertises the feed; with `features.me` off the `/me` page uses the default share image instead of a card that is never generated."
+  },
+  "minimal-hero": {
+    "date": "2026-10-13",
+    "category": "fixed",
+    "title": "The minimal appearance keeps the home headline to two lines",
+    "description": "The `minimal` preset wrapped the headline to three lines since the closing phrase was kept together; its measure now matches `full`. The minimal preset is also covered by a test run."
   }
 }
