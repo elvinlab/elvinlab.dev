@@ -13,6 +13,7 @@ import { dirname, join } from 'node:path';
 import { afterEach, expect, it } from 'vitest';
 
 import {
+  applyFixtureFeatures,
   createFixtureWorkspace,
   dropUnavailableProjectNotes,
   enableFixtureComments,
@@ -278,4 +279,29 @@ it('leaves a workspace without experiments.json untouched', () => {
   const web = mkdtempSync(join(tmpdir(), 'fixture-projects-'));
   temporary.push(web);
   expect(() => dropUnavailableProjectNotes(web, [])).not.toThrow();
+});
+
+it('switches the listed features in the fixture config and leaves the others', () => {
+  const web = webWithConfig(
+    'export const siteConfig = {\n  features: {\n    blog: true,\n    readingMode: true,\n    marks: false,\n  },\n};\n',
+  );
+  applyFixtureFeatures(web, { readingMode: false, marks: true });
+  const config = readFileSync(join(web, 'src/site.config.ts'), 'utf8');
+  expect(config).toContain('blog: true,');
+  expect(config).toContain('readingMode: false,');
+  expect(config).toContain('marks: true,');
+});
+
+it('does nothing when no features are listed', () => {
+  const web = webWithConfig('export const siteConfig = { features: { blog: true, } };\n');
+  const before = readFileSync(join(web, 'src/site.config.ts'), 'utf8');
+  applyFixtureFeatures(web, {});
+  expect(readFileSync(join(web, 'src/site.config.ts'), 'utf8')).toBe(before);
+});
+
+it('fails loudly when a listed feature is not in the fixture config', () => {
+  const web = webWithConfig(
+    'export const siteConfig = {\n  features: {\n    blog: true,\n  },\n};\n',
+  );
+  expect(() => applyFixtureFeatures(web, { readingMode: false })).toThrow(/readingMode/);
 });

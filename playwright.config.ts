@@ -5,13 +5,16 @@ import {
   resolveE2eProfile,
   serializeE2eProfile,
 } from './apps/web/scripts/e2e-features.ts';
+import { E2E_FEATURE_PROFILE_ENV, withProfileFeatures } from './apps/web/scripts/e2e-profiles.ts';
 import { siteConfig } from './apps/web/src/site.config.ts';
 
 // The specs must not assume which features this site has on: they follow the config. It is resolved
 // once here, with the same overrides the fixture build applies, and the workers inherit it through
 // the environment (see tests/browser/helpers/features.ts).
 process.env[E2E_PROFILE_ENV] = serializeE2eProfile(
-  resolveE2eProfile(siteConfig, { appearance: process.env['FIXTURE_APPEARANCE'] }),
+  resolveE2eProfile(withProfileFeatures(siteConfig, process.env[E2E_FEATURE_PROFILE_ENV]), {
+    appearance: process.env['FIXTURE_APPEARANCE'],
+  }),
 );
 
 // `pnpm verify` runs one invocation: E2E_WIDE_SPECS (comma separated) limits the 360 and 768 px
