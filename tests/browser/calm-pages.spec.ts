@@ -1,6 +1,6 @@
 import { expect, type Page, test } from '@playwright/test';
 
-import { has, liveByPath } from './helpers/features';
+import { has, liveByPath, seedTheme } from './helpers/features';
 
 /**
  * Calm pages (M3). The fixture build copies the real `site.config.ts` (`FIXTURE_APPEARANCE`
@@ -127,15 +127,12 @@ test.beforeEach(({ browserName: _browserName }, testInfo) => {
 });
 
 const withTheme = async (page: Page, theme: string, extra?: Record<string, string>) => {
-  await page.addInitScript(
-    ([stored, more]) => {
-      localStorage.setItem('theme', stored as string);
-      for (const [key, value] of Object.entries((more as Record<string, string>) ?? {})) {
-        localStorage.setItem(key, value);
-      }
-    },
-    [theme, extra ?? {}] as const,
-  );
+  // `seedTheme` also reaches the theme through the color scheme when the toggle is off, because the
+  // boot script then ignores the stored choice and follows the system preference.
+  await seedTheme(page, theme);
+  await page.addInitScript((more) => {
+    for (const [key, value] of Object.entries(more)) localStorage.setItem(key, value);
+  }, extra ?? {});
 };
 
 const noOverflow = (page: Page) =>
@@ -204,11 +201,20 @@ test('reading mode and the collapsed home keep a clean edge', async ({ page }) =
   await withTheme(collapsed, 'elvinlab-dark', { 'banner-expanded': '0' });
   await collapsed.goto('/');
   await expect(collapsed.locator('[data-banner-fade]')).toBeVisible();
-  const banner = await collapsed.locator('[data-banner]').boundingBox();
-  const fade = await collapsed.locator('[data-banner-fade]').boundingBox();
-  expect(
-    Math.abs((banner?.y ?? 0) + (banner?.height ?? 0) - ((fade?.y ?? 0) + (fade?.height ?? 0))),
-  ).toBeLessThan(1);
+  // The banner collapses with a height transition: measure until it has settled (it is mid-collapse,
+  // hundreds of px off, on a loaded machine) instead of once, so the check never races the animation.
+  await expect
+    .poll(
+      async () => {
+        const banner = await collapsed.locator('[data-banner]').boundingBox();
+        const fade = await collapsed.locator('[data-banner-fade]').boundingBox();
+        return Math.abs(
+          (banner?.y ?? 0) + (banner?.height ?? 0) - ((fade?.y ?? 0) + (fade?.height ?? 0)),
+        );
+      },
+      { message: 'the fade ends where the collapsed banner ends' },
+    )
+    .toBeLessThan(1);
 });
 
 test('the banners follow the height caps of the preset', async ({ page }, testInfo) => {
