@@ -802,5 +802,11 @@
     "category": "fixed",
     "title": "The minimal appearance keeps the home headline to two lines",
     "description": "The `minimal` preset wrapped the headline to three lines since the closing phrase was kept together; its measure now matches `full`. The minimal preset is also covered by a test run."
+  },
+  "reduced-motion-entrance": {
+    "date": "2026-10-13",
+    "category": "fixed",
+    "title": "With reduced motion, entrance animations do not run",
+    "description": "The fade-in-and-rise entrance of the page cards and the author photo was shortened to 0.01 ms for visitors who ask for less motion, but still left the elements transparent and 8 px low for their first frames and for their 100 to 250 ms delay. It no longer runs at all in that case, so the content is in place from the first frame. A test covers it."
   }
 }

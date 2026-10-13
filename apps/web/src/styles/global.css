@@ -69,6 +69,15 @@
     /* biome-ignore lint/complexity/noImportantStyles: must override every animation */
     scroll-behavior: auto !important;
   }
+
+  /* The entrance (`animate-fade-in-up`, also with a breakpoint prefix) ends in the element's own
+     style, so for reduced motion it does not run at all: even a 0.01 ms animation leaves the element
+     transparent and 8 px low for its first frames, and a layout measured then disagrees with the
+     final one. */
+  [class*="animate-fade-in-up"] {
+    /* biome-ignore lint/complexity/noImportantStyles: must override the utility and its variants */
+    animation: none !important;
+  }
 }
 
 /* Cross-page view transitions (DESIGN.md "Page transitions"). CSS only; unsupported browsers (Firefox)
