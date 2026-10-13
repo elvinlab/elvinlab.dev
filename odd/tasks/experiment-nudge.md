@@ -19,7 +19,7 @@ Owner asked for a notification, accepted the two-layer plan (static card first, 
 ## Tasks
 - [x] N1 — Flag and options in the schema and `site.config.ts`, white-label fixture off, `pnpm docs:config`. Tier 2.
 - [x] N2 — `ExperimentCard.astro` (static card, latest-experiment selector with a unit test, ES/EN texts). Tier 2.
-- [ ] N3 — Static layer: card at the end of `NotePage.astro`, static block on the home. Tier 2.
+- [x] N3 — Static layer: card at the end of `NotePage.astro`, static block on the home. Tier 2.
 - [ ] N4 — Floating layer: script, once-per-session, dismissal storage, page exclusions. Tier 3.
 - [ ] N5 — Same floating behaviour on `/notes` (`NotesIndex.astro`). Tier 2.
 - [ ] N6 — Visual design in the notebook language, phone bar, motion and reduced motion. Tier 3.
@@ -42,7 +42,8 @@ Forecast under 400 authored changed lines per work unit; `ask-on-risk` strategy 
 ## Progress and evidence
 N1 done (inline, Tier 2 mirror of the readingMode pattern: the brief would cost as much as the edit): RED (5 schema tests failing), GREEN (164 config tests; 1416 unit tests total), typecheck 0 errors, lint clean, depcruise clean, white-label green, `docs:config` regenerated. Flag is `.default(false)` so outputs gain the key; three fixtures extended. e2e and Lighthouse not re-run: the flag renders nothing yet; they run at the close of the first work unit.
 N2 done (inline: delegation to OpenCode `omniroute/elvinlabCode` failed with "Cannot connect to API", exit 1, nothing written; Codex was also active in the repo, so no second writer was started): RED (selector module missing), GREEN (6 selector tests; 78 in portfolio and i18n), typecheck 0 errors, lint clean. `ExperimentCard.astro` renders no script or CSS and is not placed in any page yet (N3). Cover render reused from `ExperimentCompact.astro`; link goes to the case note, else `/experiments/#id`. Key `nudge.cta` is added for N4 and unused until then.
+N3 done (inline, same OpenCode outage): `ExperimentNudge.astro` gates on `experimentNudge` and `experiments` and renders the latest live experiment. NotePage exposes `<slot name="end" />` and the two note routes fill it, because notes cannot import portfolio (depcruise: no-circular and no-cross-feature-internals fired first, then clean: 304 modules). Home renders it only when `homeSections.experiments` is off (the grid already shows experiments). Checked on real builds: flag off, 0 cards on every page; flag on, card on the ES home, EN home and 9 ES notes (no EN notes are published). Screenshots sent to the owner; known draft issue: the card sits flush against the Next-note card on a phone (spacing belongs to N6). typecheck 0 errors, lint clean. e2e and Lighthouse still pending for the close of this work unit.
 Plan only so far. Issues: N1 #125, N2 #126, N3 #127, N4 #128, N5 #129, N6 #130, N7 #131, N8 #132 (T86 to T93).
 
 ## Next step
-Start N3 (#127): place the static card at the end of notes and on the home, behind the flag.
+Finish the first work unit: N8 (changelog and docs), then e2e and Lighthouse once; then N4.
