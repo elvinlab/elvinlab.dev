@@ -108,6 +108,9 @@ export const DICTIONARIES = {
     'education.expires': 'Vence {date}',
     'education.verify': 'Verificar',
     'education.cover.soon': 'Copia del documento próximamente',
+    'education.viewer.open': 'Ampliar documento',
+    'education.viewer.close': 'Cerrar',
+    'education.viewer.label': 'Documento ampliado',
     'education.page.title': 'Formación, página {page}',
     'education.page.description':
       'Formación, página {page} de {pages}: títulos y certificados en orden cronológico.',
@@ -417,6 +420,9 @@ export const DICTIONARIES = {
     'education.expires': 'Expires {date}',
     'education.verify': 'Verify',
     'education.cover.soon': 'Document copy coming soon',
+    'education.viewer.open': 'Enlarge document',
+    'education.viewer.close': 'Close',
+    'education.viewer.label': 'Enlarged document',
     'education.page.title': 'Education, page {page}',
     'education.page.description':
       'Education, page {page} of {pages}: degrees and certificates in chronological order.',

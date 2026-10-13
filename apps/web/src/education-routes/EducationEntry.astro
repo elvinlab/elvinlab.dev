@@ -7,7 +7,7 @@
  * typographic cover (year, type, issuer), the stand-in for a document the owner has not provided yet. The `id` is the anchor `/education/#<id>` that `/me` links to.
  * Styles: `education-styles.ts`, emitted by `EducationPage.astro`.
  */
-import { Image } from 'astro:assets';
+import { getImage, Image } from 'astro:assets';
 
 import type { Credential } from '@/features/credentials/index.ts';
 import { educationDateLabel } from '@/features/credentials/index.ts';
@@ -30,9 +30,12 @@ const expires = data.expires
 const applied = text(data.appliedIn);
 const learnings = (data.learnings ?? []).map((entry) => text(entry)).filter(Boolean);
 const image = data.image ? { src: resolveEducationImage(id, data.image.file), alt: text(data.image.alt) } : undefined;
+// The viewer and the no-JS fallback open this larger copy, optimized at build time.
+const full = image ? (await getImage({ src: image.src, width: 1600, format: 'webp' })).src : undefined;
 ---
 
 <li id={id} class="ed-item" data-education-item>
+  <div class="ed-body">
   <p class="ed-meta">
     <span class="ed-badge" data-kind={data.kind}>{t(locale, `education.kind.${data.kind}`)}</span>
     <span>{date}</span>
@@ -41,9 +44,25 @@ const image = data.image ? { src: resolveEducationImage(id, data.image.file), al
   <h3 class="ed-title">{data.title}</h3>
   <p class="ed-issuer">{data.issuer}</p>
   {applied && <p class="ed-applied"><strong>{t(locale, 'education.applied')}:</strong> {applied}</p>}
+  {data.url && (
+    <a class="ed-verify" href={data.url} {...externalLinkAttrs(data.url, site.url)}>
+      {t(locale, 'education.verify')}<ExternalHint href={data.url} locale={locale} />
+    </a>
+  )}
+  {learnings.length > 0 && (
+    <details class="ed-learned">
+      <summary>{t(locale, 'education.learned')}</summary>
+      <ul>
+        {learnings.map((point) => <li>{point}</li>)}
+      </ul>
+    </details>
+  )}
+  </div>
   {image ? (
     <figure class="ed-figure">
-      <Image src={image.src} alt={image.alt} loading="lazy" widths={[448, 896]} sizes="(min-width: 480px) 448px, 100vw" />
+      <a class="ed-doc" href={full} data-ed-open aria-haspopup="dialog" aria-label={`${t(locale, 'education.viewer.open')}: ${image.alt}`}>
+        <Image src={image.src} alt={image.alt} loading="lazy" widths={[320, 640, 896]} sizes="(min-width: 768px) 320px, (min-width: 480px) 448px, 100vw" />
+      </a>
     </figure>
   ) : (
     <div class="ed-cover" aria-hidden="true" data-education-cover>
@@ -69,18 +88,5 @@ const image = data.image ? { src: resolveEducationImage(id, data.image.file), al
       <p class="ed-cover-issuer">{data.issuer}</p>
       <p class="ed-cover-note">{t(locale, 'education.cover.soon')}</p>
     </div>
-  )}
-  {data.url && (
-    <a class="ed-verify" href={data.url} {...externalLinkAttrs(data.url, site.url)}>
-      {t(locale, 'education.verify')}<ExternalHint href={data.url} locale={locale} />
-    </a>
-  )}
-  {learnings.length > 0 && (
-    <details class="ed-learned">
-      <summary>{t(locale, 'education.learned')}</summary>
-      <ul>
-        {learnings.map((point) => <li>{point}</li>)}
-      </ul>
-    </details>
   )}
 </li>

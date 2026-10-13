@@ -826,5 +826,11 @@
     "category": "added",
     "title": "Education page",
     "description": "A new Education page (/education/) lists my degrees and certificates as a timeline by year, with a link in the menu. /me now shows a short Recent education block that links to each entry. Adopters can switch it off with features.education and tune it with the education block of the site config."
+  },
+  "education-document-viewer": {
+    "date": "2026-10-13",
+    "category": "added",
+    "title": "Education document viewer",
+    "description": "On the Education page the document thumbnails are smaller and open a larger copy in a viewer you can close with Esc, the Close button or a click outside it; without JavaScript they open the image itself. The text now sits next to the document on wide screens, and the Learned block shows a small arrow that tells it opens."
   }
 }

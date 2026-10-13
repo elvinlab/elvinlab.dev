@@ -121,6 +121,94 @@ for (const { path, locale } of PAGES) {
     if (await cover.count()) await expect(cover).toHaveAttribute('aria-hidden', 'true');
   });
 
+  test(`${path} gives every entry with an image exactly one viewer link, and none to the others`, async ({
+    page,
+  }) => {
+    await page.goto(path);
+    for (const entry of credentials) {
+      const links = page.locator(`#${entry.id} [data-ed-open]`);
+      await expect(links).toHaveCount(entry.image ? 1 : 0);
+      if (entry.image) {
+        await expect(links).toHaveAttribute('href', /\.webp$/);
+        const box = await links.boundingBox();
+        expect(box?.width).toBeGreaterThanOrEqual(44);
+        expect(box?.height).toBeGreaterThanOrEqual(44);
+      }
+    }
+  });
+
+  test(`${path} opens the document in a dialog, closes it with Esc, the button and the backdrop`, async ({
+    page,
+  }) => {
+    test.skip(!credentials.some((entry) => entry.image), 'no entry has an image');
+    await page.goto(path);
+    const trigger = page.locator('[data-ed-open]').first();
+    const dialog = page.locator('dialog[data-ed-viewer]');
+    await expect(dialog).not.toHaveAttribute('open', /.*/);
+    const href = await trigger.getAttribute('href');
+    const alt = await trigger.locator('img').getAttribute('alt');
+
+    await trigger.click();
+    await expect(dialog).toHaveAttribute('open', '');
+    const full = dialog.locator('img');
+    await expect(full).toHaveAttribute('src', /\.webp$/);
+    expect(new URL((await full.getAttribute('src')) ?? '', page.url()).href).toBe(
+      new URL(href ?? '', page.url()).href,
+    );
+    await expect(full).toHaveAttribute('alt', alt ?? '');
+    await expect(dialog).toHaveAccessibleName(text(locale, 'education.viewer.label'));
+
+    await page.keyboard.press('Escape');
+    await expect(dialog).not.toHaveAttribute('open', /.*/);
+    await expect(trigger).toBeFocused();
+
+    await trigger.click();
+    const close = dialog.getByRole('button', { name: text(locale, 'education.viewer.close') });
+    const box = await close.boundingBox();
+    expect(box?.width).toBeGreaterThanOrEqual(44);
+    expect(box?.height).toBeGreaterThanOrEqual(44);
+    await close.click();
+    await expect(dialog).not.toHaveAttribute('open', /.*/);
+    await expect(trigger).toBeFocused();
+
+    await trigger.click();
+    await expect(dialog).toHaveAttribute('open', '');
+    await page.mouse.click(4, 4);
+    await expect(dialog).not.toHaveAttribute('open', /.*/);
+  });
+
+  for (const theme of [themes.dark, themes.light]) {
+    test(`${path} has no axe violations with the viewer open (${theme})`, async ({ page }) => {
+      test.skip(!credentials.some((entry) => entry.image), 'no entry has an image');
+      await seedTheme(page, theme);
+      await page.goto(path);
+      await page.locator('[data-ed-open]').first().click();
+      await expect(page.locator('dialog[data-ed-viewer]')).toHaveAttribute('open', '');
+      const { violations } = await scan(page);
+      expect(describeViolations(violations)).toEqual([]);
+    });
+  }
+
+  test(`${path} keeps the text block beside a 20rem document from 768px and the phone order below`, async ({
+    page,
+  }) => {
+    const entry = credentials.find((candidate) => candidate.image) ?? credentials[0];
+    await page.setViewportSize({ width: 1280, height: 900 });
+    await page.goto(path);
+    const item = page.locator(`#${entry?.id}`);
+    const body = await item.locator('.ed-body').boundingBox();
+    const doc = await item.locator('.ed-figure, .ed-cover').boundingBox();
+    expect(doc?.width).toBeLessThanOrEqual(321);
+    expect(body && doc && body.x + body.width <= doc.x + 1).toBe(true);
+    await page.setViewportSize({ width: 390, height: 900 });
+    const order = await item.evaluate((node) => {
+      const top = (selector: string) =>
+        node.querySelector(selector)?.getBoundingClientRect().top ?? -1;
+      return [top('.ed-meta'), top('.ed-title'), top('.ed-issuer'), top('.ed-figure, .ed-cover')];
+    });
+    expect(order).toEqual([...order].sort((a, b) => a - b));
+  });
+
   for (const width of [360, 390]) {
     test(`${path} does not overflow horizontally at ${width}px`, async ({ page }) => {
       await page.setViewportSize({ width, height: 900 });
@@ -141,6 +229,21 @@ for (const { path, locale } of PAGES) {
     });
   }
 }
+
+test('without JavaScript the document link opens the full image', async ({ browser, baseURL }) => {
+  const context = await browser.newContext({
+    javaScriptEnabled: false,
+    ...(baseURL ? { baseURL } : {}),
+  });
+  const page = await context.newPage();
+  await page.goto('/education/');
+  const links = page.locator('[data-ed-open]');
+  expect(await links.count()).toBe(credentials.filter((entry) => entry.image).length);
+  for (const href of await links.evaluateAll((nodes) => nodes.map((n) => n.getAttribute('href')))) {
+    expect(href).toMatch(/\.webp$/);
+  }
+  await context.close();
+});
 
 test('the Spanish and English pages are alternates of each other', async ({ page }) => {
   await page.goto('/education/');

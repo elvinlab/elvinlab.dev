@@ -4,7 +4,8 @@
  * vertical timeline grouped by year (newest year first; inside a year the optional `order` of the
  * entry in `credentials.json`, then its id), with the sort switch, summary and pager of the shared listing kit only when
  * the list is long enough to need them. Its CSS is one string (`education-styles.ts`) with only the
- * parts this page renders. No JavaScript: the learnings use a native `<details>`.
+ * parts this page renders. The learnings use a native `<details>`; the only script is the tiny inline document viewer
+ * (`education-viewer.ts`), emitted only when an entry has an image.
  */
 
 import { localizePath } from '@elvinlab/core';
@@ -27,6 +28,7 @@ import SortSwitch from '@/shared/ui/SortSwitch.astro';
 
 import EducationEntry from './EducationEntry.astro';
 import { educationCss } from './education-styles.ts';
+import { educationViewerScript } from './education-viewer.ts';
 
 /** `sort` is set on the pages of a sort that is not the default one; they are not indexed. */
 type Props = { locale: Locale; page?: number; sort?: EducationSort };
@@ -57,9 +59,10 @@ const sortOptions = offered.map((key) => ({
   href: href(1, key === EDUCATION_DEFAULT_SORT ? undefined : key),
 }));
 const groups = groupEducationByYear(current.items);
+const hasImage = current.items.some(({ data }) => data.image !== undefined);
 const css = educationCss({
   timeline: groups.length > 0,
-  image: current.items.some(({ data }) => data.image !== undefined),
+  image: hasImage,
   cover: current.items.some(({ data }) => data.image === undefined),
   details: current.items.some(({ data }) => (data.learnings?.length ?? 0) > 0),
   head: sortOptions.length > 1,
@@ -93,6 +96,17 @@ const css = educationCss({
             </li>
           ))}
         </ol>
+        {hasImage && (
+          <>
+            <dialog class="ed-viewer" data-ed-viewer aria-label={t(locale, 'education.viewer.label')}>
+              <form method="dialog">
+                <button type="submit">{t(locale, 'education.viewer.close')}</button>
+                <img alt="" />
+              </form>
+            </dialog>
+            <script is:inline set:html={educationViewerScript()} />
+          </>
+        )}
         {pages.length > 1 && (
           <footer class="ed-foot">
             <ListingSummary locale={locale} from={current.from} to={current.to} total={current.total} />

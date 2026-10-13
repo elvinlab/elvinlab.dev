@@ -106,25 +106,30 @@ const TIMELINE = `
   .ed-item:first-child {
     border-top: 0;
   }
-  /* From tablet up the document sits beside the text, so the page does not leave the right half empty. */
+  /* Phones: the body wrapper vanishes and explicit orders keep meta, title, issuer, applied, document,
+     verify, learnings. From tablet up the text block sits beside a 20rem document, centered against it. */
+  .ed-body {
+    display: contents;
+  }
+  .ed-meta { order: 1; }
+  .ed-title { order: 2; }
+  .ed-issuer { order: 3; }
+  .ed-applied { order: 4; }
+  .ed-figure,
+  .ed-cover { order: 5; }
+  .ed-verify { order: 6; }
+  .ed-learned { order: 7; }
   @media (min-width: 768px) {
     .ed-item {
       display: grid;
-      grid-template-columns: minmax(0, 1fr) minmax(0, 28rem);
+      grid-template-columns: minmax(0, 1fr) 20rem;
       column-gap: 2.5rem;
-      row-gap: 0;
-      align-content: start;
+      align-items: center;
     }
-    .ed-item > * {
-      grid-column: 1;
-      margin-bottom: 0.5rem;
-    }
-    .ed-item > .ed-figure,
-    .ed-item > .ed-cover {
-      grid-column: 2;
-      grid-row: 1 / span 7;
-      align-self: start;
-      margin: 0;
+    .ed-body {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
     }
     .ed-title {
       font-size: 1.375rem;
@@ -169,6 +174,7 @@ const TIMELINE = `
     align-items: center;
     align-self: flex-start;
     min-height: 44px;
+    font-weight: 700;
     color: var(--color-primary);
     text-decoration: underline;
     text-underline-offset: 3px;
@@ -182,11 +188,61 @@ const IMAGE = `
     border-radius: var(--radius-inner);
     background: var(--color-card);
   }
+  .ed-doc {
+    display: block;
+    cursor: zoom-in;
+  }
   .ed-figure img {
     display: block;
     width: 100%;
     max-width: 28rem;
     height: auto;
+    object-fit: contain;
+  }
+  @media (min-width: 768px) {
+    .ed-figure {
+      max-width: 20rem;
+      margin: 0;
+    }
+  }
+  /* The shared viewer: a native modal dialog; padding lives on the form so a click on the dialog itself
+     is always the backdrop. */
+  .ed-viewer {
+    margin: auto;
+    padding: 0;
+    border: 0;
+    border-radius: var(--radius-inner);
+    background: var(--color-card);
+    color: var(--color-text);
+    max-width: min(96vw, 1100px);
+  }
+  .ed-viewer::backdrop {
+    background: color-mix(in srgb, black 70%, transparent);
+  }
+  .ed-viewer form {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    margin: 0;
+    padding: 0.75rem;
+  }
+  .ed-viewer button {
+    align-self: flex-end;
+    min-width: 44px;
+    min-height: 44px;
+    padding: 0 1rem;
+    border: 0;
+    border-radius: var(--radius-inner);
+    background: var(--color-button);
+    color: white;
+    font-weight: 700;
+    cursor: pointer;
+  }
+  .ed-viewer img {
+    display: block;
+    max-width: 100%;
+    max-height: calc(94vh - 5rem);
+    margin: 0 auto;
     object-fit: contain;
   }
 `;
@@ -219,6 +275,11 @@ const COVER = `
     color: var(--color-text-secondary);
     font-family: var(--font-mono);
     font-size: 0.8125rem;
+  }
+  @media (min-width: 768px) {
+    .ed-cover {
+      max-width: 20rem;
+    }
   }
   .ed-cover > * {
     margin: 0;
@@ -261,9 +322,27 @@ const DETAILS = `
     display: flex;
     align-items: center;
     min-height: 44px;
+    gap: 0.5rem;
     cursor: pointer;
+    list-style: none;
     font-weight: 700;
     color: var(--color-primary);
+  }
+  .ed-learned summary::-webkit-details-marker {
+    display: none;
+  }
+  /* A chevron drawn with two borders; it turns when the block opens (a static state, no motion). */
+  .ed-learned summary::before {
+    content: '';
+    flex: none;
+    width: 0.5rem;
+    height: 0.5rem;
+    border-right: 2px solid currentColor;
+    border-bottom: 2px solid currentColor;
+    transform: rotate(-45deg);
+  }
+  .ed-learned[open] summary::before {
+    transform: rotate(45deg);
   }
   .ed-learned ul {
     margin: 0;
