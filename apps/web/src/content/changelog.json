@@ -916,5 +916,17 @@
     "category": "changed",
     "title": "Navbar: pixel states and pixel icons",
     "description": "Every navbar control now shows a stepped, notched fill on hover and keyboard focus, a square 2 px focus ring and a 1 px press instead of the soft rounded tint and shrink. The theme, background and menu icons are redrawn as crisp pixel glyphs. With reduced motion the states appear at once, without movement."
+  },
+  "education-real-credentials": {
+    "date": "2026-10-13",
+    "category": "added",
+    "title": "Education lists the real credentials",
+    "description": "The Education page now shows seven credentials: the university degree and six courses from DevTalles, Udemy and Platzi. Each one has its certificate image, a verification link and what the course covered. The degree shows a typographic cover until its document is available."
+  },
+  "education-order-and-layout": {
+    "date": "2026-10-13",
+    "category": "changed",
+    "title": "Education: newest first, a working sort switch and a two-column layout",
+    "description": "The timeline now lists the newest credential first and orders a year by month. The Newest and Oldest switch works both ways (it used to link to the page you were already on). On desktop the document sits beside the text instead of leaving the right half empty."
   }
 }
