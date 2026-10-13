@@ -57,17 +57,17 @@ Las descripciones vienen del esquema (`.describe()`), por eso están en inglés.
 | Key | Type | Required | Default | Description |
 | --- | --- | --- | --- | --- |
 | `url` | `URL` | yes |  | Canonical origin of the site (https). Used for canonical links, the sitemap and share images. |
-| `title` | `string` | yes |  | Site name: browser tab suffix, Open Graph site name and footer. |
-| `description` | `{ <locale>: string }` | yes |  | Default meta description per locale (shown in search results and link previews). |
+| `title` | `string (max 30)` | yes |  | Site name: browser tab suffix, Open Graph site name and footer. |
+| `description` | `{ <locale>: string (max 160) }` | yes |  | Default meta description per locale (shown in search results and link previews). Max 160 characters per locale. |
 | `locales` | `object` | yes |  | Languages of the site. |
 | `locales.default` | `string` | yes |  | Default locale, served without a URL prefix (for example `es` at `/`). |
 | `locales.supported` | `string[]` | yes |  | Every locale the UI is translated into; non-default ones live under `/<locale>/`. |
 | `identity` | `object` | yes |  | Who the site is about. |
-| `identity.name` | `string` | yes |  | Full name of the site owner. |
-| `identity.handle` | `string` | yes |  | Short lowercase handle shown in the navbar and footer wordmark. |
-| `identity.role` | `{ <locale>: string }` | yes |  | One-line professional headline per locale. |
-| `identity.bio` | `{ <locale>: string }` | yes |  | Short bio per locale (also the description of the /me page). |
-| `identity.location` | `string` | no |  | City or country shown on /me and share cards. |
+| `identity.name` | `string (max 40)` | yes |  | Full name of the site owner. |
+| `identity.handle` | `string (max 24)` | yes |  | Short lowercase handle shown in the navbar and footer wordmark. |
+| `identity.role` | `{ <locale>: string (max 80) }` | yes |  | One-line professional headline per locale. Max 80 characters per locale. |
+| `identity.bio` | `{ <locale>: string (max 200) }` | yes |  | Short bio per locale (also the description of the /me page). Max 200 characters per locale. |
+| `identity.location` | `string (max 50)` | no |  | City or country shown on /me and share cards. |
 | `identity.startedYear` | `integer (min 1970)` | yes |  | First year of professional work; years of experience are derived from it. |
 | `identity.avatar` | `string` | no |  | File name of a profile photo placed in `apps/web/src/assets/` (for example `avatar.png`); it is optimized at build time. Omit to show initials. |
 | `identity.photo` | `string` | no |  | Portrait shown only on /me (and in the /me share card); `avatar` is used elsewhere. Falls back to `avatar` when omitted. |
@@ -85,10 +85,10 @@ Las descripciones vienen del esquema (`.describe()`), por eso están en inglés.
 | `now.updatedAt` | `date (YYYY-MM-DD)` | yes |  | Date of the last update of the block (`YYYY-MM-DD`), shown on the card. |
 | `now.items` | `object[] (max 3)` | yes |  | One to three rows, in display order. |
 | `now.items[].kind` | `'focus' \| 'building' \| 'exploring' \| 'learning'` | yes |  | Label of the row: `focus`, `building`, `exploring` or `learning`. |
-| `now.items[].text` | `{ <locale>: string }` | yes |  | What it is, per locale (the default locale is required). |
+| `now.items[].text` | `{ <locale>: string (max 120) }` | yes |  | What it is, per locale (the default locale is required). Max 120 characters per locale. |
 | `now.items[].href` | `URL \| string` | no |  | Optional link for the text: an https URL or a site path starting with `/`. |
 | `socials` | `object[]` | yes |  | Social profile links shown in the footer and used as `sameAs` in structured data. |
-| `socials[].label` | `string` | yes |  | Link text and accessible name. |
+| `socials[].label` | `string (max 16)` | yes |  | Link text and accessible name. |
 | `socials[].url` | `URL` | yes |  | Profile URL (https only: an email address never belongs in public config). |
 | `socials[].icon` | `string` | yes |  | Icon name (`github`, `linkedin`, ...). |
 | `background` | `object` | no | `{"galaxy":true,"cursorWaves":false}` | Default animated banner background (each visitor can change it). All effects read the theme palette. |
@@ -102,7 +102,7 @@ Las descripciones vienen del esquema (`.describe()`), por eso están en inglés.
 | `experiments.perPage` | `integer (min 4, max 48)` | no | `12` | Compact cards per page of `/experiments/`. Page 1 also holds the big pieces; a second page exists only when the compact cards exceed this number (`/experiments/page/2/`). About 1 KB of HTML per compact card (929 B measured with 30 generated entries and 919 B with 100, comparing pages 2 and later); the cost depends on the content, so measure your own entries with `pnpm stress:experiments`. |
 | `experiments.maxFeatured` | `integer (min 1, max 6)` | no | `3` | Most experiments that may have `featured: true` (the big exhibition pieces). The build fails with the list of offenders when more are featured. |
 | `experiments.meRows` | `integer (min 1, max 6)` | no | `3` | Rows of "Recent experiments" on `/me`. Never more than `perPage`: a larger value is lowered to `perPage`, so every row links to an anchor that lives on page 1. |
-| `experiments.intro` | `{ <locale>: string }` | no |  | Optional intro under the title of `/experiments/`, per locale (the default locale is required). Omit it to use the interface default. |
+| `experiments.intro` | `{ <locale>: string (max 200) }` | no |  | Optional intro under the title of `/experiments/`, per locale (the default locale is required). Omit it to use the interface default. Max 200 characters per locale. |
 | `experiments.words` | `{ <locale>: string (max 24)[] (max 6) }` | no |  | Optional decorative comment stack beside the title of `/experiments/` (desktop only), per locale: one to six short words, for example `{ "es": ["construir", "probar"] }`. The leading `// ` is added for you. Nothing renders there unless you set this (the default header is just the title and the intro). |
 | `experiments.defaultSort` | `'newest' \| 'oldest' \| 'title'` | no | `newest` | Order of the compact cards at `/experiments/`: `newest` (publication date, newest first), `oldest` or `title` (A to Z). Big (featured) pieces always lead page 1 whatever the sort. It must be one of `sorts`. |
 | `experiments.sorts` | `'newest' \| 'oldest' \| 'title'[]` | no | `["newest","oldest","title"]` | Sorts the visitor can choose, from `newest`, `oldest` and `title`. Each one except `defaultSort` is a static page (`/experiments/oldest/`, `/experiments/oldest/page/2/`) that search engines are told not to index and that stays out of the sitemap. A list of one sort shows no switch. |
@@ -118,28 +118,28 @@ Las descripciones vienen del esquema (`.describe()`), por eso están en inglés.
 | `recruiter` | `object` | yes |  | Recruiter card on the home page and /me. |
 | `recruiter.available` | `boolean` | yes |  | Show or hide the whole availability line (not whether you are open to work). |
 | `recruiter.openToWork` | `boolean` | no | `true` | Whether you are open to work: green status dot when true, the brand accent colour when false. |
-| `recruiter.status` | `{ <locale>: string }` | yes |  | Availability text per locale. Parts separated by " · " show as a headline plus short tags on the home card (for example "Working at Buo · open to chat"); a single part is one tag (for example "Open to work"). |
-| `recruiter.lookingFor` | `{ <locale>: string }` | yes |  | What you are open to, per locale. Shown as the availability line in the /me sidebar, below the status. |
+| `recruiter.status` | `{ <locale>: string (max 60) }` | yes |  | Max 60 characters per locale. Availability text per locale. Parts separated by " · " show as a headline plus short tags on the home card (for example "Working at Buo · open to chat"); a single part is one tag (for example "Open to work"). |
+| `recruiter.lookingFor` | `{ <locale>: string (max 100) }` | yes |  | Max 100 characters per locale. What you are open to, per locale. Shown as the availability line in the /me sidebar, below the status. |
 | `recruiter.cvUrl` | `URL \| { <locale>: URL }` | no |  | Link to a downloadable CV (https): one URL for every locale, or one per locale (`{ es: ..., en: ... }`, a locale without one falls back to the default locale). Omit to hide the CV button. |
 | `me` | `object` | yes |  | Singular /me profile data. Lists that grow (experience, certificates) live in `src/content/`. |
-| `me.timezone` | `string` | yes |  | Display timezone, for example `UTC−6`. |
-| `me.workMode` | `{ <locale>: string }` | yes |  | Work mode per locale (remote, hybrid, ...). |
-| `me.languages` | `{ <locale>: string }` | no |  | Spoken languages per locale, for example "Spanish native · English B1". Shown in the /me sidebar; omit to hide the row. |
-| `me.headline` | `{ <locale>: string }` | no |  | The role line under the name on /me, per locale. Omit to show `identity.role`. |
-| `me.pitch` | `{ <locale>: string }` | no |  | One or two sentences under the /me headline that say what you do, per locale. Omit to hide it. |
-| `me.intro` | `{ <locale>: string }` | yes |  | The "what I bring" intro paragraph per locale. |
+| `me.timezone` | `string (max 16)` | yes |  | Display timezone, for example `UTC−6`. |
+| `me.workMode` | `{ <locale>: string (max 24) }` | yes |  | Work mode per locale (remote, hybrid, ...). Max 24 characters per locale. |
+| `me.languages` | `{ <locale>: string (max 60) }` | no |  | Spoken languages per locale, for example "Spanish native · English B1". Shown in the /me sidebar; omit to hide the row. Max 60 characters per locale. |
+| `me.headline` | `{ <locale>: string (max 60) }` | no |  | The role line under the name on /me, per locale. Omit to show `identity.role`. Max 60 characters per locale. |
+| `me.pitch` | `{ <locale>: string (max 280) }` | no |  | One or two sentences under the /me headline that say what you do, per locale. Omit to hide it. Max 280 characters per locale. |
+| `me.intro` | `{ <locale>: string (max 120) }` | yes |  | The "what I bring" intro paragraph per locale. Max 120 characters per locale. |
 | `me.facts` | `object[]` | yes |  | At-a-glance strip: value and label pairs (the design shows up to four). |
-| `me.facts[].value` | `{ <locale>: string }` | yes |  | The highlighted value. |
-| `me.facts[].label` | `{ <locale>: string }` | yes |  | What the value means. |
+| `me.facts[].value` | `{ <locale>: string (max 30) }` | yes |  | The highlighted value. Max 30 characters per locale. |
+| `me.facts[].label` | `{ <locale>: string (max 60) }` | yes |  | What the value means. Max 60 characters per locale. |
 | `me.strengths` | `object[]` | yes |  | "What I bring" tiles. |
 | `me.strengths[].icon` | `string` | yes |  | Icon name of the tile. |
-| `me.strengths[].title` | `{ <locale>: string }` | yes |  | Tile title. |
-| `me.strengths[].body` | `{ <locale>: string }` | yes |  | Tile text. |
+| `me.strengths[].title` | `{ <locale>: string (max 48) }` | yes |  | Tile title. Max 48 characters per locale. |
+| `me.strengths[].body` | `{ <locale>: string (max 180) }` | yes |  | Tile text. Max 180 characters per locale. |
 | `me.stack` | `object[]` | yes |  | Tech stack groups. |
-| `me.stack[].label` | `{ <locale>: string }` | yes |  | Group name (Languages, Frontend, ...). |
-| `me.stack[].items` | `string[]` | yes |  | Tools in the group. |
+| `me.stack[].label` | `{ <locale>: string (max 32) }` | yes |  | Group name (Languages, Frontend, ...). Max 32 characters per locale. |
+| `me.stack[].items` | `string (max 24)[]` | yes |  | Tools in the group (each max 24 characters). |
 | `me.stack[].icon` | `string` | no |  | Icon name shown before the group name (code, server, shield-check, cloud, bot, flask, layers, ...). Omit for no icon. |
-| `me.stack[].hint` | `{ <locale>: string }` | no |  | One plain-language sentence per locale that says what the group is. Shown as a hover and focus tooltip; omit for no tooltip. |
+| `me.stack[].hint` | `{ <locale>: string (max 180) }` | no |  | One plain-language sentence per locale that says what the group is. Shown as a hover and focus tooltip; omit for no tooltip. Max 180 characters per locale. |
 | `me.stack[].layer` | `boolean` | no |  | Draws the group as a numbered layer of the product (for example data, backend, frontend, cloud), joined to the next layer by a vertical line. Omit for a group that cuts across layers, such as AI or quality. Keep the layers first in the list. |
 | `me.stack[].folded` | `boolean` | no |  | Puts the group inside a collapsed "more tools" block under the stack (native details, no script). Use it for secondary groups so the stack stays short; a layer cannot be folded. |
 | `features` | `object` | yes |  | Feature flags: off means the routes are not generated and the nav entry is hidden. The four interface switches (`backToTop`, `languageHint`, `themeToggle`, `backgroundPicker`) default to on and render nothing when off. |
@@ -169,7 +169,7 @@ Las descripciones vienen del esquema (`.describe()`), por eso están en inglés.
 | `giscus.repoId` | `string` | yes |  | Repository node id from https://giscus.app (starts with `R_`). |
 | `giscus.category` | `string` | yes |  | Discussion category name (an Announcements-type category). |
 | `giscus.categoryId` | `string` | yes |  | Category node id from https://giscus.app (starts with `DIC_`). |
-| `notice` | `{ <locale>: string }` | no |  | Optional site-wide notice strip per locale (for example "under construction"). Remove the key to hide it. |
+| `notice` | `{ <locale>: string (max 160) }` | no |  | Optional site-wide notice strip per locale (for example "under construction"). Remove the key to hide it. Max 160 characters per locale. |
 <!-- docs:end site-config -->
 
 ## 4. Referencia: contenido (`src/content/`)
@@ -505,7 +505,57 @@ El texto vive en `apps/web/src/features/privacy/content.ts` y `apps/web/src/feat
 
 ### 6.10 Textos de la interfaz y un idioma nuevo
 
-Los textos de la interfaz están en `apps/web/src/shared/i18n/index.ts`. Añadir un tercer idioma implica: agregarlo a `locales.supported`, un diccionario completo en `i18n` y **un árbol de páginas propio** en `apps/web/src/pages/<idioma>/` (las páginas de cada idioma son explícitas hoy, no dinámicas), además del contenido traducido.
+Los textos de la interfaz están en `apps/web/src/shared/i18n/index.ts`. Añadir un tercer idioma implica: agregarlo a `locales.supported`, un diccionario completo en `i18n` y **su propio árbol de páginas** en `apps/web/src/pages/<idioma>/` (las páginas de cada idioma son explícitas hoy, no dinámicas), más el contenido traducido.
+
+#### Cambiar un texto: límites de longitud (español e inglés)
+
+Un texto demasiado largo desborda un botón, parte una entrada del menú en dos líneas o empuja el diseño más allá de la pantalla de un teléfono. Por eso cada texto de la interfaz tiene un **límite de longitud por grupo de claves**, igual en **ambos idiomas**, y `pnpm test` falla con la clave, el idioma, la longitud y el límite cuando un texto se pasa. Escribí hasta el límite en **español**: es en promedio un 16% más largo que el inglés, así que el texto en inglés que le sigue cabe. Los límites se fijan en `apps/web/src/shared/i18n/text-limits.ts`; la tabla de abajo se genera desde ahí.
+
+<!-- docs:start text-limits -->
+| Key group | Limit (characters, in each language) | Where it appears |
+| --- | --- | --- |
+| `subscribe.*` | 200 | The subscription form, its messages and the confirmation pages |
+| `experiments.*` | 140 | Intro and sort descriptions of `/experiments/` |
+| `author.*` | 130 | The author card on the home |
+| `me.*` | 110 | The `/me` page: headings, hints and labels |
+| `notes.*` | 100 | The notes index, filters, topics and start-here block |
+| `privacy.*` | 100 | Short fragments of the privacy page |
+| `changelog.*` | 90 | The changelog page |
+| `comments.*` | 90 | The comments block under a note |
+| `home.*` | 90 | Sections of the home |
+| `placeholder.*` | 80 | The placeholder page |
+| `recruiter.*` | 64 | The hiring card and availability line |
+| `marks.*` | 48 | The footprint button and its messages |
+| `notFound.*` | 48 | The 404 page |
+| `language.*` | 44 | The language switch and the language hint banner |
+| `listing.*` | 44 | Pager and sort controls of every list |
+| `link.*` | 36 | External link hints |
+| `experiment.*` | 32 | Labels on an experiment card |
+| `banner.*` | 28 | Banner buttons |
+| `note.*` | 28 | Labels inside a note (reading time, license, translations) |
+| `now.*` | 28 | The "Now" card |
+| `nudge.*` | 28 | The latest-experiment card: label, link and close button |
+| `reading.*` | 28 | The reading mode button (one line) |
+| `skip.*` | 28 | The skip-to-content link |
+| `background.*` | 24 | The background picker button |
+| `aside.*` | 20 | The notes sidebar |
+| `backtotop.*` | 20 | The back-to-top button |
+| `theme.*` | 20 | The theme button |
+| `footer.*` | 16 | Footer links |
+| `nav.*` | 16 | The navigation menu: one line at 360 px |
+| `exp.*` | 14 | Experiment status pills |
+| `stamp.*` | 12 | Notebook stamps: at most two words and 12 characters |
+<!-- docs:end text-limits -->
+
+Reglas que acompañan a la tabla:
+
+- **Menú, pie y botones**: una línea a 360 px. Mantenelos en una o dos palabras (`nav.*` 16 caracteres).
+- **Sellos** (`stamp.*`): como máximo dos palabras y 12 caracteres, dentro de su marco (DESIGN.md).
+- **Marcadores** como `{name}` cuentan por cómo están escritos, no por el texto que los reemplaza.
+- **Mantené los dos idiomas**: una clave que falta en inglés muestra el español en silencio, y un test falla (la única excepción, `experiment.case.en`, está escrita en el test con su motivo).
+- **Una clave nueva necesita un grupo**: si su primera parte no está en la tabla, el test te pide agregar uno.
+- **Los textos que no están en el diccionario también tienen límites**, que imponen sus esquemas con el campo exacto en el error: tu nombre, cargo y bio en `site.config.ts`, las notas (título y descripción), los experimentos, la experiencia y los certificados. Aparecen como `string (max N)` en las tablas de esta guía.
+- **Para necesitar más espacio**: cambiá el texto, corré `pnpm test` y `pnpm test:e2e` (el spec de desbordamiento horizontal revisa 360 px), mirá la página a ojo en un teléfono y solo entonces subí el límite en `text-limits.ts` con el motivo en el commit.
 
 ### 6.11 Actualizar dependencias y herramientas
 

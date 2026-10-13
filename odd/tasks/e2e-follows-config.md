@@ -34,6 +34,7 @@ Someone who adopts the project switches features off (or changes colors and text
 - [x] E4 — Lighthouse URL list and white-label check follow the flags. Tier 3.
 - [ ] E5 — Adopter profiles: configs, `pnpm test:profiles`, verification-map entry, CI decision. Tier 3.
 - [ ] E6 — Phase 2: specs read UI texts from the i18n dictionary. Tier 2.
+- [x] E9 — Text limits (owner request, 2026-10-12): changing a Spanish or English text must not overflow or wrap unexpectedly. Done: `shared/i18n/text-limits.ts` (limit by key group, 31 groups, set from the measured longest text plus about 20%) enforced in both languages by `text-limits.test.ts` (also stamps at 2 words and 12 characters, and Spanish and English parity with one documented exception); `DICTIONARIES` exported from `i18n/index.ts` (no behavior change); 26 visible config fields now have `.max()` limits in `schema.ts` (title, description, identity, socials, now, experiments intro, recruiter, me, notice) with a table-driven test (accepts N, rejects N+1; this site stays within all); the generator writes the table into both configuration guides (`text-limits` block) and section 6.10 of both guides explains the rules. 1526 unit tests green, white-label green. Tier 3, inline.
 - [ ] E7 — Docs: README, CONFIGURATION (section 10), TESTING; remove the "known limit" note when the profiles are green. Tier 2.
 
 ## Route declaration
