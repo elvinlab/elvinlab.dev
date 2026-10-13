@@ -59,6 +59,7 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       notes_only: ${{ steps.scope.outputs.notes_only }}
+      profiles_relevant: ${{ steps.scope.outputs.profiles_relevant }}
     steps:
       - name: Decide whether the push only publishes notes
         id: scope
@@ -67,15 +68,25 @@ jobs:
           BEFORE: ${{ github.event.before }}
         run: |
           notes_only=false
+          # The adopter profiles only matter when the push can change what a feature switch does:
+          # a push that touches nothing but docs, trackers, READMEs, issue templates or content
+          # cannot. Anything else, an unknown base or an unreadable diff keeps them on.
+          profiles_relevant=true
           if [ -n "$BEFORE" ] && [ "$BEFORE" != "0000000000000000000000000000000000000000" ]; then
             if files="$(gh api --paginate "repos/$GITHUB_REPOSITORY/compare/$BEFORE...$GITHUB_SHA" --jq '.files[].filename')" \
-              && [ -n "$files" ] && [ "$(printf '%s\n' "$files" | wc -l)" -lt 300 ] \
-              && ! printf '%s\n' "$files" | grep -qvE '^(apps/web/src/content/notes/|apps/web/src/content/(changelog|releases)\.json$)'; then
-              notes_only=true
+              && [ -n "$files" ] && [ "$(printf '%s\n' "$files" | wc -l)" -lt 300 ]; then
+              if ! printf '%s\n' "$files" | grep -qvE '^(apps/web/src/content/notes/|apps/web/src/content/(changelog|releases)\.json$)'; then
+                notes_only=true
+              fi
+              if ! printf '%s\n' "$files" | grep -qvE '^(docs/|odd/|README(\.en)?\.md$|\.github/ISSUE_TEMPLATE/|apps/web/src/content/)'; then
+                profiles_relevant=false
+              fi
             fi
           fi
           echo "notes_only=$notes_only" >> "$GITHUB_OUTPUT"
+          echo "profiles_relevant=$profiles_relevant" >> "$GITHUB_OUTPUT"
           echo "notes-only fast lane: $notes_only" >> "$GITHUB_STEP_SUMMARY"
+          echo "adopter profiles relevant: $profiles_relevant" >> "$GITHUB_STEP_SUMMARY"
 
   # Fast-lane stand-in for e2e/lighthouse: the build validates note frontmatter and translations,
   # and the two budgets catch a note that bloats the page. Runs only when `changes` says notes-only.
@@ -172,6 +183,58 @@ jobs:
         if: always()
         run: |
           echo "e2e (shard ${{ matrix.shard }}/4): $(( $(date +%s) - JOB_START ))s" >> "$GITHUB_STEP_SUMMARY"
+
+  # Adopter profiles (odd/tasks/e2e-follows-config.md): the same e2e suite against this site with
+  # some features switched off (apps/web/scripts/e2e-profiles.ts), proving that someone who turns
+  # features off in site.config.ts still gets a green pipeline. One runner per profile, in parallel
+  # with e2e and lighthouse, so a profile faster than the slowest gate adds nothing to the release.
+  # NOT a deploy gate yet: `continue-on-error` keeps a red profile from failing the run, and it is
+  # not in `checks.needs`. To make it blocking once the durations and stability are known, add
+  # `profiles` to the needs of `checks` and drop `continue-on-error`. Skipped when the push cannot
+  # change what a switch does (docs, trackers, READMEs, content).
+  profiles:
+    name: profile ${{ matrix.profile }}
+    needs: changes
+    if: ${{ needs.changes.outputs.profiles_relevant == 'true' }}
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    strategy:
+      fail-fast: false
+      matrix:
+        profile: [quiet, blog-only, me-only, bare]
+    steps:
+      - name: Record job start
+        run: echo "JOB_START=$(date +%s)" >> "$GITHUB_ENV"
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: jdx/mise-action@2d8d4cafcbd33be2ea37d2b6f5ad595363d1f1ca # v5.1.1
+      - name: Resolve the pnpm store path
+        id: pnpm-store
+        run: echo "path=$(pnpm store path --silent)" >> "$GITHUB_OUTPUT"
+      - name: Cache the pnpm store
+        uses: actions/cache@caa296126883cff596d87d8935842f9db880ef25 # v5.1.0
+        with:
+          path: ${{ steps.pnpm-store.outputs.path }}
+          key: pnpm-store-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml') }}
+          restore-keys: pnpm-store-${{ runner.os }}-
+      - run: pnpm install --frozen-lockfile
+      - name: Resolve the Playwright version
+        id: playwright
+        run: echo "version=$(pnpm exec playwright --version | awk '{print $2}')" >> "$GITHUB_OUTPUT"
+      - name: Cache Playwright browsers
+        uses: actions/cache@caa296126883cff596d87d8935842f9db880ef25 # v5.1.0
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-${{ runner.os }}-${{ steps.playwright.outputs.version }}
+      - name: Install Chromium for browser checks
+        run: pnpm exec playwright install --with-deps chromium
+      - name: e2e at 1280 px with the ${{ matrix.profile }} profile
+        env:
+          E2E_FEATURE_PROFILE: ${{ matrix.profile }}
+        run: pnpm test:e2e:quick
+      - name: Job duration
+        if: always()
+        run: |
+          echo "profile ${{ matrix.profile }}: $(( $(date +%s) - JOB_START ))s" >> "$GITHUB_STEP_SUMMARY"
 
   # Sharded: the URLs of lighthouserc.json (10 today) split across 2 runners (`--shard=N/2`, every 2nd URL),
   # still 3 runs per URL and the same assertions. `checks` needs this whole matrix, so it passes only
