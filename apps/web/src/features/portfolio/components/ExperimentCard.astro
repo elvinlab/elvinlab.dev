@@ -4,7 +4,8 @@
  * (a small flask icon, the label, status and year, the thumbnail, title, a short summary, up to
  * three tags and a pixel arrow).
  * It is plain HTML and works with no JavaScript; the floating behaviour is a separate script that
- * clones this same markup. The whole card is one link, named "label: title", to the experiment's
+ * clones this same markup. It is a plain `div`, not an `<aside>`: on this site `main aside`
+ * means the notes sidebar (reading mode hides it, the home lays it out beside the content). The whole card is one link, named "label: title", to the experiment's
  * case note when it has one, else to its place on `/experiments/`. Its look is `experiment-card.css`,
  * inlined by `ExperimentNudge` (never Tailwind utilities, which would land in every page's
  * stylesheet even with the nudge off). The caller decides whether to render it.
@@ -30,7 +31,7 @@ const label = t(locale, 'nudge.label');
 const tags = visibleExperimentTags(entry.tags);
 ---
 
-<aside class:list={['xn', className]} aria-label={label} data-experiment-card>
+<div class:list={['xn', className]} data-experiment-card>
   <a class="xn-link" href={href} aria-label={`${label}: ${entry.title}`}>
     <p class="xn-head">
       <svg class="xn-flask" viewBox="0 0 9 8" width="18" height="16" shape-rendering="crispEdges" fill="currentColor" aria-hidden="true" focusable="false"><path d="M3 0h3v1H3zM4 1h1v2H4zM3 3h3v1H3zM2 4h5v1H2zM1 5h7v2H1zM0 7h9v1H0z"></path></svg>
@@ -56,4 +57,4 @@ const tags = visibleExperimentTags(entry.tags);
       </span>
     </span>
   </a>
-</aside>
+</div>

@@ -8,6 +8,8 @@
   width: min(30rem, calc(100vw - 2.5rem));
   opacity: 0;
   visibility: hidden;
+  /* Hidden means gone at once: no fade-out that keeps catching clicks or covering links. */
+  pointer-events: none;
   transform: translate(-50%, 1rem);
   /* A hard offset shadow, no blur: it stays on the pixel grid. */
   box-shadow:
@@ -20,17 +22,14 @@
 .nudge-float[data-open] {
   opacity: 1;
   visibility: visible;
+  pointer-events: auto;
   transform: translate(-50%, 0);
 }
 @media (prefers-reduced-motion: no-preference) {
-  .nudge-float.nudge-float {
+  .nudge-float[data-open] {
     transition:
       opacity 0.3s steps(4, end),
-      transform 0.3s steps(4, end),
-      visibility 0s linear 0.3s;
-  }
-  .nudge-float[data-open] {
-    transition-delay: 0s;
+      transform 0.3s steps(4, end);
   }
 }
 .nudge-float .xn-head {

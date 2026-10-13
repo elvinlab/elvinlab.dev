@@ -27,6 +27,7 @@ function fakeElement() {
       element.appended.push(child);
     },
     querySelectorAll: () => [] as unknown[],
+    contains: (node: unknown) => node === element,
     cloneNode: () => fakeElement(),
   };
   return element;
@@ -44,6 +45,11 @@ type Options = {
   source?: 'template';
   target?: string;
   missingTarget?: boolean;
+  footer?: boolean;
+  /** The footer is not parsed yet when the script runs, as in a real note. */
+  loading?: boolean;
+  /** Skip the first scroll the visitor makes after the page loads. */
+  noScroll?: boolean;
 };
 
 function run(options: Options = {}) {
@@ -73,13 +79,24 @@ function run(options: Options = {}) {
         }
         observe() {}
       };
+  const loaded: Listener[] = [];
+  const documentListeners: Record<string, Listener> = {};
+  let finished = false;
   const document = {
+    readyState: options.loading ? 'loading' : 'complete',
+    addEventListener: (type: string, fn: Listener) => {
+      if (type === 'DOMContentLoaded') loaded.push(fn);
+      else documentListeners[type] = fn;
+    },
     body,
     createElement: () => fakeElement(),
     querySelector: (selector: string) => {
       if (selector === '[data-experiment-card]') return options.source === 'template' ? null : card;
       if (selector === 'template[data-experiment-template]') {
         return options.source === 'template' ? { content: { firstElementChild: card } } : null;
+      }
+      if (selector === '[data-site-footer]') {
+        return options.footer && !(options.loading && !finished) ? fakeElement() : null;
       }
       return selector === (options.target ?? 'article') && !options.missingTarget ? article : null;
     },
@@ -102,6 +119,7 @@ function run(options: Options = {}) {
     'requestAnimationFrame',
     nudgeScript({ threshold, closeLabel: 'Close', target: options.target ?? 'article' }),
   )(document, window, store(local), store(session), ObserverStub, (fn: () => void) => fn());
+  if (!options.noScroll) windowListeners['scroll']?.(...([] as never[]));
   const box = body.appended[0] as ReturnType<typeof fakeElement> | undefined;
   return {
     box,
@@ -112,7 +130,14 @@ function run(options: Options = {}) {
       article.top = nextTop;
       windowListeners['scroll']?.(...([] as never[]));
     },
+    focusOn: (target: unknown) => documentListeners['focusin']?.(...([{ target }] as never[])),
+    finishLoading: () => {
+      finished = true;
+      for (const fn of loaded) fn(...([] as never[]));
+    },
     cover: (visible: boolean) => observed[0]?.(...([[{ isIntersecting: visible }]] as never[])),
+    footerInView: (visible: boolean) =>
+      observed[1]?.(...([[{ isIntersecting: visible }]] as never[])),
     close: () =>
       box?.appended.at(-1) &&
       (box.appended.at(-1) as ReturnType<typeof fakeElement>).listeners['click']?.(
@@ -142,8 +167,16 @@ describe('nudgeScript', () => {
     expect(page.box?.hasAttribute('inert')).toBe(false);
   });
 
-  it('opens at once when the page already loads past the threshold', () => {
+  it('opens on the first scroll when the page already loads past the threshold', () => {
     expect(isOpen(run({ top: 0 }).box)).toBe(true);
+  });
+
+  it('never opens on load, not even on a short page, until the visitor scrolls', () => {
+    const page = run({ top: 0, noScroll: true });
+    expect(isOpen(page.box)).toBe(false);
+    expect(page.session[NUDGE_STORAGE_KEY]).toBeUndefined();
+    page.scrollTo(0);
+    expect(isOpen(page.box)).toBe(true);
   });
 
   it('remembers for the session that it was shown, and stops listening to scroll', () => {
@@ -166,6 +199,44 @@ describe('nudgeScript', () => {
     expect(isOpen(page.box)).toBe(false);
     page.cover(false);
     expect(isOpen(page.box)).toBe(true);
+  });
+
+  it('hides while the page footer is on screen, so it never covers the links there', () => {
+    const page = run({ top: 0, footer: true });
+    expect(isOpen(page.box)).toBe(true);
+    page.footerInView(true);
+    expect(isOpen(page.box)).toBe(false);
+    page.footerInView(false);
+    expect(isOpen(page.box)).toBe(true);
+  });
+
+  it('finds the footer even when the page has not parsed it yet', () => {
+    const page = run({ top: 0, footer: true, loading: true });
+    expect(page.footerInView(true)).toBeUndefined();
+    page.finishLoading();
+    page.footerInView(true);
+    expect(isOpen(page.box)).toBe(false);
+  });
+
+  it('stays hidden while either the static card or the footer is on screen', () => {
+    const page = run({ top: 0, footer: true });
+    page.cover(true);
+    page.footerInView(true);
+    page.cover(false);
+    expect(isOpen(page.box)).toBe(false);
+    page.footerInView(false);
+    expect(isOpen(page.box)).toBe(true);
+  });
+
+  it('steps aside when keyboard focus moves to anything outside the card', () => {
+    const page = run({ top: 0 });
+    expect(isOpen(page.box)).toBe(true);
+    page.focusOn(page.box);
+    expect(isOpen(page.box)).toBe(true);
+    page.focusOn({});
+    expect(isOpen(page.box)).toBe(false);
+    page.scrollTo(0);
+    expect(isOpen(page.box)).toBe(false);
   });
 
   it('closes with the button and remembers the choice across visits', () => {
@@ -200,6 +271,12 @@ describe('nudgeScript', () => {
 
   it('does nothing when the element to measure is missing', () => {
     expect(run({ top: 0, missingTarget: true }).box).toBeUndefined();
+  });
+
+  it('has no line comments, which would swallow the code once line breaks are collapsed', () => {
+    expect(nudgeScript({ threshold: 0.7, closeLabel: 'Close', target: 'article' })).not.toContain(
+      '//',
+    );
   });
 
   it('is small enough to inline in a page', () => {

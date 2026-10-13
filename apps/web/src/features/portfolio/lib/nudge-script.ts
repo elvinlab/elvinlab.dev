@@ -11,14 +11,16 @@ export type NudgeScriptConfig = {
 
 /**
  * Inline script that floats the experiment card. It clones the static card (or, on a page that has
- * none, the one inside `template[data-experiment-template]`), opens the copy once the bottom of the
- * viewport passes `threshold` of `target`, hides it while a static card is on screen and lets the
- * visitor close it. Shown at most once per browser session
+ * none, the one inside `template[data-experiment-template]`), opens the copy, after the first scroll the visitor makes (never on load, so a short page cannot
+ * pop it open unread), once the bottom of the viewport passes `threshold` of `target`, hides it while a static card or the page footer is on
+ * screen (so it never covers the links there; the footer is looked up after the document loads), and
+ * steps aside for the rest of the visit once keyboard focus lands anywhere outside it (WCAG focus not
+ * obscured) and lets the visitor close it. Shown at most once per browser session
  * (`sessionStorage`) and never again after a close (`localStorage`); blocked storage is not an error.
  * Inline, not bundled, so a build with `features.experimentNudge` off ships none of it.
  */
 export function nudgeScript(config: NudgeScriptConfig): string {
-  return `(function (cfg) {
+  const source = `(function (cfg) {
   var card = document.querySelector('[data-experiment-card]');
   var template = card ? null : document.querySelector('template[data-experiment-template]');
   var source = card || (template && template.content.firstElementChild);
@@ -45,10 +47,12 @@ export function nudgeScript(config: NudgeScriptConfig): string {
   document.body.appendChild(box);
   var armed = false;
   var closed = false;
-  var covered = false;
+  var overCard = false;
+  var overFoot = false;
+  var dodged = false;
   var queued = false;
   function paint() {
-    if (armed && !closed && !covered) {
+    if (armed && !closed && !dodged && !overCard && !overFoot) {
       box.removeAttribute('inert');
       box.setAttribute('data-open', '');
     } else {
@@ -70,18 +74,29 @@ export function nudgeScript(config: NudgeScriptConfig): string {
   function onScroll() {
     if (!queued) { queued = true; requestAnimationFrame(check); }
   }
+  document.addEventListener('focusin', function (event) {
+    if (!box.contains(event.target)) { dodged = true; paint(); }
+  });
   close.addEventListener('click', function () {
     closed = true;
     remember(localStorage);
     paint();
   });
-  if (card && typeof IntersectionObserver === 'function') {
+  function watch(el, set) {
+    if (!el || typeof IntersectionObserver !== 'function') return;
     new IntersectionObserver(function (entries) {
-      covered = entries[entries.length - 1].isIntersecting;
+      set(entries[entries.length - 1].isIntersecting);
       paint();
-    }).observe(card);
+    }).observe(el);
   }
+  watch(card, function (on) { overCard = on; });
+  function watchFooter() { watch(document.querySelector('[data-site-footer]'), function (on) { overFoot = on; }); }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', watchFooter);
+  else watchFooter();
   window.addEventListener('scroll', onScroll, { passive: true });
-  check();
 })(${JSON.stringify(config)});`;
+  // Never put a `//` comment inside the script above: collapsing line breaks would make it swallow
+  // the code after it. Indentation and line breaks cost bytes on every page; every statement ends in `;` or `}`, so
+  // collapsing them to one space is safe (no automatic semicolon insertion to trip over).
+  return source.replace(/\s*\n\s*/g, ' ');
 }

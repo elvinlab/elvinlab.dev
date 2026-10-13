@@ -124,6 +124,16 @@ try {
   ) {
     fail('the reading mode rendered although features.readingMode is off');
   }
+  // The experiment nudge is off in the alternative config: no card, floating copy, script, CSS or key.
+  if (
+    /data-experiment-card|data-nudge-floating|experiment-nudge|\.xn-link|\.nudge-float/.test(
+      rawHtml,
+    )
+  ) {
+    fail(
+      'the experiment card (markup, script or CSS) rendered although features.experimentNudge is off',
+    );
+  }
   // No `now` block in the alternative config: the card renders nothing, not even an empty wrapper.
   if (/data-now-card/.test(rawHtml) || NOW_FOCUS.some((text) => rawHtml.includes(text))) {
     fail('the Now card rendered although the config has no `now` block');
