@@ -1,0 +1,20 @@
+---
+/**
+ * The experiment nudge, gated: it renders the card for the latest experiment only when both
+ * `features.experimentNudge` and `features.experiments` are on and a live (not archived) experiment
+ * exists. Off, it emits nothing: no markup, no script, no CSS, nothing stored in the browser.
+ */
+import ExperimentCard from '@/features/portfolio/components/ExperimentCard.astro';
+import { latestExperiment } from '@/features/portfolio/lib/latest-experiment.ts';
+import { loadExperiments } from '@/features/portfolio/lib/load-experiments.ts';
+import { isEnabled } from '@/shared/config/index.ts';
+import { LOCALES, type Locale } from '@/shared/i18n/index.ts';
+
+type Props = { locale: Locale };
+
+const { locale } = Astro.props;
+const enabled = isEnabled('experimentNudge') && isEnabled('experiments');
+const entry = enabled ? latestExperiment(await loadExperiments(), LOCALES.defaultLocale) : undefined;
+---
+
+{entry && <ExperimentCard entry={entry} locale={locale} />}

@@ -126,6 +126,8 @@ const readingLabel = t(locale, 'notes.readingTime', { min: readingMinutes(entry.
 
   <PrevNext locale={locale} prev={prev} next={next} />
 
+  <slot name="end" />
+
   <Comments locale={locale} />
   <ReadingMode slot="floating" part="exit" locale={locale} />
 

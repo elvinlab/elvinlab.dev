@@ -9,7 +9,7 @@
 import { Image } from 'astro:assets';
 import { localizePath } from '@elvinlab/core';
 
-import type { ExperimentEntry } from '@/features/portfolio/index.ts';
+import type { ExperimentEntry } from '@/features/portfolio/lib/load-experiments.ts';
 import { LOCALES, type Locale, t } from '@/shared/i18n/index.ts';
 import { resolveExperimentImage } from '@/shared/lib/experiment-image.ts';
 import { pickLocale } from '@/shared/lib/localized.ts';

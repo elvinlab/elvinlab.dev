@@ -1,3 +1,4 @@
+export { default as ExperimentNudge } from './components/ExperimentNudge.astro';
 export { default as ExperimentRow } from './components/ExperimentRow.astro';
 export { default as ExperimentTile } from './components/ExperimentTile.astro';
 export { default as Home } from './components/Home.astro';
