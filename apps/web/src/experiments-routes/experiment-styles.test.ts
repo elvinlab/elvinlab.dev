@@ -71,7 +71,6 @@ describe('experimentsCss', () => {
 
   it('keeps idle gallery thumbnails readable on touch and larger on phones', () => {
     const css = experimentsCss({ ...NONE, pieces: true, media: true, gallery: true });
-    expect(css).toMatch(/\.xp-thumb\{[^}]*opacity:0\.85/);
     expect(css).not.toContain('opacity:0.6;');
     expect(css).toMatch(/@media \(max-width:639px\)\{\.xp-thumb\{[^}]*aspect-ratio:4 \/ 3/);
   });
@@ -162,6 +161,64 @@ describe('experimentsCss', () => {
         expect(Number(x) === 0 && Number(y) === 0 ? true : Number(blur ?? 0) > 0).toBe(true);
       }
       expect(css).not.toMatch(/#[0-9a-f]{3,8}\b/i);
+    });
+  });
+
+  describe('rail thumbnails and the result fact', () => {
+    const ALL: ExperimentsCssParts = {
+      pieces: true,
+      media: true,
+      gallery: true,
+      more: false,
+      years: false,
+      footer: false,
+      lab: false,
+      empty: false,
+    };
+
+    it('gives every thumbnail a visible edge from the text color and no fade', () => {
+      const css = experimentsCss(ALL);
+      expect(css).toMatch(
+        /\.xp-thumb\{[^}]*border:1px solid color-mix\(in srgb,\s*var\(--color-text\)\s*55%,\s*transparent\)/,
+      );
+      for (const [, value] of css.matchAll(/\.xp-thumb[^{]*\{[^}]*?opacity:([\d.]+)/g)) {
+        expect(Number(value)).toBeGreaterThanOrEqual(0.9);
+      }
+      expect(css).not.toMatch(/\.xp-thumb[^{]*\{[^}]*transition:opacity/);
+    });
+
+    it('marks the checked thumbnail with a 2 px primary outline and a primary edge', () => {
+      const css = experimentsCss(ALL);
+      expect(css).toMatch(
+        /:checked ~ \.xp-thumbs > \.xp-thumb:nth-child\(1\)[^{]*\{[^}]*outline:2px solid var\(--color-primary\)/,
+      );
+      expect(css).toMatch(
+        /:checked ~ \.xp-thumbs > \.xp-thumb:nth-child\(4\)[^{]*\{[^}]*border-color:var\(--color-primary\)/,
+      );
+    });
+
+    it('keeps the keyboard focus ring on the thumbnails', () => {
+      expect(experimentsCss(ALL)).toMatch(
+        /:focus-visible ~ \.xp-thumbs > \.xp-thumb:nth-child\(1\)[^{]*\{[^}]*box-shadow:/,
+      );
+    });
+
+    it('sets the result off with a square 3 px primary rule, a primary label and larger full-color text', () => {
+      const css = experimentsCss(ALL);
+      expect(css).toMatch(
+        /\.xp-facts \[data-result\]\{[^}]*border-left:3px solid var\(--color-primary\)/,
+      );
+      expect(css).toMatch(/\.xp-facts \[data-result\]\{[^}]*padding-left:/);
+      expect(css).not.toMatch(/\.xp-facts \[data-result\]\{[^}]*border-radius/);
+      expect(css).toMatch(/\.xp-facts \[data-result\] dt\{[^}]*color:var\(--color-primary\)/);
+      expect(css).toMatch(/\.xp-facts \[data-result\] dd\{[^}]*color:var\(--color-text\)/);
+      expect(css).toMatch(/\.xp-facts \[data-result\] dd\{[^}]*font-size:1\.0625rem/);
+      expect(css).not.toMatch(/\.xp-facts[^{]*\{[^}]*text-transform/);
+    });
+
+    it('does not depend on the image: the result rule is part of the pieces CSS', () => {
+      const solo = experimentsCss({ ...ALL, media: false, gallery: false });
+      expect(solo).toContain('.xp-facts [data-result]');
     });
   });
 });

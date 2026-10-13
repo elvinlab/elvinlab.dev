@@ -271,6 +271,17 @@ const PIECE = `
     color: var(--color-text-secondary);
     text-wrap: pretty;
   }
+  .xp-facts [data-result] {
+    padding-left: 1rem;
+    border-left: 3px solid var(--color-primary);
+  }
+  .xp-facts [data-result] dt {
+    color: var(--color-primary);
+  }
+  .xp-facts [data-result] dd {
+    font-size: 1.0625rem;
+    color: var(--color-text);
+  }
   .xp-description {
     margin: 0;
     line-height: 1.55;
@@ -573,7 +584,7 @@ const GALLERY = `
   .xp-radio:nth-of-type(4):checked ~ .xp-thumbs > .xp-thumb:nth-child(4) {
     outline: 2px solid var(--color-primary);
     outline-offset: -2px;
-    opacity: 1;
+    border-color: var(--color-primary);
   }
   .xp-radio:nth-of-type(1):focus-visible ~ .xp-thumbs > .xp-thumb:nth-child(1),
   .xp-radio:nth-of-type(2):focus-visible ~ .xp-thumbs > .xp-thumb:nth-child(2),
@@ -588,7 +599,7 @@ const GALLERY = `
     color: var(--color-muted);
     font-variant-numeric: tabular-nums;
   }
-  /* Thumbnails: 80 x 50 at most on wide screens; under 640 px they share the row (4:3, up to 104 px wide) so four never wrap. */
+  /* Thumbnails: a 1 px edge (text color at 55%, 3:1 on the card and the page in both themes) tells them apart; the active one swaps it for a 2 px primary outline, no fade. 80 x 50 at most on wide screens; under 640 px they share the row (4:3, up to 104 px wide) so four never wrap. */
   .xp-thumbs {
     display: flex;
     gap: 0.5rem;
@@ -600,8 +611,9 @@ const GALLERY = `
     flex: 0 1 5rem;
     min-width: 0;
     aspect-ratio: 8 / 5;
+    box-sizing: border-box;
+    border: 1px solid color-mix(in srgb, var(--color-text) 55%, transparent);
     border-radius: var(--radius-inner);
-    opacity: 0.85;
     cursor: pointer;
   }
   @media (max-width: 639px) {
@@ -621,12 +633,12 @@ const GALLERY = `
   }
   @media (hover: hover) {
     .xp-thumb:hover {
-      opacity: 1;
+      border-color: var(--color-text);
     }
   }
   @media (prefers-reduced-motion: no-preference) {
     .xp-thumb {
-      transition: opacity 150ms ease-out;
+      transition: border-color 150ms ease-out;
     }
     .xp-gallery .xp-slide {
       animation: xp-fade 280ms steps(4, end);

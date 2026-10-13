@@ -845,6 +845,12 @@
     "title": "Pixel buttons on Experiments",
     "description": "The read-the-case button and the Live site and Code links of the Experiments page now share the pixel look of Education: stepped corners, a pixel arrow that moves two pixels in two steps on hover and focus, a darker fill and a one-pixel lift on the button, and a tinted pill on the links. Keyboard focus drops the corners so the ring stays whole. On phones the button takes the full row and the two links sit side by side below it."
   },
+  "experiments-rail-and-result": {
+    "date": "2026-10-13",
+    "category": "changed",
+    "title": "Clearer screenshots and results on Experiments",
+    "description": "The small previews under each screenshot on the Experiments page now have a visible edge in both themes instead of fading into the card, and the one you are viewing gets a clear violet outline. In every piece the Result is set off from the Problem and My part with a violet rule on the left, a violet label and larger text in the full text color."
+  },
   "stamp-below-navbar": {
     "date": "2026-10-13",
     "category": "fixed",

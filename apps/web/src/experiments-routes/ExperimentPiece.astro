@@ -63,7 +63,7 @@ const first = index === 1;
     {facts.length > 0 ? (
       <dl class="xp-facts">
         {facts.map(([key, value]) => (
-          <div>
+          <div data-result={key === 'experiment.result' ? '' : undefined}>
             <dt>{t(locale, key)}</dt>
             <dd>{value}</dd>
           </div>
