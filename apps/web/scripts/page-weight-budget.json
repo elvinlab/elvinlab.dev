@@ -12,13 +12,13 @@
       }
     },
     "me": {
-      "why": "Recruiter page: hero photo plus experience blocks, the numbered layer rail and the folded more-tools block of the full-stack story, and 44 px hit areas; its LCP margin is the thinnest after /experiments/. 2026-10-12: html 119700 -> 122900 for the collapsed raw-data layer (about 3.2 KB of field / type / value rows rendered from config, no script); the style budget is unchanged because the block reuses existing utility classes. 2026-10-12: style 55712 -> 56000, html 122900 -> 123600 for the native feel layer (about 190 B of safe-area, overscroll and tap CSS plus 60 B of theme-color sync script and the pressed-state classes on navbar, footer and chip links), the minimum measured need. 2026-10-12 (N4): style 56000 -> 56400, html 123600 -> 123900 for the page-transition CSS in global.css (about 470 B of style on every page: the @view-transition opt-in, the navbar group name, the root override and the reduced-motion pseudo-element reset), the minimum measured need plus small headroom.",
+      "why": "Recruiter page: hero photo plus experience blocks, the numbered layer rail and the folded more-tools block of the full-stack story, and 44 px hit areas; its LCP margin is the thinnest after /experiments/. 2026-10-12: html 119700 -> 122900 for the collapsed raw-data layer (about 3.2 KB of field / type / value rows rendered from config, no script); the style budget is unchanged because the block reuses existing utility classes. 2026-10-12: style 55712 -> 56000, html 122900 -> 123600 for the native feel layer (about 190 B of safe-area, overscroll and tap CSS plus 60 B of theme-color sync script and the pressed-state classes on navbar, footer and chip links), the minimum measured need. 2026-10-12 (N4): style 56000 -> 56400, html 123600 -> 123900 for the page-transition CSS in global.css (about 470 B of style on every page: the @view-transition opt-in, the navbar group name, the root override and the reduced-motion pseudo-element reset), the minimum measured need plus small headroom. 2026-10-13 (reduced-motion entrance): html 123900 -> 124000 for one global rule in `global.css` (`[class*=animate-fade-in-up]{animation:none!important}`, about 55 B of inline style on every page) so the fade-in entrance does not run at all with reduced motion; measured overshoot +6 B html, the minimum measured need plus about 100 B of headroom.",
       "styleBytes": 56400,
-      "htmlBytes": 123900,
+      "htmlBytes": 124000,
       "measured": {
         "styleBytes": 55712,
-        "htmlBytes": 122854,
-        "date": "2026-10-12"
+        "htmlBytes": 123906,
+        "date": "2026-10-13"
       }
     },
     "experiments": {
@@ -42,13 +42,13 @@
       }
     },
     "contact": {
-      "why": "Form page: the lightest shared head, only the site stylesheet plus the form. 2026-10-12 (N5d): style 55100 -> 55200 for the page stamp (measured overshoot +9 B of site style from the Stamp utility classes), the minimum measured need plus about 90 B of headroom. 2026-10-12 (N4): style 55200 -> 55600 for the page-transition CSS in global.css (about 470 B of style on every page: the @view-transition opt-in, the navbar group name, the root override and the reduced-motion pseudo-element reset), the minimum measured need plus small headroom.",
-      "styleBytes": 55600,
+      "why": "Form page: the lightest shared head, only the site stylesheet plus the form. 2026-10-12 (N5d): style 55100 -> 55200 for the page stamp (measured overshoot +9 B of site style from the Stamp utility classes), the minimum measured need plus about 90 B of headroom. 2026-10-12 (N4): style 55200 -> 55600 for the page-transition CSS in global.css (about 470 B of style on every page: the @view-transition opt-in, the navbar group name, the root override and the reduced-motion pseudo-element reset), the minimum measured need plus small headroom. 2026-10-13 (reduced-motion entrance): style 55600 -> 55700 for one global rule in `global.css` (`[class*=animate-fade-in-up]{animation:none!important}`, about 55 B of inline style on every page) so the fade-in entrance does not run at all with reduced motion; measured overshoot +7 B style, the minimum measured need plus about 100 B of headroom.",
+      "styleBytes": 55700,
       "htmlBytes": 91000,
       "measured": {
-        "styleBytes": 52942,
+        "styleBytes": 55607,
         "htmlBytes": 87407,
-        "date": "2026-10-07"
+        "date": "2026-10-13"
       }
     },
     "subscribe": {
@@ -102,13 +102,13 @@
       "articleBytes": 65536
     },
     "result": {
-      "why": "One short card under the compact banner (404, confirm and unsubscribe, es and en): budget is the measured value rounded up to 100 B, so these small pages stay tight. 2026-10-12: style 54300 -> 54500, html 79100 -> 79600 for the native feel layer (about 190 B of safe-area, overscroll and tap CSS plus 60 B of theme-color sync script and the pressed-state classes on navbar, footer and chip links), the minimum measured need. 2026-10-12 (N4): style 54500 -> 54800, html 79600 -> 79900 for the page-transition CSS in global.css (about 470 B of style on every page: the @view-transition opt-in, the navbar group name, the root override and the reduced-motion pseudo-element reset), the minimum measured need plus small headroom.",
-      "styleBytes": 54800,
-      "htmlBytes": 79900,
+      "why": "One short card under the compact banner (404, confirm and unsubscribe, es and en): budget is the measured value rounded up to 100 B, so these small pages stay tight. 2026-10-12: style 54300 -> 54500, html 79100 -> 79600 for the native feel layer (about 190 B of safe-area, overscroll and tap CSS plus 60 B of theme-color sync script and the pressed-state classes on navbar, footer and chip links), the minimum measured need. 2026-10-12 (N4): style 54500 -> 54800, html 79600 -> 79900 for the page-transition CSS in global.css (about 470 B of style on every page: the @view-transition opt-in, the navbar group name, the root override and the reduced-motion pseudo-element reset), the minimum measured need plus small headroom. 2026-10-13 (reduced-motion entrance): style 54800 -> 54900, html 79900 -> 80000 for one global rule in `global.css` (`[class*=animate-fade-in-up]{animation:none!important}`, about 55 B of inline style on every page) so the fade-in entrance does not run at all with reduced motion; measured overshoot +3 B style and +3 B html, the minimum measured need plus about 100 B of headroom.",
+      "styleBytes": 54900,
+      "htmlBytes": 80000,
       "measured": {
-        "styleBytes": 54245,
-        "htmlBytes": 79045,
-        "date": "2026-10-11"
+        "styleBytes": 54803,
+        "htmlBytes": 79903,
+        "date": "2026-10-13"
       }
     },
     "default": {

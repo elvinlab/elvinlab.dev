@@ -213,9 +213,13 @@ test.describe('home hero action and language cue', () => {
 });
 
 test.describe('home sidebar cards by width', () => {
+  // The sidebar only: the page also has the "Also in English" language hint, another `aside`
+  // whose script may or may not have run yet, and its children would count as sidebar cards.
+  const sidebar = (page: Page) =>
+    page.getByRole('complementary', { name: text('es', 'aside.label') });
   const lefts = (page: Page) =>
-    page
-      .locator('aside > div > *')
+    sidebar(page)
+      .locator(':scope > div > *')
       .evaluateAll((cards) => cards.map((card) => (card as HTMLElement).offsetLeft));
 
   test('lays the cards out in columns on tablets (820 px)', async ({ page }) => {
@@ -237,7 +241,7 @@ test.describe('home sidebar cards by width', () => {
     await page.goto('/');
     expect(new Set(await lefts(page)).size).toBe(1);
     const main = await page.locator('[data-main-grid] > div').first().boundingBox();
-    const aside = await page.locator('aside').first().boundingBox();
+    const aside = await sidebar(page).boundingBox();
     if (!main || !aside) throw new Error('main column and aside must be laid out');
     expect(aside.x).toBeGreaterThan(main.x + main.width - 1);
   });

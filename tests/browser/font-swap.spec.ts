@@ -35,7 +35,7 @@ type Layout = {
   navLinks: number;
   h1Text: number;
   /** Height of every element in document order, to name what changed when the page height does. */
-  heights: [string, number][];
+  heights: [string, number, number][];
 };
 
 test.beforeEach(({ browserName: _browserName }, testInfo) => {
@@ -54,12 +54,17 @@ const measure = (page: Page): Promise<Layout> =>
     const links = [...document.querySelectorAll('header nav a')].map(
       (link) => link.getBoundingClientRect().width,
     );
-    const heights: [string, number][] = [];
+    const heights: [string, number, number][] = [];
     const walk = (element: Element, path: string) => {
       const label =
         typeof element.className === 'string' ? element.className.trim().split(/\s+/)[0] : '';
       const id = `${path}/${element.tagName.toLowerCase()}${label ? `.${label}` : ''}`;
-      heights.push([id, Math.round(element.getBoundingClientRect().height * 100) / 100]);
+      const box = element.getBoundingClientRect();
+      heights.push([
+        id,
+        Math.round(box.height * 100) / 100,
+        Math.round((box.top + window.scrollY) * 100) / 100,
+      ]);
       if (heights.length < 3000) for (const child of element.children) walk(child, id);
     };
     walk(document.body, '');
@@ -142,16 +147,48 @@ for (const [path, width] of PAGES.flatMap((p) => WIDTHS.map((w) => [p, w] as con
       navWidth: (after.navLinks - before.navLinks) / (before.navLinks || 1),
       h1Width: (after.h1Text - before.h1Text) / before.h1Text,
     };
-    // The elements whose height changed, biggest first: when the page height moves, this names them.
-    const moved = before.heights
-      .map(([id, height], index) => ({
+    // What moved, for a failure message that names it: the elements whose height or position changed
+    // (small changes count: eight of them can add up to the 8 px that moved the page), and the element
+    // that ends the document before and after.
+    const pairs = before.heights.map(([id, height, top], index) => {
+      const next = after.heights[index];
+      return {
         id,
-        change: (after.heights[index]?.[1] ?? height) - height,
-      }))
-      .filter((entry) => Math.abs(entry.change) >= 1)
-      .sort((a, b) => Math.abs(b.change) - Math.abs(a.change))
-      .slice(0, 6)
-      .map((entry) => `${entry.change.toFixed(1)} ${entry.id.slice(-100)}`);
+        dHeight: (next?.[1] ?? height) - height,
+        dTop: (next?.[2] ?? top) - top,
+        bottomBefore: top + height,
+        bottomAfter: (next?.[2] ?? top) + (next?.[1] ?? height),
+      };
+    });
+    const describe = (id: string) => id.slice(-90);
+    const heightChanges = pairs.filter((pair) => Math.abs(pair.dHeight) >= 0.1);
+    const shifts = pairs.filter(
+      (pair) => Math.abs(pair.dTop) >= 0.5 && Math.abs(pair.dHeight) < 0.1,
+    );
+    const lowest = (key: 'bottomBefore' | 'bottomAfter') =>
+      pairs.reduce(
+        (best, pair) => (pair[key] > best[key] ? pair : best),
+        pairs[0] ?? { id: '', dHeight: 0, dTop: 0, bottomBefore: 0, bottomAfter: 0 },
+      );
+    const moved = [
+      `${heightChanges.length} elements changed height (sum ${heightChanges.reduce((sum, pair) => sum + pair.dHeight, 0).toFixed(1)} px): ${heightChanges
+        .sort((x, y) => Math.abs(y.dHeight) - Math.abs(x.dHeight))
+        .slice(0, 5)
+        .map((pair) => `${pair.dHeight.toFixed(2)} ${describe(pair.id)}`)
+        .join(' ; ')}`,
+      `${shifts.length} elements only shifted; the first in document order: ${shifts
+        .slice(0, 3)
+        .map((pair) => `${pair.dTop.toFixed(1)} ${describe(pair.id)}`)
+        .join(' ; ')}; the element before it: ${(() => {
+        const first = shifts[0];
+        const at = first ? pairs.indexOf(first) : -1;
+        const previous = at > 0 ? pairs[at - 1] : undefined;
+        return previous
+          ? `${describe(previous.id)} (height ${previous.dHeight.toFixed(2)}, top ${previous.dTop.toFixed(2)})`
+          : 'none';
+      })()}`,
+      `last element before: ${describe(lowest('bottomBefore').id)} (${lowest('bottomBefore').bottomBefore.toFixed(1)}), after: ${describe(lowest('bottomAfter').id)} (${lowest('bottomAfter').bottomAfter.toFixed(1)})`,
+    ];
     test.info().annotations.push({ type: 'swap-delta', description: JSON.stringify(delta) });
     test.info().annotations.push({ type: 'swap-moved', description: moved.join(' | ') });
     console.log(
@@ -162,10 +199,9 @@ for (const [path, width] of PAGES.flatMap((p) => WIDTHS.map((w) => [p, w] as con
     if (BASELINE) return;
     // On a phone one line of the footer call to action can still wrap differently (a line is 20 px,
     // far below the fold); the content above it must not move.
-    expect(
-      Math.abs(delta.documentHeight),
-      `elements that changed height: ${moved.join(' | ') || 'none'}`,
-    ).toBeLessThanOrEqual(width < 500 ? 24 : 2);
+    expect(Math.abs(delta.documentHeight), `what moved: ${moved.join(' | ')}`).toBeLessThanOrEqual(
+      width < 500 ? 24 : 2,
+    );
     expect(Math.abs(delta.paragraphY)).toBeLessThanOrEqual(2);
     expect(Math.abs(delta.navWidth)).toBeLessThanOrEqual(0.03);
     expect(Math.abs(delta.h1Width)).toBeLessThanOrEqual(0.03);
