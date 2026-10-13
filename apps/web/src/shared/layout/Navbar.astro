@@ -45,7 +45,7 @@ const { href: otherHref, kind: otherKind } = resolveLocaleTarget({
 });
 const switchLabel = t(locale, otherKind === 'home-fallback' ? 'language.switch.home' : 'language.switch');
 const linkClass =
-  'flex h-11 items-center rounded-control px-3 md:px-2 font-medium transition-colors duration-150 hover:bg-card-hover active:scale-96 aria-[current=page]:text-primary';
+  'flex h-11 items-center px-3 md:px-2 font-medium aria-[current=page]:text-primary';
 ---
 
 <div data-nav-scrim hidden></div>
@@ -54,7 +54,7 @@ const linkClass =
     aria-label={t(locale, 'nav.label')}
     class="relative flex min-h-18 flex-wrap items-center gap-x-1 rounded-b-card bg-card/92 px-3 backdrop-blur-md md:gap-1 md:px-3"
   >
-    <a href={localizePath('/', locale, LOCALES)} class="group mr-auto flex h-11 min-w-0 items-center gap-2 rounded-control px-1 font-retro text-xs active:scale-96">
+    <a href={localizePath('/', locale, LOCALES)} class="group mr-auto flex h-11 min-w-0 items-center gap-2 px-1 font-retro text-xs">
       <BrandMark /><span>{site.identity.handle}</span>
     </a>
 
@@ -68,7 +68,7 @@ const linkClass =
       href={otherHref}
       hreflang={otherLocale}
       lang={otherLocale}
-      class="grid h-11 min-w-11 shrink-0 place-items-center rounded-control px-2 font-mono text-sm uppercase transition-colors duration-150 hover:bg-card-hover active:scale-96"
+      class="grid h-11 min-w-11 shrink-0 place-items-center px-2 font-mono text-sm uppercase"
       aria-label={switchLabel}
     >
       {otherLocale}
@@ -77,13 +77,13 @@ const linkClass =
     {site.features.backgroundPicker && <BackgroundPicker label={t(locale, 'background.switch')} locale={locale} />}
     <button
       type="button"
-      class="grid size-11 shrink-0 place-items-center rounded-control transition-colors duration-150 hover:bg-card-hover active:scale-96 md:hidden"
+      class="grid size-11 shrink-0 place-items-center md:hidden"
       aria-label={t(locale, 'nav.menu')}
       aria-expanded="false"
       aria-controls="nav-menu"
       data-nav-toggle
     >
-      <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path data-icon="menu" d="M4 7h16M4 12h16M4 17h16"></path><path data-icon="close" class="hidden" d="M6 6l12 12M18 6L6 18"></path></svg>
+      <svg viewBox="0 0 10 10" width="20" height="20" fill="currentColor" shape-rendering="crispEdges" aria-hidden="true"><path data-icon="menu" d="M0 1h10v2H0zM0 4h10v2H0zM0 7h10v2H0z"></path><path data-icon="close" class="hidden" d="M0 0h2v1H0zM8 0h2v1H8zM1 1h2v1H1zM7 1h2v1H7zM2 2h2v1H2zM6 2h2v1H6zM3 3h4v1H3zM4 4h2v2H4zM3 6h4v1H3zM2 7h2v1H2zM6 7h2v1H6zM1 8h2v1H1zM7 8h2v1H7zM0 9h2v1H0zM8 9h2v1H8z"></path></svg>
     </button>
 
     <ul id="nav-menu" hidden class="absolute inset-x-0 top-full mt-2 flex flex-col gap-1 p-2 md:hidden">

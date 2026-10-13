@@ -910,5 +910,11 @@
     "category": "changed",
     "title": "Navbar: a pixel-notched phone menu and the wordmark on tablets",
     "description": "The phone menu is now a card with stepped pixel corners and the bar's thin edge, opens with a short stepped dissolve (none with reduced motion) and dims the page behind it; tapping the dimmed page closes it. From 780 px the bar shows the wordmark next to the logo, and below that the logo link is a 44 px target."
+  },
+  "navbar-pixel-identity": {
+    "date": "2026-10-13",
+    "category": "changed",
+    "title": "Navbar: pixel states and pixel icons",
+    "description": "Every navbar control now shows a stepped, notched fill on hover and keyboard focus, a square 2 px focus ring and a 1 px press instead of the soft rounded tint and shrink. The theme, background and menu icons are redrawn as crisp pixel glyphs. With reduced motion the states appear at once, without movement."
   }
 }

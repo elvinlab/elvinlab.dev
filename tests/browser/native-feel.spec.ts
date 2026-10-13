@@ -93,9 +93,14 @@ test('tappable controls show pressed feedback', async ({ page }) => {
     if (!box) throw new Error('target has no box');
     await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
     await page.mouse.down();
-    const pressed = await target.evaluate((element) => getComputedStyle(element).scale);
+    // Footer links and chips scale; the navbar controls nudge 1 px down instead (a transform, stepped).
+    const feedback = () =>
+      target.evaluate((element) => {
+        const style = getComputedStyle(element);
+        return style.scale !== 'none' || style.transform !== 'none';
+      });
+    await expect.poll(feedback).toBe(true);
     await page.mouse.up();
-    expect(pressed).not.toBe('none');
   }
 });
 

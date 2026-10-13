@@ -114,7 +114,7 @@
    scrolls the target under it. Matches the 6rem of `.prose h2`. */
 html {
   scroll-padding-top: 6rem;
-  /* Native feel: no scroll chaining (`contain` keeps the native bounce, `none` would not), no grey tap flash (pressed state is `active:scale-96`). */
+  /* Native feel: no scroll chaining (`contain` keeps the native bounce, `none` would not), no grey tap flash (the navbar presses with a 1 px nudge, other controls with `active:scale-96`). */
   overscroll-behavior: contain;
   -webkit-tap-highlight-color: transparent;
 }
@@ -288,6 +288,40 @@ body {
   }
   [data-navbar] ul:not(#nav-menu) a {
     padding-inline: 0.25rem;
+  }
+}
+
+/* Pixel control states for every navbar control (links, language code, toggles, brand). The hover and focus fill is
+   a notched layer (`::before`, the navbar's `--nav-notch`, painted above the bar and below the label), so the control is never clipped and its
+   focus ring (the global 2 px primary outline) stays square and whole. Press is a 1 px nudge. Movement is two
+   steps in about 150 ms, only when motion is allowed; under reduced motion the fill and ring appear at once. */
+[data-navbar] nav :is(a, button) {
+  position: relative;
+}
+[data-navbar] nav :is(a, button)::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background-color: var(--color-card-hover);
+  clip-path: var(--nav-notch);
+  opacity: 0;
+}
+[data-navbar] nav :is(a, button):focus-visible::before {
+  opacity: 1;
+}
+@media (hover: hover) {
+  [data-navbar] nav :is(a, button):hover::before {
+    opacity: 1;
+  }
+}
+[data-navbar] nav :is(a, button):active {
+  transform: translateY(1px);
+}
+@media (prefers-reduced-motion: no-preference) {
+  [data-navbar] nav :is(a, button),
+  [data-navbar] nav :is(a, button)::before {
+    transition: 150ms steps(2, end);
   }
 }
 
