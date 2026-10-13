@@ -29,7 +29,14 @@ const PAGES = ['/notes/smoke-es/', '/'];
 /** Desktop, plus a phone and the tight Spanish nav width, where a wider fallback would wrap lines. */
 const WIDTHS = [1280, 820, 390];
 
-type Layout = { documentHeight: number; paragraphY: number; navLinks: number; h1Text: number };
+type Layout = {
+  documentHeight: number;
+  paragraphY: number;
+  navLinks: number;
+  h1Text: number;
+  /** Height of every element in document order, to name what changed when the page height does. */
+  heights: [string, number][];
+};
 
 test.beforeEach(({ browserName: _browserName }, testInfo) => {
   test.skip(testInfo.project.name !== 'chromium-1280', 'each test sets its own viewport');
@@ -47,7 +54,17 @@ const measure = (page: Page): Promise<Layout> =>
     const links = [...document.querySelectorAll('header nav a')].map(
       (link) => link.getBoundingClientRect().width,
     );
+    const heights: [string, number][] = [];
+    const walk = (element: Element, path: string) => {
+      const label =
+        typeof element.className === 'string' ? element.className.trim().split(/\s+/)[0] : '';
+      const id = `${path}/${element.tagName.toLowerCase()}${label ? `.${label}` : ''}`;
+      heights.push([id, Math.round(element.getBoundingClientRect().height * 100) / 100]);
+      if (heights.length < 3000) for (const child of element.children) walk(child, id);
+    };
+    walk(document.body, '');
     return {
+      heights,
       documentHeight: document.documentElement.scrollHeight,
       paragraphY: paragraph.getBoundingClientRect().y + window.scrollY,
       navLinks: links.reduce((sum, width) => sum + width, 0),
@@ -125,16 +142,30 @@ for (const [path, width] of PAGES.flatMap((p) => WIDTHS.map((w) => [p, w] as con
       navWidth: (after.navLinks - before.navLinks) / (before.navLinks || 1),
       h1Width: (after.h1Text - before.h1Text) / before.h1Text,
     };
+    // The elements whose height changed, biggest first: when the page height moves, this names them.
+    const moved = before.heights
+      .map(([id, height], index) => ({
+        id,
+        change: (after.heights[index]?.[1] ?? height) - height,
+      }))
+      .filter((entry) => Math.abs(entry.change) >= 1)
+      .sort((a, b) => Math.abs(b.change) - Math.abs(a.change))
+      .slice(0, 6)
+      .map((entry) => `${entry.change.toFixed(1)} ${entry.id.slice(-100)}`);
     test.info().annotations.push({ type: 'swap-delta', description: JSON.stringify(delta) });
+    test.info().annotations.push({ type: 'swap-moved', description: moved.join(' | ') });
     console.log(
       `${BASELINE ? 'baseline' : 'fallback'} ${path} ${width}`,
-      JSON.stringify({ before, after, delta }),
+      JSON.stringify({ delta, moved }),
     );
 
     if (BASELINE) return;
     // On a phone one line of the footer call to action can still wrap differently (a line is 20 px,
     // far below the fold); the content above it must not move.
-    expect(Math.abs(delta.documentHeight)).toBeLessThanOrEqual(width < 500 ? 24 : 2);
+    expect(
+      Math.abs(delta.documentHeight),
+      `elements that changed height: ${moved.join(' | ') || 'none'}`,
+    ).toBeLessThanOrEqual(width < 500 ? 24 : 2);
     expect(Math.abs(delta.paragraphY)).toBeLessThanOrEqual(2);
     expect(Math.abs(delta.navWidth)).toBeLessThanOrEqual(0.03);
     expect(Math.abs(delta.h1Width)).toBeLessThanOrEqual(0.03);
