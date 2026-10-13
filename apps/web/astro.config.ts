@@ -19,6 +19,7 @@ import { isSubscribeActive } from './src/features/subscribe/availability.ts';
 import { blogRoutesIntegration } from './src/integrations/blog-routes.ts';
 import { changelogRoutesIntegration } from './src/integrations/changelog-routes.ts';
 import { contactRoutesIntegration } from './src/integrations/contact-routes.ts';
+import { educationRoutesIntegration } from './src/integrations/education-routes.ts';
 import { experimentsRoutesIntegration } from './src/integrations/experiments-routes.ts';
 import { externalLinks } from './src/integrations/external-links.ts';
 import { noindexHeaders } from './src/integrations/noindex-headers.ts';
@@ -86,6 +87,7 @@ export default defineConfig({
     contactRoutesIntegration(site.features.contact),
     changelogRoutesIntegration(site.features.changelog),
     experimentsRoutesIntegration(site.features.experiments),
+    educationRoutesIntegration(site.features.education),
     mdx(),
     preact(),
     sitemap({

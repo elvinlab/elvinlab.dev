@@ -11,6 +11,7 @@ const allOn = {
   changelog: true,
   readingMode: true,
   readingProgress: true,
+  education: true,
   marks: true,
   subscribe: false,
   me: true,

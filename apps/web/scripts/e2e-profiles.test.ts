@@ -37,6 +37,7 @@ describe('E2E_PROFILES', () => {
     const { routes, features } = resolveE2eProfile(withProfileFeatures(siteConfig, 'blog-only'));
     expect(routes.notes).toBe(true);
     expect(routes.experiments).toBe(false);
+    expect(features.education).toBe(false);
     expect(features.me).toBe(false);
   });
 
@@ -45,6 +46,11 @@ describe('E2E_PROFILES', () => {
     expect(routes.notes).toBe(false);
     expect(routes.subscribe).toBe(false);
     expect(features.me).toBe(true);
+  });
+
+  it('bare turns the education timeline off with the rest of the portfolio', () => {
+    const { features } = resolveE2eProfile(withProfileFeatures(siteConfig, 'bare'));
+    expect(features.education).toBe(false);
   });
 
   it('bare turns every optional route off', () => {

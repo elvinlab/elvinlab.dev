@@ -34,6 +34,7 @@ export const E2E_PROFILES: Readonly<Record<string, E2eFeatureProfile>> = {
     features: {
       me: false,
       credentials: false,
+      education: false,
       experiments: false,
       experimentNudge: false,
       contact: false,
@@ -63,6 +64,7 @@ export const E2E_PROFILES: Readonly<Record<string, E2eFeatureProfile>> = {
       comments: false,
       contact: false,
       credentials: false,
+      education: false,
       experiments: false,
       experimentNudge: false,
       changelog: false,

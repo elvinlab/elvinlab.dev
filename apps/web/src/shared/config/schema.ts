@@ -298,6 +298,42 @@ export const siteConfigSchema = z
       .describe(
         'Settings of the experiments list (`features.experiments`): pagination, sorting, big pieces, the rows on `/me` and the page header texts. Every key is optional and falls back to its default.',
       ),
+    education: z
+      .strictObject({
+        perPage: z
+          .int()
+          .min(4)
+          .max(48)
+          .default(12)
+          .describe(
+            'Entries per page of `/education/`. The timeline is grouped by year inside each page; a second page exists only when the entries exceed this number (`/education/page/2/`).',
+          ),
+        sortFrom: z
+          .int()
+          .min(2)
+          .max(48)
+          .default(4)
+          .describe(
+            'The sort switch (oldest first, newest first) and the page of the alternate order (`/education/newest/`, not indexed) exist only when the entries number at least this many; below it the timeline has a single order.',
+          ),
+        meRows: z
+          .int()
+          .min(1)
+          .max(6)
+          .default(3)
+          .describe(
+            'Rows of the "Recent education" block on `/me`, newest first; each links to its entry on `/education/`.',
+          ),
+        intro: localizedText(200)
+          .optional()
+          .describe(
+            'Optional intro under the title of `/education/`, per locale (the default locale is required). Omit it to use the interface default. Max 200 characters per locale.',
+          ),
+      })
+      .prefault({})
+      .describe(
+        'Settings of the education timeline (`features.education`): pagination, the sort switch, the rows on `/me` and the page intro. Every key is optional and falls back to its default.',
+      ),
     changelog: z
       .strictObject({
         perPage: z
@@ -494,6 +530,12 @@ export const siteConfigSchema = z
             'The /contact form: off removes the route and the contact Action, hides the nav entry and every link to it (the legal pages and the subscription messages then name no Contact page), and keeps it out of the sitemap.',
           ),
         credentials: z.boolean().describe('Certificates and degrees on /me.'),
+        education: z
+          .boolean()
+          .default(true)
+          .describe(
+            'The /education timeline of degrees and certificates (`credentials.json`): off removes the routes, the nav entry, the /me block and the sitemap entries.',
+          ),
         experiments: z.boolean().describe('The experiments (projects) section and its pages.'),
         changelog: z
           .boolean()
@@ -649,6 +691,9 @@ export const siteConfigSchema = z
       ...(config.notice && { notice: { path: ['notice'], text: config.notice } }),
       ...(config.experiments.intro && {
         'experiments.intro': { path: ['experiments', 'intro'], text: config.experiments.intro },
+      }),
+      ...(config.education.intro && {
+        'education.intro': { path: ['education', 'intro'], text: config.education.intro },
       }),
       ...(config.experiments.words && {
         'experiments.words': { path: ['experiments', 'words'], text: config.experiments.words },

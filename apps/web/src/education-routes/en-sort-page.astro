@@ -1,0 +1,12 @@
+---
+import { educationSortParam } from '@/features/credentials/index.ts';
+
+import EducationPage from './EducationPage.astro';
+import { sortPagePaths } from './static-paths.ts';
+
+export const getStaticPaths = sortPagePaths;
+
+const { sort, page } = Astro.params;
+---
+
+<EducationPage locale="en" sort={educationSortParam(sort)} page={Number(page)} />

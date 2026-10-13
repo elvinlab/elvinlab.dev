@@ -1,0 +1,61 @@
+---
+/**
+ * One entry of the education timeline: type badge, date as it is known (the year, or the short month
+ * and the year), title, issuer, and only the optional parts the entry really has (expiry, where it
+ * was applied, the document image, the verification link, the learnings in a native `<details>`).
+ * Nothing is drawn for a missing field. The `id` is the anchor `/education/#<id>` that `/me` links to.
+ * Styles: `education-styles.ts`, emitted by `EducationPage.astro`.
+ */
+import { Image } from 'astro:assets';
+
+import type { Credential } from '@/features/credentials/index.ts';
+import { educationDateLabel } from '@/features/credentials/index.ts';
+import { site } from '@/shared/config/index.ts';
+import { LOCALES, type Locale, t } from '@/shared/i18n/index.ts';
+import { externalLinkAttrs } from '@/shared/lib/external-link.ts';
+import { pickLocale } from '@/shared/lib/localized.ts';
+import ExternalHint from '@/shared/ui/ExternalHint.astro';
+
+import { resolveEducationImage } from './education-image.ts';
+
+type Props = { id: string; data: Credential; locale: Locale };
+
+const { id, data, locale } = Astro.props;
+const text = (value: Parameters<typeof pickLocale>[0]) => pickLocale(value, locale, LOCALES.defaultLocale);
+const date = educationDateLabel(data.year, data.month, locale);
+const expires = data.expires
+  ? educationDateLabel(Number(data.expires.slice(0, 4)), Number(data.expires.slice(5)), locale)
+  : undefined;
+const applied = text(data.appliedIn);
+const learnings = (data.learnings ?? []).map((entry) => text(entry)).filter(Boolean);
+const image = data.image ? { src: resolveEducationImage(id, data.image.file), alt: text(data.image.alt) } : undefined;
+---
+
+<li id={id} class="ed-item" data-education-item>
+  <p class="ed-meta">
+    <span class="ed-badge" data-kind={data.kind}>{t(locale, `education.kind.${data.kind}`)}</span>
+    <span>{date}</span>
+    {expires && <span>{t(locale, 'education.expires', { date: expires })}</span>}
+  </p>
+  <h3 class="ed-title">{data.title}</h3>
+  <p class="ed-issuer">{data.issuer}</p>
+  {applied && <p class="ed-applied"><strong>{t(locale, 'education.applied')}:</strong> {applied}</p>}
+  {image && (
+    <figure class="ed-figure">
+      <Image src={image.src} alt={image.alt} loading="lazy" widths={[448, 896]} sizes="(min-width: 480px) 448px, 100vw" />
+    </figure>
+  )}
+  {data.url && (
+    <a class="ed-verify" href={data.url} {...externalLinkAttrs(data.url, site.url)}>
+      {t(locale, 'education.verify')}<ExternalHint href={data.url} locale={locale} />
+    </a>
+  )}
+  {learnings.length > 0 && (
+    <details class="ed-learned">
+      <summary>{t(locale, 'education.learned')}</summary>
+      <ul>
+        {learnings.map((point) => <li>{point}</li>)}
+      </ul>
+    </details>
+  )}
+</li>

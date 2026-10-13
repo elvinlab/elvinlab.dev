@@ -4,7 +4,7 @@
  * developer can take over through config + content only. Run via `pnpm test:white-label`.
  */
 import { spawnSync } from 'node:child_process';
-import { readdirSync, readFileSync, realpathSync, writeFileSync } from 'node:fs';
+import { existsSync, readdirSync, readFileSync, realpathSync, writeFileSync } from 'node:fs';
 import { basename, extname, join, resolve } from 'node:path';
 
 import { createFixtureWorkspace } from './fixture-workspace.ts';
@@ -129,6 +129,14 @@ try {
     fail(
       'reading progress (label, script or privacy wording) rendered although features.readingProgress is off',
     );
+  }
+  // The education timeline is off in the alternative config: no route, no item markup, no CSS.
+  if (
+    existsSync(join(workspace.web, 'dist/client/education')) ||
+    existsSync(join(workspace.web, 'dist/client/en/education')) ||
+    /data-education-item|\.ed-timeline/.test(rawHtml)
+  ) {
+    fail('the education timeline rendered although features.education is off');
   }
   // The experiment nudge is off in the alternative config: no card, floating copy, script, CSS or key.
   if (

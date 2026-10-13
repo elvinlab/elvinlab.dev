@@ -1,0 +1,104 @@
+---
+/**
+ * The `/education/` page for one locale and sort: the shared `PageHeader`, then a single-sided
+ * vertical timeline grouped by year (oldest year first; inside a year the optional `order` of the
+ * entry in `credentials.json`, then its id), with the sort switch, summary and pager of the shared listing kit only when
+ * the list is long enough to need them. Its CSS is one string (`education-styles.ts`) with only the
+ * parts this page renders. No JavaScript: the learnings use a native `<details>`.
+ */
+
+import { localizePath } from '@elvinlab/core';
+
+import {
+  EDUCATION_DEFAULT_SORT,
+  type EducationSort,
+  educationPath,
+  groupEducationByYear,
+  loadEducationPages,
+} from '@/features/credentials/index.ts';
+import { introText } from '@/features/portfolio/index.ts';
+import { site } from '@/shared/config/index.ts';
+import { LOCALES, type Locale, t } from '@/shared/i18n/index.ts';
+import BaseLayout from '@/shared/layout/BaseLayout.astro';
+import ListingSummary from '@/shared/ui/ListingSummary.astro';
+import PageHeader from '@/shared/ui/PageHeader.astro';
+import Pager from '@/shared/ui/Pager.astro';
+import SortSwitch from '@/shared/ui/SortSwitch.astro';
+
+import EducationEntry from './EducationEntry.astro';
+import { educationCss } from './education-styles.ts';
+
+/** `sort` is set on the pages of a sort that is not the default one; they are not indexed. */
+type Props = { locale: Locale; page?: number; sort?: EducationSort };
+
+const { locale, page = 1, sort: requested } = Astro.props;
+const { entries, pages, sort, offered } = await loadEducationPages(requested);
+const current = pages.find((candidate) => candidate.page === page);
+if (!current) throw new Error(`/education/ has no page ${page} (${pages.length} in total)`);
+const paged = page > 1;
+const href = (target: number, forSort: EducationSort | undefined = requested): string =>
+  localizePath(educationPath(target, forSort), locale, LOCALES);
+const pageUrl = (target: number): string => new URL(href(target), site.url).href;
+const sortLabel = t(locale, `listing.sort.${sort}`);
+const title = requested
+  ? t(locale, paged ? 'education.sorted.page.title' : 'education.sorted.title', { sort: sortLabel, page })
+  : paged
+    ? t(locale, 'education.page.title', { page })
+    : t(locale, 'education.title');
+const description = requested
+  ? t(locale, 'education.sorted.description', { sort: sortLabel, page, pages: pages.length })
+  : paged
+    ? t(locale, 'education.page.description', { page, pages: pages.length })
+    : t(locale, 'education.description');
+const intro = introText(site.education.intro, locale, LOCALES.defaultLocale, t(locale, 'education.intro'));
+const sortOptions = offered.map((key) => ({
+  key,
+  label: t(locale, `listing.sort.${key}`),
+  href: href(1, key === EDUCATION_DEFAULT_SORT ? undefined : key),
+}));
+const groups = groupEducationByYear(current.items);
+const css = educationCss({
+  timeline: groups.length > 0,
+  image: current.items.some(({ data }) => data.image !== undefined),
+  details: current.items.some(({ data }) => (data.learnings?.length ?? 0) > 0),
+  head: sortOptions.length > 1,
+  footer: pages.length > 1,
+  empty: entries.length === 0,
+});
+---
+
+<BaseLayout locale={locale} path={educationPath(page, requested)} title={title} description={description} noindex={requested !== undefined} pixelTitle>
+  {paged && <link slot="head" rel="prev" href={pageUrl(page - 1)} />}
+  {page < pages.length && <link slot="head" rel="next" href={pageUrl(page + 1)} />}
+  <style is:inline set:html={css} />
+  <PageHeader slot="banner" title={t(locale, 'education.title')} description={intro} stamp={t(locale, 'stamp.education')} />
+  <section class="ed-page">
+    {entries.length === 0 ? (
+      <p class="ed-empty">{t(locale, 'education.empty')}</p>
+    ) : (
+      <>
+        {sortOptions.length > 1 && (
+          <div class="ed-head">
+            <SortSwitch locale={locale} options={sortOptions} current={sort} label={t(locale, 'education.sort.label')} />
+          </div>
+        )}
+        <ol class="ed-timeline" aria-label={t(locale, 'education.list.label')}>
+          {groups.map(({ year, items }) => (
+            <li class="ed-year">
+              <h2 class="ed-year-label">{year}</h2>
+              <ul class="ed-items">
+                {items.map((entry) => <EducationEntry id={entry.id} data={entry.data} locale={locale} />)}
+              </ul>
+            </li>
+          ))}
+        </ol>
+        {pages.length > 1 && (
+          <footer class="ed-foot">
+            <ListingSummary locale={locale} from={current.from} to={current.to} total={current.total} />
+            <Pager locale={locale} page={page} pages={pages.length} href={href} label={t(locale, 'education.pager.label')} />
+          </footer>
+        )}
+      </>
+    )}
+  </section>
+</BaseLayout>

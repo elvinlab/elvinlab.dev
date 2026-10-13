@@ -107,6 +107,11 @@ Las descripciones vienen del esquema (`.describe()`), por eso están en inglés.
 | `experiments.defaultSort` | `'newest' \| 'oldest' \| 'title'` | no | `newest` | Order of the compact cards at `/experiments/`: `newest` (publication date, newest first), `oldest` or `title` (A to Z). Big (featured) pieces always lead page 1 whatever the sort. It must be one of `sorts`. |
 | `experiments.sorts` | `'newest' \| 'oldest' \| 'title'[]` | no | `["newest","oldest","title"]` | Sorts the visitor can choose, from `newest`, `oldest` and `title`. Each one except `defaultSort` is a static page (`/experiments/oldest/`, `/experiments/oldest/page/2/`) that search engines are told not to index and that stays out of the sitemap. A list of one sort shows no switch. |
 | `experiments.sortFrom` | `integer (min 2, max 48)` | no | `4` | The sort switch and the alternate-sort pages exist only when the compact cards (everything that is not a big piece) number at least this many; below it the order is not worth choosing. |
+| `education` | `object` | no | `{}` | Settings of the education timeline (`features.education`): pagination, the sort switch, the rows on `/me` and the page intro. Every key is optional and falls back to its default. |
+| `education.perPage` | `integer (min 4, max 48)` | no | `12` | Entries per page of `/education/`. The timeline is grouped by year inside each page; a second page exists only when the entries exceed this number (`/education/page/2/`). |
+| `education.sortFrom` | `integer (min 2, max 48)` | no | `4` | The sort switch (oldest first, newest first) and the page of the alternate order (`/education/newest/`, not indexed) exist only when the entries number at least this many; below it the timeline has a single order. |
+| `education.meRows` | `integer (min 1, max 6)` | no | `3` | Rows of the "Recent education" block on `/me`, newest first; each links to its entry on `/education/`. |
+| `education.intro` | `{ <locale>: string (max 200) }` | no |  | Optional intro under the title of `/education/`, per locale (the default locale is required). Omit it to use the interface default. Max 200 characters per locale. |
 | `changelog` | `object` | no | `{}` | Settings of the changelog (`features.changelog`). Every key is optional and falls back to its default. |
 | `changelog.perPage` | `integer (min 2, max 30)` | no | `4` | Release days per page of `/changelog/`. A release is one production day, so this counts days, not entries; a second page exists only when the days exceed this number (`/changelog/page/2/`). Page 1 opens its two newest days; the rest stay collapsed. |
 | `notes` | `object` | no | `{}` | Settings of the notes area (`features.blog`): the static topic pages. Every key is optional and falls back to its default. |
@@ -147,6 +152,7 @@ Las descripciones vienen del esquema (`.describe()`), por eso están en inglés.
 | `features.comments` | `boolean` | yes |  | Giscus comments on notes. Needs the `giscus` block below, otherwise nothing renders. |
 | `features.contact` | `boolean` | yes |  | The /contact form: off removes the route and the contact Action, hides the nav entry and every link to it (the legal pages and the subscription messages then name no Contact page), and keeps it out of the sitemap. |
 | `features.credentials` | `boolean` | yes |  | Certificates and degrees on /me. |
+| `features.education` | `boolean` | no | `true` | The /education timeline of degrees and certificates (`credentials.json`): off removes the routes, the nav entry, the /me block and the sitemap entries. |
 | `features.experiments` | `boolean` | yes |  | The experiments (projects) section and its pages. |
 | `features.changelog` | `boolean` | yes |  | Visitor-facing /changelog page: off removes the route, the footer link and the sitemap entry. |
 | `features.me` | `boolean` | yes |  | The /me recruiter page: off hides it from the nav, marks it noindex and keeps it out of the sitemap. |
@@ -228,11 +234,18 @@ Se agrupan por año, el más nuevo primero. Solo se muestran si `features.creden
 | --- | --- | --- | --- | --- |
 | `title` | `string (max 120)` | yes |  | Name of the certificate or degree (max 120 characters). |
 | `issuer` | `string (max 80)` | yes |  | Who issued it (max 80 characters). |
-| `kind` | `'degree' \| 'certificate'` | yes |  | Whether it is a degree or a certificate. |
+| `kind` | `'degree' \| 'certificate' \| 'professional'` | yes |  | Whether it is a degree, a course certificate or a professional certification. |
 | `year` | `integer (min 1970)` | yes |  | Year obtained; certificates are grouped by year, newest first. |
 | `month` | `integer (min 1, max 12)` | no |  | Optional month (1-12) to order items within a year. |
+| `order` | `integer (min 0)` | no |  | Optional editorial position inside its year on `/education/` (lower first). Entries without it follow, ordered by id. |
 | `url` | `URL` | no |  | Verification link (https only). |
 | `credentialId` | `string` | no |  | Credential id in kebab-case, if the issuer gives one. |
+| `image` | `object` | no |  | Optional public copy of the document. |
+| `image.file` | `string` | yes |  | File name inside `src/assets/education/` (a public copy of the document). |
+| `image.alt` | `string \| { <locale>: string }` | yes |  | What the image shows (max 140 characters). |
+| `learnings` | `string \| { <locale>: string }[] (max 8)` | no |  | Optional points learned; the entry gets a details block only when present. |
+| `appliedIn` | `string \| { <locale>: string }` | no |  | Optional note on where it was applied (max 160 characters). |
+| `expires` | `string` | no |  | Optional expiry as YYYY-MM, for certifications that lapse. |
 <!-- docs:end credentials -->
 
 ### Experimentos — `experiments.json`
@@ -520,6 +533,7 @@ Un texto demasiado largo desborda un botón, parte una entrada del menú en dos 
 | Key group | Limit (characters, in each language) | Where it appears |
 | --- | --- | --- |
 | `subscribe.*` | 200 | The subscription form, its messages and the confirmation pages |
+| `education.*` | 140 | Intro, labels and sort descriptions of `/education/` |
 | `experiments.*` | 140 | Intro and sort descriptions of `/experiments/` |
 | `author.*` | 130 | The author card on the home |
 | `me.*` | 110 | The `/me` page: headings, hints and labels |

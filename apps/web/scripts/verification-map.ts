@@ -182,11 +182,23 @@ const EXPERIMENTS = area(
   `${SRC}/shared/ui/SortSwitch.astro`,
   `${SRC}/shared/ui/ListingSummary.astro`,
 );
+// The education timeline: its routes, the credentials feature and data, the listing kit (add `assets/education/**` with the first document image).
+const EDUCATION = area(
+  `${SRC}/education-routes/**`,
+  `${SRC}/integrations/education-routes.ts`,
+  `${SRC}/features/credentials/**`,
+  `${SRC}/content/credentials.json`,
+  `${SRC}/shared/lib/listing.ts`,
+  `${SRC}/shared/ui/Pager.astro`,
+  `${SRC}/shared/ui/SortSwitch.astro`,
+  `${SRC}/shared/ui/ListingSummary.astro`,
+);
 const EVERY_PAGE = [
   ...NOTE_PAGE,
   ...HOME,
   ...ME,
   ...EXPERIMENTS,
+  ...EDUCATION,
   ...CONTACT,
   ...LEGAL,
   ...CHANGELOG,
@@ -367,6 +379,7 @@ export const CHECKS: readonly CheckDef[] = [
   e2e({ file: 'notes-topics.spec.ts', covers: NOTE_PAGE }),
   e2e({ file: 'performance.spec.ts', covers: EVERY_PAGE }),
   e2e({ file: 'experiments.spec.ts', covers: [...EXPERIMENTS, ...ME] }),
+  e2e({ file: 'education.spec.ts', covers: EDUCATION }),
   e2e({
     file: 'experiment-nudge.spec.ts',
     covers: [...NOTE_PAGE, ...HOME],

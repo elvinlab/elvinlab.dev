@@ -1,0 +1,10 @@
+---
+import EducationPage from './EducationPage.astro';
+import { laterPagePaths } from './static-paths.ts';
+
+export const getStaticPaths = laterPagePaths;
+
+const { page } = Astro.params;
+---
+
+<EducationPage locale="en" page={Number(page)} />

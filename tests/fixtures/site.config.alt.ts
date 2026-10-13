@@ -18,6 +18,7 @@ export const siteConfig = {
     comments: true,
     contact: true,
     credentials: true,
+    education: false,
     experiments: true,
     me: true,
     changelog: true,
