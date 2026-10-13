@@ -121,8 +121,9 @@ export function classifyPage(path: string): PageType {
     return 'result';
   // `/changelog/` and its later pages `/changelog/page/N/`.
   if (first === 'changelog' && (second === undefined || second === 'page')) return 'changelog';
-  // `/education/` and its later pages `/education/page/N/`; the alternate order stays `default` (noindex).
-  if (first === 'education' && (second === undefined || second === 'page')) return 'education';
+  // `/education/`, its later pages `/education/page/N/` and the alternate order `/education/<sort>/`
+  // (a noindex duplicate of the same timeline, so it weighs the same).
+  if (first === 'education') return 'education';
   if (second === undefined) {
     if (first === 'me' || first === 'experiments' || first === 'contact' || first === 'subscribe')
       return first;

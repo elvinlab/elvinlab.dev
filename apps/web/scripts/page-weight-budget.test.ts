@@ -64,7 +64,7 @@ describe('classifyPage', () => {
     ['/education/', 'education'],
     ['/en/education/', 'education'],
     ['/education/page/2/', 'education'],
-    ['/education/newest/', 'default'],
+    ['/education/newest/', 'education'],
   ])('%s is %s', (path, type) => {
     expect(classifyPage(path)).toBe(type);
   });

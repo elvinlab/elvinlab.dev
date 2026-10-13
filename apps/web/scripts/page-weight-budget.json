@@ -32,12 +32,12 @@
       }
     },
     "education": {
-      "why": "Education timeline: type badge, date, title, issuer per entry, the timeline CSS (about 2.7 KB, shipped only here) and the shared pager and sort switch. 2026-10-13 (E1/E2): style 57800 and html 92000 measured on 3 entries (style 57701, html 85531), with room for a full page of 12 entries (about 600 B each, plus the 440 B nav link); the alternate order and later pages are noindex duplicates and classify the same way as page 1 or as default. 2026-10-13 (education nav, 768 px header): style 57800 -> 58000 (measured 57972 B, overshoot +172 B: the visually hidden handle next to the brand mark between md and lg, about 270 B of inline CSS on every page, plus an overshoot the base commit already had on some page types). The six sections no longer fit one row at 768 px without hiding the handle, the minimum measured need plus small headroom.",
-      "styleBytes": 58000,
+      "why": "Education timeline: type badge, date, title, issuer per entry, the timeline CSS (about 2.7 KB, shipped only here) and the shared pager and sort switch. 2026-10-13 (E1/E2): style 57800 and html 92000 measured on 3 entries (style 57701, html 85531), with room for a full page of 12 entries (about 600 B each, plus the 440 B nav link); the alternate order and later pages are noindex duplicates and classify the same way as page 1 or as default. 2026-10-13 (education nav, 768 px header): style 57800 -> 58000 (measured 57972 B, overshoot +172 B: the visually hidden handle next to the brand mark between md and lg, about 270 B of inline CSS on every page, plus an overshoot the base commit already had on some page types). The six sections no longer fit one row at 768 px without hiding the handle, the minimum measured need plus small headroom. 2026-10-13 (real data): style 58000 -> 59200 (measured 58982 B, overshoot +982 B) once the entries carry a verification link (the DevTalles certificates), which adds the link CSS; html measured 88679 B on 5 entries. The alternate order `/education/<sort>/` now classifies as `education`, since it is the same timeline and exists from `sortFrom` entries.",
+      "styleBytes": 59200,
       "htmlBytes": 92000,
       "measured": {
-        "styleBytes": 57972,
-        "htmlBytes": 85849,
+        "styleBytes": 58982,
+        "htmlBytes": 88679,
         "date": "2026-10-13"
       }
     },

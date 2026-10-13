@@ -127,10 +127,20 @@ test('the Spanish and English pages are alternates of each other', async ({ page
   await expect(page.locator('html')).toHaveAttribute('lang', 'en');
 });
 
-test('the alternate order and later pages do not exist below the thresholds', async ({ page }) => {
-  for (const path of ['/education/newest/', '/en/education/newest/', '/education/page/2/']) {
+// Mirrors `education.sortFrom` and `education.perPage` in site.config.ts: the alternate order and the
+// second page exist only once the list is long enough, so the expectation follows the data.
+const SORT_FROM = 4;
+const PER_PAGE = 12;
+
+test('the alternate order and later pages exist only above the thresholds', async ({ page }) => {
+  const cases: [string, boolean][] = [
+    ['/education/newest/', credentials.length >= SORT_FROM],
+    ['/en/education/newest/', credentials.length >= SORT_FROM],
+    ['/education/page/2/', credentials.length > PER_PAGE],
+  ];
+  for (const [path, exists] of cases) {
     const response = await page.goto(path);
-    expect(response?.status(), path).toBe(404);
+    expect(response?.status(), path).toBe(exists ? 200 : 404);
   }
 });
 
