@@ -43,3 +43,10 @@ Route: delegated writer per task; parent reviews diffs and re-runs checks.
 - Gaps: no document images (no thumbnails on `/me`); mobile menu not visually reviewed beyond the e2e link check.
 
 Parent review: re-observed typecheck, lint, depcruise, build, check:page-weight (40/40), e2e:quick education + mobile-ux (69 passed). Writer also ran vitest (1600), js-budget, white-label, 6-spec e2e quick (154) and test:profiles (4 profiles). Not run: Lighthouse, 3-viewport e2e battery.
+
+## Follow-up with the owner (2026-10-13)
+- Real data loaded: seven credentials (3 DevTalles, 2 Udemy, 1 Platzi, 1 university degree) with verification links, document images (six) and learnings (six; the Udemy full-stack bootcamp has none: only third-party snippets found). The degree has no image yet: the page shows a ruled-paper typographic cover (CSS plus a pixel SVG, `aria-hidden`) until the owner provides it.
+- Decisions: default order is newest first (`/education/oldest/` is the alternate, from `sortFrom` entries); inside a year `order`, then month (unknown month = start of the year), then id; entries sit in two columns from 768 px. Keep the current pagination (`perPage` 12 + pager); no infinite scroll or lazy-load-with-animation: it would break `#id` anchors, SEO, the no-JS page and the JS budget. Images already lazy-load.
+- Checks observed after the last change: vitest 1602, typecheck, lint, e2e:quick education + overflow + a11y + cv-and-credentials + mobile-ux + view-transitions (161), check:page-weight 42/42, white-label, docs:config. Not run: Lighthouse, full 3-viewport e2e. The default flip and its tests were edited together (no separate RED).
+- Gotchas: (1) text of a pixel-font CSS variable written inside any file Tailwind scans (even a budget JSON) makes Tailwind emit it on every page (+24 B); (2) the white-label check now empties `credentials.json` because verification links carry the owner's handle; (3) a failed e2e leaves `test-results/` behind: remove it before measuring page weight.
+- Pending: public copy of the university document (owner), the Udemy bootcamp learnings (owner), visor `<dialog>` (X6) once documents are final.
