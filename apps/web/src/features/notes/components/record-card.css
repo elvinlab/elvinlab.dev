@@ -29,3 +29,8 @@
   top: -0.875rem;
   right: 0.75rem;
 }
+/* In the banner the card sits right under the floating navbar, so the stamp only grazes the corner
+   (it used to overhang by 14 px and touched the navbar, 4 px away). */
+.record-card-banner .record-stamp {
+  top: -0.25rem;
+}

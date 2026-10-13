@@ -4,7 +4,7 @@
  * developer can take over through config + content only. Run via `pnpm test:white-label`.
  */
 import { spawnSync } from 'node:child_process';
-import { readdirSync, readFileSync, realpathSync, writeFileSync } from 'node:fs';
+import { existsSync, readdirSync, readFileSync, realpathSync, writeFileSync } from 'node:fs';
 import { basename, extname, join, resolve } from 'node:path';
 
 import { createFixtureWorkspace } from './fixture-workspace.ts';
@@ -81,12 +81,14 @@ function collectServerText(dir: string): string {
 
 const workspace = createFixtureWorkspace(source, join(source, 'tests/fixtures/notes'));
 try {
-  // Swap identity (config) and identity-bearing content (experiments) for neutral fixtures.
+  // Swap identity (config) and identity-bearing content (experiments, credentials) for neutral fixtures.
   writeFileSync(
     join(workspace.web, 'src/site.config.ts'),
     readFileSync(join(source, 'tests/fixtures/site.config.alt.ts'), 'utf8'),
   );
   writeFileSync(join(workspace.web, 'src/content/experiments.json'), '{}\n');
+  // The owner's degrees and certificates (with their verification links) are identity-bearing too.
+  writeFileSync(join(workspace.web, 'src/content/credentials.json'), '{}\n');
   // The owner's changelog entries and release headlines must not reach a fork's build.
   writeFileSync(join(workspace.web, 'src/content/changelog.json'), '{}\n');
   writeFileSync(join(workspace.web, 'src/content/releases.json'), '{}\n');
@@ -123,6 +125,22 @@ try {
     )
   ) {
     fail('the reading mode rendered although features.readingMode is off');
+  }
+  // Reading progress is off in the alternative config: no label slot, script, stored key or privacy wording.
+  if (/data-progress-label|"progress:"|progress:&lt;/.test(rawHtml)) {
+    fail(
+      'reading progress (label, script or privacy wording) rendered although features.readingProgress is off',
+    );
+  }
+  // The education timeline is off in the alternative config: no route, no item markup, no CSS.
+  if (
+    existsSync(join(workspace.web, 'dist/client/education')) ||
+    existsSync(join(workspace.web, 'dist/client/en/education')) ||
+    /data-education-item|data-me-education|\.ed-timeline/.test(rawHtml)
+  ) {
+    fail(
+      'the education timeline rendered although features.education is off (or the /me block did)',
+    );
   }
   // The experiment nudge is off in the alternative config: no card, floating copy, script, CSS or key.
   if (

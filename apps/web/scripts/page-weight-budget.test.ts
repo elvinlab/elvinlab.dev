@@ -61,6 +61,10 @@ describe('classifyPage', () => {
     ['/changelog/', 'changelog'],
     ['/en/changelog/', 'changelog'],
     ['/changelog/page/2/', 'changelog'],
+    ['/education/', 'education'],
+    ['/en/education/', 'education'],
+    ['/education/page/2/', 'education'],
+    ['/education/newest/', 'education'],
   ])('%s is %s', (path, type) => {
     expect(classifyPage(path)).toBe(type);
   });

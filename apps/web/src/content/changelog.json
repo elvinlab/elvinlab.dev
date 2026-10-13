@@ -808,5 +808,131 @@
     "category": "fixed",
     "title": "With reduced motion, entrance animations do not run",
     "description": "The fade-in-and-rise entrance of the page cards and the author photo was shortened to 0.01 ms for visitors who ask for less motion, but still left the elements transparent and 8 px low for their first frames and for their 100 to 250 ms delay. It no longer runs at all in that case, so the content is in place from the first frame. A test covers it."
+  },
+  "stamp-phone-spacing": {
+    "date": "2026-10-13",
+    "category": "fixed",
+    "title": "The page stamp no longer crowds the title on phones",
+    "description": "On narrow screens the rotated stamp above the page title (Experiments, Contact, Changelog and the other inner pages) sat almost touching the heading. The gap is now 20 px instead of 12 px."
+  },
+  "reading-progress": {
+    "date": "2026-10-13",
+    "category": "added",
+    "title": "Notes remember where you stopped",
+    "description": "If you leave a note halfway, coming back puts you where you were. Once you read 90% of a note, the notes index, the home notebook and the latest-note card mark it as read; a note you started shows 'Continue reading'. It is all stored in your browser (nothing leaves it) and can be switched off with features.readingProgress."
+  },
+  "education-page": {
+    "date": "2026-10-13",
+    "category": "added",
+    "title": "Education page",
+    "description": "A new Education page (/education/) lists my degrees and certificates as a timeline by year, with a link in the menu. /me now shows a short Recent education block that links to each entry. Adopters can switch it off with features.education and tune it with the education block of the site config."
+  },
+  "education-document-viewer": {
+    "date": "2026-10-13",
+    "category": "added",
+    "title": "Education document viewer",
+    "description": "On the Education page the document thumbnails are smaller and open a larger copy in a viewer you can close with Esc, the Close button or a click outside it; without JavaScript they open the image itself. The text now sits next to the document on wide screens, and the Learned block shows a small arrow that tells it opens."
+  },
+  "education-pixel-buttons": {
+    "date": "2026-10-13",
+    "category": "changed",
+    "title": "Pixel buttons on Education",
+    "description": "The buttons of the Education page now have a small pixel look: stepped corners and a pixel X on the viewer close button, pixel corner brackets and a plus on the document thumbnails, pixel arrows on Verify and on the Learned block, and stepped corners on the sort switch. The viewer opens with a short stepped dissolve and the details respond to hover and focus in two or three steps. With reduced motion nothing moves and the states stay visible through color and outline."
+  },
+  "experiments-pixel-buttons": {
+    "date": "2026-10-13",
+    "category": "changed",
+    "title": "Pixel buttons on Experiments",
+    "description": "The read-the-case button and the Live site and Code links of the Experiments page now share the pixel look of Education: stepped corners, a pixel arrow that moves two pixels in two steps on hover and focus, a darker fill and a one-pixel lift on the button, and a tinted pill on the links. Keyboard focus drops the corners so the ring stays whole. On phones the button takes the full row and the two links sit side by side below it."
+  },
+  "experiments-rail-and-result": {
+    "date": "2026-10-13",
+    "category": "changed",
+    "title": "Clearer screenshots and results on Experiments",
+    "description": "The small previews under each screenshot on the Experiments page now have a visible edge in both themes instead of fading into the card, and the one you are viewing gets a clear violet outline. In every piece the Result is set off from the Problem and My part with a violet rule on the left, a violet label and larger text in the full text color."
+  },
+  "stamp-below-navbar": {
+    "date": "2026-10-13",
+    "category": "fixed",
+    "title": "The page stamp no longer touches the navbar on desktop",
+    "description": "From tablet width up, the rotated stamp at the top right of the header of Experiments, Contact, Changelog, Education and the topic pages hung against the bottom edge of the floating navbar. It now sits 20 px below it. The stamp keeps its place above the title on phones."
+  },
+  "experiments-notebook-panel": {
+    "date": "2026-10-13",
+    "category": "changed",
+    "title": "Experiments read like a lab notebook",
+    "description": "On the Experiments page the text of each piece no longer sits in a dark card: it rests directly on the page, separated by space and the thin line between pieces. Each piece now opens with an entry label like Experiment 001, in the notebook mono face with the number in pink, the same way notes are numbered. The number is stable: it is the position by publication date, so a piece keeps it in every sort and page."
+  },
+  "decision-stamp-below-navbar": {
+    "date": "2026-10-13",
+    "category": "fixed",
+    "title": "The decision stamp no longer touches the navbar on notes",
+    "description": "On a note, from desktop width up, the DECISION stamp on the decision record in the banner hung 14 px above its card and ended 4 px under the floating navbar. It now only grazes the card corner and keeps about 17 px of air. Tablets and phones are unchanged."
+  },
+  "experiments-hover-feedback": {
+    "date": "2026-10-13",
+    "category": "changed",
+    "title": "Clearer hover on the Experiments screenshots",
+    "description": "On the Experiments page, hovering or focusing a screenshot thumbnail now turns its edge violet and lifts it 1 px in two quick steps; the selected one stays put. Hovering or focusing the big screenshot grows the four corner brackets by 4 px and turns them violet. Nothing shifts the layout, and with reduced motion only the color changes."
+  },
+  "notes-index-reading-path": {
+    "date": "2026-10-13",
+    "category": "changed",
+    "title": "The notes index reads as a reading path",
+    "description": "Each row on the notes index now shows the title first, then the date and the reading time on one line, the excerpt and at most three chips (the category and two tags; search still finds every tag). The Start here block is now a compact strip of three titles, so the list starts about 210 px higher on desktop and 300 px on phones."
+  },
+  "notes-index-controls": {
+    "date": "2026-10-13",
+    "category": "changed",
+    "title": "Read marks and pixel controls on the notes index",
+    "description": "A note you finished now shows a pixel check next to its number and one you started a half-filled marker, each with its label in the accent color. Chips, the Topics strip and the search field have notched pixel corners and two-step hover motion (none with reduced motion). The search shows a live result count, and an empty search shows what you typed and a button that clears it."
+  },
+  "notes-sidebar-tags": {
+    "date": "2026-10-13",
+    "category": "changed",
+    "title": "A shorter tag list on the notes index",
+    "description": "The sidebar of the notes index now shows the 12 most used tags and keeps the rest behind a \"More tags\" line that opens in place, with no script needed to toggle it. If you arrive with a tag filter that is one of the hidden tags, the list opens on its own so you can see it."
+  },
+  "navbar-accessibility": {
+    "date": "2026-10-13",
+    "category": "fixed",
+    "title": "Navbar: skip link, 360 px bar and announced states",
+    "description": "The skip link now jumps past the navbar to the content, the bar stays on one row from 320 px, the theme toggle and background picker announce their state, and the phone menu moves focus into itself, hides the page behind it and shows a close icon while open."
+  },
+  "navbar-surface-and-marker": {
+    "date": "2026-10-13",
+    "category": "changed",
+    "title": "Navbar: a solid bar and a marker for the current page",
+    "description": "The navbar bar is now almost opaque with a thin edge in both themes, so page content no longer shows through after scrolling, and the current section is marked with a small purple pixel bar under its label (a bar at the left edge in the phone menu), so color is no longer the only cue."
+  },
+  "navbar-menu-and-tablet": {
+    "date": "2026-10-13",
+    "category": "changed",
+    "title": "Navbar: a pixel-notched phone menu and the wordmark on tablets",
+    "description": "The phone menu is now a card with stepped pixel corners and the bar's thin edge, opens with a short stepped dissolve (none with reduced motion) and dims the page behind it; tapping the dimmed page closes it. From 780 px the bar shows the wordmark next to the logo, and below that the logo link is a 44 px target."
+  },
+  "navbar-pixel-identity": {
+    "date": "2026-10-13",
+    "category": "changed",
+    "title": "Navbar: pixel states and pixel icons",
+    "description": "Every navbar control now shows a stepped, notched fill on hover and keyboard focus, a square 2 px focus ring and a 1 px press instead of the soft rounded tint and shrink. The theme, background and menu icons are redrawn as crisp pixel glyphs. With reduced motion the states appear at once, without movement."
+  },
+  "education-real-credentials": {
+    "date": "2026-10-13",
+    "category": "added",
+    "title": "Education lists the real credentials",
+    "description": "The Education page now shows seven credentials: the university degree and six courses from DevTalles, Udemy and Platzi. Each one has its certificate image, a verification link and what the course covered. The degree shows a typographic cover until its document is available."
+  },
+  "education-order-and-layout": {
+    "date": "2026-10-13",
+    "category": "changed",
+    "title": "Education: newest first, a working sort switch and a two-column layout",
+    "description": "The timeline now lists the newest credential first and orders a year by month. The Newest and Oldest switch works both ways (it used to link to the page you were already on). On desktop the document sits beside the text instead of leaving the right half empty."
+  },
+  "back-to-top-clear-of-navbar": {
+    "date": "2026-10-13",
+    "category": "fixed",
+    "title": "Back to top no longer overlaps the navbar",
+    "description": "At the very bottom of a page on a small phone, the back to top button lifted above the taller footer could end up under the navbar's menu button. It now keeps a gap below the bar and stays hidden when there is no room, and the footer is a little tighter on narrow phones (320 to 389 px)."
   }
 }

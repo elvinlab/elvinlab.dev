@@ -99,10 +99,10 @@ const preloadedFonts = pixelTitle ? [pixelifySansLatin] : [];
       {t(locale, 'skip.content')}
     </a>
     <SiteNotice locale={locale} />
+    <div class="sticky top-0 z-40 mx-auto max-w-[1200px] px-3 md:px-4" data-site-chrome>
+      <Navbar locale={locale} translations={translations} />
+    </div>
     <main id="main" tabindex="-1" class="outline-none">
-      <div class="sticky top-0 z-40 mx-auto max-w-[1200px] px-3 md:px-4" data-site-chrome>
-        <Navbar locale={locale} translations={translations} />
-      </div>
       {hasBanner ? (
         <div class="-mt-18" data-banner-offset><slot name="banner" /></div>
       ) : (

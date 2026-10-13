@@ -23,10 +23,12 @@ const valid = {
     comments: false,
     contact: true,
     credentials: true,
+    education: true,
     experiments: true,
     me: true,
     changelog: true,
     readingMode: true,
+    readingProgress: true,
     marks: true,
     subscribe: false,
   },
@@ -573,7 +575,14 @@ describe('interface switches', () => {
     ...valid,
     features: { ...valid.features, ...extra },
   });
-  const keys = ['backToTop', 'languageHint', 'themeToggle', 'backgroundPicker'] as const;
+  const keys = [
+    'backToTop',
+    'languageHint',
+    'themeToggle',
+    'backgroundPicker',
+    'readingProgress',
+    'education',
+  ] as const;
 
   it("defaults every switch to on so existing configs keep today's interface", () => {
     const parsed = parseSiteConfig(valid);
@@ -586,6 +595,43 @@ describe('interface switches', () => {
 
   it.each(keys)('rejects a non-boolean %s', (key) => {
     expect(() => parseSiteConfig(withFeatures({ [key]: 'no' as never }))).toThrow();
+  });
+});
+
+describe('education block', () => {
+  const withEducation = (education: unknown) => ({ ...valid, education });
+
+  it('is optional and defaults to 12 per page, a sort switch from 4 entries and 3 rows on /me', () => {
+    const defaults = { perPage: 12, sortFrom: 4, meRows: 3 };
+    expect(parseSiteConfig(valid).education).toEqual(defaults);
+    expect(parseSiteConfig(withEducation({})).education).toEqual(defaults);
+  });
+
+  it('accepts values inside the ranges and a localized intro', () => {
+    const parsed = parseSiteConfig(
+      withEducation({ perPage: 24, sortFrom: 6, meRows: 5, intro: { es: 'Mi camino.' } }),
+    );
+    expect(parsed.education).toMatchObject({ perPage: 24, sortFrom: 6, meRows: 5 });
+    expect(parsed.education.intro).toEqual({ es: 'Mi camino.' });
+  });
+
+  it('rejects values outside the ranges, non-integers, a long intro and unknown keys', () => {
+    for (const bad of [
+      { perPage: 3 },
+      { perPage: 49 },
+      { perPage: 12.5 },
+      { sortFrom: 1 },
+      { meRows: 0 },
+      { meRows: 7 },
+      { intro: { es: 'x'.repeat(201) } },
+      { perpage: 10 },
+    ]) {
+      expect(() => parseSiteConfig(withEducation(bad)), JSON.stringify(bad)).toThrow();
+    }
+  });
+
+  it('requires the intro in the default locale', () => {
+    expect(() => parseSiteConfig(withEducation({ intro: { en: 'My path.' } }))).toThrow();
   });
 });
 

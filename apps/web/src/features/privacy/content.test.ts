@@ -280,3 +280,25 @@ describe('buildPrivacyContent without a contact page', () => {
     expect(without.en.sections.map((section) => section.id)).toContain('subscribe');
   });
 });
+
+describe('buildPrivacyContent with readingProgress', () => {
+  const withProgress = buildPrivacyContent({ ...input, readingProgress: true });
+  const storageBody = (page: PrivacyContent): string =>
+    page.sections.find((section) => section.id === 'local-storage')?.body ?? '';
+
+  it('says nothing about reading progress unless the feature is on', () => {
+    expect(everyText(content)).not.toMatch(/progress:|progreso de lectura|reading progress/i);
+  });
+
+  it('declares the per-note key and what it holds, in both locales', () => {
+    expect(storageBody(withProgress.es)).toContain('progress:&lt;nota&gt;');
+    expect(storageBody(withProgress.es)).toMatch(/hasta dónde/);
+    expect(storageBody(withProgress.en)).toContain('progress:&lt;note&gt;');
+    expect(storageBody(withProgress.en)).toMatch(/how far/);
+  });
+
+  it('keeps the other preferences untouched', () => {
+    expect(storageBody(withProgress.es)).toContain('cuatro');
+    expect(storageBody(withProgress.en)).toContain('four');
+  });
+});

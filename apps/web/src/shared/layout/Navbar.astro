@@ -2,6 +2,11 @@
 /**
  * Sticky 72 px navbar card. Sections follow the feature flags; under `md` they collapse into a
  * disclosure menu. The language link and theme toggle (when its switch is on) stay visible at every width.
+ * From 768 to 779 px the handle next to the brand mark is visually hidden (it stays the home link's
+ * accessible name, and the link grows to a 44 px square) so the six sections and the controls fit one
+ * row; from 780 px it shows, with tighter link padding up to 863 px (rules in `global.css`).
+ * The menu panel is drawn by `#nav-menu::before/::after` (notched edge and face) and the scrim sits
+ * before the header so it covers the viewport below the bar.
  */
 
 import { getCollection } from 'astro:content';
@@ -40,16 +45,17 @@ const { href: otherHref, kind: otherKind } = resolveLocaleTarget({
 });
 const switchLabel = t(locale, otherKind === 'home-fallback' ? 'language.switch.home' : 'language.switch');
 const linkClass =
-  'flex h-11 items-center rounded-control px-3 md:px-2 font-medium transition-colors duration-150 hover:bg-card-hover active:scale-96 aria-[current=page]:text-primary';
+  'flex h-11 items-center px-3 md:px-2 font-medium aria-[current=page]:text-primary';
 ---
 
+<div data-nav-scrim hidden></div>
 <header data-navbar class="transition-transform duration-300 will-change-transform">
   <nav
     aria-label={t(locale, 'nav.label')}
-    class="relative flex min-h-18 flex-wrap items-center gap-x-1 rounded-b-card bg-card/70 px-3 backdrop-blur-md md:gap-1 md:px-3"
+    class="relative flex min-h-18 flex-wrap items-center gap-x-1 rounded-b-card bg-card/92 px-3 backdrop-blur-md md:gap-1 md:px-3"
   >
-    <a href={localizePath('/', locale, LOCALES)} class="group mr-auto flex h-11 min-w-0 items-center gap-2 rounded-control px-1 font-retro text-xs active:scale-96">
-      <BrandMark />{site.identity.handle}
+    <a href={localizePath('/', locale, LOCALES)} class="group mr-auto flex h-11 min-w-0 items-center gap-2 px-1 font-retro text-xs">
+      <BrandMark /><span>{site.identity.handle}</span>
     </a>
 
     <ul class="hidden items-center gap-1 md:flex">
@@ -62,25 +68,25 @@ const linkClass =
       href={otherHref}
       hreflang={otherLocale}
       lang={otherLocale}
-      class="grid h-11 min-w-11 shrink-0 place-items-center rounded-control px-2 font-mono text-sm uppercase transition-colors duration-150 hover:bg-card-hover active:scale-96"
+      class="grid h-11 min-w-11 shrink-0 place-items-center px-2 font-mono text-sm uppercase"
       aria-label={switchLabel}
     >
       {otherLocale}
     </a>
     {site.features.themeToggle && <ThemeToggle label={t(locale, 'theme.switch')} />}
-    {site.features.backgroundPicker && <BackgroundPicker label={t(locale, 'background.switch')} />}
+    {site.features.backgroundPicker && <BackgroundPicker label={t(locale, 'background.switch')} locale={locale} />}
     <button
       type="button"
-      class="grid size-11 shrink-0 place-items-center rounded-control transition-colors duration-150 hover:bg-card-hover active:scale-96 md:hidden"
+      class="grid size-11 shrink-0 place-items-center md:hidden"
       aria-label={t(locale, 'nav.menu')}
       aria-expanded="false"
       aria-controls="nav-menu"
       data-nav-toggle
     >
-      <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"></path></svg>
+      <svg viewBox="0 0 10 10" width="20" height="20" fill="currentColor" shape-rendering="crispEdges" aria-hidden="true"><path data-icon="menu" d="M0 1h10v2H0zM0 4h10v2H0zM0 7h10v2H0z"></path><path data-icon="close" class="hidden" d="M0 0h2v1H0zM8 0h2v1H8zM1 1h2v1H1zM7 1h2v1H7zM2 2h2v1H2zM6 2h2v1H6zM3 3h4v1H3zM4 4h2v2H4zM3 6h4v1H3zM2 7h2v1H2zM6 7h2v1H6zM1 8h2v1H1zM7 8h2v1H7zM0 9h2v1H0zM8 9h2v1H8z"></path></svg>
     </button>
 
-    <ul id="nav-menu" hidden class="absolute inset-x-0 top-full mt-2 flex flex-col gap-1 rounded-card bg-card p-2 md:hidden">
+    <ul id="nav-menu" hidden class="absolute inset-x-0 top-full mt-2 flex flex-col gap-1 p-2 md:hidden">
       {items.map((item) => (
         <li><a href={item.href} class={linkClass} aria-current={item.current ? 'page' : undefined} hreflang={item.hreflang}>{item.label}</a></li>
       ))}
@@ -91,11 +97,21 @@ const linkClass =
 <script>
   const toggle = document.querySelector<HTMLButtonElement>('[data-nav-toggle]');
   const menu = document.getElementById('nav-menu');
+  const scrim = document.querySelector<HTMLElement>('[data-nav-scrim]');
+
+  // While the menu is open the content behind it (everything but the navbar) is inert.
+  const behind = document.querySelectorAll<HTMLElement>('main, body > [data-site-chrome]:not(:has([data-navbar]))');
 
   const setOpen = (open: boolean): void => {
     if (!toggle || !menu) return;
     toggle.setAttribute('aria-expanded', String(open));
     menu.hidden = !open;
+    if (scrim) scrim.hidden = !open;
+    for (const icon of toggle.querySelectorAll<SVGPathElement>('[data-icon]')) {
+      icon.classList.toggle('hidden', icon.dataset['icon'] === (open ? 'menu' : 'close'));
+    }
+    for (const region of behind) region.inert = open;
+    if (open) menu.querySelector('a')?.focus();
   };
 
   toggle?.addEventListener('click', () => setOpen(menu?.hidden === true));
@@ -104,6 +120,10 @@ const linkClass =
       setOpen(false);
       toggle?.focus();
     }
+  });
+  // Content behind an open menu is inert, so a click there lands on the page itself: close.
+  document.addEventListener('click', (event) => {
+    if (menu && !menu.hidden && !(event.target as Element).closest('[data-navbar]')) setOpen(false);
   });
 
   // Auto-hide the navbar on scroll down, reveal on scroll up (past a small threshold). It never

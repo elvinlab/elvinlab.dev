@@ -10,6 +10,7 @@ export type E2eRoutes = Readonly<{
   contact: boolean;
   changelog: boolean;
   experiments: boolean;
+  education: boolean;
   subscribe: boolean;
   me: boolean;
 }>;
@@ -27,7 +28,7 @@ export type E2eProfile = Readonly<{
  * applies the same overrides as the fixture patches (`fixture-workspace.ts`): `features.subscribe`
  * is forced on and `appearance` can be overridden (`FIXTURE_APPEARANCE`). Routes follow how
  * `astro.config.ts` injects them: the notes routes need `blog`, the subscribe routes need `blog`
- * and `subscribe`, and contact, changelog and experiments follow their own flag.
+ * and `subscribe`, and contact, changelog, experiments and education follow their own flag.
  */
 export function resolveE2eProfile(
   input: unknown,
@@ -55,6 +56,7 @@ export function resolveE2eProfile(
       contact: features.contact,
       changelog: features.changelog,
       experiments: features.experiments,
+      education: features.education,
       subscribe: features.blog && features.subscribe,
       me: true,
     },

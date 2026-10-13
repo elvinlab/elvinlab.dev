@@ -92,7 +92,7 @@ Así se trabaja aquí: cada tarea es un *issue* escrito como un brief de delegac
 - **Modo lectura** opcional en cada nota: una sola columna, sin banner animado ni barra lateral, para leer cómodo en móvil y escritorio.
 - **Comentarios y reacciones** con Giscus, cargados solo al llegar a ellos.
 - **Tarjetas al compartir** propias para cada nota y para `/me`, generadas al compilar.
-- **`/me`**: portafolio con experiencia, certificados y experimentos; se imprime limpio a PDF.
+- **`/me`**: portafolio con experiencia, formación y experimentos; se imprime limpio a PDF.
 - **Formulario de contacto** seguro: Turnstile, límite de envíos y falla cerrado si falta configuración.
 - **Changelog público**, **páginas de privacidad y términos** y **tema claro/oscuro** con fondos animados elegibles.
 - **Aspecto configurable**: el preset `appearance` (`minimal` o `full`) fija la escala tipográfica, la altura de los banners y el detalle de las notas, y `home` activa o apaga cada sección de la portada.
@@ -113,10 +113,12 @@ Todo lo opcional es un interruptor en [`site.config.ts`](apps/web/src/site.confi
 | `contact` | El formulario `/contact` | secretos de Turnstile y de correo (falla cerrado sin ellos) |
 | `me` | La página de portafolio `/me` | |
 | `credentials` | Certificados y títulos en `/me` | |
+| `education` | Página `/education/` y bloque «Formación reciente» de `/me` | |
 | `experiments` | `/experiments` y sus secciones en la home y en `/me` | |
 | `experimentNudge` | La tarjeta del último experimento (apagada por defecto) | `experiments` |
 | `changelog` | El `/changelog` público | |
 | `readingMode` | El modo lectura en las notas | |
+| `readingProgress` | Recuerda dónde te quedaste en una nota y marca las leídas | |
 | `marks` | El botón de huella "estuve aquí" | una base D1 y un limitador de envíos |
 | `subscribe` | Suscripción por correo con doble confirmación | `blog`, D1, secretos de Turnstile y de correo |
 | `backToTop`, `languageHint`, `themeToggle`, `backgroundPicker` | Detalles de interfaz (encendidos por defecto) | |

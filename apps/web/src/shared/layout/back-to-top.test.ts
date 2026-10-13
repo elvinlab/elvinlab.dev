@@ -1,6 +1,14 @@
 import { describe, expect, it } from 'vitest';
 
-import { IDLE_HIDE_MS, liftAboveFooter, nextVisibility, shouldAutoHide } from './back-to-top.ts';
+import {
+  BAR_GAP_PX,
+  BUTTON_SIZE_PX,
+  fitsBelowBar,
+  IDLE_HIDE_MS,
+  liftAboveFooter,
+  nextVisibility,
+  shouldAutoHide,
+} from './back-to-top.ts';
 
 describe('nextVisibility', () => {
   it('stays hidden near the top and while reading downwards', () => {
@@ -39,6 +47,40 @@ describe('liftAboveFooter', () => {
 
   it('lifts by the part of the footer that is on screen', () => {
     expect(liftAboveFooter({ viewportHeight: 800, footerTop: 500 })).toBe(300);
+  });
+});
+
+describe('fitsBelowBar', () => {
+  const base = { viewportHeight: 740, base: 16, barBottom: 72 };
+
+  it('fits when the button is not lifted at all', () => {
+    expect(fitsBelowBar({ ...base, lift: 0 })).toBe(true);
+  });
+
+  it('fits while its top stays at least the gap below the bar', () => {
+    // top = 740 - 16 - lift - 44 = 680 - lift; the ceiling is 72 + 8 = 80, so the last lift that fits is 600.
+    expect(BUTTON_SIZE_PX).toBe(44);
+    expect(BAR_GAP_PX).toBe(8);
+    expect(fitsBelowBar({ ...base, lift: 600 })).toBe(true);
+  });
+
+  it('does not fit one pixel past the ceiling: the lift needed to clear the footer would reach the bar', () => {
+    expect(fitsBelowBar({ ...base, lift: 601 })).toBe(false);
+    expect(fitsBelowBar({ ...base, lift: 607 })).toBe(false);
+  });
+
+  it('counts the reading mode base offset', () => {
+    expect(fitsBelowBar({ ...base, base: 64, lift: 552 })).toBe(true);
+    expect(fitsBelowBar({ ...base, base: 64, lift: 553 })).toBe(false);
+  });
+
+  it('never fits in a viewport shorter than the button plus the bar', () => {
+    expect(fitsBelowBar({ viewportHeight: 120, lift: 0, base: 16, barBottom: 72 })).toBe(false);
+  });
+
+  it('takes the bar height as given, so a taller bar leaves less room', () => {
+    expect(fitsBelowBar({ ...base, barBottom: 90, lift: 582 })).toBe(true);
+    expect(fitsBelowBar({ ...base, barBottom: 90, lift: 583 })).toBe(false);
   });
 });
 

@@ -1,0 +1,123 @@
+---
+/**
+ * The `/education/` page for one locale and sort: the shared `PageHeader`, then a single-sided
+ * vertical timeline grouped by year (newest year first; inside a year the optional `order` of the
+ * entry in `credentials.json`, then its id), with the sort switch, summary and pager of the shared listing kit only when
+ * the list is long enough to need them. Its CSS is one string (`education-styles.ts`) with only the
+ * parts this page renders. The learnings use a native `<details>`; the only script is the tiny inline document viewer
+ * (`education-viewer.ts`), emitted only when an entry has an image.
+ */
+
+import { localizePath } from '@elvinlab/core';
+
+import {
+  type EducationSort,
+  educationPath,
+  groupEducationByYear,
+  loadEducationPages,
+} from '@/features/credentials/index.ts';
+import { introText } from '@/features/portfolio/index.ts';
+import { site } from '@/shared/config/index.ts';
+import { LOCALES, type Locale, t } from '@/shared/i18n/index.ts';
+import BaseLayout from '@/shared/layout/BaseLayout.astro';
+import ListingSummary from '@/shared/ui/ListingSummary.astro';
+import PageHeader from '@/shared/ui/PageHeader.astro';
+import Pager from '@/shared/ui/Pager.astro';
+import SortSwitch from '@/shared/ui/SortSwitch.astro';
+
+import EducationEntry from './EducationEntry.astro';
+import { educationCss } from './education-styles.ts';
+import { educationViewerScript } from './education-viewer.ts';
+
+/** `sort` is set on the pages of a sort that is not the default one; they are not indexed. */
+type Props = { locale: Locale; page?: number; sort?: EducationSort };
+
+const { locale, page = 1, sort: requested } = Astro.props;
+const { entries, pages, sort, offered } = await loadEducationPages(requested);
+const current = pages.find((candidate) => candidate.page === page);
+if (!current) throw new Error(`/education/ has no page ${page} (${pages.length} in total)`);
+const paged = page > 1;
+const href = (target: number, forSort: EducationSort | undefined = requested): string =>
+  localizePath(educationPath(target, forSort), locale, LOCALES);
+const pageUrl = (target: number): string => new URL(href(target), site.url).href;
+const sortLabel = t(locale, `listing.sort.${sort}`);
+const title = requested
+  ? t(locale, paged ? 'education.sorted.page.title' : 'education.sorted.title', { sort: sortLabel, page })
+  : paged
+    ? t(locale, 'education.page.title', { page })
+    : t(locale, 'education.title');
+const description = requested
+  ? t(locale, 'education.sorted.description', { sort: sortLabel, page, pages: pages.length })
+  : paged
+    ? t(locale, 'education.page.description', { page, pages: pages.length })
+    : t(locale, 'education.description');
+const intro = introText(site.education.intro, locale, LOCALES.defaultLocale, t(locale, 'education.intro'));
+const sortOptions = offered.map((key) => ({
+  key,
+  label: t(locale, `listing.sort.${key}`),
+  // The key itself: `educationPath` collapses the default order to the base page (an `undefined` here
+  // would fall back to the order being viewed and the option would point at the current page).
+  href: href(1, key),
+}));
+const groups = groupEducationByYear(current.items);
+const hasImage = current.items.some(({ data }) => data.image !== undefined);
+const css = educationCss({
+  timeline: groups.length > 0,
+  image: hasImage,
+  cover: current.items.some(({ data }) => data.image === undefined),
+  details: current.items.some(({ data }) => (data.learnings?.length ?? 0) > 0),
+  head: sortOptions.length > 1,
+  footer: pages.length > 1,
+  empty: entries.length === 0,
+});
+---
+
+<BaseLayout locale={locale} path={educationPath(page, requested)} title={title} description={description} noindex={requested !== undefined} pixelTitle>
+  {paged && <link slot="head" rel="prev" href={pageUrl(page - 1)} />}
+  {page < pages.length && <link slot="head" rel="next" href={pageUrl(page + 1)} />}
+  <style is:inline set:html={css} />
+  <PageHeader slot="banner" title={t(locale, 'education.title')} description={intro} stamp={t(locale, 'stamp.education')} />
+  <section class="ed-page">
+    {entries.length === 0 ? (
+      <p class="ed-empty">{t(locale, 'education.empty')}</p>
+    ) : (
+      <>
+        {sortOptions.length > 1 && (
+          <div class="ed-head">
+            <SortSwitch locale={locale} options={sortOptions} current={sort} label={t(locale, 'education.sort.label')} />
+          </div>
+        )}
+        <ol class="ed-timeline" aria-label={t(locale, 'education.list.label')}>
+          {groups.map(({ year, items }) => (
+            <li class="ed-year">
+              <h2 class="ed-year-label">{year}</h2>
+              <ul class="ed-items">
+                {items.map((entry) => <EducationEntry id={entry.id} data={entry.data} locale={locale} />)}
+              </ul>
+            </li>
+          ))}
+        </ol>
+        {hasImage && (
+          <>
+            <dialog class="ed-viewer" data-ed-viewer aria-label={t(locale, 'education.viewer.label')}>
+              <form method="dialog">
+                <button type="submit" class="ed-viewer-close">
+                  <svg aria-hidden="true" viewBox="0 0 7 7" width="14" height="14" fill="currentColor" shape-rendering="crispEdges"><path d="M0 0h1v1H0zM6 0h1v1H6zM1 1h1v1H1zM5 1h1v1H5zM2 2h1v1H2zM4 2h1v1H4zM3 3h1v1H3zM2 4h1v1H2zM4 4h1v1H4zM1 5h1v1H1zM5 5h1v1H5zM0 6h1v1H0zM6 6h1v1H6z" /></svg>
+                  {t(locale, 'education.viewer.close')}
+                </button>
+                <img alt="" />
+              </form>
+            </dialog>
+            <script is:inline set:html={educationViewerScript()} />
+          </>
+        )}
+        {pages.length > 1 && (
+          <footer class="ed-foot">
+            <ListingSummary locale={locale} from={current.from} to={current.to} total={current.total} />
+            <Pager locale={locale} page={page} pages={pages.length} href={href} label={t(locale, 'education.pager.label')} />
+          </footer>
+        )}
+      </>
+    )}
+  </section>
+</BaseLayout>

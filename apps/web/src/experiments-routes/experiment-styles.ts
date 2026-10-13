@@ -29,8 +29,26 @@ export interface ExperimentsCssParts {
   empty: boolean;
 }
 
+/* A 4 px two-step notch on each corner: crisp pixel corners instead of a rounded rectangle. Written once,
+   as the custom property `--xp-notch` of `.xp-page`. Clipping also clips the outline, so a clipped control
+   drops the notch (`clip-path: none`) while it has keyboard focus. */
+const NOTCH = `polygon(
+    0 4px, 2px 4px, 2px 2px, 4px 2px, 4px 0,
+    calc(100% - 4px) 0, calc(100% - 4px) 2px, calc(100% - 2px) 2px, calc(100% - 2px) 4px, 100% 4px,
+    100% calc(100% - 4px), calc(100% - 2px) calc(100% - 4px), calc(100% - 2px) calc(100% - 2px),
+    calc(100% - 4px) calc(100% - 2px), calc(100% - 4px) 100%,
+    4px 100%, 4px calc(100% - 2px), 2px calc(100% - 2px), 2px calc(100% - 4px), 0 calc(100% - 4px)
+  )`;
+
+/* A right-pointing chevron on an 8x10 grid of 2 px cells (two cells thick), the glyph of the secondary links. */
+const CHEVRON = `polygon(
+    4px 0, 4px 2px, 6px 2px, 6px 4px, 8px 4px, 8px 6px, 6px 6px, 6px 8px, 4px 8px, 4px 10px,
+    0 10px, 0 8px, 2px 8px, 2px 6px, 4px 6px, 4px 4px, 2px 4px, 2px 2px, 0 2px, 0 0
+  )`;
+
 const HEADER = `
   .xp-page {
+    --xp-notch: ${NOTCH};
     display: flex;
     flex-direction: column;
     gap: 3rem;
@@ -194,9 +212,6 @@ const PIECE = `
     flex-direction: column;
     gap: 1.25rem;
     min-width: 0;
-    padding: 1.5rem;
-    border-radius: var(--radius-card);
-    background: var(--color-card);
   }
   /* No media column: the panel is the whole piece, in a readable width. */
   .xp-piece[data-solo] .xp-panel {
@@ -204,6 +219,18 @@ const PIECE = `
   }
   .xp-top {
     display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+  /* The entry label ("Experimento 001"): the mono face of the facts' labels, like the number of a note; only the number is pink. */
+  .xp-num {
+    margin: 0;
+    font-size: 0.875rem;
+  }
+  .xp-num b {
+    font-weight: 400;
+    color: var(--color-pink);
   }
   .xp-status {
     display: inline-flex;
@@ -243,7 +270,8 @@ const PIECE = `
     gap: 1rem;
     margin: 0;
   }
-  .xp-facts dt {
+  .xp-facts dt,
+  .xp-num {
     font: 400 0.8125rem / 1.125rem var(--font-mono);
     color: var(--color-muted);
   }
@@ -252,6 +280,17 @@ const PIECE = `
     line-height: 1.55;
     color: var(--color-text-secondary);
     text-wrap: pretty;
+  }
+  .xp-facts [data-result] {
+    padding-left: 1rem;
+    border-left: 3px solid var(--color-primary);
+  }
+  .xp-facts [data-result] dt {
+    color: var(--color-primary);
+  }
+  .xp-facts [data-result] dd {
+    font-size: 1.0625rem;
+    color: var(--color-text);
   }
   .xp-description {
     margin: 0;
@@ -283,10 +322,12 @@ const PIECE = `
   .xp-btn {
     display: inline-flex;
     align-items: center;
+    justify-content: center;
     gap: 0.5rem;
     min-height: 2.75rem;
     padding-inline: 1.25rem;
-    border-radius: var(--radius-control);
+    border-radius: 0;
+    clip-path: var(--xp-notch);
     background: var(--color-button);
     color: white;
     font-weight: 500;
@@ -295,30 +336,85 @@ const PIECE = `
   .xp-link {
     display: inline-flex;
     align-items: center;
+    justify-content: center;
     min-height: 2.75rem;
     padding-inline: 0.75rem;
-    border-radius: var(--radius-control);
+    border-radius: 0;
+    clip-path: var(--xp-notch);
     color: var(--color-primary);
     font-size: 0.875rem;
     text-decoration: underline dashed;
     text-underline-offset: 4px;
   }
-  .xp-link:hover {
-    background: var(--color-card-hover);
+  /* The pixel chevron after a secondary link (the "opens in a new tab" note is visually hidden text). */
+  .xp-link::after {
+    content: '';
+    flex-shrink: 0;
+    width: 8px;
+    height: 10px;
+    margin-left: 0.5rem;
+    background: currentColor;
+    clip-path: ${CHEVRON};
+  }
+  @media (hover: hover) {
+    .xp-btn:hover {
+      background: color-mix(in srgb, var(--color-button) 80%, black);
+    }
+    .xp-link:hover {
+      background: color-mix(in srgb, var(--color-primary) 14%, transparent);
+    }
+  }
+  /* A clipped control would cut its own outline: the notch is dropped while it has keyboard focus. */
+  .xp-btn:focus-visible,
+  .xp-link:focus-visible {
+    outline: 2px solid var(--color-primary);
+    outline-offset: 3px;
+    clip-path: none;
+  }
+  /* Phones: the primary takes the full row, the secondary links share the row below it. */
+  @media (max-width: 640px) {
+    .xp-actions {
+      gap: 0.5rem;
+    }
+    .xp-btn {
+      width: 100%;
+    }
+    .xp-link {
+      flex: 1 1 0;
+      min-width: 0;
+    }
   }
   @media (prefers-reduced-motion: no-preference) {
     .xp-btn {
-      transition: transform 150ms ease-out, opacity 150ms ease-out;
-    }
-    .xp-btn:active {
-      transform: scale(0.96);
+      transition:
+        transform 120ms steps(2, end),
+        background-color 120ms steps(2, end);
     }
     .xp-link {
-      transition: background-color 150ms ease-out;
+      transition: background-color 120ms steps(2, end);
     }
-  }
-  .xp-btn:hover {
-    opacity: 0.9;
+    .xp-arrow {
+      transition: transform 120ms steps(2, end);
+    }
+    .xp-link::after {
+      transition: transform 120ms steps(2, end);
+    }
+    @media (hover: hover) {
+      .xp-btn:hover {
+        transform: translateY(-1px);
+      }
+      .xp-btn:hover .xp-arrow,
+      .xp-link:hover::after {
+        transform: translate(2px, 2px);
+      }
+    }
+    .xp-btn:focus-visible .xp-arrow,
+    .xp-link:focus-visible::after {
+      transform: translate(2px, 2px);
+    }
+    .xp-btn:active {
+      transform: translateY(1px);
+    }
   }
   /*
    * Scroll reveal for the pieces after the first one: progressive enhancement only. Without
@@ -376,6 +472,7 @@ const MEDIA = `
   }
   /* The image box: hairline outline, clipped zoom, square-capped pixel corner brackets (3 px bars, 14 px arms) on the frame. */
   .xp-shot {
+    --xp-arm: 14px;
     position: relative;
     color: color-mix(in srgb, var(--color-text) 38%, transparent);
   }
@@ -385,14 +482,14 @@ const MEDIA = `
     inset: -6px;
     pointer-events: none;
     background:
-      linear-gradient(currentColor, currentColor) top left / 14px 3px no-repeat,
-      linear-gradient(currentColor, currentColor) top left / 3px 14px no-repeat,
-      linear-gradient(currentColor, currentColor) top right / 14px 3px no-repeat,
-      linear-gradient(currentColor, currentColor) top right / 3px 14px no-repeat,
-      linear-gradient(currentColor, currentColor) bottom left / 14px 3px no-repeat,
-      linear-gradient(currentColor, currentColor) bottom left / 3px 14px no-repeat,
-      linear-gradient(currentColor, currentColor) bottom right / 14px 3px no-repeat,
-      linear-gradient(currentColor, currentColor) bottom right / 3px 14px no-repeat;
+      linear-gradient(currentColor, currentColor) top left / var(--xp-arm) 3px no-repeat,
+      linear-gradient(currentColor, currentColor) top left / 3px var(--xp-arm) no-repeat,
+      linear-gradient(currentColor, currentColor) top right / var(--xp-arm) 3px no-repeat,
+      linear-gradient(currentColor, currentColor) top right / 3px var(--xp-arm) no-repeat,
+      linear-gradient(currentColor, currentColor) bottom left / var(--xp-arm) 3px no-repeat,
+      linear-gradient(currentColor, currentColor) bottom left / 3px var(--xp-arm) no-repeat,
+      linear-gradient(currentColor, currentColor) bottom right / var(--xp-arm) 3px no-repeat,
+      linear-gradient(currentColor, currentColor) bottom right / 3px var(--xp-arm) no-repeat;
   }
   .xp-clip {
     position: relative;
@@ -424,17 +521,20 @@ const MEDIA = `
     min-width: 0;
     text-wrap: pretty;
   }
-  /* Hover and focus: the image grows slightly inside its frame and the brackets turn violet. */
+  /* Hover and focus: the image grows slightly inside its frame; the brackets turn primary and their arms grow 4 px in two steps (motion only; with reduced motion the color alone changes). */
   @media (prefers-reduced-motion: no-preference) {
     .xp-clip img {
       transition: transform 400ms ease-out;
     }
     .xp-shot {
-      transition: color 250ms ease-out;
+      transition: color 150ms steps(2, end);
+    }
+    .xp-shot::after {
+      transition: background-size 150ms steps(2, end);
     }
   }
   @media (hover: hover) {
-    .xp-media:hover .xp-shot {
+    .xp-shot:hover {
       color: var(--color-primary);
     }
   }
@@ -446,6 +546,12 @@ const MEDIA = `
       .xp-media:hover .xp-clip img {
         transform: scale(1.03);
       }
+      .xp-shot:hover {
+        --xp-arm: 18px;
+      }
+    }
+    .xp-media:focus-within .xp-shot {
+      --xp-arm: 18px;
     }
     .xp-media:focus-within .xp-clip img {
       transform: scale(1.03);
@@ -498,7 +604,8 @@ const GALLERY = `
   .xp-radio:nth-of-type(4):checked ~ .xp-thumbs > .xp-thumb:nth-child(4) {
     outline: 2px solid var(--color-primary);
     outline-offset: -2px;
-    opacity: 1;
+    border-color: var(--color-primary);
+    transform: none;
   }
   .xp-radio:nth-of-type(1):focus-visible ~ .xp-thumbs > .xp-thumb:nth-child(1),
   .xp-radio:nth-of-type(2):focus-visible ~ .xp-thumbs > .xp-thumb:nth-child(2),
@@ -513,7 +620,7 @@ const GALLERY = `
     color: var(--color-muted);
     font-variant-numeric: tabular-nums;
   }
-  /* Thumbnails: 80 x 50 at most on wide screens; under 640 px they share the row (4:3, up to 104 px wide) so four never wrap. */
+  /* Thumbnails: a 1 px edge (text color at 55%, 3:1 on the card and the page in both themes) tells them apart; the active one swaps it for a 2 px primary outline, no fade. 80 x 50 at most on wide screens; under 640 px they share the row (4:3, up to 104 px wide) so four never wrap. */
   .xp-thumbs {
     display: flex;
     gap: 0.5rem;
@@ -525,8 +632,9 @@ const GALLERY = `
     flex: 0 1 5rem;
     min-width: 0;
     aspect-ratio: 8 / 5;
+    box-sizing: border-box;
+    border: 1px solid color-mix(in srgb, var(--color-text) 55%, transparent);
     border-radius: var(--radius-inner);
-    opacity: 0.85;
     cursor: pointer;
   }
   @media (max-width: 639px) {
@@ -544,14 +652,34 @@ const GALLERY = `
     object-fit: cover;
     object-position: top;
   }
+  /* Hover and keyboard focus: the edge turns primary; with motion allowed the thumbnail also lifts 1 px (the active one stays put, see the checked rule). */
   @media (hover: hover) {
     .xp-thumb:hover {
-      opacity: 1;
+      border-color: var(--color-primary);
     }
+  }
+  .xp-radio:nth-of-type(1):focus-visible ~ .xp-thumbs > .xp-thumb:nth-child(1),
+  .xp-radio:nth-of-type(2):focus-visible ~ .xp-thumbs > .xp-thumb:nth-child(2),
+  .xp-radio:nth-of-type(3):focus-visible ~ .xp-thumbs > .xp-thumb:nth-child(3),
+  .xp-radio:nth-of-type(4):focus-visible ~ .xp-thumbs > .xp-thumb:nth-child(4) {
+    border-color: var(--color-primary);
   }
   @media (prefers-reduced-motion: no-preference) {
     .xp-thumb {
-      transition: opacity 150ms ease-out;
+      transition:
+        border-color 150ms steps(2, end),
+        transform 150ms steps(2, end);
+    }
+    @media (hover: hover) {
+      .xp-thumb:hover {
+        transform: translateY(-1px);
+      }
+    }
+    .xp-radio:nth-of-type(1):focus-visible:not(:checked) ~ .xp-thumbs > .xp-thumb:nth-child(1),
+    .xp-radio:nth-of-type(2):focus-visible:not(:checked) ~ .xp-thumbs > .xp-thumb:nth-child(2),
+    .xp-radio:nth-of-type(3):focus-visible:not(:checked) ~ .xp-thumbs > .xp-thumb:nth-child(3),
+    .xp-radio:nth-of-type(4):focus-visible:not(:checked) ~ .xp-thumbs > .xp-thumb:nth-child(4) {
+      transform: translateY(-1px);
     }
     .xp-gallery .xp-slide {
       animation: xp-fade 280ms steps(4, end);

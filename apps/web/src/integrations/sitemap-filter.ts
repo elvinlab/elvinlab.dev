@@ -5,6 +5,9 @@ const SORTED_EXPERIMENTS = new RegExp(
   `^/experiments/(?:${LISTING_SORTS.join('|')})/(?:page/\\d+/)?$`,
 );
 
+/** `/education/oldest/` and `/education/oldest/page/2/`: the alternate order of the timeline (a `noindex` duplicate). */
+const SORTED_EDUCATION = new RegExp(`^/education/(?:${LISTING_SORTS.join('|')})/(?:page/\\d+/)?$`);
+
 /**
  * True when a pathname should be excluded from the sitemap because its feature flag is off.
  * Pathnames are expected without locale prefix (e.g. `/me/`, `/en/me/` after locale is stripped).
@@ -36,6 +39,8 @@ export function isHiddenFromSitemap(pathname: string, features?: typeof site.fea
   // The alternate sorts of the experiments list are `noindex` duplicates of the default order:
   // never in the sitemap, whatever the flags say. They exist only on a long enough list.
   if (SORTED_EXPERIMENTS.test(withoutLocale)) return true;
+  if (!flags.education && /^\/education\/(?:page\/\d+\/)?$/.test(withoutLocale)) return true;
+  if (SORTED_EDUCATION.test(withoutLocale)) return true;
   if (!flags.contact && withoutLocale === '/contact/') return true;
   if (
     !flags.changelog &&

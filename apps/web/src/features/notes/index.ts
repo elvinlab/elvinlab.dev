@@ -8,6 +8,7 @@ export { default as NoteIndexRow } from './components/NoteIndexRow.astro';
 // Page-level entry components — the only way pages reach the notes feature.
 export { default as NotePage } from './components/NotePage.astro';
 export { default as NotesIndex } from './components/NotesIndex.astro';
+export { default as ReadingProgressMemory } from './components/ReadingProgressMemory.astro';
 export { default as TopicPage } from './components/TopicPage.astro';
 export { loadTopics } from './lib/load-topics.ts';
 export { secondaryMetaSlot } from './lib/note-meta.ts';

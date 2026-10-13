@@ -66,6 +66,9 @@ export const siteConfig = {
   // `words` (the decorative `// build` stack by the title, per locale) are optional and fall back to
   // the interface defaults, for example: intro: { es: '...', en: '...' }, words: { es: ['construir'], en: ['build'] }.
   experiments: { perPage: 12, maxFeatured: 3, meRows: 3 },
+  // The education timeline (`/education/`) and its rows on `/me`: docs/PORTFOLIO.md. `intro` is
+  // optional per locale and falls back to the interface default.
+  education: { perPage: 12, sortFrom: 4, meRows: 3 },
   socials: [
     { label: 'GitHub', url: 'https://github.com/elvinlab', icon: 'github' },
     { label: 'LinkedIn', url: 'https://www.linkedin.com/in/elvinlab', icon: 'linkedin' },
@@ -75,10 +78,12 @@ export const siteConfig = {
     comments: true,
     contact: true,
     credentials: true,
+    education: true,
     experiments: true,
     me: true,
     changelog: true,
     readingMode: true,
+    readingProgress: true,
     experimentNudge: true,
     marks: true,
     subscribe: true,

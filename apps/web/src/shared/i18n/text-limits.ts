@@ -12,6 +12,7 @@
 export const TEXT_LIMITS: Readonly<Record<string, number>> = {
   subscribe: 200,
   experiments: 140,
+  education: 140,
   author: 130,
   me: 110,
   privacy: 100,
@@ -47,6 +48,7 @@ export const TEXT_LIMITS: Readonly<Record<string, number>> = {
 export const TEXT_LIMIT_NOTES: Readonly<Record<string, string>> = {
   subscribe: 'The subscription form, its messages and the confirmation pages',
   experiments: 'Intro and sort descriptions of `/experiments/`',
+  education: 'Intro, labels and sort descriptions of `/education/`',
   author: 'The author card on the home',
   me: 'The `/me` page: headings, hints and labels',
   privacy: 'Short fragments of the privacy page',
@@ -62,7 +64,7 @@ export const TEXT_LIMIT_NOTES: Readonly<Record<string, string>> = {
   language: 'The language switch and the language hint banner',
   link: 'External link hints',
   experiment: 'Labels on an experiment card',
-  reading: 'The reading mode button (one line)',
+  reading: 'The reading mode button and the read / continue reading labels (one line)',
   now: 'The "Now" card',
   note: 'Labels inside a note (reading time, license, translations)',
   skip: 'The skip-to-content link',

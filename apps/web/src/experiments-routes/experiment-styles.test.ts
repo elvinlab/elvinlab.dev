@@ -71,8 +71,270 @@ describe('experimentsCss', () => {
 
   it('keeps idle gallery thumbnails readable on touch and larger on phones', () => {
     const css = experimentsCss({ ...NONE, pieces: true, media: true, gallery: true });
-    expect(css).toMatch(/\.xp-thumb\{[^}]*opacity:0\.85/);
     expect(css).not.toContain('opacity:0.6;');
     expect(css).toMatch(/@media \(max-width:639px\)\{\.xp-thumb\{[^}]*aspect-ratio:4 \/ 3/);
+  });
+  describe('pixel buttons', () => {
+    const ALL: ExperimentsCssParts = {
+      pieces: true,
+      media: true,
+      gallery: true,
+      more: true,
+      years: true,
+      footer: true,
+      lab: true,
+      empty: false,
+    };
+    const NO_PREF = /@media \(prefers-reduced-motion:\s*no-preference\)\{/g;
+
+    /** The CSS with every `prefers-reduced-motion: no-preference` block (nested braces) removed. */
+    const outsideMotion = (css: string): string => {
+      let out = css;
+      for (;;) {
+        NO_PREF.lastIndex = 0;
+        const match = NO_PREF.exec(out);
+        if (!match) return out;
+        let depth = 1;
+        let end = match.index + match[0].length;
+        while (depth > 0 && end < out.length) {
+          if (out[end] === '{') depth += 1;
+          if (out[end] === '}') depth -= 1;
+          end += 1;
+        }
+        out = out.slice(0, match.index) + out.slice(end);
+      }
+    };
+
+    it('defines the stepped corner notch once on the page wrapper', () => {
+      const css = experimentsCss(ALL);
+      expect(css).toMatch(/\.xp-page\{[^}]*--xp-notch:polygon\(/);
+      expect(css.match(/--xp-notch:polygon\(/g)).toHaveLength(1);
+    });
+
+    it('notches the primary button and the secondary links, and drops the notch on focus', () => {
+      const css = experimentsCss(ALL);
+      expect(css).toMatch(/\.xp-btn\{[^}]*clip-path:var\(--xp-notch\)/);
+      expect(css).toMatch(/\.xp-link\{[^}]*clip-path:var\(--xp-notch\)/);
+      expect(css).toMatch(/\.xp-btn:focus-visible,\.xp-link:focus-visible\{[^}]*clip-path:none/);
+      expect(css).toMatch(
+        /\.xp-btn:focus-visible,\.xp-link:focus-visible\{[^}]*outline:[^;}]*solid/,
+      );
+      expect(css).toMatch(/\.xp-btn:focus-visible,\.xp-link:focus-visible\{[^}]*outline-offset:/);
+    });
+
+    it('darkens the primary on hover with color-mix instead of dimming it', () => {
+      const css = experimentsCss(ALL);
+      expect(css).toMatch(/\.xp-btn:hover\{[^}]*color-mix\(in srgb,\s*var\(--color-button\)/);
+      expect(css).not.toMatch(/\.xp-btn:hover\{[^}]*opacity/);
+      expect(css).not.toContain('scale(0.96)');
+    });
+
+    it('nudges the arrow two pixels in steps and keeps the secondary glyph a pixel shape', () => {
+      const css = experimentsCss(ALL);
+      expect(css).toMatch(/\.xp-arrow\{[^}]*steps\(2,\s*end\)/);
+      expect(css).toMatch(/\.xp-btn:hover \.xp-arrow[^{]*\{[^}]*translate\(2px,\s*2px\)/);
+      expect(css).toMatch(/\.xp-link::after\{[^}]*clip-path:polygon\(/);
+      expect(css).toMatch(/\.xp-link:hover::after[^{]*\{[^}]*translate\(2px,\s*2px\)/);
+    });
+
+    it('lays the actions on a phone as a full-width primary over two links side by side', () => {
+      const css = experimentsCss(ALL);
+      expect(css).toMatch(/@media \(max-width:640px\)\{[^@]*\.xp-btn\{[^}]*width:100%/);
+      expect(css).toMatch(/@media \(max-width:640px\)\{[^@]*\.xp-link\{[^}]*flex:1 1 0/);
+    });
+
+    it('keeps every animation, transition and steps() of the buttons inside a no-preference block', () => {
+      const css = experimentsCss(ALL);
+      const rest = outsideMotion(css);
+      expect(rest).not.toContain('steps(');
+      expect(rest).not.toMatch(/(^|[;{])(animation|transition)[a-z-]*:(?!none)/);
+      expect(css).toMatch(
+        /prefers-reduced-motion:no-preference\)\{[^@]*\.xp-btn\{[^}]*transition:/,
+      );
+    });
+
+    it('uses no hard offset shadow and no hex color', () => {
+      const css = experimentsCss(ALL);
+      for (const [, x, y, blur] of css.matchAll(
+        /box-shadow:\s*(-?[\d.]+)(?:px)?\s+(-?[\d.]+)(?:px)?\s+([\d.]+)?/g,
+      )) {
+        expect(Number(x) === 0 && Number(y) === 0 ? true : Number(blur ?? 0) > 0).toBe(true);
+      }
+      expect(css).not.toMatch(/#[0-9a-f]{3,8}\b/i);
+    });
+  });
+
+  describe('rail thumbnails and the result fact', () => {
+    const ALL: ExperimentsCssParts = {
+      pieces: true,
+      media: true,
+      gallery: true,
+      more: false,
+      years: false,
+      footer: false,
+      lab: false,
+      empty: false,
+    };
+
+    it('gives every thumbnail a visible edge from the text color and no fade', () => {
+      const css = experimentsCss(ALL);
+      expect(css).toMatch(
+        /\.xp-thumb\{[^}]*border:1px solid color-mix\(in srgb,\s*var\(--color-text\)\s*55%,\s*transparent\)/,
+      );
+      for (const [, value] of css.matchAll(/\.xp-thumb[^{]*\{[^}]*?opacity:([\d.]+)/g)) {
+        expect(Number(value)).toBeGreaterThanOrEqual(0.9);
+      }
+      expect(css).not.toMatch(/\.xp-thumb[^{]*\{[^}]*transition:opacity/);
+    });
+
+    it('marks the checked thumbnail with a 2 px primary outline and a primary edge', () => {
+      const css = experimentsCss(ALL);
+      expect(css).toMatch(
+        /:checked ~ \.xp-thumbs > \.xp-thumb:nth-child\(1\)[^{]*\{[^}]*outline:2px solid var\(--color-primary\)/,
+      );
+      expect(css).toMatch(
+        /:checked ~ \.xp-thumbs > \.xp-thumb:nth-child\(4\)[^{]*\{[^}]*border-color:var\(--color-primary\)/,
+      );
+    });
+
+    it('keeps the keyboard focus ring on the thumbnails', () => {
+      expect(experimentsCss(ALL)).toMatch(
+        /:focus-visible ~ \.xp-thumbs > \.xp-thumb:nth-child\(1\)[^{]*\{[^}]*box-shadow:/,
+      );
+    });
+
+    it('sets the result off with a square 3 px primary rule, a primary label and larger full-color text', () => {
+      const css = experimentsCss(ALL);
+      expect(css).toMatch(
+        /\.xp-facts \[data-result\]\{[^}]*border-left:3px solid var\(--color-primary\)/,
+      );
+      expect(css).toMatch(/\.xp-facts \[data-result\]\{[^}]*padding-left:/);
+      expect(css).not.toMatch(/\.xp-facts \[data-result\]\{[^}]*border-radius/);
+      expect(css).toMatch(/\.xp-facts \[data-result\] dt\{[^}]*color:var\(--color-primary\)/);
+      expect(css).toMatch(/\.xp-facts \[data-result\] dd\{[^}]*color:var\(--color-text\)/);
+      expect(css).toMatch(/\.xp-facts \[data-result\] dd\{[^}]*font-size:1\.0625rem/);
+      expect(css).not.toMatch(/\.xp-facts[^{]*\{[^}]*text-transform/);
+    });
+
+    it('does not depend on the image: the result rule is part of the pieces CSS', () => {
+      const solo = experimentsCss({ ...ALL, media: false, gallery: false });
+      expect(solo).toContain('.xp-facts [data-result]');
+    });
+  });
+  describe('boxless notebook panel', () => {
+    const PIECES: ExperimentsCssParts = {
+      pieces: true,
+      media: true,
+      gallery: true,
+      more: false,
+      years: false,
+      footer: false,
+      lab: false,
+      empty: false,
+    };
+    const rule = (css: string, selector: string): string =>
+      css.match(new RegExp(`(?:^|\\})${selector.replace(/[.[\]]/g, '\\$&')}\\{([^}]*)\\}`))?.[1] ??
+      '';
+
+    it('gives the text panel no fill, no radius and no card padding', () => {
+      const panel = rule(experimentsCss(PIECES), '.xp-panel');
+      expect(panel).not.toBe('');
+      expect(panel).not.toMatch(/background/);
+      expect(panel).not.toMatch(/border-radius/);
+      expect(panel).not.toMatch(/padding/);
+    });
+
+    it('styles the entry label like the note number: pink number, no capitals', () => {
+      const css = experimentsCss(PIECES);
+      expect(css).toMatch(/\.xp-num b\{[^}]*color:var\(--color-pink\)/);
+      expect(css).not.toMatch(/\.xp-num[^{]*\{[^}]*text-transform/);
+    });
+
+    it('uses no hex color', () => {
+      expect(experimentsCss(PIECES)).not.toMatch(/#[0-9a-f]{3,8}\b/i);
+    });
+  });
+});
+
+describe('hover feedback on the rail and the frame', () => {
+  const PIECES: ExperimentsCssParts = { ...NONE, pieces: true, media: true, gallery: true };
+  const css = experimentsCss(PIECES);
+  /** The body of the `@media (prefers-reduced-motion:no-preference)` blocks, balanced by braces. */
+  const motionBlocks = (): string[] => {
+    const blocks: string[] = [];
+    const marker = '@media (prefers-reduced-motion:no-preference){';
+    let from = css.indexOf(marker);
+    while (from !== -1) {
+      let depth = 1;
+      let index = from + marker.length;
+      while (depth > 0 && index < css.length) {
+        const char = css[index];
+        if (char === '{') depth += 1;
+        if (char === '}') depth -= 1;
+        index += 1;
+      }
+      blocks.push(css.slice(from + marker.length, index - 1));
+      from = css.indexOf(marker, index);
+    }
+    return blocks;
+  };
+
+  const outsideMotion = (): string => {
+    let rest = css;
+    for (const block of motionBlocks()) {
+      rest = rest.replace(`@media (prefers-reduced-motion:no-preference){${block}}`, '');
+    }
+    return rest;
+  };
+
+  it('turns the thumbnail edge primary on hover and on keyboard focus', () => {
+    expect(css).toMatch(
+      /@media \(hover:hover\)\{[^@]*\.xp-thumb:hover\{[^}]*border-color:var\(--color-primary\)/,
+    );
+    expect(css).toMatch(
+      /:focus-visible ~ \.xp-thumbs > \.xp-thumb:nth-child\(2\)[^{]*\{[^}]*box-shadow:/,
+    );
+  });
+
+  it('lifts a thumbnail 1 px in two steps, only with motion allowed', () => {
+    const motion = motionBlocks().join('');
+    expect(motion).toMatch(/\.xp-thumb\{transition:[^}]*transform 150ms steps\(2,\s*end\)/);
+    expect(motion).toMatch(/\.xp-thumb:hover\{transform:translateY\(-1px\)/);
+    expect(motion).toMatch(
+      /:focus-visible:not\(:checked\) ~ \.xp-thumbs > \.xp-thumb:nth-child\(1\)[^{]*\{[^}]*transform:translateY\(-1px\)/,
+    );
+    expect(outsideMotion()).not.toContain('translateY(-1px)');
+  });
+
+  it('keeps the active thumbnail in place', () => {
+    for (const nth of [1, 2, 3, 4]) {
+      expect(css).toMatch(
+        new RegExp(
+          `:checked ~ \\.xp-thumbs > \\.xp-thumb:nth-child\\(${nth}\\)[^{]*\\{[^}]*transform:none`,
+        ),
+      );
+    }
+  });
+
+  it('grows the four frame brackets and turns them primary on hover and focus-within', () => {
+    expect(css).toMatch(/\.xp-shot\{[^}]*--xp-arm:14px/);
+    expect(css).toMatch(/\.xp-shot::after\{[^}]*var\(--xp-arm\) 3px/);
+    expect(css).toMatch(/\.xp-shot:hover\{[^}]*color:var\(--color-primary\)/);
+    expect(css).toMatch(/\.xp-media:focus-within \.xp-shot\{[^}]*color:var\(--color-primary\)/);
+    const motion = motionBlocks().join('');
+    expect(motion).toMatch(/--xp-arm:18px/);
+    expect(motion).toMatch(/\.xp-shot::after\{transition:[^}]*steps\(2,\s*end\)/);
+    expect(motion).toMatch(/\.xp-shot\{transition:color 150ms steps\(2,\s*end\)/);
+    expect(outsideMotion()).not.toContain('--xp-arm:18px');
+  });
+
+  it('puts every steps() timing inside a no-preference block', () => {
+    const outside = outsideMotion();
+    expect(outside).not.toMatch(/\.xp-(thumb|shot)[^{]*\{[^}]*steps\(/);
+  });
+
+  it('adds no hex color and no hard offset shadow', () => {
+    expect(css).not.toMatch(/#[0-9a-f]{3,8}\b/i);
+    expect(css).not.toMatch(/box-shadow:\s*-?\d+px -?\d+px 0 /);
   });
 });

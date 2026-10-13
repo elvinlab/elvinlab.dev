@@ -92,7 +92,7 @@ This is how work goes here: every task is an *issue* written as a delegation bri
 - Optional **reading mode** on every note: a single column, no animated banner or sidebar, for comfortable reading on mobile and desktop.
 - **Comments and reactions** with Giscus, loaded only when you reach them.
 - Own **share cards** for each note and for `/me`, generated at build time.
-- **`/me`**: a portfolio with experience, certificates and experiments; it prints cleanly to PDF.
+- **`/me`**: a portfolio with experience, education and experiments; it prints cleanly to PDF.
 - A safe **contact form**: Turnstile, a send limit and it fails closed when configuration is missing.
 - **Email subscription**: readers get new notes (and, now and then, an announcement of a project) with double opt-in and a one-page unsubscribe; I trigger each send by hand. Guide: [`docs/SUBSCRIPTION.en.md`](docs/SUBSCRIPTION.en.md).
 - A **public changelog**, **privacy and terms pages** and a **light/dark theme** with selectable animated backgrounds.
@@ -113,10 +113,12 @@ Everything optional is a switch in [`site.config.ts`](apps/web/src/site.config.t
 | `contact` | The `/contact` form | Turnstile and email secrets (fails closed without them) |
 | `me` | The `/me` portfolio page | |
 | `credentials` | Certificates and degrees on `/me` | |
+| `education` | `/education/` page and the "Recent education" block on `/me` | |
 | `experiments` | `/experiments` and its sections on the home and `/me` | |
 | `experimentNudge` | The latest-experiment card (off by default) | `experiments` |
 | `changelog` | The public `/changelog` | |
 | `readingMode` | Reading mode on notes | |
+| `readingProgress` | Remembers where you stopped in a note and marks read notes | |
 | `marks` | The "I was here" footprint button | a D1 database and a rate limiter |
 | `subscribe` | Email subscription with double opt-in | `blog`, D1, Turnstile and email secrets |
 | `backToTop`, `languageHint`, `themeToggle`, `backgroundPicker` | Interface touches (on by default) | |

@@ -1,6 +1,14 @@
 import { describe, expect, it } from 'vitest';
 
-import { activeTag, rowHasTag, rowTagList, tagHref, visibleTags } from './note-tags.ts';
+import {
+  activeTag,
+  ROW_TAG_LIMIT,
+  rowChipTags,
+  rowHasTag,
+  rowTagList,
+  tagHref,
+  visibleTags,
+} from './note-tags.ts';
 
 describe('visibleTags', () => {
   it('drops the tag that repeats the category and keeps the order', () => {
@@ -10,6 +18,26 @@ describe('visibleTags', () => {
   it('returns every tag when none repeats the category', () => {
     expect(visibleTags(['astro', 'css'], 'meta')).toEqual(['astro', 'css']);
     expect(visibleTags([], 'meta')).toEqual([]);
+  });
+});
+
+describe('rowChipTags', () => {
+  it('keeps the first two tags that do not repeat the category', () => {
+    expect(ROW_TAG_LIMIT).toBe(2);
+    expect(rowChipTags(['meta', 'astro', 'css', 'a11y'], 'meta')).toEqual(['astro', 'css']);
+  });
+
+  it('returns fewer when the note has fewer, and none without tags', () => {
+    expect(rowChipTags(['astro'], 'meta')).toEqual(['astro']);
+    expect(rowChipTags([], 'meta')).toEqual([]);
+  });
+
+  it('honors another limit', () => {
+    expect(rowChipTags(['a', 'b', 'c'], 'x', 1)).toEqual(['a']);
+  });
+
+  it('never changes the searchable list of the row', () => {
+    expect(rowTagList('meta', ['astro', 'css', 'a11y'])).toBe('meta|astro|css|a11y');
   });
 });
 

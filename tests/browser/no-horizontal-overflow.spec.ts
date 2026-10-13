@@ -4,7 +4,17 @@ import { liveByPath } from './helpers/features';
 
 /** WCAG 1.4.10 reflow: no page scrolls sideways at the narrowest supported widths. */
 const PATHS = liveByPath(
-  ['/', '/me/', '/en/me/', '/experiments/', '/notes/', '/contact/', '/changelog/'],
+  [
+    '/',
+    '/me/',
+    '/en/me/',
+    '/experiments/',
+    '/education/',
+    '/en/education/',
+    '/notes/',
+    '/contact/',
+    '/changelog/',
+  ],
   (path) => path,
 );
 const WIDTHS = [320, 390, 768, 1024];

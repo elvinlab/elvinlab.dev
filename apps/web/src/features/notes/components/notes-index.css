@@ -31,3 +31,254 @@
     pointer-events: none;
   }
 }
+/* "Start here" strip: a heading and title-only links. Phones stack the links on 44 px lines; from
+   768 px the heading sits at the left and the links are tight lines for a mouse. */
+.ni-start {
+  display: flex;
+  flex-direction: column;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px dashed var(--color-divider);
+}
+.ni-start ul {
+  display: flex;
+  flex-direction: column;
+}
+.ni-start a {
+  display: flex;
+  align-items: baseline;
+  gap: 0.75rem;
+  min-height: 2.75rem;
+  padding: 0.625rem 0;
+}
+.ni-start a span:first-child {
+  font-weight: 400;
+}
+@media (min-width: 768px) {
+  .ni-start {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    align-items: baseline;
+    column-gap: 2rem;
+  }
+  .ni-start a {
+    min-height: 0;
+    padding: 0.125rem 0;
+  }
+}
+/* One meta line under a row title: date, reading time, badge and label with a gap, never a separator. */
+.ni-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.25rem 1rem;
+  margin-top: -0.25rem;
+}
+/* Pixel details of the index (DESIGN.md, "Notes index"). Everything below is scoped to `.ni-page`, the
+   wrapper `NotesIndex` and `NotesSidebar` put on the page and the sidebar, or to classes only those two
+   emit, so topic pages, the home and `/me` keep their rounded chips. The notch is a 4 px two-step corner
+   (the recipe of `/education/` and `/experiments/`), written once as a custom property here. A clipped
+   control would cut its own outline, so the search field, the button and the link drop the notch while
+   they have keyboard focus; a chip is never clipped itself: its notched fill is a `::before`, so its
+   44 px hit area (`::after`) and its focus ring stay whole. */
+.ni-page {
+  --ni-notch: polygon(
+    0 4px,
+    2px 4px,
+    2px 2px,
+    4px 2px,
+    4px 0,
+    calc(100% - 4px) 0,
+    calc(100% - 4px) 2px,
+    calc(100% - 2px) 2px,
+    calc(100% - 2px) 4px,
+    100% 4px,
+    100% calc(100% - 4px),
+    calc(100% - 2px) calc(100% - 4px),
+    calc(100% - 2px) calc(100% - 2px),
+    calc(100% - 4px) calc(100% - 2px),
+    calc(100% - 4px) 100%,
+    4px 100%,
+    4px calc(100% - 2px),
+    2px calc(100% - 2px),
+    2px calc(100% - 4px),
+    0 calc(100% - 4px)
+  );
+}
+.ni-chip {
+  isolation: isolate;
+  border-radius: 0;
+  background: transparent;
+}
+.ni-chip::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: var(--color-chip);
+  clip-path: var(--ni-notch);
+}
+.ni-input {
+  border-radius: 0;
+  clip-path: var(--ni-notch);
+}
+.ni-link,
+.ni-btn {
+  border-radius: 0;
+  clip-path: var(--ni-notch);
+}
+.ni-link {
+  padding-inline: 0.5rem;
+}
+.ni-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 2.75rem;
+  padding-inline: 1.25rem;
+  border: 0;
+  background: var(--color-button);
+  color: white;
+  font-weight: 500;
+  cursor: pointer;
+}
+.ni-input:focus-visible,
+.ni-link:focus-visible,
+.ni-btn:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 3px;
+  clip-path: none;
+}
+@media (hover: hover) {
+  .ni-chip:hover::before {
+    background: color-mix(in srgb, var(--color-primary) 16%, var(--color-chip));
+  }
+  .ni-input:hover {
+    background: color-mix(in srgb, var(--color-primary) 10%, var(--color-chip));
+  }
+  .ni-link:hover {
+    background: color-mix(in srgb, var(--color-primary) 14%, transparent);
+  }
+  .ni-btn:hover {
+    background: color-mix(in srgb, var(--color-button) 80%, black);
+  }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .ni-chip,
+  .ni-link,
+  .ni-btn {
+    transition:
+      transform 120ms steps(2, end),
+      color 120ms steps(2, end),
+      background-color 120ms steps(2, end);
+  }
+  .ni-chip::before,
+  .ni-input {
+    transition: background-color 120ms steps(2, end);
+  }
+  @media (hover: hover) {
+    .ni-chip:hover,
+    .ni-btn:hover {
+      transform: translateY(-1px);
+    }
+  }
+  .ni-chip:active,
+  .ni-btn:active {
+    transform: translateY(1px);
+  }
+}
+/* Result count beside the search (also on phones, so the list does not start lower) and the empty state under it. */
+.ni-search {
+  flex-basis: 12rem;
+  min-width: 0;
+}
+[data-notes-count] {
+  white-space: nowrap;
+}
+.ni-empty:not([hidden]) {
+  display: grid;
+  justify-items: start;
+  gap: 0.75rem;
+  padding-block: 1rem;
+}
+.ni-empty-title {
+  font-weight: 700;
+}
+.ni-empty strong {
+  overflow-wrap: anywhere;
+}
+/* Sidebar tags: the 12 most used show, the rest sit in a native disclosure (no script to toggle it). The summary is a
+   44 px primary-color line with a pixel chevron (the recipe of `/education/`, two cells thick) that turns a quarter when
+   open; hover tints it with stepped corners, and with keyboard focus the notch goes so the outline shows whole. */
+.ni-more summary {
+  display: flex;
+  align-items: center;
+  width: fit-content;
+  min-height: 2.75rem;
+  gap: 0.5rem;
+  margin-inline: -0.5rem;
+  padding-inline: 0.5rem;
+  cursor: pointer;
+  list-style: none;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--color-primary);
+  text-decoration: none;
+}
+.ni-more summary::-webkit-details-marker {
+  display: none;
+}
+.ni-more summary::before {
+  content: "";
+  flex: none;
+  width: 8px;
+  height: 10px;
+  background: currentColor;
+  clip-path: polygon(
+    4px 0,
+    4px 2px,
+    6px 2px,
+    6px 4px,
+    8px 4px,
+    8px 6px,
+    6px 6px,
+    6px 8px,
+    4px 8px,
+    4px 10px,
+    0 10px,
+    0 8px,
+    2px 8px,
+    2px 6px,
+    4px 6px,
+    4px 4px,
+    2px 4px,
+    2px 2px,
+    0 2px,
+    0 0
+  );
+}
+.ni-more[open] summary::before {
+  transform: rotate(90deg);
+}
+.ni-more[open] summary {
+  margin-bottom: 0.25rem;
+}
+@media (hover: hover) {
+  .ni-more summary:hover {
+    background: color-mix(in srgb, var(--color-primary) 12%, transparent);
+    clip-path: var(--ni-notch);
+  }
+}
+.ni-more summary:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+  background: color-mix(in srgb, var(--color-primary) 12%, transparent);
+  clip-path: none;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .ni-more summary {
+    transition: background-color 120ms steps(2, end);
+  }
+  .ni-more summary::before {
+    transition: transform 120ms steps(2, end);
+  }
+}

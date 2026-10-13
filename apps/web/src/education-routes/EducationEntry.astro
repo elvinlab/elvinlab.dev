@@ -1,0 +1,93 @@
+---
+/**
+ * One entry of the education timeline: type badge, date as it is known (the year, or the short month
+ * and the year), title, issuer, and only the optional parts the entry really has (expiry, where it
+ * was applied, the document image, the verification link, the learnings in a native `<details>`).
+ * Nothing is drawn for a missing field except the document slot: without an image it shows a decorative
+ * typographic cover (year, type, issuer), the stand-in for a document the owner has not provided yet. The `id` is the anchor `/education/#<id>` that `/me` links to.
+ * Styles: `education-styles.ts`, emitted by `EducationPage.astro`.
+ */
+import { getImage, Image } from 'astro:assets';
+
+import type { Credential } from '@/features/credentials/index.ts';
+import { educationDateLabel } from '@/features/credentials/index.ts';
+import { site } from '@/shared/config/index.ts';
+import { LOCALES, type Locale, t } from '@/shared/i18n/index.ts';
+import { externalLinkAttrs } from '@/shared/lib/external-link.ts';
+import { pickLocale } from '@/shared/lib/localized.ts';
+import ExternalHint from '@/shared/ui/ExternalHint.astro';
+
+import { resolveEducationImage } from './education-image.ts';
+
+type Props = { id: string; data: Credential; locale: Locale };
+
+const { id, data, locale } = Astro.props;
+const text = (value: Parameters<typeof pickLocale>[0]) => pickLocale(value, locale, LOCALES.defaultLocale);
+const date = educationDateLabel(data.year, data.month, locale);
+const expires = data.expires
+  ? educationDateLabel(Number(data.expires.slice(0, 4)), Number(data.expires.slice(5)), locale)
+  : undefined;
+const applied = text(data.appliedIn);
+const learnings = (data.learnings ?? []).map((entry) => text(entry)).filter(Boolean);
+const image = data.image ? { src: resolveEducationImage(id, data.image.file), alt: text(data.image.alt) } : undefined;
+// The viewer and the no-JS fallback open this larger copy, optimized at build time.
+const full = image ? (await getImage({ src: image.src, width: 1600, format: 'webp' })).src : undefined;
+---
+
+<li id={id} class="ed-item" data-education-item>
+  <div class="ed-body">
+  <p class="ed-meta">
+    <span class="ed-badge" data-kind={data.kind}>{t(locale, `education.kind.${data.kind}`)}</span>
+    <span>{date}</span>
+    {expires && <span>{t(locale, 'education.expires', { date: expires })}</span>}
+  </p>
+  <h3 class="ed-title">{data.title}</h3>
+  <p class="ed-issuer">{data.issuer}</p>
+  {applied && <p class="ed-applied"><strong>{t(locale, 'education.applied')}:</strong> {applied}</p>}
+  {data.url && (
+    <a class="ed-verify" href={data.url} {...externalLinkAttrs(data.url, site.url)}>
+      {t(locale, 'education.verify')}<ExternalHint href={data.url} locale={locale} />
+      <svg aria-hidden="true" viewBox="0 0 7 7" width="14" height="14" fill="currentColor" shape-rendering="crispEdges"><path d="M2 0h5v1H2zM6 1h1v4H6zM5 1h1v1H5zM4 2h1v1H4zM3 3h1v1H3zM2 4h1v1H2zM1 5h1v1H1zM0 6h1v1H0z" /></svg>
+    </a>
+  )}
+  {learnings.length > 0 && (
+    <details class="ed-learned">
+      <summary>{t(locale, 'education.learned')}</summary>
+      <ul>
+        {learnings.map((point) => <li>{point}</li>)}
+      </ul>
+    </details>
+  )}
+  </div>
+  {image ? (
+    <figure class="ed-figure">
+      <a class="ed-doc" href={full} data-ed-open aria-haspopup="dialog" aria-label={`${t(locale, 'education.viewer.open')}: ${image.alt}`}>
+        <Image src={image.src} alt={image.alt} loading="lazy" widths={[320, 640, 896]} sizes="(min-width: 768px) 320px, (min-width: 480px) 448px, 100vw" />
+      </a>
+    </figure>
+  ) : (
+    <div class="ed-cover" aria-hidden="true" data-education-cover>
+      <svg class="ed-cover-icon" aria-hidden="true" viewBox="0 0 14 8" width="56" height="32" fill="currentColor" shape-rendering="crispEdges">
+        {data.kind === 'degree' ? (
+          <>
+            <rect x="6" y="0" width="2" height="1" /><rect x="4" y="1" width="6" height="1" />
+            <rect x="2" y="2" width="10" height="1" /><rect x="0" y="3" width="14" height="1" />
+            <rect x="2" y="4" width="10" height="1" /><rect x="4" y="5" width="6" height="1" />
+            <rect x="3" y="6" width="2" height="2" /><rect x="9" y="6" width="2" height="2" />
+            <rect x="5" y="7" width="4" height="1" /><rect x="13" y="4" width="1" height="3" />
+          </>
+        ) : (
+          <>
+            <rect x="3" y="0" width="8" height="1" /><rect x="3" y="1" width="1" height="7" />
+            <rect x="10" y="1" width="1" height="7" /><rect x="3" y="7" width="8" height="1" />
+            <rect x="5" y="3" width="4" height="1" /><rect x="5" y="5" width="4" height="1" />
+          </>
+        )}
+      </svg>
+      <p class="ed-cover-year font-pixel">{data.year}</p>
+      <p class="ed-cover-kind">{t(locale, `education.kind.${data.kind}`)}</p>
+      <p class="ed-cover-issuer">{data.issuer}</p>
+      <p class="ed-cover-note">{t(locale, 'education.cover.soon')}</p>
+    </div>
+  )}
+</li>

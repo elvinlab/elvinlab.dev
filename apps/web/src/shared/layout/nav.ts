@@ -1,6 +1,6 @@
 import type { SiteConfig } from '@/shared/config/index.ts';
 
-export type NavKey = 'home' | 'notes' | 'experiments' | 'about' | 'contact';
+export type NavKey = 'home' | 'notes' | 'experiments' | 'about' | 'education' | 'contact';
 
 export type NavItem = {
   key: NavKey;
@@ -17,6 +17,7 @@ const ITEMS: { item: NavItem; feature?: keyof SiteConfig['features'] }[] = [
   { item: { key: 'notes', path: '/notes/' }, feature: 'blog' },
   { item: { key: 'experiments', path: '/experiments/' }, feature: 'experiments' },
   { item: { key: 'about', path: '/me/' }, feature: 'me' },
+  { item: { key: 'education', path: '/education/' }, feature: 'education' },
   { item: { key: 'contact', path: '/contact/' }, feature: 'contact' },
 ];
 

@@ -31,6 +31,31 @@ export function liftAboveFooter({
   return Math.max(0, viewportHeight - footerTop);
 }
 
+/** Side of the (square) button, matching `size-11` in `BackToTop.astro`. */
+export const BUTTON_SIZE_PX = 44;
+/** Clear space kept between the bottom of the navbar and the top of the lifted button. */
+export const BAR_GAP_PX = 8;
+
+/**
+ * Whether the button, lifted by `lift` above its resting offset `base`, still sits at least
+ * `BAR_GAP_PX` below the navbar (`barBottom`, the bar's real height). When it does not, lifting it
+ * clear of the footer would push it under the bar: there is room to avoid only one of the two, so the
+ * caller hides the button (at the very bottom the reader reaches the top by scrolling).
+ */
+export function fitsBelowBar({
+  viewportHeight,
+  lift,
+  base,
+  barBottom,
+}: {
+  viewportHeight: number;
+  lift: number;
+  base: number;
+  barBottom: number;
+}): boolean {
+  return viewportHeight - base - lift - BUTTON_SIZE_PX >= barBottom + BAR_GAP_PX;
+}
+
 /**
  * Whether the idle timer may hide the button: not while the reader hovers or focuses it, and not at
  * the bottom of the page (lifted above the footer), where it covers nothing and is most wanted.

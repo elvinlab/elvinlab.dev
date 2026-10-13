@@ -3,7 +3,9 @@
 import { localizePath } from '@elvinlab/core';
 
 import LangBadge from '@/features/notes/components/LangBadge.astro';
+import ReadingProgressMemory from '@/features/notes/components/ReadingProgressMemory.astro';
 import { formatDate, type NoteLike, noteNumber } from '@/features/notes/lib/notes.ts';
+import { isEnabled } from '@/shared/config/index.ts';
 import { LOCALES, type Locale } from '@/shared/i18n/index.ts';
 
 type Props = { note: NoteLike; locale: Locale };
@@ -15,12 +17,16 @@ const href = localizePath(`/notes/${note.slug}/`, data.lang, LOCALES);
 
 <a
   href={href}
+  data-slug={isEnabled('readingProgress') ? note.slug : undefined}
   class="group grid grid-cols-[56px_1fr_auto] items-center gap-3 border-t border-dashed border-divider py-3 transition-colors duration-150 hover:bg-card-hover md:rounded-inner md:px-2"
 >
   <span class="font-mono text-sm text-muted">{noteNumber(data.number)}</span>
   <span class="line-clamp-2 min-w-0 font-medium transition-colors duration-150 group-hover:text-primary md:truncate">{data.title}</span>
   <span class="contents gap-2 text-sm text-muted md:flex">
-    <time datetime={data.pubDate.toISOString()} class="col-start-2">{formatDate(data.pubDate, locale)}</time>
+    <span class="col-start-2 flex flex-wrap items-center gap-x-2 md:col-auto">
+      <time datetime={data.pubDate.toISOString()}>{formatDate(data.pubDate, locale)}</time>
+      <ReadingProgressMemory part="label" locale={locale} />
+    </span>
     <LangBadge lang={data.lang} />
   </span>
 </a>

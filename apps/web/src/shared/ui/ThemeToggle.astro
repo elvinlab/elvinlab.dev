@@ -3,23 +3,25 @@
  * Cycles through the themes defined in tokens.json and remembers the choice. Works without a
  * framework: the pre-paint script in <head> applies the saved theme, this button only changes it.
  */
-import { THEME_STORAGE_KEY, THEMES } from '@elvinlab/core';
+import { DEFAULT_THEME, THEME_STORAGE_KEY, THEMES } from '@elvinlab/core';
 
 type Props = { label: string };
 
 const { label } = Astro.props;
+const startsDark = (THEMES.find((theme) => theme.name === DEFAULT_THEME)?.scheme ?? 'dark') === 'dark';
 ---
 
 <button
   type="button"
-  class="grid size-11 shrink-0 place-items-center rounded-control text-text transition-colors duration-150 hover:bg-card-hover active:scale-96"
+  class="grid size-11 shrink-0 place-items-center text-text"
   aria-label={label}
+  aria-pressed={startsDark ? 'true' : 'false'}
   data-theme-toggle
   data-themes={JSON.stringify(THEMES)}
   data-storage-key={THEME_STORAGE_KEY}
 >
-  <svg data-icon="dark" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"></path></svg>
-  <svg data-icon="light" class="hidden" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"></path></svg>
+  <svg data-icon="dark" viewBox="0 0 10 10" width="20" height="20" fill="currentColor" shape-rendering="crispEdges" aria-hidden="true"><path d="M3 0h2v1H3zM2 1h3v1H2zM1 2h3v1H1zM0 3h4v3H0zM0 6h5v1H0zM1 7h8v1H1zM2 8h6v1H2zM3 9h4v1H3z"></path></svg>
+  <svg data-icon="light" class="hidden" viewBox="0 0 10 10" width="20" height="20" fill="currentColor" shape-rendering="crispEdges" aria-hidden="true"><path d="M4 0h2v1H4zM1 1h1v1H1zM8 1h1v1H8zM3 2h4v1H3zM2 3h6v4H2zM0 4h1v2H0zM9 4h1v2H9zM3 7h4v1H3zM1 8h1v1H1zM8 8h1v1H8zM4 9h2v1H4z"></path></svg>
 </button>
 
 <script>
@@ -47,6 +49,7 @@ const { label } = Astro.props;
   const syncIcon = (button: HTMLElement, themes: ThemeOption[]): void => {
     const current = themes.find((theme) => theme.name === root.getAttribute('data-theme'));
     const scheme = current?.scheme ?? 'dark';
+    button.setAttribute('aria-pressed', String(scheme === 'dark'));
     for (const icon of button.querySelectorAll<SVGElement>('[data-icon]')) {
       icon.classList.toggle('hidden', icon.dataset['icon'] !== scheme);
     }

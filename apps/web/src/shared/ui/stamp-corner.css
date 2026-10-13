@@ -3,12 +3,12 @@
    as Tailwind utilities, so the note pages (which inline `stamp.css`) and the site stylesheet do not
    pay for it. The parent of the stamp is `position: relative`. */
 .stamp-corner {
-  margin-bottom: 0.75rem;
+  margin-bottom: 1.25rem;
 }
 @media (min-width: 768px) {
   .stamp-corner {
     position: absolute;
-    top: -1.25rem;
+    top: 0;
     right: 0;
     margin-bottom: 0;
   }

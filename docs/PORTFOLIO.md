@@ -27,7 +27,7 @@ Guía de «quiero cambiar X: qué archivo, qué campo, un ejemplo» para lo que 
 | Imágenes de un experimento | `apps/web/src/assets/experiments/<clave>/` | archivos listados en `images` |
 | Tamaño de página, destacados, filas en `/me`, intro y palabras de la página | `site.config.ts` | bloque `experiments` |
 | Notas | `apps/web/src/content/notes/<slug>/index.mdx` | ver [NOTES.md](NOTES.md) |
-| Certificados y títulos (hoy se muestran en `/me`) | `apps/web/src/content/credentials.json` | una clave por certificado |
+| Certificados y títulos (`/education/` y el bloque de `/me`) | `apps/web/src/content/credentials.json` | una clave por certificado |
 | Nombres de etiquetas de experimentos (`ai-agents` se muestra «AI agents») | `apps/web/src/features/portfolio/lib/experiments.ts` | `EXPERIMENT_TAG_LABELS` |
 | Etiquetas genéricas de la interfaz (botones, estados, «Más experimentos», paginador) | `apps/web/src/shared/i18n/index.ts` | claves `experiments.*`, `exp.status.*`, `me.*` |
 
@@ -97,6 +97,7 @@ me: {
 
 - `images[]`: de 1 a 4, **en el orden en que se muestran**. La primera es la portada: la usan las filas de `/me`, la tarjeta compacta y la primera diapositiva. `alt` es obligatorio (hasta 140 caracteres); `caption` es opcional (hasta 120) y se ve bajo la imagen. Con una imagen es una figura; con dos o más, una galería con miniaturas que funciona sin JavaScript; sin `images`, una portada tipográfica (nunca una captura falsa).
 - `featured: true`: el experimento es una **pieza grande** (galería, tres datos, acciones). Máximo `experiments.maxFeatured` (3 por defecto). Si ninguno es destacado, el primero según el orden es la pieza grande.
+- **Número de entrada:** cada pieza grande abre con «Experimento 001», como «Nota 003» en las notas. El número es estable: la posición del experimento por fecha de publicación (`publishedAt`, o 1 de enero de su `year`) entre TODOS los experimentos, de más antiguo (001) a más nuevo, con el `id` como desempate. No cambia con el orden elegido ni con la página, y no se escribe a mano. Un experimento nuevo recibe el número siguiente solo si es el más reciente; uno con fecha anterior desplaza a los posteriores.
 - `order`: posición dentro del mismo nivel (menor primero, 100 por defecto) y desempate de los órdenes. Los destacados siempre van antes. `publishedAt` (opcional, `AAAA-MM-DD`) fija la fecha exacta para ordenar por fecha; sin él se usa el 1 de enero de `year`.
 - `status`: `running` (punto verde, «En curso»), `shipped` (violeta, «Publicado») o `archived` (gris, «Archivado»).
 - `note`: slug de una nota **publicada**; añade el botón «Leer el caso» (indica el idioma de la nota si difiere del de la página).
@@ -184,7 +185,10 @@ Los resultados y aportes que no hayas validado no se publican: sin cifras, usuar
 
 ## 6. Certificados y formación
 
-Hoy los certificados se muestran en `/me`, agrupados por año (se necesita `features.credentials`). Se editan en `apps/web/src/content/credentials.json`:
+Los títulos y certificados viven en `apps/web/src/content/credentials.json` (una clave por entrada) y alimentan dos lugares:
+
+- **`/education/`** (y `/en/education/`): la línea de tiempo completa, agrupada por año, del más reciente al más antiguo. Necesita `features.education`.
+- **`/me`**: con `features.education` activa, un bloque compacto «Formación reciente» (las `education.meRows` más nuevas, 3 por defecto, cada una con enlace a su entrada) y un enlace «Ver mi recorrido de formación». Con `features.education` apagada, `/me` conserva la lista larga de certificados por año (necesita `features.credentials`).
 
 ```json
 {
@@ -192,12 +196,24 @@ Hoy los certificados se muestran en `/me`, agrupados por año (se necesita `feat
     "title": "Ingeniería en Programación",
     "issuer": "Universidad Nacional",
     "kind": "degree",
-    "year": 2021
+    "year": 2021,
+    "order": 0
   }
 }
 ```
 
-La página dedicada de formación (`/education/`) está planeada y todavía no existe; cuando llegue, esta guía se completa con su sección.
+### Cómo agregar una formación
+
+1. Añade una clave nueva en kebab-case a `credentials.json`. La clave es el ancla: `/education/#<clave>` apunta a esa entrada (y `/me` enlaza a ella).
+2. Campos obligatorios: `title` (máx. 120), `issuer` (máx. 80), `kind` (`degree`, `certificate` o `professional`) y `year`. Opcionales: `month` (1-12, se muestra y ordena las entradas dentro de su año), `url` (enlace https de verificación; aparece como «Verificar»), `credentialId`, `expires` (`AAAA-MM`).
+3. **Orden dentro de un año:** primero `order` (entero, menor primero), después el mes (una entrada sin mes cuenta como el inicio del año), después la clave. El año manda. Fija `order` cuando quieras un orden editorial.
+4. **Solo con contenido real:** `learnings` (1 a 8 puntos, aparecen en un bloque «Qué aprendí»), `appliedIn` («Dónde lo apliqué») e `image` (copia pública del documento) se muestran únicamente cuando existen; nunca se inventa texto. La única excepción es el espacio del documento: sin `image`, la entrada muestra una portada tipográfica decorativa (año, tipo y emisor, solo con CSS) hasta que haya una copia real. En pantallas anchas el documento ocupa una columna de 20rem junto al texto, y al pulsar la miniatura se abre una copia mayor en un visor (un enlace simple a la imagen si JavaScript está desactivado). Las imágenes van en `apps/web/src/assets/education/<archivo>` (nunca en `public/`; si falta el archivo, el build falla) y llevan `alt`.
+5. Los textos aceptan una cadena o un objeto por idioma (`{ "es": "…", "en": "…" }`).
+6. Ejecuta `pnpm docs:config` si cambiaste el esquema y revisa `/education/` en local.
+
+### Ajustes de la página
+
+El bloque `education` de `site.config.ts` (todo opcional): `perPage` (entradas por página, 12), `sortFrom` (desde cuántas entradas aparece el selector «más antiguas primero» y la página `/education/oldest/`, que no se indexa; 4), `meRows` (filas de `/me`, 3) e `intro` (texto bajo el título, por idioma). El detalle está en [CONFIGURATION.md](CONFIGURATION.md).
 
 ## 7. Lista de verificación antes de publicar
 

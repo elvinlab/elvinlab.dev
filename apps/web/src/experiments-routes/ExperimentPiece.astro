@@ -25,9 +25,11 @@ type Props = {
   locale: Locale;
   /** 1-based position on the page: it decides which side the media sits on and which piece is first. */
   index: number;
+  /** The stable entry number ("001"): the position by publication date over all the experiments. */
+  number: string;
 };
 
-const { experiment, locale, index } = Astro.props;
+const { experiment, locale, index, number } = Astro.props;
 const text = (value: ExperimentEntry['subtitle']) => pickLocale(value, locale, LOCALES.defaultLocale);
 const subtitle = text(experiment.subtitle);
 type FactKey = 'experiment.problem' | 'experiment.contribution' | 'experiment.result';
@@ -45,12 +47,15 @@ const caseHref = experiment.note
   : undefined;
 const tags = visibleExperimentTags(experiment.tags);
 const first = index === 1;
+const MARK = '\u0001';
+const [entryBefore = '', entryAfter = ''] = t(locale, 'experiment.entry', { number: MARK }).split(MARK);
 ---
 
 <article id={experiment.id} class="xp-piece" data-flip={hasMedia && index % 2 === 0 ? '' : undefined} data-first={first ? '' : undefined} data-featured={hasMedia && first && experiment.featured ? '' : undefined} data-solo={hasMedia ? undefined : ''}>
   {hasMedia && <ExperimentMedia experiment={experiment} locale={locale} priority={first} />}
   <div class="xp-panel">
     <div class="xp-top">
+      <p class="xp-num">{entryBefore}<b>{number}</b>{entryAfter}</p>
       <span class="xp-status">
         <span class="xp-dot" data-status={experiment.status} aria-hidden="true"></span>
         {t(locale, `exp.status.${experiment.status}`)}
@@ -63,7 +68,7 @@ const first = index === 1;
     {facts.length > 0 ? (
       <dl class="xp-facts">
         {facts.map(([key, value]) => (
-          <div>
+          <div data-result={key === 'experiment.result' ? '' : undefined}>
             <dt>{t(locale, key)}</dt>
             <dd>{value}</dd>
           </div>

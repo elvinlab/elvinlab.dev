@@ -12,6 +12,7 @@ import { localizePath } from '@elvinlab/core';
 
 import {
   type ExperimentSort,
+  experimentNumbers,
   experimentsHref,
   introText,
   labWords,
@@ -35,6 +36,7 @@ type Props = { locale: Locale; page?: number; sort?: ExperimentSort };
 
 const { locale, page = 1, sort: requested } = Astro.props;
 const { experiments, pages, sort, offered } = await loadExperimentPages(requested);
+const numbers = experimentNumbers(experiments);
 const current = pages.find((candidate) => candidate.page === page);
 if (!current) throw new Error(`/experiments/ has no page ${page} (${pages.length} in total)`);
 const { big, entries, groups } = current;
@@ -94,7 +96,7 @@ const css = experimentsCss({
         {big.map((experiment, i) => (
           <>
             {i > 0 && <div class="xp-hairline" aria-hidden="true"></div>}
-            <ExperimentPiece experiment={experiment} locale={locale} index={i + 1} />
+            <ExperimentPiece experiment={experiment} locale={locale} index={i + 1} number={numbers.get(experiment.id) ?? ''} />
           </>
         ))}
       </div>

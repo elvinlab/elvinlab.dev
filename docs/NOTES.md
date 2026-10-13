@@ -116,7 +116,7 @@ Detalles que evitan errores:
 
 ### 3.1. Notas «Empieza aquí»
 
-`/notes/` abre con un bloque «Empieza aquí» de tres notas, y al final de cada nota «Sigue leyendo» muestra primero esas mismas notas (si el lector no las acaba de ver en anterior/siguiente) y después las relacionadas. Se eligen con dos campos en la propia nota:
+`/notes/` abre con una tira compacta «Empieza aquí» de tres notas (un encabezado y los tres títulos con su número; la razón de una línea no se muestra ahí), y al final de cada nota «Sigue leyendo» muestra primero esas mismas notas (si el lector no las acaba de ver en anterior/siguiente) y después las relacionadas. Se eligen con dos campos en la propia nota:
 
 ```yaml
 startHere: 2

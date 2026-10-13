@@ -107,6 +107,11 @@ The descriptions come from the schema (`.describe()`), which is why they are in 
 | `experiments.defaultSort` | `'newest' \| 'oldest' \| 'title'` | no | `newest` | Order of the compact cards at `/experiments/`: `newest` (publication date, newest first), `oldest` or `title` (A to Z). Big (featured) pieces always lead page 1 whatever the sort. It must be one of `sorts`. |
 | `experiments.sorts` | `'newest' \| 'oldest' \| 'title'[]` | no | `["newest","oldest","title"]` | Sorts the visitor can choose, from `newest`, `oldest` and `title`. Each one except `defaultSort` is a static page (`/experiments/oldest/`, `/experiments/oldest/page/2/`) that search engines are told not to index and that stays out of the sitemap. A list of one sort shows no switch. |
 | `experiments.sortFrom` | `integer (min 2, max 48)` | no | `4` | The sort switch and the alternate-sort pages exist only when the compact cards (everything that is not a big piece) number at least this many; below it the order is not worth choosing. |
+| `education` | `object` | no | `{}` | Settings of the education timeline (`features.education`): pagination, the sort switch, the rows on `/me` and the page intro. Every key is optional and falls back to its default. |
+| `education.perPage` | `integer (min 4, max 48)` | no | `12` | Entries per page of `/education/`. The timeline is grouped by year inside each page; a second page exists only when the entries exceed this number (`/education/page/2/`). |
+| `education.sortFrom` | `integer (min 2, max 48)` | no | `4` | The sort switch (newest first, oldest first) and the page of the alternate order (`/education/oldest/`, not indexed) exist only when the entries number at least this many; below it the timeline has a single order. |
+| `education.meRows` | `integer (min 1, max 6)` | no | `3` | Rows of the "Recent education" block on `/me`, newest first; each links to its entry on `/education/`. |
+| `education.intro` | `{ <locale>: string (max 200) }` | no |  | Optional intro under the title of `/education/`, per locale (the default locale is required). Omit it to use the interface default. Max 200 characters per locale. |
 | `changelog` | `object` | no | `{}` | Settings of the changelog (`features.changelog`). Every key is optional and falls back to its default. |
 | `changelog.perPage` | `integer (min 2, max 30)` | no | `4` | Release days per page of `/changelog/`. A release is one production day, so this counts days, not entries; a second page exists only when the days exceed this number (`/changelog/page/2/`). Page 1 opens its two newest days; the rest stay collapsed. |
 | `notes` | `object` | no | `{}` | Settings of the notes area (`features.blog`): the static topic pages. Every key is optional and falls back to its default. |
@@ -142,11 +147,12 @@ The descriptions come from the schema (`.describe()`), which is why they are in 
 | `me.stack[].hint` | `{ <locale>: string (max 180) }` | no |  | One plain-language sentence per locale that says what the group is. Shown as a hover and focus tooltip; omit for no tooltip. Max 180 characters per locale. |
 | `me.stack[].layer` | `boolean` | no |  | Draws the group as a numbered layer of the product (for example data, backend, frontend, cloud), joined to the next layer by a vertical line. Omit for a group that cuts across layers, such as AI or quality. Keep the layers first in the list. |
 | `me.stack[].folded` | `boolean` | no |  | Puts the group inside a collapsed "more tools" block under the stack (native details, no script). Use it for secondary groups so the stack stays short; a layer cannot be folded. |
-| `features` | `object` | yes |  | Feature flags: off means the routes are not generated and the nav entry is hidden. The four interface switches (`backToTop`, `languageHint`, `themeToggle`, `backgroundPicker`) default to on and render nothing when off. |
+| `features` | `object` | yes |  | Feature flags: off means the routes are not generated and the nav entry is hidden. The interface switches (`backToTop`, `languageHint`, `themeToggle`, `backgroundPicker`, `readingProgress`) default to on and render nothing when off. |
 | `features.blog` | `boolean` | yes |  | Lab Notes: the notes index, note pages, RSS and the nav entry. |
 | `features.comments` | `boolean` | yes |  | Giscus comments on notes. Needs the `giscus` block below, otherwise nothing renders. |
 | `features.contact` | `boolean` | yes |  | The /contact form: off removes the route and the contact Action, hides the nav entry and every link to it (the legal pages and the subscription messages then name no Contact page), and keeps it out of the sitemap. |
 | `features.credentials` | `boolean` | yes |  | Certificates and degrees on /me. |
+| `features.education` | `boolean` | no | `true` | The /education timeline of degrees and certificates (`credentials.json`): off removes the routes, the nav entry, the /me block and the sitemap entries. |
 | `features.experiments` | `boolean` | yes |  | The experiments (projects) section and its pages. |
 | `features.changelog` | `boolean` | yes |  | Visitor-facing /changelog page: off removes the route, the footer link and the sitemap entry. |
 | `features.me` | `boolean` | yes |  | The /me recruiter page: off hides it from the nav, marks it noindex and keeps it out of the sitemap. |
@@ -157,6 +163,7 @@ The descriptions come from the schema (`.describe()`), which is why they are in 
 | `features.languageHint` | `boolean` | no | `true` | The banner that suggests the other language to visitors whose browser prefers it. Off renders neither the banner nor its script. |
 | `features.themeToggle` | `boolean` | no | `true` | The theme button in the navbar. Off renders no button and no script: the theme still resolves from the visitor's system preference (or the default theme) on every page. |
 | `features.backgroundPicker` | `boolean` | no | `true` | The navbar button that cycles the banner background effect. Off renders no button and no script: the effect follows the owner default from `background`. |
+| `features.readingProgress` | `boolean` | no | `true` | Remembers how far each visitor read every note: returns them to where they stopped and marks finished notes "read" in the lists. Off renders no script and no label and stores nothing in the browser. |
 | `features.experimentNudge` | `boolean` | no | `false` | A card that points to the latest experiment: static at the end of every note and on the home, floating once the visitor has read most of a note. Off by default; off renders no card, no script or CSS and stores nothing in the browser. It also needs `features.experiments`: with that flag off it never shows. |
 | `integrations` | `object` | no | `{}` | Public ids of third-party services. They ship in the HTML by design, so they live here and not in secrets. |
 | `integrations.cloudflareAnalyticsToken` | `string` | no |  | Cloudflare Web Analytics beacon token (public). Omit to turn analytics off. Env `PUBLIC_CF_ANALYTICS_TOKEN` overrides it. |
@@ -209,7 +216,7 @@ Shown in the `/me` timeline. If you omit `end`, it is the current job. `role`, `
 
 ### Certificates and degrees — `credentials.json`
 
-Grouped by year, newest first. Only shown when `features.credentials` is on.
+They feed `/education/` (a timeline by year, newest first; needs `features.education`) and `/me`: with `features.education` on, a block with the newest `education.meRows`; off, the long list by year, which needs `features.credentials`. How to add one: [PORTFOLIO.en.md](PORTFOLIO.en.md#6-credentials-and-education).
 
 ```json
 {
@@ -227,11 +234,18 @@ Grouped by year, newest first. Only shown when `features.credentials` is on.
 | --- | --- | --- | --- | --- |
 | `title` | `string (max 120)` | yes |  | Name of the certificate or degree (max 120 characters). |
 | `issuer` | `string (max 80)` | yes |  | Who issued it (max 80 characters). |
-| `kind` | `'degree' \| 'certificate'` | yes |  | Whether it is a degree or a certificate. |
-| `year` | `integer (min 1970)` | yes |  | Year obtained; certificates are grouped by year, newest first. |
-| `month` | `integer (min 1, max 12)` | no |  | Optional month (1-12) to order items within a year. |
+| `kind` | `'degree' \| 'certificate' \| 'professional'` | yes |  | Whether it is a degree, a course certificate or a professional certification. |
+| `year` | `integer (min 1970)` | yes |  | Year obtained; `/education/` groups entries by year (newest first) and `/me` shows the newest. |
+| `month` | `integer (min 1, max 12)` | no |  | Optional month (1-12), shown and used to order entries within a year. |
+| `order` | `integer (min 0)` | no |  | Optional editorial position inside its year on `/education/` (lower first). Entries without it follow, ordered by id. |
 | `url` | `URL` | no |  | Verification link (https only). |
 | `credentialId` | `string` | no |  | Credential id in kebab-case, if the issuer gives one. |
+| `image` | `object` | no |  | Optional public copy of the document. |
+| `image.file` | `string` | yes |  | File name inside `src/assets/education/` (a public copy of the document). |
+| `image.alt` | `string \| { <locale>: string }` | yes |  | What the image shows (max 140 characters). |
+| `learnings` | `string \| { <locale>: string }[] (max 8)` | no |  | Optional points learned; the entry gets a details block only when present. |
+| `appliedIn` | `string \| { <locale>: string }` | no |  | Optional note on where it was applied (max 160 characters). |
+| `expires` | `string` | no |  | Optional expiry as YYYY-MM, for certifications that lapse. |
 <!-- docs:end credentials -->
 
 ### Experiments — `experiments.json`
@@ -410,26 +424,30 @@ Each `features` flag switches the whole feature off: the route is not generated,
 | `blog` | Notes index, notes and RSS | With no published notes, the menu hides "Notes" and the feed. With `blog: false` no notes route, RSS feed or sitemap entry is built (the routes in `src/blog-routes/` are injected only when the flag is on, by `integrations/blog-routes.ts`) |
 | `comments` | Comments and reactions (Giscus) | Needs the `giscus` block; see 6.5 |
 | `contact` | The `/contact` form | Needs the Worker secrets; without them it fails closed |
-| `credentials` | Certificates on `/me` | |
+| `credentials` | Certificates on `/me` | With `education` on, `/me` shows the recent-education block instead of this list |
+| `education` | `/education/` page and the "Recent education" block of `/me` | Off: no route and no menu entry |
 | `experiments` | Experiments section and pages (`/experiments/`) | |
 | `changelog` | The `/changelog` page and its link | When off the route is not generated (see "What each switch does") |
 | `me` | The `/me` page (portfolio) | |
 | `readingMode` | Reading mode on notes | Off: no button, script or CSS ships and nothing is stored in the browser |
+| `readingProgress` | Remembers reading progress on notes | Off: no script or label ships and nothing is stored in the browser (on by default) |
 
 #### What each switch does
 
-All flags live under `features` in `site.config.ts`. The four interface switches (`backToTop`, `languageHint`, `themeToggle`, `backgroundPicker`) default to `true` when omitted; `experimentNudge` defaults to `false`. Checked against the code.
+All flags live under `features` in `site.config.ts`. The interface switches (`backToTop`, `languageHint`, `themeToggle`, `backgroundPicker`, `readingProgress`) default to `true` when omitted; `experimentNudge` defaults to `false`. Checked against the code.
 
 | Flag | What it controls | What disappears when it is off | Dependencies |
 | --- | --- | --- | --- |
 | `blog` | Lab Notes: `/notes` index, notes and the `/rss.xml` feed | The routes (`integrations/blog-routes.ts`), the "Notes" menu entry, the feed and the sitemap entries; the home and `/me` stop reading notes | With no published notes the menu also hides "Notes". `subscribe` requires `blog` |
 | `comments` | Comments and reactions (Giscus) on notes | The component and its mention in the privacy and terms pages | Needs the `giscus` block; without it nothing renders |
 | `contact` | The `/contact` page (and `/en/contact`) and the `contact` Action | The routes (`integrations/contact-routes.ts`), the Action (answers "unavailable" without reaching any provider), the menu entry, the author card and `/me` buttons, and the sitemap entry. The privacy and terms pages stop linking to contact (they point to "the channels published on this site") and privacy loses its "Contact form" section. The subscription error messages stop mentioning the Contact page | When on, needs the Worker secrets (`CONTACT_*`) and the Turnstile key; without them it fails closed |
-| `credentials` | Certificates and degrees on `/me` | The certificates section of `/me` | |
+| `credentials` | Certificates and degrees on `/me` | The certificates section of `/me` | Ignored on `/me` while `education` is on |
+| `education` | `/education/` page (education timeline) and the "Recent education" block of `/me` | The routes (`integrations/education-routes.ts`), the "Education" menu entry, the `/me` block (the long list returns if `credentials` is on) and the sitemap entries | Reads `credentials.json`; the `education` block of `site.config.ts` tunes page, switch and rows |
 | `experiments` | Experiments section | The `/experiments/` and `/en/experiments/` routes (`integrations/experiments-routes.ts`), the menu entry, the home section and the `/me` section, and its sitemap entry | `home.experiments` also needs it |
 | `me` | The `/me` page | The "About" menu entry, the home hiring card, the notes sidebar link and the `/me` share card; the page is marked `noindex` and kept out of the sitemap | |
 | `changelog` | The `/changelog` page (and `/en/changelog`) | The routes (`integrations/changelog-routes.ts`), the footer link and the sitemap entry | |
 | `readingMode` | Reading mode on notes | Button, script and CSS; nothing is stored in the browser | |
+| `readingProgress` | Returns the reader to where they stopped in a note (restores the position) and marks notes "read" or "continue reading" in the notes index, the home notebook and the latest-note card | The inline scripts, the labels and the `progress:<note>` key in `localStorage`; the privacy page stops declaring it | |
 | `marks` | Footprint button on notes and the home | The button and its counter, and the privacy section | Needs `SITE_DB` (D1) and `MARKS_RATE_LIMITER` |
 | `subscribe` | Email subscription | The `/subscribe/**` routes, the `/api/subscribe/notify` endpoint, the footer link and form, and the privacy section | Needs `blog` and a Turnstile key to show the form; also `SITE_DB`, `SUBSCRIBE_RATE_LIMITER`, `SUBSCRIBE_FROM` and `SUBSCRIBE_TOKEN_SECRET` (see 6.14) |
 | `backToTop` | Floating "back to top" button | The button and its script (nothing else depends on it) | |
@@ -517,6 +535,7 @@ A text that is too long overflows a button, wraps a menu entry onto two lines or
 | Key group | Limit (characters, in each language) | Where it appears |
 | --- | --- | --- |
 | `subscribe.*` | 200 | The subscription form, its messages and the confirmation pages |
+| `education.*` | 140 | Intro, labels and sort descriptions of `/education/` |
 | `experiments.*` | 140 | Intro and sort descriptions of `/experiments/` |
 | `author.*` | 130 | The author card on the home |
 | `me.*` | 110 | The `/me` page: headings, hints and labels |
@@ -537,7 +556,7 @@ A text that is too long overflows a button, wraps a menu entry onto two lines or
 | `note.*` | 28 | Labels inside a note (reading time, license, translations) |
 | `now.*` | 28 | The "Now" card |
 | `nudge.*` | 28 | The latest-experiment card: label, link and close button |
-| `reading.*` | 28 | The reading mode button (one line) |
+| `reading.*` | 28 | The reading mode button and the read / continue reading labels (one line) |
 | `skip.*` | 28 | The skip-to-content link |
 | `background.*` | 24 | The background picker button |
 | `aside.*` | 20 | The notes sidebar |

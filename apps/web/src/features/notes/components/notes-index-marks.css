@@ -1,0 +1,70 @@
+/* Read marks of the notes index: only inlined while `features.readingProgress` is on (the white-label
+   build asserts that no progress wording ships with it off). Same scope as `notes-index.css`. */
+/* Read marks. The number gets a pixel check (read) or a half-filled square (in progress) next to it,
+   drawn from 2 px cells and shown only when the labels script has set the state of the row, so the
+   unread rows have nothing there. The label itself leaves the meta line and sits under the number: an
+   absolutely positioned label takes no room, so filling it in cannot wrap the meta line or move a row.
+   It has no pointer events, so the stretched title link still opens the note from there. */
+.ni-num {
+  display: flex;
+  align-items: center;
+  align-self: start;
+  gap: 0.5rem;
+}
+.ni-num::after {
+  content: none;
+  flex-shrink: 0;
+  background: var(--color-primary);
+}
+[data-note-row]:has([data-progress-label][data-state="read"]) .ni-num::after {
+  content: "";
+  width: 14px;
+  height: 10px;
+  clip-path: polygon(
+    12px 0,
+    14px 0,
+    14px 4px,
+    12px 4px,
+    12px 6px,
+    10px 6px,
+    10px 8px,
+    8px 8px,
+    8px 10px,
+    2px 10px,
+    2px 8px,
+    0 8px,
+    0 4px,
+    2px 4px,
+    2px 6px,
+    4px 6px,
+    4px 8px,
+    6px 8px,
+    6px 6px,
+    8px 6px,
+    8px 4px,
+    10px 4px,
+    10px 2px,
+    12px 2px
+  );
+}
+[data-note-row]:has([data-progress-label][data-state="continue"]) .ni-num::after {
+  content: "";
+  width: 10px;
+  height: 10px;
+  clip-path: path(evenodd, "M0 0H10V10H0ZM5 2H8V8H5Z");
+}
+[data-note-row] [data-progress-label] {
+  position: absolute;
+  top: 3.625rem;
+  left: 0;
+  width: 4rem;
+  color: var(--color-primary);
+  line-height: 1.125rem;
+  pointer-events: none;
+}
+@media (min-width: 768px) {
+  [data-note-row] [data-progress-label] {
+    left: 0.75rem;
+    width: 5.5rem;
+  }
+}
