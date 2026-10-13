@@ -832,5 +832,11 @@
     "category": "added",
     "title": "Education document viewer",
     "description": "On the Education page the document thumbnails are smaller and open a larger copy in a viewer you can close with Esc, the Close button or a click outside it; without JavaScript they open the image itself. The text now sits next to the document on wide screens, and the Learned block shows a small arrow that tells it opens."
+  },
+  "education-pixel-buttons": {
+    "date": "2026-10-13",
+    "category": "changed",
+    "title": "Pixel buttons on Education",
+    "description": "The buttons of the Education page now have a small pixel look: stepped corners and a pixel X on the viewer close button, pixel corner brackets and a plus on the document thumbnails, pixel arrows on Verify and on the Learned block, and stepped corners on the sort switch. The viewer opens with a short stepped dissolve and the details respond to hover and focus in two or three steps. With reduced motion nothing moves and the states stay visible through color and outline."
   }
 }

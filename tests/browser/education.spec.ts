@@ -20,6 +20,7 @@ type Credential = {
   order?: number;
   month?: number;
   learnings?: unknown[];
+  url?: string;
   image?: unknown;
 };
 const credentials = Object.entries(
@@ -356,5 +357,200 @@ for (const { path, locale } of PAGES) {
     await expect(
       page.locator('#nav-menu').getByRole('link', { name: text(locale, 'nav.education') }),
     ).toBeVisible();
+  });
+}
+
+// Pixel details of the buttons (E6): glyphs, stepped corners and motion that exists only without
+// `prefers-reduced-motion`.
+const withImage = credentials.find((entry) => entry.image);
+const withLearnings = credentials.find((entry) => entry.learnings?.length);
+const withUrl = credentials.find((entry) => entry.url);
+
+const box = async (locator: ReturnType<Page['locator']>) => {
+  const rect = await locator.boundingBox();
+  if (!rect) throw new Error('element has no box');
+  return rect;
+};
+
+const outlineStyle = (locator: ReturnType<Page['locator']>) =>
+  locator.evaluate((node) => {
+    const style = getComputedStyle(node);
+    return { style: style.outlineStyle, width: Number.parseFloat(style.outlineWidth) };
+  });
+
+for (const { path, locale } of PAGES) {
+  test(`${path} close button has a pixel glyph, a text label and a 44px target`, async ({
+    page,
+  }) => {
+    test.skip(!withImage, 'no entry has an image');
+    await page.goto(path);
+    await page.locator('[data-ed-open]').first().click();
+    const close = page.locator('dialog[data-ed-viewer]').getByRole('button', {
+      name: text(locale, 'education.viewer.close'),
+    });
+    const glyph = close.locator('svg[aria-hidden="true"]');
+    await expect(glyph).toHaveCount(1);
+    await expect(glyph).toHaveAttribute('shape-rendering', 'crispEdges');
+    await expect(close).toContainText(text(locale, 'education.viewer.close'));
+    const rect = await box(close);
+    expect(rect.width).toBeGreaterThanOrEqual(44);
+    expect(rect.height).toBeGreaterThanOrEqual(44);
+    expect(await close.evaluate((node) => getComputedStyle(node).clipPath)).toContain('polygon');
+  });
+
+  test(`${path} hovering the buttons, thumbnail, verify link and disclosure shifts no layout`, async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width: 1280, height: 900 });
+    await page.goto(path);
+    const targets: ReturnType<Page['locator']>[] = [
+      page.locator('.lk-sort-option:not([aria-current="true"])').first(),
+    ];
+    if (withImage) targets.push(page.locator(`#${withImage.id} .ed-doc`));
+    if (withUrl) targets.push(page.locator(`#${withUrl.id} .ed-verify`));
+    if (withLearnings) targets.push(page.locator(`#${withLearnings.id} .ed-learned summary`));
+    for (const target of targets) {
+      await target.scrollIntoViewIfNeeded();
+      const before = await box(target);
+      const around = await page.evaluate(() => document.documentElement.scrollHeight);
+      await target.hover();
+      await page.waitForTimeout(400);
+      const after = await box(target);
+      expect(after.width).toBeCloseTo(before.width, 0);
+      expect(after.height).toBeCloseTo(before.height, 0);
+      expect(await page.evaluate(() => document.documentElement.scrollHeight)).toBe(around);
+    }
+    if (withImage) {
+      await page.locator('[data-ed-open]').first().click();
+      const close = page.locator('dialog[data-ed-viewer] button');
+      const before = await box(close);
+      await close.hover();
+      await page.waitForTimeout(400);
+      const after = await box(close);
+      expect(after.width).toBeCloseTo(before.width, 0);
+      expect(after.height).toBeCloseTo(before.height, 0);
+    }
+  });
+
+  test(`${path} thumbnail shows pixel brackets on hover and a visible focus ring`, async ({
+    page,
+  }) => {
+    test.skip(!withImage, 'no entry has an image');
+    await page.goto(path);
+    const doc = page.locator(`#${withImage?.id} .ed-doc`);
+    const opacity = () =>
+      doc.evaluate((node) => getComputedStyle(node, '::after').opacity as string);
+    expect(await opacity()).toBe('0');
+    await doc.hover();
+    await expect.poll(opacity).toBe('1');
+    await page.mouse.move(0, 0);
+    await page.keyboard.press('Shift');
+    await doc.focus();
+    expect((await outlineStyle(doc)).style).not.toBe('none');
+    await expect.poll(opacity).toBe('1');
+  });
+
+  test(`${path} verify link keeps its underline and shows one pixel arrow`, async ({ page }) => {
+    test.skip(!withUrl, 'no entry has a verification link');
+    await page.goto(path);
+    const link = page.locator(`#${withUrl?.id} .ed-verify`);
+    await expect(link.locator('svg[aria-hidden="true"]')).toHaveCount(1);
+    expect(await link.evaluate((node) => getComputedStyle(node).textDecorationLine)).toContain(
+      'underline',
+    );
+    const rect = await box(link);
+    expect(rect.height).toBeGreaterThanOrEqual(44);
+    await page.keyboard.press('Shift');
+    await link.focus();
+    expect((await outlineStyle(link)).style).not.toBe('none');
+  });
+
+  test(`${path} disclosure and sort options are 44px targets with a visible focus ring`, async ({
+    page,
+  }) => {
+    await page.goto(path);
+    await page.keyboard.press('Shift');
+    const options = page.locator('.lk-sort-option');
+    const count = await options.count();
+    for (let index = 0; index < count; index += 1) {
+      const option = options.nth(index);
+      expect((await box(option)).height).toBeGreaterThanOrEqual(44);
+      await option.focus();
+      expect((await outlineStyle(option)).style).not.toBe('none');
+    }
+    if (count > 0) {
+      expect(await options.first().evaluate((node) => getComputedStyle(node).clipPath)).toContain(
+        'polygon',
+      );
+    }
+    if (withLearnings) {
+      const summary = page.locator(`#${withLearnings.id} .ed-learned summary`);
+      expect((await box(summary)).height).toBeGreaterThanOrEqual(44);
+      await summary.focus();
+      expect((await outlineStyle(summary)).style).not.toBe('none');
+    }
+  });
+
+  test(`${path} close button shows a visible focus ring`, async ({ page }) => {
+    test.skip(!withImage, 'no entry has an image');
+    await page.goto(path);
+    await page.locator('[data-ed-open]').first().click();
+    await page.keyboard.press('Shift');
+    const close = page.locator('dialog[data-ed-viewer] button');
+    await close.focus();
+    const ring = await outlineStyle(close);
+    expect(ring.style).not.toBe('none');
+    expect(ring.width).toBeGreaterThanOrEqual(2);
+  });
+
+  test.describe(`${path} with reduced motion`, () => {
+    test.use({ reducedMotion: 'reduce' });
+
+    test('nothing in the buttons, the dialog or the sort switch animates', async ({ page }) => {
+      await page.goto(path);
+      const motion = (selector: string) =>
+        page
+          .locator(selector)
+          .first()
+          .evaluate((node) => {
+            const style = getComputedStyle(node);
+            // The site-wide reduced-motion reset may leave 1e-05s instead of 0s: both mean no motion.
+            const seconds = Number.parseFloat(style.transitionDuration);
+            return {
+              duration: seconds <= 0.001 ? '0s' : style.transitionDuration,
+              animation: style.animationName,
+            };
+          });
+      const sort = await motion('.lk-sort-option');
+      expect(sort).toEqual({ duration: '0s', animation: 'none' });
+      if (!withImage) return;
+      await page.locator('[data-ed-open]').first().click();
+      for (const selector of [
+        'dialog[data-ed-viewer]',
+        'dialog[data-ed-viewer] button',
+        'dialog[data-ed-viewer] button svg',
+      ]) {
+        expect(await motion(selector), selector).toEqual({ duration: '0s', animation: 'none' });
+      }
+      const backdrop = await page
+        .locator('dialog[data-ed-viewer]')
+        .evaluate((node) => getComputedStyle(node, '::backdrop').animationName);
+      expect(backdrop).toBe('none');
+    });
+  });
+
+  test.describe(`${path} with motion allowed`, () => {
+    test.use({ reducedMotion: 'no-preference' });
+
+    test('the dialog opens with a stepped dissolve', async ({ page }) => {
+      test.skip(!withImage, 'no entry has an image');
+      await page.goto(path);
+      await page.locator('[data-ed-open]').first().click();
+      const dialog = page.locator('dialog[data-ed-viewer]');
+      expect(await dialog.evaluate((node) => getComputedStyle(node).animationName)).toBe('ed-pop');
+      expect(
+        await dialog.evaluate((node) => getComputedStyle(node).animationTimingFunction),
+      ).toMatch(/^steps\(4/);
+    });
   });
 }
