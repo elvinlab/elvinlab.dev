@@ -1,7 +1,7 @@
 import { expect, type Locator, type Page, test } from '@playwright/test';
 
 import { describeViolations, scan } from './helpers/axe';
-import { seedTheme } from './helpers/features';
+import { has, seedTheme } from './helpers/features';
 import { themes } from './helpers/site';
 import { stubThirdParties } from './helpers/third-party';
 
@@ -76,6 +76,16 @@ const DESKTOP_CONTROLS = {
   picker: '[data-background-toggle]',
 } as const;
 
+const HAS_THEME = has({ flags: ['themeToggle'] });
+const HAS_PICKER = has({ flags: ['backgroundPicker'] });
+
+/** The controls of the desktop bar this profile renders (an adopter can turn the theme button and the picker off). */
+const LIVE_CONTROLS = Object.entries(DESKTOP_CONTROLS).filter(
+  ([name]) => (name !== 'theme' || HAS_THEME) && (name !== 'picker' || HAS_PICKER),
+);
+/** A control that is always there to stand in for the theme button where a check only needs one pixel control. */
+const STAND_IN = HAS_THEME ? DESKTOP_CONTROLS.theme : DESKTOP_CONTROLS.language;
+
 type Look = {
   clip: string;
   layerClip: string;
@@ -136,7 +146,7 @@ const scaleOf = (transform: string): [number, number] => {
 
 for (const theme of [themes.dark, themes.light]) {
   test.describe(`control states (${theme})`, () => {
-    for (const [name, selector] of Object.entries(DESKTOP_CONTROLS)) {
+    for (const [name, selector] of LIVE_CONTROLS) {
       test(`${name}: hover draws a notched fill on a layer and never clips the control`, async ({
         browser,
       }) => {
@@ -198,7 +208,7 @@ for (const theme of [themes.dark, themes.light]) {
 }
 
 test.describe('press', () => {
-  for (const [name, selector] of Object.entries(DESKTOP_CONTROLS)) {
+  for (const [name, selector] of LIVE_CONTROLS) {
     test(`${name}: pressing nudges 1 px down and never scales`, async ({ browser }) => {
       const { page, close } = await open(browser);
       const control = page.locator(selector).first();
@@ -221,7 +231,7 @@ test.describe('press', () => {
 test.describe('reduced motion', () => {
   test('the states stay visible by fill and ring, with no transition', async ({ browser }) => {
     const { page, close } = await open(browser, { reducedMotion: 'reduce' });
-    for (const [name, selector] of Object.entries(DESKTOP_CONTROLS)) {
+    for (const [name, selector] of LIVE_CONTROLS) {
       if (name === 'picker') continue; // hidden under reduced motion: it would promise a change nobody sees
       const control = page.locator(selector).first();
       const rest = await look(control);
@@ -231,17 +241,15 @@ test.describe('reduced motion', () => {
       expect((await look(control)).layerClip).not.toBe('none');
     }
     await page.keyboard.press('Tab');
-    await page.locator(DESKTOP_CONTROLS.theme).focus();
+    await page.locator(STAND_IN).focus();
     // The reset leaves a 1e-05s transition on every property, so the ring width settles on the next frame.
-    await expect
-      .poll(async () => (await look(page.locator(DESKTOP_CONTROLS.theme))).outline.width)
-      .toBe('2px');
+    await expect.poll(async () => (await look(page.locator(STAND_IN))).outline.width).toBe('2px');
     await close();
   });
 
   test('with motion allowed the steps are two, about 150 ms', async ({ browser }) => {
     const { page, close } = await open(browser);
-    const timing = await page.locator(DESKTOP_CONTROLS.theme).evaluate((el) => {
+    const timing = await page.locator(STAND_IN).evaluate((el) => {
       const own = getComputedStyle(el);
       const layer = getComputedStyle(el, '::before');
       return {
@@ -261,11 +269,13 @@ test.describe('reduced motion', () => {
   });
 });
 
+/** The glyph hosts this profile renders, and the icons they must hold (theme: 2, picker: 3, menu: one svg). */
 const GLYPH_HOSTS = [
-  '[data-theme-toggle]',
-  '[data-background-toggle]',
+  ...(HAS_THEME ? ['[data-theme-toggle]'] : []),
+  ...(HAS_PICKER ? ['[data-background-toggle]'] : []),
   '[data-nav-toggle]',
-] as const;
+];
+const ICON_CONTROLS = GLYPH_HOSTS.filter((host) => host !== '[data-nav-toggle]');
 
 test.describe('pixel glyph icons', () => {
   test('every icon is one crisp filled path on a small grid, sized as before', async ({
@@ -308,13 +318,12 @@ test.describe('pixel glyph icons', () => {
     }, GLYPH_HOSTS);
     // theme: dark + light; picker: galaxy + cursor-waves + off; menu: one svg with two paths.
     expect(icons.map((icon) => icon.icon)).toEqual([
-      'dark',
-      'light',
-      'galaxy',
-      'cursor-waves',
-      'off',
+      ...(HAS_THEME ? ['dark', 'light'] : []),
+      ...(HAS_PICKER ? ['galaxy', 'cursor-waves', 'off'] : []),
       'menu+close',
     ]);
+    if (!HAS_THEME) await expect(page.locator('[data-theme-toggle]')).toHaveCount(0);
+    if (!HAS_PICKER) await expect(page.locator('[data-background-toggle]')).toHaveCount(0);
     for (const icon of icons) {
       expect(icon.fill, icon.icon).toBe('currentColor');
       expect(icon.stroke, icon.icon).toBeNull();
@@ -331,7 +340,7 @@ test.describe('pixel glyph icons', () => {
     browser,
   }) => {
     const { page, close } = await open(browser);
-    for (const host of ['[data-theme-toggle]', '[data-background-toggle]']) {
+    for (const host of ICON_CONTROLS) {
       const control = page.locator(host);
       const box = await control.boundingBox();
       expect(box?.width).toBe(MIN_TARGET);
@@ -348,17 +357,18 @@ test.describe('pixel glyph icons', () => {
   test('clicking the theme toggle and the picker still swaps the visible icon', async ({
     browser,
   }) => {
+    test.skip(
+      ICON_CONTROLS.length === 0,
+      'needs features.themeToggle or features.backgroundPicker',
+    );
     const { page, close } = await open(browser);
     const visible = (host: string) =>
       page.locator(`${host} svg:not(.hidden)`).evaluate((svg) => svg.getAttribute('data-icon'));
-    const theme = page.locator('[data-theme-toggle]');
-    const before = await visible('[data-theme-toggle]');
-    await theme.click();
-    await expect.poll(() => visible('[data-theme-toggle]')).not.toBe(before);
-    const picker = page.locator('[data-background-toggle]');
-    const start = await visible('[data-background-toggle]');
-    await picker.click();
-    await expect.poll(() => visible('[data-background-toggle]')).not.toBe(start);
+    for (const host of ICON_CONTROLS) {
+      const before = await visible(host);
+      await page.locator(host).click();
+      await expect.poll(() => visible(host)).not.toBe(before);
+    }
     await close();
   });
 
@@ -382,7 +392,7 @@ test.describe('pixel glyph icons', () => {
   for (const theme of [themes.dark, themes.light]) {
     test(`icons keep 3:1 contrast against the bar in ${theme}`, async ({ browser }) => {
       const { page, close } = await open(browser, { theme });
-      const ratio = await page.evaluate(() => {
+      const ratio = await page.evaluate((iconHost) => {
         const channel = (value: number): number => {
           const v = value / 255;
           return v <= 0.03928 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4;
@@ -399,9 +409,7 @@ test.describe('pixel glyph icons', () => {
         };
         const luminance = ([r, g, b]: number[]): number =>
           0.2126 * channel(r ?? 0) + 0.7152 * channel(g ?? 0) + 0.0722 * channel(b ?? 0);
-        const fg = rgb(
-          getComputedStyle(document.querySelector('[data-theme-toggle]') as Element).color,
-        );
+        const fg = rgb(getComputedStyle(document.querySelector(iconHost) as Element).color);
         const nav = rgb(
           getComputedStyle(document.querySelector('[data-navbar] nav') as Element).backgroundColor,
         );
@@ -410,7 +418,7 @@ test.describe('pixel glyph icons', () => {
         const bg = [0, 1, 2].map((i) => (nav[i] ?? 0) * alpha + (page[i] ?? 0) * (1 - alpha));
         const [hi, lo] = [luminance(fg), luminance(bg)].sort((a, b) => b - a);
         return ((hi ?? 0) + 0.05) / ((lo ?? 0) + 0.05);
-      });
+      }, ICON_CONTROLS[0] ?? '[data-nav-toggle]');
       expect(ratio).toBeGreaterThanOrEqual(3);
       await close();
     });
@@ -431,13 +439,16 @@ test.describe('layout is unchanged', () => {
       const controls: Record<string, string> = {
         brand: DESKTOP_CONTROLS.brand,
         language: DESKTOP_CONTROLS.language,
-        theme: DESKTOP_CONTROLS.theme,
-        picker: DESKTOP_CONTROLS.picker,
+        ...(HAS_THEME ? { theme: DESKTOP_CONTROLS.theme } : {}),
+        ...(HAS_PICKER ? { picker: DESKTOP_CONTROLS.picker } : {}),
         ...(phone ? { menu: '[data-nav-toggle]' } : {}),
       };
+      // The recorded boxes are right-aligned: they hold only with every control present.
+      const exact = HAS_THEME && HAS_PICKER;
       for (const [name, selector] of Object.entries(controls)) {
         const box = await page.locator(selector).first().boundingBox();
         expect(box?.height, `${name} height`).toBeGreaterThanOrEqual(MIN_TARGET);
+        if (!exact) continue;
         const [x, w] = recorded[name as keyof typeof recorded] as readonly [number, number];
         expect(Math.round(box?.x ?? -1), `${name} x`).toBe(x);
         expect(Math.round(box?.width ?? -1), `${name} width`).toBe(w);

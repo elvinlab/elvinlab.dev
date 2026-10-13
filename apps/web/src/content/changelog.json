@@ -940,5 +940,11 @@
     "category": "changed",
     "title": "The Lighthouse gate uses the median of three runs",
     "description": "LCP and the performance score are now judged on the median of the three Lighthouse runs instead of the worst one, and the LCP limits went up by 200 ms (2700 ms, and 2800 ms on the note fixture). One noisy CI run no longer blocks a deploy; accessibility, SEO, best practices, CLS and TBT stay strict."
+  },
+  "ci-notes-lane-hardening": {
+    "date": "2026-10-13",
+    "category": "changed",
+    "title": "Notes CI checks",
+    "description": "Checks built notes, links and changelog; smoke verifies enabled blog routes and new notes. Log growth raises only the HTML cap; CSS/JS caps stay fixed."
   }
 }

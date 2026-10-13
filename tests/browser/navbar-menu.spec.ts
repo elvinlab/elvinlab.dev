@@ -1,7 +1,7 @@
 import { expect, type Page, test } from '@playwright/test';
 
 import { describeViolations, scan } from './helpers/axe';
-import { seedTheme } from './helpers/features';
+import { has, seedTheme } from './helpers/features';
 import { themes } from './helpers/site';
 import { stubThirdParties } from './helpers/third-party';
 
@@ -73,10 +73,14 @@ test.describe('menu panel', () => {
     await page.keyboard.press('Enter');
     const first = page.locator('#nav-menu a').first();
     await expect(first).toBeFocused();
-    await page.keyboard.press('Tab');
-    const second = page.locator('#nav-menu a').nth(1);
-    await expect(second).toBeFocused();
-    const ring = await second.evaluate((el) => {
+    // A profile with a single menu link has no second one to Tab to: check the ring on the first.
+    let target = first;
+    if ((await page.locator('#nav-menu a').count()) > 1) {
+      await page.keyboard.press('Tab');
+      target = page.locator('#nav-menu a').nth(1);
+      await expect(target).toBeFocused();
+    }
+    const ring = await target.evaluate((el) => {
       const style = getComputedStyle(el);
       return { style: style.outlineStyle, width: Number.parseFloat(style.outlineWidth) };
     });
@@ -216,6 +220,10 @@ test.describe('tablet bar', () => {
         test(`${path} keeps one ${BAR_HEIGHT} px row at ${width} px${withPicker ? ' with the picker' : ''}`, async ({
           browser,
         }) => {
+          test.skip(
+            withPicker && !has({ flags: ['backgroundPicker'] }),
+            'needs features.backgroundPicker',
+          );
           const context = await browser.newContext({
             viewport: { width, height: 900 },
             reducedMotion: withPicker ? 'no-preference' : 'reduce',
@@ -235,7 +243,7 @@ test.describe('tablet bar', () => {
             page.locator('[data-navbar] ul:not(#nav-menu) a').first(),
             page.locator('[data-navbar] ul:not(#nav-menu) a').last(),
             page.locator('[data-navbar] nav > a[hreflang]').first(),
-            page.locator('[data-theme-toggle]'),
+            ...(has({ flags: ['themeToggle'] }) ? [page.locator('[data-theme-toggle]')] : []),
             ...(withPicker ? [page.locator('[data-background-toggle]')] : []),
           ];
           const centers: number[] = [];

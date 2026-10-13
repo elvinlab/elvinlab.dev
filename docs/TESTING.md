@@ -41,7 +41,7 @@ Verify what a change touches, and record it. Do not run the whole stack after ev
 4. **Record every run and every skip** in the task tracker and in the [verification ledger](../odd/verification-ledger.md): what ran, the result and the commit; for a skipped check, why it was safe to skip.
 5. **Never report a skipped check as verified.** Say "not re-run: untouched since `<sha>`".
 6. **Delegated writers run only the checks the parent lists** under `## Verify` in the brief, taken from the map below. A writer does not run the full suite by default, and the parent does not repeat it.
-7. **Release:** run what the ledger shows as stale, then push. CI on `main` runs the whole stack once more (`static`, `e2e`, `lighthouse`, `checks`) before it deploys, so it is the full backstop; the local run before a release is not. The one exception is the notes-only fast lane ([ADR 0016](adr/0016-publish-note-command-and-notes-fast-lane.md)): a push that only touches published notes and `changelog.json`/`releases.json` skips `e2e` and `lighthouse` and runs `static`, `notes-gate` (build, JS budget, page weight) and the deploy.
+7. **Release:** run what the ledger shows as stale, then push. CI on `main` runs the whole stack once more (`static`, `e2e`, `lighthouse`, `checks`) before it deploys, so it is the full backstop; the local run before a release is not. The one exception is the notes-only fast lane ([ADR 0016](adr/0016-publish-note-command-and-notes-fast-lane.md)): a push that only touches published notes and `changelog.json`/`releases.json` skips `e2e` and `lighthouse` and runs `static`, `notes-gate` (build, JS budget, page weight, `check:built-notes`, and the changelog page spec, since a publish always edits `changelog.json`) and the deploy, whose smoke check also requires 200 on `/notes/`, `/rss.xml` and each published note when `features.blog` is enabled. The workflow derives the flag from the validated candidate before deployment; blog-off builds skip only those blog routes, while unknown flags and unavailable changed-note targets fail closed. `docs:config` and `changelog:audit` are not CI steps (`publish-note` runs the audit).
 
 ### `pnpm verify`: the rule as a command
 
@@ -65,7 +65,7 @@ The single source of truth is [`apps/web/scripts/verification-map.ts`](../apps/w
 - `pnpm verify --files <paths>` plans (and with `--run` executes) for a simulated change set without editing files; it cannot be combined with `--record`.
 - `--run` ends with `elapsed <n>s (full stack baseline 340 s: saved <p>%)`. Baseline, what changed and the measurements: [`odd/verification-timings.md`](../odd/verification-timings.md).
 - CI shards the `e2e` job in four (`--shard=N/4`); white-label, `version.txt` and the image check run in shard 1 only; `checks` needs the whole matrix. Each job prints its duration in the run summary.
-- CI also runs Lighthouse in two shards (`--shard=N/2`): each takes every second URL of `lighthouserc.json` (shard 1: `/`, `/me/`, `/experiments/`, `/notes/smoke-es/`, `/en/contact/`; shard 2: `/en/`, `/en/me/`, `/notes/`, `/contact/`, `/subscribe/`), still 3 runs per URL and the same assertions. Locally `pnpm test:lighthouse` runs all ten; `node apps/web/scripts/run-lighthouse-ci.ts --shard 1/2` reproduces a CI shard. `--url` wins over `--shard`; `--runs` composes with both. `checks` needs the whole matrix, so it fails if either shard fails.
+- CI also runs Lighthouse in two shards (`--shard=N/2`): each takes every second URL of `lighthouserc.json`, still 3 runs per URL and the same assertions. Locally `pnpm test:lighthouse` runs all configured URLs (13 currently); `node apps/web/scripts/run-lighthouse-ci.ts --shard 1/2` reproduces a CI shard. `--url` wins over `--shard`; `--runs` composes with both. `checks` needs the whole matrix, so it fails if either shard fails.
 - A diff in `apps/web/src/shared/i18n/index.ts` that only adds keys is ignored; a changed or removed key counts.
 - `pnpm verify --run` with Lighthouse runs only the affected URLs (`run-lighthouse-ci.ts --url <path>`, repeatable); with no flag it measures every URL of `lighthouserc.json` as before.
 - Biome does not read Markdown, so a docs-only change plans `lint` and runs nothing.
@@ -85,8 +85,8 @@ The single source of truth is [`apps/web/scripts/verification-map.ts`](../apps/w
 | You touched | Run | Skip, if untouched |
 | --- | --- | --- |
 | Documentation, trackers, `odd/` | `lint` on the files | everything else |
-| `changelog.json`, `releases.json` | the changelog unit tests (`releases.test.ts`), `lint`; the build when the page layout changed | e2e |
-| A note (`content/notes/**`) | `build` (it validates the frontmatter), `lint` | e2e, Lighthouse (the gate measures fixtures, not real notes) |
+| `changelog.json`, `releases.json` | the changelog unit tests (`releases.test.ts`), `tests/browser/changelog.spec.ts`, `lint`; the build when the page layout changed | the rest of e2e, Lighthouse (`/changelog/` is intentionally not a Lighthouse URL) |
+| A note (`content/notes/**`) | `build` (it validates the frontmatter), `check:built-notes` (its page, the index, sitemap, feed, topics and every internal link exist), `lint` | e2e, Lighthouse (the gate measures fixtures, not real notes; `check:built-notes` is what looks at the real ones) |
 | Schema, `site.config.ts`, `env-vars.ts`, fixtures | `docs:config`, the config unit tests, `typecheck`, `test:white-label`, `build` | e2e, Lighthouse |
 | Unit-tested logic (`lib/`, `ports`, `adapters`, `actions`) | the related unit tests, `typecheck`, `lint` | e2e (unless the page behavior changed), Lighthouse |
 | Added, moved or removed files, or edited imports | `depcruise` | |
@@ -233,6 +233,18 @@ feature really needs the bytes: build, run `node apps/web/scripts/page-weight-bu
 with the new `measured` and date, and say why in the commit and in the changelog. Never raise a budget
 to make a failing run pass without a measured reason. The check runs in CI next to `check:js-budget`
 and in `pnpm verify` (family `page-weight`, planned for any change that can alter built pages).
+
+**2026-10-13 release CI fixes — measured changelog allowance.** The Lighthouse and
+notes-gate changelog entries grew the first changelog page's editorial markup. Even after shortening
+the pending entry, `/changelog/` measured 128845 B against 128690 B (+155 B). The owner authorized a
+bounded ceiling of **129000 B**, not automatic growth or an arbitrary relaxation. The final entry
+also records this reason: the final `/changelog/` HTML is **128899 B**, leaving **101 B**
+of HTML headroom; inline styles measure **63066 B**. The English twin measures 128595 B.
+The dated notes-index/topic baselines were refreshed from the same build (nine index rows and
+six rows on the largest topic); their growth rules and ceilings did not change.
+The existing **63216 B CSS ceiling** and **30 KiB JavaScript gzip cap** remain unchanged. This
+allowance adds no runtime script or stylesheet and changes no other page limit. `changelog` remains
+a fixed page type, outside `CONTENT_GROWTH`; future growth still needs a measured decision.
 
 ### Content-aware notes budgets (2026-10-11)
 

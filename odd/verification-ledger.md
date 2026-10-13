@@ -1,6 +1,21 @@
 # Verification ledger
 
-## Current release evidence (2026-10-12)
+## CI recovery candidate evidence (2026-10-13)
+
+Candidate: the interrupted release fix and notes-only lane hardening, including the feature-aware navbar specs and the documented changelog HTML allowance. These are observed local results, not a claim that a new production release or GitHub profile job has passed.
+
+- Independent verification: full unit suite passed (44 core + 1727 web tests); focused nine-file script run passed 147 tests; changelog browser spec passed 6 tests.
+- Full typecheck initially found two TS4111 errors in the new smoke test. Bracket property access fixed them; the rerun passed with zero errors, warnings or hints, and all 47 affected script tests passed.
+- Direct Biome checks passed (602 files), architecture passed (332 modules / 877 dependencies), actionlint and shell syntax passed, and the source diff is whitespace-clean. RTK's Biome parser produced unusable failures; the identical direct commands passed without source fixes.
+- Fresh build, JS budget and page-weight budget passed for 42 pages. Compiled-note validation passed for nine enabled notes with three explicit pre-existing link warnings (the English 404 and subscribe-result note-index targets).
+- Changelog HTML: ES 128899 B and EN 128595 B, against a bounded 129000 B ceiling. The 128690 -> 129000 B change covers measured editorial markup growth from the release entries; CSS and JS ceilings did not change. ES headroom is 101 B after final wording.
+- Smoke regressions cover blog-on/off, invalid feature flags, language fallback and missing index/feed/note failures using local HTTP only. Seven executions of the actual workflow selector with mocked compare responses proved notes-only selection, full-lane fallback, removed-note filtering, failed lookup rejection and the 300-file boundary.
+- Owner explicitly deferred all four full profile suites and Lighthouse to real CI. Inspect every profile outcome separately: informational profile failures do not necessarily fail the aggregate gate.
+- A mixed code release intentionally skips the actual `notes-gate` GitHub job. This record proves its components and selectors locally; execution of that conditional job requires a genuine future notes-only publication. No synthetic production push was made solely to exercise it.
+
+The forthcoming main CI run is the source of truth for profile, Lighthouse and deployment outcomes. This pre-release record does not convert those deferred checks into local passes.
+
+## Historical release evidence (2026-10-12)
 
 2026-10-12 reconciliation: release `ce5bdeb` matches the audited local tree. Existing [CI run 38322066089](https://github.com/elvinlab/elvinlab.dev/actions/runs/38322066089) passed its required gates and deploy. This is existing CI evidence, not a new local run.
 
