@@ -115,7 +115,7 @@ test('search and tag filtering keep working on the lean rows', async ({ page }) 
   }
 });
 
-test('the continue label stays on the meta line of a row with stored progress', async ({
+test('the continue label sits in the number column of a row with stored progress', async ({
   page,
 }) => {
   test.skip(!has({ flags: ['readingProgress'] }), 'needs features.readingProgress');
@@ -127,9 +127,13 @@ test('the continue label stays on the meta line of a row with stored progress', 
   const label = page.locator('[data-slug="smoke-es"] [data-progress-label]');
   await expect(label).toBeVisible();
   await expect(label).toHaveText(text('es', 'reading.continue'));
-  const time = await page.locator('[data-slug="smoke-es"] time').boundingBox();
+  // The label stays in the meta line of the markup but is lifted under the number (notes-index.css),
+  // so it never moves the meta line: it ends before the title column and starts below the number.
+  const title = await page.locator('[data-slug="smoke-es"] h3 a').boundingBox();
+  const number = await page.locator('[data-slug="smoke-es"] .ni-num').boundingBox();
   const labelBox = await label.boundingBox();
-  expect(Math.abs((time?.y ?? 0) - (labelBox?.y ?? 99))).toBeLessThanOrEqual(2);
+  expect((labelBox?.x ?? 0) + (labelBox?.width ?? 0)).toBeLessThanOrEqual(title?.x ?? 0);
+  expect(labelBox?.y ?? 0).toBeGreaterThanOrEqual((number?.y ?? 0) + (number?.height ?? 0));
 });
 
 test('the start-here strip keeps its heading and shows only numbers and titles', async ({

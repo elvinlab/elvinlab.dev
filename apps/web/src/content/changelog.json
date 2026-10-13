@@ -880,5 +880,11 @@
     "category": "changed",
     "title": "The notes index reads as a reading path",
     "description": "Each row on the notes index now shows the title first, then the date and the reading time on one line, the excerpt and at most three chips (the category and two tags; search still finds every tag). The Start here block is now a compact strip of three titles, so the list starts about 210 px higher on desktop and 300 px on phones."
+  },
+  "notes-index-controls": {
+    "date": "2026-10-13",
+    "category": "changed",
+    "title": "Read marks and pixel controls on the notes index",
+    "description": "A note you finished now shows a pixel check next to its number and one you started a half-filled marker, each with its label in the accent color. Chips, the Topics strip and the search field have notched pixel corners and two-step hover motion (none with reduced motion). The search shows a live result count, and an empty search shows what you typed and a button that clears it."
   }
 }

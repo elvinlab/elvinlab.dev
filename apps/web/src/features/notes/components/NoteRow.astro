@@ -5,7 +5,9 @@
  * The title is the row's only link; its `::after` stretches over the row so the whole row opens the
  * note (no script). The category and tag chips sit above that layer (`z-10`) as separate links to the
  * filtered index. The ruled line between rows and the wide-screen margin rule are CSS on this element
- * (`notes-index.css`, inlined by `NotesIndex`), so a row adds no markup for them.
+ * (`notes-index.css`, inlined by `NotesIndex`), so a row adds no markup for them. The read / continue label
+ * (filled in by `ReadingProgressMemory`) is lifted out of the meta line by that CSS into the number column,
+ * where it cannot move a row, and the check or half marker is drawn beside the number (`.ni-num`).
  */
 import { localizePath } from '@elvinlab/core';
 
@@ -40,7 +42,7 @@ const href = localizePath(`/notes/${note.slug}/`, data.lang, LOCALES);
   data-tags={rowTagList(data.category, data.tags)}
   class="relative grid grid-cols-[64px_1fr] gap-x-4 gap-y-2 py-5 transition-colors duration-150 hover:bg-card-hover md:grid-cols-[88px_1fr] md:rounded-inner md:px-3"
 >
-  <span class="pt-1 font-mono text-sm text-muted">{noteNumber(data.number)}</span>
+  <span class="ni-num pt-1 font-mono text-sm text-muted">{noteNumber(data.number)}</span>
 
   <div class="flex flex-col gap-2">
     <h3 class="text-lg font-bold leading-snug">
@@ -55,8 +57,8 @@ const href = localizePath(`/notes/${note.slug}/`, data.lang, LOCALES);
     <p class="text-sm leading-relaxed text-text-secondary">{data.description}</p>
     <div class="flex flex-wrap items-center gap-1.5">
       {secondaryMetaSlot === 'foot' && <LangBadge lang={data.lang} />}
-      <Chip href={tagHref(data.category, topics)} class="relative z-10">{data.category}</Chip>
-      {rowChipTags(data.tags, data.category).map((tag) => <Chip href={tagHref(tag, topics)} class="relative z-10">#{tag}</Chip>)}
+      <Chip href={tagHref(data.category, topics)} class="ni-chip relative z-10">{data.category}</Chip>
+      {rowChipTags(data.tags, data.category).map((tag) => <Chip href={tagHref(tag, topics)} class="ni-chip relative z-10">#{tag}</Chip>)}
     </div>
   </div>
 </article>

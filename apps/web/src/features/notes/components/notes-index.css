@@ -73,3 +73,136 @@
   gap: 0.25rem 1rem;
   margin-top: -0.25rem;
 }
+/* Pixel details of the index (DESIGN.md, "Notes index"). Everything below is scoped to `.ni-page`, the
+   wrapper `NotesIndex` and `NotesSidebar` put on the page and the sidebar, or to classes only those two
+   emit, so topic pages, the home and `/me` keep their rounded chips. The notch is a 4 px two-step corner
+   (the recipe of `/education/` and `/experiments/`), written once as a custom property here. A clipped
+   control would cut its own outline, so the search field, the button and the link drop the notch while
+   they have keyboard focus; a chip is never clipped itself: its notched fill is a `::before`, so its
+   44 px hit area (`::after`) and its focus ring stay whole. */
+.ni-page {
+  --ni-notch: polygon(
+    0 4px,
+    2px 4px,
+    2px 2px,
+    4px 2px,
+    4px 0,
+    calc(100% - 4px) 0,
+    calc(100% - 4px) 2px,
+    calc(100% - 2px) 2px,
+    calc(100% - 2px) 4px,
+    100% 4px,
+    100% calc(100% - 4px),
+    calc(100% - 2px) calc(100% - 4px),
+    calc(100% - 2px) calc(100% - 2px),
+    calc(100% - 4px) calc(100% - 2px),
+    calc(100% - 4px) 100%,
+    4px 100%,
+    4px calc(100% - 2px),
+    2px calc(100% - 2px),
+    2px calc(100% - 4px),
+    0 calc(100% - 4px)
+  );
+}
+.ni-chip {
+  isolation: isolate;
+  border-radius: 0;
+  background: transparent;
+}
+.ni-chip::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: var(--color-chip);
+  clip-path: var(--ni-notch);
+}
+.ni-input {
+  border-radius: 0;
+  clip-path: var(--ni-notch);
+}
+.ni-link,
+.ni-btn {
+  border-radius: 0;
+  clip-path: var(--ni-notch);
+}
+.ni-link {
+  padding-inline: 0.5rem;
+}
+.ni-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 2.75rem;
+  padding-inline: 1.25rem;
+  border: 0;
+  background: var(--color-button);
+  color: white;
+  font-weight: 500;
+  cursor: pointer;
+}
+.ni-input:focus-visible,
+.ni-link:focus-visible,
+.ni-btn:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 3px;
+  clip-path: none;
+}
+@media (hover: hover) {
+  .ni-chip:hover::before {
+    background: color-mix(in srgb, var(--color-primary) 16%, var(--color-chip));
+  }
+  .ni-input:hover {
+    background: color-mix(in srgb, var(--color-primary) 10%, var(--color-chip));
+  }
+  .ni-link:hover {
+    background: color-mix(in srgb, var(--color-primary) 14%, transparent);
+  }
+  .ni-btn:hover {
+    background: color-mix(in srgb, var(--color-button) 80%, black);
+  }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .ni-chip,
+  .ni-link,
+  .ni-btn {
+    transition:
+      transform 120ms steps(2, end),
+      color 120ms steps(2, end),
+      background-color 120ms steps(2, end);
+  }
+  .ni-chip::before,
+  .ni-input {
+    transition: background-color 120ms steps(2, end);
+  }
+  @media (hover: hover) {
+    .ni-chip:hover,
+    .ni-btn:hover {
+      transform: translateY(-1px);
+    }
+  }
+  .ni-chip:active,
+  .ni-btn:active {
+    transform: translateY(1px);
+  }
+}
+/* Result count beside the search (also on phones, so the list does not start lower) and the empty state under it. */
+.ni-search {
+  flex-basis: 12rem;
+  min-width: 0;
+}
+[data-notes-count] {
+  white-space: nowrap;
+}
+.ni-empty:not([hidden]) {
+  display: grid;
+  justify-items: start;
+  gap: 0.75rem;
+  padding-block: 1rem;
+}
+.ni-empty-title {
+  font-weight: 700;
+}
+.ni-empty strong {
+  overflow-wrap: anywhere;
+}
