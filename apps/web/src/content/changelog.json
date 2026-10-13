@@ -898,5 +898,11 @@
     "category": "fixed",
     "title": "Navbar: skip link, 360 px bar and announced states",
     "description": "The skip link now jumps past the navbar to the content, the bar stays on one row from 320 px, the theme toggle and background picker announce their state, and the phone menu moves focus into itself, hides the page behind it and shows a close icon while open."
+  },
+  "navbar-surface-and-marker": {
+    "date": "2026-10-13",
+    "category": "changed",
+    "title": "Navbar: a solid bar and a marker for the current page",
+    "description": "The navbar bar is now almost opaque with a thin edge in both themes, so page content no longer shows through after scrolling, and the current section is marked with a small purple pixel bar under its label (a bar at the left edge in the phone menu), so color is no longer the only cue."
   }
 }

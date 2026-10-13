@@ -138,6 +138,53 @@ body {
   }
 }
 
+/* Bar surface: the bar is a near-opaque card (`bg-card/92` on the nav). Its 1 px hairline on the sides and
+   bottom is a pseudo-element, so the bar box never changes; the text token at 24% opacity keeps it
+   visible on dark and light pages. */
+[data-navbar] > nav::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border: 1px solid var(--color-text);
+  border-top-width: 0;
+  border-radius: inherit;
+  opacity: 0.24;
+  pointer-events: none;
+}
+
+/* Current link marker (color is not the only cue): a 2 px pixel bar under the label with stepped 2 px
+   ends in the desktop row, a 3 px square bar at the left edge in the phone menu. Pseudo-element only,
+   so the link box never changes; no animation. */
+[data-navbar] a[aria-current="page"] {
+  position: relative;
+}
+[data-navbar] a[aria-current="page"]::after {
+  content: "";
+  position: absolute;
+  inset-inline: 0.5rem;
+  bottom: 0.5rem;
+  height: 2px;
+  background-color: var(--color-primary);
+  clip-path: polygon(
+    2px 0,
+    calc(100% - 2px) 0,
+    calc(100% - 2px) 1px,
+    100% 1px,
+    100% 2px,
+    0 2px,
+    0 1px,
+    2px 1px
+  );
+}
+#nav-menu a[aria-current="page"]::after {
+  inset-inline: 0 auto;
+  top: 0.5rem;
+  bottom: 0.5rem;
+  width: 3px;
+  height: auto;
+  clip-path: none;
+}
+
 [data-site-footer] {
   padding-bottom: max(2rem, env(safe-area-inset-bottom));
 }

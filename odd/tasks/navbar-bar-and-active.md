@@ -12,8 +12,8 @@
 - Active link marker: a small pixel marker in the primary color on the current link, in the desktop row (a 2 px tall bar under the label with stepped 2 px ends, built with `clip-path` or a stepped background, no rounded ends) and in the mobile menu (the same marker, or a 3 px square-capped bar at the left of the row); it never changes the link box (use a pseudo-element), exactly one per page, color is no longer the only cue (keep the purple text too), and it works in light and dark with contrast at least 3:1 against the bar. No new animation.
 
 ## Tasks
-- [ ] B1 — Opaque bar with a hairline edge in both themes; hide-on-scroll, sticky, safe-area and the banner overlap keep working.
-- [ ] B2 — Pixel active-link marker in the desktop row and the mobile menu; `aria-current` untouched.
+- [x] B1 — Opaque bar with a hairline edge in both themes; hide-on-scroll, sticky, safe-area and the banner overlap keep working.
+- [x] B2 — Pixel active-link marker in the desktop row and the mobile menu; `aria-current` untouched.
 
 ## Acceptance criteria
 - Every page keeps its layout (the navbar box and the offsets are unchanged: 72 px bar, banner `-mt-18`); only the bar surface and the active marker change.
@@ -23,3 +23,13 @@
 
 ## Progress and evidence
 Route: delegated writer; parent reviews the diff, re-runs checks and looks at screenshots.
+
+### Writer report (2026-10-13, uncommitted; the parent reviews and commits)
+- RED: new `tests/browser/navbar-surface.spec.ts` (`test:e2e:quick`) ran 14 failed, 5 passed before any change (surface x4, one-marker x8, mobile marker x2 failed; overflow and axe passed because nothing had changed yet). GREEN after the change: 19 passed. Unit: `apps/web/src/shared/layout/navbar-surface.test.ts` (reads `global.css` and `Navbar.astro` from disk): 4 tests.
+- B1: the nav class `bg-card/70` became `bg-card/92` (same token, alpha 0.92; `backdrop-blur-md` kept: after the first look at 0.92 without blur, content under the bar still showed as readable ghost text on dark, with the blur it is a soft smear). The old utility stays in the build because `BannerToggle.astro` still uses it. The hairline is one rule in `global.css` on `[data-navbar] > nav::before` (absolute, inset 0, 1 px border sides and bottom, text token, opacity 0.24; an opacity instead of `color-mix` because lightningcss emitted a duplicated fallback for every `color-mix` rule). The box is unchanged (72 px, same x and width as the header at 1280 and 390).
+- B2: `[data-navbar] a[aria-current="page"]` gets `position: relative` and an `::after` 2 px bar (inset 0.5rem, bottom 0.5rem, polygon clip with 2 px steps, primary token); `#nav-menu a[aria-current="page"]::after` is a 3 px square bar at the left edge (top/bottom 0.5rem). Link boxes stay 44 px.
+- Page weight (build vs the base build): style +594 B and html +594 B on every one of the 12 page types (uniform, no leak). Budgets raised, only for types over their budget, by the measured overshoot plus about 150 B (the base had little headroom), with a dated reason in each `why`: home, result, changelog, contact, education, experiments, me, default (style only), subscribe, notes-index (style only), note, topic. Changelog html: a further +640 B for its new entry (overshoot 237 B plus about 400 B).
+- Specs changed: none of the existing ones (no assertion expected the old alpha). New: `navbar-surface.spec.ts`, mapped in `verification-map.ts`.
+- Checks: biome clean, typecheck 0 errors, depcruise clean, web vitest 1671 passed, `check:js-budget` pass, `check:page-weight` 42 of 42 within budget, `test:white-label` pass, `docs:config` up to date. `test:e2e:quick` on the 21 listed specs: 412 passed, 3 skipped (the 320 px picker rows and one calm-pages case). `test:e2e` (3 viewports) navbar-a11y, mobile-ux, no-horizontal-overflow, navbar-surface: 119 passed, 244 skipped.
+- Visual review (Playwright PNGs, reduced motion): /, /notes/, /education/, /experiments/ at 1280 and 390, dark and light; scroll 600 down and 100 up on /education/ at 1280; menu open at 390 with the marker; marker at 3x. Changed after review: kept the blur (see B1). The marker reads clearly in both themes (stepped ends visible at 3x); the hairline is clear on dark and subtle but visible on light; the mobile left bar sits well against the row text.
+- Gaps: no Lighthouse or full e2e battery; contrast not measured numerically (primary on card is the same pair as the existing purple text, so at least 4.5:1 by the theme tokens); Safari not exercised.
