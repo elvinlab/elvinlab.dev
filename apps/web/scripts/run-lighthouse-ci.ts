@@ -56,28 +56,60 @@ export function selectShard<T>(items: T[], { index, total }: Shard): T[] {
 }
 
 /**
+ * The URLs of `lighthouserc.json` whose pages exist for the feature set under test (this site's
+ * `site.config.ts`, or an adopter profile from `E2E_FEATURE_PROFILE`): Lighthouse must not audit a
+ * `/contact/` that an adopter turned off. The alias hook is registered here, and the modules that
+ * need it are imported afterwards, so the command that CI and `pnpm verify` run stays as it is.
+ */
+async function liveUrls(urls: string[]): Promise<string[]> {
+  await import('./register-alias.mjs');
+  const [{ siteConfig }, { resolveE2eProfile }, profiles, { liveLighthouseUrls }] =
+    await Promise.all([
+      import('@/site.config.ts'),
+      import('./e2e-features.ts'),
+      import('./e2e-profiles.ts'),
+      import('./lighthouse-pages.ts'),
+    ]);
+  const profile = resolveE2eProfile(
+    profiles.withProfileFeatures(siteConfig, process.env[profiles.E2E_FEATURE_PROFILE_ENV]),
+    { appearance: process.env['FIXTURE_APPEARANCE'] },
+  );
+  return liveLighthouseUrls(urls, profile);
+}
+
+/**
  * Writes a temporary copy of lighthouserc.json holding only the requested URLs (same host and port
  * as the file) and returns its path, or undefined to use the committed configuration unchanged.
  * `--url` paths win and ignore `--shard`; otherwise a shard keeps its slice of the configured list.
- * Each process writes into its own scratch directory, so shards need no coordination.
+ * Pages the feature set under test does not build are dropped first. Each process writes into its
+ * own scratch directory, so shards need no coordination.
  */
-function filteredConfig(
+async function filteredConfig(
   paths: string[],
   shard: Shard | undefined,
   dir: string,
-): string | undefined {
-  if (paths.length === 0 && !shard) return undefined;
+): Promise<string | undefined> {
   const config = JSON.parse(readFileSync(join(root, 'lighthouserc.json'), 'utf8')) as {
     ci: { collect: { url: string[] } };
   };
+  const available = await liveUrls(config.ci.collect.url);
+  if (paths.length === 0 && !shard && available.length === config.ci.collect.url.length) {
+    return undefined;
+  }
   let urls: string[];
   if (paths.length > 0) {
-    urls = config.ci.collect.url.filter((url) => paths.includes(new URL(url).pathname));
+    urls = available.filter((url) => paths.includes(new URL(url).pathname));
     const unknown = paths.filter((path) => !urls.some((url) => new URL(url).pathname === path));
-    if (unknown.length > 0) throw new Error(`not in lighthouserc.json: ${unknown.join(', ')}`);
-  } else {
-    urls = selectShard(config.ci.collect.url, shard as Shard);
+    if (unknown.length > 0) {
+      throw new Error(
+        `not in lighthouserc.json, or not built for this feature set: ${unknown.join(', ')}`,
+      );
+    }
+  } else if (shard) {
+    urls = selectShard(available, shard);
     if (urls.length === 0) throw new Error('this shard has no URLs (more shards than URLs)');
+  } else {
+    urls = available;
   }
   console.log(`lighthouse URLs: ${urls.join(' ')}`);
   config.ci.collect.url = urls;
@@ -86,11 +118,11 @@ function filteredConfig(
   return file;
 }
 
-function main(): void {
+async function main(): Promise<void> {
   const scratch = mkdtempSync(join(tmpdir(), 'lhci-'));
   try {
     const args = process.argv.slice(2);
-    const config = filteredConfig(requestedPaths(args), parseShard(args), scratch);
+    const config = await filteredConfig(requestedPaths(args), parseShard(args), scratch);
     const runs = requestedRuns(args);
     const result = spawnSync(
       process.execPath,
@@ -114,4 +146,9 @@ function main(): void {
   }
 }
 
-if (import.meta.main) main();
+if (import.meta.main) {
+  main().catch((error: unknown) => {
+    console.error(error);
+    process.exitCode = 1;
+  });
+}
