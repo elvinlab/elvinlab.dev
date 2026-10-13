@@ -5,7 +5,7 @@
 2026-10-12 reconciliation: release `ce5bdeb` matches the audited local tree. Existing [CI run 38322066089](https://github.com/elvinlab/elvinlab.dev/actions/runs/38322066089) passed its required gates and deploy. This is existing CI evidence, not a new local run.
 
 - The CI run provides current release proof for static checks, browser shards, Lighthouse shards, required checks and deploy. It does not convert earlier failed/partial local runs into new local passes.
-- Current Lighthouse note-fixture exception: performance ≥ 0.93 and LCP ≤ 2600 ms only on `/notes/smoke-es/`; other paths remain ≥ 0.95 and ≤ 2500 ms. Follow-up: #119.
+- Current Lighthouse note-fixture exception: performance ≥ 0.93 and LCP ≤ 2800 ms only on `/notes/smoke-es/`; other paths remain ≥ 0.95 and ≤ 2700 ms. Since 2026-10-13 LCP and the performance score gate on the median of the three runs (owner decision), the other categories stay pessimistic. Follow-up: #119.
 - The seeded per-family table and measurements below are historical local evidence, not the latest CI baseline. Consult the current release run and scope fingerprints in `odd/verification-state.json` before deciding whether local checks need rerunning.
 - This reconciliation changes passive documentation only; its focused documentation checks are recorded in the reconciliation task tracker, not as an application-wide verification run.
 

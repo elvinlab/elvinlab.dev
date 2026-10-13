@@ -161,11 +161,15 @@ mise exec -- pnpm test:lighthouse
 The JavaScript budget checks every production-built HTML page, including inline scripts, local
 transitive imports, and island modules (`component-url`/`renderer-url`) and their imports, at no more than 30 KiB gzip. Lighthouse uses a separate temporary production
 build with synthetic English and Spanish note fixtures, emulates mobile, and checks all four
-categories at 95 or higher plus LCP ≤ 2500 ms, CLS ≤ 0.1 and TBT ≤ 200 ms. Three runs are
-aggregated pessimistically so one bad run cannot be hidden by a better one.
+categories at 95 or higher plus LCP ≤ 2700 ms, CLS ≤ 0.1 and TBT ≤ 200 ms. Three runs are
+taken per URL. LCP and the performance score use the median of the three runs (owner decision,
+2026-10-13: the worst-of-three gate failed releases 12 and 22 by 13 to 45 ms on runner noise, with
+single runs ranging from 2124 to 2645 ms on the same page); accessibility, best practices, SEO, CLS
+and TBT stay pessimistic, because they do not vary between runs.
 The `assertMatrix` in `lighthouserc.json` has one owner-approved exception (2026-10-12):
-`/notes/smoke-es/` allows performance ≥ 93 and LCP ≤ 2600 ms; accessibility, best practices,
-SEO, CLS and TBT stay unchanged. Every other gated URL retains performance ≥ 95 and LCP ≤ 2500 ms.
+`/notes/smoke-es/` allows performance ≥ 93 and LCP ≤ 2800 ms (the LCP gates were raised by 200 ms
+on 2026-10-13, from 2600 and 2500); accessibility, best practices, SEO, CLS and TBT stay unchanged.
+Every other gated URL retains performance ≥ 95 and LCP ≤ 2700 ms.
 Reducing note-page weight and restoring its original thresholds remains open in issue #119.
 
 Lighthouse reports are written locally to `.lighthouseci/` (ignored by Git); the configuration
