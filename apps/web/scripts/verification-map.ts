@@ -361,6 +361,12 @@ export const CHECKS: readonly CheckDef[] = [
   e2e({ file: 'notes-topics.spec.ts', covers: NOTE_PAGE }),
   e2e({ file: 'performance.spec.ts', covers: EVERY_PAGE }),
   e2e({ file: 'experiments.spec.ts', covers: [...EXPERIMENTS, ...ME] }),
+  e2e({
+    file: 'experiment-nudge.spec.ts',
+    covers: [...NOTE_PAGE, ...HOME],
+    helpers: true,
+    responsive: true,
+  }),
   e2e({ file: 'font-swap.spec.ts', covers: [...NOTE_PAGE, ...HOME] }),
   e2e({ file: 'changelog.spec.ts', covers: CHANGELOG }),
   e2e({ file: 'pixel-display.spec.ts', covers: [...NOTE_PAGE, ...HOME], responsive: true }),

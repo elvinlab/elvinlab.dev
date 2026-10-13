@@ -28,6 +28,7 @@ export const siteConfig = {
     languageHint: true,
     themeToggle: true,
     backgroundPicker: true,
+    experimentNudge: false,
   },
   legal: { privacyUpdated: '2026-01-01', termsUpdated: '2026-01-01' },
   background: { galaxy: true, cursorWaves: false },

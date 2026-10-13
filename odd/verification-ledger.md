@@ -1,8 +1,18 @@
 # Verification ledger
 
+## Current release evidence (2026-10-12)
+
+2026-10-12 reconciliation: release `ce5bdeb` matches the audited local tree. Existing [CI run 38322066089](https://github.com/elvinlab/elvinlab.dev/actions/runs/38322066089) passed its required gates and deploy. This is existing CI evidence, not a new local run.
+
+- The CI run provides current release proof for static checks, browser shards, Lighthouse shards, required checks and deploy. It does not convert earlier failed/partial local runs into new local passes.
+- Current Lighthouse note-fixture exception: performance ≥ 0.93 and LCP ≤ 2600 ms only on `/notes/smoke-es/`; other paths remain ≥ 0.95 and ≤ 2500 ms. Follow-up: #119.
+- The seeded per-family table and measurements below are historical local evidence, not the latest CI baseline. Consult the current release run and scope fingerprints in `odd/verification-state.json` before deciding whether local checks need rerunning.
+- This reconciliation changes passive documentation only; its focused documentation checks are recorded in the reconciliation task tracker, not as an application-wide verification run.
+
+
 The repository rule is in [`docs/TESTING.md`](../docs/TESTING.md), section "Touch-scoped verification": verify what a change touches, record it, and do not repeat a check whose scope was untouched since its last green entry. Update this file in the same commit as the change it records.
 
-## Last green commit per check family
+## Historical local seed: last green commit per check family (2026-10-05)
 
 A check is **stale** when files in its scope changed after its last green commit: `git diff --name-only <sha>..HEAD -- <scope>` prints something. Seeded on 2026-10-05 from the records of that day (commits are exact where a run was made on a clean commit; the Lighthouse and e2e rows were run on the working tree of that commit).
 
@@ -213,3 +223,7 @@ Release commit `f9467c5`. CI: static, e2e (4 shards, all projects), lighthouse (
 ### Release 18 deployed (2026-10-12, run 38276546818)
 
 Release commit `5912ab9`. Local battery before the release (delegated, GREEN): lint, typecheck, vitest (1373), depcruise, docs:config, build, page-weight (37 pages), js-budget, white-label, full e2e (1289 passed; one `font-swap` intermittent, since fixed in `7269237`), full Lighthouse (11 URLs, worst LCP 2344 ms on `/experiments/`), dev cold start, changelog audit. CI: static, e2e (4 shards) and lighthouse (2 shards); `lighthouse (1)` failed once (performance score under 0.95 on `/notes/smoke-es/`), the re-run of the failed job passed, deploy green. Production `/version.txt` = `5912ab9`; `/notes/`, two topic pages and `/rss.xml` answer 200. Not re-run since the release: nothing in the shipped tree changed after `26adb42`.
+
+### Experiment nudge, turned on for this blog (2026-10-12, local, not released)
+
+Candidate: `develop` after N1 to N7 of `odd/tasks/experiment-nudge.md` (`features.experimentNudge: true`). Full battery run twice (the first run found real defects, fixed and re-run): lint, typecheck, vitest (1442 across 129 files), depcruise (307 modules), build, white-label (asserts the flag-off build ships no card, script or CSS), js-budget, page-weight (38 pages within budget after the three budgets were raised with the measured cost), full `test:e2e:quick` (774 passed at 1280 px), the new `experiment-nudge.spec.ts` at 3 viewports (96 passed) and Lighthouse (1 run, 11 URLs, assertions passed). Defects the first run found and that were fixed: the floating card covering the footer links (the script ran before the footer was parsed), opening on load on short pages, covering the keyboard-focused element, fading out while still catching clicks, and an `<aside>` that broke the home and reading-mode locators. Not run: the 360 and 768 px projects of the whole suite (only the new spec ran at 3 viewports), real-device checks, and CI on `main` (nothing is pushed or released).

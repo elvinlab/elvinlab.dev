@@ -1,0 +1,70 @@
+/* The floating experiment card: bottom centre, lifted into view with a stepped (pixel) slide. */
+.nudge-float.nudge-float {
+  position: fixed;
+  left: 50%;
+  bottom: calc(1.25rem + env(safe-area-inset-bottom));
+  z-index: 40;
+  margin: 0;
+  width: min(30rem, calc(100vw - 2.5rem));
+  opacity: 0;
+  visibility: hidden;
+  /* Hidden means gone at once: no fade-out that keeps catching clicks or covering links. */
+  pointer-events: none;
+  transform: translate(-50%, 1rem);
+  /* A hard offset shadow, no blur: it stays on the pixel grid. */
+  box-shadow:
+    0 -4px 0 0 var(--xn-line),
+    0 4px 0 0 var(--xn-line),
+    -4px 0 0 0 var(--xn-line),
+    4px 0 0 0 var(--xn-line),
+    10px 10px 0 0 rgb(0 0 0 / 0.35);
+}
+.nudge-float[data-open] {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+  transform: translate(-50%, 0);
+}
+@media (prefers-reduced-motion: no-preference) {
+  .nudge-float[data-open] {
+    transition:
+      opacity 0.3s steps(4, end),
+      transform 0.3s steps(4, end);
+  }
+}
+.nudge-float .xn-head {
+  padding-right: 2.25rem;
+}
+.nudge-float .xn-meta {
+  margin-left: auto;
+}
+.nudge-close {
+  position: absolute;
+  top: 0.375rem;
+  right: 0.5rem;
+  display: grid;
+  width: 2rem;
+  height: 2rem;
+  place-items: center;
+  font-family: var(--font-mono);
+  font-size: 1.125rem;
+  line-height: 1;
+  color: var(--color-muted);
+}
+.nudge-close::before {
+  content: "";
+  position: absolute;
+  inset: -0.25rem;
+}
+.nudge-close:hover {
+  color: var(--color-pink);
+}
+/* On a phone the card spans the width: the back-to-top button rides above it while it is open. */
+@media (max-width: 40rem) {
+  html:has(.nudge-float[data-open]) [data-back-to-top] {
+    bottom: calc(env(safe-area-inset-bottom) + 13.25rem);
+  }
+}
+html[data-reading] .nudge-float {
+  display: none;
+}

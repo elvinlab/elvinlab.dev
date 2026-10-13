@@ -14,8 +14,9 @@ and serves it with Astro preview. It checks home, notes, note detail, contact pa
 For a faster loop while iterating, `mise exec -- pnpm test:e2e:quick` runs the same checks at 1280
 pixels only, and a spec path narrows it further (`pnpm test:e2e:quick tests/browser/smoke.spec.ts`).
 Each run pays about 9 seconds of fixed cost (workspace copy, build, preview). Run the full
-`pnpm test:e2e` (all three viewports) once before closing a change. Workers default to half of the
-available cores, so the full suite takes about 73 seconds on a 12-core machine (107 seconds at 2 workers).
+`pnpm test:e2e` (all three viewports) once before closing a change. Current configuration (`playwright.config.ts`) uses `workers: '100%'` and `retries: 0`, locally and in CI.
+The 73-second full-suite measurement on a 12-core machine (107 seconds at 2 workers)
+was recorded on 2026-10-02 with the then-current half-core setting; it is not a current timing promise.
 
 Fixtures live in `tests/fixtures/notes`, outside publishable content. Drafts, secrets and existing
 build output are excluded from the temporary copy; source configuration and tokens are never edited.
@@ -92,7 +93,7 @@ The single source of truth is [`apps/web/scripts/verification-map.ts`](../apps/w
 | A feature's UI (`features/<x>/components`) | its unit tests, the e2e specs of that area, `a11y.spec.ts` for its page, `typecheck` | specs of other areas |
 | Client JavaScript, islands, scripts, client dependencies | `build` then `check:js-budget`, the area's e2e, `check:dev-cold-start` if a dependency was added | |
 | Anything that changes the HTML or CSS bytes of a gated URL (styles, layout, head or SEO tags, fonts, note or home or contact markup) | `check:page-weight` after `build`, `test:lighthouse` and the area's e2e; compare the document size and the worst LCP with the ledger | Lighthouse if no page the gate loads changed |
-| Notes pages and what they render (`NotePage`, share panel, marks, prose styles) | the notes specs (`notes-layout`, `notes-tag-filter`, `notes-start-here`, `notes-topics`, `note-share`, `link-previews`, `note-translations`, `reading-mode`, `calm-pages`, `card-links`, `focus-not-obscured`, `marks`) and `a11y.spec.ts` | contact, home and `/me` specs |
+| Notes pages and what they render (`NotePage`, share panel, marks, prose styles) | the notes specs (`notes-layout`, `notes-tag-filter`, `notes-start-here`, `notes-topics`, `note-share`, `link-previews`, `note-translations`, `reading-mode`, `calm-pages`, `card-links`, `focus-not-obscured`, `marks`, `experiment-nudge`) and `a11y.spec.ts` | contact, home and `/me` specs |
 | Notebook identity (`Ink`, `Stamp`, `Fix`, `note-prose.css`, `record-card.css`, `DecisionRecord`) | `ink`, `note-prose`, `decision-record` and `page-stamps` specs, then the notes specs above; `home-ink` and `home-byline` when the home headline or byline changed | contact and `/me` specs |
 | Notes index rows (`NoteRow`, `notes-index.css`) | `notes-index-ruled`, `card-links`, `native-feel` (a stretched-link row must press with a tint, never a transform) | home and `/me` specs |
 | Cross-page transitions, native feel (`global.css` view-transition rules, safe-area, `theme-color`) | `view-transitions`, `native-feel`, then a wide change: the whole stack once | |
@@ -121,12 +122,33 @@ mise exec -- pnpm test:lighthouse
 The JavaScript budget checks every production-built HTML page, including inline scripts, local
 transitive imports, and island modules (`component-url`/`renderer-url`) and their imports, at no more than 30 KiB gzip. Lighthouse uses a separate temporary production
 build with synthetic English and Spanish note fixtures, emulates mobile, and checks all four
-categories at 95 or higher plus LCP < 2500 ms, CLS < 0.1 and TBT < 200 ms. Three runs are
+categories at 95 or higher plus LCP ≤ 2500 ms, CLS ≤ 0.1 and TBT ≤ 200 ms. Three runs are
 aggregated pessimistically so one bad run cannot be hidden by a better one.
+The `assertMatrix` in `lighthouserc.json` has one owner-approved exception (2026-10-12):
+`/notes/smoke-es/` allows performance ≥ 93 and LCP ≤ 2600 ms; accessibility, best practices,
+SEO, CLS and TBT stay unchanged. Every other gated URL retains performance ≥ 95 and LCP ≤ 2500 ms.
+Reducing note-page weight and restoring its original thresholds remains open in issue #119.
 
 Lighthouse reports are written locally to `.lighthouseci/` (ignored by Git); the configuration
 does not upload them. CI runs every browser, white-label and performance gate in the `checks` job,
 which the deploy job requires.
+
+### Optional production audits
+
+Production-wide Lighthouse audits are optional diagnostics, not an additional CI or feature-delivery
+gate. The owner stopped the exhaustive all-route/all-mode pursuit of 100 on 2026-10-12 to prioritize
+features. Do not resume it automatically; a new comprehensive audit requires an explicit request.
+Continue using the existing touch-scoped checks and CI budgets above, including the approved
+note-fixture exception. This decision neither weakens those gates nor raises them to 100.
+
+The [partial production audit checkpoint](../odd/tasks/production-lighthouse-audit-checkpoint.md)
+records 74 completed Navigation reports and 192 partial interaction reports (266 total). It distinguishes
+measured results, incomplete coverage and remaining findings; it is not an all-mode quality guarantee.
+Read categories according to their mode: an absent category or a null score is not a pass (Timespan
+and Snapshot do not expose the same categories as Navigation). Intentional `noindex` subscription
+token-state pages must remain non-indexable even when Lighthouse SEO reports 66 rather than 100.
+An accessibility score of 100 does not replace manual accessibility review or prove every audit
+passed; the checkpoint retains a non-scoring visible-label/accessibility-name mismatch for follow-up.
 
 ### Page weight budget (`pnpm check:page-weight`)
 
@@ -244,7 +266,9 @@ Lighthouse measures a fixture served by `astro preview`, which does **not** comp
 simulated slow 4G (about 1.6 Mbps, 150 ms round trip). The note page is about 98 KB of HTML, of which
 about 52 KB is inline CSS (the whole site stylesheet is inlined in every page), and it sits right at a
 TCP slow-start round-trip boundary: a few hundred more bytes cost one extra round trip, about 150 ms,
-and the LCP budget is 2500 ms with only about 90 ms to spare.
+and the LCP budget at the time was 2500 ms with only about 90 ms to spare.
+This is historical measurement evidence: since 2026-10-12 the note fixture alone uses
+2600 ms / performance ≥ 93; see the current Quality budgets section above and follow-up #119.
 
 Measured on 2026-10-02 on `/notes/smoke-es/` (worst of three runs; same machine, same fixture):
 

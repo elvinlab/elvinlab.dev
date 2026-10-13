@@ -1,5 +1,20 @@
 # Feature: elvinlab.dev — portfolio + Lab Notes
 
+## Current state (reconciled 2026-10-12)
+
+2026-10-12 reconciliation: release `ce5bdeb` matches the audited local tree. Existing [CI run 38322066089](https://github.com/elvinlab/elvinlab.dev/actions/runs/38322066089) passed its required gates and deploy. This is existing CI evidence, not a new local run.
+
+- The owner stopped the comprehensive production Lighthouse audit to prioritize features: 74 completed Navigation reports plus 192 partial interaction reports, 266 of 378 planned. The 78 journey IDs have some results, not verified complete journeys. See the [checkpoint](production-lighthouse-audit-checkpoint.md) for scores and limitations; no automatic continuation or all-mode 100 claim.
+- Routine work remains directly on `develop`. The earlier documentation/GitHub reconciliation was published to `develop` at `79215f4`; that push did not merge to `main` or deploy. This new checkpoint is a separate local documentation work unit, not evidence of another publication.
+- Notebook identity and motion have shipped; keep #119 open for note and `/me` LCP improvements. Only `/notes/smoke-es/` allows performance ≥ 0.93 and LCP ≤ 2600 ms; other gated paths retain ≥ 0.95 and ≤ 2500 ms.
+- Project 2: 90 items, 69 Done, 21 Todo, zero In Progress; all 21 open issues match Todo. No issue closure or project-status change is justified by this audit.
+- #87 is closed; its remaining LCP work is #119. #81 shipped in `d440d6b`; Education, case pages, R2 and owner-only work remain backlog.
+- PR #117 is closed; replacement #123 remains open without Satori. PR #115 remains open. Earlier PR/board inventories below are historical snapshots.
+- Migration 0003 was applied before `41a31af`; its recorded notification dry run returned 0 recipients, with no email sent. No database, email or deployment operation was repeated.
+
+The dated release and investigation entries below preserve evidence; they are not current TODOs unless explicitly retained above or in their feature tracker. No new browser/manual checks were performed during reconciliation.
+
+
 Locator: `odd/tasks/elvinlab-site.md` · No Engram mirror (CLAUDE.md: the file in git is the only source of truth)
 
 ## Objective

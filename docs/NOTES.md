@@ -247,6 +247,8 @@ Comportamiento del que no tienes que ocuparte:
 - **Impresión**: la banda y las máscaras vuelven a líneas simples.
 - **Accesibilidad**: el número de sección y el sello son decorativos; no forman parte del nombre accesible del título.
 
+- **Tarjeta de experimento**: después de cada nota, una tarjeta con marco de píxeles del último experimento (con `features.experimentNudge` encendido) y una copia flotante cuando la nota ya se leyó en su mayor parte. No escribís nada para ella; ver [PORTFOLIO.md](PORTFOLIO.md#la-tarjeta-del-último-experimento).
+
 Límite conocido de la numeración: el contador CSS numera **todos** los `h2` del artículo, pero el índice lateral lista solo los títulos `##` del Markdown. Un `<h2>` escrito a mano dentro de un componente MDX recibiría número y no tendría entrada en el índice. Escribe las secciones solo con `##`.
 
 Como la negrita y los enlaces ya se ven diseñados, **usa la negrita con medida** (un término clave, no una frase entera): cinco frases en negrita en una pantalla parecen un rotulador gastado.
@@ -312,9 +314,9 @@ Reglas:
 
 ### 5.5. Qué puede hacer quien escribe con los presupuestos
 
-Toda nota ya lleva unos 61 KB de CSS en línea en su cabecera (el aspecto de cuaderno, la tarjeta de decisión, el sello, el modo lectura). Además:
+La medición del 2026-10-12 registró unos 61 KB de CSS en línea en la cabecera de una nota (el aspecto de cuaderno, la tarjeta de decisión, el sello, el modo lectura). Además:
 
-- **Compuerta LCP**: menos de 2500 ms en móvil, el peor de tres runs. La página de nota está en torno a 2,27 a 2,42 s, así que el margen es de unos 80 ms y unos cientos de bytes de CSS en la cabecera pueden romperlo ([TESTING.md](TESTING.md)). Quien escribe no puede añadir CSS a la cabecera, pero el contenido pesado en la primera pantalla (una imagen grande o un bloque de código antes de la primera sección) mueve el LCP. Lighthouse mide notas sintéticas de prueba, no la tuya, y el carril rápido de notas se lo salta: la disciplina es tuya.
+- **Compuerta LCP**: la nota sintética `/notes/smoke-es/` admite LCP ≤ 2600 ms y rendimiento ≥ 93 desde el 2026-10-12; las demás URLs conservan 2500 ms y ≥ 95 ([TESTING.md](TESTING.md)). Las mediciones locales de 2,27–2,42 s y el margen de unos 80 ms correspondían al límite anterior, no son un margen actual garantizado. El contenido pesado en la primera pantalla puede mover el LCP. Lighthouse mide notas sintéticas, no tu nota, y el carril rápido de notas omite esta prueba: conserva la disciplina editorial. Reducir el peso y restaurar el límite anterior sigue pendiente en #119.
 - **Peso de página** (`pnpm check:page-weight`, [reglas](TESTING.md#content-aware-notes-budgets-2026-10-11)): el cuerpo renderizado del artículo tiene su propio techo (64 KiB de HTML) y su propio margen, mientras que la estructura de la página y el CSS conservan techos fijos. Un texto más largo no consume el presupuesto de la estructura; los bloques de código largos y las tablas grandes son lo que empuja al artículo.
 - **La tinta cuesta bytes solo donde se usa.** `Fix` lleva su CSS acotado e `Ink` mete su CSS en línea una vez por página y variante, así que una nota que no usa ninguno no paga nada, y una que usa los dos midió unos 3,6 KB de HTML incluyendo el marcado. El techo de estilo de una nota se comparte con el CSS de cuaderno, así que **la primera nota que use `Fix` o `Ink` debe ejecutar `pnpm check:page-weight` antes que nada** (ninguna nota publicada los usa todavía).
 - **Si `check:page-weight` falla tras añadir una nota**: lee la línea que falló. `article` por encima de 64 KiB: recorta código y contenido. HTML total por encima del techo de la estructura con el artículo dentro de su límite: creció la estructura, no tu texto (para y avisa a la persona propietaria). `style` por encima de su techo justo tras añadir `Fix`/`Ink`: es el CSS de la tinta; quita uno de los componentes o avisa. Nunca subas un techo para que una nota pase; la sección 10 tiene los detalles.

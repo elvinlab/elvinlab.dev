@@ -17,6 +17,7 @@ const allOn = {
   languageHint: true,
   themeToggle: true,
   backgroundPicker: true,
+  experimentNudge: false,
 };
 
 describe('isHiddenFromSitemap', () => {

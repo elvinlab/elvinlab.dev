@@ -111,6 +111,9 @@ The descriptions come from the schema (`.describe()`), which is why they are in 
 | `changelog.perPage` | `integer (min 2, max 30)` | no | `4` | Release days per page of `/changelog/`. A release is one production day, so this counts days, not entries; a second page exists only when the days exceed this number (`/changelog/page/2/`). Page 1 opens its two newest days; the rest stay collapsed. |
 | `notes` | `object` | no | `{}` | Settings of the notes area (`features.blog`): the static topic pages. Every key is optional and falls back to its default. |
 | `notes.topicMinNotes` | `integer (min 1, max 20)` | no | `2` | Notes a topic needs before it gets its own page (`/notes/tag/<topic>/`). A topic with fewer notes, or without an intro, is not generated, and its chips keep pointing to the filter on `/notes/`. The topics themselves live in `src/content/topics.json`. |
+| `nudge` | `object` | no | `{}` | Settings of the experiment card (`features.experimentNudge`). Every key is optional and falls back to its default. |
+| `nudge.scrollThreshold` | `number (min 0.3, max 0.95)` | no | `0.7` | Share of a note the visitor must scroll before the floating experiment card appears (0.3 to 0.95). |
+| `nudge.indexScrollThreshold` | `number (min 0.3, max 0.95)` | no | `0.6` | The same threshold on the `/notes/` index, where visitors browse instead of read (0.3 to 0.95). |
 | `recruiter` | `object` | yes |  | Recruiter card on the home page and /me. |
 | `recruiter.available` | `boolean` | yes |  | Show or hide the whole availability line (not whether you are open to work). |
 | `recruiter.openToWork` | `boolean` | no | `true` | Whether you are open to work: green status dot when true, the brand accent colour when false. |
@@ -153,6 +156,7 @@ The descriptions come from the schema (`.describe()`), which is why they are in 
 | `features.languageHint` | `boolean` | no | `true` | The banner that suggests the other language to visitors whose browser prefers it. Off renders neither the banner nor its script. |
 | `features.themeToggle` | `boolean` | no | `true` | The theme button in the navbar. Off renders no button and no script: the theme still resolves from the visitor's system preference (or the default theme) on every page. |
 | `features.backgroundPicker` | `boolean` | no | `true` | The navbar button that cycles the banner background effect. Off renders no button and no script: the effect follows the owner default from `background`. |
+| `features.experimentNudge` | `boolean` | no | `false` | A card that points to the latest experiment: static at the end of every note and on the home, floating once the visitor has read most of a note. Off by default; off renders no card, no script or CSS and stores nothing in the browser. It also needs `features.experiments`: with that flag off it never shows. |
 | `integrations` | `object` | no | `{}` | Public ids of third-party services. They ship in the HTML by design, so they live here and not in secrets. |
 | `integrations.cloudflareAnalyticsToken` | `string` | no |  | Cloudflare Web Analytics beacon token (public). Omit to turn analytics off. Env `PUBLIC_CF_ANALYTICS_TOKEN` overrides it. |
 | `integrations.turnstileSiteKey` | `string` | no |  | Cloudflare Turnstile public site key for the contact form, bound to the domain. Env `PUBLIC_TURNSTILE_SITE_KEY` overrides it (use a test key locally). |
@@ -521,11 +525,11 @@ A one-tap, anonymous "I was here" button on every note (header and end of the ar
 **One database for the whole site.** The database is `elvinlab-dev-db`, bound as `SITE_DB`, and it is meant to host future features too. The rules that keep it scalable:
 
 - **One table per feature, named after it** (`note_footprints`; a future feature would add for example `page_views`). A feature reads and writes only its own tables, through its own adapter behind its own port (`features/<x>/adapters/d1.ts`); it never touches another feature's table.
-- **Migrations are one shared, numbered sequence** in `apps/web/migrations/`, named `NNNN_<feature>_<change>.sql` (today `0001_note_footprints.sql`). Wrangler records what was applied in the `d1_migrations` table of that database.
+- **Migrations are one shared, numbered sequence** in `apps/web/migrations/`, named `NNNN_<feature>_<change>.sql` (currently `0001_note_footprints.sql`, `0002_subscribers.sql` and `0003_subscriber_notes.sql`). Wrangler records what was applied in the `d1_migrations` table of that database.
 - **Limits:** the free plan gives 5 GB per account. If a feature ever outgrows the shared database, give it its own database and its own binding.
 - Bindings that are specific to a feature (the rate limiter `MARKS_RATE_LIMITER`) keep the feature's name; only the database is shared.
 
-**Until the database exists and is bound the buttons do not appear** (the Actions answer "unavailable" and the page renders nothing): turning the flag on without the steps below is safe, it just shows nothing. These steps run in **your Cloudflare account**. *On elvinlab.dev steps 1 to 3 were done on 2026-10-05: database `elvinlab-dev-db` in region ENAM, its id and the `SITE_DB` binding are in `wrangler.jsonc` and the `note_footprints` table exists. (A first database named `elvinlab-marks` was created and deleted the same day, empty, to give the site one database that can grow.) Only the release (step 4) and the check (step 5) remain.*
+**Until the database exists and is bound the buttons do not appear** (the Actions answer "unavailable" and the page renders nothing): turning the flag on without the steps below is safe, it just shows nothing. These steps run in **your Cloudflare account**. *On elvinlab.dev the database, binding and table were configured on 2026-10-05 and footprints shipped in release `950e582`. (An empty database initially named `elvinlab-marks` was created and deleted that same day before adopting the shared site database.) Migrations 0001–0003 have already been applied according to the release record. The steps below are a runbook for new installations, not pending site work. The historical record does not confirm a real manual button tap.*
 
 1. Create the database (needs `wrangler login`): `cd apps/web && mise exec -- pnpm exec wrangler d1 create elvinlab-dev-db`. It prints a `database_id`.
 2. Add the binding to `apps/web/wrangler.jsonc`:
@@ -535,7 +539,7 @@ A one-tap, anonymous "I was here" button on every note (header and end of the ar
    ]
    ```
    (`MARKS_RATE_LIMITER`, the per-IP limit, is already declared under `ratelimits`.)
-3. Create the tables in the real database: `mise exec -- pnpm exec wrangler d1 migrations apply elvinlab-dev-db --remote` (today it applies `apps/web/migrations/0001_note_footprints.sql`).
+3. Create the tables in the real database: `mise exec -- pnpm exec wrangler d1 migrations apply elvinlab-dev-db --remote` (applies every pending migration in the 0001–0003 sequence).
 4. Release as usual (section 7). If the deploy fails with an authorization error, the API token of the GitHub `production` environment may lack permission to deploy a Worker with a D1 binding: add the D1 edit permission to the token. *Checked on elvinlab.dev on 2026-10-05: the existing deploy token deployed the Worker with the D1 binding with no extra permission.*
 5. Check it: open a note, press the button and reload (the count is kept), or `curl -s -X POST https://YOUR-DOMAIN/_actions/marks.get/ -H 'content-type: application/json' -H 'origin: https://YOUR-DOMAIN' -d '{"slug":"<a published note slug>"}'`, which answers with the total.
 
@@ -543,7 +547,9 @@ To turn it off, set `features.marks: false`: no markup, no CSS and no script rea
 
 ### 6.14 Email subscription to new notes (`subscribe`)
 
-Visitors leave an email in the footer form (the subscription band, the only place of the subscription; it loads its code and Turnstile only on first focus) and get one email for each new note and, now and then, an announcement of one of the author's projects. The list lives in the shared D1 database (table `subscribers`), signing up needs a confirmation click (double opt-in), every email carries an unsubscribe link (also in the `List-Unsubscribe` header; no one-click POST, see ADR 0014), and Resend only sends (it sits behind a port). The flag is `features.subscribe` (ships **off**); the routes `/subscribe/confirm/`, `/subscribe/unsubscribe/` (and their `/en` twins) exist only while it and `features.blog` are on. The form also needs a Turnstile site key (recipe 6.6). Full guide (owner runbook, data, limits and troubleshooting): [`SUBSCRIPTION.en.md`](SUBSCRIPTION.en.md). Decision record: [ADR 0014](adr/0014-email-subscription-d1-list-resend-port.md); the privacy page gets its `subscribe` section when the flag is on.
+Visitors leave an email in the footer form (the subscription band, the only place of the subscription; it loads its code and Turnstile only on first focus) and get one email for each new note and, now and then, an announcement of one of the author's projects. The list lives in the shared D1 database (table `subscribers`), signing up needs a confirmation click (double opt-in), every email carries an unsubscribe link (also in the `List-Unsubscribe` header; no one-click POST, see ADR 0014), and Resend only sends (it sits behind a port). The flag is `features.subscribe` (initial default **off**; already enabled on this site); the routes `/subscribe/confirm/`, `/subscribe/unsubscribe/` (and their `/en` twins) exist only while it and `features.blog` are on. The form also needs a Turnstile site key (recipe 6.6). Full guide (owner runbook, data, limits and troubleshooting): [`SUBSCRIPTION.en.md`](SUBSCRIPTION.en.md). Decision record: [ADR 0014](adr/0014-email-subscription-d1-list-resend-port.md); the privacy page gets its `subscribe` section when the flag is on.
+
+**Site status (2026-10-12):** subscription is already shipped; migration 0003 and the delivery ledger were applied before release `41a31af`. The recorded dry run returned 0 recipients and sent no email. This runbook remains useful for new installations; it does not authorize repeating operations or sending messages.
 
 Until every step below is done the form shows nothing useful (the Actions answer "unavailable"), so do them **in this order**, in your own accounts, before flipping the flag:
 

@@ -1,0 +1,60 @@
+---
+/**
+ * The experiment nudge card: a pixel-framed index card that points to the latest experiment
+ * (a small flask icon, the label, status and year, the thumbnail, title, a short summary, up to
+ * three tags and a pixel arrow).
+ * It is plain HTML and works with no JavaScript; the floating behaviour is a separate script that
+ * clones this same markup. It is a plain `div`, not an `<aside>`: on this site `main aside`
+ * means the notes sidebar (reading mode hides it, the home lays it out beside the content). The whole card is one link, named "label: title", to the experiment's
+ * case note when it has one, else to its place on `/experiments/`. Its look is `experiment-card.css`,
+ * inlined by `ExperimentNudge` (never Tailwind utilities, which would land in every page's
+ * stylesheet even with the nudge off). The caller decides whether to render it.
+ */
+import { Image } from 'astro:assets';
+import { localizePath } from '@elvinlab/core';
+
+import { experimentTagLabel, visibleExperimentTags } from '@/features/portfolio/lib/experiments.ts';
+import type { ExperimentEntry } from '@/features/portfolio/lib/load-experiments.ts';
+import { LOCALES, type Locale, t } from '@/shared/i18n/index.ts';
+import { resolveExperimentImage } from '@/shared/lib/experiment-image.ts';
+import { pickLocale } from '@/shared/lib/localized.ts';
+
+type Props = { entry: ExperimentEntry; locale: Locale; class?: string | undefined };
+
+const { entry, locale, class: className } = Astro.props;
+const cover = entry.images?.[0];
+const image = cover ? resolveExperimentImage(entry.id, cover.file) : undefined;
+const href = entry.note
+  ? localizePath(`/notes/${entry.note}/`, entry.noteLang ?? LOCALES.defaultLocale, LOCALES)
+  : `${localizePath('/experiments/', locale, LOCALES)}#${entry.id}`;
+const label = t(locale, 'nudge.label');
+const tags = visibleExperimentTags(entry.tags);
+---
+
+<div class:list={['xn', className]} data-experiment-card>
+  <a class="xn-link" href={href} aria-label={`${label}: ${entry.title}`}>
+    <p class="xn-head">
+      <svg class="xn-flask" viewBox="0 0 9 8" width="18" height="16" shape-rendering="crispEdges" fill="currentColor" aria-hidden="true" focusable="false"><path d="M3 0h3v1H3zM4 1h1v2H4zM3 3h3v1H3zM2 4h5v1H2zM1 5h7v2H1zM0 7h9v1H0z"></path></svg>
+      {label}
+      <span class="xn-meta">
+        <span class="xn-dot" data-status={entry.status} aria-hidden="true"></span>
+        <span>{t(locale, `exp.status.${entry.status}`)}</span>
+        <span>{entry.year}</span>
+      </span>
+    </p>
+    <span class="xn-body">
+      {image && cover && (
+        <Image class="xn-cover" src={image} alt="" format="webp" quality={75} width={176} height={112} widths={[176, 352]} sizes="88px" loading="lazy" decoding="async" />
+      )}
+      <span class="xn-text">
+        <span class="xn-title">{entry.title}</span>
+        <span class="xn-desc">{pickLocale(entry.description, locale, LOCALES.defaultLocale)}</span>
+        {tags.length > 0 && <span class="xn-tags">{tags.map((tag) => <span class="xn-tag">{experimentTagLabel(tag)}</span>)}</span>}
+        <span class="xn-cta">
+          {t(locale, 'nudge.cta')}
+          <svg class="xn-arrow" viewBox="0 0 9 9" width="16" height="16" shape-rendering="crispEdges" fill="currentColor" aria-hidden="true" focusable="false"><path d="M8 4h1v1H8zM7 3h1v3H7zM6 2h1v5H6zM5 1h1v7H5zM0 3h5v3H0z"></path></svg>
+        </span>
+      </span>
+    </span>
+  </a>
+</div>

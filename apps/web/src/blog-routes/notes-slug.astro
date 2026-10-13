@@ -2,6 +2,7 @@
 import { getCollection } from 'astro:content';
 
 import { NotePage } from '@/features/notes/index.ts';
+import { ExperimentNudge } from '@/features/portfolio/index.ts';
 
 export async function getStaticPaths() {
   const notes = await getCollection('notes', (note) => note.data.lang === 'es');
@@ -11,4 +12,6 @@ export async function getStaticPaths() {
 const { entry } = Astro.props;
 ---
 
-<NotePage entry={entry} locale="es" />
+<NotePage entry={entry} locale="es">
+  <ExperimentNudge slot="end" locale="es" class="xn-spaced" floating />
+</NotePage>

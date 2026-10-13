@@ -719,3 +719,41 @@ describe('changelog block', () => {
     expect(() => parseSiteConfig(withChangelog({ pages: 4 }))).toThrow();
   });
 });
+
+describe('experiment nudge', () => {
+  const withNudge = (nudge: unknown) => ({ ...valid, nudge });
+
+  it('is off by default so an existing config keeps rendering nothing', () => {
+    expect(parseSiteConfig(valid).features.experimentNudge).toBe(false);
+  });
+
+  it('turns on only when the config says so', () => {
+    const features = { ...valid.features, experimentNudge: true };
+    expect(parseSiteConfig({ ...valid, features }).features.experimentNudge).toBe(true);
+  });
+
+  it('defaults the scroll thresholds to 0.7 on notes and 0.6 on the index', () => {
+    expect(parseSiteConfig(valid).nudge).toEqual({
+      scrollThreshold: 0.7,
+      indexScrollThreshold: 0.6,
+    });
+    expect(parseSiteConfig(withNudge({})).nudge).toEqual({
+      scrollThreshold: 0.7,
+      indexScrollThreshold: 0.6,
+    });
+  });
+
+  it('accepts thresholds from 0.3 to 0.95 and rejects the rest', () => {
+    expect(parseSiteConfig(withNudge({ scrollThreshold: 0.3 })).nudge.scrollThreshold).toBe(0.3);
+    expect(
+      parseSiteConfig(withNudge({ indexScrollThreshold: 0.95 })).nudge.indexScrollThreshold,
+    ).toBe(0.95);
+    for (const scrollThreshold of [0.2, 1, '0.7', -1]) {
+      expect(() => parseSiteConfig(withNudge({ scrollThreshold }))).toThrow();
+    }
+  });
+
+  it('rejects unknown keys', () => {
+    expect(() => parseSiteConfig(withNudge({ delay: 5 }))).toThrow();
+  });
+});

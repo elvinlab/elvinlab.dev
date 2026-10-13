@@ -1,0 +1,50 @@
+---
+/**
+ * The experiment nudge, gated: it renders the card for the latest experiment only when both
+ * `features.experimentNudge` and `features.experiments` are on and a live (not archived) experiment
+ * exists. With `floating` it also emits the script and CSS that lift the card into a floating one.
+ * On a note the static card stays at the end of the page (`variant="note"`); on the notes index
+ * there is no static card, so the card waits in a `<template>` until the script floats it
+ * (`variant="index"`). Off, it emits nothing: no markup, no script, no CSS, nothing stored in the
+ * browser.
+ */
+import ExperimentCard from '@/features/portfolio/components/ExperimentCard.astro';
+import cardCss from '@/features/portfolio/components/experiment-card.css?inline';
+import nudgeCss from '@/features/portfolio/components/nudge.css?inline';
+import { latestExperiment } from '@/features/portfolio/lib/latest-experiment.ts';
+import { loadExperiments } from '@/features/portfolio/lib/load-experiments.ts';
+import { nudgeScript } from '@/features/portfolio/lib/nudge-script.ts';
+import { isEnabled, site } from '@/shared/config/index.ts';
+import { LOCALES, type Locale, t } from '@/shared/i18n/index.ts';
+
+type Props = {
+  locale: Locale;
+  class?: string | undefined;
+  floating?: boolean;
+  variant?: 'note' | 'index';
+};
+
+const { locale, class: className, floating = false, variant = 'note' } = Astro.props;
+const isIndex = variant === 'index';
+const enabled = isEnabled('experimentNudge') && isEnabled('experiments');
+const entry = enabled ? latestExperiment(await loadExperiments(), LOCALES.defaultLocale) : undefined;
+---
+
+{entry && <style is:inline set:html={cardCss} />}
+{entry && !isIndex && <ExperimentCard entry={entry} locale={locale} class={className} />}
+{entry && isIndex && (
+  <template data-experiment-template>
+    <ExperimentCard entry={entry} locale={locale} class={className} />
+  </template>
+)}
+{entry && floating && (
+  <>
+    {/* Inlined only here: pages and builds without the nudge never carry these rules. */}
+    <style is:inline set:html={nudgeCss} />
+    <script is:inline set:html={nudgeScript({
+  threshold: isIndex ? site.nudge.indexScrollThreshold : site.nudge.scrollThreshold,
+  closeLabel: t(locale, 'nudge.close'),
+  target: isIndex ? 'main' : 'article',
+})} />
+  </>
+)}

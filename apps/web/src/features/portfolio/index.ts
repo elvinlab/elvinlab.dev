@@ -1,9 +1,11 @@
+export { default as ExperimentNudge } from './components/ExperimentNudge.astro';
 export { default as ExperimentRow } from './components/ExperimentRow.astro';
 export { default as ExperimentTile } from './components/ExperimentTile.astro';
 export { default as Home } from './components/Home.astro';
 export { loadExperimentPages } from './lib/experiment-list.ts';
 export { caseLinkLabelKey, experimentTagLabel, visibleExperimentTags } from './lib/experiments.ts';
 export { introText, labWords } from './lib/header-text.ts';
+export { latestExperiment } from './lib/latest-experiment.ts';
 export { type ExperimentEntry, loadExperiments } from './lib/load-experiments.ts';
 export {
   type ExperimentSort,

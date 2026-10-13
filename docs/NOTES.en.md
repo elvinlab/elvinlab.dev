@@ -247,6 +247,8 @@ Behavior you do not have to handle:
 - **Print**: bands and masks fall back to plain rules.
 - **Accessibility**: the section number and the stamp are decorative; they are not part of the heading's accessible name.
 
+- **Experiment card**: after every note, a pixel-framed card for the latest experiment (when `features.experimentNudge` is on), and a floating copy once the note is mostly read. You write nothing for it; see [PORTFOLIO.en.md](PORTFOLIO.en.md#the-latest-experiment-card).
+
 Known limit of the numbering: the CSS counter numbers **every** `h2` inside the article, but the table of contents lists only the `##` headings of the Markdown. A raw `<h2>` written inside an MDX component would get a number and no entry in the table of contents. Write sections with `##` only.
 
 Because bold and links look designed on their own, **use bold sparingly** (a key term, not a whole sentence): five bold phrases in a screen read as highlighter spam.
@@ -312,9 +314,9 @@ Rules:
 
 ### 5.5. What a writer can do to the budgets
 
-Every note already carries about 61 KB of inline CSS in its head (the notebook look, the decision card, the stamp, reading mode). On top of that:
+The 2026-10-12 measurement recorded about 61 KB of inline CSS in a note head (the notebook look, the decision card, the stamp, reading mode). On top of that:
 
-- **LCP gate**: below 2500 ms on mobile, worst of three runs. The note page sits at about 2.27 to 2.42 s, so the margin is about 80 ms and a few hundred bytes of head CSS can break it ([TESTING.md](TESTING.md)). A writer cannot add head CSS, but heavy content above the fold (a big image or code block before the first section) moves the LCP. Lighthouse measures synthetic fixture notes, not your note, and the notes-only fast lane skips it: the discipline is yours.
+- **LCP gate**: the synthetic `/notes/smoke-es/` fixture allows LCP ≤ 2600 ms and performance ≥ 93 since 2026-10-12; other URLs retain 2500 ms and ≥ 95 ([TESTING.md](TESTING.md)). Local measurements of 2.27–2.42 s and about 80 ms of margin referred to the previous threshold, not a guaranteed current margin. Heavy content above the fold can move LCP. Lighthouse measures synthetic notes, not yours, and the notes-only fast lane skips it: keep the editorial discipline. Reducing weight and restoring the previous gate remains open in #119.
 - **Page weight** (`pnpm check:page-weight`, [rules](TESTING.md#content-aware-notes-budgets-2026-10-11)): the rendered article body has its own ceiling (64 KiB of HTML) and grows its own allowance, while the page shell and the CSS keep fixed ceilings. A longer text is free of the shell budget; long code blocks and big tables are what push the article.
 - **Ink costs bytes only where it is used.** `Fix` carries its scoped CSS and `Ink` inlines its CSS once per page and variant, so a note that uses neither pays nothing, and a note that uses both measured about 3.6 KB of HTML including markup. The style ceiling of a note is shared with the notebook CSS, so the **first note that uses `Fix` or `Ink` must run `pnpm check:page-weight` before anything else** (no published note uses them yet).
 - **If `check:page-weight` fails after adding a note**: read the line that failed. `article` over 64 KiB: trim code and content. Total HTML over the shell ceiling with the article inside its limit: the shell grew, not your text (stop and tell the owner). `style` over its ceiling right after adding `Fix`/`Ink`: it is the ink CSS; remove one of the components or tell the owner. Never raise a ceiling to make a note pass; section 10 has the details.

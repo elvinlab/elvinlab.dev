@@ -37,7 +37,7 @@ Two components, `Fix` (struck-through mistake plus the correction) and `Ink` (ha
 - [x] **N3** `Fix` and `Ink` production components: CSS home, production build check, i18n, a11y, unit and e2e tests. Route: delegated writer.
 - [x] **N4** Cross-page transitions with fallback. Route: delegated writer.
 - [x] **N5e** `/me` ink tag: dropped by recommendation (owner answered "sigamos" after the recommendation to leave `/me` without it).
-- [ ] **N5** Per-page signature, one page type per commit. Route: delegated writer per page type. Remaining after N5a: note page chrome and decision record (N5b), home, notes index, `/me`, shared `PageHeader` stamp.
+- [x] **N5** Per-page signature delivered through N5a–N5d. Route: delegated writer per page type. N5e (`/me` ink tag) was explicitly dropped, not implemented.
 - [x] **N5d** Page header stamp (Experiments, Changelog, Contact, topic pages) and ruled-paper rows on the notes index. Route: delegated writer.
 - [x] **N5c** Home hero ink: one `Ink` underline on the key phrase of the headline, phrase marked in the i18n string. Route: delegated writer.
 - [x] **N5b** Decision record as an index card with a pink ink `Stamp` (note page chrome). Route: delegated writer.
@@ -46,7 +46,7 @@ Two components, `Fix` (struck-through mistake plus the correction) and `Ink` (ha
 - [x] **N7a** Fix the N7 findings (row press bug, format, inline-mark test, verification map, external-links, notes-layout, changelog, view-transitions flake). Route: delegated writer.
 - [x] **N8** Trim the note head CSS for LCP margin (no visible change). Route: delegated writer.
 - [x] **N9** Note authoring guide: NOTES.md/NOTES.en.md explain the notebook design to whoever writes a note (automatic treatment, `Fix`/`Ink`, density, budgets, preview gotchas, checklist, worked example). Route: delegated writer, docs only.
-- [ ] **N7** Close: full `test:e2e:quick`, white-label, budgets, mobile Lighthouse once. Route: delegated verification worker; parent reads the report.
+- [x] **N7** Release closure established by the existing successful CI run 38322066089 (release `ce5bdeb`), including browser, white-label, budget and mobile Lighthouse gates plus deploy. Earlier partial local runs remain historical; no new local full suite is claimed.
 
 ## Authorized scope
 
@@ -90,4 +90,4 @@ Forecast well above 400 authored changed lines: strategy `ask-on-risk`; chain st
 
 ## Next step
 
-Commit N8, then rerun N7 once (full `test:e2e:quick`, white-label, budgets, mobile Lighthouse) and take the release decision.
+Notebook identity has shipped in `ce5bdeb`; the [existing successful CI run](https://github.com/elvinlab/elvinlab.dev/actions/runs/38322066089) closes release verification. Follow up on note and `/me` LCP weight in #119 and restore the note-fixture 2500 ms / 0.95 thresholds only after measured improvements. No deployment or new local suite was run during this reconciliation.
