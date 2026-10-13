@@ -31,7 +31,7 @@ Someone who adopts the project switches features off (or changes colors and text
 - [x] E1 — Seam: resolved flags in `E2E_FEATURES`, helper `features.ts` with unit tests, readiness URL `/`. Tier 3.
 - [ ] E2 — Notes family follows `blog` and the component flags (about 32 specs). Tier 2, delegated writer.
 - [ ] E3 — Contact, changelog, me, experiments, subscribe and component-flag specs, plus the shared page lists (a11y, performance, smoke, internal-links, external-links, cookies). Tier 2, delegated writer.
-- [ ] E4 — Lighthouse URL list and white-label check follow the flags. Tier 3.
+- [x] E4 — Lighthouse URL list and white-label check follow the flags. Tier 3.
 - [ ] E5 — Adopter profiles: configs, `pnpm test:profiles`, verification-map entry, CI decision. Tier 3.
 - [ ] E6 — Phase 2: specs read UI texts from the i18n dictionary. Tier 2.
 - [ ] E7 — Docs: README, CONFIGURATION (section 10), TESTING; remove the "known limit" note when the profiles are green. Tier 2.
@@ -47,6 +47,7 @@ E1, E4, E5 inline (design and judgement). E2, E3, E6 delegated to one writer at 
 ## Progress and evidence
 E1 done (inline, Tier 3): `apps/web/scripts/e2e-features.ts` resolves the profile (flags with the fixture overrides, home sections, which routes exist; `/me` is always built) with 15 unit tests (RED first); `playwright.config.ts` exports it as `E2E_PROFILE`; `tests/browser/helpers/features.ts` gives specs `requires()` and `livePages()`; readiness URL is now `/`; `tsconfig.browser.json` got the `@/` alias and `allowImportingTsExtensions`. Playwright loads the alias through the nearest tsconfig of `apps/web/scripts`. Proven on the nudge spec: card on, 32 passed; card off (temporary edit, restored), 32 skipped and none failed, server started. typecheck 0 errors, lint clean.
 Profiles (E5 groundwork, done with E1): `apps/web/scripts/e2e-profiles.ts` defines `quiet`, `blog-only`, `me-only` and `bare` as data; `E2E_FEATURE_PROFILE=<name>` makes both the Playwright config (profile) and `fixture-preview.ts` (`applyFixtureFeatures` patches the workspace copy) use it; 287 script tests green (RED first). Proven: quiet profile, nudge spec 31 skipped; `reading-mode.spec` 16 failed as expected until E2; a wrong name fails with the list of profiles. Command for writers: `E2E_FEATURE_PROFILE=quiet mise exec -- pnpm test:e2e:quick <specs>`.
+E4 done (inline): `lighthouse-pages.ts` maps every URL of `lighthouserc.json` to what it needs (a URL nobody decided about is an error) and `run-lighthouse-ci.ts` drops the pages the feature set under test does not build; it registers the `@/` alias itself and imports dynamically, so the command CI and `pnpm verify` run is unchanged. `white-label-check.ts` needed no change: it builds its own alternative config, independent of the real flags (it passed with six features off). E5 code done: `pnpm test:profiles [name ...]` runs the quick e2e once per profile and fails on any failing run (parse, selection and report unit-tested); the new tool files are registered as full-wide in `verification-map.ts`. 303 script tests green. NOT yet run end to end: Lighthouse per profile and `pnpm test:profiles` (heavy; waiting for the E2/E3 writer so the runs do not compete). CI decision for profiles pending with the owner.
 Issues: E1 #133, E2 #134, E3 #135, E4 #136, E5 #137, E6 #138, E7 #139 (T94 to T100).
 
 ## Next step
