@@ -217,29 +217,47 @@ test.describe('home sidebar cards by width', () => {
   // whose script may or may not have run yet, and its children would count as sidebar cards.
   const sidebar = (page: Page) =>
     page.getByRole('complementary', { name: text('es', 'aside.label') });
+  // The marks card leaves the sidebar when the counter turns out to be unavailable (the stubbed
+  // API in the suite), so a card can be detached between the lookup and the read: skip those.
   const lefts = (page: Page) =>
     sidebar(page)
       .locator(':scope > div > *')
-      .evaluateAll((cards) => cards.map((card) => (card as HTMLElement).offsetLeft));
+      .evaluateAll((cards) =>
+        cards
+          .filter((card) => card.isConnected)
+          .map((card) => ({
+            card: `${card.tagName.toLowerCase()}.${String(card.className).split(/\s+/)[0]}`,
+            left: (card as HTMLElement).offsetLeft,
+            display: getComputedStyle(card).display,
+            parent: (card as HTMLElement).offsetParent?.tagName.toLowerCase() ?? 'none',
+          })),
+      );
+  /** The distinct left offsets, with the cards behind them so a failure names the odd one out. */
+  const columns = async (page: Page) => {
+    const cards = await lefts(page);
+    return { count: new Set(cards.map((card) => card.left)).size, cards };
+  };
 
   test('lays the cards out in columns on tablets (820 px)', async ({ page }) => {
     await page.setViewportSize({ width: 820, height: 1000 });
     await page.goto('/');
-    const xs = await lefts(page);
-    expect(xs.length).toBeGreaterThanOrEqual(2);
-    expect(new Set(xs).size).toBeGreaterThanOrEqual(2);
+    const { count, cards } = await columns(page);
+    expect(cards.length).toBeGreaterThanOrEqual(2);
+    expect(count, JSON.stringify(cards)).toBeGreaterThanOrEqual(2);
   });
 
   test('stacks the cards in one column on phones (390 px)', async ({ page }) => {
     await page.setViewportSize({ width: 390, height: 844 });
     await page.goto('/');
-    expect(new Set(await lefts(page)).size).toBe(1);
+    const { count, cards } = await columns(page);
+    expect(count, JSON.stringify(cards)).toBe(1);
   });
 
   test('keeps the sidebar beside the content with stacked cards at 1280 px', async ({ page }) => {
     await page.setViewportSize({ width: 1280, height: 900 });
     await page.goto('/');
-    expect(new Set(await lefts(page)).size).toBe(1);
+    const { count, cards } = await columns(page);
+    expect(count, JSON.stringify(cards)).toBe(1);
     const main = await page.locator('[data-main-grid] > div').first().boundingBox();
     const aside = await sidebar(page).boundingBox();
     if (!main || !aside) throw new Error('main column and aside must be laid out');
