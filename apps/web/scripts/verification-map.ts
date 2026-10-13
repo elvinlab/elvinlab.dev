@@ -182,12 +182,13 @@ const EXPERIMENTS = area(
   `${SRC}/shared/ui/SortSwitch.astro`,
   `${SRC}/shared/ui/ListingSummary.astro`,
 );
-// The education timeline: its routes, the credentials feature and data, the listing kit (add `assets/education/**` with the first document image).
+// The education timeline: its routes, the credentials feature and data, the document images and the listing kit.
 const EDUCATION = area(
   `${SRC}/education-routes/**`,
   `${SRC}/integrations/education-routes.ts`,
   `${SRC}/features/credentials/**`,
   `${SRC}/content/credentials.json`,
+  `${SRC}/assets/education/**`,
   `${SRC}/shared/lib/listing.ts`,
   `${SRC}/shared/ui/Pager.astro`,
   `${SRC}/shared/ui/SortSwitch.astro`,
