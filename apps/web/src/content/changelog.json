@@ -862,5 +862,11 @@
     "category": "changed",
     "title": "Experiments read like a lab notebook",
     "description": "On the Experiments page the text of each piece no longer sits in a dark card: it rests directly on the page, separated by space and the thin line between pieces. Each piece now opens with an entry label like Experiment 001, in the notebook mono face with the number in pink, the same way notes are numbered. The number is stable: it is the position by publication date, so a piece keeps it in every sort and page."
+  },
+  "decision-stamp-below-navbar": {
+    "date": "2026-10-13",
+    "category": "fixed",
+    "title": "The decision stamp no longer touches the navbar on notes",
+    "description": "On a note, from desktop width up, the DECISION stamp on the decision record in the banner hung 14 px above its card and ended 4 px under the floating navbar. It now only grazes the card corner and keeps about 17 px of air. Tablets and phones are unchanged."
   }
 }
