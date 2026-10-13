@@ -5,24 +5,29 @@ export type NudgeScriptConfig = {
   threshold: number;
   /** Accessible name of the close button, already in the page language. */
   closeLabel: string;
+  /** CSS selector of the element the scroll share is measured against (the note, or the page). */
+  target: string;
 };
 
 /**
- * Inline script that promotes the static experiment card to a floating one. It clones the card,
- * opens the copy once the bottom of the viewport passes `threshold` of the note, hides it while the
- * static card is on screen and lets the visitor close it. Shown at most once per browser session
+ * Inline script that floats the experiment card. It clones the static card (or, on a page that has
+ * none, the one inside `template[data-experiment-template]`), opens the copy once the bottom of the
+ * viewport passes `threshold` of `target`, hides it while a static card is on screen and lets the
+ * visitor close it. Shown at most once per browser session
  * (`sessionStorage`) and never again after a close (`localStorage`); blocked storage is not an error.
  * Inline, not bundled, so a build with `features.experimentNudge` off ships none of it.
  */
 export function nudgeScript(config: NudgeScriptConfig): string {
   return `(function (cfg) {
   var card = document.querySelector('[data-experiment-card]');
-  var article = document.querySelector('article');
-  if (!card || !article) return;
+  var template = card ? null : document.querySelector('template[data-experiment-template]');
+  var source = card || (template && template.content.firstElementChild);
+  var article = document.querySelector(cfg.target);
+  if (!source || !article) return;
   function seen(store) { try { return store.getItem(${JSON.stringify(NUDGE_STORAGE_KEY)}) === '1'; } catch (e) { return false; } }
   function remember(store) { try { store.setItem(${JSON.stringify(NUDGE_STORAGE_KEY)}, '1'); } catch (e) {} }
   if (seen(localStorage) || seen(sessionStorage)) return;
-  var box = card.cloneNode(true);
+  var box = source.cloneNode(true);
   box.removeAttribute('data-experiment-card');
   box.setAttribute('data-nudge-floating', '');
   box.setAttribute('inert', '');
@@ -70,7 +75,7 @@ export function nudgeScript(config: NudgeScriptConfig): string {
     remember(localStorage);
     paint();
   });
-  if (typeof IntersectionObserver === 'function') {
+  if (card && typeof IntersectionObserver === 'function') {
     new IntersectionObserver(function (entries) {
       covered = entries[entries.length - 1].isIntersecting;
       paint();

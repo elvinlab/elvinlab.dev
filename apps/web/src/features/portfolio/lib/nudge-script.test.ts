@@ -41,6 +41,9 @@ type Options = {
   session?: Record<string, string>;
   blocked?: boolean;
   noObserver?: boolean;
+  source?: 'template';
+  target?: string;
+  missingTarget?: boolean;
 };
 
 function run(options: Options = {}) {
@@ -73,8 +76,13 @@ function run(options: Options = {}) {
   const document = {
     body,
     createElement: () => fakeElement(),
-    querySelector: (selector: string) =>
-      selector === '[data-experiment-card]' ? card : selector === 'article' ? article : null,
+    querySelector: (selector: string) => {
+      if (selector === '[data-experiment-card]') return options.source === 'template' ? null : card;
+      if (selector === 'template[data-experiment-template]') {
+        return options.source === 'template' ? { content: { firstElementChild: card } } : null;
+      }
+      return selector === (options.target ?? 'article') && !options.missingTarget ? article : null;
+    },
   };
   const window = {
     innerHeight: viewport,
@@ -92,7 +100,7 @@ function run(options: Options = {}) {
     'sessionStorage',
     'IntersectionObserver',
     'requestAnimationFrame',
-    nudgeScript({ threshold, closeLabel: 'Close' }),
+    nudgeScript({ threshold, closeLabel: 'Close', target: options.target ?? 'article' }),
   )(document, window, store(local), store(session), ObserverStub, (fn: () => void) => fn());
   const box = body.appended[0] as ReturnType<typeof fakeElement> | undefined;
   return {
@@ -177,7 +185,26 @@ describe('nudgeScript', () => {
     expect(isOpen(run({ top: 0, noObserver: true }).box)).toBe(true);
   });
 
+  it('floats from a template on a page that has no static card', () => {
+    const page = run({ top: 0, source: 'template' });
+    expect(page.box?.classes.has('nudge-float')).toBe(true);
+    expect(isOpen(page.box)).toBe(true);
+  });
+
+  it('measures the scroll against the configured element', () => {
+    const page = run({ top: 700, target: 'main' });
+    expect(isOpen(page.box)).toBe(false);
+    page.scrollTo(100);
+    expect(isOpen(page.box)).toBe(true);
+  });
+
+  it('does nothing when the element to measure is missing', () => {
+    expect(run({ top: 0, missingTarget: true }).box).toBeUndefined();
+  });
+
   it('is small enough to inline in a page', () => {
-    expect(nudgeScript({ threshold: 0.7, closeLabel: 'Close' }).length).toBeLessThan(2500);
+    expect(
+      nudgeScript({ threshold: 0.7, closeLabel: 'Close', target: 'article' }).length,
+    ).toBeLessThan(3000);
   });
 });

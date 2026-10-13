@@ -77,5 +77,7 @@ const tags = [...new Set(sortNotes(notes).flatMap((note) => note.data.tags))];
     ))}
   </div>
 
+  <slot name="end" />
+
   <NotesSidebar slot="aside" locale={locale} categories={categories} tags={tags} topics={topicTags} />
 </BaseLayout>
