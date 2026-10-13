@@ -28,6 +28,20 @@ for (const { path, toggle, exit } of NOTES) {
       await expect(page.locator('[data-banner] canvas')).toHaveCount(1);
     });
 
+    test('keeps the toggle clear of the decision stamp on a phone', async ({ page }) => {
+      await page.setViewportSize({ width: 390, height: 844 });
+      await page.goto(path);
+      const gap = await page.evaluate(() => {
+        const toggle = document.querySelector('[data-reading-toggle]')?.getBoundingClientRect();
+        const stamp = document
+          .querySelector('[data-record-inline] .record-stamp')
+          ?.getBoundingClientRect();
+        if (!toggle || !stamp) throw new Error('toggle or stamp missing');
+        return stamp.top - toggle.bottom;
+      });
+      expect(gap).toBeGreaterThanOrEqual(16);
+    });
+
     test('removes the noise, keeps the content and survives a reload', async ({ page }) => {
       await page.goto(path);
       await toggleOf(page).click();
