@@ -379,6 +379,7 @@ export const CHECKS: readonly CheckDef[] = [
   e2e({ file: 'changelog.spec.ts', covers: CHANGELOG }),
   e2e({ file: 'pixel-display.spec.ts', covers: [...NOTE_PAGE, ...HOME], responsive: true }),
   e2e({ file: 'reading-mode.spec.ts', covers: NOTE_PAGE, helpers: true, responsive: true }),
+  e2e({ file: 'reading-progress.spec.ts', covers: NOTE_PAGE, helpers: true }),
   e2e({ file: 'smoke.spec.ts', covers: EVERY_PAGE }),
   e2e({ file: 'subscribe.spec.ts', covers: NOTE_PAGE, helpers: true, responsive: true }),
   e2e({ file: 'theme.spec.ts', covers: EVERY_PAGE }),

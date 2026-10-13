@@ -142,7 +142,7 @@ Las descripciones vienen del esquema (`.describe()`), por eso están en inglés.
 | `me.stack[].hint` | `{ <locale>: string (max 180) }` | no |  | One plain-language sentence per locale that says what the group is. Shown as a hover and focus tooltip; omit for no tooltip. Max 180 characters per locale. |
 | `me.stack[].layer` | `boolean` | no |  | Draws the group as a numbered layer of the product (for example data, backend, frontend, cloud), joined to the next layer by a vertical line. Omit for a group that cuts across layers, such as AI or quality. Keep the layers first in the list. |
 | `me.stack[].folded` | `boolean` | no |  | Puts the group inside a collapsed "more tools" block under the stack (native details, no script). Use it for secondary groups so the stack stays short; a layer cannot be folded. |
-| `features` | `object` | yes |  | Feature flags: off means the routes are not generated and the nav entry is hidden. The four interface switches (`backToTop`, `languageHint`, `themeToggle`, `backgroundPicker`) default to on and render nothing when off. |
+| `features` | `object` | yes |  | Feature flags: off means the routes are not generated and the nav entry is hidden. The interface switches (`backToTop`, `languageHint`, `themeToggle`, `backgroundPicker`, `readingProgress`) default to on and render nothing when off. |
 | `features.blog` | `boolean` | yes |  | Lab Notes: the notes index, note pages, RSS and the nav entry. |
 | `features.comments` | `boolean` | yes |  | Giscus comments on notes. Needs the `giscus` block below, otherwise nothing renders. |
 | `features.contact` | `boolean` | yes |  | The /contact form: off removes the route and the contact Action, hides the nav entry and every link to it (the legal pages and the subscription messages then name no Contact page), and keeps it out of the sitemap. |
@@ -157,6 +157,7 @@ Las descripciones vienen del esquema (`.describe()`), por eso están en inglés.
 | `features.languageHint` | `boolean` | no | `true` | The banner that suggests the other language to visitors whose browser prefers it. Off renders neither the banner nor its script. |
 | `features.themeToggle` | `boolean` | no | `true` | The theme button in the navbar. Off renders no button and no script: the theme still resolves from the visitor's system preference (or the default theme) on every page. |
 | `features.backgroundPicker` | `boolean` | no | `true` | The navbar button that cycles the banner background effect. Off renders no button and no script: the effect follows the owner default from `background`. |
+| `features.readingProgress` | `boolean` | no | `true` | Remembers how far each visitor read every note: returns them to where they stopped and marks finished notes "read" in the lists. Off renders no script and no label and stores nothing in the browser. |
 | `features.experimentNudge` | `boolean` | no | `false` | A card that points to the latest experiment: static at the end of every note and on the home, floating once the visitor has read most of a note. Off by default; off renders no card, no script or CSS and stores nothing in the browser. It also needs `features.experiments`: with that flag off it never shows. |
 | `integrations` | `object` | no | `{}` | Public ids of third-party services. They ship in the HTML by design, so they live here and not in secrets. |
 | `integrations.cloudflareAnalyticsToken` | `string` | no |  | Cloudflare Web Analytics beacon token (public). Omit to turn analytics off. Env `PUBLIC_CF_ANALYTICS_TOKEN` overrides it. |
@@ -415,6 +416,7 @@ Cada bandera de `features` apaga la función completa: no se genera la ruta, des
 | `changelog` | Página `/changelog` y su enlace | Apagada no se genera la ruta (ver «Qué hace cada interruptor») |
 | `me` | Página `/me` (portafolio) | |
 | `readingMode` | Modo lectura en las notas | Apagada: no se envía botón, script, CSS ni se guarda nada en el navegador |
+| `readingProgress` | Recordar el progreso de lectura en las notas | Apagada: no se envía script ni etiqueta y no se guarda nada en el navegador (encendida por defecto) |
 
 #### Qué hace cada interruptor
 
@@ -430,6 +432,7 @@ Todas las banderas viven en `features` de `site.config.ts`. Las cuatro últimas 
 | `me` | Página `/me` | La entrada «Sobre mí» del menú, la tarjeta de contratación de la portada, el enlace de la barra lateral de las notas y la tarjeta de compartir de `/me`; la página queda `noindex` y fuera del sitemap | |
 | `changelog` | Página `/changelog` (y `/en/changelog`) | Las rutas (`integrations/changelog-routes.ts`), el enlace del pie y la entrada del sitemap | |
 | `readingMode` | Modo lectura en las notas | Botón, script y CSS; no se guarda nada en el navegador | |
+| `readingProgress` | Devuelve al lector a donde se quedó en una nota (restaura la posición) y marca las notas como "Leída" o "Seguir leyendo" en el índice de notas, el cuaderno del inicio y la tarjeta de la última nota | Los scripts en línea, las etiquetas y la clave `progress:<nota>` en `localStorage`; la página de privacidad deja de declararla | |
 | `marks` | Botón de huella en las notas y en la portada | El botón y su contador, y la sección de privacidad | Necesita `SITE_DB` (D1) y `MARKS_RATE_LIMITER` |
 | `subscribe` | Suscripción por correo | Las rutas `/subscribe/**`, el endpoint `/api/subscribe/notify`, el enlace y el formulario del pie, y la sección de privacidad | Necesita `blog` y una clave de Turnstile para mostrar el formulario; además `SITE_DB`, `SUBSCRIBE_RATE_LIMITER`, `SUBSCRIBE_FROM` y `SUBSCRIBE_TOKEN_SECRET` (ver 6.14) |
 | `backToTop` | Botón flotante «volver arriba» | El botón y su script (el resto de la página no depende de él) | |
@@ -537,7 +540,7 @@ Un texto demasiado largo desborda un botón, parte una entrada del menú en dos 
 | `note.*` | 28 | Labels inside a note (reading time, license, translations) |
 | `now.*` | 28 | The "Now" card |
 | `nudge.*` | 28 | The latest-experiment card: label, link and close button |
-| `reading.*` | 28 | The reading mode button (one line) |
+| `reading.*` | 28 | The reading mode button and the read / continue reading labels (one line) |
 | `skip.*` | 28 | The skip-to-content link |
 | `background.*` | 24 | The background picker button |
 | `aside.*` | 20 | The notes sidebar |

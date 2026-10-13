@@ -544,6 +544,12 @@ export const siteConfigSchema = z
           .describe(
             'The navbar button that cycles the banner background effect. Off renders no button and no script: the effect follows the owner default from `background`.',
           ),
+        readingProgress: z
+          .boolean()
+          .default(true)
+          .describe(
+            'Remembers how far each visitor read every note: returns them to where they stopped and marks finished notes "read" in the lists. Off renders no script and no label and stores nothing in the browser.',
+          ),
         experimentNudge: z
           .boolean()
           .default(false)
@@ -552,7 +558,7 @@ export const siteConfigSchema = z
           ),
       })
       .describe(
-        'Feature flags: off means the routes are not generated and the nav entry is hidden. The four interface switches (`backToTop`, `languageHint`, `themeToggle`, `backgroundPicker`) default to on and render nothing when off.',
+        'Feature flags: off means the routes are not generated and the nav entry is hidden. The interface switches (`backToTop`, `languageHint`, `themeToggle`, `backgroundPicker`, `readingProgress`) default to on and render nothing when off.',
       ),
     integrations: z
       .object({

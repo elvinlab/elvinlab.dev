@@ -27,6 +27,7 @@ const valid = {
     me: true,
     changelog: true,
     readingMode: true,
+    readingProgress: true,
     marks: true,
     subscribe: false,
   },
@@ -573,7 +574,13 @@ describe('interface switches', () => {
     ...valid,
     features: { ...valid.features, ...extra },
   });
-  const keys = ['backToTop', 'languageHint', 'themeToggle', 'backgroundPicker'] as const;
+  const keys = [
+    'backToTop',
+    'languageHint',
+    'themeToggle',
+    'backgroundPicker',
+    'readingProgress',
+  ] as const;
 
   it("defaults every switch to on so existing configs keep today's interface", () => {
     const parsed = parseSiteConfig(valid);

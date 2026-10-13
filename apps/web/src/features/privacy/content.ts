@@ -31,6 +31,8 @@ export type PrivacyInput = {
   comments?: { repo: string };
   /** True when the reading mode feature is on, which stores one more preference in the browser. */
   readingMode?: boolean;
+  /** True when reading progress is on: declares the per-note `progress:` key in local storage. */
+  readingProgress?: boolean;
   /** True when the footprint button is on: adds the marks section and one more local storage note. */
   marks?: boolean;
   /** True when the email subscription is on: adds the subscribe section. */
@@ -134,6 +136,7 @@ function buildBaseContent({
   contact,
   updated,
   readingMode = false,
+  readingProgress = false,
   marks = false,
 }: PrivacyInput): Record<'es' | 'en', PrivacyContent> {
   return {
@@ -166,7 +169,7 @@ function buildBaseContent({
         {
           id: 'local-storage',
           title: 'Almacenamiento local',
-          body: `<p>Este sitio solo guarda en <code>localStorage</code> ${readingMode ? 'cinco' : 'cuatro'} preferencias de interfaz: el tema, el efecto de fondo que elijas, si el banner está expandido, ${readingMode ? 'el descarte del aviso de idioma y si activaste el modo lectura' : 'y el descarte del aviso de idioma'}. No se usan para identificarte ni para seguimiento.${marks ? ' Si dejas huellas en una nota, también se guarda en <code>localStorage</code> cuántas dejaste en esa nota (<code>marks:&lt;nota&gt;</code>), solo para respetar el tope por persona.' : ''}</p>`,
+          body: `<p>Este sitio solo guarda en <code>localStorage</code> ${readingMode ? 'cinco' : 'cuatro'} preferencias de interfaz: el tema, el efecto de fondo que elijas, si el banner está expandido, ${readingMode ? 'el descarte del aviso de idioma y si activaste el modo lectura' : 'y el descarte del aviso de idioma'}. No se usan para identificarte ni para seguimiento.${marks ? ' Si dejas huellas en una nota, también se guarda en <code>localStorage</code> cuántas dejaste en esa nota (<code>marks:&lt;nota&gt;</code>), solo para respetar el tope por persona.' : ''}${readingProgress ? ' Para devolverte a donde lo dejaste, también guarda hasta dónde llegaste en cada nota que abres (<code>progress:&lt;nota&gt;</code>) y la fecha de esa visita.' : ''}</p>`,
         },
         {
           id: 'cookies',
@@ -209,7 +212,7 @@ function buildBaseContent({
         {
           id: 'local-storage',
           title: 'Local storage',
-          body: `<p>This site only keeps ${readingMode ? 'five' : 'four'} interface preferences in <code>localStorage</code>: the theme, the background effect you pick, whether the banner is expanded, ${readingMode ? 'the language hint dismissal, and whether you turned on reading mode' : 'and the language hint dismissal'}. They are not used to identify you or for tracking.${marks ? ' If you leave footprints on a note, <code>localStorage</code> also keeps how many you left on that note (<code>marks:&lt;note&gt;</code>), only to respect the per-person cap.' : ''}</p>`,
+          body: `<p>This site only keeps ${readingMode ? 'five' : 'four'} interface preferences in <code>localStorage</code>: the theme, the background effect you pick, whether the banner is expanded, ${readingMode ? 'the language hint dismissal, and whether you turned on reading mode' : 'and the language hint dismissal'}. They are not used to identify you or for tracking.${marks ? ' If you leave footprints on a note, <code>localStorage</code> also keeps how many you left on that note (<code>marks:&lt;note&gt;</code>), only to respect the per-person cap.' : ''}${readingProgress ? ' To bring you back to where you stopped, it also keeps how far you got in each note you open (<code>progress:&lt;note&gt;</code>) and the date of that visit.' : ''}</p>`,
         },
         {
           id: 'cookies',

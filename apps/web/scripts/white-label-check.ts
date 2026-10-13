@@ -124,6 +124,12 @@ try {
   ) {
     fail('the reading mode rendered although features.readingMode is off');
   }
+  // Reading progress is off in the alternative config: no label slot, script, stored key or privacy wording.
+  if (/data-progress-label|"progress:"|progress:&lt;/.test(rawHtml)) {
+    fail(
+      'reading progress (label, script or privacy wording) rendered although features.readingProgress is off',
+    );
+  }
   // The experiment nudge is off in the alternative config: no card, floating copy, script, CSS or key.
   if (
     /data-experiment-card|data-nudge-floating|experiment-nudge|\.xn-link|\.nudge-float/.test(

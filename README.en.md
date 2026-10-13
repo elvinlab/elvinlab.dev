@@ -117,6 +117,7 @@ Everything optional is a switch in [`site.config.ts`](apps/web/src/site.config.t
 | `experimentNudge` | The latest-experiment card (off by default) | `experiments` |
 | `changelog` | The public `/changelog` | |
 | `readingMode` | Reading mode on notes | |
+| `readingProgress` | Remembers where you stopped in a note and marks read notes | |
 | `marks` | The "I was here" footprint button | a D1 database and a rate limiter |
 | `subscribe` | Email subscription with double opt-in | `blog`, D1, Turnstile and email secrets |
 | `backToTop`, `languageHint`, `themeToggle`, `backgroundPicker` | Interface touches (on by default) | |

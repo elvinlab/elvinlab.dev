@@ -117,6 +117,7 @@ Todo lo opcional es un interruptor en [`site.config.ts`](apps/web/src/site.confi
 | `experimentNudge` | La tarjeta del último experimento (apagada por defecto) | `experiments` |
 | `changelog` | El `/changelog` público | |
 | `readingMode` | El modo lectura en las notas | |
+| `readingProgress` | Recuerda dónde te quedaste en una nota y marca las leídas | |
 | `marks` | El botón de huella "estuve aquí" | una base D1 y un limitador de envíos |
 | `subscribe` | Suscripción por correo con doble confirmación | `blog`, D1, secretos de Turnstile y de correo |
 | `backToTop`, `languageHint`, `themeToggle`, `backgroundPicker` | Detalles de interfaz (encendidos por defecto) | |

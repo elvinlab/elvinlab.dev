@@ -12,9 +12,11 @@ import {
   LangBadge,
   type NoteData,
   noteNumber,
+  ReadingProgressMemory,
   readingMinutes,
   secondaryMetaSlot,
 } from '@/features/notes/index.ts';
+import { isEnabled } from '@/shared/config/index.ts';
 import { LOCALES, type Locale, t } from '@/shared/i18n/index.ts';
 
 type Props = { locale: Locale; slug: string; data: NoteData; body: string };
@@ -24,7 +26,7 @@ const href = localizePath(`/notes/${slug}/`, data.lang, LOCALES);
 const readingLabel = t(locale, 'notes.readingTime', { min: readingMinutes(body) });
 ---
 
-<section data-card-link class="relative flex flex-col gap-5">
+<section data-card-link data-slug={isEnabled('readingProgress') ? slug : undefined} class="relative flex flex-col gap-5">
   <div class="flex flex-wrap items-center justify-between gap-2">
     <span class="flex items-center gap-2 font-mono text-sm">
       <span class="text-pink">{t(locale, 'notes.entry', { number: noteNumber(data.number) })}</span>
@@ -47,6 +49,7 @@ const readingLabel = t(locale, 'notes.readingTime', { min: readingMinutes(body) 
     <span aria-hidden="true" class="flex h-11 w-fit items-center rounded-control bg-button px-5 font-medium text-white">
       {t(locale, 'home.readNote')}
     </span>
+    <ReadingProgressMemory part="label" locale={locale} />
     {secondaryMetaSlot === 'foot' && <LangBadge lang={data.lang} />}
   </div>
 </section>

@@ -814,5 +814,11 @@
     "category": "fixed",
     "title": "The page stamp no longer crowds the title on phones",
     "description": "On narrow screens the rotated stamp above the page title (Experiments, Contact, Changelog and the other inner pages) sat almost touching the heading. The gap is now 20 px instead of 12 px."
+  },
+  "reading-progress": {
+    "date": "2026-10-13",
+    "category": "added",
+    "title": "Notes remember where you stopped",
+    "description": "If you leave a note halfway, coming back puts you where you were. Once you read 90% of a note, the notes index, the home notebook and the latest-note card mark it as read; a note you started shows 'Continue reading'. It is all stored in your browser (nothing leaves it) and can be switched off with features.readingProgress."
   }
 }

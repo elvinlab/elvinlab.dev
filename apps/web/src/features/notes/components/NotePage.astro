@@ -13,6 +13,7 @@ import noteProseCss from '@/features/notes/components/note-prose.css?inline';
 import PrevNext from '@/features/notes/components/PrevNext.astro';
 import ReadingMode from '@/features/notes/components/ReadingMode.astro';
 import ReadingProgress from '@/features/notes/components/ReadingProgress.astro';
+import ReadingProgressMemory from '@/features/notes/components/ReadingProgressMemory.astro';
 import RelatedNotes from '@/features/notes/components/RelatedNotes.astro';
 import recordCardCss from '@/features/notes/components/record-card.css?inline';
 import ShareCard from '@/features/notes/components/ShareCard.astro';
@@ -79,6 +80,7 @@ const readingLabel = t(locale, 'notes.readingTime', { min: readingMinutes(entry.
   {/* Inlined here, minified by `?inline`: a bundled CSS import leaks into every page that reaches NotePage through the feature barrel (measured +4.3 KB of style on the home, privacy, subscribe and topic pages), while this ships only with a rendered note. */}
   <style slot="head" is:inline set:html={noteProseCss + recordCardCss + stampCss} />
   <ReadingProgress slot="banner" />
+  <ReadingProgressMemory slot="floating" part="note" slug={entry.id} />
   <Banner slot="banner" height="360px">
     <BackgroundCanvas slot="background" />
     <div data-banner-split class="lg:grid lg:grid-cols-[minmax(0,1fr)_26rem] lg:items-end lg:gap-12">

@@ -22,6 +22,7 @@ export const siteConfig = {
     me: true,
     changelog: true,
     readingMode: false,
+    readingProgress: false,
     marks: false,
     subscribe: false,
     backToTop: true,

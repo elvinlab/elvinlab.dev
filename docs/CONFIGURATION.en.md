@@ -142,7 +142,7 @@ The descriptions come from the schema (`.describe()`), which is why they are in 
 | `me.stack[].hint` | `{ <locale>: string (max 180) }` | no |  | One plain-language sentence per locale that says what the group is. Shown as a hover and focus tooltip; omit for no tooltip. Max 180 characters per locale. |
 | `me.stack[].layer` | `boolean` | no |  | Draws the group as a numbered layer of the product (for example data, backend, frontend, cloud), joined to the next layer by a vertical line. Omit for a group that cuts across layers, such as AI or quality. Keep the layers first in the list. |
 | `me.stack[].folded` | `boolean` | no |  | Puts the group inside a collapsed "more tools" block under the stack (native details, no script). Use it for secondary groups so the stack stays short; a layer cannot be folded. |
-| `features` | `object` | yes |  | Feature flags: off means the routes are not generated and the nav entry is hidden. The four interface switches (`backToTop`, `languageHint`, `themeToggle`, `backgroundPicker`) default to on and render nothing when off. |
+| `features` | `object` | yes |  | Feature flags: off means the routes are not generated and the nav entry is hidden. The interface switches (`backToTop`, `languageHint`, `themeToggle`, `backgroundPicker`, `readingProgress`) default to on and render nothing when off. |
 | `features.blog` | `boolean` | yes |  | Lab Notes: the notes index, note pages, RSS and the nav entry. |
 | `features.comments` | `boolean` | yes |  | Giscus comments on notes. Needs the `giscus` block below, otherwise nothing renders. |
 | `features.contact` | `boolean` | yes |  | The /contact form: off removes the route and the contact Action, hides the nav entry and every link to it (the legal pages and the subscription messages then name no Contact page), and keeps it out of the sitemap. |
@@ -157,6 +157,7 @@ The descriptions come from the schema (`.describe()`), which is why they are in 
 | `features.languageHint` | `boolean` | no | `true` | The banner that suggests the other language to visitors whose browser prefers it. Off renders neither the banner nor its script. |
 | `features.themeToggle` | `boolean` | no | `true` | The theme button in the navbar. Off renders no button and no script: the theme still resolves from the visitor's system preference (or the default theme) on every page. |
 | `features.backgroundPicker` | `boolean` | no | `true` | The navbar button that cycles the banner background effect. Off renders no button and no script: the effect follows the owner default from `background`. |
+| `features.readingProgress` | `boolean` | no | `true` | Remembers how far each visitor read every note: returns them to where they stopped and marks finished notes "read" in the lists. Off renders no script and no label and stores nothing in the browser. |
 | `features.experimentNudge` | `boolean` | no | `false` | A card that points to the latest experiment: static at the end of every note and on the home, floating once the visitor has read most of a note. Off by default; off renders no card, no script or CSS and stores nothing in the browser. It also needs `features.experiments`: with that flag off it never shows. |
 | `integrations` | `object` | no | `{}` | Public ids of third-party services. They ship in the HTML by design, so they live here and not in secrets. |
 | `integrations.cloudflareAnalyticsToken` | `string` | no |  | Cloudflare Web Analytics beacon token (public). Omit to turn analytics off. Env `PUBLIC_CF_ANALYTICS_TOKEN` overrides it. |
@@ -415,10 +416,11 @@ Each `features` flag switches the whole feature off: the route is not generated,
 | `changelog` | The `/changelog` page and its link | When off the route is not generated (see "What each switch does") |
 | `me` | The `/me` page (portfolio) | |
 | `readingMode` | Reading mode on notes | Off: no button, script or CSS ships and nothing is stored in the browser |
+| `readingProgress` | Remembers reading progress on notes | Off: no script or label ships and nothing is stored in the browser (on by default) |
 
 #### What each switch does
 
-All flags live under `features` in `site.config.ts`. The four interface switches (`backToTop`, `languageHint`, `themeToggle`, `backgroundPicker`) default to `true` when omitted; `experimentNudge` defaults to `false`. Checked against the code.
+All flags live under `features` in `site.config.ts`. The interface switches (`backToTop`, `languageHint`, `themeToggle`, `backgroundPicker`, `readingProgress`) default to `true` when omitted; `experimentNudge` defaults to `false`. Checked against the code.
 
 | Flag | What it controls | What disappears when it is off | Dependencies |
 | --- | --- | --- | --- |
@@ -430,6 +432,7 @@ All flags live under `features` in `site.config.ts`. The four interface switches
 | `me` | The `/me` page | The "About" menu entry, the home hiring card, the notes sidebar link and the `/me` share card; the page is marked `noindex` and kept out of the sitemap | |
 | `changelog` | The `/changelog` page (and `/en/changelog`) | The routes (`integrations/changelog-routes.ts`), the footer link and the sitemap entry | |
 | `readingMode` | Reading mode on notes | Button, script and CSS; nothing is stored in the browser | |
+| `readingProgress` | Returns the reader to where they stopped in a note (restores the position) and marks notes "read" or "continue reading" in the notes index, the home notebook and the latest-note card | The inline scripts, the labels and the `progress:<note>` key in `localStorage`; the privacy page stops declaring it | |
 | `marks` | Footprint button on notes and the home | The button and its counter, and the privacy section | Needs `SITE_DB` (D1) and `MARKS_RATE_LIMITER` |
 | `subscribe` | Email subscription | The `/subscribe/**` routes, the `/api/subscribe/notify` endpoint, the footer link and form, and the privacy section | Needs `blog` and a Turnstile key to show the form; also `SITE_DB`, `SUBSCRIBE_RATE_LIMITER`, `SUBSCRIBE_FROM` and `SUBSCRIBE_TOKEN_SECRET` (see 6.14) |
 | `backToTop` | Floating "back to top" button | The button and its script (nothing else depends on it) | |
@@ -537,7 +540,7 @@ A text that is too long overflows a button, wraps a menu entry onto two lines or
 | `note.*` | 28 | Labels inside a note (reading time, license, translations) |
 | `now.*` | 28 | The "Now" card |
 | `nudge.*` | 28 | The latest-experiment card: label, link and close button |
-| `reading.*` | 28 | The reading mode button (one line) |
+| `reading.*` | 28 | The reading mode button and the read / continue reading labels (one line) |
 | `skip.*` | 28 | The skip-to-content link |
 | `background.*` | 24 | The background picker button |
 | `aside.*` | 20 | The notes sidebar |

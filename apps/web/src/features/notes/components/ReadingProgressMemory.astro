@@ -1,0 +1,39 @@
+---
+/** Remembers how far each visitor read, behind `features.readingProgress`. One component, three parts:
+ * `note` (script for a note page), `label` (the hidden "read / continue reading" slot inside a list row,
+ * plus the labels script, emitted once per page) and nothing else. Off: nothing renders, nothing ships. */
+import {
+  claimProgressScript,
+  progressLabelsScript,
+  progressNoteScript,
+} from '@/features/notes/lib/reading-progress-memory.ts';
+import { isEnabled } from '@/shared/config/index.ts';
+import { type Locale, t } from '@/shared/i18n/index.ts';
+
+type Props = { part: 'note'; slug: string } | { part: 'label'; locale: Locale };
+
+const props = Astro.props;
+const enabled = isEnabled('readingProgress');
+const emitLabelsScript = enabled && props.part === 'label' && claimProgressScript(Astro.request);
+---
+
+{enabled && props.part === 'note' && <script is:inline set:html={progressNoteScript(props.slug)} />}
+
+{enabled && props.part === 'label' && (
+  <>
+    <span
+      data-progress-label
+      hidden
+      class="text-meta data-[state=continue]:text-primary"
+    ></span>
+    {emitLabelsScript && (
+      <script
+        is:inline
+        set:html={progressLabelsScript({
+          read: t(props.locale, 'reading.read'),
+          continue: t(props.locale, 'reading.continue'),
+        })}
+      />
+    )}
+  </>
+)}

@@ -11,6 +11,7 @@ const allOn = {
   me: true,
   changelog: true,
   readingMode: true,
+  readingProgress: true,
   marks: true,
   subscribe: false,
   backToTop: true,

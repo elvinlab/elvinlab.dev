@@ -11,10 +11,12 @@ import { localizePath } from '@elvinlab/core';
 import { secondaryMetaSlot } from '@/features/notes/lib/note-meta.ts';
 import { rowTagList, tagHref, visibleTags } from '@/features/notes/lib/note-tags.ts';
 import { formatDate, type NoteLike, noteNumber, searchText } from '@/features/notes/lib/notes.ts';
+import { isEnabled } from '@/shared/config/index.ts';
 import { LOCALES, type Locale, t } from '@/shared/i18n/index.ts';
 import Chip from '@/shared/ui/Chip.astro';
 
 import LangBadge from './LangBadge.astro';
+import ReadingProgressMemory from './ReadingProgressMemory.astro';
 
 type Props = {
   note: NoteLike & { readingMinutes: number };
@@ -30,6 +32,7 @@ const href = localizePath(`/notes/${note.slug}/`, data.lang, LOCALES);
 
 <article
   data-note-row
+  data-slug={isEnabled('readingProgress') ? note.slug : undefined}
   data-card-link
   data-lang={data.lang}
   data-search={searchText(note)}
@@ -56,5 +59,6 @@ const href = localizePath(`/notes/${note.slug}/`, data.lang, LOCALES);
       {secondaryMetaSlot === 'header' && <LangBadge lang={data.lang} />}
     </span>
     <span class="whitespace-nowrap">{t(locale, 'notes.readingTime', { min: note.readingMinutes })}</span>
+    <ReadingProgressMemory part="label" locale={locale} />
   </div>
 </article>

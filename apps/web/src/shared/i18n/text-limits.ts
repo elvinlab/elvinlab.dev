@@ -62,7 +62,7 @@ export const TEXT_LIMIT_NOTES: Readonly<Record<string, string>> = {
   language: 'The language switch and the language hint banner',
   link: 'External link hints',
   experiment: 'Labels on an experiment card',
-  reading: 'The reading mode button (one line)',
+  reading: 'The reading mode button and the read / continue reading labels (one line)',
   now: 'The "Now" card',
   note: 'Labels inside a note (reading time, license, translations)',
   skip: 'The skip-to-content link',
