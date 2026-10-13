@@ -82,6 +82,10 @@ for (const [path, text] of PAGES) {
       if (!boxes.stamp || !boxes.titleText) return;
       expect(hit(boxes.stamp, boxes.titleText)).toBe(false);
       if (boxes.description) expect(hit(boxes.stamp, boxes.description)).toBe(false);
+      // On phones the stamp sits above the title: leave air between its rotated box and the text.
+      if (width < 768) {
+        expect(boxes.titleText.y - (boxes.stamp.y + boxes.stamp.h)).toBeGreaterThanOrEqual(14);
+      }
       expect(boxes.stamp.x).toBeGreaterThanOrEqual(0);
       expect(boxes.stamp.x + boxes.stamp.w).toBeLessThanOrEqual(width);
       expect(boxes.doc).toBeLessThanOrEqual(width);

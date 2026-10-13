@@ -808,5 +808,11 @@
     "category": "fixed",
     "title": "With reduced motion, entrance animations do not run",
     "description": "The fade-in-and-rise entrance of the page cards and the author photo was shortened to 0.01 ms for visitors who ask for less motion, but still left the elements transparent and 8 px low for their first frames and for their 100 to 250 ms delay. It no longer runs at all in that case, so the content is in place from the first frame. A test covers it."
+  },
+  "stamp-phone-spacing": {
+    "date": "2026-10-13",
+    "category": "fixed",
+    "title": "The page stamp no longer crowds the title on phones",
+    "description": "On narrow screens the rotated stamp above the page title (Experiments, Contact, Changelog and the other inner pages) sat almost touching the heading. The gap is now 20 px instead of 12 px."
   }
 }
