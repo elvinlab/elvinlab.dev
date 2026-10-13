@@ -109,7 +109,7 @@ The descriptions come from the schema (`.describe()`), which is why they are in 
 | `experiments.sortFrom` | `integer (min 2, max 48)` | no | `4` | The sort switch and the alternate-sort pages exist only when the compact cards (everything that is not a big piece) number at least this many; below it the order is not worth choosing. |
 | `education` | `object` | no | `{}` | Settings of the education timeline (`features.education`): pagination, the sort switch, the rows on `/me` and the page intro. Every key is optional and falls back to its default. |
 | `education.perPage` | `integer (min 4, max 48)` | no | `12` | Entries per page of `/education/`. The timeline is grouped by year inside each page; a second page exists only when the entries exceed this number (`/education/page/2/`). |
-| `education.sortFrom` | `integer (min 2, max 48)` | no | `4` | The sort switch (oldest first, newest first) and the page of the alternate order (`/education/newest/`, not indexed) exist only when the entries number at least this many; below it the timeline has a single order. |
+| `education.sortFrom` | `integer (min 2, max 48)` | no | `4` | The sort switch (newest first, oldest first) and the page of the alternate order (`/education/oldest/`, not indexed) exist only when the entries number at least this many; below it the timeline has a single order. |
 | `education.meRows` | `integer (min 1, max 6)` | no | `3` | Rows of the "Recent education" block on `/me`, newest first; each links to its entry on `/education/`. |
 | `education.intro` | `{ <locale>: string (max 200) }` | no |  | Optional intro under the title of `/education/`, per locale (the default locale is required). Omit it to use the interface default. Max 200 characters per locale. |
 | `changelog` | `object` | no | `{}` | Settings of the changelog (`features.changelog`). Every key is optional and falls back to its default. |
@@ -216,7 +216,7 @@ Shown in the `/me` timeline. If you omit `end`, it is the current job. `role`, `
 
 ### Certificates and degrees — `credentials.json`
 
-They feed `/education/` (a timeline by year, oldest first; needs `features.education`) and `/me`: with `features.education` on, a block with the newest `education.meRows`; off, the long list by year, which needs `features.credentials`. How to add one: [PORTFOLIO.en.md](PORTFOLIO.en.md#6-credentials-and-education).
+They feed `/education/` (a timeline by year, newest first; needs `features.education`) and `/me`: with `features.education` on, a block with the newest `education.meRows`; off, the long list by year, which needs `features.credentials`. How to add one: [PORTFOLIO.en.md](PORTFOLIO.en.md#6-credentials-and-education).
 
 ```json
 {
@@ -235,8 +235,8 @@ They feed `/education/` (a timeline by year, oldest first; needs `features.educa
 | `title` | `string (max 120)` | yes |  | Name of the certificate or degree (max 120 characters). |
 | `issuer` | `string (max 80)` | yes |  | Who issued it (max 80 characters). |
 | `kind` | `'degree' \| 'certificate' \| 'professional'` | yes |  | Whether it is a degree, a course certificate or a professional certification. |
-| `year` | `integer (min 1970)` | yes |  | Year obtained; `/education/` groups entries by year (oldest first) and `/me` shows the newest. |
-| `month` | `integer (min 1, max 12)` | no |  | Optional month (1-12) to order items within a year. |
+| `year` | `integer (min 1970)` | yes |  | Year obtained; `/education/` groups entries by year (newest first) and `/me` shows the newest. |
+| `month` | `integer (min 1, max 12)` | no |  | Optional month (1-12), shown and used to order entries within a year. |
 | `order` | `integer (min 0)` | no |  | Optional editorial position inside its year on `/education/` (lower first). Entries without it follow, ordered by id. |
 | `url` | `URL` | no |  | Verification link (https only). |
 | `credentialId` | `string` | no |  | Credential id in kebab-case, if the issuer gives one. |

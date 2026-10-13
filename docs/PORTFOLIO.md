@@ -186,7 +186,7 @@ Los resultados y aportes que no hayas validado no se publican: sin cifras, usuar
 
 Los títulos y certificados viven en `apps/web/src/content/credentials.json` (una clave por entrada) y alimentan dos lugares:
 
-- **`/education/`** (y `/en/education/`): la línea de tiempo completa, agrupada por año, del más antiguo al más reciente. Necesita `features.education`.
+- **`/education/`** (y `/en/education/`): la línea de tiempo completa, agrupada por año, del más reciente al más antiguo. Necesita `features.education`.
 - **`/me`**: con `features.education` activa, un bloque compacto «Formación reciente» (las `education.meRows` más nuevas, 3 por defecto, cada una con enlace a su entrada) y un enlace «Ver mi recorrido de formación». Con `features.education` apagada, `/me` conserva la lista larga de certificados por año (necesita `features.credentials`).
 
 ```json
@@ -204,15 +204,15 @@ Los títulos y certificados viven en `apps/web/src/content/credentials.json` (un
 ### Cómo agregar una formación
 
 1. Añade una clave nueva en kebab-case a `credentials.json`. La clave es el ancla: `/education/#<clave>` apunta a esa entrada (y `/me` enlaza a ella).
-2. Campos obligatorios: `title` (máx. 120), `issuer` (máx. 80), `kind` (`degree`, `certificate` o `professional`) y `year`. Opcionales: `month` (1-12, se muestra pero nunca coloca la entrada), `url` (enlace https de verificación; aparece como «Verificar»), `credentialId`, `expires` (`AAAA-MM`).
-3. **Orden dentro de un año:** primero `order` (entero, menor primero), después la clave. El año manda; el mes no se usa para ordenar. Fija `order` cuando quieras un orden editorial.
+2. Campos obligatorios: `title` (máx. 120), `issuer` (máx. 80), `kind` (`degree`, `certificate` o `professional`) y `year`. Opcionales: `month` (1-12, se muestra y ordena las entradas dentro de su año), `url` (enlace https de verificación; aparece como «Verificar»), `credentialId`, `expires` (`AAAA-MM`).
+3. **Orden dentro de un año:** primero `order` (entero, menor primero), después el mes (una entrada sin mes cuenta como el inicio del año), después la clave. El año manda. Fija `order` cuando quieras un orden editorial.
 4. **Solo con contenido real:** `learnings` (1 a 8 puntos, aparecen en un bloque «Qué aprendí»), `appliedIn` («Dónde lo apliqué») e `image` (copia pública del documento) se muestran únicamente cuando existen; nunca se inventa texto. La única excepción es el espacio del documento: sin `image`, la entrada muestra una portada tipográfica decorativa (año, tipo y emisor, solo con CSS) hasta que haya una copia real. Las imágenes van en `apps/web/src/assets/education/<archivo>` (nunca en `public/`; si falta el archivo, el build falla) y llevan `alt`.
 5. Los textos aceptan una cadena o un objeto por idioma (`{ "es": "…", "en": "…" }`).
 6. Ejecuta `pnpm docs:config` si cambiaste el esquema y revisa `/education/` en local.
 
 ### Ajustes de la página
 
-El bloque `education` de `site.config.ts` (todo opcional): `perPage` (entradas por página, 12), `sortFrom` (desde cuántas entradas aparece el selector «más reciente primero» y la página `/education/newest/`, que no se indexa; 4), `meRows` (filas de `/me`, 3) e `intro` (texto bajo el título, por idioma). El detalle está en [CONFIGURATION.md](CONFIGURATION.md).
+El bloque `education` de `site.config.ts` (todo opcional): `perPage` (entradas por página, 12), `sortFrom` (desde cuántas entradas aparece el selector «más antiguas primero» y la página `/education/oldest/`, que no se indexa; 4), `meRows` (filas de `/me`, 3) e `intro` (texto bajo el título, por idioma). El detalle está en [CONFIGURATION.md](CONFIGURATION.md).
 
 ## 7. Lista de verificación antes de publicar
 

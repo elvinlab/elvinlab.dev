@@ -23,11 +23,11 @@ const ids = (entries: readonly Entry[]) => entries.map((entry) => entry.id);
 describe('sortEducation', () => {
   const list = [e('b', 2026), e('a1', 2021), e('a2', 2021), e('c', 2023)];
 
-  it('puts the oldest year first and orders a year by id when no order is set', () => {
+  it('puts the oldest year first and orders a year by id when no order or month is set', () => {
     expect(ids(sortEducation(list, 'oldest'))).toEqual(['a1', 'a2', 'c', 'b']);
   });
 
-  it('puts the newest year first and still orders a year the same way', () => {
+  it('puts the newest year first and orders a year by id when no order or month is set', () => {
     expect(ids(sortEducation(list, 'newest'))).toEqual(['b', 'c', 'a1', 'a2']);
   });
 
@@ -37,9 +37,19 @@ describe('sortEducation', () => {
     expect(ids(sortEducation(list, 'newest'))).toEqual(['m', 'z', 'a']);
   });
 
-  it('ignores the month: it never places an entry', () => {
-    const sorted = sortEducation([e('b', 2022, 1), e('a', 2022, 12)], 'oldest');
-    expect(ids(sorted)).toEqual(['a', 'b']);
+  it('orders a year by month, oldest first, and puts an unknown month before the known ones', () => {
+    const list = [e('a9', 2022, 9), e('z4', 2022, 4), e('k0', 2022), e('m4', 2022, 4)];
+    expect(ids(sortEducation(list, 'oldest'))).toEqual(['k0', 'm4', 'z4', 'a9']);
+  });
+
+  it('orders a year by month, newest first, and puts an unknown month last', () => {
+    const list = [e('a9', 2022, 9), e('z4', 2022, 4), e('k0', 2022), e('m4', 2022, 4)];
+    expect(ids(sortEducation(list, 'newest'))).toEqual(['a9', 'm4', 'z4', 'k0']);
+  });
+
+  it('lets an explicit editorial order win over the month', () => {
+    const list = [e('late', 2022, 12, 0), e('early', 2022, 1)];
+    expect(ids(sortEducation(list, 'oldest'))).toEqual(['late', 'early']);
   });
 
   it('does not mutate its input', () => {
@@ -76,17 +86,17 @@ describe('educationDateLabel', () => {
 });
 
 describe('paging and sorts', () => {
-  it('offers no sort below sortFrom and oldest first from it', () => {
+  it('offers no sort below sortFrom and newest first from it', () => {
     expect(offeredEducationSorts(3, 4)).toEqual([]);
-    expect(offeredEducationSorts(4, 4)).toEqual(['oldest', 'newest']);
+    expect(offeredEducationSorts(4, 4)).toEqual(['newest', 'oldest']);
   });
 
-  it('builds the paths: oldest is the base, newest lives under its key', () => {
+  it('builds the paths: newest is the base, oldest lives under its key', () => {
     expect(educationPath(1)).toBe('/education/');
     expect(educationPath(2)).toBe('/education/page/2/');
-    expect(educationPath(1, 'oldest')).toBe('/education/');
-    expect(educationPath(1, 'newest')).toBe('/education/newest/');
-    expect(educationPath(3, 'newest')).toBe('/education/newest/page/3/');
+    expect(educationPath(1, 'newest')).toBe('/education/');
+    expect(educationPath(1, 'oldest')).toBe('/education/oldest/');
+    expect(educationPath(3, 'oldest')).toBe('/education/oldest/page/3/');
   });
 
   it('pages the sorted list: one page while it fits, every entry exactly once', () => {

@@ -10,7 +10,7 @@ requires({ flags: ['education'] });
 
 /**
  * The education timeline. The fixture build copies the real `credentials.json`, so the expected
- * order is derived from it: ascending by year, then the `order` field, then the id inside a year.
+ * order is derived from it: newest first by year, then the `order` field, then the month, then the id inside a year.
  */
 type Credential = {
   title: string;
@@ -18,6 +18,7 @@ type Credential = {
   kind: string;
   year: number;
   order?: number;
+  month?: number;
   learnings?: unknown[];
   image?: unknown;
 };
@@ -26,10 +27,12 @@ const credentials = Object.entries(
     readFileSync(new URL('../../apps/web/src/content/credentials.json', import.meta.url), 'utf8'),
   ) as Record<string, Credential>,
 ).map(([id, entry]) => ({ id, ...entry }));
-const ascending = [...credentials].sort(
+// The default order: newest first (year, then `order`, then the month descending, then the id).
+const newest = [...credentials].sort(
   (a, b) =>
-    a.year - b.year ||
+    b.year - a.year ||
     (a.order ?? Number.MAX_SAFE_INTEGER) - (b.order ?? Number.MAX_SAFE_INTEGER) ||
+    (b.month ?? 0) - (a.month ?? 0) ||
     a.id.localeCompare(b.id),
 );
 
@@ -64,13 +67,13 @@ for (const { path, locale } of PAGES) {
     await expect(page.locator('meta[name="robots"]')).toHaveCount(0);
   });
 
-  test(`${path} lists the credentials ascending by year with type badge and issuer`, async ({
+  test(`${path} lists the credentials newest first with type badge and issuer`, async ({
     page,
   }) => {
     await page.goto(path);
     const items = page.locator('[data-education-item]');
-    await expect(items).toHaveCount(ascending.length);
-    for (const [index, credential] of ascending.entries()) {
+    await expect(items).toHaveCount(newest.length);
+    for (const [index, credential] of newest.entries()) {
       const item = items.nth(index);
       await expect(item).toHaveAttribute('id', credential.id);
       await expect(item.getByRole('heading', { level: 3, name: credential.title })).toBeVisible();
@@ -80,7 +83,7 @@ for (const { path, locale } of PAGES) {
       );
     }
     const years = await page.locator('.ed-year-label').allTextContents();
-    expect(years.map(Number)).toEqual([...new Set(ascending.map(({ year }) => year))]);
+    expect(years.map(Number)).toEqual([...new Set(newest.map(({ year }) => year))]);
   });
 
   test(`${path} anchors every item by its id`, async ({ page }) => {
@@ -157,8 +160,8 @@ const PER_PAGE = 12;
 
 test('the alternate order and later pages exist only above the thresholds', async ({ page }) => {
   const cases: [string, boolean][] = [
-    ['/education/newest/', credentials.length >= SORT_FROM],
-    ['/en/education/newest/', credentials.length >= SORT_FROM],
+    ['/education/oldest/', credentials.length >= SORT_FROM],
+    ['/en/education/oldest/', credentials.length >= SORT_FROM],
     ['/education/page/2/', credentials.length > PER_PAGE],
   ];
   for (const [path, exists] of cases) {
@@ -167,12 +170,6 @@ test('the alternate order and later pages exist only above the thresholds', asyn
   }
 });
 
-const newest = [...credentials].sort(
-  (a, b) =>
-    b.year - a.year ||
-    (a.order ?? Number.MAX_SAFE_INTEGER) - (b.order ?? Number.MAX_SAFE_INTEGER) ||
-    a.id.localeCompare(b.id),
-);
 const MEROWS = 3;
 
 for (const { path, locale } of PAGES) {

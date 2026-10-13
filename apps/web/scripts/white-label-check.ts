@@ -81,12 +81,14 @@ function collectServerText(dir: string): string {
 
 const workspace = createFixtureWorkspace(source, join(source, 'tests/fixtures/notes'));
 try {
-  // Swap identity (config) and identity-bearing content (experiments) for neutral fixtures.
+  // Swap identity (config) and identity-bearing content (experiments, credentials) for neutral fixtures.
   writeFileSync(
     join(workspace.web, 'src/site.config.ts'),
     readFileSync(join(source, 'tests/fixtures/site.config.alt.ts'), 'utf8'),
   );
   writeFileSync(join(workspace.web, 'src/content/experiments.json'), '{}\n');
+  // The owner's degrees and certificates (with their verification links) are identity-bearing too.
+  writeFileSync(join(workspace.web, 'src/content/credentials.json'), '{}\n');
   // The owner's changelog entries and release headlines must not reach a fork's build.
   writeFileSync(join(workspace.web, 'src/content/changelog.json'), '{}\n');
   writeFileSync(join(workspace.web, 'src/content/releases.json'), '{}\n');

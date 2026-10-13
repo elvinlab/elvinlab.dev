@@ -23,7 +23,7 @@ export function educationRoutes(enabled: boolean): EducationRoute[] {
     // Page 2 onwards; page 1 is the base URL. `getStaticPaths` generates a page only when needed.
     { pattern: '/education/page/[page]', entrypoint: entry('page.astro') },
     { pattern: '/en/education/page/[page]', entrypoint: entry('en-page.astro') },
-    // The alternate order (`/education/newest/`), generated only from `education.sortFrom` entries.
+    // The alternate order (`/education/oldest/`), generated only from `education.sortFrom` entries.
     { pattern: '/education/[sort]', entrypoint: entry('sort.astro') },
     { pattern: '/en/education/[sort]', entrypoint: entry('en-sort.astro') },
     { pattern: '/education/[sort]/page/[page]', entrypoint: entry('sort-page.astro') },

@@ -33,14 +33,14 @@ export function credentialSchema() {
       .int()
       .min(1970)
       .describe(
-        'Year obtained; `/education/` groups entries by year (oldest first) and `/me` shows the newest.',
+        'Year obtained; `/education/` groups entries by year (newest first) and `/me` shows the newest.',
       ),
     month: z
       .int()
       .min(1)
       .max(12)
       .optional()
-      .describe('Optional month (1-12) to order items within a year.'),
+      .describe('Optional month (1-12), shown and used to order entries within a year.'),
     order: z
       .int()
       .min(0)

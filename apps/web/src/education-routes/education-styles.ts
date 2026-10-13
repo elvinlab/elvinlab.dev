@@ -106,6 +106,30 @@ const TIMELINE = `
   .ed-item:first-child {
     border-top: 0;
   }
+  /* From tablet up the document sits beside the text, so the page does not leave the right half empty. */
+  @media (min-width: 768px) {
+    .ed-item {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 28rem);
+      column-gap: 2.5rem;
+      row-gap: 0;
+      align-content: start;
+    }
+    .ed-item > * {
+      grid-column: 1;
+      margin-bottom: 0.5rem;
+    }
+    .ed-item > .ed-figure,
+    .ed-item > .ed-cover {
+      grid-column: 2;
+      grid-row: 1 / span 7;
+      align-self: start;
+      margin: 0;
+    }
+    .ed-title {
+      font-size: 1.375rem;
+    }
+  }
   .ed-item:target {
     background: color-mix(in srgb, var(--color-primary) 10%, transparent);
     border-radius: var(--radius-inner);
@@ -167,35 +191,68 @@ const IMAGE = `
   }
 `;
 
-/* The stand-in for a document that is not available yet: a framed paper with the year, the type and
-   the issuer in type only. Decorative (aria-hidden), same ratio as the real documents. */
+/* The stand-in for a document that is not available yet: ruled notebook paper in a dashed frame with
+   a pixel glyph, the year, the type and the issuer. Decorative (aria-hidden), same ratio as the real
+   documents. */
 const COVER = `
   .ed-cover {
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
+    position: relative;
+    display: grid;
+    grid-template-columns: 1fr auto;
+    grid-template-rows: auto 1fr auto auto auto;
+    align-items: start;
     box-sizing: border-box;
     width: 100%;
     max-width: 28rem;
     aspect-ratio: 4 / 3;
-    padding: 1rem 1.25rem;
+    padding: 1.25rem 1.5rem;
     border: 2px dashed color-mix(in srgb, var(--color-primary) 45%, transparent);
     border-radius: var(--radius-inner);
+    background-color: var(--color-card);
+    background-image: repeating-linear-gradient(
+      to bottom,
+      transparent 0,
+      transparent 1.75rem,
+      color-mix(in srgb, var(--color-divider) 80%, transparent) 1.75rem,
+      color-mix(in srgb, var(--color-divider) 80%, transparent) calc(1.75rem + 1px)
+    );
     color: var(--color-text-secondary);
     font-family: var(--font-mono);
     font-size: 0.8125rem;
   }
-  .ed-cover-year {
+  .ed-cover > * {
     margin: 0;
+  }
+  .ed-cover-icon {
+    grid-column: 1;
+    grid-row: 1;
     color: var(--color-primary);
-    font-size: 3rem;
+  }
+  .ed-cover-year {
+    grid-column: 2;
+    grid-row: 1;
+    color: var(--color-primary);
+    font-size: 2.5rem;
     line-height: 1;
   }
+  .ed-cover-kind {
+    grid-column: 1 / -1;
+    grid-row: 3;
+    font-weight: 700;
+    color: var(--color-primary);
+  }
   .ed-cover-issuer {
-    margin: 0;
+    grid-column: 1 / -1;
+    grid-row: 4;
     color: var(--color-text);
     font-size: 1rem;
     font-weight: 600;
+  }
+  .ed-cover-note {
+    grid-column: 1 / -1;
+    grid-row: 5;
+    margin-top: 0.5rem;
+    color: var(--color-muted);
   }
 `;
 

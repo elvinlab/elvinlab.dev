@@ -186,7 +186,7 @@ Contributions and outcomes you have not validated are not published: no invented
 
 Degrees and certificates live in `apps/web/src/content/credentials.json` (one key per entry) and feed two places:
 
-- **`/education/`** (and `/en/education/`): the full timeline, grouped by year, oldest first. Needs `features.education`.
+- **`/education/`** (and `/en/education/`): the full timeline, grouped by year, newest first. Needs `features.education`.
 - **`/me`**: with `features.education` on, a compact "Recent education" block (the newest `education.meRows` entries, 3 by default, each linking to its entry) and a "See my education path" link. With `features.education` off, `/me` keeps the long certificates-by-year list (needs `features.credentials`).
 
 ```json
@@ -204,15 +204,15 @@ Degrees and certificates live in `apps/web/src/content/credentials.json` (one ke
 ### How to add a credential
 
 1. Add a new kebab-case key to `credentials.json`. The key is the anchor: `/education/#<key>` points at that entry (and `/me` links to it).
-2. Required fields: `title` (max 120), `issuer` (max 80), `kind` (`degree`, `certificate` or `professional`) and `year`. Optional: `month` (1-12, shown but never used to place the entry), `url` (https verification link, shown as "Verify"), `credentialId`, `expires` (`YYYY-MM`).
-3. **Order inside a year:** `order` first (integer, lower first), then the key. The year decides; the month is not used to order. Set `order` when you want an editorial order.
+2. Required fields: `title` (max 120), `issuer` (max 80), `kind` (`degree`, `certificate` or `professional`) and `year`. Optional: `month` (1-12, shown and used to order entries inside their year), `url` (https verification link, shown as "Verify"), `credentialId`, `expires` (`YYYY-MM`).
+3. **Order inside a year:** `order` first (integer, lower first), then the month (an entry without a month counts as the start of the year), then the key. The year decides. Set `order` when you want an editorial order.
 4. **Only with real content:** `learnings` (1 to 8 points, shown in a "What I learned" block), `appliedIn` ("Where I applied it") and `image` (a public copy of the document) render only when present, and no text is invented. The one exception is the document slot: without an `image` the entry shows a decorative typographic cover (year, type and issuer, CSS only) until a real copy exists. Images go in `apps/web/src/assets/education/<file>` (never `public/`; a missing file fails the build) and need `alt`.
 5. Text fields accept one string or a per-language object (`{ "es": "…", "en": "…" }`).
 6. Run `pnpm docs:config` if you changed the schema and check `/education/` locally.
 
 ### Page settings
 
-The `education` block of `site.config.ts` (everything optional): `perPage` (entries per page, 12), `sortFrom` (how many entries before the "newest first" switch and the `/education/newest/` page, which is not indexed, appear; 4), `meRows` (rows on `/me`, 3) and `intro` (text under the title, per language). Details in [CONFIGURATION.en.md](CONFIGURATION.en.md).
+The `education` block of `site.config.ts` (everything optional): `perPage` (entries per page, 12), `sortFrom` (how many entries before the "oldest first" switch and the `/education/oldest/` page, which is not indexed, appear; 4), `meRows` (rows on `/me`, 3) and `intro` (text under the title, per language). Details in [CONFIGURATION.en.md](CONFIGURATION.en.md).
 
 ## 7. Checklist before publishing
 

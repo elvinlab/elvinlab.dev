@@ -5,7 +5,7 @@ const SORTED_EXPERIMENTS = new RegExp(
   `^/experiments/(?:${LISTING_SORTS.join('|')})/(?:page/\\d+/)?$`,
 );
 
-/** `/education/newest/` and `/education/newest/page/2/`: the alternate order of the timeline (a `noindex` duplicate). */
+/** `/education/oldest/` and `/education/oldest/page/2/`: the alternate order of the timeline (a `noindex` duplicate). */
 const SORTED_EDUCATION = new RegExp(`^/education/(?:${LISTING_SORTS.join('|')})/(?:page/\\d+/)?$`);
 
 /**

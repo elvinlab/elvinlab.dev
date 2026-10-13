@@ -314,7 +314,7 @@ export const siteConfigSchema = z
           .max(48)
           .default(4)
           .describe(
-            'The sort switch (oldest first, newest first) and the page of the alternate order (`/education/newest/`, not indexed) exist only when the entries number at least this many; below it the timeline has a single order.',
+            'The sort switch (newest first, oldest first) and the page of the alternate order (`/education/oldest/`, not indexed) exist only when the entries number at least this many; below it the timeline has a single order.',
           ),
         meRows: z
           .int()
