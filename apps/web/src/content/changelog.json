@@ -904,5 +904,11 @@
     "category": "changed",
     "title": "Navbar: a solid bar and a marker for the current page",
     "description": "The navbar bar is now almost opaque with a thin edge in both themes, so page content no longer shows through after scrolling, and the current section is marked with a small purple pixel bar under its label (a bar at the left edge in the phone menu), so color is no longer the only cue."
+  },
+  "navbar-menu-and-tablet": {
+    "date": "2026-10-13",
+    "category": "changed",
+    "title": "Navbar: a pixel-notched phone menu and the wordmark on tablets",
+    "description": "The phone menu is now a card with stepped pixel corners and the bar's thin edge, opens with a short stepped dissolve (none with reduced motion) and dims the page behind it; tapping the dimmed page closes it. From 780 px the bar shows the wordmark next to the logo, and below that the logo link is a 44 px target."
   }
 }

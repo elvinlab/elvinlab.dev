@@ -185,6 +185,112 @@ body {
   clip-path: none;
 }
 
+/* Notch for the phone menu panel: a 4 px two-step corner (the pixel pages' recipe), written once as a custom
+   property of the navbar. It clips the panel's own edge and face layers, never the panel, so a link's focus
+   ring is never cut. */
+[data-navbar] {
+  --nav-notch: polygon(
+    0 4px,
+    2px 4px,
+    2px 2px,
+    4px 2px,
+    4px 0,
+    calc(100% - 4px) 0,
+    calc(100% - 4px) 2px,
+    calc(100% - 2px) 2px,
+    calc(100% - 2px) 4px,
+    100% 4px,
+    100% calc(100% - 4px),
+    calc(100% - 2px) calc(100% - 4px),
+    calc(100% - 2px) calc(100% - 2px),
+    calc(100% - 4px) calc(100% - 2px),
+    calc(100% - 4px) 100%,
+    4px 100%,
+    4px calc(100% - 2px),
+    2px calc(100% - 2px),
+    2px calc(100% - 4px),
+    0 calc(100% - 4px)
+  );
+}
+
+/* Phone menu panel: a notched card with the bar's hairline. The edge layer (text token at 24%) shows as a 1 px
+   ring around the face layer (card token, inset 1 px); both sit behind the rows. */
+#nav-menu {
+  isolation: isolate;
+}
+#nav-menu::before,
+#nav-menu::after {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  clip-path: var(--nav-notch);
+  pointer-events: none;
+}
+#nav-menu::before {
+  inset: 0;
+  background-color: var(--color-text);
+  opacity: 0.24;
+}
+#nav-menu::after {
+  inset: 1px;
+  background-color: var(--color-card);
+}
+@media (prefers-reduced-motion: no-preference) {
+  #nav-menu:not([hidden]) {
+    animation: nav-menu-in 160ms steps(3, end);
+  }
+}
+@keyframes nav-menu-in {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+}
+
+/* Scrim over the inert page while the phone menu is open: the page token at 60%, no blur, no motion. It is a
+   sibling before the header, so the bar (and the panel) paint above it. */
+[data-nav-scrim] {
+  position: fixed;
+  inset: 0;
+  background-color: var(--color-page);
+  opacity: 0.6;
+}
+@media (min-width: 768px) {
+  [data-nav-scrim] {
+    display: none;
+  }
+}
+
+/* 768 to 779 px: the wordmark is visually hidden (it stays the home link's name) and the logo link grows to a
+   44 px square. From 780 px the wordmark shows; up to 863 px the links and the row lose their horizontal
+   padding and gap so it fits with six links, the language code and both toggles (measured in
+   odd/tasks/navbar-menu-and-tablet.md). 864 px and up is the desktop row. */
+@media (min-width: 768px) and (max-width: 779px) {
+  [data-navbar] nav > a:first-child {
+    min-width: 2.75rem;
+    justify-content: center;
+  }
+  [data-navbar] nav > a:first-child > span {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+}
+@media (min-width: 780px) and (max-width: 863px) {
+  [data-navbar] nav {
+    column-gap: 0;
+  }
+  [data-navbar] ul:not(#nav-menu) {
+    column-gap: 0;
+  }
+  [data-navbar] ul:not(#nav-menu) a {
+    padding-inline: 0.25rem;
+  }
+}
+
 [data-site-footer] {
   padding-bottom: max(2rem, env(safe-area-inset-bottom));
 }
