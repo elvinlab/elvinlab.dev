@@ -133,6 +133,23 @@ Lighthouse reports are written locally to `.lighthouseci/` (ignored by Git); the
 does not upload them. CI runs every browser, white-label and performance gate in the `checks` job,
 which the deploy job requires.
 
+### Optional production audits
+
+Production-wide Lighthouse audits are optional diagnostics, not an additional CI or feature-delivery
+gate. The owner stopped the exhaustive all-route/all-mode pursuit of 100 on 2026-10-12 to prioritize
+features. Do not resume it automatically; a new comprehensive audit requires an explicit request.
+Continue using the existing touch-scoped checks and CI budgets above, including the approved
+note-fixture exception. This decision neither weakens those gates nor raises them to 100.
+
+The [partial production audit checkpoint](../odd/tasks/production-lighthouse-audit-checkpoint.md)
+records 74 completed Navigation reports and 192 partial interaction reports (266 total). It distinguishes
+measured results, incomplete coverage and remaining findings; it is not an all-mode quality guarantee.
+Read categories according to their mode: an absent category or a null score is not a pass (Timespan
+and Snapshot do not expose the same categories as Navigation). Intentional `noindex` subscription
+token-state pages must remain non-indexable even when Lighthouse SEO reports 66 rather than 100.
+An accessibility score of 100 does not replace manual accessibility review or prove every audit
+passed; the checkpoint retains a non-scoring visible-label/accessibility-name mismatch for follow-up.
+
 ### Page weight budget (`pnpm check:page-weight`)
 
 After `pnpm --filter web build`, `apps/web/scripts/page-weight-budget.ts` reads every

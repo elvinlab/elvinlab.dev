@@ -16,7 +16,7 @@ Bring documentation, local task trackers, repository issues and GitHub Project 2
 ## Delivery strategy
 
 `ask-on-risk`; forecast 250–350 authored changed lines excluding generated files. Reassess actual count before committing; ask once if it exceeds approximately 400 lines.
-Feature branch: `docs/reconcile-repo-and-github` from `4b94342`.
+Historical preparation branch: `docs/reconcile-repo-and-github` from `4b94342`. The owner subsequently chose direct work on `develop`; reconciliation was published there at `79215f4` (2026-10-12). No merge to `main` or deployment was performed by that push.
 
 ## Tasks
 
@@ -53,4 +53,4 @@ Feature branch: `docs/reconcile-repo-and-github` from `4b94342`.
 
 ## Next step
 
-Reconciliation is complete. Feature branch remains local; no push, PR, merge or deployment was performed. Next implementation should use current issue briefs and preserve unfinished work, including manual SQL with no individual execution evidence.
+Reconciliation is complete and published to `develop` at `79215f4`; the earlier local-branch/push-pending status is superseded. No PR, merge to `main` or deployment was performed by that publication. Next implementation should use current issue briefs and preserve unfinished work, including manual SQL with no individual execution evidence. The separate [partial production Lighthouse audit](production-lighthouse-audit-checkpoint.md) was stopped by the owner; it does not reopen this reconciliation or authorize more GitHub mutations.

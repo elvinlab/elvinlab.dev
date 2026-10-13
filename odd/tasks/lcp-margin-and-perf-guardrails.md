@@ -4,6 +4,20 @@ Current gate (2026-10-12): `/notes/smoke-es/` alone allows performance ≥ 0.93 
 
 Status: **T58 delivered in release 13 (`30ccbf9`, 2026-10-07); issue #87 is closed. Remaining `/me/` and note-page LCP work is tracked in #119 (T81).** Started 2026-10-07 (owner: "dale con el issue 87 del margen de LCP"). Tier 3. Related: issue #87, `docs/TESTING.md` ("The note-page LCP gate is sensitive to a few bytes"), the closed #72 (cut the inline CSS), `odd/tasks/me-portfolio-update.md` (headroom policy, release 12).
 
+## Production audit checkpoint (2026-10-12)
+
+The owner stopped the comprehensive production Lighthouse audit and prioritized features; do not
+resume it without an explicit request. Completed Navigation coverage: 37 public HTML routes on
+mobile and desktop (74 reports), desktop performance 100 on 37/37 and mobile 95–100 (26/37 at 100).
+ES `/experiments/` measured 95 with LCP 2838 ms. These production measurements are not the synthetic
+CI fixture and do not replace its gate or establish a reliable margin across future runs.
+
+The [checkpoint](production-lighthouse-audit-checkpoint.md) records another 192 partial interaction
+reports: 266 reports total, not full planned coverage or all-mode 100. Issue #119 remains open for
+note and `/me/` LCP work and restoration of the note-fixture thresholds. No performance fix or
+threshold change was made by this audit or its documentation checkpoint. Preserve the dated
+investigation below as historical evidence, not a claim that the remaining work is complete.
+
 ## Objective
 
 The CI Lighthouse gate (`largest-contentful-paint <= 2500 ms`, pessimistic over 3 runs) must pass with a comfortable margin instead of by a few milliseconds, on `/experiments/`, `/me/` and the pages that follow, and regressions in page weight must fail loudly before a release.
