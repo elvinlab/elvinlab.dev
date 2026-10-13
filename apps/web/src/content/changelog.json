@@ -844,5 +844,11 @@
     "category": "changed",
     "title": "Pixel buttons on Experiments",
     "description": "The read-the-case button and the Live site and Code links of the Experiments page now share the pixel look of Education: stepped corners, a pixel arrow that moves two pixels in two steps on hover and focus, a darker fill and a one-pixel lift on the button, and a tinted pill on the links. Keyboard focus drops the corners so the ring stays whole. On phones the button takes the full row and the two links sit side by side below it."
+  },
+  "stamp-below-navbar": {
+    "date": "2026-10-13",
+    "category": "fixed",
+    "title": "The page stamp no longer touches the navbar on desktop",
+    "description": "From tablet width up, the rotated stamp at the top right of the header of Experiments, Contact, Changelog, Education and the topic pages hung against the bottom edge of the floating navbar. It now sits 20 px below it. The stamp keeps its place above the title on phones."
   }
 }

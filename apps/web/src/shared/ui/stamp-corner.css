@@ -8,7 +8,7 @@
 @media (min-width: 768px) {
   .stamp-corner {
     position: absolute;
-    top: -1.25rem;
+    top: 0;
     right: 0;
     margin-bottom: 0;
   }
