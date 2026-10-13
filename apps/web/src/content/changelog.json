@@ -892,5 +892,11 @@
     "category": "changed",
     "title": "A shorter tag list on the notes index",
     "description": "The sidebar of the notes index now shows the 12 most used tags and keeps the rest behind a \"More tags\" line that opens in place, with no script needed to toggle it. If you arrive with a tag filter that is one of the hidden tags, the list opens on its own so you can see it."
+  },
+  "navbar-accessibility": {
+    "date": "2026-10-13",
+    "category": "fixed",
+    "title": "Navbar: skip link, 360 px bar and announced states",
+    "description": "The skip link now jumps past the navbar to the content, the bar stays on one row from 320 px, the theme toggle and background picker announce their state, and the phone menu moves focus into itself, hides the page behind it and shows a close icon while open."
   }
 }

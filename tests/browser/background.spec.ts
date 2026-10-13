@@ -238,6 +238,11 @@ test('fine-pointer desktop runs the animated WebGL background once the visitor p
 const PICKER = '[data-background-toggle]';
 /** `gap-1` between navbar controls (Tailwind spacing 1 = 4 px). */
 const NAVBAR_GAP_PX = 4;
+/** Below 390 px `global.css` drops the gap so the bar stays on one row (navbar-a11y.spec.ts). */
+const NARROW_NAVBAR_GAP_PX = 0;
+const NARROW_MAX_WIDTH_PX = 389;
+const expectedGap = (width: number): number =>
+  width <= NARROW_MAX_WIDTH_PX ? NARROW_NAVBAR_GAP_PX : NAVBAR_GAP_PX;
 
 /** Horizontal gap between the theme toggle and the control that follows it in the navbar. */
 const gapAfterThemeToggle = async (page: Page, next: string): Promise<number> => {
@@ -293,7 +298,7 @@ test.describe('background picker visibility', () => {
       expect(await page.evaluate(() => matchMedia('(pointer: coarse)').matches)).toBe(true);
       await expect(page.locator(PICKER)).toBeHidden();
       if (has({ flags: ['themeToggle'] })) {
-        expect(await gapAfterThemeToggle(page, '[data-nav-toggle]')).toBe(NAVBAR_GAP_PX);
+        expect(await gapAfterThemeToggle(page, '[data-nav-toggle]')).toBe(expectedGap(width));
       }
       expect(
         await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth),
@@ -326,7 +331,7 @@ test.describe('background picker visibility', () => {
     await page.goto('/');
     await expect(page.locator(PICKER)).toBeHidden();
     if (has({ flags: ['themeToggle'] })) {
-      expect(await gapAfterThemeToggle(page, '[data-nav-toggle]')).toBe(NAVBAR_GAP_PX);
+      expect(await gapAfterThemeToggle(page, '[data-nav-toggle]')).toBe(expectedGap(360));
     }
     await context.close();
   });

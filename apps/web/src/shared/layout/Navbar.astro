@@ -70,7 +70,7 @@ const linkClass =
       {otherLocale}
     </a>
     {site.features.themeToggle && <ThemeToggle label={t(locale, 'theme.switch')} />}
-    {site.features.backgroundPicker && <BackgroundPicker label={t(locale, 'background.switch')} />}
+    {site.features.backgroundPicker && <BackgroundPicker label={t(locale, 'background.switch')} locale={locale} />}
     <button
       type="button"
       class="grid size-11 shrink-0 place-items-center rounded-control transition-colors duration-150 hover:bg-card-hover active:scale-96 md:hidden"
@@ -79,7 +79,7 @@ const linkClass =
       aria-controls="nav-menu"
       data-nav-toggle
     >
-      <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"></path></svg>
+      <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path data-icon="menu" d="M4 7h16M4 12h16M4 17h16"></path><path data-icon="close" class="hidden" d="M6 6l12 12M18 6L6 18"></path></svg>
     </button>
 
     <ul id="nav-menu" hidden class="absolute inset-x-0 top-full mt-2 flex flex-col gap-1 rounded-card bg-card p-2 md:hidden">
@@ -94,10 +94,18 @@ const linkClass =
   const toggle = document.querySelector<HTMLButtonElement>('[data-nav-toggle]');
   const menu = document.getElementById('nav-menu');
 
+  // While the menu is open the content behind it (everything but the navbar) is inert.
+  const behind = document.querySelectorAll<HTMLElement>('main, body > [data-site-chrome]:not(:has([data-navbar]))');
+
   const setOpen = (open: boolean): void => {
     if (!toggle || !menu) return;
     toggle.setAttribute('aria-expanded', String(open));
     menu.hidden = !open;
+    for (const icon of toggle.querySelectorAll<SVGPathElement>('[data-icon]')) {
+      icon.classList.toggle('hidden', icon.dataset['icon'] === (open ? 'menu' : 'close'));
+    }
+    for (const region of behind) region.inert = open;
+    if (open) menu.querySelector('a')?.focus();
   };
 
   toggle?.addEventListener('click', () => setOpen(menu?.hidden === true));
@@ -106,6 +114,10 @@ const linkClass =
       setOpen(false);
       toggle?.focus();
     }
+  });
+  // Content behind an open menu is inert, so a click there lands on the page itself: close.
+  document.addEventListener('click', (event) => {
+    if (menu && !menu.hidden && !(event.target as Element).closest('[data-navbar]')) setOpen(false);
   });
 
   // Auto-hide the navbar on scroll down, reveal on scroll up (past a small threshold). It never

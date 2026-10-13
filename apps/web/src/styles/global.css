@@ -129,6 +129,15 @@ body {
   padding-top: env(safe-area-inset-top);
 }
 
+/* Narrow phones (320 to 389 px): the brand and four 44 px targets do not fit the bar's 8 px gaps and
+   12 px padding, so the bar wrapped to a second row. Tighter gaps and padding keep one 72 px row; 390 px and up is unchanged. */
+@media (max-width: 389px) {
+  [data-navbar] nav {
+    column-gap: 0;
+    padding-inline: 0.25rem;
+  }
+}
+
 [data-site-footer] {
   padding-bottom: max(2rem, env(safe-area-inset-bottom));
 }

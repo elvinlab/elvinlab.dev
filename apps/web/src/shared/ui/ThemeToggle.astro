@@ -3,17 +3,19 @@
  * Cycles through the themes defined in tokens.json and remembers the choice. Works without a
  * framework: the pre-paint script in <head> applies the saved theme, this button only changes it.
  */
-import { THEME_STORAGE_KEY, THEMES } from '@elvinlab/core';
+import { DEFAULT_THEME, THEME_STORAGE_KEY, THEMES } from '@elvinlab/core';
 
 type Props = { label: string };
 
 const { label } = Astro.props;
+const startsDark = (THEMES.find((theme) => theme.name === DEFAULT_THEME)?.scheme ?? 'dark') === 'dark';
 ---
 
 <button
   type="button"
   class="grid size-11 shrink-0 place-items-center rounded-control text-text transition-colors duration-150 hover:bg-card-hover active:scale-96"
   aria-label={label}
+  aria-pressed={startsDark ? 'true' : 'false'}
   data-theme-toggle
   data-themes={JSON.stringify(THEMES)}
   data-storage-key={THEME_STORAGE_KEY}
@@ -47,6 +49,7 @@ const { label } = Astro.props;
   const syncIcon = (button: HTMLElement, themes: ThemeOption[]): void => {
     const current = themes.find((theme) => theme.name === root.getAttribute('data-theme'));
     const scheme = current?.scheme ?? 'dark';
+    button.setAttribute('aria-pressed', String(scheme === 'dark'));
     for (const icon of button.querySelectorAll<SVGElement>('[data-icon]')) {
       icon.classList.toggle('hidden', icon.dataset['icon'] !== scheme);
     }
