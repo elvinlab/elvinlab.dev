@@ -1,0 +1,58 @@
+.nudge-float.nudge-float {
+  position: fixed;
+  left: 1rem;
+  bottom: calc(1rem + env(safe-area-inset-bottom));
+  z-index: 40;
+  margin: 0;
+  width: min(22rem, calc(100vw - 5rem));
+  padding-right: 2.5rem;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(0.75rem);
+  box-shadow: 0 0.5rem 1.5rem rgb(0 0 0 / 0.3);
+}
+.nudge-float[data-open] {
+  opacity: 1;
+  visibility: visible;
+  transform: none;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .nudge-float.nudge-float {
+    transition:
+      opacity 0.25s ease,
+      transform 0.25s ease,
+      visibility 0s linear 0.25s;
+  }
+  .nudge-float[data-open] {
+    transition-delay: 0s;
+  }
+}
+.nudge-close {
+  position: absolute;
+  top: 0.25rem;
+  right: 0.25rem;
+  width: 2rem;
+  height: 2rem;
+  border-radius: var(--radius-pill);
+  font-size: 1.25rem;
+  line-height: 1;
+  color: var(--color-muted);
+}
+.nudge-close::before {
+  content: "";
+  position: absolute;
+  inset: -0.25rem;
+}
+.nudge-close:hover {
+  color: var(--color-text);
+}
+html[data-reading] .nudge-float,
+html[data-reading] [data-experiment-card] {
+  display: none;
+}
+@media print {
+  .nudge-float,
+  [data-experiment-card] {
+    display: none;
+  }
+}
