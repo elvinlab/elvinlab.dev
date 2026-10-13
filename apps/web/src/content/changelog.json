@@ -771,6 +771,6 @@
     "date": "2026-10-12",
     "category": "added",
     "title": "Optional card for the latest experiment",
-    "description": "A small card that points to the newest experiment: static after every note and on the home, with the floating version coming next. It is switched by `features.experimentNudge` (off by default, on for this blog) and `nudge` in `site.config.ts`; off renders nothing."
+    "description": "A small card that points to the newest experiment: static after every note and on the home, with the floating version coming next. It is switched by `features.experimentNudge` (off by default, on for this blog) and `nudge` in `site.config.ts`; off renders nothing. Closing the floating card hides it for 30 days (`nudge.reappearAfterDays`)."
   }
 }

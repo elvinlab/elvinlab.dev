@@ -114,6 +114,7 @@ The descriptions come from the schema (`.describe()`), which is why they are in 
 | `nudge` | `object` | no | `{}` | Settings of the experiment card (`features.experimentNudge`). Every key is optional and falls back to its default. |
 | `nudge.scrollThreshold` | `number (min 0.3, max 0.95)` | no | `0.7` | Share of a note the visitor must scroll before the floating experiment card appears (0.3 to 0.95). |
 | `nudge.indexScrollThreshold` | `number (min 0.3, max 0.95)` | no | `0.6` | The same threshold on the `/notes/` index, where visitors browse instead of read (0.3 to 0.95). |
+| `nudge.reappearAfterDays` | `integer (min 0, max 365)` | no | `30` | Days a visitor who closed the floating card does not see it again; after that it may float again once. 0 means a close lasts for good (until the browser data is cleared). The static card after the note never goes away. |
 | `recruiter` | `object` | yes |  | Recruiter card on the home page and /me. |
 | `recruiter.available` | `boolean` | yes |  | Show or hide the whole availability line (not whether you are open to work). |
 | `recruiter.openToWork` | `boolean` | no | `true` | Whether you are open to work: green status dot when true, the brand accent colour when false. |

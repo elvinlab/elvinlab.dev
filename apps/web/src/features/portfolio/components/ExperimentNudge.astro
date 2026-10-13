@@ -45,6 +45,7 @@ const entry = enabled ? latestExperiment(await loadExperiments(), LOCALES.defaul
   threshold: isIndex ? site.nudge.indexScrollThreshold : site.nudge.scrollThreshold,
   closeLabel: t(locale, 'nudge.close'),
   target: isIndex ? 'main' : 'article',
+  reappearAfterDays: site.nudge.reappearAfterDays,
 })} />
   </>
 )}

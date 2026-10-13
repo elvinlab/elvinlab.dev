@@ -336,6 +336,14 @@ export const siteConfigSchema = z
           .describe(
             'The same threshold on the `/notes/` index, where visitors browse instead of read (0.3 to 0.95).',
           ),
+        reappearAfterDays: z
+          .int()
+          .min(0)
+          .max(365)
+          .default(30)
+          .describe(
+            'Days a visitor who closed the floating card does not see it again; after that it may float again once. 0 means a close lasts for good (until the browser data is cleared). The static card after the note never goes away.',
+          ),
       })
       .prefault({})
       .describe(

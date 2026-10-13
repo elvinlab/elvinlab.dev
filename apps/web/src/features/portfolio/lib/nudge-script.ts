@@ -7,6 +7,8 @@ export type NudgeScriptConfig = {
   closeLabel: string;
   /** CSS selector of the element the scroll share is measured against (the note, or the page). */
   target: string;
+  /** Days a close lasts; 0 means for good. */
+  reappearAfterDays: number;
 };
 
 /**
@@ -16,7 +18,8 @@ export type NudgeScriptConfig = {
  * screen (so it never covers the links there; the footer is looked up after the document loads), and
  * steps aside for the rest of the visit once keyboard focus lands anywhere outside it (WCAG focus not
  * obscured) and lets the visitor close it. Shown at most once per browser session
- * (`sessionStorage`) and never again after a close (`localStorage`); blocked storage is not an error.
+ * (`sessionStorage`) and not again for `reappearAfterDays` after a close (`localStorage` keeps the
+ * time of the close; 0 means for good); blocked storage is not an error.
  * Inline, not bundled, so a build with `features.experimentNudge` off ships none of it.
  */
 export function nudgeScript(config: NudgeScriptConfig): string {
@@ -26,9 +29,16 @@ export function nudgeScript(config: NudgeScriptConfig): string {
   var source = card || (template && template.content.firstElementChild);
   var article = document.querySelector(cfg.target);
   if (!source || !article) return;
-  function seen(store) { try { return store.getItem(${JSON.stringify(NUDGE_STORAGE_KEY)}) === '1'; } catch (e) { return false; } }
-  function remember(store) { try { store.setItem(${JSON.stringify(NUDGE_STORAGE_KEY)}, '1'); } catch (e) {} }
-  if (seen(localStorage) || seen(sessionStorage)) return;
+  var KEY = ${JSON.stringify(NUDGE_STORAGE_KEY)};
+  function shownThisSession() { try { return sessionStorage.getItem(KEY) === '1'; } catch (e) { return false; } }
+  function closedRecently() {
+    try {
+      var at = Number(localStorage.getItem(KEY));
+      if (!at) return false;
+      return cfg.reappearAfterDays === 0 || Date.now() - at < cfg.reappearAfterDays * 86400000;
+    } catch (e) { return false; }
+  }
+  if (shownThisSession() || closedRecently()) return;
   var box = source.cloneNode(true);
   box.removeAttribute('data-experiment-card');
   box.setAttribute('data-nudge-floating', '');
@@ -66,7 +76,7 @@ export function nudgeScript(config: NudgeScriptConfig): string {
     var rect = article.getBoundingClientRect();
     if (!armed && rect.height > 0 && (window.innerHeight - rect.top) / rect.height >= cfg.threshold) {
       armed = true;
-      remember(sessionStorage);
+      try { sessionStorage.setItem(KEY, '1'); } catch (e) {}
       window.removeEventListener('scroll', onScroll);
     }
     paint();
@@ -79,7 +89,7 @@ export function nudgeScript(config: NudgeScriptConfig): string {
   });
   close.addEventListener('click', function () {
     closed = true;
-    remember(localStorage);
+    try { localStorage.setItem(KEY, String(Date.now())); } catch (e) {}
     paint();
   });
   function watch(el, set) {

@@ -50,7 +50,14 @@ type Options = {
   loading?: boolean;
   /** Skip the first scroll the visitor makes after the page loads. */
   noScroll?: boolean;
+  /** `nudge.reappearAfterDays`; 0 means a close lasts for good. */
+  days?: number;
+  /** The clock the script sees (ms since the epoch). */
+  now?: number;
 };
+
+const NOW = 2_000_000_000_000;
+const DAY = 86_400_000;
 
 function run(options: Options = {}) {
   const { top = 0, height = 1000, viewport = 800, threshold = 0.7 } = options;
@@ -117,8 +124,16 @@ function run(options: Options = {}) {
     'sessionStorage',
     'IntersectionObserver',
     'requestAnimationFrame',
-    nudgeScript({ threshold, closeLabel: 'Close', target: options.target ?? 'article' }),
-  )(document, window, store(local), store(session), ObserverStub, (fn: () => void) => fn());
+    'Date',
+    nudgeScript({
+      threshold,
+      closeLabel: 'Close',
+      target: options.target ?? 'article',
+      reappearAfterDays: options.days ?? 30,
+    }),
+  )(document, window, store(local), store(session), ObserverStub, (fn: () => void) => fn(), {
+    now: () => options.now ?? NOW,
+  });
   if (!options.noScroll) windowListeners['scroll']?.(...([] as never[]));
   const box = body.appended[0] as ReturnType<typeof fakeElement> | undefined;
   return {
@@ -189,8 +204,30 @@ describe('nudgeScript', () => {
     expect(run({ top: 0, session: { [NUDGE_STORAGE_KEY]: '1' } }).box).toBeUndefined();
   });
 
-  it('does nothing when the visitor closed it before', () => {
-    expect(run({ top: 0, local: { [NUDGE_STORAGE_KEY]: '1' } }).box).toBeUndefined();
+  it('does nothing when the visitor closed it within the last 30 days', () => {
+    const closed = String(NOW - 29 * DAY);
+    expect(run({ top: 0, local: { [NUDGE_STORAGE_KEY]: closed } }).box).toBeUndefined();
+  });
+
+  it('comes back once the configured days have passed since the close', () => {
+    const closed = String(NOW - 31 * DAY);
+    expect(isOpen(run({ top: 0, local: { [NUDGE_STORAGE_KEY]: closed } }).box)).toBe(true);
+    expect(
+      run({ top: 0, days: 7, local: { [NUDGE_STORAGE_KEY]: String(NOW - 6 * DAY) } }).box,
+    ).toBeUndefined();
+    expect(
+      isOpen(run({ top: 0, days: 7, local: { [NUDGE_STORAGE_KEY]: String(NOW - 8 * DAY) } }).box),
+    ).toBe(true);
+  });
+
+  it('never comes back when the days are 0', () => {
+    const closed = String(NOW - 4000 * DAY);
+    expect(run({ top: 0, days: 0, local: { [NUDGE_STORAGE_KEY]: closed } }).box).toBeUndefined();
+  });
+
+  it('treats the old permanent marker as a close from long ago', () => {
+    expect(isOpen(run({ top: 0, local: { [NUDGE_STORAGE_KEY]: '1' } }).box)).toBe(true);
+    expect(run({ top: 0, days: 0, local: { [NUDGE_STORAGE_KEY]: '1' } }).box).toBeUndefined();
   });
 
   it('hides while the static card is on screen and returns when it leaves', () => {
@@ -243,7 +280,7 @@ describe('nudgeScript', () => {
     const page = run({ top: 0 });
     page.close();
     expect(isOpen(page.box)).toBe(false);
-    expect(page.local[NUDGE_STORAGE_KEY]).toBe('1');
+    expect(page.local[NUDGE_STORAGE_KEY]).toBe(String(NOW));
   });
 
   it('keeps working when the browser blocks storage', () => {
@@ -274,14 +311,20 @@ describe('nudgeScript', () => {
   });
 
   it('has no line comments, which would swallow the code once line breaks are collapsed', () => {
-    expect(nudgeScript({ threshold: 0.7, closeLabel: 'Close', target: 'article' })).not.toContain(
-      '//',
-    );
+    expect(
+      nudgeScript({
+        threshold: 0.7,
+        closeLabel: 'Close',
+        target: 'article',
+        reappearAfterDays: 30,
+      }),
+    ).not.toContain('//');
   });
 
   it('is small enough to inline in a page', () => {
     expect(
-      nudgeScript({ threshold: 0.7, closeLabel: 'Close', target: 'article' }).length,
-    ).toBeLessThan(3000);
+      nudgeScript({ threshold: 0.7, closeLabel: 'Close', target: 'article', reappearAfterDays: 30 })
+        .length,
+    ).toBeLessThan(3300);
   });
 });

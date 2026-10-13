@@ -231,3 +231,7 @@ Candidate: `develop` after N1 to N7 of `odd/tasks/experiment-nudge.md` (`feature
 ### Release 19 deployed (2026-10-12, run 38340323460)
 
 Release commit `3c2ba0d` (the experiment card, turned on for this blog). CI: static, e2e (4 shards), lighthouse (2 shards), checks and deploy all green on the first attempt, no reruns; `notes-gate` skipped (not a notes-only push). Production `/version.txt` = `3c2ba0d`; `/`, `/en/`, `/notes/` and a note answer 200 and carry the card markup. Not checked by hand: the floating card on a real phone, and the link-preview caches (no new share links were added).
+
+### Experiment nudge: a close expires (2026-10-12, local, not released)
+
+Change: `nudge.reappearAfterDays` (default 30, 0 = for good); the script stores the time of the close instead of a flag. Touched: schema, script, wrapper, e2e spec, docs, changelog, two page-weight budgets. Ran: 265 vitest in config and portfolio (RED first: 2 schema and 5 script tests), typecheck, lint, `docs:config`, build, `check:page-weight` (38 pages; `notes-index` and `note` html budgets raised by the measured 186 and 248 B), `test:white-label`, `experiment-nudge.spec.ts` at 3 viewports (96 passed). Not re-run: the rest of the e2e suite, `check:js-budget` and Lighthouse (the change adds about 300 B of inline script and no layout or CSS; they ran green on `3c2ba0d` and CI on `main` runs them again at the next release). Not pushed, not released.

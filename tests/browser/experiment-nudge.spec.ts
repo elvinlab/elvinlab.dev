@@ -99,7 +99,9 @@ for (const { path, label, experiments } of NOTES) {
       await expect(page.locator(OPEN)).toBeVisible();
       await page.locator('.nudge-close').click();
       await expect(page.locator(FLOATING)).toBeHidden();
-      expect(await page.evaluate(() => localStorage.getItem('experiment-nudge'))).toBe('1');
+      expect(await page.evaluate(() => localStorage.getItem('experiment-nudge'))).toMatch(
+        /^\d{13}$/,
+      );
       await page.reload();
       await expect(page.locator(FLOATING)).toHaveCount(0);
     });
