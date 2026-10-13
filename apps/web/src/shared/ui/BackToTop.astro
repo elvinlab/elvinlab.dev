@@ -2,7 +2,8 @@
 /**
  * Discreet pixel "back to top" button, rendered once by the layout. Hidden (inert, so neither
  * focusable nor announced) until the reader has scrolled deep and then scrolls up; it lifts above
- * the footer instead of covering it, steps in and out, and stays still under reduced motion.
+ * the footer instead of covering it, but never under the navbar: when clearing the footer would push
+ * it into the bar it stays hidden. It steps in and out and stays still under reduced motion.
  */
 import { type Locale, t } from '@/shared/i18n/index.ts';
 import { IDLE_HIDE_MS } from '@/shared/layout/back-to-top.ts';
@@ -41,6 +42,7 @@ const label = t(locale, 'backtotop.label');
 
 <script>
   import {
+    fitsBelowBar,
     IDLE_HIDE_MS,
     liftAboveFooter,
     nextVisibility,
@@ -50,6 +52,7 @@ const label = t(locale, 'backtotop.label');
 
   const button = document.querySelector<HTMLButtonElement>('[data-back-to-top]');
   const footer = document.querySelector<HTMLElement>('[data-site-footer]');
+  const navbar = document.querySelector<HTMLElement>('[data-navbar]');
   if (button) {
     let shown = false;
     let last = window.scrollY;
@@ -57,6 +60,7 @@ const label = t(locale, 'backtotop.label');
     let returning = false;
     let idle: number | undefined;
     let lift = 0;
+    let fits = true;
     // After the reader stops scrolling the button gets out of the way (unless it is being used or it
     // sits above the footer at the bottom of the page).
     const armIdle = (): void => {
@@ -68,27 +72,36 @@ const label = t(locale, 'backtotop.label');
         else armIdle();
       }, Number(button.dataset['idleMs'] ?? IDLE_HIDE_MS));
     };
+    // `shown` is what the scroll gesture wants; the button is only on screen while it also fits below the bar.
+    const render = (): void => {
+      const visible = shown && fits;
+      button.toggleAttribute('data-shown', visible);
+      button.toggleAttribute('inert', !visible);
+      button.setAttribute('aria-hidden', String(!visible));
+    };
     const show = (next: boolean): void => {
       shown = next;
-      button.toggleAttribute('data-shown', next);
-      button.toggleAttribute('inert', !next);
-      button.setAttribute('aria-hidden', String(!next));
+      render();
       armIdle();
     };
     show(false);
     const onScroll = (): void => {
       const y = window.scrollY;
+      const base = document.documentElement.hasAttribute('data-reading') ? 64 : 16;
+      const box = footer?.getBoundingClientRect();
+      lift = box && box.height > 0 ? liftAboveFooter({ viewportHeight: window.innerHeight, footerTop: box.top }) : 0;
+      // The bar's layout height, whether or not it is currently slid out: it is back as soon as the reader scrolls up.
+      fits = fitsBelowBar({ viewportHeight: window.innerHeight, lift, base, barBottom: navbar?.offsetHeight ?? 0 });
       if (returning) returning = y > SCROLL_STEP_PX;
       else if (Math.abs(y - last) > SCROLL_STEP_PX) {
         show(nextVisibility({ y, previousY: last, shown }) || document.activeElement === button);
         last = y;
         armIdle();
       }
-      const box = footer?.getBoundingClientRect();
-      lift = box && box.height > 0 ? liftAboveFooter({ viewportHeight: window.innerHeight, footerTop: box.top }) : 0;
+      render();
       button.style.setProperty('--btt-lift', `${lift}px`);
       // Reading mode pins its exit pill at the same corner: sit above it.
-      button.style.setProperty('--btt-base', document.documentElement.hasAttribute('data-reading') ? '4rem' : '1rem');
+      button.style.setProperty('--btt-base', `${base}px`);
       ticking = false;
     };
     document.addEventListener('scroll', () => {

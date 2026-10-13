@@ -928,5 +928,11 @@
     "category": "changed",
     "title": "Education: newest first, a working sort switch and a two-column layout",
     "description": "The timeline now lists the newest credential first and orders a year by month. The Newest and Oldest switch works both ways (it used to link to the page you were already on). On desktop the document sits beside the text instead of leaving the right half empty."
+  },
+  "back-to-top-clear-of-navbar": {
+    "date": "2026-10-13",
+    "category": "fixed",
+    "title": "Back to top no longer overlaps the navbar",
+    "description": "At the very bottom of a page on a small phone, the back to top button lifted above the taller footer could end up under the navbar's menu button. It now keeps a gap below the bar and stays hidden when there is no room, and the footer is a little tighter on narrow phones (320 to 389 px)."
   }
 }

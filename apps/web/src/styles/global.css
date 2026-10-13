@@ -329,6 +329,30 @@ body {
   padding-bottom: max(2rem, env(safe-area-inset-bottom));
 }
 
+/* Narrow phones (320 to 389 px): a tall footer leaves the back-to-top button no room between the navbar and
+   the footer's links, so it would have to hide at the bottom of the page. Tighter vertical gaps give about
+   80 px back; the content, the 44 px targets and everything from 390 px up are unchanged. */
+@media (max-width: 389px) {
+  [data-site-footer] {
+    padding-top: 1.25rem;
+    padding-bottom: max(1.25rem, env(safe-area-inset-bottom));
+  }
+  [data-site-footer] > div {
+    row-gap: 0.75rem;
+  }
+  [data-site-footer] > div > div:first-child {
+    row-gap: 0.5rem;
+  }
+  [data-site-footer] [data-subscribe-cta] {
+    margin-bottom: 0.75rem;
+    padding: 1rem;
+    row-gap: 0.75rem;
+  }
+  [data-site-footer] [data-subscribe-cta] form > div:first-of-type {
+    row-gap: 0.5rem;
+  }
+}
+
 /* Article body (design v3): 68ch measure, generous line height, dashed dividers, pink quote bar. */
 .prose {
   max-width: 68ch;
