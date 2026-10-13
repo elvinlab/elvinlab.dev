@@ -29,8 +29,26 @@ export interface ExperimentsCssParts {
   empty: boolean;
 }
 
+/* A 4 px two-step notch on each corner: crisp pixel corners instead of a rounded rectangle. Written once,
+   as the custom property `--xp-notch` of `.xp-page`. Clipping also clips the outline, so a clipped control
+   drops the notch (`clip-path: none`) while it has keyboard focus. */
+const NOTCH = `polygon(
+    0 4px, 2px 4px, 2px 2px, 4px 2px, 4px 0,
+    calc(100% - 4px) 0, calc(100% - 4px) 2px, calc(100% - 2px) 2px, calc(100% - 2px) 4px, 100% 4px,
+    100% calc(100% - 4px), calc(100% - 2px) calc(100% - 4px), calc(100% - 2px) calc(100% - 2px),
+    calc(100% - 4px) calc(100% - 2px), calc(100% - 4px) 100%,
+    4px 100%, 4px calc(100% - 2px), 2px calc(100% - 2px), 2px calc(100% - 4px), 0 calc(100% - 4px)
+  )`;
+
+/* A right-pointing chevron on an 8x10 grid of 2 px cells (two cells thick), the glyph of the secondary links. */
+const CHEVRON = `polygon(
+    4px 0, 4px 2px, 6px 2px, 6px 4px, 8px 4px, 8px 6px, 6px 6px, 6px 8px, 4px 8px, 4px 10px,
+    0 10px, 0 8px, 2px 8px, 2px 6px, 4px 6px, 4px 4px, 2px 4px, 2px 2px, 0 2px, 0 0
+  )`;
+
 const HEADER = `
   .xp-page {
+    --xp-notch: ${NOTCH};
     display: flex;
     flex-direction: column;
     gap: 3rem;
@@ -283,10 +301,12 @@ const PIECE = `
   .xp-btn {
     display: inline-flex;
     align-items: center;
+    justify-content: center;
     gap: 0.5rem;
     min-height: 2.75rem;
     padding-inline: 1.25rem;
-    border-radius: var(--radius-control);
+    border-radius: 0;
+    clip-path: var(--xp-notch);
     background: var(--color-button);
     color: white;
     font-weight: 500;
@@ -295,30 +315,85 @@ const PIECE = `
   .xp-link {
     display: inline-flex;
     align-items: center;
+    justify-content: center;
     min-height: 2.75rem;
     padding-inline: 0.75rem;
-    border-radius: var(--radius-control);
+    border-radius: 0;
+    clip-path: var(--xp-notch);
     color: var(--color-primary);
     font-size: 0.875rem;
     text-decoration: underline dashed;
     text-underline-offset: 4px;
   }
-  .xp-link:hover {
-    background: var(--color-card-hover);
+  /* The pixel chevron after a secondary link (the "opens in a new tab" note is visually hidden text). */
+  .xp-link::after {
+    content: '';
+    flex-shrink: 0;
+    width: 8px;
+    height: 10px;
+    margin-left: 0.5rem;
+    background: currentColor;
+    clip-path: ${CHEVRON};
+  }
+  @media (hover: hover) {
+    .xp-btn:hover {
+      background: color-mix(in srgb, var(--color-button) 80%, black);
+    }
+    .xp-link:hover {
+      background: color-mix(in srgb, var(--color-primary) 14%, transparent);
+    }
+  }
+  /* A clipped control would cut its own outline: the notch is dropped while it has keyboard focus. */
+  .xp-btn:focus-visible,
+  .xp-link:focus-visible {
+    outline: 2px solid var(--color-primary);
+    outline-offset: 3px;
+    clip-path: none;
+  }
+  /* Phones: the primary takes the full row, the secondary links share the row below it. */
+  @media (max-width: 640px) {
+    .xp-actions {
+      gap: 0.5rem;
+    }
+    .xp-btn {
+      width: 100%;
+    }
+    .xp-link {
+      flex: 1 1 0;
+      min-width: 0;
+    }
   }
   @media (prefers-reduced-motion: no-preference) {
     .xp-btn {
-      transition: transform 150ms ease-out, opacity 150ms ease-out;
-    }
-    .xp-btn:active {
-      transform: scale(0.96);
+      transition:
+        transform 120ms steps(2, end),
+        background-color 120ms steps(2, end);
     }
     .xp-link {
-      transition: background-color 150ms ease-out;
+      transition: background-color 120ms steps(2, end);
     }
-  }
-  .xp-btn:hover {
-    opacity: 0.9;
+    .xp-arrow {
+      transition: transform 120ms steps(2, end);
+    }
+    .xp-link::after {
+      transition: transform 120ms steps(2, end);
+    }
+    @media (hover: hover) {
+      .xp-btn:hover {
+        transform: translateY(-1px);
+      }
+      .xp-btn:hover .xp-arrow,
+      .xp-link:hover::after {
+        transform: translate(2px, 2px);
+      }
+    }
+    .xp-btn:focus-visible .xp-arrow,
+    .xp-link:focus-visible::after {
+      transform: translate(2px, 2px);
+    }
+    .xp-btn:active {
+      transform: translateY(1px);
+    }
   }
   /*
    * Scroll reveal for the pieces after the first one: progressive enhancement only. Without

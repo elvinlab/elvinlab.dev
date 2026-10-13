@@ -218,13 +218,14 @@ test.describe('home sidebar cards by width', () => {
   const sidebar = (page: Page) =>
     page.getByRole('complementary', { name: text('es', 'aside.label') });
   // The marks card leaves the sidebar when the counter turns out to be unavailable (the stubbed
-  // API in the suite), so a card can be detached between the lookup and the read: skip those.
+  // API in the suite), so a card can be detached or hidden between the lookup and the read: skip those.
   const lefts = (page: Page) =>
     sidebar(page)
       .locator(':scope > div > *')
       .evaluateAll((cards) =>
         cards
-          .filter((card) => card.isConnected)
+          // Detached or `display: none` cards take no space (offsetLeft 0), so they are not a column.
+          .filter((card) => card.isConnected && getComputedStyle(card).display !== 'none')
           .map((card) => ({
             card: `${card.tagName.toLowerCase()}.${String(card.className).split(/\s+/)[0]}`,
             left: (card as HTMLElement).offsetLeft,
