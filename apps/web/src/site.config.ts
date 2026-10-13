@@ -79,6 +79,7 @@ export const siteConfig = {
     me: true,
     changelog: true,
     readingMode: true,
+    experimentNudge: false,
     marks: true,
     subscribe: true,
     backToTop: true,

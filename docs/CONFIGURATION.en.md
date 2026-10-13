@@ -111,6 +111,9 @@ The descriptions come from the schema (`.describe()`), which is why they are in 
 | `changelog.perPage` | `integer (min 2, max 30)` | no | `4` | Release days per page of `/changelog/`. A release is one production day, so this counts days, not entries; a second page exists only when the days exceed this number (`/changelog/page/2/`). Page 1 opens its two newest days; the rest stay collapsed. |
 | `notes` | `object` | no | `{}` | Settings of the notes area (`features.blog`): the static topic pages. Every key is optional and falls back to its default. |
 | `notes.topicMinNotes` | `integer (min 1, max 20)` | no | `2` | Notes a topic needs before it gets its own page (`/notes/tag/<topic>/`). A topic with fewer notes, or without an intro, is not generated, and its chips keep pointing to the filter on `/notes/`. The topics themselves live in `src/content/topics.json`. |
+| `nudge` | `object` | no | `{}` | Settings of the experiment card (`features.experimentNudge`). Every key is optional and falls back to its default. |
+| `nudge.scrollThreshold` | `number (min 0.3, max 0.95)` | no | `0.7` | Share of a note the visitor must scroll before the floating experiment card appears (0.3 to 0.95). |
+| `nudge.indexScrollThreshold` | `number (min 0.3, max 0.95)` | no | `0.6` | The same threshold on the `/notes/` index, where visitors browse instead of read (0.3 to 0.95). |
 | `recruiter` | `object` | yes |  | Recruiter card on the home page and /me. |
 | `recruiter.available` | `boolean` | yes |  | Show or hide the whole availability line (not whether you are open to work). |
 | `recruiter.openToWork` | `boolean` | no | `true` | Whether you are open to work: green status dot when true, the brand accent colour when false. |
@@ -153,6 +156,7 @@ The descriptions come from the schema (`.describe()`), which is why they are in 
 | `features.languageHint` | `boolean` | no | `true` | The banner that suggests the other language to visitors whose browser prefers it. Off renders neither the banner nor its script. |
 | `features.themeToggle` | `boolean` | no | `true` | The theme button in the navbar. Off renders no button and no script: the theme still resolves from the visitor's system preference (or the default theme) on every page. |
 | `features.backgroundPicker` | `boolean` | no | `true` | The navbar button that cycles the banner background effect. Off renders no button and no script: the effect follows the owner default from `background`. |
+| `features.experimentNudge` | `boolean` | no | `false` | A card that points to the latest experiment: static at the end of every note and on the home, floating once the visitor has read most of a note. Off by default; off renders no card, no script or CSS and stores nothing in the browser. It also needs `features.experiments`: with that flag off it never shows. |
 | `integrations` | `object` | no | `{}` | Public ids of third-party services. They ship in the HTML by design, so they live here and not in secrets. |
 | `integrations.cloudflareAnalyticsToken` | `string` | no |  | Cloudflare Web Analytics beacon token (public). Omit to turn analytics off. Env `PUBLIC_CF_ANALYTICS_TOKEN` overrides it. |
 | `integrations.turnstileSiteKey` | `string` | no |  | Cloudflare Turnstile public site key for the contact form, bound to the domain. Env `PUBLIC_TURNSTILE_SITE_KEY` overrides it (use a test key locally). |

@@ -318,6 +318,29 @@ export const siteConfigSchema = z
       .describe(
         'Settings of the notes area (`features.blog`): the static topic pages. Every key is optional and falls back to its default.',
       ),
+    nudge: z
+      .strictObject({
+        scrollThreshold: z
+          .number()
+          .min(0.3)
+          .max(0.95)
+          .default(0.7)
+          .describe(
+            'Share of a note the visitor must scroll before the floating experiment card appears (0.3 to 0.95).',
+          ),
+        indexScrollThreshold: z
+          .number()
+          .min(0.3)
+          .max(0.95)
+          .default(0.6)
+          .describe(
+            'The same threshold on the `/notes/` index, where visitors browse instead of read (0.3 to 0.95).',
+          ),
+      })
+      .prefault({})
+      .describe(
+        'Settings of the experiment card (`features.experimentNudge`). Every key is optional and falls back to its default.',
+      ),
     recruiter: z
       .object({
         available: z
@@ -489,6 +512,12 @@ export const siteConfigSchema = z
           .default(true)
           .describe(
             'The navbar button that cycles the banner background effect. Off renders no button and no script: the effect follows the owner default from `background`.',
+          ),
+        experimentNudge: z
+          .boolean()
+          .default(false)
+          .describe(
+            'A card that points to the latest experiment: static at the end of every note and on the home, floating once the visitor has read most of a note. Off by default; off renders no card, no script or CSS and stores nothing in the browser. It also needs `features.experiments`: with that flag off it never shows.',
           ),
       })
       .describe(
