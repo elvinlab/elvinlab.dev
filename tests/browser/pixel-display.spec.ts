@@ -28,6 +28,7 @@ for (const path of HOME_PATHS) {
     });
 
     test('every section title with the accent bar computes Pixelify Sans', async ({ page }) => {
+      test.skip(!has({ routes: ['notes'] }), 'needs the notes routes');
       await page.goto(path);
       const families = await page
         .locator('main h2:has(> span.bg-primary)')
@@ -94,6 +95,7 @@ for (const width of WIDTHS) {
 }
 
 test('note page titles and prose stay IBM Plex Sans', async ({ page }) => {
+  test.skip(!has({ routes: ['notes'] }), 'needs the notes routes');
   await page.goto('/notes/smoke-es/');
   expect(await familyOf(page, 'main h1')).not.toMatch(PIXEL_FAMILY);
   expect(await familyOf(page, 'article .prose p')).not.toMatch(PIXEL_FAMILY);
@@ -169,6 +171,7 @@ test('the contact form and its side panel start at the same top', async ({ page 
 });
 
 test('pages whose title is not pixel do not preload the pixel face', async ({ page }) => {
+  test.skip(!has({ routes: ['notes'] }), 'needs the notes routes');
   await page.goto('/notes/smoke-es/');
   await expect(page.locator('head link[rel="preload"][href*="pixelify-sans"]')).toHaveCount(0);
 });

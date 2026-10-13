@@ -1,5 +1,9 @@
 import { expect, test } from '@playwright/test';
 
+import { requires } from './helpers/features';
+
+requires({ routes: ['notes'] });
+
 // The fixture notes carry no `startHere` flag, so these checks exercise the fallback (the most
 // recent notes of the language fill the block). The flagged path is covered by unit tests.
 

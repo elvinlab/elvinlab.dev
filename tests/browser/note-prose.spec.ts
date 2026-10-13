@@ -1,6 +1,8 @@
 import { expect, type Page, test } from '@playwright/test';
 
-import { has } from './helpers/features';
+import { has, requires } from './helpers/features';
+
+requires({ routes: ['notes'] });
 
 /** Automatic notebook treatment of note prose (DESIGN.md, "Notebook ink system"), against the fixture notes. */
 

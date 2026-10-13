@@ -126,6 +126,7 @@ test.describe('prefetch', () => {
   });
 
   test('hovering an internal link prefetches its page', async ({ page }) => {
+    test.skip(!has({ routes: ['notes'] }), 'needs the notes routes');
     await page.goto('/', { waitUntil: 'networkidle' });
     await page.locator('[data-navbar]').getByRole('link', { name: 'Notas' }).first().hover();
     await expect(page.locator('head link[rel="prefetch"][href$="/notes/"]')).toHaveCount(1);

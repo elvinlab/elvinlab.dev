@@ -1,5 +1,9 @@
 import { expect, test } from '@playwright/test';
 
+import { requires } from './helpers/features';
+
+requires({ routes: ['notes'] });
+
 /**
  * The share panel of a note: copy link plus one plain link per network. They are ordinary anchors
  * (no third-party script), they open in a new tab and each carries the canonical URL of the note.

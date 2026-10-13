@@ -1,6 +1,8 @@
 import { expect, type Page, test } from '@playwright/test';
 
-import { has, seedTheme } from './helpers/features';
+import { has, requires, seedTheme } from './helpers/features';
+
+requires({ routes: ['notes'] });
 
 /** Vertical gap between the bottom of the article card and the top of the previous/next block. */
 const gapBelowArticle = (page: Page) =>
@@ -26,6 +28,7 @@ test('and more room in reading mode, where the article card is gone', async ({ p
 });
 
 test('the previous/next block keeps a gap before the discussion too', async ({ page }) => {
+  test.skip(!has({ flags: ['comments'] }), 'needs features.comments');
   await page.goto('/notes/smoke-es/');
   const gap = await page.evaluate(() => {
     const nav = document.querySelector('[data-prev-next]');

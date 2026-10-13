@@ -1,8 +1,10 @@
 import { expect, type Page, test } from '@playwright/test';
 
 import { describeViolations, scan } from './helpers/axe';
-import { has, liveByPath, seedTheme } from './helpers/features';
+import { has, liveByPath, requires, seedTheme } from './helpers/features';
 import { stubThirdParties } from './helpers/third-party';
+
+requires({ routes: ['subscribe'] });
 
 /**
  * The email subscription: the form in the global footer band and the two landing pages of the emailed links.

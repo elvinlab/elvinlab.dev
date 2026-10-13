@@ -1,7 +1,7 @@
 import { expect, test } from '@playwright/test';
 
 import { siteConfig } from '../../apps/web/src/site.config';
-import { liveByPath } from './helpers/features';
+import { has, liveByPath } from './helpers/features';
 
 /**
  * Links that leave the site open in a new tab (so the visitor keeps their place in the blog),
@@ -135,6 +135,7 @@ test('the social links keep rel="me" next to the safety tokens', async ({ page }
 });
 
 test('a link in a note body is handled like any other', async ({ page }) => {
+  test.skip(!has({ routes: ['notes'] }), 'needs the notes routes');
   await page.goto('/notes/smoke-es/');
   const link = page.locator('article a[href^="https://example.org"]');
   await expect(link).toHaveCount(1);
@@ -148,6 +149,7 @@ test('a link in a note body is handled like any other', async ({ page }) => {
 });
 
 test('an English note announces the new tab in English', async ({ page }) => {
+  test.skip(!has({ routes: ['notes'] }), 'needs the notes routes');
   await page.goto('/en/notes/smoke-en/');
   const link = page.locator('article a[href^="https://example.org"]');
   await expect(link).toHaveCount(1);

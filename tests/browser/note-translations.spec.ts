@@ -1,5 +1,9 @@
 import { expect, type Page, test } from '@playwright/test';
 
+import { requires } from './helpers/features';
+
+requires({ routes: ['notes'] });
+
 const alternates = (page: Page) =>
   page
     .locator('link[rel="alternate"][hreflang]')

@@ -1,5 +1,9 @@
 import { expect, test } from '@playwright/test';
 
+import { requires } from './helpers/features';
+
+requires({ routes: ['notes'] });
+
 // The fixture notes all carry the `testing` category and tag, so that filter matches every row and
 // an unknown tag matches none; the per-row `data-tags` attribute proves the rule behind both. The
 // tag `testing` belongs to the fixture topic, so its chips link to the topic page; `sin-tema` (on

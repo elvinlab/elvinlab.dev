@@ -101,6 +101,7 @@ test('tappable controls show pressed feedback', async ({ page }) => {
 test('a stretched-link note row presses with a tint and never changes geometry', async ({
   page,
 }) => {
+  test.skip(!has({ routes: ['notes'] }), 'needs the notes routes');
   await page.goto('/notes/');
   const row = page.locator('[data-note-row]').first();
   const link = row.locator('h3 a');

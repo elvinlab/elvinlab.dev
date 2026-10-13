@@ -3,7 +3,7 @@ import { join } from 'node:path';
 
 import { expect, type Locator, type Page, test } from '@playwright/test';
 
-import { liveByPath } from './helpers/features';
+import { has, liveByPath } from './helpers/features';
 
 /**
  * The fixture build copies the real `site.config.ts`; `FIXTURE_APPEARANCE` overrides the preset of
@@ -102,6 +102,8 @@ test('the home computes the scale of its preset', async ({ page }, testInfo) => 
   const expected = SCALES[await presetOf(page)][testInfo.project.name];
   if (!expected) throw new Error('unreachable: skipped in beforeEach');
   expect(await fontSize(page.locator('[data-home-hero] h1'))).toBe(expected.hero);
+  // The section titles and the latest note come from the notes, which this profile may not build.
+  if (!has({ routes: ['notes'] })) return;
   expect(await fontSize(page.locator('main h2:has(> span.bg-primary)'))).toBe(expected.section);
   // The latest note leads the home on the note-title step (it is no longer a card, see DESIGN.md).
   expect(await fontSize(page.locator('main h2:has(> a[href*="/notes/"])'))).toBe(
@@ -130,11 +132,13 @@ test('the inner pages compute the page-title step of their preset', async ({ pag
     expect(await fontSize(page.locator('main h1')), path).toBe(expected.pageTitle);
   }
   // The notes banner keeps its own hero scale.
+  if (!has({ routes: ['notes'] })) return;
   await page.goto('/notes/');
   expect(await fontSize(page.locator('main h1'))).toBe(expected.hero);
 });
 
 test('a note computes the title and prose scale of its preset', async ({ page }, testInfo) => {
+  test.skip(!has({ routes: ['notes'] }), 'needs the notes routes');
   await page.goto('/notes/smoke-es/');
   const expected = SCALES[await presetOf(page)][testInfo.project.name];
   if (!expected) throw new Error('unreachable: skipped in beforeEach');

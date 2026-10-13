@@ -1,8 +1,10 @@
 import { expect, test } from '@playwright/test';
 
 import { describeViolations, scan } from './helpers/axe';
-import { seedTheme } from './helpers/features';
+import { requires, seedTheme } from './helpers/features';
 import { stubThirdParties } from './helpers/third-party';
+
+requires({ routes: ['notes'] });
 
 // `tests/fixtures/topics.json` defines one topic, `pruebas`, over the tag `testing`, which both
 // Spanish fixture notes carry. These checks run on the real built output of that fixture.

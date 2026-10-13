@@ -297,6 +297,7 @@ test('the decision record follows the preset spacing and keeps every label', asy
 test('the decision record sits in the banner from lg up and inline in the article below it', async ({
   page,
 }, testInfo) => {
+  test.skip(!has({ routes: ['notes'] }), 'needs the notes routes');
   await page.goto('/notes/smoke-es/');
   const inBanner = page.locator('[data-banner] section[aria-label]');
   const inArticle = page.locator('[data-article] section[aria-label]');
@@ -325,6 +326,7 @@ test('the decision record sits in the banner from lg up and inline in the articl
 test('the note header keeps date and reading time, and the preset places badge, author and tags', async ({
   page,
 }) => {
+  test.skip(!has({ routes: ['notes'] }), 'needs the notes routes');
   await page.goto('/notes/smoke-es/');
   const preset = await presetOf(page);
   const header = page.locator('[data-banner]');

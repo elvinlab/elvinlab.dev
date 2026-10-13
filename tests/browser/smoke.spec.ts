@@ -1,15 +1,17 @@
 import { expect, test } from '@playwright/test';
 
-import { liveByPath } from './helpers/features';
+import { has, liveByPath } from './helpers/features';
 
 for (const { locale, prefix, slug } of [
   { locale: 'es', prefix: '', slug: 'smoke-es' },
   { locale: 'en', prefix: '/en', slug: 'smoke-en' },
 ]) {
-  const paths =
+  const paths = liveByPath(
     locale === 'es'
       ? [`${prefix}/`, `${prefix}/notes/`, `${prefix}/notes/${slug}/`]
-      : [`${prefix}/`, `${prefix}/notes/${slug}/`];
+      : [`${prefix}/`, `${prefix}/notes/${slug}/`],
+    (path) => path,
+  );
 
   for (const path of paths) {
     test(`${path} renders production content`, async ({ page }) => {
@@ -37,7 +39,9 @@ for (const { locale, prefix, slug } of [
           );
         }
       } else {
-        await expect(page.locator(`a[href="${prefix}/notes/${slug}/"]`).first()).toBeVisible();
+        if (has({ routes: ['notes'] })) {
+          await expect(page.locator(`a[href="${prefix}/notes/${slug}/"]`).first()).toBeVisible();
+        }
       }
       expect(
         await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth),
@@ -84,11 +88,13 @@ for (const { locale, path } of [
       }),
     ).toHaveCount(0);
     // The profile button shows from md up; below md the hero button (data-hero-cta) carries it.
-    const profileLink = hiringCard.locator(`a[href="${locale === 'es' ? '/me/' : '/en/me/'}"]`);
-    await expect(profileLink).toHaveCount(1);
-    const wide = await page.evaluate(() => window.matchMedia('(min-width: 768px)').matches);
-    if (wide) await expect(profileLink).toBeVisible();
-    else await expect(page.locator('[data-hero-cta]')).toBeVisible();
+    if (has({ flags: ['me'] })) {
+      const profileLink = hiringCard.locator(`a[href="${locale === 'es' ? '/me/' : '/en/me/'}"]`);
+      await expect(profileLink).toHaveCount(1);
+      const wide = await page.evaluate(() => window.matchMedia('(min-width: 768px)').matches);
+      if (wide) await expect(profileLink).toBeVisible();
+      else await expect(page.locator('[data-hero-cta]')).toBeVisible();
+    }
     // The CV link exists now (one Drive PDF per language, see cv-and-credentials.spec.ts).
     await expect(
       hiringCard.getByRole('link', { name: locale === 'es' ? 'Ver CV' : 'View CV' }),
@@ -115,6 +121,7 @@ const CONTACT_PAGES = liveByPath(
 test('locale suggestion stays in document flow and only appears for a locale mismatch', async ({
   page,
 }) => {
+  test.skip(!has({ flags: ['languageHint'] }), 'needs features.languageHint');
   await page.addInitScript(() => {
     Object.defineProperty(navigator, 'languages', { configurable: true, get: () => ['en'] });
   });
@@ -153,6 +160,8 @@ test('locale suggestion stays in document flow and only appears for a locale mis
   await page.reload();
   await expect(hint).toBeHidden();
 
+  // The translated-note suggestion needs the notes routes.
+  if (!has({ routes: ['notes'] })) return;
   await page.evaluate(() => localStorage.removeItem('language-hint-dismissed'));
   const spanishNote = await page.goto('/notes/smoke-es/');
   expect(spanishNote?.status()).toBe(200);
@@ -165,6 +174,7 @@ test('locale suggestion stays in document flow and only appears for a locale mis
 });
 
 test('the locale suggestion is a quiet line of text, not a card', async ({ page }) => {
+  test.skip(!has({ flags: ['languageHint'] }), 'needs features.languageHint');
   await page.addInitScript(() => {
     Object.defineProperty(navigator, 'languages', { configurable: true, get: () => ['en'] });
   });

@@ -1,5 +1,7 @@
 import { expect, test } from '@playwright/test';
 
+import { has } from './helpers/features';
+
 const PAGES = [
   { path: '/terms/', h1: 'Términos de uso', footer: 'Términos', privacy: 'Privacidad' },
   { path: '/en/terms/', h1: 'Terms of use', footer: 'Terms', privacy: 'Privacy' },
@@ -14,9 +16,9 @@ for (const { path, h1, footer, privacy } of PAGES) {
         'owner',
         'content',
         'use',
-        'comments',
+        ...(has({ flags: ['comments'] }) ? ['comments'] : []),
         'links',
-        'professional',
+        ...(has({ flags: ['me'] }) ? ['professional'] : []),
         'privacy',
         'changes',
       ]) {

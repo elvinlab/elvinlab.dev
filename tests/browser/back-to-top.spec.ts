@@ -1,10 +1,12 @@
 import { expect, type Page, test } from '@playwright/test';
 
 import { describeViolations, scan } from './helpers/axe';
-import { has, seedTheme } from './helpers/features';
+import { has, liveByPath, requires, seedTheme } from './helpers/features';
 import { stubThirdParties } from './helpers/third-party';
 
-const PAGES = ['/', '/notes/smoke-es/', '/me/', '/en/notes/smoke-en/'];
+requires({ flags: ['backToTop'] });
+
+const PAGES = liveByPath(['/', '/notes/smoke-es/', '/me/', '/en/notes/smoke-en/'], (path) => path);
 const VIEWPORTS = [
   { width: 360, height: 740 },
   { width: 390, height: 844 },
@@ -78,6 +80,13 @@ const overlaps = (page: Page) =>
   });
 
 test.describe('back to top', () => {
+  test.beforeEach(({ browserName: _browserName }, testInfo) => {
+    test.skip(
+      !has({ routes: ['notes'] }) && testInfo.title !== 'has an accessible name in both languages',
+      'needs the notes routes',
+    );
+  });
+
   test('is hidden and unavailable at the top and while reading downwards', async ({ page }) => {
     await page.goto('/notes/smoke-es/');
     await expect(button(page)).toBeHidden();

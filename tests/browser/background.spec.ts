@@ -5,6 +5,7 @@ import { has } from './helpers/features';
 test('the background picker cycles galaxy -> cursor-waves -> off at runtime, no reload, from the paper default', async ({
   browser,
 }) => {
+  test.skip(!has({ flags: ['backgroundPicker'] }), 'needs features.backgroundPicker');
   // Effects are intentionally inert under prefers-reduced-motion (the project default); override
   // it here, like the fine-pointer test below, to exercise the actual runtime swap.
   const context = await browser.newContext({ reducedMotion: 'no-preference' });
@@ -32,6 +33,7 @@ test('the background picker cycles galaxy -> cursor-waves -> off at runtime, no 
 });
 
 test('the background choice persists across reloads', async ({ browser }) => {
+  test.skip(!has({ flags: ['backgroundPicker'] }), 'needs features.backgroundPicker');
   const context = await browser.newContext({ reducedMotion: 'no-preference' });
   const page = await context.newPage();
   await page.goto('/');
@@ -53,6 +55,7 @@ test('the background choice persists across reloads', async ({ browser }) => {
 test('regression: cycling many times never loses the WebGL context (one context per canvas, reused across effects)', async ({
   browser,
 }) => {
+  test.skip(!has({ flags: ['backgroundPicker'] }), 'needs features.backgroundPicker');
   // A prior implementation opened a fresh WebGL2 context per effect switch; Firefox in particular
   // enforces a low concurrent-context limit and would lose the context after a handful of cycles,
   // leaving the banner blank. Regression for that: cycle well past where it used to break.
@@ -197,6 +200,7 @@ test('the default background is the static paper: no WebGL, no animation, no sta
 test('fine-pointer desktop runs the animated WebGL background once the visitor picks galaxy', async ({
   browser,
 }) => {
+  test.skip(!has({ flags: ['backgroundPicker'] }), 'needs features.backgroundPicker');
   const context = await browser.newContext({
     isMobile: false,
     hasTouch: false,
@@ -245,6 +249,7 @@ const gapAfterThemeToggle = async (page: Page, next: string): Promise<number> =>
 
 test.describe('background picker visibility', () => {
   test('desktop with a fine pointer and motion allowed shows the picker', async ({ browser }) => {
+    test.skip(!has({ flags: ['backgroundPicker'] }), 'needs features.backgroundPicker');
     const context = await browser.newContext({
       isMobile: false,
       hasTouch: false,
@@ -258,6 +263,7 @@ test.describe('background picker visibility', () => {
   });
 
   test('a narrow desktop window keeps the picker: width never hides it', async ({ browser }) => {
+    test.skip(!has({ flags: ['backgroundPicker'] }), 'needs features.backgroundPicker');
     const context = await browser.newContext({
       isMobile: false,
       hasTouch: false,

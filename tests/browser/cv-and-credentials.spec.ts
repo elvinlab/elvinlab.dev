@@ -1,5 +1,7 @@
 import { expect, test } from '@playwright/test';
 
+import { has } from './helpers/features';
+
 /**
  * The CV button serves one PDF per language, and the credentials list never shows placeholder
  * text. The fixture build copies the real `site.config.ts` and `content/credentials.json`.
@@ -33,6 +35,7 @@ test('every CV button points at the PDF of its own language', async ({ page }) =
 
 for (const path of ['/me/', '/en/me/']) {
   test(`${path} lists real platforms and no placeholder issuer`, async ({ page }) => {
+    test.skip(!has({ flags: ['credentials'] }), 'needs features.credentials');
     await page.goto(path);
     await expect(page.getByText(/sin confirmar|unconfirmed/i)).toHaveCount(0);
     await expect(page.getByText('DevTalles')).toBeVisible();

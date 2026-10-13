@@ -1,5 +1,7 @@
 import { expect, type Page, test } from '@playwright/test';
 
+import { has, requires } from './helpers/features';
+
 const meta = (page: Page, attribute: 'property' | 'name', key: string) =>
   page.locator(`meta[${attribute}="${key}"]`);
 
@@ -15,6 +17,8 @@ const NOTES = [
 
 for (const { path, slug, title, locale } of NOTES) {
   test.describe(`${path} link preview`, () => {
+    requires({ routes: ['notes'] });
+
     test('is an article with its own card, alt text and locale', async ({ page }) => {
       await page.goto(path);
       await expect(meta(page, 'property', 'og:type')).toHaveAttribute('content', 'article');
@@ -95,16 +99,19 @@ for (const { path, locale, card, bio } of [
   { path: '/me/', locale: 'es_ES', card: 'me-es', bio: 'Ingeniero full-stack' },
   { path: '/en/me/', locale: 'en_US', card: 'me-en', bio: 'Full-stack engineer' },
 ]) {
+  // The /me card is generated only with `features.me`; without it the page falls back to the
+  // default share image instead of pointing at a card that does not exist.
+  const cardPath = has({ flags: ['me'] }) ? `/og/${card}.png` : '/og-image.png';
   test.describe(`${path} link preview`, () => {
     test('has its own card, a real title and a description', async ({ page }) => {
       await page.goto(path);
       await expect(meta(page, 'property', 'og:image')).toHaveAttribute(
         'content',
-        `https://elvinlab.dev/og/${card}.png`,
+        `https://elvinlab.dev${cardPath}`,
       );
       await expect(meta(page, 'name', 'twitter:image')).toHaveAttribute(
         'content',
-        `https://elvinlab.dev/og/${card}.png`,
+        `https://elvinlab.dev${cardPath}`,
       );
       await expect(meta(page, 'property', 'og:title')).toHaveAttribute(
         'content',
@@ -123,7 +130,7 @@ for (const { path, locale, card, bio } of [
     });
 
     test('serves the real 1200x630 PNG card', async ({ request }) => {
-      const response = await request.get(`/og/${card}.png`);
+      const response = await request.get(cardPath);
       expect(response.status()).toBe(200);
       expect(response.headers()['content-type']).toContain('image/png');
       const png = await response.body();

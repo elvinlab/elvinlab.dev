@@ -1,5 +1,9 @@
 import { expect, type Page, test } from '@playwright/test';
 
+import { requires } from './helpers/features';
+
+requires({ routes: ['notes'] });
+
 /** Notebook ink components (`Fix`, `Ink`; DESIGN.md "Notebook ink system"), against the fixture notes that use them. */
 
 test.beforeEach(({ browserName: _browserName }, testInfo) => {

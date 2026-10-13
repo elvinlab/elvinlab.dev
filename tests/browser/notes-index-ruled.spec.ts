@@ -1,5 +1,9 @@
 import { expect, type Page, test } from '@playwright/test';
 
+import { requires } from './helpers/features';
+
+requires({ routes: ['notes'] });
+
 /**
  * The notes index rows read like a lab log: a ruled-paper line between rows and a margin rule on wide
  * screens, drawn with CSS on the existing row element (DESIGN.md, "Notes index"). Height floor, numbered

@@ -1,6 +1,9 @@
 import { expect, type Page, test } from '@playwright/test';
 
 import { describeViolations, scan } from './helpers/axe';
+import { requires } from './helpers/features';
+
+requires({ routes: ['notes'] });
 
 /** The decision record as an index card with a pink ink stamp (DESIGN.md, "Decision record"). */
 

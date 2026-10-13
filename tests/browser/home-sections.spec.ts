@@ -1,5 +1,7 @@
 import { expect, type Page, test } from '@playwright/test';
 
+import { has } from './helpers/features';
+
 /**
  * The fixture build copies the real `site.config.ts` (`FIXTURE_APPEARANCE` overrides the preset of
  * the copy). Under `minimal` the home drops the hero pills and the pillars; under `full` it shows
@@ -84,7 +86,9 @@ for (const { path, now, nowDate, nowFocus, retired, pillars, notebook, hiring } 
       // Wide screens show the photo in the hero and the sidebar card drops it (see the avatar test).
       await expect(page.locator('aside').getByText('Elvin González')).toBeVisible();
       await expect(page.getByRole('heading', { name: hiring })).toBeVisible();
-      await expect(page.getByRole('heading', { name: notebook })).toBeVisible();
+      if (has({ routes: ['notes'] })) {
+        await expect(page.getByRole('heading', { name: notebook })).toBeVisible();
+      }
     });
 
     test('shows the hiring status tags on a single line', async ({ page }) => {
@@ -115,6 +119,7 @@ for (const { path, now, nowDate, nowFocus, retired, pillars, notebook, hiring } 
 
 test.describe('home hero action and language cue', () => {
   test('shows a profile link in the hero on phones only', async ({ page }) => {
+    test.skip(!has({ flags: ['me'] }), 'needs features.me');
     await page.setViewportSize({ width: 390, height: 844 });
     await page.goto('/');
     const cta = page.locator('[data-home-hero] a[href="/me/"]');
@@ -173,6 +178,7 @@ test.describe('home hero action and language cue', () => {
   test('notes the language of the notes on /en/ and does not call Spanish notes foreign on /', async ({
     page,
   }) => {
+    test.skip(!has({ routes: ['notes'] }), 'needs the notes routes');
     await page.goto('/en/');
     await expect(page.getByText('Notes written in Spanish.')).toBeVisible();
     await page.goto('/');
@@ -182,6 +188,7 @@ test.describe('home hero action and language cue', () => {
   test('keeps the main column on the page background and only the decision record boxed', async ({
     page,
   }) => {
+    test.skip(!has({ routes: ['notes'] }), 'needs the notes routes');
     await page.goto('/');
     const TRANSPARENT = 'rgba(0, 0, 0, 0)';
     const background = (selector: string) =>

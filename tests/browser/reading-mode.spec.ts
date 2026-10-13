@@ -1,7 +1,7 @@
 import { expect, type Page, test } from '@playwright/test';
 
 import { describeViolations, scan } from './helpers/axe';
-import { requires } from './helpers/features';
+import { has, requires } from './helpers/features';
 import { stubThirdParties } from './helpers/third-party';
 
 requires({ flags: ['readingMode'], routes: ['notes'] });
@@ -65,7 +65,9 @@ for (const { path, toggle, exit } of NOTES) {
       // The decision record shows once, inline, whatever the width (the banner copy steps aside).
       await expect(page.locator('[data-banner] section[aria-label]')).toBeHidden();
       await expect(page.locator('[data-article] section[aria-label]')).toBeVisible();
-      await expect(page.locator('[data-comments]')).toHaveCount(1);
+      if (has({ flags: ['comments'] })) {
+        await expect(page.locator('[data-comments]')).toHaveCount(1);
+      }
 
       await page.reload();
       expect(await isReading(page)).toBe(true);

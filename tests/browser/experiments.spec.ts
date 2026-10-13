@@ -1,6 +1,8 @@
 import { expect, type Page, test } from '@playwright/test';
 
-import { has, seedTheme } from './helpers/features';
+import { has, requires, seedTheme } from './helpers/features';
+
+requires({ routes: ['experiments'] });
 
 /**
  * The experiments page and the compact experiments block on `/me`. The fixture build copies the real `experiments.json`;

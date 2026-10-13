@@ -373,6 +373,7 @@ export const CHECKS: readonly CheckDef[] = [
     helpers: true,
     responsive: true,
   }),
+  e2e({ file: 'no-blog-feed.spec.ts', covers: [...NOTE_PAGE, ...HOME], helpers: true }),
   e2e({ file: 'font-swap.spec.ts', covers: [...NOTE_PAGE, ...HOME] }),
   e2e({ file: 'changelog.spec.ts', covers: CHANGELOG }),
   e2e({ file: 'pixel-display.spec.ts', covers: [...NOTE_PAGE, ...HOME], responsive: true }),
