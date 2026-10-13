@@ -2,11 +2,20 @@ import { expect, type Page, test } from '@playwright/test';
 
 import { describeViolations, scan } from './helpers/axe';
 import { livePages, requires, seedTheme } from './helpers/features';
+import { escapeRegExp, text, themes } from './helpers/site';
 import { stubThirdParties } from './helpers/third-party';
 
 const NOTES = [
-  { path: '/notes/smoke-es/', label: /Último experimento/, experiments: '/experiments/' },
-  { path: '/en/notes/smoke-en/', label: /Latest experiment/, experiments: '/en/experiments/' },
+  {
+    path: '/notes/smoke-es/',
+    label: new RegExp(escapeRegExp(text('es', 'nudge.label'))),
+    experiments: '/experiments/',
+  },
+  {
+    path: '/en/notes/smoke-en/',
+    label: new RegExp(escapeRegExp(text('en', 'nudge.label'))),
+    experiments: '/en/experiments/',
+  },
 ] as const;
 
 const STATIC_CARD = '[data-experiment-card]:not([data-nudge-floating])';
@@ -154,7 +163,7 @@ for (const { path, label, experiments } of NOTES) {
       expect(gaps.overflow).toBe(false);
     });
 
-    for (const theme of ['elvinlab-dark', 'elvinlab-light']) {
+    for (const theme of [themes.dark, themes.light]) {
       test(`has no axe violations with the card open (${theme})`, async ({ page }) => {
         await seedTheme(page, theme);
         await shortViewport(page);

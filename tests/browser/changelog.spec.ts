@@ -1,6 +1,7 @@
 import { expect, test } from '@playwright/test';
 
 import { requires } from './helpers/features';
+import { text } from './helpers/site';
 
 requires({ flags: ['changelog'], routes: ['changelog'] });
 
@@ -13,15 +14,29 @@ const LOCALES = [
   {
     base: '/changelog/',
     prefix: '',
-    labels: ['Novedades', 'Cambios', 'Correcciones', 'Eliminado', 'Seguridad', 'Obsoleto'],
-    pager: 'Paginación del changelog',
+    labels: [
+      text('es', 'changelog.kind.added'),
+      text('es', 'changelog.kind.changed'),
+      text('es', 'changelog.kind.fixed'),
+      text('es', 'changelog.kind.removed'),
+      text('es', 'changelog.kind.security'),
+      text('es', 'changelog.kind.deprecated'),
+    ],
+    pager: text('es', 'changelog.pager.label'),
     lang: 'es',
   },
   {
     base: '/en/changelog/',
     prefix: '/en',
-    labels: ['New', 'Changes', 'Fixes', 'Removed', 'Security', 'Deprecated'],
-    pager: 'Changelog pagination',
+    labels: [
+      text('en', 'changelog.kind.added'),
+      text('en', 'changelog.kind.changed'),
+      text('en', 'changelog.kind.fixed'),
+      text('en', 'changelog.kind.removed'),
+      text('en', 'changelog.kind.security'),
+      text('en', 'changelog.kind.deprecated'),
+    ],
+    pager: text('en', 'changelog.pager.label'),
     lang: 'en',
   },
 ] as const;

@@ -1,6 +1,7 @@
 import { expect, type Page, test } from '@playwright/test';
 
 import { has, requires } from './helpers/features';
+import { escapeRegExp, identityIn, site } from './helpers/site';
 
 const meta = (page: Page, attribute: 'property' | 'name', key: string) =>
   page.locator(`meta[${attribute}="${key}"]`);
@@ -33,17 +34,14 @@ for (const { path, slug, title, locale } of NOTES) {
       // the note title alone: the domain is already `og:site_name` and is drawn on the card. The
       // browser tab keeps the suffix.
       await expect(meta(page, 'property', 'og:title')).toHaveAttribute('content', title);
-      await expect(meta(page, 'property', 'og:site_name')).toHaveAttribute(
-        'content',
-        'elvinlab.dev',
-      );
-      await expect(page).toHaveTitle(`${title} · elvinlab.dev`);
+      await expect(meta(page, 'property', 'og:site_name')).toHaveAttribute('content', site.title);
+      await expect(page).toHaveTitle(`${title} · ${site.title}`);
 
-      const image = `https://elvinlab.dev/og/notes/${slug}.png`;
+      const image = `${site.origin}/og/notes/${slug}.png`;
       await expect(meta(page, 'property', 'og:image')).toHaveAttribute('content', image);
       await expect(meta(page, 'name', 'twitter:image')).toHaveAttribute('content', image);
       // The card shows the title and the domain, so the alt text names both.
-      const alt = `${title} · elvinlab.dev`;
+      const alt = `${title} · ${site.title}`;
       await expect(meta(page, 'property', 'og:image:alt')).toHaveAttribute('content', alt);
       await expect(meta(page, 'name', 'twitter:image:alt')).toHaveAttribute('content', alt);
       await expect(meta(page, 'name', 'twitter:card')).toHaveAttribute(
@@ -70,8 +68,8 @@ for (const { path, slug, title, locale } of NOTES) {
         .locator('script[type="application/ld+json"]')
         .evaluateAll((nodes) => nodes.map((node) => JSON.parse(node.textContent ?? '{}')));
       const post = blocks.find((block) => block['@type'] === 'BlogPosting');
-      expect(post.image).toBe(`https://elvinlab.dev/og/notes/${slug}.png`);
-      expect(post.author.url).toBe('https://elvinlab.dev');
+      expect(post.image).toBe(`${site.origin}/og/notes/${slug}.png`);
+      expect(post.author.url).toBe(site.origin);
     });
   });
 }
@@ -86,7 +84,7 @@ test.describe('other pages keep the default card', () => {
       await expect(meta(page, 'property', 'og:type')).toHaveAttribute('content', 'website');
       await expect(meta(page, 'property', 'og:image')).toHaveAttribute(
         'content',
-        'https://elvinlab.dev/og-image.png',
+        `${site.origin}/og-image.png`,
       );
       await expect(meta(page, 'property', 'og:image:alt')).toHaveAttribute('content', /Elvin/);
       await expect(meta(page, 'property', 'og:locale')).toHaveAttribute('content', locale);
@@ -96,8 +94,18 @@ test.describe('other pages keep the default card', () => {
 });
 
 for (const { path, locale, card, bio } of [
-  { path: '/me/', locale: 'es_ES', card: 'me-es', bio: 'Ingeniero full-stack' },
-  { path: '/en/me/', locale: 'en_US', card: 'me-en', bio: 'Full-stack engineer' },
+  {
+    path: '/me/',
+    locale: 'es_ES',
+    card: 'me-es',
+    bio: identityIn('es').bio.split(' ').slice(0, 2).join(' '),
+  },
+  {
+    path: '/en/me/',
+    locale: 'en_US',
+    card: 'me-en',
+    bio: identityIn('en').bio.split(' ').slice(0, 2).join(' '),
+  },
 ]) {
   // The /me card is generated only with `features.me`; without it the page falls back to the
   // default share image instead of pointing at a card that does not exist.
@@ -107,23 +115,23 @@ for (const { path, locale, card, bio } of [
       await page.goto(path);
       await expect(meta(page, 'property', 'og:image')).toHaveAttribute(
         'content',
-        `https://elvinlab.dev${cardPath}`,
+        `${site.origin}${cardPath}`,
       );
       await expect(meta(page, 'name', 'twitter:image')).toHaveAttribute(
         'content',
-        `https://elvinlab.dev${cardPath}`,
+        `${site.origin}${cardPath}`,
       );
       await expect(meta(page, 'property', 'og:title')).toHaveAttribute(
         'content',
-        'Elvin González · elvinlab.dev',
+        `${site.name} · ${site.title}`,
       );
       await expect(meta(page, 'property', 'og:description')).toHaveAttribute(
         'content',
-        new RegExp(bio),
+        new RegExp(escapeRegExp(bio)),
       );
       await expect(meta(page, 'property', 'og:image:alt')).toHaveAttribute(
         'content',
-        /Elvin González/,
+        new RegExp(escapeRegExp(site.name)),
       );
       await expect(meta(page, 'property', 'og:locale')).toHaveAttribute('content', locale);
       await expect(meta(page, 'property', 'og:type')).toHaveAttribute('content', 'website');

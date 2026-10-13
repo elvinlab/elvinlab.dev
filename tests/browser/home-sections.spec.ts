@@ -1,6 +1,7 @@
 import { expect, type Page, test } from '@playwright/test';
 
 import { has } from './helpers/features';
+import { nowIn, site, text } from './helpers/site';
 
 /**
  * The fixture build copies the real `site.config.ts` (`FIXTURE_APPEARANCE` overrides the preset of
@@ -35,20 +36,20 @@ const HOMES = [
   {
     path: '/',
     now: 'Ahora',
-    nowDate: 'Actualizado el 2 de octubre de 2026',
-    nowFocus: 'Optimizar IA y proyectos personales',
+    nowDate: nowIn('es').date,
+    nowFocus: nowIn('es').focus,
     retired: 'Bitácora',
-    pillars: 'En qué trabajo',
+    pillars: text('es', 'home.pillars'),
     notebook: 'Cuaderno',
-    hiring: '¿Contratando?',
+    hiring: text('es', 'recruiter.title'),
   },
   {
     path: '/en/',
     now: 'Now',
-    nowDate: 'Updated October 2, 2026',
-    nowFocus: 'Optimizing AI and personal projects',
+    nowDate: nowIn('en').date,
+    nowFocus: nowIn('en').focus,
     retired: 'Lab log',
-    pillars: 'What I work on',
+    pillars: text('en', 'home.pillars'),
     notebook: 'Notebook',
     hiring: 'Hiring?',
   },
@@ -63,7 +64,7 @@ for (const { path, now, nowDate, nowFocus, retired, pillars, notebook, hiring } 
       const on = PRESET_SECTIONS[await presetOf(page)];
       await expect(page.locator('[data-home-hero] h1')).toBeVisible();
       await expect(page.locator('[data-home-hero] ul')).toHaveCount(countFor(on.heroPills));
-      await expect(page.getByText('Clean architecture')).toHaveCount(countFor(on.heroPills));
+      await expect(page.getByText(text('es', 'home.pill.1'))).toHaveCount(countFor(on.heroPills));
       await expect(page.locator(`section[aria-label="${pillars}"]`)).toHaveCount(
         countFor(on.pillars),
       );
@@ -84,7 +85,7 @@ for (const { path, now, nowDate, nowFocus, retired, pillars, notebook, hiring } 
     test('keeps the author card, the recruiter card and the notebook index', async ({ page }) => {
       await page.goto(path);
       // Wide screens show the photo in the hero and the sidebar card drops it (see the avatar test).
-      await expect(page.locator('aside').getByText('Elvin González')).toBeVisible();
+      await expect(page.locator('aside').getByText(site.name)).toBeVisible();
       await expect(page.getByRole('heading', { name: hiring })).toBeVisible();
       if (has({ routes: ['notes'] })) {
         await expect(page.getByRole('heading', { name: notebook })).toBeVisible();
@@ -135,18 +136,18 @@ test.describe('home hero action and language cue', () => {
     await page.setViewportSize({ width: 1280, height: 900 });
     await page.goto('/');
     const heroFigure = page.locator('[data-hero-content] figure');
-    const heroAvatar = heroFigure.locator('img[alt="Elvin González"]');
+    const heroAvatar = heroFigure.locator(`img[alt="${site.name}"]`);
     await expect(heroAvatar).toBeVisible();
     const h1Box = await page.locator('[data-home-hero] h1').boundingBox();
     const figureBox = await heroFigure.boundingBox();
     if (!h1Box || !figureBox) throw new Error('hero h1 and figure must be laid out');
     expect(figureBox.x).toBeGreaterThanOrEqual(h1Box.x + h1Box.width);
-    await expect(heroFigure.locator('figcaption')).toContainText('Elvin González');
-    await expect(page.locator('aside img[alt="Elvin González"]')).toBeHidden();
+    await expect(heroFigure.locator('figcaption')).toContainText(site.name);
+    await expect(page.locator(`aside img[alt="${site.name}"]`)).toBeHidden();
 
     await page.setViewportSize({ width: 360, height: 800 });
     await expect(heroFigure).toBeHidden();
-    await expect(page.locator('aside img[alt="Elvin González"]')).toBeVisible();
+    await expect(page.locator(`aside img[alt="${site.name}"]`)).toBeVisible();
   });
 
   for (const width of [1280, 1440]) {
@@ -166,8 +167,8 @@ test.describe('home hero action and language cue', () => {
   }) => {
     await page.setViewportSize({ width: 1280, height: 900 });
     await page.goto('/');
-    const heroAvatar = page.locator('[data-hero-content] img[alt="Elvin González"]');
-    const cardAvatar = page.locator('aside img[alt="Elvin González"]');
+    const heroAvatar = page.locator(`[data-hero-content] img[alt="${site.name}"]`);
+    const cardAvatar = page.locator(`aside img[alt="${site.name}"]`);
     await expect(heroAvatar).toBeVisible();
     await expect(cardAvatar).toBeHidden();
     await page.locator('[data-banner-toggle]').click();
@@ -180,9 +181,13 @@ test.describe('home hero action and language cue', () => {
   }) => {
     test.skip(!has({ routes: ['notes'] }), 'needs the notes routes');
     await page.goto('/en/');
-    await expect(page.getByText('Notes written in Spanish.')).toBeVisible();
+    await expect(
+      page.getByText(text('en', 'home.notebook.langNote', { language: 'Spanish' })),
+    ).toBeVisible();
     await page.goto('/');
-    await expect(page.getByText('Notas escritas en español.')).toHaveCount(0);
+    await expect(
+      page.getByText(text('es', 'home.notebook.langNote', { language: 'español' })),
+    ).toHaveCount(0);
   });
 
   test('keeps the main column on the page background and only the decision record boxed', async ({

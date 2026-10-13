@@ -1,6 +1,7 @@
 import { expect, test } from '@playwright/test';
 
 import { has, liveByPath } from './helpers/features';
+import { escapeRegExp, site, text } from './helpers/site';
 
 for (const { locale, prefix, slug } of [
   { locale: 'es', prefix: '', slug: 'smoke-es' },
@@ -61,20 +62,24 @@ for (const { locale, path } of [
     const hero = page.locator('[data-home-hero]');
     await expect(hero).toBeVisible();
     await expect(hero.locator('h1 .animate-blink')).toHaveCount(0);
-    const navbarBrand = page.locator('[data-navbar]').getByRole('link', { name: /elvinlab/ });
+    const navbarBrand = page
+      .locator('[data-navbar]')
+      .getByRole('link', { name: new RegExp(escapeRegExp(site.handle)) });
     await expect(navbarBrand).toHaveAttribute('href', locale === 'es' ? '/' : '/en/');
-    await expect(navbarBrand).toContainText('elvinlab');
+    await expect(navbarBrand).toContainText(site.handle);
     await expect(navbarBrand).toHaveClass(/font-retro/);
     await expect(navbarBrand.locator('.animate-blink')).toHaveCount(0);
     await expect(page.locator('[data-banner-fade]')).toHaveCSS('height', '120px');
 
     // The photo sits in the hero from md up and in the sidebar card on phones: exactly one is visible.
     await expect(
-      page.locator('img[alt="Elvin González"][src$=".webp"]').filter({ visible: true }),
+      page.locator(`img[alt="${site.name}"][src$=".webp"]`).filter({ visible: true }),
     ).toHaveCount(1);
 
     const hiringCard = page.locator('section', {
-      has: page.getByRole('heading', { name: locale === 'es' ? '¿Contratando?' : 'Hiring?' }),
+      has: page.getByRole('heading', {
+        name: locale === 'es' ? text('es', 'recruiter.title') : text('en', 'recruiter.title'),
+      }),
     });
     const availability = hiringCard.locator('[data-recruiter-status]');
     await expect(availability).toBeVisible();

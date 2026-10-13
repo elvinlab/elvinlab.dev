@@ -1,6 +1,7 @@
 import { expect, test } from '@playwright/test';
 
 import { has } from './helpers/features';
+import { credentialIssuers } from './helpers/site';
 
 /**
  * The CV button serves one PDF per language, and the credentials list never shows placeholder
@@ -38,8 +39,8 @@ for (const path of ['/me/', '/en/me/']) {
     test.skip(!has({ flags: ['credentials'] }), 'needs features.credentials');
     await page.goto(path);
     await expect(page.getByText(/sin confirmar|unconfirmed/i)).toHaveCount(0);
-    await expect(page.getByText('DevTalles')).toBeVisible();
-    await expect(page.getByText('Udemy')).toBeVisible();
-    await expect(page.getByText('Universidad Nacional de Costa Rica')).toBeVisible();
+    for (const issuer of credentialIssuers) {
+      await expect(page.getByText(issuer).first()).toBeVisible();
+    }
   });
 }

@@ -1,6 +1,7 @@
 import { expect, type Page, test } from '@playwright/test';
 
 import { requires } from './helpers/features';
+import { site, text } from './helpers/site';
 
 requires({ routes: ['notes'] });
 
@@ -12,9 +13,9 @@ const alternates = (page: Page) =>
     );
 
 const PAIR = [
-  'en https://elvinlab.dev/en/notes/smoke-en/',
-  'es https://elvinlab.dev/notes/smoke-es/',
-  'x-default https://elvinlab.dev/notes/smoke-es/',
+  `en ${site.origin}/en/notes/smoke-en/`,
+  `es ${site.origin}/notes/smoke-es/`,
+  `x-default ${site.origin}/notes/smoke-es/`,
 ];
 
 test.describe('a note and its translation', () => {
@@ -29,7 +30,7 @@ test.describe('a note and its translation', () => {
     await page.goto('/en/notes/smoke-en/');
     await expect(page.locator('link[rel="canonical"]')).toHaveAttribute(
       'href',
-      'https://elvinlab.dev/en/notes/smoke-en/',
+      `${site.origin}/en/notes/smoke-en/`,
     );
   });
 
@@ -47,7 +48,7 @@ test.describe('a note and its translation', () => {
     await page.goto('/notes/smoke-es/');
     await expect(page.locator('header a[lang="en"]')).toHaveAttribute(
       'aria-label',
-      'Read in English',
+      text('es', 'language.switch'),
     );
   });
 
@@ -69,6 +70,6 @@ test.describe('a note without a translation', () => {
     expect(await alternates(page)).toEqual([]);
     const link = page.locator('header a[lang="en"]');
     await expect(link).toHaveAttribute('href', '/en/');
-    await expect(link).toHaveAttribute('aria-label', 'Go to the English home page');
+    await expect(link).toHaveAttribute('aria-label', text('es', 'language.switch.home'));
   });
 });

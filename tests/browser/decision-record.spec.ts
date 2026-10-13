@@ -2,6 +2,7 @@ import { expect, type Page, test } from '@playwright/test';
 
 import { describeViolations, scan } from './helpers/axe';
 import { requires } from './helpers/features';
+import { themes } from './helpers/site';
 
 requires({ routes: ['notes'] });
 
@@ -13,7 +14,7 @@ test.beforeEach(({ browserName: _browserName }, testInfo) => {
 
 const ES = '/notes/smoke-es/';
 const EN = '/en/notes/smoke-en/';
-const THEMES = ['elvinlab-dark', 'elvinlab-light'] as const;
+const THEMES = [themes.dark, themes.light] as const;
 
 const BANNER = '[data-record-banner] [data-stamp]';
 const INLINE = '[data-record-inline] [data-stamp]';

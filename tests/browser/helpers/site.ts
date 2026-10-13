@@ -47,3 +47,59 @@ export const themes = {
   light: themeWith('light'),
   all: themeIds,
 } as const;
+
+/** Escapes the characters that mean something in a regular expression, to match a text literally. */
+export const escapeRegExp = (value: string): string => value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+
+type Localized = Partial<Record<'es' | 'en', string>>;
+type Experiment = {
+  title: string;
+  url?: string;
+  repo?: string;
+  order?: number;
+  images: { alt: Localized; caption: Localized }[];
+};
+const experimentFile = JSON.parse(
+  readFileSync(new URL('../../../apps/web/src/content/experiments.json', import.meta.url), 'utf8'),
+) as Record<string, Experiment>;
+
+/** The entries of `experiments.json` in display order, each with its id (the card anchor). */
+export const experiments = Object.entries(experimentFile)
+  .map(([id, entry]) => ({ id, ...entry }))
+  .sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
+
+/** The first (featured) experiment and the second one. */
+export const flagship = experiments[0] as (typeof experiments)[number];
+export const secondExperiment = experiments[1] as (typeof experiments)[number];
+
+/** A social profile of the owner by its icon id (`'linkedin'`). */
+export const social = (icon: string): { label: string; url: string } => {
+  const found = siteConfig.socials.find((entry) => entry.icon === icon);
+  return { label: found?.label ?? '', url: found?.url ?? '' };
+};
+
+/** The distinct issuers of `credentials.json` (platforms and universities), as listed on `/me`. */
+export const credentialIssuers: string[] = [
+  ...new Set(
+    Object.values(
+      JSON.parse(
+        readFileSync(
+          new URL('../../../apps/web/src/content/credentials.json', import.meta.url),
+          'utf8',
+        ),
+      ) as Record<string, { issuer: string }>,
+    ).map((credential) => credential.issuer),
+  ),
+];
+
+/** The "Now" card as written in `site.config.ts`: the dated line and the first row, in a locale. */
+export const nowIn = (locale: 'es' | 'en') => {
+  const now = siteConfig.now;
+  const date = new Intl.DateTimeFormat(locale, { dateStyle: 'long', timeZone: 'UTC' }).format(
+    new Date(`${now?.updatedAt}T00:00:00Z`),
+  );
+  return {
+    date: text(locale, 'now.updated', { date }),
+    focus: now?.items?.[0]?.text[locale] ?? '',
+  };
+};

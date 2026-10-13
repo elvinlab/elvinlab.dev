@@ -1,6 +1,7 @@
 import { expect, type Page, test } from '@playwright/test';
 
 import { has, requires, seedTheme } from './helpers/features';
+import { themes } from './helpers/site';
 
 requires({ routes: ['notes'] });
 
@@ -107,7 +108,7 @@ test('the decision record in the banner has a visible solid index-card border in
   page,
 }, testInfo) => {
   test.skip(testInfo.project.name !== 'chromium-1280', 'the banner record shows from lg');
-  await seedTheme(page, 'elvinlab-dark');
+  await seedTheme(page, themes.dark);
   await page.goto('/notes/smoke-es/');
   const border = await page.evaluate(() => {
     const record = document.querySelector('[data-record-banner] section');

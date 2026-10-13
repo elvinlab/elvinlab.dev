@@ -2,6 +2,7 @@ import { expect, test } from '@playwright/test';
 
 import { describeViolations, scan } from './helpers/axe';
 import { liveByPath, seedTheme } from './helpers/features';
+import { themes } from './helpers/site';
 import { stubThirdParties } from './helpers/third-party';
 
 const PAGES = liveByPath(
@@ -25,7 +26,7 @@ const PAGES = liveByPath(
   ],
   (path) => path,
 );
-const THEMES = ['elvinlab-dark', 'elvinlab-light'];
+const THEMES = [themes.dark, themes.light];
 
 test.beforeEach(async ({ page }) => {
   await stubThirdParties(page);

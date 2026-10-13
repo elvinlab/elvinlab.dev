@@ -1,6 +1,7 @@
 import { expect, type Page, test } from '@playwright/test';
 
 import { requires } from './helpers/features';
+import { themes } from './helpers/site';
 
 requires({ routes: ['notes'] });
 
@@ -13,7 +14,7 @@ test.beforeEach(({ browserName: _browserName }, testInfo) => {
   test.skip(testInfo.project.name !== 'chromium-1280', 'each test sets its own viewport');
 });
 
-const THEMES = ['elvinlab-dark', 'elvinlab-light'] as const;
+const THEMES = [themes.dark, themes.light] as const;
 
 const setTheme = (page: Page, theme: (typeof THEMES)[number]) =>
   page.evaluate((value) => {

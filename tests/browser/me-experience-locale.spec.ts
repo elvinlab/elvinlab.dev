@@ -1,5 +1,7 @@
 import { expect, type Page, test } from '@playwright/test';
 
+import { text } from './helpers/site';
+
 /**
  * The `/me` experience timeline follows the page language: role and summary come from the
  * per-locale entries of `content/experience.json`, so `/en/me/` shows no Spanish experience text.
@@ -11,7 +13,7 @@ test.beforeEach(({ browserName: _browserName }, testInfo) => {
 
 const ES = {
   path: '/me/',
-  heading: 'Experiencia',
+  heading: text('es', 'me.experience'),
   roles: ['Ingeniero de software', 'Desarrollador de software', 'Desarrollador full-stack'],
   summaries: [
     'Entrega de extremo a extremo en un SaaS de recursos humanos',
@@ -23,7 +25,7 @@ const ES = {
 
 const EN = {
   path: '/en/me/',
-  heading: 'Experience',
+  heading: text('en', 'me.experience'),
   roles: ['Software Engineer', 'Software Developer', 'Full-stack Developer'],
   summaries: [
     'End-to-end delivery on an HR SaaS',

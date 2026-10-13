@@ -1,6 +1,7 @@
 import { expect, type Page, test } from '@playwright/test';
 
 import { has, liveByPath, seedTheme } from './helpers/features';
+import { themes } from './helpers/site';
 
 /**
  * Calm pages (M3). The fixture build copies the real `site.config.ts` (`FIXTURE_APPEARANCE`
@@ -75,7 +76,7 @@ const BANNER_PAGES = liveByPath(
   ],
   (path) => path,
 );
-const THEMES = ['elvinlab-dark', 'elvinlab-light'];
+const THEMES = [themes.dark, themes.light];
 const FADE_HEIGHT = 120;
 /** `minimal` caps every page banner at 240 px (`--banner-page-cap`). */
 const PAGE_BANNER_CAP = 240;
@@ -190,7 +191,7 @@ test('the blend is in the served HTML, so the first paint needs no script', asyn
 
 test('reading mode and the collapsed home keep a clean edge', async ({ page }) => {
   if (has({ flags: ['readingMode'] })) {
-    await withTheme(page, 'elvinlab-dark', { 'reading-mode': '1' });
+    await withTheme(page, themes.dark, { 'reading-mode': '1' });
     await page.goto('/notes/smoke-es/');
     await expect(page.locator('[data-banner-fade]')).toBeHidden();
     // The compact header has no floor: the title alone sizes it.
@@ -198,7 +199,7 @@ test('reading mode and the collapsed home keep a clean edge', async ({ page }) =
   }
 
   const collapsed = await page.context().newPage();
-  await withTheme(collapsed, 'elvinlab-dark', { 'banner-expanded': '0' });
+  await withTheme(collapsed, themes.dark, { 'banner-expanded': '0' });
   await collapsed.goto('/');
   await expect(collapsed.locator('[data-banner-fade]')).toBeVisible();
   // The banner collapses with a height transition: measure until it has settled (it is mid-collapse,

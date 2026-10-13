@@ -2,6 +2,7 @@ import { expect, test } from '@playwright/test';
 
 import { describeViolations, scan } from './helpers/axe';
 import { requires, seedTheme } from './helpers/features';
+import { themes } from './helpers/site';
 import { stubThirdParties } from './helpers/third-party';
 
 requires({ routes: ['notes'] });
@@ -96,7 +97,7 @@ test('an unknown topic is a 404', async ({ request }) => {
   expect((await request.get('/notes/tag/no-such-topic/')).status()).toBe(404);
 });
 
-for (const theme of ['elvinlab-dark', 'elvinlab-light']) {
+for (const theme of [themes.dark, themes.light]) {
   test(`the topic page has no axe violations (${theme})`, async ({ page }) => {
     await seedTheme(page, theme);
     await page.goto(TOPIC);

@@ -1,6 +1,7 @@
 import { expect, test } from '@playwright/test';
 
 import { has, liveByPath } from './helpers/features';
+import { site } from './helpers/site';
 
 /** Neither big face is preloaded: each one sat on the critical path of the simulated LCP and cost the
  * note page and /me/ their margin against the 2500 ms gate. They load on demand (`font-display: swap`). */
@@ -73,7 +74,7 @@ for (const { path, preloads: expectedPreloads } of PAGES) {
 
 test('the home profile photo is served as an optimized, dimensioned image', async ({ page }) => {
   await page.goto('/');
-  const avatar = page.locator('[data-hero-content] img[alt="Elvin González"]');
+  const avatar = page.locator(`[data-hero-content] img[alt="${site.name}"]`);
   await avatar.scrollIntoViewIfNeeded();
   await expect(avatar).toBeVisible();
 
@@ -91,7 +92,7 @@ test('the home profile photo is served as an optimized, dimensioned image', asyn
 
 test('the /me profile photo is optimized and sized', async ({ page }) => {
   await page.goto('/me/');
-  const avatar = page.locator('img[alt="Elvin González"]');
+  const avatar = page.locator(`img[alt="${site.name}"]`);
   await expect(avatar).toBeVisible();
   await expect(avatar).toHaveAttribute('src', /\.(webp|avif)(\?.*)?$/);
   expect(Number(await avatar.getAttribute('width'))).toBeGreaterThan(0);
@@ -104,7 +105,7 @@ const ME_PORTRAIT_MAX_BYTES = 60_000;
 
 test('the /me portrait is not larger than its slot needs and is prioritized', async ({ page }) => {
   await page.goto('/me/');
-  const portrait = page.locator('img[alt="Elvin González"]');
+  const portrait = page.locator(`img[alt="${site.name}"]`);
   await expect(portrait).toBeVisible();
 
   expect(Number(await portrait.getAttribute('width'))).toBeLessThanOrEqual(ME_PORTRAIT_MAX_WIDTH);

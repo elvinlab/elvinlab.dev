@@ -1,6 +1,7 @@
 import { expect, type Locator, type Page, test } from '@playwright/test';
 
 import { has, liveByPath } from './helpers/features';
+import { text } from './helpers/site';
 
 /** Phone viewports: 360 is the narrowest supported width, 390 the design reference. */
 const PHONES = [
@@ -167,7 +168,7 @@ for (const phone of PHONES) {
       await page.goto('/');
       await expect(page.locator('[data-hero-cta]')).toBeVisible();
       const hiringCard = page.locator('section', {
-        has: page.getByRole('heading', { name: '¿Contratando?' }),
+        has: page.getByRole('heading', { name: text('es', 'recruiter.title') }),
       });
       await expect(hiringCard.locator('[data-recruiter-status]')).toBeVisible();
       await expect(hiringCard.locator('a[href="/me/"]')).toBeHidden();

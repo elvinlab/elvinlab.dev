@@ -2,7 +2,7 @@ import { expect, type Page, test } from '@playwright/test';
 
 import { describeViolations, scan } from './helpers/axe';
 import { has, requires } from './helpers/features';
-import { text } from './helpers/site';
+import { text, themes } from './helpers/site';
 import { stubThirdParties } from './helpers/third-party';
 
 requires({ flags: ['readingMode'], routes: ['notes'] });
@@ -118,7 +118,7 @@ for (const { path, toggle, exit } of NOTES) {
       expect(overflow).toBe(false);
     });
 
-    for (const theme of ['elvinlab-dark', 'elvinlab-light']) {
+    for (const theme of [themes.dark, themes.light]) {
       test(`has no axe violations in reading mode (${theme})`, async ({ page }) => {
         await page.addInitScript((t) => {
           localStorage.setItem('theme', t);
@@ -175,7 +175,7 @@ test('pauses the background effect while reading and restores it afterwards', as
   // `style.display` is only ever set by the effect runner: the effect itself was stopped.
   expect(await inlineDisplay()).toBe('none');
 
-  await page.getByRole('button', { name: 'Salir del modo lectura' }).click();
+  await page.getByRole('button', { name: text('es', 'reading.exit') }).click();
   expect(await inlineDisplay()).toBe('');
   await expect(page.locator('[data-background]')).toBeVisible();
   // Reading mode never overwrites the visitor's chosen background.

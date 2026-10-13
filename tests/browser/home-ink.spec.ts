@@ -1,5 +1,7 @@
 import { expect, type Page, test } from '@playwright/test';
 
+import { themes } from './helpers/site';
+
 /**
  * The home headline marks its key phrase with one hand-drawn ink underline (`Ink`, DESIGN.md
  * "Notebook ink system"). The marker lives in the i18n string (`[[...]]`); the text itself never
@@ -14,7 +16,7 @@ test.beforeEach(({ browserName: _browserName }, testInfo) => {
   test.skip(testInfo.project.name !== 'chromium-1280', 'each test sets its own viewport');
 });
 
-const setTheme = (page: Page, theme: 'elvinlab-dark' | 'elvinlab-light') =>
+const setTheme = (page: Page, theme: string) =>
   page.evaluate((value) => {
     document.documentElement.dataset['theme'] = value;
   }, theme);
@@ -36,8 +38,8 @@ for (const [path, phrase, sentence] of HOME) {
 }
 
 for (const [theme, color] of [
-  ['elvinlab-dark', '%23ec4899'],
-  ['elvinlab-light', '%23be185d'],
+  [themes.dark, '%23ec4899'],
+  [themes.light, '%23be185d'],
 ] as const) {
   test(`the headline stroke uses the ${theme} ink color`, async ({ page }) => {
     await page.goto('/');

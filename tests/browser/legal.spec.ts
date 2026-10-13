@@ -1,9 +1,15 @@
 import { expect, test } from '@playwright/test';
 
 import { has } from './helpers/features';
+import { site, text } from './helpers/site';
 
 const PAGES = [
-  { path: '/terms/', h1: 'Términos de uso', footer: 'Términos', privacy: 'Privacidad' },
+  {
+    path: '/terms/',
+    h1: 'Términos de uso',
+    footer: text('es', 'footer.terms'),
+    privacy: text('es', 'footer.privacy'),
+  },
   { path: '/en/terms/', h1: 'Terms of use', footer: 'Terms', privacy: 'Privacy' },
 ] as const;
 
@@ -57,6 +63,6 @@ test('the sitemap lists both terms pages', async ({ request }) => {
   const index = await (await request.get('/sitemap-index.xml')).text();
   const first = /<loc>[^<]*\/(sitemap-\d+\.xml)<\/loc>/.exec(index)?.[1] ?? 'sitemap-0.xml';
   const sitemap = await (await request.get(`/${first}`)).text();
-  expect(sitemap).toContain('https://elvinlab.dev/terms/');
-  expect(sitemap).toContain('https://elvinlab.dev/en/terms/');
+  expect(sitemap).toContain(`${site.origin}/terms/`);
+  expect(sitemap).toContain(`${site.origin}/en/terms/`);
 });

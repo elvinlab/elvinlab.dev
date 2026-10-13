@@ -1,6 +1,7 @@
 import { expect, type Page, test } from '@playwright/test';
 
 import { requires } from './helpers/features';
+import { escapeRegExp, text, themes } from './helpers/site';
 
 requires({ routes: ['notes'] });
 
@@ -13,7 +14,7 @@ test.beforeEach(({ browserName: _browserName }, testInfo) => {
 const ES = '/notes/smoke-es/';
 const EN = '/en/notes/smoke-en/';
 
-const setTheme = (page: Page, theme: 'elvinlab-dark' | 'elvinlab-light') =>
+const setTheme = (page: Page, theme: string) =>
   page.evaluate((value) => {
     document.documentElement.dataset['theme'] = value;
   }, theme);
@@ -23,15 +24,19 @@ test('Fix keeps del and ins semantics with a localized hidden label', async ({ p
   const fix = page.locator('.fix').first();
   await expect(fix.locator('del')).toHaveText('pnpm run publish');
   await expect(fix.locator('ins')).toHaveText('pnpm publish-note');
-  await expect(fix.locator('.sr-only')).toHaveText(/corregido a/);
+  await expect(fix.locator('.sr-only')).toHaveText(
+    new RegExp(escapeRegExp(text('es', 'notes.fix.correctedTo'))),
+  );
 
   await page.goto(EN);
-  await expect(page.locator('.fix').first().locator('.sr-only')).toHaveText(/corrected to/);
+  await expect(page.locator('.fix').first().locator('.sr-only')).toHaveText(
+    new RegExp(escapeRegExp(text('en', 'notes.fix.correctedTo'))),
+  );
 });
 
 for (const [theme, color] of [
-  ['elvinlab-dark', '%23ec4899'],
-  ['elvinlab-light', '%23be185d'],
+  [themes.dark, '%23ec4899'],
+  [themes.light, '%23be185d'],
 ] as const) {
   test(`the strike and underline strokes use the ${theme} ink color`, async ({ page }) => {
     await page.goto(ES);

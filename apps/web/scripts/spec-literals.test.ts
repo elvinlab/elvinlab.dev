@@ -26,6 +26,21 @@ function files(dir: string): string[] {
   );
 }
 
+const isWordChar = (char: string | undefined): boolean => /[\p{L}\p{N}_]/u.test(char ?? '');
+
+/**
+ * Whether `value` is written out in `line`. A match glued to letters on a side where the value
+ * itself ends in a letter (`Performance` inside `PerformanceObserver`) is an identifier, not a copy.
+ */
+function occurs(line: string, value: string): boolean {
+  for (let from = line.indexOf(value); from !== -1; from = line.indexOf(value, from + 1)) {
+    const gluedBefore = isWordChar(value[0]) && isWordChar(line[from - 1]);
+    const gluedAfter = isWordChar(value.at(-1)) && isWordChar(line[from + value.length]);
+    if (!gluedBefore && !gluedAfter) return true;
+  }
+  return false;
+}
+
 /** Values the specs may not write out, with where each one lives. */
 function forbidden(): Map<string, string> {
   const values = new Map<string, string>();
@@ -69,6 +84,22 @@ function forbidden(): Map<string, string> {
   return values;
 }
 
+describe('occurs', () => {
+  it('finds a value written out, with punctuation around it', () => {
+    expect(occurs("name: 'Modo lectura',", 'Modo lectura')).toBe(true);
+    expect(occurs('/Último experimento/', 'Último experimento')).toBe(true);
+  });
+
+  it('ignores a value that is part of an identifier', () => {
+    expect(occurs('new PerformanceObserver(() => {})', 'Performance')).toBe(false);
+    expect(occurs('const homePerformance = 1', 'Performance')).toBe(false);
+  });
+
+  it('still finds a later real copy on the same line', () => {
+    expect(occurs("PerformanceObserver('Performance')", 'Performance')).toBe(true);
+  });
+});
+
 describe('browser specs and the site they test', () => {
   it('do not copy the owner, the domain, the themes or the interface texts', () => {
     const values = forbidden();
@@ -83,7 +114,7 @@ describe('browser specs and the site they test', () => {
             return;
           const line = rawLine.replace(/\\(['"`])/g, '$1');
           for (const [value, origin] of values) {
-            if (line.includes(value)) {
+            if (occurs(line, value)) {
               found.push(`${relative(root, file)}:${index + 1} "${value}" (${origin})`);
             }
           }
