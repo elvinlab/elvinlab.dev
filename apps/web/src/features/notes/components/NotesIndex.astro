@@ -4,8 +4,9 @@ import { getCollection } from 'astro:content';
 
 import { BackgroundCanvas } from '@/features/backgrounds/index.ts';
 import { loadTopics } from '@/features/notes/lib/load-topics.ts';
-import { groupByYear, readingMinutes, sortNotes } from '@/features/notes/lib/notes.ts';
+import { groupByYear, readingMinutes } from '@/features/notes/lib/notes.ts';
 import { assertStartHere, selectStartHere } from '@/features/notes/lib/start-here.ts';
+import { topTags } from '@/features/notes/lib/top-tags.ts';
 import { topicHref } from '@/features/notes/lib/topics.ts';
 import { isEnabled } from '@/shared/config/index.ts';
 import { type Locale, t } from '@/shared/i18n/index.ts';
@@ -40,7 +41,7 @@ for (const note of notes) categoryCounts.set(note.data.category, (categoryCounts
 const categories = [...categoryCounts.entries()]
   .map(([name, count]) => ({ name, count }))
   .sort((a, b) => b.count - a.count);
-const tags = [...new Set(sortNotes(notes).flatMap((note) => note.data.tags))];
+const { top: tags, rest: moreTags } = topTags(notes.map((note) => note.data.tags));
 ---
 
 <BaseLayout locale={locale} path="/notes/" title={t(locale, 'notes.title')} noindex={noindex} translated={false} pixelTitle>
@@ -86,5 +87,5 @@ const tags = [...new Set(sortNotes(notes).flatMap((note) => note.data.tags))];
 
   <slot name="end" />
 
-  <NotesSidebar slot="aside" locale={locale} categories={categories} tags={tags} topics={topicTags} />
+  <NotesSidebar slot="aside" locale={locale} categories={categories} tags={tags} moreTags={moreTags} topics={topicTags} />
 </BaseLayout>

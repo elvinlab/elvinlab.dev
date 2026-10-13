@@ -110,4 +110,21 @@ describe('notes-index.css pixel controls', () => {
     expect(marksCss).toContain('data-progress-label');
     expect(controlsCss).not.toContain('data-progress-label');
   });
+  it('styles the more-tags disclosure: a 44 px summary with a pixel chevron that turns when open', () => {
+    const summary = plain.filter((block) => block.prelude.includes('.ni-more summary'));
+    const rule = summary.map((block) => block.body).join('');
+    expect(rule.replace(/\s/g, '')).toContain('min-height:2.75rem');
+    expect(rule).toContain('list-style: none');
+    expect(rule).not.toContain('underline');
+    const chevron = plain.find((block) => block.prelude === '.ni-more summary::before');
+    expect(chevron?.body).toContain('clip-path: polygon(');
+    const open = plain.find((block) => block.prelude.includes('.ni-more[open] summary::before'));
+    expect(open?.body).toContain('rotate(90deg)');
+  });
+
+  it('animates the disclosure chevron only inside the no-preference block', () => {
+    const motion = motionBlocks.map((block) => block.body).join('');
+    expect(motion).toMatch(/\.ni-more summary::before[\s\S]*steps\(2/);
+    expect(outsideMotion(css)).not.toContain('.ni-more summary::before {\n    transition');
+  });
 });

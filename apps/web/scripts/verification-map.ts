@@ -413,6 +413,7 @@ export const CHECKS: readonly CheckDef[] = [
   e2e({ file: 'notes-index-ruled.spec.ts', covers: [...NOTES, ...SUBSCRIBE] }),
   e2e({ file: 'notes-index-path.spec.ts', covers: NOTES, helpers: true }),
   e2e({ file: 'notes-index-controls.spec.ts', covers: NOTES, helpers: true }),
+  e2e({ file: 'notes-sidebar-tags.spec.ts', covers: NOTES, helpers: true }),
   e2e({
     file: 'page-stamps.spec.ts',
     covers: [...EXPERIMENTS, ...CHANGELOG, ...CONTACT, ...LEGAL, ...SUBSCRIBE, ...NOTES],

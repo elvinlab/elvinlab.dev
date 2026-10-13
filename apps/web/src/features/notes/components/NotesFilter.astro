@@ -52,6 +52,13 @@ const initial = total === 1 ? one : other;
     notice.hidden = false;
   }
 
+  // The static page cannot know the URL: open the "more tags" disclosure when the active tag is inside it.
+  const more = document.querySelector<HTMLDetailsElement>('[data-notes-more]');
+  if (more && tag) {
+    const hidden = [...more.querySelectorAll<HTMLAnchorElement>('a[href*="?tag="]')];
+    if (hidden.some((link) => new URL(link.href).searchParams.get('tag')?.trim().toLowerCase() === tag)) more.open = true;
+  }
+
   const apply = (): void => {
     const query = (search?.value ?? '').trim().toLowerCase();
     let visible = 0;

@@ -10,11 +10,14 @@ import Chip from '@/shared/ui/Chip.astro';
 type Props = {
   locale: Locale;
   categories: { name: string; count: number }[];
+  /** The most used tags, always visible. */
   tags: string[];
+  /** The remaining tags, inside the native disclosure (none: no disclosure). */
+  moreTags?: string[];
   topics: ReadonlyMap<string, string>;
 };
 
-const { locale, categories, tags, topics } = Astro.props;
+const { locale, categories, tags, moreTags = [], topics } = Astro.props;
 const aboutHref = localizePath('/me/', locale, LOCALES);
 ---
 
@@ -49,6 +52,12 @@ const aboutHref = localizePath('/me/', locale, LOCALES);
     <section class="flex flex-col gap-3 border-t border-dashed border-divider pt-5">
       <h2 class="font-display text-base font-bold">{t(locale, 'notes.sidebar.tags')}</h2>
       <div class="flex flex-wrap gap-1.5">{tags.map((tag) => <Chip href={tagHref(tag, topics)} class="ni-chip">#{tag}</Chip>)}</div>
+      {moreTags.length > 0 && (
+        <details class="ni-more" data-notes-more>
+          <summary>{t(locale, 'notes.sidebar.tags.more', { count: moreTags.length })}</summary>
+          <div class="flex flex-wrap gap-1.5">{moreTags.map((tag) => <Chip href={tagHref(tag, topics)} class="ni-chip">#{tag}</Chip>)}</div>
+        </details>
+      )}
     </section>
   )}
 

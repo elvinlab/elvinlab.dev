@@ -886,5 +886,11 @@
     "category": "changed",
     "title": "Read marks and pixel controls on the notes index",
     "description": "A note you finished now shows a pixel check next to its number and one you started a half-filled marker, each with its label in the accent color. Chips, the Topics strip and the search field have notched pixel corners and two-step hover motion (none with reduced motion). The search shows a live result count, and an empty search shows what you typed and a button that clears it."
+  },
+  "notes-sidebar-tags": {
+    "date": "2026-10-13",
+    "category": "changed",
+    "title": "A shorter tag list on the notes index",
+    "description": "The sidebar of the notes index now shows the 12 most used tags and keeps the rest behind a \"More tags\" line that opens in place, with no script needed to toggle it. If you arrive with a tag filter that is one of the hidden tags, the list opens on its own so you can see it."
   }
 }
