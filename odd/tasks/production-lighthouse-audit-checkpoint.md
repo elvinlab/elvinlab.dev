@@ -23,7 +23,7 @@ Preserve the verified production audit results and the owner's decision to stop 
   - Test-first exception: passive documentation has no meaningful behavioral RED.
   - Runtime scenario: N/A — no runtime behavior changes.
   - Rollback boundary: this documentation-only work-unit commit.
-  - Commit: pending.
+  - Commit: `5c8f239` — `docs: record partial Lighthouse audit and feature-first decision` (93 authored changed lines).
 
 ## Verified evidence
 
@@ -49,7 +49,7 @@ Preserve the verified production audit results and the owner's decision to stop 
 - Writer checks: `git diff --check` passed; `mise exec -- pnpm --filter web exec vitest run scripts/docs-quality.test.ts scripts/config-docs.test.ts` passed (2 files, 41 tests). Structural Markdown readback passed.
 - No new Lighthouse, browser, full build or E2E runs: passive documentation-only scope, no runtime changes. Existing production CI evidence was not rerun or relabeled as new proof.
 - Parent structural readback and independent command spot check passed: `git diff --cached --check` and the same 41 documentation tests. Native assessment classified the five Markdown files as passive; RDD remains off. Local commit identity follows below; new checkpoint publication remains unauthorized.
-- Engram mirror: initial write/readback completed (#924); updated full-document mirror pending parent closure.
+- Engram mirror: initial write/readback completed (#924); full-document closure mirror uses the same topic and locator.
 
 ## Next step
 
