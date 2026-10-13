@@ -2,13 +2,22 @@ import { expect, type Page, test } from '@playwright/test';
 
 import { describeViolations, scan } from './helpers/axe';
 import { has, requires } from './helpers/features';
+import { text } from './helpers/site';
 import { stubThirdParties } from './helpers/third-party';
 
 requires({ flags: ['readingMode'], routes: ['notes'] });
 
 const NOTES = [
-  { path: '/notes/smoke-es/', toggle: 'Modo lectura', exit: 'Salir del modo lectura' },
-  { path: '/en/notes/smoke-en/', toggle: 'Reading mode', exit: 'Exit reading mode' },
+  {
+    path: '/notes/smoke-es/',
+    toggle: text('es', 'reading.toggle'),
+    exit: text('es', 'reading.exit'),
+  },
+  {
+    path: '/en/notes/smoke-en/',
+    toggle: text('en', 'reading.toggle'),
+    exit: text('en', 'reading.exit'),
+  },
 ] as const;
 
 test.beforeEach(async ({ page }) => {
