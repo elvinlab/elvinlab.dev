@@ -16,6 +16,9 @@ import {
  */
 export const profile: E2eProfile = parseE2eProfile(process.env[E2E_PROFILE_ENV]);
 
+/** Whether everything in `needs` is on, for conditions inside a test (a nav entry, a link, a section). */
+export const has = (needs: E2eNeeds): boolean => missingNeeds(profile, needs).length === 0;
+
 /** Skips every test of the file (or of the enclosing `describe`) when something it needs is off. */
 export function requires(needs: E2eNeeds): void {
   const missing = missingNeeds(profile, needs);
