@@ -1,0 +1,15 @@
+{
+  "detector": {
+    "ignoreRules": [],
+    "ignoreFiles": [],
+    "ignoreValues": [
+      {
+        "rule": "broken-image",
+        "value": "*",
+        "files": ["apps/web/src/education-routes/EducationPage.astro"],
+        "createdAt": "2026-10-13T17:30:08.753Z",
+        "reason": "The document viewer img has an empty src on purpose: the viewer script fills src when the dialog opens, so no request is made until then."
+      }
+    ]
+  }
+}
