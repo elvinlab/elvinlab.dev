@@ -221,4 +221,37 @@ describe('experimentsCss', () => {
       expect(solo).toContain('.xp-facts [data-result]');
     });
   });
+  describe('boxless notebook panel', () => {
+    const PIECES: ExperimentsCssParts = {
+      pieces: true,
+      media: true,
+      gallery: true,
+      more: false,
+      years: false,
+      footer: false,
+      lab: false,
+      empty: false,
+    };
+    const rule = (css: string, selector: string): string =>
+      css.match(new RegExp(`(?:^|\\})${selector.replace(/[.[\]]/g, '\\$&')}\\{([^}]*)\\}`))?.[1] ??
+      '';
+
+    it('gives the text panel no fill, no radius and no card padding', () => {
+      const panel = rule(experimentsCss(PIECES), '.xp-panel');
+      expect(panel).not.toBe('');
+      expect(panel).not.toMatch(/background/);
+      expect(panel).not.toMatch(/border-radius/);
+      expect(panel).not.toMatch(/padding/);
+    });
+
+    it('styles the entry label like the note number: pink number, no capitals', () => {
+      const css = experimentsCss(PIECES);
+      expect(css).toMatch(/\.xp-num b\{[^}]*color:var\(--color-pink\)/);
+      expect(css).not.toMatch(/\.xp-num[^{]*\{[^}]*text-transform/);
+    });
+
+    it('uses no hex color', () => {
+      expect(experimentsCss(PIECES)).not.toMatch(/#[0-9a-f]{3,8}\b/i);
+    });
+  });
 });

@@ -382,6 +382,7 @@ export const CHECKS: readonly CheckDef[] = [
   e2e({ file: 'experiments.spec.ts', covers: [...EXPERIMENTS, ...ME] }),
   e2e({ file: 'experiments-buttons.spec.ts', covers: EXPERIMENTS }),
   e2e({ file: 'experiments-images.spec.ts', covers: EXPERIMENTS }),
+  e2e({ file: 'experiments-panel.spec.ts', covers: EXPERIMENTS }),
   e2e({ file: 'education.spec.ts', covers: EDUCATION }),
   e2e({
     file: 'experiment-nudge.spec.ts',

@@ -56,7 +56,7 @@ const thumbs = (page: Page) => page.locator('.xp-piece').first().locator('label.
 
 for (const path of PAGES) {
   for (const theme of [themes.light, themes.dark]) {
-    test(`${path} thumbnail edge has 3:1 contrast against the card and the page in ${theme}`, async ({
+    test(`${path} thumbnail edge has 3:1 contrast against the page (the panel is boxless) in ${theme}`, async ({
       page,
     }) => {
       await seedTheme(page, theme);
@@ -67,24 +67,16 @@ for (const path of PAGES) {
       await idle.scrollIntoViewIfNeeded();
       const read = await idle.evaluate((node) => {
         const style = getComputedStyle(node);
-        const surface = (selector: string) => {
-          const found = document.querySelector(selector);
-          return found ? getComputedStyle(found).backgroundColor : '';
-        };
         return {
           edge: style.borderTopColor,
           width: Number.parseFloat(style.borderTopWidth),
-          card: surface('.xp-panel'),
           page: getComputedStyle(document.body).backgroundColor,
         };
       });
       expect(read.width).toBeGreaterThanOrEqual(1);
-      const card = parseColor(read.card);
       const pageBg = over(parseColor(read.page), [255, 255, 255, 1]);
-      for (const surface of [card, pageBg]) {
-        const edge = over(parseColor(read.edge), surface);
-        expect(contrast(edge, surface)).toBeGreaterThanOrEqual(3);
-      }
+      const edge = over(parseColor(read.edge), pageBg);
+      expect(contrast(edge, pageBg)).toBeGreaterThanOrEqual(3);
     });
   }
 

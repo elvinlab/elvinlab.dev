@@ -212,9 +212,6 @@ const PIECE = `
     flex-direction: column;
     gap: 1.25rem;
     min-width: 0;
-    padding: 1.5rem;
-    border-radius: var(--radius-card);
-    background: var(--color-card);
   }
   /* No media column: the panel is the whole piece, in a readable width. */
   .xp-piece[data-solo] .xp-panel {
@@ -222,6 +219,18 @@ const PIECE = `
   }
   .xp-top {
     display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+  /* The entry label ("Experimento 001"): the mono face of the facts' labels, like the number of a note; only the number is pink. */
+  .xp-num {
+    margin: 0;
+    font-size: 0.875rem;
+  }
+  .xp-num b {
+    font-weight: 400;
+    color: var(--color-pink);
   }
   .xp-status {
     display: inline-flex;
@@ -261,7 +270,8 @@ const PIECE = `
     gap: 1rem;
     margin: 0;
   }
-  .xp-facts dt {
+  .xp-facts dt,
+  .xp-num {
     font: 400 0.8125rem / 1.125rem var(--font-mono);
     color: var(--color-muted);
   }

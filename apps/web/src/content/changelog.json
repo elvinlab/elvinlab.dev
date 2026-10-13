@@ -856,5 +856,11 @@
     "category": "fixed",
     "title": "The page stamp no longer touches the navbar on desktop",
     "description": "From tablet width up, the rotated stamp at the top right of the header of Experiments, Contact, Changelog, Education and the topic pages hung against the bottom edge of the floating navbar. It now sits 20 px below it. The stamp keeps its place above the title on phones."
+  },
+  "experiments-notebook-panel": {
+    "date": "2026-10-13",
+    "category": "changed",
+    "title": "Experiments read like a lab notebook",
+    "description": "On the Experiments page the text of each piece no longer sits in a dark card: it rests directly on the page, separated by space and the thin line between pieces. Each piece now opens with an entry label like Experiment 001, in the notebook mono face with the number in pink, the same way notes are numbered. The number is stable: it is the position by publication date, so a piece keeps it in every sort and page."
   }
 }
