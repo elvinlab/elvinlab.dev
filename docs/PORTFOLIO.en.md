@@ -110,6 +110,16 @@ me: {
 - `experiment "x" points to an image src/assets/experiments/x/f.jpg, which does not exist`: the file is not in the entry's folder.
 - A field out of range (text too long, non-https URL, more than 4 images): the Zod message gives the exact path.
 
+### The latest experiment card
+
+With `features.experimentNudge` on, the site points visitors to your newest experiment (the flag is off in the schema; it is on in this site's `site.config.ts`). Adding or archiving an experiment therefore changes what that card shows, with no other edit:
+
+- **Which one**: the newest experiment whose `status` is not `archived`, by `publishedAt` (else 1 January of its `year`). `featured` and `order` are ignored on purpose: it answers "what is new?", not "what is biggest?".
+- **What it shows**: the status, the year, the cover (`images[0]`, when there is one), the title, the description, up to three tags and a link: to its case `note` when it has one, else to its place on `/experiments/`.
+- **Where**: after every note, on the home (only when `home.experiments` is off, because that grid already lists the experiments) and, floating at the bottom centre, once a note is mostly read (`nudge.scrollThreshold`, default 0.7) or the notes index is browsed (`nudge.indexScrollThreshold`, 0.6). Never on `/me`, `/contact` or `/experiments`.
+- **Floating rules**: it opens only after the visitor scrolls, once per session, hides near the footer and while keyboard focus is elsewhere, and a close is remembered for good. Details in [DESIGN.md](DESIGN.md).
+- **Cost**: it adds about 3.6 KB of inline CSS and 7 KB of HTML to every note (page-weight budgets in `apps/web/scripts/page-weight-budget.json` were raised for it). With the flag off none of it ships.
+
 ## 4. Pagination and tiers of the list
 
 The list builds itself from the data; there is nothing to configure per page.

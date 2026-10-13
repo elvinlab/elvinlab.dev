@@ -247,6 +247,8 @@ Behavior you do not have to handle:
 - **Print**: bands and masks fall back to plain rules.
 - **Accessibility**: the section number and the stamp are decorative; they are not part of the heading's accessible name.
 
+- **Experiment card**: after every note, a pixel-framed card for the latest experiment (when `features.experimentNudge` is on), and a floating copy once the note is mostly read. You write nothing for it; see [PORTFOLIO.en.md](PORTFOLIO.en.md#the-latest-experiment-card).
+
 Known limit of the numbering: the CSS counter numbers **every** `h2` inside the article, but the table of contents lists only the `##` headings of the Markdown. A raw `<h2>` written inside an MDX component would get a number and no entry in the table of contents. Write sections with `##` only.
 
 Because bold and links look designed on their own, **use bold sparingly** (a key term, not a whole sentence): five bold phrases in a screen read as highlighter spam.

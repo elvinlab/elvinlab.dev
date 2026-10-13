@@ -247,6 +247,8 @@ Comportamiento del que no tienes que ocuparte:
 - **Impresión**: la banda y las máscaras vuelven a líneas simples.
 - **Accesibilidad**: el número de sección y el sello son decorativos; no forman parte del nombre accesible del título.
 
+- **Tarjeta de experimento**: después de cada nota, una tarjeta con marco de píxeles del último experimento (con `features.experimentNudge` encendido) y una copia flotante cuando la nota ya se leyó en su mayor parte. No escribís nada para ella; ver [PORTFOLIO.md](PORTFOLIO.md#la-tarjeta-del-último-experimento).
+
 Límite conocido de la numeración: el contador CSS numera **todos** los `h2` del artículo, pero el índice lateral lista solo los títulos `##` del Markdown. Un `<h2>` escrito a mano dentro de un componente MDX recibiría número y no tendría entrada en el índice. Escribe las secciones solo con `##`.
 
 Como la negrita y los enlaces ya se ven diseñados, **usa la negrita con medida** (un término clave, no una frase entera): cinco frases en negrita en una pantalla parecen un rotulador gastado.

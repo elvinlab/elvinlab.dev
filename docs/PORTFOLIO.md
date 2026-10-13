@@ -110,6 +110,16 @@ me: {
 - `experiment "x" points to an image src/assets/experiments/x/f.jpg, which does not exist`: el archivo no está en la carpeta de la entrada.
 - Un campo fuera de rango (texto demasiado largo, URL no https, más de 4 imágenes): el mensaje de Zod indica la ruta exacta.
 
+### La tarjeta del último experimento
+
+Con `features.experimentNudge` encendido, el sitio lleva a los visitantes a tu experimento más nuevo (en el esquema el flag viene apagado; en el `site.config.ts` de este sitio está encendido). Agregar o archivar un experimento cambia entonces lo que muestra esa tarjeta, sin otra edición:
+
+- **Cuál**: el experimento más nuevo cuyo `status` no sea `archived`, por `publishedAt` (si falta, 1 de enero de su `year`). `featured` y `order` se ignoran a propósito: responde "¿qué hay de nuevo?", no "¿cuál es el más grande?".
+- **Qué muestra**: el estado, el año, la portada (`images[0]`, si hay), el título, la descripción, hasta tres etiquetas y un enlace: a su `note` de caso si la tiene, y si no a su lugar en `/experiments/`.
+- **Dónde**: después de cada nota, en la home (solo cuando `home.experiments` está apagado, porque esa cuadrícula ya lista los experimentos) y, flotante abajo al centro, cuando una nota ya se leyó en su mayor parte (`nudge.scrollThreshold`, por defecto 0.7) o al recorrer el listado de notas (`nudge.indexScrollThreshold`, 0.6). Nunca en `/me`, `/contact` ni `/experiments`.
+- **Reglas de la flotante**: se abre solo después de que el visitante hace scroll, una vez por sesión, se esconde cerca del pie y mientras el foco del teclado está en otro lugar, y un cierre se recuerda para siempre. Detalles en [DESIGN.md](DESIGN.md).
+- **Costo**: suma unos 3,6 KB de CSS en línea y 7 KB de HTML a cada nota (los presupuestos de peso de `apps/web/scripts/page-weight-budget.json` se subieron por esto). Con el flag apagado no se envía nada.
+
 ## 4. Paginación y niveles de la lista
 
 La lista se arma sola a partir de los datos; no hay nada que configurar por página.
