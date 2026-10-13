@@ -436,6 +436,7 @@ Todas las banderas viven en `features` de `site.config.ts`. Las cuatro últimas 
 | `languageHint` | Aviso que sugiere el otro idioma según el navegador | El aviso y su script | |
 | `themeToggle` | Botón de tema del menú | El botón y su script. El tema se sigue resolviendo en cada página con el script previo al pintado: preferencia del sistema o tema por defecto, y se olvida una elección guardada antes | |
 | `backgroundPicker` | Botón del menú que cambia el efecto del banner | El botón y su script; el fondo sigue el valor por defecto de `background` e ignora una elección guardada antes | |
+| `experimentNudge` | La tarjeta del último experimento (apagada por defecto) | La tarjeta después de cada nota y en la home, la copia flotante en notas y `/notes/`, y su script y CSS | Necesita `experiments`; con `home.experiments` encendido no sale en la home. Se ajusta con `nudge.*` (umbrales de scroll, `reappearAfterDays`) |
 
 Con `contact` apagado, la Action y las rutas no existen, así que el formulario del pie de suscripción no tiene ya adónde mandar a la gente: el mensaje de error se limita a pedir que se reintente más tarde.
 
@@ -640,5 +641,7 @@ El sitio está pensado para que otra persona lo adopte **solo cambiando configur
 3. Ajusta el tema en `packages/core/src/tokens/tokens.json` si quieres otra paleta.
 4. Pon tus secretos de Cloudflare (sección 6.7) y tus variables de CI (sección 7).
 5. Verifica: `pnpm test:white-label` construye el sitio con una identidad alternativa y **falla si se filtra una sola cadena del dueño original**.
+
+> **Límite conocido (comprobado el 2026-10-12): apagar funciones rompe el e2e.** Las comprobaciones estáticas (tipos, lint, pruebas unitarias, arquitectura, build, presupuestos de JavaScript y de peso, `pnpm test:white-label`) pasan con funciones apagadas, pero las pruebas de navegador de `tests/browser/` dan por hecho el conjunto de funciones y las URL de este sitio: no leen `site.config.ts`. Con seis interruptores apagados (`readingMode`, `marks`, `contact`, `changelog`, `experimentNudge`, `themeToggle`) fallaron 208 de unas 790 pruebas e2e. El CI solo despliega si pasan sus comprobaciones, así que quien adopte el proyecto debe borrar o adaptar las pruebas de cada función que apague (y de cada texto de interfaz que cambie, porque las pruebas leen algunos) hasta que la suite aprenda a seguir la config. Los colores son más seguros, pero `a11y.spec.ts` marcará una paleta sin suficiente contraste, a propósito.
 
 Este proyecto aún no incluye un archivo de licencia; antes de que otra persona lo reutilice, define bajo qué licencia se comparte.

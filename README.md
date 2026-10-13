@@ -97,7 +97,37 @@ Así se trabaja aquí: cada tarea es un *issue* escrito como un brief de delegac
 - **Changelog público**, **páginas de privacidad y términos** y **tema claro/oscuro** con fondos animados elegibles.
 - **Aspecto configurable**: el preset `appearance` (`minimal` o `full`) fija la escala tipográfica, la altura de los banners y el detalle de las notas, y `home` activa o apaga cada sección de la portada.
 - **Suscripción por correo**: quien lee recibe las notas nuevas (y, de vez en cuando, un aviso de un proyecto) con doble confirmación y baja en una página; el envío lo disparo yo a mano. Guía: [`docs/SUBSCRIPTION.md`](docs/SUBSCRIPTION.md).
+- Una **tarjeta del último experimento**: fija después de cada nota y en la home, y flotante cuando una nota ya se leyó en su mayor parte; al cerrarla se esconde un tiempo (`nudge.reappearAfterDays`).
+- Un botón anónimo de **huella** ("estuve aquí") en las notas, y pequeños detalles de interfaz: volver arriba, un aviso para cambiar de idioma, un botón de tema y otro que cambia el efecto del banner.
+- Un **aspecto de cuaderno** (tinta dibujada a mano, sellos, un error tachado con su corrección) y detalles pixelados.
 - **Bilingüe** (ES/EN) sin redirecciones por idioma.
+
+## Encender y apagar cosas
+
+Todo lo opcional es un interruptor en [`site.config.ts`](apps/web/src/site.config.ts), dentro de `features`. Apagado significa que no se envía nada: ni ruta, ni entrada de menú, ni script ni CSS. Un valor inválido rompe el build y nombra el problema.
+
+| Interruptor (`features.`) | Qué agrega | Necesita |
+| --- | --- | --- |
+| `blog` | Lab Notes: índice, notas y RSS | |
+| `comments` | Comentarios y reacciones con Giscus en las notas | el bloque `giscus` |
+| `contact` | El formulario `/contact` | secretos de Turnstile y de correo (falla cerrado sin ellos) |
+| `me` | La página de portafolio `/me` | |
+| `credentials` | Certificados y títulos en `/me` | |
+| `experiments` | `/experiments` y sus secciones en la home y en `/me` | |
+| `experimentNudge` | La tarjeta del último experimento (apagada por defecto) | `experiments` |
+| `changelog` | El `/changelog` público | |
+| `readingMode` | El modo lectura en las notas | |
+| `marks` | El botón de huella "estuve aquí" | una base D1 y un limitador de envíos |
+| `subscribe` | Suscripción por correo con doble confirmación | `blog`, D1, secretos de Turnstile y de correo |
+| `backToTop`, `languageHint`, `themeToggle`, `backgroundPicker` | Detalles de interfaz (encendidos por defecto) | |
+
+Más allá de los interruptores:
+
+- **Secciones de la home** (`home`): pills del hero, tarjeta de autor, tarjeta de contratación, huellas, tarjeta "Now", pilares, índice del cuaderno y experimentos, cada una encendida o apagada. El preset `appearance` (`minimal` o `full`) fija el punto de partida.
+- **Colores, radios y tipografías**: `packages/core/src/tokens/tokens.json`. **Efecto del banner**: `background`. **Aviso del sitio**: `notice`.
+- **Textos**: tu nombre, bio y enlaces en `site.config.ts`; las notas y las entradas del portafolio en `apps/web/src/content/`; los textos de interfaz (ES/EN) en `apps/web/src/shared/i18n/index.ts`; privacidad y términos en sus `content.ts`.
+
+Estos interruptores y secciones de la home son todo lo configurable hoy; el resto del diseño es código. La referencia completa, con cada clave y su valor por defecto, está en [`docs/CONFIGURATION.md`](docs/CONFIGURATION.md#62-activar-o-apagar-funciones).
 
 ## Calidad medida
 
@@ -173,6 +203,8 @@ Se trabaja en `develop` con push libre. El release es un push a `main`, que disp
 ## Usarlo como base
 
 El sitio está pensado para que otra persona lo adopte reemplazando `site.config.ts`, el contenido y las imágenes de `public/`. La receta completa y su verificación están en [la guía](docs/CONFIGURATION.md#10-usar-este-sitio-como-base-para-otra-persona-white-label).
+
+> **Límite conocido (comprobado el 2026-10-12): apagar funciones rompe el e2e.** Las comprobaciones estáticas pasan con funciones apagadas, pero las pruebas de navegador de `tests/browser/` dan por hecho el conjunto de funciones y las URL de este sitio y no leen `site.config.ts`. Con seis interruptores apagados fallaron 208 de unas 790 pruebas e2e, y el CI solo despliega si pasan sus comprobaciones. Quien adopte el proyecto debe borrar o adaptar las pruebas de cada función que apague (y de cada texto de interfaz que cambie) hasta que la suite aprenda a seguir la config. Detalle en [la guía](docs/CONFIGURATION.md#10-usar-este-sitio-como-base-para-otra-persona-white-label).
 
 ## Estado y licencia
 

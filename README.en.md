@@ -97,7 +97,37 @@ This is how work goes here: every task is an *issue* written as a delegation bri
 - **Email subscription**: readers get new notes (and, now and then, an announcement of a project) with double opt-in and a one-page unsubscribe; I trigger each send by hand. Guide: [`docs/SUBSCRIPTION.en.md`](docs/SUBSCRIPTION.en.md).
 - A **public changelog**, **privacy and terms pages** and a **light/dark theme** with selectable animated backgrounds.
 - **Configurable appearance**: the `appearance` preset (`minimal` or `full`) sets the type scale, the banner heights and the note detail, and `home` switches each home section on or off.
+- A **card for the latest experiment**: static after every note and on the home, and floating once a note is mostly read; closing it hides it for a while (`nudge.reappearAfterDays`).
+- An anonymous **footprint button** ("I was here") on notes, and small interface touches: back to top, a hint to switch language, a theme button and a button that cycles the banner effect.
+- A **notebook look** (hand-drawn ink, stamps, a struck-through mistake with its correction) and pixel details.
 - **Bilingual** (ES/EN) with no language redirects.
+
+## Turning things on and off
+
+Everything optional is a switch in [`site.config.ts`](apps/web/src/site.config.ts), under `features`. Off means it ships nothing: no route, no menu entry, no script or CSS. An invalid value breaks the build and names the problem.
+
+| Switch (`features.`) | What it adds | Needs |
+| --- | --- | --- |
+| `blog` | Lab Notes: index, notes and RSS | |
+| `comments` | Giscus comments and reactions on notes | the `giscus` block |
+| `contact` | The `/contact` form | Turnstile and email secrets (fails closed without them) |
+| `me` | The `/me` portfolio page | |
+| `credentials` | Certificates and degrees on `/me` | |
+| `experiments` | `/experiments` and its sections on the home and `/me` | |
+| `experimentNudge` | The latest-experiment card (off by default) | `experiments` |
+| `changelog` | The public `/changelog` | |
+| `readingMode` | Reading mode on notes | |
+| `marks` | The "I was here" footprint button | a D1 database and a rate limiter |
+| `subscribe` | Email subscription with double opt-in | `blog`, D1, Turnstile and email secrets |
+| `backToTop`, `languageHint`, `themeToggle`, `backgroundPicker` | Interface touches (on by default) | |
+
+Beyond the switches:
+
+- **Home sections** (`home`): hero pills, author card, hiring card, footprints, "Now" card, pillars, notebook index and experiments, each on or off. The `appearance` preset (`minimal` or `full`) sets the starting point.
+- **Colors, radii and fonts**: `packages/core/src/tokens/tokens.json`. **Banner effect**: `background`. **Site notice**: `notice`.
+- **Texts**: your name, bio and links in `site.config.ts`; notes and portfolio entries in `apps/web/src/content/`; interface texts (ES/EN) in `apps/web/src/shared/i18n/index.ts`; privacy and terms in their `content.ts`.
+
+These switches and home sections are everything configurable today; the rest of the layout is code. The full reference, with every key and default, is in [`docs/CONFIGURATION.en.md`](docs/CONFIGURATION.en.md#62-turning-features-on-or-off).
 
 ## Measured quality
 
@@ -173,6 +203,8 @@ Work happens on `develop` with free pushes. A release is a push to `main`, which
 ## Using it as a base
 
 The site is meant to be adopted by someone else by replacing `site.config.ts`, the content and the images in `public/`. The full recipe and how to verify it are in [the guide](docs/CONFIGURATION.en.md#10-using-this-site-as-a-base-for-someone-else-white-label).
+
+> **Known limit (checked on 2026-10-12): turning features off breaks the e2e suite.** The static gates (typecheck, lint, unit tests, architecture, build, JavaScript and page-weight budgets, `pnpm test:white-label`) pass with features off, but the browser specs under `tests/browser/` assume this site's feature set and URLs: they do not read `site.config.ts`. With six switches off (`readingMode`, `marks`, `contact`, `changelog`, `experimentNudge`, `themeToggle`) 208 of about 790 e2e tests failed. The CI deploys only when its gates pass, so an adopter has to delete or adapt the specs of every feature they turn off (and of every UI text they change, because the specs read some of them) until the suite learns to follow the config. Colors are safer, but `a11y.spec.ts` will flag a palette without enough contrast, on purpose.
 
 ## Status and license
 

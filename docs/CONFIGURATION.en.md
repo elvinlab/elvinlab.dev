@@ -418,7 +418,7 @@ Each `features` flag switches the whole feature off: the route is not generated,
 
 #### What each switch does
 
-All flags live under `features` in `site.config.ts`. The last four (interface) default to `true` when omitted. Checked against the code.
+All flags live under `features` in `site.config.ts`. The four interface switches (`backToTop`, `languageHint`, `themeToggle`, `backgroundPicker`) default to `true` when omitted; `experimentNudge` defaults to `false`. Checked against the code.
 
 | Flag | What it controls | What disappears when it is off | Dependencies |
 | --- | --- | --- | --- |
@@ -436,6 +436,7 @@ All flags live under `features` in `site.config.ts`. The last four (interface) d
 | `languageHint` | Banner suggesting the other language from the browser settings | The banner and its script | |
 | `themeToggle` | Navbar theme button | The button and its script. The theme still resolves on every page through the pre-paint script: system preference or default theme, and a choice saved earlier is forgotten | |
 | `backgroundPicker` | Navbar button that cycles the banner effect | The button and its script; the background follows the `background` default and ignores a choice saved earlier | |
+| `experimentNudge` | The latest-experiment card (off by default) | The card after every note and on the home, the floating copy on notes and `/notes/`, and their script and CSS | Needs `experiments`; `home.experiments` on hides the home copy. Tuned by `nudge.*` (scroll thresholds, `reappearAfterDays`) |
 
 With `contact` off, the Action and routes do not exist, so the subscription error message simply asks the visitor to try again later.
 
@@ -640,5 +641,7 @@ The site is meant to be adopted by someone else by **changing only configuration
 3. Adjust the theme in `packages/core/src/tokens/tokens.json` if you want another palette.
 4. Set your Cloudflare secrets (section 6.7) and your CI variables (section 7).
 5. Verify: `pnpm test:white-label` builds the site with an alternative identity and **fails if a single string of the original owner leaks**.
+
+> **Known limit (checked on 2026-10-12): turning features off breaks the e2e suite.** The static gates (typecheck, lint, unit tests, architecture, build, JavaScript and page-weight budgets, `pnpm test:white-label`) pass with features off, but the browser specs under `tests/browser/` assume this site's feature set and URLs: they do not read `site.config.ts`. With six switches off (`readingMode`, `marks`, `contact`, `changelog`, `experimentNudge`, `themeToggle`) 208 of about 790 e2e tests failed. The CI deploys only when its gates pass, so an adopter has to delete or adapt the specs of every feature they turn off (and of every UI text they change, because the specs read some of them) until the suite learns to follow the config. Colors are safer, but `a11y.spec.ts` will flag a palette without enough contrast, on purpose.
 
 This project does not include a license file yet; before someone else reuses it, decide under which license it is shared.
