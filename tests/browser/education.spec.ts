@@ -12,7 +12,14 @@ requires({ flags: ['education'] });
  * The education timeline. The fixture build copies the real `credentials.json`, so the expected
  * order is derived from it: ascending by year, then the `order` field, then the id inside a year.
  */
-type Credential = { title: string; issuer: string; kind: string; year: number; order?: number };
+type Credential = {
+  title: string;
+  issuer: string;
+  kind: string;
+  year: number;
+  order?: number;
+  learnings?: unknown[];
+};
 const credentials = Object.entries(
   JSON.parse(
     readFileSync(new URL('../../apps/web/src/content/credentials.json', import.meta.url), 'utf8'),
@@ -83,7 +90,7 @@ for (const { path, locale } of PAGES) {
     }
   });
 
-  test(`${path} draws a visible vertical line and needs no details without learnings`, async ({
+  test(`${path} draws a visible vertical line and a details block only where learnings exist`, async ({
     page,
   }) => {
     await page.goto(path);
@@ -91,8 +98,10 @@ for (const { path, locale } of PAGES) {
       .locator('.ed-timeline')
       .evaluate((node) => getComputedStyle(node).borderLeftWidth);
     expect(Number.parseFloat(line)).toBeGreaterThanOrEqual(2);
-    // Nothing in the current data has learnings, so no entry may render an empty details block.
-    await expect(page.locator('.ed-learned')).toHaveCount(0);
+    // One details block per entry that has learnings, never an empty one for the rest.
+    await expect(page.locator('.ed-learned')).toHaveCount(
+      credentials.filter((entry) => entry.learnings?.length).length,
+    );
   });
 
   for (const width of [360, 390]) {
