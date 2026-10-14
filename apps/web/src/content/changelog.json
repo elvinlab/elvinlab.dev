@@ -946,5 +946,10 @@
     "category": "changed",
     "title": "Notes CI checks",
     "description": "Checks built notes, links and changelog; smoke verifies enabled blog routes and new notes. Log growth raises only the HTML cap; CSS/JS caps stay fixed."
+  },
+  "note-010": {
+    "date": "2026-10-13",
+    "category": "added",
+    "title": "Note 010: a visitor changelog without semver"
   }
 }
