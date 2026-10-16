@@ -27,7 +27,7 @@ Execute the plan incrementally on `develop`, starting with what needs no new con
 - [x] **T2** (EL-01b) `docs/BRAND.md`: let the "atemporal" voice rule admit a dated "Ahora" section, as the plan requires, without opening the door to time-dependent copy elsewhere. Route: inline (one decision, one file).
 - [x] **T3** (16.5, issue #58) "All notes" link in the English UI. Reproduced live (`/en/notes/` 404) and fixed in `3c83905`; close #58 after the next release.
 - [x] **T4** (16.5) Investigate the late or faint block appearance when navigating: `fade-in-up` (300 ms from opacity 0) is the candidate, not a conclusion; measure before changing. Route: decide after measuring. (Closed 2026-10-16: the main column now rises transform-only; see the section below.) Commit f87cac3.
-- [ ] **T5** (16.5) Language selector without translation: improve the label so it does not promise an English version that does not exist. Needs the owner's wording if it is user-facing copy.
+- [x] **T5** (16.5) Language selector without translation: improve the label so it does not promise an English version that does not exist. Needs the owner's wording if it is user-facing copy. (Closed 2026-10-16, superseded by T35 #59: the switcher now says "Go to the English home page"/"Ir a la página de inicio en español" on home-fallback, and "Read in English"/"Leer en español" only when a translation exists.)
 
 ### Added 2026-10-02 on the owner's instruction
 - [x] **T6** Switch the site to the `full` appearance preset (`appearance: 'full'` in `site.config.ts`). The owner wants the fuller home back.
