@@ -987,5 +987,11 @@
     "category": "changed",
     "title": "A Fix inside a note heading is now forbidden",
     "description": "Fix carries its text in props, so inside a heading it dropped its words from the heading anchor and the table of contents. The build check now forbids it; Ink is still allowed in headings."
+  },
+  "credential-in-progress": {
+    "date": "2026-10-16",
+    "category": "added",
+    "title": "Credentials can be marked as in progress",
+    "description": "The education timeline and the profile can now show a credential that is still in progress, with a status label. The owner turns it on per credential with an optional flag."
   }
 }

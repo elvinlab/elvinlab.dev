@@ -225,6 +225,13 @@ const TIMELINE = `
     background: var(--color-button);
     color: white;
   }
+  .ed-progress {
+    padding: 0.25rem 0.5rem;
+    border-radius: var(--radius-inner);
+    font-weight: 700;
+    background: var(--color-chip);
+    color: var(--color-text-secondary);
+  }
   .ed-title {
     margin: 0;
     font: 700 1.125rem / 1.35 var(--font-display);

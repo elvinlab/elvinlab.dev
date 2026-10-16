@@ -247,6 +247,7 @@ Alimentan `/education/` (línea de tiempo por año, del más antiguo al más nue
 | `learnings` | `string \| { <locale>: string }[] (max 8)` | no |  | Optional points learned; the entry gets a details block only when present. |
 | `appliedIn` | `string \| { <locale>: string }` | no |  | Optional note on where it was applied (max 160 characters). |
 | `expires` | `string` | no |  | Optional expiry as YYYY-MM, for certifications that lapse. |
+| `inProgress` | `boolean` | no |  | Optional true marks the credential as in progress; the entry shows a status label instead of presenting the year as a completion date. |
 <!-- docs:end credentials -->
 
 ### Experimentos — `experiments.json`
