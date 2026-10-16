@@ -1042,12 +1042,6 @@
     "title": "The verify command no longer under-plans a simulated change",
     "description": "pnpm verify --files applied the registry freshness filter to a change that is not on disk, so it planned only lint. A simulated change now ignores the registry and shows the full scoped plan."
   },
-  "entrance-rise-only": {
-    "date": "2026-10-16",
-    "category": "changed",
-    "title": "The main content rises instead of fading in on navigation",
-    "description": "The page column that holds the heading now animates transform only (a subtle 8 px rise), so it is never invisible or faint while a page loads. This also matches the design rule that an LCP candidate never animates opacity. The sidebar and footer keep their fade."
-  },
   "experience-contributions": {
     "date": "2026-10-16",
     "category": "added",
