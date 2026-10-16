@@ -1,5 +1,9 @@
 # Verification ledger
 
+## /me portfolio M4–M6 (2026-10-16)
+
+Experience contributions (M4), curated notes with an "Article in Spanish" label (M5) and a specific `/me` title and description (M6) delivered on `develop` (commits bc9b476, 289a6b9, c7b873a). Layout-wide verification (`pnpm verify --since 581819e --run --record`) ran three times: lint, typecheck, depcruise, docs:config, unit (1750), build, js-budget, page-weight (47 pages), white-label and e2e (71 specs) green each time; `/me` and `/en/me` Lighthouse green. The only recurring failure is `/education/` performance 0.94 vs 0.95 on the local 1-run Lighthouse — pre-existing and untouched by this work, green on the 3-run median for both `/education/` and `/en/education/`. Not recorded (the run was not green); CI runs 3 runs per URL and is the backstop.
+
 ## CI recovery candidate evidence (2026-10-13)
 
 Candidate: the interrupted release fix and notes-only lane hardening, including the feature-aware navbar specs and the documented changelog HTML allowance. These are observed local results, not a claim that a new production release or GitHub profile job has passed.

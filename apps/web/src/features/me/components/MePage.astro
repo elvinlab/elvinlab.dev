@@ -24,6 +24,7 @@ import { isEnabled, site } from '@/shared/config/index.ts';
 import { LOCALES, type Locale, t } from '@/shared/i18n/index.ts';
 import Banner from '@/shared/layout/Banner.astro';
 import BaseLayout from '@/shared/layout/BaseLayout.astro';
+import { pickLocale } from '@/shared/lib/localized.ts';
 import { DEFAULT_OG_IMAGE, profileCardPath } from '@/shared/seo/og.ts';
 import SectionHeading from '@/shared/ui/SectionHeading.astro';
 import SocialIcon from '@/shared/ui/SocialIcon.astro';
@@ -42,16 +43,21 @@ const credentials = isEnabled('credentials') && !isEnabled('education') ? (await
 const experiments = isEnabled('experiments') ? (await loadExperiments()).slice(0, experimentsSettings.meRows) : [];
 const noteEntries = isEnabled('blog') ? await getCollection('notes') : [];
 const allNotes = sortNotes(noteEntries.map((n) => ({ slug: n.id, data: n.data })));
-const notes = allNotes.slice(0, 3);
+const bySlug = new Map(allNotes.map((note) => [note.slug, note]));
+// Curated by capability with a one-line framing; empty falls back to the latest notes.
+const curated = (site.me.curatedNotes ?? []).flatMap(({ slug, framing }) => {
+  const note = bySlug.get(slug);
+  return note ? [{ note, framing }] : [];
+});
+const notes = curated.length > 0 ? curated.map((entry) => entry.note) : allNotes.slice(0, 3);
 const hasNotes = hasPublishedNotes(allNotes);
-const bio = site.identity.bio[locale];
 ---
 
 <BaseLayout
   locale={locale}
   path="/me/"
-  title={site.identity.name}
-  {...(bio ? { description: bio } : {})}
+  title={`${site.identity.name} · ${site.identity.role[locale]}`}
+  {...(site.me.pitch ? { description: site.me.pitch[locale] } : {})}
   ogImage={site.features.me ? profileCardPath(locale) : DEFAULT_OG_IMAGE}
   ogImageAlt={`${site.identity.name} · ${site.identity.role[locale]}`}
   printable
@@ -99,7 +105,23 @@ const bio = site.identity.bio[locale];
           <a href="/notes/" class="relative text-sm text-primary underline decoration-dashed underline-offset-4 after:absolute after:-inset-x-2 after:-inset-y-3 print:hidden">{t(locale, 'home.allNotes')}</a>
         </div>
         <p class="text-sm text-muted">{t(locale, 'me.notes.subtitle')}</p>
-        <div>{notes.map((note) => <NoteIndexRow note={note} locale={locale} />)}</div>
+        {curated.length > 0 ? (
+          <div class="flex flex-col">
+            {curated.map(({ note, framing }) => (
+              <a href={localizePath(`/notes/${note.slug}/`, note.data.lang, LOCALES)} class="group flex flex-col gap-1 border-t border-dashed border-divider py-3">
+                <span class="flex flex-wrap items-center gap-x-2">
+                  <span class="font-medium transition-colors duration-150 group-hover:text-primary">{note.data.title}</span>
+                  {note.data.lang !== locale && (
+                    <span class="rounded-pill bg-chip px-2 py-0.5 font-mono text-meta text-primary">{t(locale, 'me.notes.articleInSpanish')}</span>
+                  )}
+                </span>
+                <span class="text-sm text-text-secondary">{pickLocale(framing, locale, LOCALES.defaultLocale)}</span>
+              </a>
+            ))}
+          </div>
+        ) : (
+          <div>{notes.map((note) => <NoteIndexRow note={note} locale={locale} />)}</div>
+        )}
       </section>
     )}
 

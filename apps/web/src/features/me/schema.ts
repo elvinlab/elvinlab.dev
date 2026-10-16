@@ -34,6 +34,13 @@ export function experienceSchema() {
       summary: text(280).describe(
         'One truthful summary, no bullets: one string, or one text per locale (max 280 characters each).',
       ),
+      contributions: z
+        .array(text(160))
+        .max(4)
+        .optional()
+        .describe(
+          'Up to four short, truthful outcomes of the role (what was delivered): each one string, or one text per locale (max 160 characters each). Omit when there are none.',
+        ),
       tags: z
         .array(z.string().regex(kebab))
         .max(5)

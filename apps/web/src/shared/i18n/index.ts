@@ -186,8 +186,9 @@ export const DICTIONARIES = {
     'me.experiments.more.text':
       'Si quieres seguir conociendo mi trabajo, hay más experimentos, decisiones y aprendizajes.',
     'me.experiments.more.cta': 'Ver todos los experimentos',
-    'me.notes.title': 'Cómo pienso: últimas notas',
+    'me.notes.title': 'Cómo pienso',
     'me.notes.subtitle': 'Apuntes cortos de decisiones reales: qué elegí y por qué.',
+    'me.notes.articleInSpanish': 'Artículo en español',
     'me.education': 'Formación reciente',
     'me.education.more': 'Ver mi recorrido de formación',
     'me.certificates': 'Certificados y títulos',
@@ -514,8 +515,9 @@ export const DICTIONARIES = {
     'me.experiments.more.text':
       'If you want to keep exploring my work, there are more experiments, decisions and lessons.',
     'me.experiments.more.cta': 'See all experiments',
-    'me.notes.title': 'How I think: latest notes',
+    'me.notes.title': 'How I think',
     'me.notes.subtitle': 'Short write-ups of real decisions: what I chose and why.',
+    'me.notes.articleInSpanish': 'Article in Spanish',
     'me.education': 'Recent education',
     'me.education.more': 'See my education path',
     'me.certificates': 'Certificates and degrees',

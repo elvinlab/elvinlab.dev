@@ -27,6 +27,36 @@ describe('experienceSchema', () => {
     expect(() => schema.parse({ ...valid, tags: ['a', 'b', 'c', 'd', 'e', 'f'] })).toThrow();
   });
 
+  describe('contributions', () => {
+    const contribution = { es: 'Una contribución concreta.', en: 'One concrete contribution.' };
+
+    it('accepts up to four localized contributions and rejects a fifth', () => {
+      const contributions = [contribution, contribution, contribution, contribution];
+      expect(schema.parse({ ...valid, contributions }).contributions).toHaveLength(4);
+      expect(() =>
+        schema.parse({ ...valid, contributions: [...contributions, contribution] }),
+      ).toThrow(/contributions/);
+    });
+
+    it('accepts a plain string and a per-locale object, and rejects a missing default locale', () => {
+      expect(schema.parse({ ...valid, contributions: ['Plain string'] }).contributions).toEqual([
+        'Plain string',
+      ]);
+      expect(schema.parse({ ...valid, contributions: [contribution] }).contributions).toEqual([
+        contribution,
+      ]);
+      expect(() => schema.parse({ ...valid, contributions: [{ en: 'Only English' }] })).toThrow(
+        /es/,
+      );
+    });
+
+    it('keeps the per-contribution length limit', () => {
+      expect(() =>
+        schema.parse({ ...valid, contributions: [{ es: 'Corto', en: 'x'.repeat(161) }] }),
+      ).toThrow();
+    });
+  });
+
   describe('per-locale text', () => {
     const perLocale = { es: 'Ingeniero de software', en: 'Software Engineer' };
 

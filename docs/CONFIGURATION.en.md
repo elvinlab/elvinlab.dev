@@ -148,6 +148,9 @@ The descriptions come from the schema (`.describe()`), which is why they are in 
 | `me.stack[].hint` | `{ <locale>: string (max 180) }` | no |  | One plain-language sentence per locale that says what the group is. Shown as a hover and focus tooltip; omit for no tooltip. Max 180 characters per locale. |
 | `me.stack[].layer` | `boolean` | no |  | Draws the group as a numbered layer of the product (for example data, backend, frontend, cloud), joined to the next layer by a vertical line. Omit for a group that cuts across layers, such as AI or quality. Keep the layers first in the list. |
 | `me.stack[].folded` | `boolean` | no |  | Puts the group inside a collapsed "more tools" block under the stack (native details, no script). Use it for secondary groups so the stack stays short; a layer cannot be folded. |
+| `me.curatedNotes` | `object[] (max 3)` | no |  | Up to three notes curated by capability, each with a one-line framing. Omit to show the latest notes instead. |
+| `me.curatedNotes[].slug` | `string` | yes |  | Slug of a published note to show. |
+| `me.curatedNotes[].framing` | `{ <locale>: string (max 120) }` | yes |  | One line per locale saying what this note demonstrates (the capability it backs). Max 120 characters per locale. |
 | `features` | `object` | yes |  | Feature flags: off means the routes are not generated and the nav entry is hidden. The interface switches (`backToTop`, `languageHint`, `themeToggle`, `backgroundPicker`, `readingProgress`) default to on and render nothing when off. |
 | `features.blog` | `boolean` | yes |  | Lab Notes: the notes index, note pages, RSS and the nav entry. |
 | `features.comments` | `boolean` | yes |  | Giscus comments on notes. Needs the `giscus` block below, otherwise nothing renders. |
@@ -212,6 +215,7 @@ Shown in the `/me` timeline. If you omit `end`, it is the current job. `role`, `
 | `end` | `integer (min 1970)` | no |  | Year the role ended. Omit for the current role (drawn with a solid dot). |
 | `location` | `string \| { <locale>: string }` | no |  | Where the role was based: one string, or one text per locale (max 80 characters each). |
 | `summary` | `string \| { <locale>: string }` | yes |  | One truthful summary, no bullets: one string, or one text per locale (max 280 characters each). |
+| `contributions` | `string \| { <locale>: string }[] (max 4)` | no |  | Up to four short, truthful outcomes of the role (what was delivered): each one string, or one text per locale (max 160 characters each). Omit when there are none. |
 | `tags` | `string[] (max 5)` | no | `[]` | Up to five kebab-case tags. |
 <!-- docs:end experience -->
 
@@ -366,6 +370,7 @@ Four scopes: **build** (read while building), **Worker** (in production, at runt
 | `SUBSCRIBE_FROM` | Worker (runtime) | yes | no | Sender of the subscription emails (`Name <address>` or a bare address), on a domain verified in Resend. Required only when `features.subscribe` is on. An address is never written in tracked files. | Cloudflare Worker secret; `.dev.vars` locally |
 | `SUBSCRIBE_TOKEN_SECRET` | Worker (runtime) | yes | no | Random secret (at least 32 characters) that signs the unsubscribe link of every email. Required only when `features.subscribe` is on. Changing it invalidates the unsubscribe links already sent. | Cloudflare Worker secret; `.dev.vars` locally |
 | `SUBSCRIBE_ADMIN_TOKEN` | Worker (runtime) | yes | no | Random secret (at least 32 characters) the owner sends as a Bearer token to `POST /api/subscribe/notify`, the trigger that emails a published note to the list (`pnpm notify:note`). Required only to send notes; without it the endpoint answers 503. Keep it in a password manager, never in the repository. | Cloudflare Worker secret; `.dev.vars` locally |
+| `CI` | CI | no | no | Set to `true` by GitHub Actions. The CI gates read it to retry noisy checks once (ADR 0018) and to forbid `.only` in specs; never set by hand. | GitHub Actions sets it automatically |
 | `CLOUDFLARE_API_TOKEN` | CI | yes | yes | Cloudflare API token with permission to deploy the Worker; used only by the deploy job. | GitHub environment secret (`production`) |
 | `CLOUDFLARE_ACCOUNT_ID` | CI | no | yes | Cloudflare account id the deploy job targets. Not a secret, but not needed anywhere else. | GitHub repository variable |
 | `DEV_CHECK_STRIP_DEPS` | local tooling | no | no | Set to `1` to run `pnpm check:dev-cold-start` as its own negative control: it removes the pre-optimized dependencies first and must then fail. | the shell, only when running that check |

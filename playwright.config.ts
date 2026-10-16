@@ -1,4 +1,4 @@
-import { defineConfig } from '@playwright/test';
+import { defineConfig, type ReporterDescription } from '@playwright/test';
 
 import {
   E2E_PROFILE_ENV,
@@ -17,6 +17,16 @@ process.env[E2E_PROFILE_ENV] = serializeE2eProfile(
   }),
 );
 
+const reporters: ReporterDescription[] = [
+  ['list'],
+  ['html', { open: 'never' }],
+  // In CI the JSON report is what the workflow reads to list the flaky tests in the run summary
+  // (`node apps/web/scripts/list-flaky.ts`). Locally it would only cost a file write for nothing.
+  ...(process.env['CI']
+    ? ([['json', { outputFile: 'playwright-report/results.json' }]] as ReporterDescription[])
+    : []),
+];
+
 // `pnpm verify` runs one invocation: E2E_WIDE_SPECS (comma separated) limits the 360 and 768 px
 // projects to the width dependent specs, so the others run at 1280 px only. Unset (CI,
 // `pnpm test:e2e`): every project runs every spec.
@@ -26,9 +36,11 @@ export default defineConfig({
   testDir: './tests/browser',
   fullyParallel: true,
   forbidOnly: Boolean(process.env['CI']),
-  retries: 0,
+  // CI retries a test once: a noisy gate must not block a release, and a test that passes on the
+  // retry is reported as flaky, never hidden (ADR 0018). Locally retries stay off.
+  retries: process.env['CI'] ? 1 : 0,
   workers: '100%',
-  reporter: [['list'], ['html', { open: 'never' }]],
+  reporter: reporters,
   use: {
     baseURL: 'http://127.0.0.1:4322',
     trace: 'retain-on-failure',

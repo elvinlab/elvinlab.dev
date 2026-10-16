@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { parseShard, selectShard } from './run-lighthouse-ci.ts';
+import { failedUrls, flakyMarkdown, parseShard, selectShard } from './run-lighthouse-ci.ts';
 
 const urls = ['a', 'b', 'c', 'd', 'e', 'f'];
 
@@ -39,5 +39,94 @@ describe('selectShard', () => {
 
   it('keeps every item for a single shard', () => {
     expect(selectShard(urls, { index: 1, total: 1 })).toEqual(urls);
+  });
+});
+
+describe('failedUrls', () => {
+  it('groups error-level failures by URL with sorted audits, sorted by URL', () => {
+    expect(
+      failedUrls([
+        {
+          url: 'http://127.0.0.1:4323/me/',
+          level: 'error',
+          passed: false,
+          auditId: 'cumulative-layout-shift',
+        },
+        {
+          url: 'http://127.0.0.1:4323/me/',
+          level: 'error',
+          passed: false,
+          auditId: 'categories:performance',
+        },
+        {
+          url: 'http://127.0.0.1:4323/en/',
+          level: 'error',
+          passed: false,
+          auditId: 'categories:accessibility',
+        },
+      ]),
+    ).toEqual([
+      { url: 'http://127.0.0.1:4323/en/', audits: ['categories:accessibility'] },
+      {
+        url: 'http://127.0.0.1:4323/me/',
+        audits: ['categories:performance', 'cumulative-layout-shift'],
+      },
+    ]);
+  });
+
+  it('ignores warnings, passing results and duplicates', () => {
+    expect(
+      failedUrls([
+        {
+          url: 'http://127.0.0.1:4323/me/',
+          level: 'warn',
+          passed: false,
+          auditId: 'categories:seo',
+        },
+        {
+          url: 'http://127.0.0.1:4323/en/',
+          level: 'error',
+          passed: true,
+          auditId: 'categories:seo',
+        },
+        {
+          url: 'http://127.0.0.1:4323/en/',
+          level: 'error',
+          passed: false,
+          auditId: 'categories:seo',
+        },
+        {
+          url: 'http://127.0.0.1:4323/en/',
+          level: 'error',
+          passed: false,
+          auditId: 'categories:seo',
+        },
+      ]),
+    ).toEqual([{ url: 'http://127.0.0.1:4323/en/', audits: ['categories:seo'] }]);
+  });
+
+  it('keeps a URL even when a failure carries no audit id', () => {
+    expect(
+      failedUrls([{ url: 'http://127.0.0.1:4323/me/', level: 'error', passed: false }]),
+    ).toEqual([{ url: 'http://127.0.0.1:4323/me/', audits: [] }]);
+  });
+});
+
+describe('flakyMarkdown', () => {
+  it('lists the pathname and the failing audits per URL', () => {
+    expect(
+      flakyMarkdown([
+        { url: 'http://127.0.0.1:4323/me/', audits: ['categories:performance'] },
+        { url: 'http://127.0.0.1:4323/en/contact/', audits: ['color-contrast'] },
+      ]),
+    ).toBe('- /me/ (categories:performance)\n- /en/contact/ (color-contrast)');
+  });
+
+  it('omits the parentheses when a URL failed with no audits', () => {
+    expect(flakyMarkdown([{ url: 'http://127.0.0.1:4323/me/', audits: [] }])).toBe('- /me/');
+  });
+
+  it('is empty for no failures', () => {
+    expect(flakyMarkdown([])).toBe('');
   });
 });

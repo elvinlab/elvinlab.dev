@@ -121,6 +121,15 @@ export function refineChanged(
   return changed.filter((file) => file !== I18N_DICTIONARY || !additionsOnly(readDiff(file)));
 }
 
+/**
+ * Whether a plan may consult the registry for freshness. `--files` simulates a change that is not
+ * on disk, so a fingerprint would read as unchanged and freshness would wrongly hide the scoped
+ * plan; a simulation therefore never consults the registry.
+ */
+export function registryRelevant(mode: PlanMode, simulated: boolean): boolean {
+  return mode !== 'all' && !(mode === 'changed' && simulated);
+}
+
 function select(input: PlanInput, checks: readonly CheckDef[]) {
   const wideGlobs = input.wide ?? FULL_WIDE;
   const layoutGlobs = input.layoutWide ?? LAYOUT_WIDE;

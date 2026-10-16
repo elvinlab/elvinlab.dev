@@ -256,5 +256,28 @@ export const siteConfig = {
         },
       },
     ],
+    curatedNotes: [
+      {
+        slug: 'como-construi-este-sitio',
+        framing: {
+          es: 'Arquitectura y decisiones de este sitio, de los datos a la pantalla.',
+          en: 'Architecture and decisions behind this site, from data to screen.',
+        },
+      },
+      {
+        slug: 'vibe-coding-o-especificar-primero',
+        framing: {
+          es: 'Cómo uso la IA en el flujo sin perder el control.',
+          en: 'How I use AI in the workflow without losing control.',
+        },
+      },
+      {
+        slug: 'el-lcp-se-pierde-en-el-head',
+        framing: {
+          es: 'Performance con presupuestos y números, no promesas.',
+          en: 'Performance with budgets and numbers, not promises.',
+        },
+      },
+    ],
   },
 };

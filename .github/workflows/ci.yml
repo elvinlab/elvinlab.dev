@@ -150,6 +150,16 @@ jobs:
         run: pnpm exec playwright install --with-deps chromium
       - name: Changelog page spec (a note publish always edits changelog.json)
         run: pnpm test:e2e tests/browser/changelog.spec.ts
+      - name: List flaky tests in the run summary
+        if: always()
+        run: |
+          flakes="$(node apps/web/scripts/list-flaky.ts)"
+          if [ -n "$flakes" ]; then
+            {
+              echo '## Flaky tests (passed on retry)'
+              echo "$flakes"
+            } >> "$GITHUB_STEP_SUMMARY"
+          fi
       - name: Job duration
         if: always()
         run: |
@@ -200,6 +210,16 @@ jobs:
       - name: Install Chromium for browser checks
         run: pnpm exec playwright install --with-deps chromium
       - run: pnpm test:e2e --shard=${{ matrix.shard }}/4
+      - name: List flaky tests in the run summary
+        if: always()
+        run: |
+          flakes="$(node apps/web/scripts/list-flaky.ts)"
+          if [ -n "$flakes" ]; then
+            {
+              echo '## Flaky tests (passed on retry)'
+              echo "$flakes"
+            } >> "$GITHUB_STEP_SUMMARY"
+          fi
       - name: White-label build (once)
         if: matrix.shard == 1
         run: pnpm test:white-label
@@ -279,6 +299,16 @@ jobs:
         env:
           E2E_FEATURE_PROFILE: ${{ matrix.profile }}
         run: pnpm test:e2e:quick
+      - name: List flaky tests in the run summary
+        if: always()
+        run: |
+          flakes="$(node apps/web/scripts/list-flaky.ts)"
+          if [ -n "$flakes" ]; then
+            {
+              echo '## Flaky tests (passed on retry)'
+              echo "$flakes"
+            } >> "$GITHUB_STEP_SUMMARY"
+          fi
       - name: Job duration
         if: always()
         run: |
@@ -323,6 +353,15 @@ jobs:
         run: pnpm exec playwright install --with-deps chromium
       - name: Check mobile Lighthouse budgets
         run: pnpm test:lighthouse --shard=${{ matrix.shard }}/2
+      - name: List flaky Lighthouse URLs in the run summary
+        if: always()
+        run: |
+          if [ -f .lighthouseci/flaky.md ]; then
+            {
+              echo '## Flaky Lighthouse URLs (passed on re-run)'
+              cat .lighthouseci/flaky.md
+            } >> "$GITHUB_STEP_SUMMARY"
+          fi
       - name: Job duration
         if: always()
         run: |

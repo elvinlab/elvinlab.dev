@@ -1029,5 +1029,41 @@
     "category": "changed",
     "title": "Experiment case pages share their own card",
     "description": "Each case page now has its own share card (/og/experiments/<slug>.png) with the year, title and owner, and its title no longer repeats the site name when the experiment is named after the site."
+  },
+  "noisy-gate-retry-policy": {
+    "date": "2026-10-16",
+    "category": "changed",
+    "title": "Noisy CI gates retry once and report flakes",
+    "description": "In CI, Playwright tests retry once and Lighthouse re-runs a failed URL once; a pass on the retry is listed as flaky in the run summary instead of blocking a release or hiding silently. Deterministic gates still fail immediately."
+  },
+  "verify-files-simulation": {
+    "date": "2026-10-16",
+    "category": "fixed",
+    "title": "The verify command no longer under-plans a simulated change",
+    "description": "pnpm verify --files applied the registry freshness filter to a change that is not on disk, so it planned only lint. A simulated change now ignores the registry and shows the full scoped plan."
+  },
+  "entrance-rise-only": {
+    "date": "2026-10-16",
+    "category": "changed",
+    "title": "The main content rises instead of fading in on navigation",
+    "description": "The page column that holds the heading now animates transform only (a subtle 8 px rise), so it is never invisible or faint while a page loads. This also matches the design rule that an LCP candidate never animates opacity. The sidebar and footer keep their fade."
+  },
+  "experience-contributions": {
+    "date": "2026-10-16",
+    "category": "added",
+    "title": "The experience timeline shows concrete outcomes per role",
+    "description": "Each role on /me now lists up to four short, truthful contributions (what was delivered), in Spanish and English. The texts are the owner's drafts, editable in experience.json."
+  },
+  "me-curated-notes": {
+    "date": "2026-10-16",
+    "category": "changed",
+    "title": "The profile shows notes curated by capability",
+    "description": "The /me notes now show three notes picked by capability, each with a one-line framing of what it demonstrates. On the English page, Spanish notes carry an 'Article in Spanish' label."
+  },
+  "me-seo": {
+    "date": "2026-10-16",
+    "category": "changed",
+    "title": "The profile page has its own title and description",
+    "description": "/me now uses a specific title (name and role) and the pitch as its meta description, instead of sharing the home page title. Its share card stays the profile card."
   }
 }

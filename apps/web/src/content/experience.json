@@ -1,17 +1,40 @@
 {
   "buo": {
-    "role": { "es": "Ingeniero de software", "en": "Software Engineer" },
+    "role": {
+      "es": "Ingeniero de software",
+      "en": "Software Engineer"
+    },
     "company": "Buo",
     "start": 2024,
-    "location": { "es": "Remoto", "en": "Remote" },
+    "location": {
+      "es": "Remoto",
+      "en": "Remote"
+    },
     "summary": {
       "es": "Entrega de extremo a extremo en un SaaS de recursos humanos: datos SQL, servicios Java/Spring Boot e interfaces Vue/Vuetify. Integro IA en producto y creo skills reutilizables para revisión de PRs, pruebas y documentación, con supervisión humana.",
       "en": "End-to-end delivery on an HR SaaS: SQL data, Java/Spring Boot services and Vue/Vuetify interfaces. I integrate AI into the product and build reusable skills for PR review, testing and documentation, with human oversight."
     },
-    "tags": ["sql", "java", "spring-boot", "vue", "aws"]
+    "tags": ["sql", "java", "spring-boot", "vue", "aws"],
+    "contributions": [
+      {
+        "es": "Integro IA en el producto, con revisión humana explícita.",
+        "en": "I integrate AI into the product, with explicit human review."
+      },
+      {
+        "es": "Creo skills reutilizables para revisión de PRs, pruebas y documentación.",
+        "en": "I build reusable skills for PR review, testing and documentation."
+      },
+      {
+        "es": "Entrego de extremo a extremo: datos SQL, servicios Java/Spring y vistas Vue.",
+        "en": "I deliver end-to-end: SQL data, Java/Spring services and Vue views."
+      }
+    ]
   },
   "blue-zone": {
-    "role": { "es": "Desarrollador de software", "en": "Software Developer" },
+    "role": {
+      "es": "Desarrollador de software",
+      "en": "Software Developer"
+    },
     "company": "Blue Zone Consulting Partners",
     "start": 2022,
     "end": 2024,
@@ -20,10 +43,27 @@
       "es": "Flujos ETL desde Excel hacia AWS S3 con transformación de datos y manejo de errores; procesamiento en Java e interfaces AngularJS que consumían APIs REST; apoyo en QA, visualización de datos e incorporación de nuevos desarrolladores.",
       "en": "ETL flows from Excel to AWS S3 with data transformation and error handling; Java processing and AngularJS interfaces consuming REST APIs; support for QA, data visualization and onboarding of new developers."
     },
-    "tags": ["etl", "java", "aws", "angularjs"]
+    "tags": ["etl", "java", "aws", "angularjs"],
+    "contributions": [
+      {
+        "es": "Automaticé el ETL de Excel a AWS S3, con transformación y manejo de errores.",
+        "en": "Automated the Excel-to-AWS-S3 ETL, with transformation and error handling."
+      },
+      {
+        "es": "Procesé datos en Java y los expuse a interfaces AngularJS vía APIs REST.",
+        "en": "Processed data in Java and exposed it to AngularJS UIs through REST APIs."
+      },
+      {
+        "es": "Apoyé QA, visualización de datos e incorporación de nuevos desarrolladores.",
+        "en": "Supported QA, data visualization and onboarding of new developers."
+      }
+    ]
   },
   "cnet": {
-    "role": { "es": "Desarrollador full-stack", "en": "Full-stack Developer" },
+    "role": {
+      "es": "Desarrollador full-stack",
+      "en": "Full-stack Developer"
+    },
     "company": "CNET Technology Systems",
     "start": 2021,
     "end": 2022,
@@ -31,10 +71,27 @@
       "es": "Análisis de requisitos y desarrollo con .NET Framework y React, incluidos roles y permisos; modelado de datos en SQL Server y MySQL, liderazgo de entregas y coordinación con clientes bajo Scrum, y capacitación de usuarios.",
       "en": "Requirements analysis and development with .NET Framework and React, including roles and permissions; SQL Server and MySQL data modeling, led delivery and client coordination under Scrum, and user training."
     },
-    "tags": ["sql-server", "mysql", "dotnet", "reactjs"]
+    "tags": ["sql-server", "mysql", "dotnet", "reactjs"],
+    "contributions": [
+      {
+        "es": "Desarrollé con .NET Framework y React, incluidos roles y permisos.",
+        "en": "Developed with .NET Framework and React, including roles and permissions."
+      },
+      {
+        "es": "Modelé datos en SQL Server y MySQL.",
+        "en": "Modeled data in SQL Server and MySQL."
+      },
+      {
+        "es": "Lideré entregas y coordiné clientes bajo Scrum, con capacitación de usuarios.",
+        "en": "Led delivery and coordinated clients under Scrum, with user training."
+      }
+    ]
   },
   "hacienda-el-orosi": {
-    "role": { "es": "Desarrollador de software", "en": "Software Developer" },
+    "role": {
+      "es": "Desarrollador de software",
+      "en": "Software Developer"
+    },
     "company": "Hacienda el Orosi",
     "start": 2020,
     "end": 2021,
@@ -42,6 +99,20 @@
       "es": "Liderazgo del desarrollo con el stack MERN desde los requisitos hasta las pruebas y la capacitación de usuarios; módulo contable para colaboradores, manejo multimedia con Firebase/AWS S3 y flujos de CI/CD.",
       "en": "Led development with the MERN stack from requirements to testing and user training; employee accounting module, multimedia handling with Firebase/AWS S3 and CI/CD workflows."
     },
-    "tags": ["mongodb", "express", "node", "react", "firebase"]
+    "tags": ["mongodb", "express", "node", "react", "firebase"],
+    "contributions": [
+      {
+        "es": "Lideré el desarrollo MERN, de los requisitos a las pruebas y la capacitación.",
+        "en": "Led MERN development, from requirements to testing and training."
+      },
+      {
+        "es": "Construí el módulo contable de colaboradores y el manejo multimedia con Firebase y AWS S3.",
+        "en": "Built the employee accounting module and multimedia handling with Firebase and AWS S3."
+      },
+      {
+        "es": "Automaticé los flujos de CI/CD.",
+        "en": "Automated the CI/CD workflows."
+      }
+    ]
   }
 }

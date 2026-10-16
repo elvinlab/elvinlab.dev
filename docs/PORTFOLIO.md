@@ -177,10 +177,15 @@ Estos ajustes son las opciones editoriales, no todas las constantes de presentac
     "start": 2024,
     "location": "Remoto",
     "summary": { "es": "Una línea honesta de lo que haces (hasta 280 caracteres).", "en": "One honest line about what you do." },
+    "contributions": [
+      { "es": "Algo concreto que entregaste (hasta 160 caracteres).", "en": "One concrete thing you delivered." }
+    ],
     "tags": ["typescript", "cloudflare"]
   }
 }
 ```
+
+`contributions` es opcional: hasta cuatro resultados cortos y veraces del puesto (qué se entregó, con verbo y resultado), uno por idioma. Si no los tenés validados, omití el campo; el bloque no se dibuja.
 
 Los resultados y aportes que no hayas validado no se publican: sin cifras, usuarios ni equipos inventados.
 

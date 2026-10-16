@@ -516,6 +516,23 @@ export const siteConfigSchema = z
           )
           .min(1)
           .describe('Tech stack groups.'),
+        curatedNotes: z
+          .array(
+            z.object({
+              slug: z
+                .string()
+                .regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/)
+                .describe('Slug of a published note to show.'),
+              framing: localizedText(120).describe(
+                'One line per locale saying what this note demonstrates (the capability it backs). Max 120 characters per locale.',
+              ),
+            }),
+          )
+          .max(3)
+          .optional()
+          .describe(
+            'Up to three notes curated by capability, each with a one-line framing. Omit to show the latest notes instead.',
+          ),
       })
       .describe(
         'Singular /me profile data. Lists that grow (experience, certificates) live in `src/content/`.',
