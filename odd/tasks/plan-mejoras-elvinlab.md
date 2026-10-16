@@ -26,7 +26,7 @@ Execute the plan incrementally on `develop`, starting with what needs no new con
 - [x] **T1** (EL-01a) Fix the stale delivery docs: CONVENTIONS git/delivery rows, TESTING line 53, CONFIGURATION line 455 (ES and EN). Check: `pnpm lint`; no remaining mention of staging or PR previews outside ADRs and history. Route: inline (a few lines per file, mechanical).
 - [x] **T2** (EL-01b) `docs/BRAND.md`: let the "atemporal" voice rule admit a dated "Ahora" section, as the plan requires, without opening the door to time-dependent copy elsewhere. Route: inline (one decision, one file).
 - [x] **T3** (16.5, issue #58) "All notes" link in the English UI. Reproduced live (`/en/notes/` 404) and fixed in `3c83905`; close #58 after the next release.
-- [ ] **T4** (16.5) Investigate the late or faint block appearance when navigating: `fade-in-up` (300 ms from opacity 0) is the candidate, not a conclusion; measure before changing. Route: decide after measuring.
+- [x] **T4** (16.5) Investigate the late or faint block appearance when navigating: `fade-in-up` (300 ms from opacity 0) is the candidate, not a conclusion; measure before changing. Route: decide after measuring. (Closed 2026-10-16: the main column now rises transform-only; see the section below.) Commit f87cac3.
 - [ ] **T5** (16.5) Language selector without translation: improve the label so it does not promise an English version that does not exist. Needs the owner's wording if it is user-facing copy.
 
 ### Added 2026-10-02 on the owner's instruction
@@ -200,4 +200,10 @@ Supersedes the "#76 left open" note above. #76 itself had started to conflict wi
 - **Type scale and text density: no change for now.** The owner reviewed it on their own devices and the text size is fine across the site; the footprint button text was the only thing to shrink (done on 2026-10-05).
 - **T37 (#61) credentials "in-progress" status and applied-learning text: deferred.** The "Plataforma sin confirmar" placeholders are already gone (checked live on `/me/` and `/en/me/`; `credentials.json` has 3 real entries). The remaining half of the issue (status plus learning summary) will be designed together with the release of Experiments and a separate certificates and degrees page, so it is not built now. Nothing in production depends on it.
 - Navbar with six links (#69) stays for later, waiting for Learning and Projects.
+
+## T4 (16.5) entrance rise-only (2026-10-16)
+The "late or faint block appearance when navigating" was the `fade-in-up` (opacity 0 to 1, 300 ms) on the main content column, which holds the LCP element (H1/hero) on every page. It also violated the documented design rule (DESIGN.md "motion": "anything that can be the LCP element animates transform only, never opacity") — opacity keeps the column invisible during its 150 ms delay and then fades it in. T45 had already measured no LCP delay (528 vs 524 ms), so this is a design-rule and visibility fix, not a performance fix.
+- Fix: a new transform-only entrance `rise-in` (8 px rise, no opacity) for the main column (`BaseLayout.astro`); the aside and footer keep `fade-in-up` (they are not LCP). Under `prefers-reduced-motion` both stop with `animation: none` (the rule now names both).
+- The keyframe adds about 86 B of inline CSS to every page, counted in both the style and html budgets, so the page-weight budgets were raised to the measured need plus ~150 B headroom (home, changelog, contact, education, experiments, me, default, subscribe, result and topic; the changelog html also grew by the three new 2026-10-16 changelog entries).
+- Tests updated: `reduced-motion.spec.ts` covers `rise-in`, `view-transitions.spec.ts` counts it. Changelog entry `entrance-rise-only`. Commit f87cac3.
 
