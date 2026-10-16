@@ -124,6 +124,9 @@ export function classifyPage(path: string): PageType {
   // `/education/`, its later pages `/education/page/N/` and the alternate order `/education/<sort>/`
   // (a noindex duplicate of the same timeline, so it weighs the same).
   if (first === 'education') return 'education';
+  // `/experiments/`, its later pages, the alternate sorts and the case pages (`/experiments/<slug>/`):
+  // all carry the experiments CSS, so they weigh the same as the list.
+  if (first === 'experiments') return 'experiments';
   if (second === undefined) {
     if (first === 'me' || first === 'experiments' || first === 'contact' || first === 'subscribe')
       return first;
