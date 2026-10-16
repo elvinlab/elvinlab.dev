@@ -1,5 +1,15 @@
 # Feature: elvinlab.dev — portfolio + Lab Notes
 
+## Current state (reconciled 2026-10-15)
+
+2026-10-15 reconciliation: toolchain moved from Claude Code + Codex (agentic-dev-setup) to pi (el Gentleman) + gentle-ai + Deepseek. Doc bridge added (`AGENTS.md` → `CLAUDE.md`), RTK/Caveman marked legacy in `CLAUDE.md`/`AGENTS.md`, README updated (experimental, additive). Nothing deleted.
+
+Backlog sync from Engram: 8 new issues created and added to the board as Todo — #140 T86 web app manifest + apple-touch-icon, #141 T87 `/me` availability wording, #142 T88 credentials in-progress status, #143 T89 Fix/Ink h2 + real-note verification, #144 T90 view transitions Safari/bfcache, #145 T91 home-sections flaky, #146 T92 manual Lighthouse pre-publish step, #147 T93 subscribe backfill evidence.
+
+Closed as delivered (code complete on `develop`, unreleased): #82 T53 Education page, #83 T54 compact Formación reciente, #86 T57 Certificate viewer (tracker `odd/tasks/education-page.md`; remaining = owner content + release to `main`). Comments added to #91 (DMARC `rua` pre-step) and #119 (three LCP levers).
+
+Project 2 now: 26 open issues = 26 Todo, matching. Dependabot PR #115 (actions/cache 6.1.0) and #123 (8 dep updates, no satori) stay open — useful, integrated + verified locally on branch `chore/dependabot-ci-and-runtime-refresh`, pending owner merge/release decision. Remote branches clean (main, develop, 2 Dependabot); the old `claude/project-thread-4jalfb` is gone. `develop` is 450 commits ahead of `main`; release stays the owner's call.
+
 ## Current state (reconciled 2026-10-12)
 
 2026-10-12 reconciliation: release `ce5bdeb` matches the audited local tree. Existing [CI run 38322066089](https://github.com/elvinlab/elvinlab.dev/actions/runs/38322066089) passed its required gates and deploy. This is existing CI evidence, not a new local run.
