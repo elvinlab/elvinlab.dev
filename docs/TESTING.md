@@ -14,7 +14,7 @@ and serves it with Astro preview. It checks home, notes, note detail, contact pa
 For a faster loop while iterating, `mise exec -- pnpm test:e2e:quick` runs the same checks at 1280
 pixels only, and a spec path narrows it further (`pnpm test:e2e:quick tests/browser/smoke.spec.ts`).
 Each run pays about 9 seconds of fixed cost (workspace copy, build, preview). Run the full
-`pnpm test:e2e` (all three viewports) once before closing a change. Current configuration (`playwright.config.ts`) uses `workers: '100%'` and `retries: 0`, locally and in CI.
+`pnpm test:e2e` (all three viewports) once before closing a change. Current configuration (`playwright.config.ts`) uses `workers: '100%'`; retries stay 0 locally and become 1 in CI, where a flaky test is retried once and reported in the run summary ([ADR 0018](adr/0018-noisy-gate-retry-policy.md)).
 The 73-second full-suite measurement on a 12-core machine (107 seconds at 2 workers)
 was recorded on 2026-10-02 with the then-current half-core setting; it is not a current timing promise.
 
