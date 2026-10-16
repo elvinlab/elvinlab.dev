@@ -92,6 +92,8 @@ export const siteConfig = {
     themeToggle: true,
     backgroundPicker: true,
   },
+  // The floating experiment card while reading a note: off, only the static card at the end remains.
+  nudge: { floating: false },
   // Public ids of third-party services. They ship in the HTML by design. An environment variable
   // with the same purpose overrides each one (PUBLIC_CF_ANALYTICS_TOKEN, PUBLIC_TURNSTILE_SITE_KEY).
   integrations: {

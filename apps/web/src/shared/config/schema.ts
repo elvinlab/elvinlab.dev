@@ -366,6 +366,12 @@ export const siteConfigSchema = z
       ),
     nudge: z
       .strictObject({
+        floating: z
+          .boolean()
+          .default(true)
+          .describe(
+            'Whether the floating experiment card appears once while reading a note. Off: only the static card at the end of the note (and the home block) remain.',
+          ),
         scrollThreshold: z
           .number()
           .min(0.3)

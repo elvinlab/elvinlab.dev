@@ -975,5 +975,11 @@
     "category": "added",
     "title": "The site is installable as a web app",
     "description": "elvinlab.dev can now be added to the home screen or installed as an app. A web app manifest and an apple-touch-icon ship the name, colors and icons, with no service worker."
+  },
+  "nudge-floating-off": {
+    "date": "2026-10-16",
+    "category": "changed",
+    "title": "The experiment card no longer floats while reading",
+    "description": "The floating experiment card that appeared partway through a note is now off; only the static card at the end of each note (and the home block) remains. A new nudge.floating switch lets it be turned back on."
   }
 }

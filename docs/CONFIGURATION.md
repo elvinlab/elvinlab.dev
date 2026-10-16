@@ -117,6 +117,7 @@ Las descripciones vienen del esquema (`.describe()`), por eso están en inglés.
 | `notes` | `object` | no | `{}` | Settings of the notes area (`features.blog`): the static topic pages. Every key is optional and falls back to its default. |
 | `notes.topicMinNotes` | `integer (min 1, max 20)` | no | `2` | Notes a topic needs before it gets its own page (`/notes/tag/<topic>/`). A topic with fewer notes, or without an intro, is not generated, and its chips keep pointing to the filter on `/notes/`. The topics themselves live in `src/content/topics.json`. |
 | `nudge` | `object` | no | `{}` | Settings of the experiment card (`features.experimentNudge`). Every key is optional and falls back to its default. |
+| `nudge.floating` | `boolean` | no | `true` | Whether the floating experiment card appears once while reading a note. Off: only the static card at the end of the note (and the home block) remain. |
 | `nudge.scrollThreshold` | `number (min 0.3, max 0.95)` | no | `0.7` | Share of a note the visitor must scroll before the floating experiment card appears (0.3 to 0.95). |
 | `nudge.indexScrollThreshold` | `number (min 0.3, max 0.95)` | no | `0.6` | The same threshold on the `/notes/` index, where visitors browse instead of read (0.3 to 0.95). |
 | `nudge.reappearAfterDays` | `integer (min 0, max 365)` | no | `30` | Days a visitor who closed the floating card does not see it again; after that it may float again once. 0 means a close lasts for good (until the browser data is cleared). The static card after the note never goes away. |
