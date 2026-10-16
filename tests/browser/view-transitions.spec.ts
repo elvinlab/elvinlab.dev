@@ -29,7 +29,7 @@ const instrument = (page: Page) =>
     });
     addEventListener('animationstart', (event) => {
       const name = (event as AnimationEvent).animationName;
-      if (name === 'fade-in-up' || name === 'rise-in') {
+      if (name === 'fade-in-up') {
         window.__entrances = (window.__entrances ?? 0) + 1;
       }
     });

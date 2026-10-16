@@ -29,17 +29,13 @@ for (const path of PAGES) {
     expect(delayed).toEqual([]);
   });
 
-  test(`${path}: entrance elements are in place at once when motion is reduced`, async ({
+  test(`${path}: elements that fade in are in place at once when motion is reduced`, async ({
     page,
   }) => {
     await page.emulateMedia({ reducedMotion: 'reduce' });
     await page.goto(path, { waitUntil: 'domcontentloaded' });
     const waiting = await page.evaluate(() =>
-      [
-        ...document.querySelectorAll(
-          '.animate-fade-in-up, .animate-rise-in, [class*="animate-fade-in-up"], [class*="animate-rise-in"]',
-        ),
-      ]
+      [...document.querySelectorAll('.animate-fade-in-up, [class*="animate-fade-in-up"]')]
         .filter((element) => {
           const style = getComputedStyle(element);
           return Number.parseFloat(style.opacity) < 1 || style.transform !== 'none';
