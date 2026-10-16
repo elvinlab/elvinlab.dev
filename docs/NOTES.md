@@ -520,6 +520,7 @@ Para una nota con imágenes grandes o mucho código, mide también esa URL real:
 - [ ] Las secciones usan solo `##` (nunca un `<h2>` a mano), son cortas y no llevan números escritos a mano.
 - [ ] Tinta dentro de la regla de densidad: como máximo un efecto por bloque de pantalla y un puñado por nota; todo `Fix` tiene `wrong` y `right`; cada `circle` es una frase corta de una línea; las importaciones usan exactamente `@/features/notes/components/Fix.astro` y `@/shared/ui/Ink.astro`; la negrita se usa con medida.
 - [ ] Nada pesado en la primera pantalla: la primera sección es texto, las imágenes y el código grande van después.
+- [ ] Si la nota lleva imágenes o código grande en la primera pantalla, se midió Lighthouse en la URL real (`/notes/<slug>/`, y `/en/notes/<slug>/` si tiene traducción), no en el fixture: rendimiento ≥ 95, LCP ≤ 2700 ms, CLS ≤ 0.1 y TBT ≤ 200 ms (mediana de 3 corridas para LCP y rendimiento), los mismos umbrales del CI (5.5). El CI mide `/notes/smoke-es/` y el carril rápido omite Lighthouse, así que esta es la única comprobación de tu nota real antes del deploy.
 - [ ] Si es la primera nota que usa `Fix` o `Ink`, se leyó línea a línea el resultado de `pnpm check:page-weight` (5.5) y se vio la nota en el build de producción, no solo en desarrollo (6.1).
 - [ ] Existe la entrada del changelog: `publish-note` añade `note-NNN` (categoría `added`, título «New Lab Note NNN: Título»; mira `note-009` en `changelog.json`); en el camino manual, escríbela tú.
 - [ ] Se lee bien en 360 px, en tema claro y oscuro y en modo lectura.

@@ -520,6 +520,7 @@ code-heavy articles: Lighthouse's synthetic notes do not cover every real articl
 - [ ] Sections use `##` only (never a raw `<h2>`), are short, and carry no hand-typed numbers.
 - [ ] Ink within the density rule: at most one effect per screen block and a handful per note; every `Fix` has `wrong` and `right`; each `circle` is a short single-line phrase; imports use exactly `@/features/notes/components/Fix.astro` and `@/shared/ui/Ink.astro`; bold is used sparingly.
 - [ ] Nothing heavy above the fold: the first section is text, images and large code come after it.
+- [ ] If the note has images or large code above the fold, Lighthouse was run on the real URL (`/notes/<slug>/`, and `/en/notes/<slug>/` when translated), not the fixture: performance ≥ 95, LCP ≤ 2700 ms, CLS ≤ 0.1 and TBT ≤ 200 ms (median of 3 runs for LCP and performance), the same thresholds as CI (5.5). CI measures `/notes/smoke-es/` and the fast lane skips Lighthouse, so this is the only check of your real note before the deploy.
 - [ ] If this is the first note to use `Fix` or `Ink`, `pnpm check:page-weight` was read line by line (5.5), and the note was looked at in the production build, not only in dev (6.1).
 - [ ] The changelog entry exists: `publish-note` adds `note-NNN` (category `added`, title "New Lab Note NNN: Title"; see `note-009` in `changelog.json`); in the manual path, write it yourself.
 - [ ] It reads well at 360 px, in light and dark theme and in reading mode.
