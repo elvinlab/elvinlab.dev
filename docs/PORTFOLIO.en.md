@@ -176,10 +176,15 @@ These settings are the editorial tunables, not every presentation constant. Gall
     "start": 2024,
     "location": "Remote",
     "summary": { "es": "Una línea honesta de lo que haces (hasta 280 caracteres).", "en": "One honest line about what you do." },
+    "contributions": [
+      { "es": "Algo concreto que entregaste (hasta 160 caracteres).", "en": "One concrete thing you delivered." }
+    ],
     "tags": ["typescript", "cloudflare"]
   }
 }
 ```
+
+`contributions` is optional: up to four short, truthful outcomes of the role (what was delivered, a verb plus a result), one per language. Omit it when you have none validated; the block is not drawn.
 
 Contributions and outcomes you have not validated are not published: no invented numbers, users or team sizes.
 

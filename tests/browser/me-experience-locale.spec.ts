@@ -21,6 +21,7 @@ const ES = {
     'Análisis de requisitos y desarrollo con .NET Framework y React',
     'Liderazgo del desarrollo con el stack MERN',
   ],
+  contributions: ['Integro IA en el producto', 'Automaticé el ETL de Excel a AWS S3'],
 };
 
 const EN = {
@@ -33,6 +34,7 @@ const EN = {
     'Requirements analysis and development with .NET Framework and React',
     'Led development with the MERN stack',
   ],
+  contributions: ['I integrate AI into the product', 'Automated the Excel-to-AWS-S3 ETL'],
 };
 
 const COMPANIES = [
@@ -56,10 +58,11 @@ test.describe('the experience timeline', () => {
     page,
   }) => {
     const text = await experienceText(page, ES.path, ES.heading);
-    for (const fragment of [...ES.roles, ...ES.summaries, ...COMPANIES]) {
+    for (const fragment of [...ES.roles, ...ES.summaries, ...ES.contributions, ...COMPANIES]) {
       expect(text, fragment).toContain(fragment);
     }
     for (const fragment of EN.summaries) expect(text, fragment).not.toContain(fragment);
+    for (const fragment of EN.contributions) expect(text, fragment).not.toContain(fragment);
     for (const role of ['Software Engineer', 'Software Developer', 'Full-stack Developer']) {
       expect(text, role).not.toContain(role);
     }
@@ -69,10 +72,10 @@ test.describe('the experience timeline', () => {
     page,
   }) => {
     const text = await experienceText(page, EN.path, EN.heading);
-    for (const fragment of [...EN.roles, ...EN.summaries, ...COMPANIES]) {
+    for (const fragment of [...EN.roles, ...EN.summaries, ...EN.contributions, ...COMPANIES]) {
       expect(text, fragment).toContain(fragment);
     }
-    for (const fragment of [...ES.roles.slice(0, 2), ...ES.summaries]) {
+    for (const fragment of [...ES.roles.slice(0, 2), ...ES.summaries, ...ES.contributions]) {
       expect(text, fragment).not.toContain(fragment);
     }
     expect(text).not.toContain('Desarrollador full-stack');
