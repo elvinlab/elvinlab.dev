@@ -14,7 +14,7 @@ const localized = (max: number) =>
 /**
  * A degree or certificate shown on `/me` and on the `/education/` timeline. Presentation-only data;
  * `url` is the verification link and is https so it never smuggles in an email or insecure endpoint.
- * The optional fields (`image`, `learnings`, `appliedIn`, `expires`) render only when present: an entry
+ * The optional fields (`image`, `learnings`, `appliedIn`, `expires`, `inProgress`) render only when present: an entry
  * without them shows no placeholder. Text fields accept one string or a per-locale object.
  */
 export function credentialSchema() {
@@ -81,6 +81,12 @@ export function credentialSchema() {
       .regex(/^\d{4}-(?:0[1-9]|1[0-2])$/)
       .optional()
       .describe('Optional expiry as YYYY-MM, for certifications that lapse.'),
+    inProgress: z
+      .boolean()
+      .optional()
+      .describe(
+        'Optional true marks the credential as in progress; the entry shows a status label instead of presenting the year as a completion date.',
+      ),
   });
 }
 

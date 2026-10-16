@@ -213,12 +213,29 @@ test.describe('home hero action and language cue', () => {
 });
 
 test.describe('home sidebar cards by width', () => {
+  // The fixture build has no D1 binding, so the marks action answers 503 and the footprint card
+  // REMOVES itself from the sidebar (`MarkSection.astro`, `status === 'hidden'`). Whether that
+  // removal lands before or after the layout read below is a race with the action round trip, and
+  // it changes how many cards the aside holds: that made these column assertions depend on which
+  // specs shared the batch. Pin the answer so the card is always present and the composition is
+  // deterministic, instead of tolerating either outcome.
+  test.beforeEach(async ({ page }) => {
+    await page.route(
+      (url) => url.pathname.includes('/_actions/marks.get/'),
+      (route) =>
+        route.fulfill({
+          status: 200,
+          contentType: 'application/json+devalue',
+          body: JSON.stringify([{ total: 1 }, 12]),
+        }),
+    );
+  });
   // The sidebar only: the page also has the "Also in English" language hint, another `aside`
   // whose script may or may not have run yet, and its children would count as sidebar cards.
   const sidebar = (page: Page) =>
     page.getByRole('complementary', { name: text('es', 'aside.label') });
-  // The marks card leaves the sidebar when the counter turns out to be unavailable (the stubbed
-  // API in the suite), so a card can be detached or hidden between the lookup and the read: skip those.
+  // Belt and braces: even with the counter pinned, keep skipping a card that is detached or
+  // `display: none`, because a detached node still reads `offsetLeft` 0 and would add a phantom column.
   const lefts = (page: Page) =>
     sidebar(page)
       .locator(':scope > div > *')

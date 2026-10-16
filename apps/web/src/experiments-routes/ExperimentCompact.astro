@@ -13,10 +13,8 @@ import { localizePath } from '@elvinlab/core';
 
 import type { ExperimentEntry } from '@/features/portfolio/index.ts';
 import { experimentTagLabel } from '@/features/portfolio/index.ts';
-import { site } from '@/shared/config/index.ts';
 import { LOCALES, type Locale, t } from '@/shared/i18n/index.ts';
 import { resolveExperimentImage } from '@/shared/lib/experiment-image.ts';
-import { externalLinkAttrs } from '@/shared/lib/external-link.ts';
 import { pickLocale } from '@/shared/lib/localized.ts';
 
 type Props = { experiment: ExperimentEntry; locale: Locale };
@@ -24,11 +22,9 @@ type Props = { experiment: ExperimentEntry; locale: Locale };
 const { experiment, locale } = Astro.props;
 const cover = experiment.images?.[0];
 const image = cover ? resolveExperimentImage(experiment.id, cover.file) : undefined;
-const href = experiment.note
-  ? localizePath(`/notes/${experiment.note}/`, experiment.noteLang ?? LOCALES.defaultLocale, LOCALES)
-  : (experiment.url ?? experiment.repo);
-const Tag = href ? 'a' : 'div';
-const linkProps = href ? { href, 'aria-labelledby': `${experiment.id}-t`, ...(experiment.note ? {} : externalLinkAttrs(href, site.url)) } : {};
+const href = localizePath(`/experiments/${experiment.id}/`, locale, LOCALES);
+const Tag = 'a';
+const linkProps = { href, 'aria-labelledby': `${experiment.id}-t` };
 const tags = experiment.tags.slice(0, 2);
 ---
 

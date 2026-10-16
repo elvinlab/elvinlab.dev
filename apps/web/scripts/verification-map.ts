@@ -342,6 +342,7 @@ export const CHECKS: readonly CheckDef[] = [
   e2e({ file: 'external-links.spec.ts', covers: EVERY_PAGE }),
   e2e({ file: 'brand-mark.spec.ts', covers: EVERY_PAGE, responsive: true }),
   e2e({ file: 'favicon.spec.ts', covers: EVERY_PAGE }),
+  e2e({ file: 'web-app-manifest.spec.ts', covers: EVERY_PAGE }),
   e2e({ file: 'focus-not-obscured.spec.ts', covers: EVERY_PAGE, responsive: true }),
   e2e({ file: 'home-sections.spec.ts', covers: HOME }),
   e2e({

@@ -38,6 +38,7 @@ const full = image ? (await getImage({ src: image.src, width: 1600, format: 'web
   <div class="ed-body">
   <p class="ed-meta">
     <span class="ed-badge" data-kind={data.kind}>{t(locale, `education.kind.${data.kind}`)}</span>
+    {data.inProgress && <span class="ed-progress">{t(locale, 'education.inProgress')}</span>}
     <span>{date}</span>
     {expires && <span>{t(locale, 'education.expires', { date: expires })}</span>}
   </p>

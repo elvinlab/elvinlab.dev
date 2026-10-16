@@ -18,7 +18,7 @@ type Props = { experiment: ExperimentEntry; locale: Locale; index: number };
 const { experiment, locale, index } = Astro.props;
 const cover = experiment.images?.[0];
 const image = cover ? resolveExperimentImage(experiment.id, cover.file) : undefined;
-const href = `${localizePath('/experiments/', locale, LOCALES)}#${experiment.id}`;
+const href = localizePath(`/experiments/${experiment.id}/`, locale, LOCALES);
 const THUMB = 'h-[60px] w-24 rounded-inner outline outline-1 -outline-offset-1 outline-divider';
 ---
 

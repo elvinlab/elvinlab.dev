@@ -24,9 +24,7 @@ type Props = { entry: ExperimentEntry; locale: Locale; class?: string | undefine
 const { entry, locale, class: className } = Astro.props;
 const cover = entry.images?.[0];
 const image = cover ? resolveExperimentImage(entry.id, cover.file) : undefined;
-const href = entry.note
-  ? localizePath(`/notes/${entry.note}/`, entry.noteLang ?? LOCALES.defaultLocale, LOCALES)
-  : `${localizePath('/experiments/', locale, LOCALES)}#${entry.id}`;
+const href = localizePath(`/experiments/${entry.id}/`, locale, LOCALES);
 const label = t(locale, 'nudge.label');
 const tags = visibleExperimentTags(entry.tags);
 ---

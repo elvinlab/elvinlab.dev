@@ -92,6 +92,8 @@ export const siteConfig = {
     themeToggle: true,
     backgroundPicker: true,
   },
+  // The floating experiment card while reading a note: off, only the static card at the end remains.
+  nudge: { floating: false },
   // Public ids of third-party services. They ship in the HTML by design. An environment variable
   // with the same purpose overrides each one (PUBLIC_CF_ANALYTICS_TOKEN, PUBLIC_TURNSTILE_SITE_KEY).
   integrations: {
@@ -115,12 +117,12 @@ export const siteConfig = {
     available: true,
     openToWork: false,
     status: {
-      es: 'Colaboraciones y proyectos',
-      en: 'Collaborations and projects',
+      es: 'Abierto a charlar',
+      en: 'Open to chat',
     },
     lookingFor: {
-      es: 'Colaboraciones y proyectos. Actualmente en Buo.',
-      en: 'Collaborations and projects. Currently at Buo.',
+      es: 'Solo colaboraciones y proyectos',
+      en: 'Collaborations and projects only',
     },
     cvUrl: {
       es: 'https://drive.google.com/file/d/1SZy6sPXxySHel7glTn1gBFwCUc6jytxS/view',
@@ -187,7 +189,7 @@ export const siteConfig = {
         label: { es: 'Datos', en: 'Data' },
         icon: 'database',
         layer: true,
-        items: ['SQL', 'MySQL', 'SQL Server', 'MongoDB', 'ETL', 'Cloudflare D1'],
+        items: ['SQL', 'MongoDB', 'Cloudflare D1'],
         hint: {
           es: 'Cómo modelo, guardo y muevo los datos. D1 es lo que uso en este sitio mientras lo aprendo.',
           en: 'How I model, store and move data. D1 is what I use on this site while I learn it.',
@@ -197,7 +199,7 @@ export const siteConfig = {
         label: { es: 'Backend', en: 'Backend' },
         icon: 'server',
         layer: true,
-        items: ['Java 21', 'Spring Boot', 'Spring Data JPA', '.NET', 'Node.js', 'APIs REST'],
+        items: ['Java 21', 'Spring Boot', 'Node.js'],
         hint: {
           es: 'Los servicios que hay detrás de un producto: reglas de negocio, permisos e integraciones.',
           en: 'The services behind a product: business rules, permissions and integrations.',
@@ -207,7 +209,7 @@ export const siteConfig = {
         label: { es: 'Frontend', en: 'Frontend' },
         icon: 'code',
         layer: true,
-        items: ['JavaScript', 'Vue 2', 'Vuetify 2', 'Vuex', 'React', 'Axios'],
+        items: ['JavaScript', 'Vue 2', 'React'],
         hint: {
           es: 'Lo que la gente ve y usa en pantalla: las interfaces de un producto.',
           en: 'What people see and use on screen: the interfaces of a product.',
@@ -217,7 +219,7 @@ export const siteConfig = {
         label: { es: 'Cloud y entrega', en: 'Cloud and delivery' },
         icon: 'cloud',
         layer: true,
-        items: ['AWS', 'Docker', 'GitHub Actions', 'CI/CD', 'Cloudflare Workers'],
+        items: ['AWS', 'Docker', 'Cloudflare Workers'],
         hint: {
           es: 'Dónde corre el software y cómo llega a producción de forma automática. Cloudflare Workers es lo que estoy aprendiendo en este sitio.',
           en: 'Where software runs and how it reaches production automatically. Cloudflare Workers is what I am learning on this site.',
@@ -226,6 +228,7 @@ export const siteConfig = {
       {
         label: { es: 'IA', en: 'AI' },
         icon: 'bot',
+        folded: true,
         items: ['LLM APIs', 'Claude Code', 'OpenCode'],
         hint: {
           es: 'Modelos y agentes de IA, en el producto y para apoyar el desarrollo. Cruzan todas las capas.',

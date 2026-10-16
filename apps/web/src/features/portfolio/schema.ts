@@ -55,6 +55,31 @@ export function experimentSchema() {
       .describe(
         `What it delivered, with no invented numbers (max 200 characters each). ${LOCALIZED_HINT}.`,
       ),
+    decisions: z
+      .array(text(200))
+      .min(1)
+      .max(8)
+      .optional()
+      .describe(
+        `Key decisions made while building it (max 200 characters each). ${LOCALIZED_HINT}.`,
+      ),
+    tech: z
+      .array(z.string().trim().min(1).max(40))
+      .min(1)
+      .max(12)
+      .optional()
+      .describe('Technologies used, one per item (max 40 characters each).'),
+    learned: z
+      .array(text(200))
+      .min(1)
+      .max(8)
+      .optional()
+      .describe(`What you learned (max 200 characters each). ${LOCALIZED_HINT}.`),
+    different: text(200)
+      .optional()
+      .describe(
+        `What you would do differently next time (max 200 characters each). ${LOCALIZED_HINT}.`,
+      ),
     tags: z
       .array(z.string().regex(kebab))
       .max(5)

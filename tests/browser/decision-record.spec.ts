@@ -16,8 +16,7 @@ const ES = '/notes/smoke-es/';
 const EN = '/en/notes/smoke-en/';
 const THEMES = [themes.dark, themes.light] as const;
 
-const BANNER = '[data-record-banner] [data-stamp]';
-const INLINE = '[data-record-inline] [data-stamp]';
+const RECORD = '[data-record-inline] [data-stamp]';
 
 const setTheme = (page: Page, theme: (typeof THEMES)[number]) =>
   page.evaluate((value) => {
@@ -31,14 +30,14 @@ for (const [path, text] of [
   test(`${path} stamp is decorative, localized and within the stamp limits`, async ({ page }) => {
     await page.setViewportSize({ width: 1280, height: 900 });
     await page.goto(path);
-    const stamp = page.locator(BANNER);
+    const stamp = page.locator(RECORD);
     await expect(stamp).toBeVisible();
     await expect(stamp).toHaveAttribute('aria-hidden', 'true');
     await expect(stamp).toHaveText(text);
     expect(text.length).toBeLessThanOrEqual(12);
     expect(text.split(/\s+/).length).toBeLessThanOrEqual(2);
     // The stamp lives inside the record card, never loose on the page.
-    await expect(page.locator('[data-record-banner] .record-card [data-stamp]')).toHaveCount(1);
+    await expect(page.locator('[data-record-inline] .record-card [data-stamp]')).toHaveCount(1);
     const css = await stamp.evaluate((el) => {
       const s = getComputedStyle(el);
       return { family: s.fontFamily, weight: s.fontWeight, size: parseFloat(s.fontSize) };
@@ -52,7 +51,7 @@ for (const [path, text] of [
 test('the phone card carries the same stamp', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto(ES);
-  const stamp = page.locator(INLINE);
+  const stamp = page.locator(RECORD);
   await expect(stamp).toBeVisible();
   await expect(stamp).toHaveAttribute('aria-hidden', 'true');
   await expect(stamp).toHaveText('DECISIÓN');
@@ -62,7 +61,7 @@ test('the stamp is framed and rotated 5 to 8 degrees', async ({ page }) => {
   await page.setViewportSize({ width: 1280, height: 900 });
   await page.goto(ES);
   await page.emulateMedia({ reducedMotion: 'reduce' });
-  const info = await page.locator(BANNER).evaluate((el) => {
+  const info = await page.locator(RECORD).evaluate((el) => {
     const s = getComputedStyle(el);
     const [a = 1, b = 0] = s.transform
       .replace(/matrix\(|\)/g, '')
@@ -80,7 +79,7 @@ test('the stamp overlaps the top-right corner of the card', async ({ page }) => 
   await page.goto(ES);
   await page.emulateMedia({ reducedMotion: 'reduce' });
   const { stamp, card } = await page.evaluate(() => {
-    const el = document.querySelector('[data-record-banner] [data-stamp]') as HTMLElement;
+    const el = document.querySelector('[data-record-inline] [data-stamp]') as HTMLElement;
     const section = el.closest('.record-card') as HTMLElement;
     return {
       stamp: el.getBoundingClientRect().toJSON(),
@@ -92,45 +91,19 @@ test('the stamp overlaps the top-right corner of the card', async ({ page }) => 
   expect(stamp.right).toBeGreaterThan(card.right - 80);
 });
 
-// The record sits in the banner from lg, right under the floating navbar: the stamp that hangs over
-// the card corner must leave air below the navbar, never touch it.
-for (const path of [ES, EN]) {
-  for (const width of [1024, 1280, 1536]) {
-    test(`${path} at ${width}px: the banner stamp keeps clear of the navbar`, async ({ page }) => {
-      await page.setViewportSize({ width, height: 900 });
-      await page.goto(path);
-      await page.emulateMedia({ reducedMotion: 'reduce' });
-      const gap = await page.evaluate(() => {
-        const stamp = document.querySelector('[data-record-banner] [data-stamp]');
-        const nav = document.querySelector('[data-navbar]');
-        if (!stamp || !nav) return null;
-        return stamp.getBoundingClientRect().top - nav.getBoundingClientRect().bottom;
-      });
-      expect(gap).not.toBeNull();
-      expect(gap ?? 0).toBeGreaterThanOrEqual(14);
-    });
-  }
-}
-
-test('the banner card tilts slightly; the in-content card stays level', async ({ page }) => {
+test('the record card stays level at every width', async ({ page }) => {
   await page.setViewportSize({ width: 1280, height: 900 });
   await page.goto(ES);
-  const banner = await page.locator('[data-record-banner] .record-card').evaluate((el) => {
-    const s = getComputedStyle(el);
-    return {
-      rotate: s.rotate,
-      ruled: getComputedStyle(el.querySelector('.record-head') as Element).borderBottomWidth,
-    };
-  });
-  expect(parseFloat(banner.rotate)).toBeLessThan(0);
-  expect(Math.abs(parseFloat(banner.rotate))).toBeLessThanOrEqual(1);
-  expect(parseFloat(banner.ruled)).toBeGreaterThan(0);
-
-  await page.setViewportSize({ width: 390, height: 844 });
-  const inline = await page
+  const desktop = await page
     .locator('[data-record-inline] .record-card')
     .evaluate((el) => getComputedStyle(el).rotate);
-  expect(inline).toBe('none');
+  expect(desktop).toBe('none');
+
+  await page.setViewportSize({ width: 390, height: 844 });
+  const phone = await page
+    .locator('[data-record-inline] .record-card')
+    .evaluate((el) => getComputedStyle(el).rotate);
+  expect(phone).toBe('none');
 });
 
 for (const [path, width] of [
@@ -172,7 +145,7 @@ test('with motion allowed the stamp lands once with transform only', async ({ pa
   await page.emulateMedia({ reducedMotion: 'no-preference' });
   await page.setViewportSize({ width: 1280, height: 900 });
   await page.goto(ES);
-  const info = await page.locator(BANNER).evaluate((el) => {
+  const info = await page.locator(RECORD).evaluate((el) => {
     const s = getComputedStyle(el);
     const frames = (
       document.getAnimations().find((a) => (a.effect as KeyframeEffect).target === el)?.effect as
@@ -192,7 +165,7 @@ test('with motion allowed the stamp lands once with transform only', async ({ pa
 
 for (const theme of THEMES) {
   for (const [label, size, path] of [
-    ['banner card', { width: 1280, height: 900 }, ES],
+    ['record card', { width: 1280, height: 900 }, ES],
     ['phone card', { width: 390, height: 844 }, ES],
     ['phone card EN', { width: 390, height: 844 }, EN],
   ] as const) {

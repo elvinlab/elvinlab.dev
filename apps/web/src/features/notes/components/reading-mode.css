@@ -80,9 +80,6 @@ html[data-reading] [data-prev-next] {
 html[data-reading] [data-banner-split] {
   display: block;
 }
-html[data-reading] [data-record-banner] {
-  display: none;
-}
 html[data-reading] [data-record-inline] {
   display: block;
 }

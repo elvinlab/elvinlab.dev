@@ -3,6 +3,7 @@
  * latest notes, recent education (or certificates by year while the education page is off), and a sidebar. Print-friendly. */
 import { getCollection } from 'astro:content';
 import { localizePath } from '@elvinlab/core';
+import plexSansLatin from '@fontsource-variable/ibm-plex-sans/files/ibm-plex-sans-latin-wght-normal.woff2?url';
 
 import { BackgroundCanvas } from '@/features/backgrounds/index.ts';
 import {
@@ -56,6 +57,14 @@ const bio = site.identity.bio[locale];
   printable
   noindex={!site.features.me}
 >
+  {/*
+    The /me H1 and hero text are in IBM Plex Sans (46 KB Latin) with `font-display: swap` and no
+    other preload, so on a slow run the whole hero reflows when Plex swaps in: the headline and
+    pitch re-wrap and the CTA row re-wraps, shifting the content below (CI measured CLS 0.31 once,
+    gate 0.1, issue #124). Preloading Plex here makes the swap land before the first paint, so the
+    hero never renders in the fallback. The pixel font keeps its own preload (BaseLayout, H1 pages).
+  */}
+  <link slot="head" rel="preload" as="font" type="font/woff2" href={plexSansLatin} crossorigin />
   <Banner slot="banner" height="clamp(420px, 52vh, 520px)">
     <BackgroundCanvas slot="background" />
     <MeHero locale={locale} />

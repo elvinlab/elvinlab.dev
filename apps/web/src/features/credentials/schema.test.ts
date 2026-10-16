@@ -42,6 +42,7 @@ describe('credentialSchema', () => {
     expect(parsed.learnings).toBeUndefined();
     expect(parsed.appliedIn).toBeUndefined();
     expect(parsed.expires).toBeUndefined();
+    expect(parsed.inProgress).toBeUndefined();
   });
 
   it('accepts an optional non-negative integer order', () => {
@@ -76,6 +77,12 @@ describe('credentialSchema', () => {
     expect(schema.parse({ ...valid, image }).image?.file).toBe('universidad-nacional.webp');
     expect(() => schema.parse({ ...valid, image: { ...image, file: '../secret.png' } })).toThrow();
     expect(() => schema.parse({ ...valid, image: { file: 'a.webp' } })).toThrow();
+  });
+
+  it('accepts an optional in-progress flag and rejects non-booleans', () => {
+    expect(schema.parse({ ...valid, inProgress: true }).inProgress).toBe(true);
+    expect(schema.parse({ ...valid, inProgress: false }).inProgress).toBe(false);
+    expect(() => schema.parse({ ...valid, inProgress: 'yes' })).toThrow();
   });
 
   it('accepts an expiry as YYYY-MM and rejects other shapes', () => {

@@ -8,6 +8,7 @@ import {
   checkBuiltNotes,
   checkBuiltNotesReport,
   extractLocalLinks,
+  fixInHeadingLines,
   parseNoteFrontmatter,
   parseRssPaths,
   parseSitemapLocs,
@@ -306,5 +307,38 @@ describe('checkBuiltNotes', () => {
     });
     expect(report.errors).toEqual([]);
     expect(report.known).toEqual(['privacy/index.html: known broken link /gone/ (on purpose)']);
+  });
+});
+
+describe('fixInHeadingLines', () => {
+  it('flags a Fix inside any heading level', () => {
+    const mdx = [
+      '## Un título con <Fix wrong="a" right="b" />',
+      '# <Fix wrong="x" right="y" /> solo',
+      '###### h6 <Fix wrong="a" right="b" />',
+    ].join('\n');
+    expect(fixInHeadingLines(mdx)).toEqual([
+      '## Un título con <Fix wrong="a" right="b" />',
+      '# <Fix wrong="x" right="y" /> solo',
+      '###### h6 <Fix wrong="a" right="b" />',
+    ]);
+  });
+
+  it('ignores Fix in running text and Ink in a heading', () => {
+    const mdx = [
+      'Corrí <Fix wrong="a" right="b" /> primero.',
+      '## Un <Ink>título</Ink> con tinta',
+    ].join('\n');
+    expect(fixInHeadingLines(mdx)).toEqual([]);
+  });
+
+  it('ignores heading-looking lines inside fenced code blocks', () => {
+    const mdx = [
+      '```md',
+      '## <Fix wrong="a" right="b" />',
+      '```',
+      '## real <Fix wrong="a" right="b" />',
+    ].join('\n');
+    expect(fixInHeadingLines(mdx)).toEqual(['## real <Fix wrong="a" right="b" />']);
   });
 });

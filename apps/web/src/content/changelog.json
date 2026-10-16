@@ -951,5 +951,83 @@
     "date": "2026-10-13",
     "category": "added",
     "title": "Note 010: a visitor changelog without semver"
+  },
+  "deps-tooling-2026-10-16": {
+    "date": "2026-10-16",
+    "category": "changed",
+    "title": "Routine dependency and tooling updates",
+    "description": "Updated Astro, the Cloudflare adapter, Wrangler, Playwright and Preact to their latest patch and minor releases, and the CI cache action to 6.1.0, with no visible change. Forks should expect the same."
+  },
+  "home-sidebar-test-deterministic": {
+    "date": "2026-10-16",
+    "category": "fixed",
+    "title": "A steadier browser test for the home sidebar",
+    "description": "The test that checks how the home sidebar cards line up now pins the footprint counter, so the number of cards is the same on every run instead of depending on when the stubbed read answers. Nothing changes for visitors."
+  },
+  "me-font-preload": {
+    "date": "2026-10-16",
+    "category": "fixed",
+    "title": "The profile page no longer jumps when its fonts load",
+    "description": "The /me hero text reflowed when IBM Plex Sans swapped in on a slow load (the headline and the action row re-wrapped and pushed the rest of the page, measured as CLS 0.31 once in CI against the 0.1 gate). The page now preloads the font, so the layout settles once and stays put."
+  },
+  "installable-web-app": {
+    "date": "2026-10-16",
+    "category": "added",
+    "title": "The site is installable as a web app",
+    "description": "elvinlab.dev can now be added to the home screen or installed as an app. A web app manifest and an apple-touch-icon ship the name, colors and icons, with no service worker."
+  },
+  "nudge-floating-off": {
+    "date": "2026-10-16",
+    "category": "changed",
+    "title": "The experiment card no longer floats while reading",
+    "description": "The floating experiment card that appeared partway through a note is now off; only the static card at the end of each note (and the home block) remains. A new nudge.floating switch lets it be turned back on."
+  },
+  "note-heading-fix-forbidden": {
+    "date": "2026-10-16",
+    "category": "changed",
+    "title": "A Fix inside a note heading is now forbidden",
+    "description": "Fix carries its text in props, so inside a heading it dropped its words from the heading anchor and the table of contents. The build check now forbids it; Ink is still allowed in headings."
+  },
+  "credential-in-progress": {
+    "date": "2026-10-16",
+    "category": "added",
+    "title": "Credentials can be marked as in progress",
+    "description": "The education timeline and the profile can now show a credential that is still in progress, with a status label. The owner turns it on per credential with an optional flag."
+  },
+  "availability-open-to-chat": {
+    "date": "2026-10-16",
+    "category": "changed",
+    "title": "Availability now reads open to chat, collaborations and projects only",
+    "description": "The recruiter card and the profile now say open to chat and collaborations and projects only, reflecting that Elvin works at Buo and is not open to full-time roles."
+  },
+  "satori-044-share-cards": {
+    "date": "2026-10-16",
+    "category": "changed",
+    "title": "Share cards keep their layout after the satori update",
+    "description": "satori was updated from 0.33.5 to 0.44 and the Open Graph and profile card layouts were adapted to its box-sizing change, so the cards render unchanged."
+  },
+  "me-stack-trimmed": {
+    "date": "2026-10-16",
+    "category": "changed",
+    "title": "The profile shows a shorter, focused tech stack",
+    "description": "The /me stack now shows about 12 core tools across the four layers. The jargon tools were removed, with their scope explained at the group level, so the card is shorter and lighter."
+  },
+  "note-decision-record-once": {
+    "date": "2026-10-16",
+    "category": "changed",
+    "title": "The note decision record renders once, lighter and faster",
+    "description": "Each note now renders its decision record once (above the body) instead of twice (a desktop hero copy and a mobile copy). This removed a slow Lighthouse run and restored the note gate to 2500 ms."
+  },
+  "experiment-case-pages": {
+    "date": "2026-10-16",
+    "category": "added",
+    "title": "Experiment case pages",
+    "description": "Each experiment now has its own detail page (/experiments/<slug>/, ES and EN) with the problem, my part, gallery and result sections, plus a note card at the end that links to the note discussing it. The decisions, tech, learned and different sections appear as they are filled in."
+  },
+  "case-page-share-cards": {
+    "date": "2026-10-16",
+    "category": "changed",
+    "title": "Experiment case pages share their own card",
+    "description": "Each case page now has its own share card (/og/experiments/<slug>.png) with the year, title and owner, and its title no longer repeats the site name when the experiment is named after the site."
   }
 }

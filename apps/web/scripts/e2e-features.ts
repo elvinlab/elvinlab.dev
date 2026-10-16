@@ -21,6 +21,7 @@ export type E2eProfile = Readonly<{
   appearance: Appearance;
   home: ResolvedHome;
   routes: E2eRoutes;
+  nudge: SiteConfig['nudge'];
 }>;
 
 /**
@@ -51,6 +52,7 @@ export function resolveE2eProfile(
     features,
     appearance,
     home: resolveHome({ appearance, home: parsed.home, features }),
+    nudge: parsed.nudge,
     routes: {
       notes: features.blog,
       contact: features.contact,
@@ -97,7 +99,7 @@ export function parseE2eProfile(raw: string | undefined): E2eProfile {
   if (!raw) return fail();
   try {
     const value = JSON.parse(raw) as E2eProfile;
-    if (!value.features || !value.routes || !value.home) return fail();
+    if (!value.features || !value.routes || !value.home || !value.nudge) return fail();
     return value;
   } catch {
     return fail();

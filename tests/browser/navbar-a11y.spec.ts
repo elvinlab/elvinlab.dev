@@ -225,3 +225,30 @@ for (const theme of [themes.dark, themes.light]) {
     await expectClean(page, 'open');
   });
 }
+
+test.describe('200% zoom reflow', () => {
+  test('the six links fold into the menu, the bar keeps one row and nothing scrolls sideways', async ({
+    browser,
+  }) => {
+    // 200% of a 1280 px desktop: the CSS viewport is 640 px, so the responsive menu replaces the six links.
+    const context = await browser.newContext({ viewport: { width: 640, height: 900 } });
+    const page = await context.newPage();
+    await stubThirdParties(page);
+    await page.goto('/');
+    const nav = await page.locator('[data-navbar] nav').boundingBox();
+    expect(nav?.height).toBe(BAR_HEIGHT);
+    expect(
+      await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth),
+    ).toBe(true);
+    // Every nav link lives in the menu, which opens with the keyboard and never overflows the page.
+    await page.locator('[data-nav-toggle]').focus();
+    await page.keyboard.press('Enter');
+    await expect(page.locator('#nav-menu')).toBeVisible();
+    await expect(page.locator('#nav-menu a').first()).toBeFocused();
+    expect(await page.locator('#nav-menu a').count()).toBeGreaterThanOrEqual(6);
+    expect(
+      await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth),
+    ).toBe(true);
+    await context.close();
+  });
+});

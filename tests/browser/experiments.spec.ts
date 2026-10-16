@@ -367,7 +367,7 @@ for (const [path, section, all, blurb, indexPath] of [
     await expect(rows).toHaveCount(2);
     await expect(rows.first()).toHaveAttribute(
       'href',
-      new RegExp(`^${indexPath}#(${flagship.id}|${secondExperiment.id})$`),
+      new RegExp(`^${indexPath}(${flagship.id}|${secondExperiment.id})/$`),
     );
     for (const row of await rows.all()) {
       expect((await row.boundingBox())?.height ?? 0).toBeGreaterThanOrEqual(44);
@@ -405,13 +405,13 @@ for (const [path, section, all, blurb, indexPath] of [
     expect((await cta.boundingBox())?.height ?? 0).toBeGreaterThanOrEqual(44);
   });
 
-  test(`${path} row opens its card on the experiments page`, async ({ page }) => {
+  test(`${path} row opens the case page`, async ({ page }) => {
     await page.goto(path);
     const row = page.locator('#experiments ol > li > a').first();
     const href = (await row.getAttribute('href')) ?? '';
     await row.click();
     await expect(page).toHaveURL(new RegExp(`${href}$`));
-    await expect(page.locator(`#${href.split('#')[1]}`)).toBeInViewport();
+    await expect(page.getByRole('heading', { level: 1 })).toBeVisible();
   });
 }
 

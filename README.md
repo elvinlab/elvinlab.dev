@@ -93,16 +93,18 @@ Así se trabaja aquí: cada tarea es un *issue* escrito como un brief de delegac
 - **Lab Notes**: índice por año con filtro, índice lateral con progreso, registro de decisión, tiempo de lectura, notas relacionadas, anterior/siguiente y RSS.
 - **Modo lectura** opcional en cada nota: una sola columna, sin banner animado ni barra lateral, para leer cómodo en móvil y escritorio.
 - **Comentarios y reacciones** con Giscus, cargados solo al llegar a ellos.
-- **Tarjetas al compartir** propias para cada nota y para `/me`, generadas al compilar.
+- **Tarjetas al compartir** propias para cada nota, cada case page de experimento y `/me`, generadas al compilar.
+- **Páginas de experimento** (`/experiments/<slug>/`, ES/EN): el problema, mi parte, la galería, el resultado y, al final, la nota relacionada; cada sección aparece solo si tiene contenido.
 - **`/me`**: portafolio con experiencia, formación y experimentos; se imprime limpio a PDF.
 - **Formulario de contacto** seguro: Turnstile, límite de envíos y falla cerrado si falta configuración.
 - **Changelog público**, **páginas de privacidad y términos** y **tema claro/oscuro** con fondos animados elegibles.
 - **Aspecto configurable**: el preset `appearance` (`minimal` o `full`) fija la escala tipográfica, la altura de los banners y el detalle de las notas, y `home` activa o apaga cada sección de la portada.
 - **Suscripción por correo**: quien lee recibe las notas nuevas (y, de vez en cuando, un aviso de un proyecto) con doble confirmación y baja en una página; el envío lo disparo yo a mano. Guía: [`docs/SUBSCRIPTION.md`](docs/SUBSCRIPTION.md).
-- Una **tarjeta del último experimento**: fija después de cada nota y en la home, y flotante cuando una nota ya se leyó en su mayor parte; al cerrarla se esconde un tiempo (`nudge.reappearAfterDays`).
+- Una **tarjeta del último experimento**: fija después de cada nota y en la home, con una variante flotante opcional (`nudge.floating`, apagada en este sitio); al cerrarla se esconde un tiempo (`nudge.reappearAfterDays`).
 - Un botón anónimo de **huella** ("estuve aquí") en las notas, y pequeños detalles de interfaz: volver arriba, un aviso para cambiar de idioma, un botón de tema y otro que cambia el efecto del banner.
 - Un **aspecto de cuaderno** (tinta dibujada a mano, sellos, un error tachado con su corrección) y detalles pixelados.
 - **Bilingüe** (ES/EN) sin redirecciones por idioma.
+- **Instalable** como app (manifest + íconos), sin service worker.
 
 ## Encender y apagar cosas
 
@@ -138,10 +140,10 @@ Estos interruptores y secciones de la home son todo lo configurable hoy; el rest
 
 Todo esto lo verifica el CI; si algo falla, no hay despliegue:
 
-- **Lighthouse móvil** ≥ 95 en las cuatro categorías; LCP ≤ 2,5 s y CLS ≤ 0,1. Solo la nota sintética `/notes/smoke-es/` admite rendimiento ≥ 93 y LCP ≤ 2,6 s; las demás categorías y presupuestos no cambian ([pruebas](docs/TESTING.md)).
+- **Lighthouse móvil** ≥ 95 en las cuatro categorías, CLS ≤ 0,1 y LCP ≤ 2,7 s ([pruebas](docs/TESTING.md)).
 - **JavaScript** ≤ 30 KiB (gzip) por página.
 - **Accesibilidad con axe** (WCAG 2 A, AA y 2.1 AA) en tema claro y oscuro y en 360, 768 y 1280 px.
-- Más de **400 tests unitarios** y más de **320 e2e** en navegador.
+- Más de **1700 tests unitarios** y más de **320 e2e** en navegador.
 - Un test comprueba que el sitio **no establece cookies propias** y otro que nada del dueño se filtra en una compilación con otra identidad.
 
 ## Empezar

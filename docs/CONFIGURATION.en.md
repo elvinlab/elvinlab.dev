@@ -117,6 +117,7 @@ The descriptions come from the schema (`.describe()`), which is why they are in 
 | `notes` | `object` | no | `{}` | Settings of the notes area (`features.blog`): the static topic pages. Every key is optional and falls back to its default. |
 | `notes.topicMinNotes` | `integer (min 1, max 20)` | no | `2` | Notes a topic needs before it gets its own page (`/notes/tag/<topic>/`). A topic with fewer notes, or without an intro, is not generated, and its chips keep pointing to the filter on `/notes/`. The topics themselves live in `src/content/topics.json`. |
 | `nudge` | `object` | no | `{}` | Settings of the experiment card (`features.experimentNudge`). Every key is optional and falls back to its default. |
+| `nudge.floating` | `boolean` | no | `true` | Whether the floating experiment card appears once while reading a note. Off: only the static card at the end of the note (and the home block) remain. |
 | `nudge.scrollThreshold` | `number (min 0.3, max 0.95)` | no | `0.7` | Share of a note the visitor must scroll before the floating experiment card appears (0.3 to 0.95). |
 | `nudge.indexScrollThreshold` | `number (min 0.3, max 0.95)` | no | `0.6` | The same threshold on the `/notes/` index, where visitors browse instead of read (0.3 to 0.95). |
 | `nudge.reappearAfterDays` | `integer (min 0, max 365)` | no | `30` | Days a visitor who closed the floating card does not see it again; after that it may float again once. 0 means a close lasts for good (until the browser data is cleared). The static card after the note never goes away. |
@@ -246,6 +247,7 @@ They feed `/education/` (a timeline by year, newest first; needs `features.educa
 | `learnings` | `string \| { <locale>: string }[] (max 8)` | no |  | Optional points learned; the entry gets a details block only when present. |
 | `appliedIn` | `string \| { <locale>: string }` | no |  | Optional note on where it was applied (max 160 characters). |
 | `expires` | `string` | no |  | Optional expiry as YYYY-MM, for certifications that lapse. |
+| `inProgress` | `boolean` | no |  | Optional true marks the credential as in progress; the entry shows a status label instead of presenting the year as a completion date. |
 <!-- docs:end credentials -->
 
 ### Experiments — `experiments.json`
@@ -280,6 +282,10 @@ Portfolio experiments (projects), published at `/experiments/` (and `/en/experim
 | `problem` | `string \| { <locale>: string }` | no |  | The problem it solves (max 200 characters each). One string, or one text per locale such as `{ "es": "...", "en": "..." }`. |
 | `contribution` | `string \| { <locale>: string }` | no |  | What you did yourself, as opposed to tools or teammates (max 200 characters each). One string, or one text per locale such as `{ "es": "...", "en": "..." }`. |
 | `result` | `string \| { <locale>: string }` | no |  | What it delivered, with no invented numbers (max 200 characters each). One string, or one text per locale such as `{ "es": "...", "en": "..." }`. |
+| `decisions` | `string \| { <locale>: string }[] (max 8)` | no |  | Key decisions made while building it (max 200 characters each). One string, or one text per locale such as `{ "es": "...", "en": "..." }`. |
+| `tech` | `string (max 40)[] (max 12)` | no |  | Technologies used, one per item (max 40 characters each). |
+| `learned` | `string \| { <locale>: string }[] (max 8)` | no |  | What you learned (max 200 characters each). One string, or one text per locale such as `{ "es": "...", "en": "..." }`. |
+| `different` | `string \| { <locale>: string }` | no |  | What you would do differently next time (max 200 characters each). One string, or one text per locale such as `{ "es": "...", "en": "..." }`. |
 | `tags` | `string[] (max 5)` | no | `[]` | Up to five kebab-case tags. |
 | `year` | `integer (min 2000)` | yes |  | Year the project started or shipped. |
 | `publishedAt` | `string` | no |  | Optional date it shipped (`YYYY-MM-DD`), used to sort the list by date. Without it the sort uses 1 January of `year`. Keep it inside `year`. |

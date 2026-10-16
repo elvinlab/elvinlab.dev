@@ -1,0 +1,163 @@
+---
+/**
+ * The `/experiments/<slug>/` case page: title, status and year, then the sections in the planned
+ * order — problem, contribution, gallery, decisions, tech, result, learned, different — each rendered
+ * only when the entry really has content (no placeholders), and the actions (case note, live, code)
+ * only when a link exists. Its CSS reuses the exhibition gallery (`experiment-styles.ts`); the case
+ * layout itself is Tailwind utilities, so no new stylesheet ships for it.
+ */
+import { getCollection } from 'astro:content';
+import { localizePath } from '@elvinlab/core';
+
+import type { ExperimentEntry } from '@/features/portfolio/index.ts';
+import { site } from '@/shared/config/index.ts';
+import { LOCALES, type Locale, t } from '@/shared/i18n/index.ts';
+import BaseLayout from '@/shared/layout/BaseLayout.astro';
+import { externalLinkAttrs } from '@/shared/lib/external-link.ts';
+import { pickLocale } from '@/shared/lib/localized.ts';
+import ExternalHint from '@/shared/ui/ExternalHint.astro';
+
+import ExperimentMedia from './ExperimentMedia.astro';
+import { experimentsCss } from './experiment-styles.ts';
+
+type Props = { experiment: ExperimentEntry; locale: Locale };
+
+const { experiment, locale } = Astro.props;
+const text = (value: Parameters<typeof pickLocale>[0]) => pickLocale(value, locale, LOCALES.defaultLocale);
+const description = text(experiment.description);
+const subtitle = text(experiment.subtitle);
+const problem = text(experiment.problem);
+const contribution = text(experiment.contribution);
+const result = text(experiment.result);
+const decisions = (experiment.decisions ?? []).map((entry) => text(entry)).filter(Boolean);
+const tech = experiment.tech ?? [];
+const learned = (experiment.learned ?? []).map((entry) => text(entry)).filter(Boolean);
+const different = text(experiment.different);
+const caseHref = experiment.note
+  ? localizePath(`/notes/${experiment.note}/`, experiment.noteLang ?? LOCALES.defaultLocale, LOCALES)
+  : undefined;
+const noteEntry = experiment.note
+  ? (await getCollection('notes')).find((entry) => entry.id === experiment.note)
+  : undefined;
+const backHref = localizePath('/experiments/', locale, LOCALES);
+const hasMedia = (experiment.images?.length ?? 0) > 0;
+const gallery = (experiment.images?.length ?? 0) > 1;
+const css = experimentsCss({
+  pieces: false,
+  media: hasMedia,
+  gallery,
+  more: false,
+  years: false,
+  footer: false,
+  lab: false,
+  empty: false,
+});
+---
+
+<BaseLayout locale={locale} path={`/experiments/${experiment.id}/`} title={experiment.title} description={description} ogImage={`/og/experiments/${experiment.id}.png`} ogImageAlt={experiment.title}>
+  <style is:inline set:html={css} />
+  <article class="mx-auto flex max-w-4xl flex-col gap-10 px-6 py-10 md:px-10">
+    <nav aria-label={t(locale, 'experiment.back')}>
+      <a href={backHref} class="font-mono text-sm text-muted transition-colors duration-150 hover:text-primary">&larr; {t(locale, 'experiment.back')}</a>
+    </nav>
+
+    <header class="flex flex-col gap-3">
+      <p class="flex flex-wrap items-center gap-3">
+        <span class="flex items-center gap-2">
+          <span class="size-2 shrink-0 rounded-pill" data-status={experiment.status} aria-hidden="true"></span>
+          {t(locale, `exp.status.${experiment.status}`)}
+        </span>
+        <span class="font-mono text-sm text-muted">{experiment.year}</span>
+      </p>
+      <h1 class="font-display text-4xl font-bold leading-tight text-balance md:text-5xl">{experiment.title}</h1>
+      {subtitle && <p class="text-lg text-text-secondary text-pretty">{subtitle}</p>}
+    </header>
+
+    {problem && (
+      <section class="flex flex-col gap-2">
+        <h2 class="font-display text-xl font-bold">{t(locale, 'experiment.problem')}</h2>
+        <p class="max-w-[68ch] leading-relaxed text-text-secondary">{problem}</p>
+      </section>
+    )}
+
+    {contribution && (
+      <section class="flex flex-col gap-2">
+        <h2 class="font-display text-xl font-bold">{t(locale, 'experiment.contribution')}</h2>
+        <p class="max-w-[68ch] leading-relaxed text-text-secondary">{contribution}</p>
+      </section>
+    )}
+
+    {hasMedia && <ExperimentMedia experiment={experiment} locale={locale} priority />}
+
+    {decisions.length > 0 && (
+      <section class="flex flex-col gap-2">
+        <h2 class="font-display text-xl font-bold">{t(locale, 'experiment.decisions')}</h2>
+        <ul class="flex list-disc flex-col gap-2 pl-5">
+          {decisions.map((point) => <li class="max-w-[68ch] leading-relaxed text-text-secondary">{point}</li>)}
+        </ul>
+      </section>
+    )}
+
+    {tech.length > 0 && (
+      <section class="flex flex-col gap-2">
+        <h2 class="font-display text-xl font-bold">{t(locale, 'experiment.tech')}</h2>
+        <ul class="flex flex-wrap gap-1.5">
+          {tech.map((item) => <li class="rounded-inner bg-chip px-2.5 py-1 font-mono text-meta text-text-secondary">{item}</li>)}
+        </ul>
+      </section>
+    )}
+
+    {result && (
+      <section class="flex flex-col gap-2">
+        <h2 class="font-display text-xl font-bold">{t(locale, 'experiment.result')}</h2>
+        <p class="max-w-[68ch] leading-relaxed text-text-secondary">{result}</p>
+      </section>
+    )}
+
+    {learned.length > 0 && (
+      <section class="flex flex-col gap-2">
+        <h2 class="font-display text-xl font-bold">{t(locale, 'experiment.learned')}</h2>
+        <ul class="flex list-disc flex-col gap-2 pl-5">
+          {learned.map((point) => <li class="max-w-[68ch] leading-relaxed text-text-secondary">{point}</li>)}
+        </ul>
+      </section>
+    )}
+
+    {different && (
+      <section class="flex flex-col gap-2">
+        <h2 class="font-display text-xl font-bold">{t(locale, 'experiment.different')}</h2>
+        <p class="max-w-[68ch] leading-relaxed text-text-secondary">{different}</p>
+      </section>
+    )}
+
+    {(experiment.url || experiment.repo) && (
+      <div class="flex flex-wrap gap-3 border-t border-dashed border-divider pt-6 print:hidden">
+        {experiment.url && (
+          <a href={experiment.url} {...externalLinkAttrs(experiment.url, site.url)} class="flex h-11 items-center gap-2 rounded-control bg-chip px-4 font-medium transition-colors duration-150 hover:bg-card-hover active:scale-96">
+            {t(locale, 'experiment.live')}<ExternalHint href={experiment.url} locale={locale} />
+          </a>
+        )}
+        {experiment.repo && (
+          <a href={experiment.repo} {...externalLinkAttrs(experiment.repo, site.url)} class="flex h-11 items-center gap-2 rounded-control bg-chip px-4 font-medium transition-colors duration-150 hover:bg-card-hover active:scale-96">
+            {t(locale, 'experiment.code')}<ExternalHint href={experiment.repo} locale={locale} />
+          </a>
+        )}
+      </div>
+    )}
+
+    {caseHref && noteEntry && (
+      <section class="overflow-hidden rounded-card bg-card">
+        <span class="block h-[3px] bg-gradient-to-r from-primary via-cyan to-pink" aria-hidden="true"></span>
+        <div class="flex flex-col gap-3 p-6 md:p-8">
+          <p class="font-mono text-meta text-cyan">{t(locale, 'experiment.note')}</p>
+          <h2 class="font-display text-2xl font-bold text-balance">{noteEntry.data.title}</h2>
+          {noteEntry.data.description && <p class="text-text-secondary text-pretty">{noteEntry.data.description}</p>}
+          <a href={caseHref} class="flex h-11 w-fit items-center gap-2 rounded-control bg-button px-5 font-medium text-white active:scale-96">
+            {t(locale, 'experiment.readNote')}
+            <svg aria-hidden="true" viewBox="0 0 9 9" width="18" height="18" fill="currentColor" shape-rendering="crispEdges"><rect x="8" y="4" width="1" height="1"></rect><rect x="7" y="3" width="1" height="3"></rect><rect x="6" y="2" width="1" height="5"></rect><rect x="5" y="1" width="1" height="7"></rect><rect x="0" y="3" width="5" height="3"></rect></svg>
+          </a>
+        </div>
+      </section>
+    )}
+  </article>
+</BaseLayout>

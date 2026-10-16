@@ -45,3 +45,60 @@ Go through the whole repository and decide, component by component, what should 
 ## Next step
 
 Owner decides when to run it; suggested after the Experiments release and the Education page, so the repeated patterns are visible.
+
+## Verdicts (reviewed 2026-10-16, read-only)
+
+Rules applied: presentation-only, semantic tokens only, no fetch/persistence/config reads, repeated in >=2 places, white-label safe. Nothing moved.
+
+### core now (move, with a migration task each)
+
+| Item | Reason |
+| --- | --- |
+| `shared/ui/Card.astro` (19 uses) | Pure card shell; repeated everywhere. |
+| `shared/ui/Chip.astro` (8) | Pure tag/status chip. |
+| `shared/ui/SocialIcon.astro` (8) | The pixel/stroke icon set; name in, SVG out. |
+| `shared/ui/SectionHeading.astro` (5) | Pure accent-bar heading. |
+| `shared/ui/PageHeader.astro` (12) | Pure header (title/description/stamp/icon via props). |
+| `shared/ui/InfoTip.astro` (3) | Pure tooltip (text via prop). |
+| `shared/ui/Stamp.astro` (2) | Pure stamp (slot text, tone prop). |
+| `shared/lib/localized.ts` | The localized text contract (`{ es, en }` or string). |
+| `shared/lib/listing.ts` | Pure pagination/sort/grouping. |
+| `shared/lib/minify-css.ts` | Pure CSS minifier. |
+| `shared/lib/inline-mark.ts` | Pure `[[marked]]` split. |
+
+### core later (trigger: when it repeats or is decoupled)
+
+| Item | Trigger / reason |
+| --- | --- |
+| `shared/ui/Ink.astro` (home + note fixtures) | One production use (home hero); core when a second page or a published note uses it. |
+| `shared/ui/ExternalHint.astro` (14) | Reads i18n (`link.newTab`) and site.url; core when the hint text and origin are injected. |
+| `shared/ui/BackToTop.astro` (2) | Inline scroll script + i18n label; core when label/easing are injected and the script is bundled. |
+| `shared/ui/ThemeToggle.astro` (2) | Reads the theme tokens + boot script; core when themes are injected (the boot script already is in core). |
+| `shared/ui/BrandMark.astro` (2) | The replaceable pixel wordmark; core later once a fork overrides the mark via config/assets. |
+
+### shared/ui (stay app-level)
+
+| Item | Reason |
+| --- | --- |
+| `shared/ui/BackgroundPicker.astro` (3) | Reads background config + WebGL script (side effects). |
+| `shared/ui/LanguageHint.astro` (1) | Site language suggestion (i18n + suggest-locale). |
+| `shared/ui/Pager.astro`, `SortSwitch.astro`, `ListingSummary.astro` | Listing kit with i18n labels. |
+
+### app (feature- or site-specific)
+
+| Item | Reason |
+| --- | --- |
+| `shared/layout/*` (BaseLayout, Navbar, Footer, Banner, SiteNotice, BannerToggle) | The site shell (SEO, fonts, nav, footer). |
+| `shared/layout/{nav,locale-target,subscribe-cta,notice,back-to-top,theme-boot}.ts` | Site logic (nav model, locale, subscribe CTA). |
+| `shared/lib/{avatar,experiment-image,background-preference,notes-helpers,provider-json,turnstile,external-anchor}.ts` | Config / feature / infra coupled. |
+| `shared/seo/*`, `shared/config/*`, `shared/i18n/*` | The site's SEO, config and dictionary (app contract). |
+| every `features/*/components/*` | Feature-specific (notes, portfolio, me, education, credentials, contact, subscribe, marks, comments, backgrounds). |
+| `experiments-routes/*` | Page routes (list + case pages). |
+
+### delete
+
+None — every inventory item is used.
+
+### Next (after the owner approves)
+
+Each "core now" item becomes its own migration task: move to `packages/core/src/<ui|lib>/`, re-export from `packages/core/src/index.ts`, swap the app import, then run `pnpm depcruise`, `pnpm check:js-budget`, `pnpm test:white-label` and the affected e2e. "core later" items move only when their trigger fires.

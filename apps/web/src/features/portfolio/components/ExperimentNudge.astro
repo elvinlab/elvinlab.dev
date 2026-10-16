@@ -37,7 +37,7 @@ const entry = enabled ? latestExperiment(await loadExperiments(), LOCALES.defaul
     <ExperimentCard entry={entry} locale={locale} class={className} />
   </template>
 )}
-{entry && floating && (
+{entry && floating && site.nudge.floating && (
   <>
     {/* Inlined only here: pages and builds without the nudge never carry these rules. */}
     <style is:inline set:html={nudgeCss} />

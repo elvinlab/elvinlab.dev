@@ -3,19 +3,26 @@ import { expect, test } from '@playwright/test';
 import { has, liveByPath } from './helpers/features';
 import { site } from './helpers/site';
 
-/** Neither big face is preloaded: each one sat on the critical path of the simulated LCP and cost the
- * note page and /me/ their margin against the 2500 ms gate. They load on demand (`font-display: swap`). */
+/** The big faces load on demand (`font-display: swap`), except /me/: its hero text reflowed when the
+ * late swap re-wrapped the headline and the CTA row (CI measured CLS 0.31 once against the 0.1 gate,
+ * issue #124), so /me/ preloads IBM Plex Sans. Measured with the repo's fixture: the preload zeroed
+ * the shift (CLS 0.0000 across 12 runs, was 0.0063 on /en/me/) and the LCP median keeps its margin
+ * under the 2700 ms gate. JetBrains Mono is never preloaded. */
 const BODY_FONTS: RegExp[] = [];
+const PLEX_FONT = /ibm-plex-sans-latin-wght-normal.*\.woff2$/;
 const BIG_FONTS = [
   /ibm-plex-sans-latin-wght-normal.*\.woff2$/,
   /jetbrains-mono-latin-wght-normal.*\.woff2$/,
 ];
 /** Pixelify Sans is preloaded wherever an H1 uses it (home hero, notes banner, `PageHeader`: experiments, contact, changelog, privacy, terms); never elsewhere. */
 const PIXEL_FONT = /pixelify-sans-latin-wght-normal.*\.woff2$/;
+type PreloadExpectation = { path: string; preloads: RegExp[]; allowedBig?: RegExp[] };
 const PAGES = liveByPath(
   [
     { path: '/', preloads: [...BODY_FONTS, PIXEL_FONT] },
     { path: '/en/', preloads: [...BODY_FONTS, PIXEL_FONT] },
+    { path: '/me/', preloads: [PLEX_FONT], allowedBig: [PLEX_FONT] },
+    { path: '/en/me/', preloads: [PLEX_FONT], allowedBig: [PLEX_FONT] },
     { path: '/notes/', preloads: [...BODY_FONTS, PIXEL_FONT] },
     { path: '/experiments/', preloads: [...BODY_FONTS, PIXEL_FONT] },
     { path: '/en/experiments/', preloads: [...BODY_FONTS, PIXEL_FONT] },
@@ -26,7 +33,7 @@ const PAGES = liveByPath(
     { path: '/privacy/', preloads: [...BODY_FONTS, PIXEL_FONT] },
     { path: '/en/terms/', preloads: [...BODY_FONTS, PIXEL_FONT] },
     { path: '/notes/smoke-es/', preloads: BODY_FONTS },
-  ],
+  ] satisfies PreloadExpectation[],
   ({ path }) => path,
 );
 /** The raw profile photo is a 59 KB PNG; the optimized variant must be far below that. */
@@ -36,7 +43,7 @@ test.beforeEach(({ browserName: _browserName }, testInfo) => {
   test.skip(testInfo.project.name !== 'chromium-1280', 'asset loading does not depend on width');
 });
 
-for (const { path, preloads: expectedPreloads } of PAGES) {
+for (const { path, preloads: expectedPreloads, allowedBig = [] } of PAGES) {
   test(`${path} preloads exactly the Latin variable fonts it renders and uses them`, async ({
     page,
   }) => {
@@ -58,7 +65,10 @@ for (const { path, preloads: expectedPreloads } of PAGES) {
 
     expect(preloads).toHaveLength(expectedPreloads.length);
     for (const preload of preloads)
-      for (const big of BIG_FONTS) expect(preload.href).not.toMatch(big);
+      for (const big of BIG_FONTS) {
+        if (allowedBig.some((allowed) => preload.href.match(allowed))) continue;
+        expect(preload.href).not.toMatch(big);
+      }
     for (const [index, pattern] of expectedPreloads.entries()) {
       const preload = preloads[index];
       expect(preload?.href).toMatch(pattern);

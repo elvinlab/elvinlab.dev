@@ -780,10 +780,22 @@ describe('experiment nudge', () => {
     expect(parseSiteConfig({ ...valid, features }).features.experimentNudge).toBe(true);
   });
 
-  it('defaults the thresholds to 0.7 on notes and 0.6 on the index, and a close to 30 days', () => {
-    const defaults = { scrollThreshold: 0.7, indexScrollThreshold: 0.6, reappearAfterDays: 30 };
+  it('defaults floating on, thresholds to 0.7 on notes and 0.6 on the index, and a close to 30 days', () => {
+    const defaults = {
+      floating: true,
+      scrollThreshold: 0.7,
+      indexScrollThreshold: 0.6,
+      reappearAfterDays: 30,
+    };
     expect(parseSiteConfig(valid).nudge).toEqual(defaults);
     expect(parseSiteConfig(withNudge({})).nudge).toEqual(defaults);
+  });
+
+  it('turns the floating layer off with a boolean and rejects the rest', () => {
+    expect(parseSiteConfig(withNudge({ floating: false })).nudge.floating).toBe(false);
+    for (const floating of ['yes', 1, null]) {
+      expect(() => parseSiteConfig(withNudge({ floating }))).toThrow();
+    }
   });
 
   it('takes 0 to 365 days before a closed card may return, and rejects the rest', () => {

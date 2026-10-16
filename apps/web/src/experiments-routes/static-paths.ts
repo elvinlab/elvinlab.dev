@@ -1,4 +1,8 @@
-import { type ExperimentSort, loadExperimentPages } from '@/features/portfolio/index.ts';
+import {
+  type ExperimentSort,
+  loadExperimentPages,
+  loadExperiments,
+} from '@/features/portfolio/index.ts';
 import { LISTING_SORTS } from '@/shared/config/index.ts';
 
 /** The sort param of a route, checked: only a configured sort key can reach a page. */
@@ -18,6 +22,12 @@ export async function laterPagePaths(): Promise<{ params: { page: string } }[]> 
   return pages
     .filter(({ page }) => page > 1)
     .map(({ page }) => ({ params: { page: String(page) } }));
+}
+
+/** `getStaticPaths` of `/experiments/<slug>/`: one case page per experiment id. */
+export async function casePaths(): Promise<{ params: { slug: string } }[]> {
+  const experiments = await loadExperiments();
+  return experiments.map(({ id }) => ({ params: { slug: id } }));
 }
 
 /**
