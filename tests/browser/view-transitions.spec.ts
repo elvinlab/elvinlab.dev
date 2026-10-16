@@ -28,7 +28,8 @@ const instrument = (page: Page) =>
       window.__vt = Boolean((event as Event & { viewTransition?: unknown }).viewTransition);
     });
     addEventListener('animationstart', (event) => {
-      if ((event as AnimationEvent).animationName === 'fade-in-up') {
+      const name = (event as AnimationEvent).animationName;
+      if (name === 'fade-in-up' || name === 'rise-in') {
         window.__entrances = (window.__entrances ?? 0) + 1;
       }
     });
