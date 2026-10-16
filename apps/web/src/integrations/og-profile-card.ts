@@ -60,6 +60,7 @@ function photo(avatar: string): CardNode {
     props: {
       style: {
         display: 'flex',
+        boxSizing: 'border-box',
         width: RING,
         height: RING,
         borderRadius: RING / 2,

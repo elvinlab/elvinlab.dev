@@ -999,5 +999,11 @@
     "category": "changed",
     "title": "Availability now reads open to chat, collaborations and projects only",
     "description": "The recruiter card and the profile now say open to chat and collaborations and projects only, reflecting that Elvin works at Buo and is not open to full-time roles."
+  },
+  "satori-044-share-cards": {
+    "date": "2026-10-16",
+    "category": "changed",
+    "title": "Share cards keep their layout after the satori update",
+    "description": "satori was updated from 0.33.5 to 0.44 and the Open Graph and profile card layouts were adapted to its box-sizing change, so the cards render unchanged."
   }
 }

@@ -51,6 +51,7 @@ export const text = (style: Record<string, string | number>, children: string): 
 /** Root style shared by every share card: dark page with the cyan and pink glows. */
 export const cardRootStyle: Record<string, string | number> = {
   display: 'flex',
+  boxSizing: 'border-box',
   width: CARD_SIZE.width,
   height: CARD_SIZE.height,
   padding: '72px 90px',
