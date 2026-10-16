@@ -91,16 +91,18 @@ This is how work goes here: every task is an *issue* written as a delegation bri
 - **Lab Notes**: index by year with a filter, side table of contents with progress, decision record, reading time, related notes, previous/next and RSS.
 - Optional **reading mode** on every note: a single column, no animated banner or sidebar, for comfortable reading on mobile and desktop.
 - **Comments and reactions** with Giscus, loaded only when you reach them.
-- Own **share cards** for each note and for `/me`, generated at build time.
+- Own **share cards** for each note, each experiment case page and `/me`, generated at build time.
+- **Experiment case pages** (`/experiments/<slug>/`, ES/EN): the problem, my part, the gallery, the result and, at the end, the related note; each section appears only when it has content.
 - **`/me`**: a portfolio with experience, education and experiments; it prints cleanly to PDF.
 - A safe **contact form**: Turnstile, a send limit and it fails closed when configuration is missing.
 - **Email subscription**: readers get new notes (and, now and then, an announcement of a project) with double opt-in and a one-page unsubscribe; I trigger each send by hand. Guide: [`docs/SUBSCRIPTION.en.md`](docs/SUBSCRIPTION.en.md).
 - A **public changelog**, **privacy and terms pages** and a **light/dark theme** with selectable animated backgrounds.
 - **Configurable appearance**: the `appearance` preset (`minimal` or `full`) sets the type scale, the banner heights and the note detail, and `home` switches each home section on or off.
-- A **card for the latest experiment**: static after every note and on the home, and floating once a note is mostly read; closing it hides it for a while (`nudge.reappearAfterDays`).
+- A **card for the latest experiment**: static after every note and on the home, with an optional floating variant (`nudge.floating`, off on this site); closing it hides it for a while (`nudge.reappearAfterDays`).
 - An anonymous **footprint button** ("I was here") on notes, and small interface touches: back to top, a hint to switch language, a theme button and a button that cycles the banner effect.
 - A **notebook look** (hand-drawn ink, stamps, a struck-through mistake with its correction) and pixel details.
 - **Bilingual** (ES/EN) with no language redirects.
+- **Installable** as an app (manifest + icons), with no service worker.
 
 ## Turning things on and off
 
@@ -136,10 +138,10 @@ These switches and home sections are everything configurable today; the rest of 
 
 The CI verifies all of this; if something fails, there is no deploy:
 
-- **Mobile Lighthouse** ≥ 95 in all four categories; LCP ≤ 2.5 s and CLS ≤ 0.1. The synthetic `/notes/smoke-es/` fixture alone allows performance ≥ 93 and LCP ≤ 2.6 s; the other categories and budgets stay unchanged ([testing](docs/TESTING.md)).
+- **Mobile Lighthouse** ≥ 95 in all four categories, CLS ≤ 0.1 and LCP ≤ 2.7 s ([testing](docs/TESTING.md)).
 - **JavaScript** ≤ 30 KiB (gzip) per page.
 - **Accessibility with axe** (WCAG 2 A, AA and 2.1 AA) in light and dark theme and at 360, 768 and 1280 px.
-- Over **400 unit tests** and over **320 e2e** tests in a browser.
+- Over **1700 unit tests** and over **320 e2e** tests in a browser.
 - One test checks that the site **sets no cookies of its own** and another that nothing of the owner leaks into a build with another identity.
 
 ## Getting started
