@@ -71,6 +71,8 @@ flowchart LR
 
 Así se trabaja aquí: cada tarea es un *issue* escrito como un brief de delegación con un **nivel** (1 trivial, 2 acotado, 3 complejo); el desarrollo es con **TDD estricto**; y un modelo más caro **revisa cada diff** que escribió uno más barato. La historia completa está en la nota [Claude piensa, los modelos baratos teclean](https://elvinlab.dev/notes/agentic-dev-setup/).
 
+**Actualización:** el desarrollo ahora lo lleva **pi** (el Gentleman) como orquestador, con el ecosistema **gentle-ai** para el ciclo de revisión y verificación, y modelos **Deepseek**. Es un flujo experimental y en evolución, así que convive con el setup de arriba, que dejo documentado por si vuelvo a Claude Code o Codex. La arquitectura, los presupuestos de calidad y las convenciones del repo no cambian.
+
 ## Tecnologías
 
 | Capa | Tecnología | Para qué se usa |
@@ -84,7 +86,7 @@ Así se trabaja aquí: cada tarea es un *issue* escrito como un brief de delegac
 | Servicios | **Turnstile**, **Resend**, **Web Analytics**, **Giscus** | Anti-bot, correo del formulario, analítica mínima y comentarios en GitHub Discussions |
 | Calidad | **Vitest 5**, **Playwright** + **axe-core**, **Lighthouse CI**, **Biome**, **dependency-cruiser** | Tests, accesibilidad, rendimiento, formato y fronteras de arquitectura |
 | Herramientas | **pnpm 12** (workspaces), **mise** (Node 24), **GitHub Actions**, **Dependabot** | Monorepo, versiones fijas, CI/CD y actualizaciones semanales |
-| Desarrollo asistido | **agentic-dev-setup**: Claude Code, herdr, OpenCode, OmniRoute, Ollama y Engram | Cómo se construyó (sección anterior) |
+| Desarrollo asistido | **agentic-dev-setup**: Claude Code, herdr, OpenCode, OmniRoute, Ollama y Engram → hoy: **pi (el Gentleman) + gentle-ai + Deepseek** (experimental) | Cómo se construyó (sección anterior) |
 
 ## Qué incluye
 

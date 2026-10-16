@@ -2,6 +2,8 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+> **Current toolchain:** development is now driven by **pi (el Gentleman)** with the **gentle-ai** ecosystem and **Deepseek** models. Claude Code, Codex, RTK and Caveman are **not currently in use**; they are kept below (and in `.claude/`, `.codex/`, `RTK.md`) for when/if we return to them. Repo conventions below apply regardless of toolchain.
+
 ## Status and commands
 
 Live in production at elvinlab.dev (Astro on Cloudflare Workers, CI and deploy in place). Current work and history: `odd/tasks/elvinlab-site.md` and the GitHub Project (https://github.com/users/elvinlab/projects/2).
@@ -71,7 +73,7 @@ packages/core/   → @elvinlab/core: tokens, themes, i18n (presentation-only)
 - Branches: `main` (production), `develop` (work branch, no CI attached). For routine development, work directly on `develop`; nothing runs on push. Production releases are a direct push to `main` (no PR — ADR 0012). `main` and `develop` have diverged histories, so `git merge develop` conflicts: build the release commit from `develop`'s tree (`git commit-tree develop^{tree} -p main`), fast-forward `main` onto it, confirm `git diff main develop` is empty, then push; the exact steps are in `docs/CONFIGURATION.md` section 7. That push is the only CI run (gates + deploy, in one pass). Conventional Commits, no AI attribution.
 - **Changelog stays current:** every visitor-visible or developer-facing change (features, fixes, performance, config, docs for forks, tooling) gets an entry in `apps/web/src/content/changelog.json` in the same work unit that ships it, written in English (ADR 0010). The page groups entries by production day (a release is a day) and by kind; an optional headline per day lives in `apps/web/src/content/releases.json`. Before each release run `pnpm changelog:audit`: it finds the last release (the `develop: <sha>` line at the end of the release commit message on the local ref `origin/main`; do not use `origin/main..develop`: releases are built with `commit-tree`, so that range also lists everything already published) and exits non-zero while any `feat`, `fix` or `perf` commit since then did not touch `changelog.json`. Then `pnpm changelog:stamp` (`--date YYYY-MM-DD`, `--dry-run`) sets the release day on the entries that are not in `origin/main` yet; the entry date is the day it reaches production.
 - **Touch-scoped verification (rule):** verify what a change touches and record it; do not run the whole stack after every change. Before running anything, list the touched files and what depends on them (`codegraph affected <files>` finds unit tests; it does NOT see page-level specs, so use the impact map in `docs/TESTING.md` for e2e, budgets and Lighthouse). "Test" means every kind of check: unit, types, lint, build, depcruise, docs:config, e2e, a11y, budgets, Lighthouse, white-label, cold start. A check whose scope was untouched since its last green entry in `odd/verification-ledger.md` is not re-run; if the change touches that scope, it is re-run, never trusted. Full-wide changes (dependencies, toolchain, astro/vite/tailwind/wrangler/tsconfig/biome/playwright/lighthouse config, `fixture-workspace.ts`, the verification scripts) run the whole stack once; layout-wide changes (global CSS, `shared/layout/**`, i18n structure) run a cheaper subset (everything at 1280 px, two Lighthouse URLs, 1 run locally; CI keeps 3 runs and every threshold). Timings: `odd/verification-timings.md`. Record every run and every skip in the task tracker and the ledger; report a skipped check as "not re-run: untouched since <sha>", never as verified. Delegated writers run only the checks the parent lists. A release runs what the ledger shows stale; CI on `main` runs the whole stack once more. The rule is a command: `pnpm verify` prints the plan for the uncommitted work (dry run), `--run` executes it, `--run --record` stores what passed in `odd/verification-state.json`, `--stale` plans what changed since the last green run. Details: `docs/TESTING.md`, section "Touch-scoped verification".
-- Every task is a GitHub issue written as a delegation brief with a Tier (see `.github/ISSUE_TEMPLATE/task.yml`): Tier 1/2 are delegated to OpenCode via herdr; Tier 3 is done by Claude Code, which reviews every delegated diff.
+- Every task is a GitHub issue written as a delegation brief with a Tier (see `.github/ISSUE_TEMPLATE/task.yml`): Tier 1/2 are delegated to OpenCode via herdr; Tier 3 is done by Claude Code, which reviews every delegated diff. *(Previous toolchain, not currently in use — pi delegates via its own subagents with gentle-ai; the Tier/brief convention for issue bodies is kept.)*
 - **No Engram mirror of ODD task files (overrides the global ODD protocol):** `odd/tasks/<feature>.md` in git is the only source of truth. Do not mirror it to Engram (`odd/<feature>/tasks`) after each task: the rewrite costs thousands of output tokens and adds nothing. Resume from the task file. Use `mem_save` only for decisions or gotchas that the repo does not already record.
 
 ## Brand and safety rules that affect code
@@ -87,7 +89,7 @@ packages/core/   → @elvinlab/core: tokens, themes, i18n (presentation-only)
 
 Blog live with 3 posts within 6 weeks. If time goes into polishing `core` with nothing published, flag it — that is the identified risk.
 
-<!-- rtk-instructions v2 -->
+<!-- rtk-instructions v2 — LEGACY, not currently in use (pi + gentle-ai handles command compaction now; kept for when we return to Codex/Claude Code) -->
 # Command output
 
 Command output here is condensed to save tokens, keeping every signal and
@@ -99,4 +101,4 @@ output was clearly expected, contradicting its exit code, or garbled.
 <!-- /rtk-instructions -->
 ## Shared agent instructions
 
-See [`AGENTS.md`](AGENTS.md) for repository-local Caveman and RTK guidance.
+See [`AGENTS.md`](AGENTS.md) for repository-local Caveman and RTK guidance *(legacy — Caveman and RTK are not currently in use under pi; `AGENTS.md` now documents the pi + gentle-ai toolchain)*.
