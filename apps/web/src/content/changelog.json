@@ -1053,5 +1053,11 @@
     "category": "added",
     "title": "The experience timeline shows concrete outcomes per role",
     "description": "Each role on /me now lists up to four short, truthful contributions (what was delivered), in Spanish and English. The texts are the owner's drafts, editable in experience.json."
+  },
+  "me-curated-notes": {
+    "date": "2026-10-16",
+    "category": "changed",
+    "title": "The profile shows notes curated by capability",
+    "description": "The /me notes now show three notes picked by capability, each with a one-line framing of what it demonstrates. On the English page, Spanish notes carry an 'Article in Spanish' label."
   }
 }

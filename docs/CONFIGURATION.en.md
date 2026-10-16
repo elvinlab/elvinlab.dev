@@ -148,6 +148,9 @@ The descriptions come from the schema (`.describe()`), which is why they are in 
 | `me.stack[].hint` | `{ <locale>: string (max 180) }` | no |  | One plain-language sentence per locale that says what the group is. Shown as a hover and focus tooltip; omit for no tooltip. Max 180 characters per locale. |
 | `me.stack[].layer` | `boolean` | no |  | Draws the group as a numbered layer of the product (for example data, backend, frontend, cloud), joined to the next layer by a vertical line. Omit for a group that cuts across layers, such as AI or quality. Keep the layers first in the list. |
 | `me.stack[].folded` | `boolean` | no |  | Puts the group inside a collapsed "more tools" block under the stack (native details, no script). Use it for secondary groups so the stack stays short; a layer cannot be folded. |
+| `me.curatedNotes` | `object[] (max 3)` | no |  | Up to three notes curated by capability, each with a one-line framing. Omit to show the latest notes instead. |
+| `me.curatedNotes[].slug` | `string` | yes |  | Slug of a published note to show. |
+| `me.curatedNotes[].framing` | `{ <locale>: string (max 120) }` | yes |  | One line per locale saying what this note demonstrates (the capability it backs). Max 120 characters per locale. |
 | `features` | `object` | yes |  | Feature flags: off means the routes are not generated and the nav entry is hidden. The interface switches (`backToTop`, `languageHint`, `themeToggle`, `backgroundPicker`, `readingProgress`) default to on and render nothing when off. |
 | `features.blog` | `boolean` | yes |  | Lab Notes: the notes index, note pages, RSS and the nav entry. |
 | `features.comments` | `boolean` | yes |  | Giscus comments on notes. Needs the `giscus` block below, otherwise nothing renders. |
@@ -212,6 +215,7 @@ Shown in the `/me` timeline. If you omit `end`, it is the current job. `role`, `
 | `end` | `integer (min 1970)` | no |  | Year the role ended. Omit for the current role (drawn with a solid dot). |
 | `location` | `string \| { <locale>: string }` | no |  | Where the role was based: one string, or one text per locale (max 80 characters each). |
 | `summary` | `string \| { <locale>: string }` | yes |  | One truthful summary, no bullets: one string, or one text per locale (max 280 characters each). |
+| `contributions` | `string \| { <locale>: string }[] (max 4)` | no |  | Up to four short, truthful outcomes of the role (what was delivered): each one string, or one text per locale (max 160 characters each). Omit when there are none. |
 | `tags` | `string[] (max 5)` | no | `[]` | Up to five kebab-case tags. |
 <!-- docs:end experience -->
 
