@@ -282,6 +282,10 @@ Portfolio experiments (projects), published at `/experiments/` (and `/en/experim
 | `problem` | `string \| { <locale>: string }` | no |  | The problem it solves (max 200 characters each). One string, or one text per locale such as `{ "es": "...", "en": "..." }`. |
 | `contribution` | `string \| { <locale>: string }` | no |  | What you did yourself, as opposed to tools or teammates (max 200 characters each). One string, or one text per locale such as `{ "es": "...", "en": "..." }`. |
 | `result` | `string \| { <locale>: string }` | no |  | What it delivered, with no invented numbers (max 200 characters each). One string, or one text per locale such as `{ "es": "...", "en": "..." }`. |
+| `decisions` | `string \| { <locale>: string }[] (max 8)` | no |  | Key decisions made while building it (max 200 characters each). One string, or one text per locale such as `{ "es": "...", "en": "..." }`. |
+| `tech` | `string (max 40)[] (max 12)` | no |  | Technologies used, one per item (max 40 characters each). |
+| `learned` | `string \| { <locale>: string }[] (max 8)` | no |  | What you learned (max 200 characters each). One string, or one text per locale such as `{ "es": "...", "en": "..." }`. |
+| `different` | `string \| { <locale>: string }` | no |  | What you would do differently next time (max 200 characters each). One string, or one text per locale such as `{ "es": "...", "en": "..." }`. |
 | `tags` | `string[] (max 5)` | no | `[]` | Up to five kebab-case tags. |
 | `year` | `integer (min 2000)` | yes |  | Year the project started or shipped. |
 | `publishedAt` | `string` | no |  | Optional date it shipped (`YYYY-MM-DD`), used to sort the list by date. Without it the sort uses 1 January of `year`. Keep it inside `year`. |

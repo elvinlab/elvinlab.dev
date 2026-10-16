@@ -23,6 +23,10 @@ export function experimentsRoutes(enabled: boolean): ExperimentsRoute[] {
     // `getStaticPaths` in the entrypoints generates a page only while the compact tier needs one.
     { pattern: '/experiments/page/[page]', entrypoint: entry('page.astro') },
     { pattern: '/en/experiments/page/[page]', entrypoint: entry('en-page.astro') },
+    // One case page per experiment (`/experiments/<slug>/`). Registered before the sort routes so a
+    // slug wins over the `[sort]` param; the two sets stay disjoint (no experiment may use a sort name).
+    { pattern: '/experiments/[slug]', entrypoint: entry('case.astro') },
+    { pattern: '/en/experiments/[slug]', entrypoint: entry('en-case.astro') },
     // The alternate sorts (`/experiments/oldest/`, `/experiments/oldest/page/2/`): `getStaticPaths`
     // generates them only for the enabled non-default sorts and only when the compact list reaches
     // `experiments.sortFrom`, so on a small list none of them exists.

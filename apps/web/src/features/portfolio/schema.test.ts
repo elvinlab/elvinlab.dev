@@ -76,6 +76,10 @@ describe('experimentSchema', () => {
     expect(parsed.repo).toBeUndefined();
     expect(parsed.note).toBeUndefined();
     expect(parsed.images).toBeUndefined();
+    expect(parsed.decisions).toBeUndefined();
+    expect(parsed.tech).toBeUndefined();
+    expect(parsed.learned).toBeUndefined();
+    expect(parsed.different).toBeUndefined();
   });
 
   it('accepts the optional case fields, localized and capped at 200 characters', () => {
@@ -89,6 +93,25 @@ describe('experimentSchema', () => {
     for (const key of Object.keys(fields)) {
       expect(() => schema.parse({ ...valid, [key]: 'x'.repeat(201) })).toThrow();
     }
+  });
+
+  it('accepts the optional case-page sections and caps them', () => {
+    const fields = {
+      decisions: [{ es: 'Decisión', en: 'Decision' }],
+      tech: ['Astro', 'Cloudflare Workers'],
+      learned: ['Aprendí a medir', 'Y a iterar'],
+      different: { es: 'Empezaría más simple', en: 'I would start simpler' },
+    };
+    const parsed = schema.parse({ ...valid, ...fields });
+    expect(parsed.decisions).toEqual(fields.decisions);
+    expect(parsed.tech).toEqual(fields.tech);
+    expect(parsed.learned).toEqual(fields.learned);
+    expect(parsed.different).toEqual(fields.different);
+    expect(() => schema.parse({ ...valid, decisions: [] })).toThrow();
+    expect(() => schema.parse({ ...valid, decisions: ['x'.repeat(201)] })).toThrow();
+    expect(() => schema.parse({ ...valid, tech: [] })).toThrow();
+    expect(() => schema.parse({ ...valid, tech: ['x'.repeat(41)] })).toThrow();
+    expect(() => schema.parse({ ...valid, different: 'x'.repeat(201) })).toThrow();
   });
 
   it('treats repo like url: https only, never an email', () => {

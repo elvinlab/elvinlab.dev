@@ -9,6 +9,8 @@ describe('experimentsRoutes', () => {
       '/en/experiments',
       '/experiments/page/[page]',
       '/en/experiments/page/[page]',
+      '/experiments/[slug]',
+      '/en/experiments/[slug]',
       '/experiments/[sort]',
       '/en/experiments/[sort]',
       '/experiments/[sort]/page/[page]',

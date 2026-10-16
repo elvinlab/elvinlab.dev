@@ -1,0 +1,16 @@
+---
+/** The English case page `/en/experiments/<slug>/`: one per experiment id. */
+import { loadExperiments } from '@/features/portfolio/index.ts';
+
+import ExperimentCasePage from './ExperimentCasePage.astro';
+import { casePaths } from './static-paths.ts';
+
+export const getStaticPaths = casePaths;
+
+const { slug } = Astro.params;
+const experiments = await loadExperiments();
+const experiment = experiments.find((entry) => entry.id === slug);
+if (!experiment) throw new Error(`/en/experiments/ has no case page "${slug}"`);
+---
+
+<ExperimentCasePage experiment={experiment} locale="en" />

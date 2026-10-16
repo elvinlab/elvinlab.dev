@@ -1017,5 +1017,11 @@
     "category": "changed",
     "title": "The note decision record renders once, lighter and faster",
     "description": "Each note now renders its decision record once (above the body) instead of twice (a desktop hero copy and a mobile copy). This removed a slow Lighthouse run and restored the note gate to 2500 ms."
+  },
+  "experiment-case-pages": {
+    "date": "2026-10-16",
+    "category": "added",
+    "title": "Experiment case pages",
+    "description": "Each experiment now has its own detail page (/experiments/<slug>/, ES and EN) with the problem, my part, gallery and result sections, plus a note card at the end that links to the note discussing it. The decisions, tech, learned and different sections appear as they are filled in."
   }
 }
