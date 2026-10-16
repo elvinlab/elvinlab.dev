@@ -8,7 +8,7 @@ Backlog sync from Engram: 8 new issues created and added to the board as Todo �
 
 Closed as delivered (code complete on `develop`, unreleased): #82 T53 Education page, #83 T54 compact Formación reciente, #86 T57 Certificate viewer (tracker `odd/tasks/education-page.md`; remaining = owner content + release to `main`). Comments added to #91 (DMARC `rua` pre-step) and #119 (three LCP levers).
 
-Project 2 now: 26 open issues = 26 Todo, matching. Dependabot PR #115 (actions/cache 6.1.0) and #123 (8 dep updates, no satori) stay open — useful, integrated + verified locally on branch `chore/dependabot-ci-and-runtime-refresh`, pending owner merge/release decision. Remote branches clean (main, develop, 2 Dependabot); the old `claude/project-thread-4jalfb` is gone. `develop` is 450 commits ahead of `main`; release stays the owner's call.
+Project 2 now: 26 open issues = 26 Todo, matching. Dependabot PR #115 (actions/cache 6.1.0) and #123 (8 dep updates, no satori) stay open — useful, integrated + verified locally on branch `chore/dependabot-ci-and-runtime-refresh`, pending owner merge/release decision. Remote branches clean (main, develop, 2 Dependabot); the old `claude/project-thread-4jalfb` is gone. `main` and `develop` trees were already identical before this sync (the 450-commit `rev-list` count is history divergence from the snapshot-release strategy, not unreleased work); release `44b0be9` carried these docs to `main`.
 
 ## Current state (reconciled 2026-10-12)
 
