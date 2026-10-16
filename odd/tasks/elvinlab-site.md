@@ -1,5 +1,18 @@
 # Feature: elvinlab.dev — portfolio + Lab Notes
 
+## Current state (release-ready 2026-10-16)
+
+Delivered and committed on `develop` this session (pi + gentle-ai), not pushed, not released:
+- `ci(gates)` noisy-gate retry policy (ADR 0018): Playwright `retries: 1` in CI, one Lighthouse re-run of a failed URL, flakes reported in the run summary.
+- `fix(verify)`: `pnpm verify --files` no longer applies registry freshness to a simulated change set.
+- Docs: E7 (config-follows docs), TESTING retries note, PORTFOLIO experience/notes sections.
+- `fix(web)`: the main content rises (transform-only) instead of fading opacity on navigation; page-weight budgets bumped.
+- `/me` portfolio M4–M6: per-role contributions, notes curated by capability with an "Article in Spanish" label, and a specific title/description.
+
+Release prep done: `changelog:audit` passes (6 entries added); `changelog:stamp` has nothing to do (all dated 2026-10-16); `releases.json` headline added for 2026-10-16. Verification: layout-wide `pnpm verify --since 581819e --run --record` ran three times — all families + e2e (71 specs) green each time, `/me` and `/en/me` Lighthouse green; the only recurring failure is `/education/` perf 0.94 (pre-existing, green on the 3-run median). CI on `main` (3 runs per URL) is the backstop.
+
+Release: the owner authorizes the push to `main` (ADR 0012, CONFIGURATION.md section 7); that push is the only CI trigger (gates + deploy).
+
 ## Current state (reconciled 2026-10-15)
 
 2026-10-15 reconciliation: toolchain moved from Claude Code + Codex (agentic-dev-setup) to pi (el Gentleman) + gentle-ai + Deepseek. Doc bridge added (`AGENTS.md` → `CLAUDE.md`), RTK/Caveman marked legacy in `CLAUDE.md`/`AGENTS.md`, README updated (experimental, additive). Nothing deleted.
