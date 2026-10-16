@@ -993,5 +993,11 @@
     "category": "added",
     "title": "Credentials can be marked as in progress",
     "description": "The education timeline and the profile can now show a credential that is still in progress, with a status label. The owner turns it on per credential with an optional flag."
+  },
+  "availability-open-to-chat": {
+    "date": "2026-10-16",
+    "category": "changed",
+    "title": "Availability now reads open to chat, collaborations and projects only",
+    "description": "The recruiter card and the profile now say open to chat and collaborations and projects only, reflecting that Elvin works at Buo and is not open to full-time roles."
   }
 }

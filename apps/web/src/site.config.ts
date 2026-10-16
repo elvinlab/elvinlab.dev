@@ -117,12 +117,12 @@ export const siteConfig = {
     available: true,
     openToWork: false,
     status: {
-      es: 'Colaboraciones y proyectos',
-      en: 'Collaborations and projects',
+      es: 'Abierto a charlar',
+      en: 'Open to chat',
     },
     lookingFor: {
-      es: 'Colaboraciones y proyectos. Actualmente en Buo.',
-      en: 'Collaborations and projects. Currently at Buo.',
+      es: 'Solo colaboraciones y proyectos',
+      en: 'Collaborations and projects only',
     },
     cvUrl: {
       es: 'https://drive.google.com/file/d/1SZy6sPXxySHel7glTn1gBFwCUc6jytxS/view',
