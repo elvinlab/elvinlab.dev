@@ -16,7 +16,13 @@ import { execFileSync, spawnSync } from 'node:child_process';
 import { resolve } from 'node:path';
 
 import { CHECKS, FULL_WIDE } from './verification-map.ts';
-import { type Plan, type PlanMode, planChecks, refineChanged } from './verify-plan.ts';
+import {
+  type Plan,
+  type PlanMode,
+  planChecks,
+  refineChanged,
+  registryRelevant,
+} from './verify-plan.ts';
 import {
   computeFingerprints,
   gitIo,
@@ -170,20 +176,20 @@ function main(): number {
       : 'changed';
   const viewports = option(args, '--viewports') === 'all' ? 'all' : 'quick';
 
+  const simulated = filesOption(args);
+  const changed = mode === 'changed' ? (simulated ?? detectChanged(since ?? 'HEAD')) : [];
+
   const registry = readRegistry(STATE_PATH);
   const io = gitIo(root);
   const recorded = Object.keys(registry.checks).length > 0;
   let before: Record<string, string> | undefined;
   let stale: Set<string> | undefined;
-  if (mode !== 'all' && recorded) {
+  if (registryRelevant(mode, simulated !== undefined) && recorded) {
     before = computeFingerprints(CHECKS, io, FULL_WIDE);
     stale = staleIds(CHECKS, before, registry);
   } else if (mode === 'stale') {
     stale = new Set(CHECKS.map((check) => check.id));
   }
-
-  const simulated = filesOption(args);
-  const changed = mode === 'changed' ? (simulated ?? detectChanged(since ?? 'HEAD')) : [];
   const plan = planChecks({
     mode,
     changed,

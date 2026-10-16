@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
 import { CHECKS } from './verification-map.ts';
-import { additionsOnly, planChecks, refineChanged } from './verify-plan.ts';
+import { additionsOnly, planChecks, refineChanged, registryRelevant } from './verify-plan.ts';
 
 const ids = (changed: string[], extra: Partial<Parameters<typeof planChecks>[0]> = {}) =>
   planChecks({ mode: 'changed', changed, ...extra }).items.map((item) => item.id);
@@ -212,6 +212,13 @@ describe('planChecks', () => {
     });
     expect(plan.items.map((item) => item.id)).toEqual(['lint']);
     expect(plan.skippedFresh).toContain('e2e:contact.spec.ts');
+  });
+
+  it('never applies registry freshness to a simulated change set (--files)', () => {
+    expect(registryRelevant('changed', true)).toBe(false);
+    expect(registryRelevant('changed', false)).toBe(true);
+    expect(registryRelevant('stale', false)).toBe(true);
+    expect(registryRelevant('all', false)).toBe(false);
   });
 
   it('does not let registry freshness hide a FULL-wide change: it belongs to no check scope', () => {

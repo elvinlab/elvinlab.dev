@@ -1035,5 +1035,11 @@
     "category": "changed",
     "title": "Noisy CI gates retry once and report flakes",
     "description": "In CI, Playwright tests retry once and Lighthouse re-runs a failed URL once; a pass on the retry is listed as flaky in the run summary instead of blocking a release or hiding silently. Deterministic gates still fail immediately."
+  },
+  "verify-files-simulation": {
+    "date": "2026-10-16",
+    "category": "fixed",
+    "title": "The verify command no longer under-plans a simulated change",
+    "description": "pnpm verify --files applied the registry freshness filter to a change that is not on disk, so it planned only lint. A simulated change now ignores the registry and shows the full scoped plan."
   }
 }

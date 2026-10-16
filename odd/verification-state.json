@@ -2,473 +2,473 @@
   "version": 1,
   "checks": {
     "lint": {
-      "fingerprint": "f84af6ca94ea4d9fb450410014e4838493aa4795",
-      "recordedAt": "2026-10-16T20:15:41.677Z",
+      "fingerprint": "348a8481dac259445fe06f961d08c97ea6c927bb",
+      "recordedAt": "2026-10-16T20:29:29.990Z",
       "result": "pass"
     },
     "typecheck": {
-      "fingerprint": "87f8e672a4e101eb804c504608d70389004add9b",
-      "recordedAt": "2026-10-16T20:15:41.677Z",
+      "fingerprint": "08ed4d71491b4358b2cdfa90af317158676bd87f",
+      "recordedAt": "2026-10-16T20:29:29.990Z",
       "result": "pass"
     },
     "depcruise": {
-      "fingerprint": "3923684fc8d33eb0780ce6bed04ea873d3517a7f",
-      "recordedAt": "2026-10-16T20:15:41.677Z",
+      "fingerprint": "1e17f9e0b2846b19d60eac9e22930f506e0c0592",
+      "recordedAt": "2026-10-16T20:29:29.990Z",
       "result": "pass"
     },
     "docs-config": {
-      "fingerprint": "d17acb1c693185d0d44108900fbb7a3dce6eed5a",
-      "recordedAt": "2026-10-16T20:15:41.677Z",
+      "fingerprint": "8bb3f41adcfccfd5a49965cc799bfd11d0d5d302",
+      "recordedAt": "2026-10-16T20:29:29.990Z",
       "result": "pass"
     },
     "unit": {
-      "fingerprint": "ef599a0c19da5936969e59b1deeea6aba8529cc7",
-      "recordedAt": "2026-10-16T20:15:41.677Z",
+      "fingerprint": "e89e25a59b99370d999a1e9216032727e21cbaaa",
+      "recordedAt": "2026-10-16T20:29:29.990Z",
       "result": "pass"
     },
     "build": {
-      "fingerprint": "51c050db5e1470daaadcae852dab219aab334a00",
-      "recordedAt": "2026-10-16T20:15:41.677Z",
+      "fingerprint": "c9fd7a0a11fe66f4bf3b3667d67c0167132fb92d",
+      "recordedAt": "2026-10-16T20:29:29.990Z",
       "result": "pass"
     },
     "js-budget": {
-      "fingerprint": "c21a8cf24ad5b84b8de72db9af65dfb8a69f6f31",
-      "recordedAt": "2026-10-16T20:15:41.677Z",
+      "fingerprint": "c1ebd61d528e876efd4b62e7458603faff238c27",
+      "recordedAt": "2026-10-16T20:29:29.990Z",
       "result": "pass"
     },
     "white-label": {
-      "fingerprint": "2264bd3ba785ba463bcaf99c9d32d9671bb169d6",
-      "recordedAt": "2026-10-16T20:15:41.677Z",
+      "fingerprint": "074b536a337be1551830aa8956d09062345716f4",
+      "recordedAt": "2026-10-16T20:29:29.990Z",
       "result": "pass"
     },
     "cold-start": {
-      "fingerprint": "9e0e480836f54c824b6dca2c49c9da69b1d8a79a",
-      "recordedAt": "2026-10-16T20:15:41.677Z",
+      "fingerprint": "e099b977d267db2beb096fd6a77b63cc0ed86adb",
+      "recordedAt": "2026-10-16T20:29:29.990Z",
       "result": "pass"
     },
     "e2e:a11y.spec.ts": {
-      "fingerprint": "9fa496836e20ab89d0eb29211b031fed69905728",
-      "recordedAt": "2026-10-16T20:15:41.677Z",
+      "fingerprint": "8e1503e14d549dd8d308a5206703f25fc7eb354c",
+      "recordedAt": "2026-10-16T20:29:29.990Z",
       "result": "pass"
     },
     "e2e:background.spec.ts": {
-      "fingerprint": "098fb6f2afea27a48dd9a95ada1556dba54cefe4",
-      "recordedAt": "2026-10-16T20:15:41.677Z",
+      "fingerprint": "2ebb3db4aad5087aed6724574b2552071845c35a",
+      "recordedAt": "2026-10-16T20:29:29.990Z",
       "result": "pass"
     },
     "e2e:card-links.spec.ts": {
-      "fingerprint": "097820a8fc14401e207a3f2dec135a101710e3d6",
-      "recordedAt": "2026-10-16T20:15:41.677Z",
+      "fingerprint": "782a423ef80f49319f6e4f1ae266abc57c1c0f2f",
+      "recordedAt": "2026-10-16T20:29:29.990Z",
       "result": "pass"
     },
     "e2e:comments.spec.ts": {
-      "fingerprint": "1d6acb592e67564a332fae9a26231fd12b5da4ce",
-      "recordedAt": "2026-10-16T20:15:41.677Z",
+      "fingerprint": "c498bd941d6cbc929e587d66fe5e896f4b2593ae",
+      "recordedAt": "2026-10-16T20:29:29.990Z",
       "result": "pass"
     },
     "e2e:contact.spec.ts": {
-      "fingerprint": "b95211884b8ed7cbe0486ac0ad608959216422f3",
-      "recordedAt": "2026-10-16T20:15:41.677Z",
+      "fingerprint": "afe31c42a9e949a0ae3e11c6fd1b05e2c48ffb45",
+      "recordedAt": "2026-10-16T20:29:29.990Z",
       "result": "pass"
     },
     "e2e:cookies.spec.ts": {
-      "fingerprint": "2cba2777c9e89ff522ca657d4bd613f441d68466",
-      "recordedAt": "2026-10-16T20:15:41.677Z",
+      "fingerprint": "e3a3755e10157cb485481249822d0545c94e1a50",
+      "recordedAt": "2026-10-16T20:29:29.990Z",
       "result": "pass"
     },
     "e2e:cv-and-credentials.spec.ts": {
-      "fingerprint": "0b64a7cfd25c40101db011bc0e09dc2661522ef8",
-      "recordedAt": "2026-10-16T20:15:41.677Z",
+      "fingerprint": "f87c8ba82033b83cbb42960d6c132afba3bf7512",
+      "recordedAt": "2026-10-16T20:29:29.990Z",
       "result": "pass"
     },
     "e2e:external-links.spec.ts": {
-      "fingerprint": "6aa02d9aaf0db8b3a367f857617f3e68e067777c",
-      "recordedAt": "2026-10-16T20:15:41.677Z",
+      "fingerprint": "4ca43b49a7960648c942f15fcb0ed1aab664467d",
+      "recordedAt": "2026-10-16T20:29:29.991Z",
       "result": "pass"
     },
     "e2e:favicon.spec.ts": {
-      "fingerprint": "188924aa41783fd52fa6fd733f3ae9b403cdd651",
-      "recordedAt": "2026-10-16T20:15:41.677Z",
+      "fingerprint": "a25cf311d9844d867d92f7fb8acedd852b33538f",
+      "recordedAt": "2026-10-16T20:29:29.991Z",
       "result": "pass"
     },
     "e2e:home-sections.spec.ts": {
-      "fingerprint": "7978858c828481e29c300303b6fca4473066895d",
-      "recordedAt": "2026-10-16T20:15:41.677Z",
+      "fingerprint": "a7a3a3eac6fdac72fddec6e0221952e7b743dfbf",
+      "recordedAt": "2026-10-16T20:29:29.991Z",
       "result": "pass"
     },
     "e2e:internal-links.spec.ts": {
-      "fingerprint": "7d2ff5afbd5206bf5378be99de8e8d2267f771c3",
-      "recordedAt": "2026-10-16T20:15:41.677Z",
+      "fingerprint": "a87e264f7adbd96e6509d10424c4cc40c82c7b0f",
+      "recordedAt": "2026-10-16T20:29:29.991Z",
       "result": "pass"
     },
     "e2e:legal.spec.ts": {
-      "fingerprint": "7d250887e478622924429c60734d74eb69f5ffaa",
-      "recordedAt": "2026-10-16T20:15:41.677Z",
+      "fingerprint": "904821b2281bdc94a91ae021360edb757a0693a6",
+      "recordedAt": "2026-10-16T20:29:29.991Z",
       "result": "pass"
     },
     "e2e:link-previews.spec.ts": {
-      "fingerprint": "639642981f7c7590b4f0798dbccc34eaa999208d",
-      "recordedAt": "2026-10-16T20:15:41.677Z",
+      "fingerprint": "effbc5fc70a7a2741fce245ce26f8eab7ce960a0",
+      "recordedAt": "2026-10-16T20:29:29.991Z",
       "result": "pass"
     },
     "e2e:me-experience-locale.spec.ts": {
-      "fingerprint": "9ee6cc250a0f4fbc1f8244679938adbd484100b4",
-      "recordedAt": "2026-10-16T20:15:41.677Z",
+      "fingerprint": "a29bfe8755d5bde6060a743ca6594e989bc3e4c2",
+      "recordedAt": "2026-10-16T20:29:29.991Z",
       "result": "pass"
     },
     "e2e:me-photo.spec.ts": {
-      "fingerprint": "dab4ad5f0c5e7e254e6a125393d27a4103df07e8",
-      "recordedAt": "2026-10-16T20:15:41.677Z",
+      "fingerprint": "c6638fb6b32d4d52cde06752b8e7a21fc977e58e",
+      "recordedAt": "2026-10-16T20:29:29.991Z",
       "result": "pass"
     },
     "e2e:note-share.spec.ts": {
-      "fingerprint": "9917309476f3ccebcd6301461efaa16fbebdfcc4",
-      "recordedAt": "2026-10-16T20:15:41.677Z",
+      "fingerprint": "42f5383708e82c5286d8a845f411a34e4c544b49",
+      "recordedAt": "2026-10-16T20:29:29.991Z",
       "result": "pass"
     },
     "e2e:note-translations.spec.ts": {
-      "fingerprint": "d0092fa2ae3dd1c5c33b4d16d948de11ead6b0c9",
-      "recordedAt": "2026-10-16T20:15:41.677Z",
+      "fingerprint": "2bab3130a24e7feb21490bad588cd45eafff80c6",
+      "recordedAt": "2026-10-16T20:29:29.991Z",
       "result": "pass"
     },
     "e2e:performance.spec.ts": {
-      "fingerprint": "db6dd3a7acc7834132dfc3ce558b918fbf3d16eb",
-      "recordedAt": "2026-10-16T20:15:41.677Z",
+      "fingerprint": "676c6ffe1ec09b22cda71c3f808af87363df0be1",
+      "recordedAt": "2026-10-16T20:29:29.991Z",
       "result": "pass"
     },
     "e2e:smoke.spec.ts": {
-      "fingerprint": "ea8c488ede25ba70599f2e9ee6ca1ce24699b659",
-      "recordedAt": "2026-10-16T20:15:41.677Z",
+      "fingerprint": "fead4ffeb1bf65e900969eb311b4bdf3b08141d4",
+      "recordedAt": "2026-10-16T20:29:29.991Z",
       "result": "pass"
     },
     "e2e:theme.spec.ts": {
-      "fingerprint": "715dc0b9f59b57a5430b242541940c86097f8d0c",
-      "recordedAt": "2026-10-16T20:15:41.677Z",
+      "fingerprint": "7b923042e16bfe9cf25982e3337345a46c5f19d0",
+      "recordedAt": "2026-10-16T20:29:29.991Z",
       "result": "pass"
     },
     "e2e:calm-pages.spec.ts": {
-      "fingerprint": "8fa7cfe1ae0f0ae82c5cee4cafdcef190be9a608",
-      "recordedAt": "2026-10-16T20:15:41.677Z",
+      "fingerprint": "769e726f25149d3ab9f25d880b2b50fd41d8d3b3",
+      "recordedAt": "2026-10-16T20:29:29.991Z",
       "result": "pass"
     },
     "e2e:brand-mark.spec.ts": {
-      "fingerprint": "a810075df1e5b7d9c876e0ee7e880c3006df6756",
-      "recordedAt": "2026-10-16T20:15:41.677Z",
+      "fingerprint": "090c946a35178fe35a9d2910668f4ecb3e0c7246",
+      "recordedAt": "2026-10-16T20:29:29.991Z",
       "result": "pass"
     },
     "e2e:focus-not-obscured.spec.ts": {
-      "fingerprint": "6478b60fe2a9add9f6beeb2cad7a67ce93352a96",
-      "recordedAt": "2026-10-16T20:15:41.677Z",
+      "fingerprint": "19242bf65af14815bb15bdaebc6b3ca1a3cafaf2",
+      "recordedAt": "2026-10-16T20:29:29.991Z",
       "result": "pass"
     },
     "e2e:interaction-polish.spec.ts": {
-      "fingerprint": "e9b429ff3f8c9aa3e1654d6abda9196c3d42efea",
-      "recordedAt": "2026-10-16T20:15:41.677Z",
+      "fingerprint": "8c2bada403e95bdab29f4590ea968c8fe8bb2671",
+      "recordedAt": "2026-10-16T20:29:29.991Z",
       "result": "pass"
     },
     "e2e:home-marks.spec.ts": {
-      "fingerprint": "d70cbe78957f73060a6735e2a372f16f68fe83a1",
-      "recordedAt": "2026-10-16T20:15:41.677Z",
+      "fingerprint": "eb67046d72cd26112ac87c2103ff2dbc859a652e",
+      "recordedAt": "2026-10-16T20:29:29.991Z",
       "result": "pass"
     },
     "e2e:marks.spec.ts": {
-      "fingerprint": "f86e059a7727217a54118547995a111ab502ddba",
-      "recordedAt": "2026-10-16T20:15:41.677Z",
+      "fingerprint": "0230e335d5ccd4db71ba9b260333ea8bbedd5ab3",
+      "recordedAt": "2026-10-16T20:29:29.991Z",
       "result": "pass"
     },
     "e2e:mobile-ux.spec.ts": {
-      "fingerprint": "8814afcf6a64b0c1539e3db7de9619f268156420",
-      "recordedAt": "2026-10-16T20:15:41.677Z",
+      "fingerprint": "7b089db53a7b18625701f74b1bd65fdac3434ce0",
+      "recordedAt": "2026-10-16T20:29:29.991Z",
       "result": "pass"
     },
     "e2e:notes-layout.spec.ts": {
-      "fingerprint": "83399021e3f7e5b82dffad05b61489c7cccdf0eb",
-      "recordedAt": "2026-10-16T20:15:41.677Z",
+      "fingerprint": "f559382635502523b38d982eb083a8c7d7a88b87",
+      "recordedAt": "2026-10-16T20:29:29.991Z",
       "result": "pass"
     },
     "e2e:pixel-display.spec.ts": {
-      "fingerprint": "04a3f4ba0a2172587397221e17caa75578feabb5",
-      "recordedAt": "2026-10-16T20:15:41.677Z",
+      "fingerprint": "32c0491b0b8b760953b9faea61bffff70cf57aa0",
+      "recordedAt": "2026-10-16T20:29:29.991Z",
       "result": "pass"
     },
     "e2e:reading-mode.spec.ts": {
-      "fingerprint": "de7d5d6633b05603bc29c8e25b31efc8835673f6",
-      "recordedAt": "2026-10-16T20:15:41.677Z",
+      "fingerprint": "5cd6e3bd6ae3343e226a97e8b8119bf237aa847e",
+      "recordedAt": "2026-10-16T20:29:29.991Z",
       "result": "pass"
     },
     "e2e:type-scale.spec.ts": {
-      "fingerprint": "57ee0eb9d3c8cca41d640f5cc98255bee0286a93",
-      "recordedAt": "2026-10-16T20:15:41.677Z",
+      "fingerprint": "31096943265142813185ec47caf00986e8102b1a",
+      "recordedAt": "2026-10-16T20:29:29.991Z",
       "result": "pass"
     },
     "lighthouse:/": {
-      "fingerprint": "7d8dded497fc45b70acdc07312d92d07ce135f96",
-      "recordedAt": "2026-10-16T20:15:41.677Z",
+      "fingerprint": "2d4dfca6299739b3ad10608757078ac942bbdefb",
+      "recordedAt": "2026-10-16T20:29:29.991Z",
       "result": "pass"
     },
     "lighthouse:/en/": {
-      "fingerprint": "7d8dded497fc45b70acdc07312d92d07ce135f96",
-      "recordedAt": "2026-10-16T20:15:41.677Z",
+      "fingerprint": "2d4dfca6299739b3ad10608757078ac942bbdefb",
+      "recordedAt": "2026-10-16T20:29:29.991Z",
       "result": "pass"
     },
     "lighthouse:/notes/": {
-      "fingerprint": "f62ba22edb8940028a9caae3a168020817f92366",
-      "recordedAt": "2026-10-16T20:15:41.677Z",
+      "fingerprint": "62a524c60c0513006ff547c4061e15651056e812",
+      "recordedAt": "2026-10-16T20:29:29.991Z",
       "result": "pass"
     },
     "lighthouse:/notes/smoke-es/": {
-      "fingerprint": "0910a32cb494820236eb13898d8284e437764901",
-      "recordedAt": "2026-10-16T20:15:41.677Z",
+      "fingerprint": "ec151f100fb793429ab98293f386dee11e24a302",
+      "recordedAt": "2026-10-16T20:29:29.991Z",
       "result": "pass"
     },
     "lighthouse:/contact/": {
-      "fingerprint": "b229a1b85dc8a5f17f2eff03c65dd4cb606dd5ff",
-      "recordedAt": "2026-10-16T20:15:41.677Z",
+      "fingerprint": "faccf54250c1219981e6d3b589f912cb186fe16a",
+      "recordedAt": "2026-10-16T20:29:29.991Z",
       "result": "pass"
     },
     "lighthouse:/en/contact/": {
-      "fingerprint": "b229a1b85dc8a5f17f2eff03c65dd4cb606dd5ff",
-      "recordedAt": "2026-10-16T20:15:41.677Z",
+      "fingerprint": "faccf54250c1219981e6d3b589f912cb186fe16a",
+      "recordedAt": "2026-10-16T20:29:29.991Z",
       "result": "pass"
     },
     "e2e:subscribe.spec.ts": {
-      "fingerprint": "b2576b65b68b287ad68f2442df61ae2d5291d973",
-      "recordedAt": "2026-10-16T20:15:41.677Z",
+      "fingerprint": "e5401dc2b47239e3b8d7fe42c5871e8d74970c56",
+      "recordedAt": "2026-10-16T20:29:29.991Z",
       "result": "pass"
     },
     "e2e:back-to-top.spec.ts": {
-      "fingerprint": "ea5ff84afe096ce302fe531a59a8127298d876de",
-      "recordedAt": "2026-10-16T20:15:41.677Z",
+      "fingerprint": "d1525300682ab5e2a14ea4729b084bb6e354c0bf",
+      "recordedAt": "2026-10-16T20:29:29.990Z",
       "result": "pass"
     },
     "lighthouse:/subscribe/": {
-      "fingerprint": "98e5749ea2f5a981cc9f20cd5eed336d04bb6bad",
-      "recordedAt": "2026-10-16T20:15:41.677Z",
+      "fingerprint": "f9add3bbe328e8ed1ca70e95a7ea3bd2453a24ca",
+      "recordedAt": "2026-10-16T20:29:29.991Z",
       "result": "pass"
     },
     "e2e:me-hero-tips.spec.ts": {
-      "fingerprint": "cdd38f1f077eed0d5e445649c7ace92db753df11",
-      "recordedAt": "2026-10-16T20:15:41.677Z",
+      "fingerprint": "7842cef2dddf9fe96d1b78f0c944db61e0d7a153",
+      "recordedAt": "2026-10-16T20:29:29.991Z",
       "result": "pass"
     },
     "e2e:experiments.spec.ts": {
-      "fingerprint": "77f4cbc3093a50d235fafa7be3fab74f50024d06",
-      "recordedAt": "2026-10-16T20:15:41.677Z",
+      "fingerprint": "331a025d1039102c75da039ef5c0d1e78f70544c",
+      "recordedAt": "2026-10-16T20:29:29.991Z",
       "result": "pass"
     },
     "lighthouse:/me/": {
-      "fingerprint": "0d61746a0058cba36351061143920a00469b7451",
-      "recordedAt": "2026-10-16T20:15:41.677Z",
+      "fingerprint": "b86ff856bf6734ee1354f689c686328acfb767ad",
+      "recordedAt": "2026-10-16T20:29:29.991Z",
       "result": "pass"
     },
     "lighthouse:/en/me/": {
-      "fingerprint": "0d61746a0058cba36351061143920a00469b7451",
-      "recordedAt": "2026-10-16T20:15:41.677Z",
+      "fingerprint": "b86ff856bf6734ee1354f689c686328acfb767ad",
+      "recordedAt": "2026-10-16T20:29:29.991Z",
       "result": "pass"
     },
     "lighthouse:/experiments/": {
-      "fingerprint": "08ef97c1f677a1ef524d9bb4eea1b3aa16578dc8",
-      "recordedAt": "2026-10-16T20:15:41.677Z",
+      "fingerprint": "db7def7e9362873bda34e870fa87ec291a79ba75",
+      "recordedAt": "2026-10-16T20:29:29.991Z",
       "result": "pass"
     },
     "page-weight": {
-      "fingerprint": "7fa84e7c492bbe6543257172a791ddbc13ea5115",
-      "recordedAt": "2026-10-16T20:15:41.677Z",
+      "fingerprint": "003898055d3241a9a00c29ffa91f1c16f8332940",
+      "recordedAt": "2026-10-16T20:29:29.990Z",
       "result": "pass"
     },
     "e2e:me-flat-sections.spec.ts": {
-      "fingerprint": "66c252c2097ddb9edd6c197093bb8a5aa55cbd13",
-      "recordedAt": "2026-10-16T20:15:41.677Z",
+      "fingerprint": "daaf03e97e2734a28e9c03fc0f3e2cb6a217dfa4",
+      "recordedAt": "2026-10-16T20:29:29.991Z",
       "result": "pass"
     },
     "e2e:no-horizontal-overflow.spec.ts": {
-      "fingerprint": "f8a833869792daa944d1baecd3243e468c6c22c2",
-      "recordedAt": "2026-10-16T20:15:41.677Z",
+      "fingerprint": "cc9c49b7b3d245d5fe40cf954d2b59868736f7ce",
+      "recordedAt": "2026-10-16T20:29:29.991Z",
       "result": "pass"
     },
     "e2e:notes-tag-filter.spec.ts": {
-      "fingerprint": "1aac17a9a8ec6c2eae2a1ead99bfa3f3f484b817",
-      "recordedAt": "2026-10-16T20:15:41.677Z",
+      "fingerprint": "d799eeef046ef3587d436180c37a68afee06725d",
+      "recordedAt": "2026-10-16T20:29:29.991Z",
       "result": "pass"
     },
     "e2e:notes-start-here.spec.ts": {
-      "fingerprint": "245abb71292e7bc0faf81ad547de5a29d7cacb0f",
-      "recordedAt": "2026-10-16T20:15:41.677Z",
+      "fingerprint": "ff30d590dd76afe8856521e2d587fe6df3410ac2",
+      "recordedAt": "2026-10-16T20:29:29.991Z",
       "result": "pass"
     },
     "e2e:notes-topics.spec.ts": {
-      "fingerprint": "80f31bfffd52a6e3b9bdadacc50a4b03150bdcc1",
-      "recordedAt": "2026-10-16T20:15:41.677Z",
+      "fingerprint": "327699a93057be585106da17713ec0463cff9672",
+      "recordedAt": "2026-10-16T20:29:29.991Z",
       "result": "pass"
     },
     "e2e:font-swap.spec.ts": {
-      "fingerprint": "480a403bd29ec8bed1758d2f3bfcc2dbc9c0cc73",
-      "recordedAt": "2026-10-16T20:15:41.677Z",
+      "fingerprint": "d762345128747a9bc8066bd9e2cd067048532ed6",
+      "recordedAt": "2026-10-16T20:29:29.991Z",
       "result": "pass"
     },
     "e2e:changelog.spec.ts": {
-      "fingerprint": "3abcaf66eb8faef830b826d299893e8dfcbd7de4",
-      "recordedAt": "2026-10-16T20:15:41.677Z",
+      "fingerprint": "aee6448ab488e0bc0a15cf689ad23d9e9fe3d786",
+      "recordedAt": "2026-10-16T20:29:29.991Z",
       "result": "pass"
     },
     "e2e:inner-banner.spec.ts": {
-      "fingerprint": "eedcb845e8215b804f5dcb9409db858c783e50d9",
-      "recordedAt": "2026-10-16T20:15:41.677Z",
+      "fingerprint": "4864f9d5442248d1dca949d7815f8a9bd811d8e7",
+      "recordedAt": "2026-10-16T20:29:29.991Z",
       "result": "pass"
     },
     "lighthouse:/notes/tag/pruebas/": {
-      "fingerprint": "067f75385d6458bbd9c3a720f16f4534b19689ca",
-      "recordedAt": "2026-10-16T20:15:41.677Z",
+      "fingerprint": "0e9bc6288dc5c25d6f3db5de89efa132274da088",
+      "recordedAt": "2026-10-16T20:29:29.991Z",
       "result": "pass"
     },
     "e2e:back-to-top-bar.spec.ts": {
-      "fingerprint": "130654174aef5c7097222f188a4880a68e426c16",
-      "recordedAt": "2026-10-16T20:15:41.677Z",
+      "fingerprint": "1f9e6fa6771687b0b4fa456ce9586eb8d73658f2",
+      "recordedAt": "2026-10-16T20:29:29.990Z",
       "result": "pass"
     },
     "e2e:web-app-manifest.spec.ts": {
-      "fingerprint": "1e0f025eccddca17021691ecd813894e0a7f3501",
-      "recordedAt": "2026-10-16T20:15:41.677Z",
+      "fingerprint": "e71d26d133f8447939ed17ca56824263fd139b20",
+      "recordedAt": "2026-10-16T20:29:29.991Z",
       "result": "pass"
     },
     "e2e:navbar-a11y.spec.ts": {
-      "fingerprint": "a6415e613fb0e9413c0e0b00de08caed8079cded",
-      "recordedAt": "2026-10-16T20:15:41.677Z",
+      "fingerprint": "8488290d59ded6ea6b8562d071178d9907e5e013",
+      "recordedAt": "2026-10-16T20:29:29.991Z",
       "result": "pass"
     },
     "e2e:navbar-menu.spec.ts": {
-      "fingerprint": "e822be95f7b851ab2ee80b743f46b474fa512c1d",
-      "recordedAt": "2026-10-16T20:15:41.677Z",
+      "fingerprint": "cd742fd09417184a065d2aa47de51e65bb600e29",
+      "recordedAt": "2026-10-16T20:29:29.991Z",
       "result": "pass"
     },
     "e2e:navbar-pixel.spec.ts": {
-      "fingerprint": "d11552c2cb9d66d7735fd7ac4969746323f236fc",
-      "recordedAt": "2026-10-16T20:15:41.677Z",
+      "fingerprint": "cea1c6511661bf591e77d885e60608d74d6a8a31",
+      "recordedAt": "2026-10-16T20:29:29.991Z",
       "result": "pass"
     },
     "e2e:navbar-surface.spec.ts": {
-      "fingerprint": "8e551df4e8f73c8c57721925ea9195645d4a356b",
-      "recordedAt": "2026-10-16T20:15:41.677Z",
+      "fingerprint": "301f95ed094dc36ead306b953d369189fd58a12b",
+      "recordedAt": "2026-10-16T20:29:29.991Z",
       "result": "pass"
     },
     "e2e:experiments-buttons.spec.ts": {
-      "fingerprint": "183f0e5454b6c5b846b51f2ca0d9cafc92a5b0b3",
-      "recordedAt": "2026-10-16T20:15:41.677Z",
+      "fingerprint": "2abdec843b4c34b7f883d7fb1b464a30235723c4",
+      "recordedAt": "2026-10-16T20:29:29.991Z",
       "result": "pass"
     },
     "e2e:experiments-images.spec.ts": {
-      "fingerprint": "ec583a121f60fd0c04ad04e90817b9fab2681ef1",
-      "recordedAt": "2026-10-16T20:15:41.677Z",
+      "fingerprint": "43d69ba46cd7074557694b8c065df81a3fa86489",
+      "recordedAt": "2026-10-16T20:29:29.991Z",
       "result": "pass"
     },
     "e2e:experiments-panel.spec.ts": {
-      "fingerprint": "817a6e9d25d91749b39aa1b0417a20de99499792",
-      "recordedAt": "2026-10-16T20:15:41.677Z",
+      "fingerprint": "82d54482207ac1008e8201418d39245995256da9",
+      "recordedAt": "2026-10-16T20:29:29.991Z",
       "result": "pass"
     },
     "e2e:experiments-hover.spec.ts": {
-      "fingerprint": "f31b33fe0dbca04322cfac800947a177eaeabcfa",
-      "recordedAt": "2026-10-16T20:15:41.677Z",
+      "fingerprint": "e56b04cb1367f7720a0b02ab7564b1e92da33125",
+      "recordedAt": "2026-10-16T20:29:29.991Z",
       "result": "pass"
     },
     "e2e:education.spec.ts": {
-      "fingerprint": "ec7d10af39f14601affb202198a8456cd34d7f7e",
-      "recordedAt": "2026-10-16T20:15:41.677Z",
+      "fingerprint": "f4de0d678d3a7f5e138233233b0eb939f02b9460",
+      "recordedAt": "2026-10-16T20:29:29.991Z",
       "result": "pass"
     },
     "e2e:no-blog-feed.spec.ts": {
-      "fingerprint": "42bafb34748bc3fe07f1195ea29755306b223cc8",
-      "recordedAt": "2026-10-16T20:15:41.677Z",
+      "fingerprint": "22d40e146ef2a89553171435a4d08e8f5e600fc9",
+      "recordedAt": "2026-10-16T20:29:29.991Z",
       "result": "pass"
     },
     "e2e:reduced-motion.spec.ts": {
-      "fingerprint": "20f724e49ba2c0de446e265c30c37b3f399fe4ab",
-      "recordedAt": "2026-10-16T20:15:41.677Z",
+      "fingerprint": "7eb16c94eb2c560b3bd6717a3e73cc8a7e7c28f4",
+      "recordedAt": "2026-10-16T20:29:29.991Z",
       "result": "pass"
     },
     "e2e:reading-progress.spec.ts": {
-      "fingerprint": "9ea9dd539c093b7724168900708dd8571c74ae74",
-      "recordedAt": "2026-10-16T20:15:41.677Z",
+      "fingerprint": "34505d33522755fb32cd8c1b1dc72db4c7f62637",
+      "recordedAt": "2026-10-16T20:29:29.991Z",
       "result": "pass"
     },
     "e2e:decision-record.spec.ts": {
-      "fingerprint": "f69805e5085b0e6fabdda93931fe9ce7a8f92d11",
-      "recordedAt": "2026-10-16T20:15:41.677Z",
+      "fingerprint": "10254fad1c947273528b4eead7a18156c61c3a78",
+      "recordedAt": "2026-10-16T20:29:29.991Z",
       "result": "pass"
     },
     "e2e:home-ink.spec.ts": {
-      "fingerprint": "595b211b27720f669fe4e39762e96e6b4f00581d",
-      "recordedAt": "2026-10-16T20:15:41.677Z",
+      "fingerprint": "e3696a4e4852447cbb53128ca2f9b6b51f504780",
+      "recordedAt": "2026-10-16T20:29:29.991Z",
       "result": "pass"
     },
     "e2e:ink.spec.ts": {
-      "fingerprint": "5b85d8d924d7fa5ccb96acf7619b4c2c50994032",
-      "recordedAt": "2026-10-16T20:15:41.677Z",
+      "fingerprint": "56256061eddabda1ac6ce214cbd6eaa547f8f4b0",
+      "recordedAt": "2026-10-16T20:29:29.991Z",
       "result": "pass"
     },
     "e2e:me-data-layer.spec.ts": {
-      "fingerprint": "a134df2e52eb0db28242c6ba4d3cae4fbc52b8a4",
-      "recordedAt": "2026-10-16T20:15:41.677Z",
+      "fingerprint": "b5591ba4898ccc07975991e23d49c1ec8d12ebff",
+      "recordedAt": "2026-10-16T20:29:29.991Z",
       "result": "pass"
     },
     "e2e:native-feel.spec.ts": {
-      "fingerprint": "2a42ee464351b95981d9da1b2ef7ff6bdbdba8ba",
-      "recordedAt": "2026-10-16T20:15:41.677Z",
+      "fingerprint": "a35131a072c98f75d0bcfc3904c72e984dc26eb1",
+      "recordedAt": "2026-10-16T20:29:29.991Z",
       "result": "pass"
     },
     "e2e:note-prose.spec.ts": {
-      "fingerprint": "5fc6ebe22dd9c88036221ce4f4ecd49a2726b9cf",
-      "recordedAt": "2026-10-16T20:15:41.677Z",
+      "fingerprint": "573eddea02af8ffdd1e4f0fa6296619f5d1c8dce",
+      "recordedAt": "2026-10-16T20:29:29.991Z",
       "result": "pass"
     },
     "e2e:notes-index-ruled.spec.ts": {
-      "fingerprint": "63418140eb56ac7de75ed9c2233583665b4868d1",
-      "recordedAt": "2026-10-16T20:15:41.677Z",
+      "fingerprint": "92e315844b9bbc3c3bdda1471e35f72c5788c635",
+      "recordedAt": "2026-10-16T20:29:29.991Z",
       "result": "pass"
     },
     "e2e:notes-index-path.spec.ts": {
-      "fingerprint": "1403f1cbf044e4bcdc829f132d9461e4e8f0b96d",
-      "recordedAt": "2026-10-16T20:15:41.677Z",
+      "fingerprint": "dc3d4abc01f4309eed6ea320ba8c5d3eeeed3c0f",
+      "recordedAt": "2026-10-16T20:29:29.991Z",
       "result": "pass"
     },
     "e2e:notes-index-controls.spec.ts": {
-      "fingerprint": "a92bcdc26215b49fb588b8ed3c7eefb7613ea08c",
-      "recordedAt": "2026-10-16T20:15:41.677Z",
+      "fingerprint": "50c11d0c6e238b2ea6c2c3918bffc0fae7df6242",
+      "recordedAt": "2026-10-16T20:29:29.991Z",
       "result": "pass"
     },
     "e2e:notes-sidebar-tags.spec.ts": {
-      "fingerprint": "86e443d04c9690771ec98c57701d7a31c3a3fa36",
-      "recordedAt": "2026-10-16T20:15:41.677Z",
+      "fingerprint": "ba7e841897c866d735c9b80bfcd6e6559fa1a782",
+      "recordedAt": "2026-10-16T20:29:29.991Z",
       "result": "pass"
     },
     "e2e:page-stamps.spec.ts": {
-      "fingerprint": "50666d9d8ab8344dede80a424546e8edda5f8d71",
-      "recordedAt": "2026-10-16T20:15:41.677Z",
+      "fingerprint": "2e0b5d1bd6e5b7732f899f665dfb4d22c2ca1c63",
+      "recordedAt": "2026-10-16T20:29:29.991Z",
       "result": "pass"
     },
     "e2e:view-transitions.spec.ts": {
-      "fingerprint": "ffe1539351e6aa93a0cd1b1876137170c1c01537",
-      "recordedAt": "2026-10-16T20:15:41.677Z",
+      "fingerprint": "c1bb68a7f6a8dd27b3afc85d5c81768e5f01e78b",
+      "recordedAt": "2026-10-16T20:29:29.991Z",
       "result": "pass"
     },
     "e2e:experiment-nudge.spec.ts": {
-      "fingerprint": "d341eb9ad1068f65a1f7839dd09cdfc028f1b815",
-      "recordedAt": "2026-10-16T20:15:41.677Z",
+      "fingerprint": "24358c7acf928f54a09edaac0b1bfdf3360f281b",
+      "recordedAt": "2026-10-16T20:29:29.991Z",
       "result": "pass"
     },
     "e2e:home-byline.spec.ts": {
-      "fingerprint": "c8e2ff7e021ab58b6d288c0ade59c1b721592aa9",
-      "recordedAt": "2026-10-16T20:15:41.677Z",
+      "fingerprint": "e865e91c904e82422dbba3a717d487db095dbd69",
+      "recordedAt": "2026-10-16T20:29:29.991Z",
       "result": "pass"
     },
     "lighthouse:/education/": {
-      "fingerprint": "bfd8e291a3b38516ad520e1d08578824746e1c66",
-      "recordedAt": "2026-10-16T20:15:41.677Z",
+      "fingerprint": "dcb530f02fe09329d4b149856b45bc6a77918bea",
+      "recordedAt": "2026-10-16T20:29:29.991Z",
       "result": "pass"
     },
     "lighthouse:/en/education/": {
-      "fingerprint": "bfd8e291a3b38516ad520e1d08578824746e1c66",
-      "recordedAt": "2026-10-16T20:15:41.677Z",
+      "fingerprint": "dcb530f02fe09329d4b149856b45bc6a77918bea",
+      "recordedAt": "2026-10-16T20:29:29.991Z",
       "result": "pass"
     }
   }
