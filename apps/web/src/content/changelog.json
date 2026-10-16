@@ -1011,5 +1011,11 @@
     "category": "changed",
     "title": "The profile shows a shorter, focused tech stack",
     "description": "The /me stack now shows about 12 core tools across the four layers. The jargon tools were removed, with their scope explained at the group level, so the card is shorter and lighter."
+  },
+  "note-decision-record-once": {
+    "date": "2026-10-16",
+    "category": "changed",
+    "title": "The note decision record renders once, lighter and faster",
+    "description": "Each note now renders its decision record once (above the body) instead of twice (a desktop hero copy and a mobile copy). This removed a slow Lighthouse run and restored the note gate to 2500 ms."
   }
 }

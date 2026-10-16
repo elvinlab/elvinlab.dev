@@ -166,11 +166,11 @@ taken per URL. LCP and the performance score use the median of the three runs (o
 2026-10-13: the worst-of-three gate failed releases 12 and 22 by 13 to 45 ms on runner noise, with
 single runs ranging from 2124 to 2645 ms on the same page); accessibility, best practices, SEO, CLS
 and TBT stay pessimistic, because they do not vary between runs.
-The `assertMatrix` in `lighthouserc.json` has one owner-approved exception (2026-10-12):
-`/notes/smoke-es/` allows performance ≥ 93 and LCP ≤ 2800 ms (the LCP gates were raised by 200 ms
-on 2026-10-13, from 2600 and 2500); accessibility, best practices, SEO, CLS and TBT stay unchanged.
-Every other gated URL retains performance ≥ 95 and LCP ≤ 2700 ms.
-Reducing note-page weight and restoring its original thresholds remains open in issue #119.
+The `assertMatrix` in `lighthouserc.json` matches the synthetic note to the same gate as the rest:
+`/notes/smoke-es/` allows performance ≥ 95 and LCP ≤ 2500 ms (restored 2026-10-16 after the decision
+record was rendered once instead of twice, which removed the bimodal slow run); every other gated URL
+keeps performance ≥ 95 and LCP ≤ 2700 ms (raised 2026-10-13). Accessibility, best practices, SEO,
+CLS and TBT stay unchanged.
 
 Lighthouse reports are written locally to `.lighthouseci/` (ignored by Git); the configuration
 does not upload them. CI runs every browser, white-label and performance gate in the `checks` job,
@@ -322,8 +322,8 @@ simulated slow 4G (about 1.6 Mbps, 150 ms round trip). The note page is about 98
 about 52 KB is inline CSS (the whole site stylesheet is inlined in every page), and it sits right at a
 TCP slow-start round-trip boundary: a few hundred more bytes cost one extra round trip, about 150 ms,
 and the LCP budget at the time was 2500 ms with only about 90 ms to spare.
-This is historical measurement evidence: since 2026-10-12 the note fixture alone uses
-2600 ms / performance ≥ 93; see the current Quality budgets section above and follow-up #119.
+This is historical measurement evidence; the note fixture gate was restored to 2500 ms / performance
+≥ 95 on 2026-10-16 (see the current Quality budgets section above), closing #119.
 
 Measured on 2026-10-02 on `/notes/smoke-es/` (worst of three runs; same machine, same fixture):
 

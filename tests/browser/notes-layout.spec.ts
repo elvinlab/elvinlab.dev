@@ -1,7 +1,6 @@
 import { expect, type Page, test } from '@playwright/test';
 
-import { has, profile, requires, seedTheme } from './helpers/features';
-import { themes } from './helpers/site';
+import { has, profile, requires } from './helpers/features';
 
 requires({ routes: ['notes'] });
 
@@ -105,21 +104,3 @@ for (const slug of ['smoke-es', 'smoke-es-next', 'smoke-en']) {
     expect(related).not.toContain(`/notes/${slug}/`);
   });
 }
-
-test('the decision record in the banner has a visible solid index-card border in the dark theme', async ({
-  page,
-}, testInfo) => {
-  test.skip(testInfo.project.name !== 'chromium-1280', 'the banner record shows from lg');
-  await seedTheme(page, themes.dark);
-  await page.goto('/notes/smoke-es/');
-  const border = await page.evaluate(() => {
-    const record = document.querySelector('[data-record-banner] section');
-    if (!record) return null;
-    const style = getComputedStyle(record);
-    return { style: style.borderTopStyle, color: style.borderTopColor };
-  });
-  // Index card (DESIGN.md, "Decision record as an index card"): a 1 px solid divider, no longer dashed.
-  expect(border?.style).toBe('solid');
-  // The dark divider is white at 20 percent alpha (it was 14), so the alpha channel is 0.2.
-  expect(border?.color).toMatch(/rgba\(255, 255, 255, 0\.2\)/);
-});

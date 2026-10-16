@@ -83,7 +83,7 @@ const readingLabel = t(locale, 'notes.readingTime', { min: readingMinutes(entry.
   <ReadingProgressMemory slot="floating" part="note" slug={entry.id} />
   <Banner slot="banner" height="360px">
     <BackgroundCanvas slot="background" />
-    <div data-banner-split class="lg:grid lg:grid-cols-[minmax(0,1fr)_26rem] lg:items-end lg:gap-12">
+    <div data-banner-split>
       <div>
         <p class="font-mono text-sm text-muted">
           <a href={localizePath('/notes/', 'es', LOCALES)} class="hover:text-primary">{t(locale, 'note.breadcrumb')}</a>
@@ -101,15 +101,12 @@ const readingLabel = t(locale, 'notes.readingTime', { min: readingMinutes(entry.
       </p>
       <MarkSection slug={entry.id} locale={locale} variant="header" />
       </div>
-      <div data-record-banner class="hidden lg:block">
-        <DecisionRecord locale={locale} decision={data.decision} variant="banner" />
-      </div>
     </div>
   </Banner>
 
   <article data-article class="flex flex-col gap-8 rounded-card bg-card p-6 md:p-10">
     <ReadingMode part="toggle" locale={locale} />
-    <div data-record-inline class="lg:hidden"><DecisionRecord locale={locale} decision={data.decision} variant="card" /></div>
+    <div data-record-inline><DecisionRecord locale={locale} decision={data.decision} variant="card" /></div>
     <template data-page-weight-start></template><div class="prose"><Content /></div><template data-page-weight-end></template>
 
     <div class="flex flex-col gap-3 border-t border-dashed border-divider pt-6">
