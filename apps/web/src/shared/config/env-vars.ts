@@ -114,6 +114,15 @@ export const ENV_VARS: readonly EnvVar[] = [
     setIn: 'Cloudflare Worker secret; `.dev.vars` locally',
   },
   {
+    name: 'CI',
+    scope: 'ci',
+    secret: false,
+    required: false,
+    description:
+      'Set to `true` by GitHub Actions. The CI gates read it to retry noisy checks once (ADR 0018) and to forbid `.only` in specs; never set by hand.',
+    setIn: 'GitHub Actions sets it automatically',
+  },
+  {
     name: 'CLOUDFLARE_API_TOKEN',
     scope: 'ci',
     secret: true,

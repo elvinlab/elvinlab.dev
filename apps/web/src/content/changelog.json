@@ -1029,5 +1029,11 @@
     "category": "changed",
     "title": "Experiment case pages share their own card",
     "description": "Each case page now has its own share card (/og/experiments/<slug>.png) with the year, title and owner, and its title no longer repeats the site name when the experiment is named after the site."
+  },
+  "noisy-gate-retry-policy": {
+    "date": "2026-10-16",
+    "category": "changed",
+    "title": "Noisy CI gates retry once and report flakes",
+    "description": "In CI, Playwright tests retry once and Lighthouse re-runs a failed URL once; a pass on the retry is listed as flaky in the run summary instead of blocking a release or hiding silently. Deterministic gates still fail immediately."
   }
 }

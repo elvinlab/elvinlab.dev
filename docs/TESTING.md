@@ -66,6 +66,7 @@ The single source of truth is [`apps/web/scripts/verification-map.ts`](../apps/w
 - `--run` ends with `elapsed <n>s (full stack baseline 340 s: saved <p>%)`. Baseline, what changed and the measurements: [`odd/verification-timings.md`](../odd/verification-timings.md).
 - CI shards the `e2e` job in four (`--shard=N/4`); white-label, `version.txt` and the image check run in shard 1 only; `checks` needs the whole matrix. Each job prints its duration in the run summary.
 - CI also runs Lighthouse in two shards (`--shard=N/2`): each takes every second URL of `lighthouserc.json`, still 3 runs per URL and the same assertions. Locally `pnpm test:lighthouse` runs all configured URLs (13 currently); `node apps/web/scripts/run-lighthouse-ci.ts --shard 1/2` reproduces a CI shard. `--url` wins over `--shard`; `--runs` composes with both. `checks` needs the whole matrix, so it fails if either shard fails.
+- **Noisy gates retry once, in CI only** ([ADR 0018](adr/0018-noisy-gate-retry-policy.md)): Playwright retries a test once and Lighthouse re-runs a failed URL once; a pass on the retry is listed as flaky in that job's run summary, never hidden. Deterministic gates (`lint`, `depcruise`, `typecheck`, unit tests, `build`, budgets) never retry. Local runs and `pnpm verify` keep retries off.
 - A diff in `apps/web/src/shared/i18n/index.ts` that only adds keys is ignored; a changed or removed key counts.
 - `pnpm verify --run` with Lighthouse runs only the affected URLs (`run-lighthouse-ci.ts --url <path>`, repeatable); with no flag it measures every URL of `lighthouserc.json` as before.
 - Biome does not read Markdown, so a docs-only change plans `lint` and runs nothing.
@@ -176,6 +177,15 @@ CLS and TBT stay unchanged.
 Lighthouse reports are written locally to `.lighthouseci/` (ignored by Git); the configuration
 does not upload them. CI runs every browser, white-label and performance gate in the `checks` job,
 which the deploy job requires.
+
+**Noisy-gate retry policy** ([ADR 0018](adr/0018-noisy-gate-retry-policy.md)). A flaky measurement
+must neither block a release nor hide silently. Deterministic gates — `lint`, `depcruise`,
+`typecheck`, unit tests, `build` and the size budgets — never retry: their failure is real. The two
+noisy gates retry once, in CI only: Playwright (`e2e`, `profiles`, the notes fast-lane changelog
+spec) with `retries: 1`, and Lighthouse with one automatic re-run of each URL that failed an
+assertion. A pass on the retry is reported as flaky in that job's run summary
+(`node apps/web/scripts/list-flaky.ts` for Playwright; `.lighthouseci/flaky.md` for Lighthouse).
+Locally and under `pnpm verify`, retries stay off so a developer sees the unfiltered result.
 
 ### Optional production audits
 

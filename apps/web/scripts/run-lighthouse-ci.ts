@@ -118,29 +118,113 @@ async function filteredConfig(
   return file;
 }
 
+/** One failed Lighthouse assertion, as written to `.lighthouseci/assertion-results.json`. */
+export interface AssertionResult {
+  url: string;
+  level: 'error' | 'warn';
+  passed: boolean;
+  auditId?: string;
+}
+
+/** A URL that failed at least one error-level assertion, with the audits that failed. */
+export interface FailedUrl {
+  url: string;
+  audits: string[];
+}
+
+/**
+ * The URLs (with their failing audits) that broke an `lhci autorun` assertion pass. Warnings and
+ * passing results never fail the gate, so they are dropped; repeated audits of the same URL are
+ * deduplicated, and the output is ordered by URL for a stable retry and summary.
+ */
+export function failedUrls(results: readonly AssertionResult[]): FailedUrl[] {
+  const byUrl = new Map<string, Set<string>>();
+  for (const result of results) {
+    if (result.level !== 'error' || result.passed) continue;
+    const audits = byUrl.get(result.url) ?? new Set<string>();
+    if (result.auditId) audits.add(result.auditId);
+    byUrl.set(result.url, audits);
+  }
+  return [...byUrl.entries()]
+    .map(([url, audits]) => ({ url, audits: [...audits].sort() }))
+    .sort((a, b) => a.url.localeCompare(b.url));
+}
+
+/** The one-line-per-URL markdown the CI run summary shows when a retry turns a failure into a pass. */
+export function flakyMarkdown(failed: readonly FailedUrl[]): string {
+  return failed
+    .map(({ url, audits }) => {
+      const path = new URL(url).pathname;
+      return audits.length > 0 ? `- ${path} (${audits.join(', ')})` : `- ${path}`;
+    })
+    .join('\n');
+}
+
+/** Runs `lhci autorun` once with the given filtered config and run count; returns its exit status. */
+function runAutorun(config: string | undefined, runs: number | undefined): number {
+  const result = spawnSync(
+    process.execPath,
+    [
+      cli,
+      'autorun',
+      ...(config ? [`--config=${config}`] : []),
+      ...(runs ? [`--collect.numberOfRuns=${runs}`] : []),
+    ],
+    {
+      cwd: root,
+      env: { ...process.env, CHROME_PATH: chromium.executablePath(), SITE_INDEXABLE: 'true' },
+      stdio: 'inherit',
+    },
+  );
+  if (result.error) throw result.error;
+  return result.status ?? 1;
+}
+
+/** The failed assertions `lhci autorun` wrote, or an empty list when none were recorded. */
+function readAssertionResults(): AssertionResult[] {
+  try {
+    return JSON.parse(
+      readFileSync(join(root, '.lighthouseci', 'assertion-results.json'), 'utf8'),
+    ) as AssertionResult[];
+  } catch {
+    return [];
+  }
+}
+
+/** The CI flake marker the workflow copies into the run summary; `.lighthouseci/` is git-ignored. */
+function writeFlakySummary(markdown: string): void {
+  writeFileSync(join(root, '.lighthouseci', 'flaky.md'), markdown);
+}
+
 async function main(): Promise<void> {
   const scratch = mkdtempSync(join(tmpdir(), 'lhci-'));
   try {
     const args = process.argv.slice(2);
     const config = await filteredConfig(requestedPaths(args), parseShard(args), scratch);
     const runs = requestedRuns(args);
-    const result = spawnSync(
-      process.execPath,
-      [
-        cli,
-        'autorun',
-        ...(config ? [`--config=${config}`] : []),
-        ...(runs ? [`--collect.numberOfRuns=${runs}`] : []),
-      ],
-      {
-        cwd: root,
-        env: { ...process.env, CHROME_PATH: chromium.executablePath(), SITE_INDEXABLE: 'true' },
-        stdio: 'inherit',
-      },
-    );
+    const status = runAutorun(config, runs);
 
-    if (result.error) throw result.error;
-    process.exitCode = result.status ?? 1;
+    // CI only: a noisy gate retries once instead of blocking a release, and never hides the flake.
+    // A failure with no failed URL recorded (for example a collect error) stays immediate.
+    if (status !== 0 && process.env['CI']) {
+      const failed = failedUrls(readAssertionResults());
+      if (failed.length > 0) {
+        const retryConfig = await filteredConfig(
+          failed.map(({ url }) => new URL(url).pathname),
+          undefined,
+          scratch,
+        );
+        if (runAutorun(retryConfig, runs) === 0) {
+          const summary = flakyMarkdown(failed);
+          writeFlakySummary(summary);
+          console.log(`Flaky Lighthouse URLs (passed on re-run):\n${summary}`);
+          process.exitCode = 0;
+          return;
+        }
+      }
+    }
+
+    process.exitCode = status;
   } finally {
     rmSync(scratch, { recursive: true, force: true });
   }

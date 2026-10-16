@@ -42,3 +42,4 @@ Short (≤40 lines each).
 | [0015](./0015-images-live-in-the-repository.md) | Images live in the repository; Cloudflare R2 is the documented way out | Accepted |
 | [0016](./0016-publish-note-command-and-notes-fast-lane.md) | One-command note publishing and a notes-only CI fast lane | Accepted |
 | [0017](./0017-the-ci-follows-the-site-config.md) | The CI follows the site config: adopter profiles, non-blocking | Accepted |
+| [0018](./0018-noisy-gate-retry-policy.md) | Noisy gates retry once and report flakes | Accepted |
