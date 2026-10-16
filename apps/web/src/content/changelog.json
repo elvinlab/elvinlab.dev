@@ -981,5 +981,11 @@
     "category": "changed",
     "title": "The experiment card no longer floats while reading",
     "description": "The floating experiment card that appeared partway through a note is now off; only the static card at the end of each note (and the home block) remains. A new nudge.floating switch lets it be turned back on."
+  },
+  "note-heading-fix-forbidden": {
+    "date": "2026-10-16",
+    "category": "changed",
+    "title": "A Fix inside a note heading is now forbidden",
+    "description": "Fix carries its text in props, so inside a heading it dropped its words from the heading anchor and the table of contents. The build check now forbids it; Ink is still allowed in headings."
   }
 }

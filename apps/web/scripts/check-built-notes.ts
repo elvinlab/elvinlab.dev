@@ -48,6 +48,24 @@ export function parseNoteFrontmatter(mdx: string): NoteFrontmatter {
   return { lang: unquote(lang), tags };
 }
 
+/** Heading lines (`# `…`###### `) that contain a `Fix` component, ignoring fenced code blocks.
+ * `Fix` carries its text in props (`wrong`/`right`), so a `Fix` inside a heading would drop its words
+ * from the heading slug (a trailing dash, a broken anchor) and from the table of contents. `Ink`
+ * takes a `<slot>`, so its text reaches both, and it is allowed (DESIGN.md, "Notebook ink system"). */
+export function fixInHeadingLines(mdx: string): string[] {
+  const lines: string[] = [];
+  let inFence = false;
+  for (const line of mdx.split('\n')) {
+    if (/^\s*(```|~~~)/.test(line)) {
+      inFence = !inFence;
+      continue;
+    }
+    if (inFence) continue;
+    if (/^#{1,6}\s+/.test(line) && /<Fix\b/.test(line)) lines.push(line.trim());
+  }
+  return lines;
+}
+
 const pathOf = (url: string): string => {
   try {
     return new URL(url, 'https://site.invalid').pathname;
@@ -208,6 +226,15 @@ export function checkBuiltNotesReport(input: CheckInput): CheckReport {
     if (!/<h1[\s>]/i.test(html)) errors.push(`${rel}: no <h1>`);
     if (!/<link\b[^>]*\brel=["']canonical["']/i.test(html))
       errors.push(`${rel}: no canonical link`);
+  }
+
+  // 1b. No note puts a `Fix` component inside a heading: its text lives in props, so the heading
+  // slug and the table of contents would drop it (DESIGN.md, "Notebook ink system").
+  for (const note of notes) {
+    const mdx = readFileSync(join(contentDir, 'notes', note.slug, 'index.mdx'), 'utf8');
+    for (const line of fixInHeadingLines(mdx)) {
+      errors.push(`notes/${note.slug}/index.mdx: Fix inside a heading — "${line}"`);
+    }
   }
 
   // 2. The notes index lists every published note (all languages).
