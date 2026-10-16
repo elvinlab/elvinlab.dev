@@ -969,5 +969,11 @@
     "category": "fixed",
     "title": "The profile page no longer jumps when its fonts load",
     "description": "The /me hero text reflowed when IBM Plex Sans swapped in on a slow load (the headline and the action row re-wrapped and pushed the rest of the page, measured as CLS 0.31 once in CI against the 0.1 gate). The page now preloads the font, so the layout settles once and stays put."
+  },
+  "installable-web-app": {
+    "date": "2026-10-16",
+    "category": "added",
+    "title": "The site is installable as a web app",
+    "description": "elvinlab.dev can now be added to the home screen or installed as an app. A web app manifest and an apple-touch-icon ship the name, colors and icons, with no service worker."
   }
 }

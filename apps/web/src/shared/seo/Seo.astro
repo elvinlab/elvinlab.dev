@@ -68,6 +68,8 @@ const themeColors = ['dark', 'light'].flatMap((scheme) => {
 {(alternates ?? links.alternates).map((alternate) => <link rel="alternate" hreflang={alternate.hreflang} href={alternate.href} />)}
 <link rel="icon" href="/favicon.ico" sizes="32x32" />
 <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+<link rel="apple-touch-icon" href="/apple-touch-icon.png" sizes="180x180" />
+<link rel="manifest" href="/manifest.webmanifest" />
 {showRss && <link rel="alternate" type="application/rss+xml" title={`${site.title} · Lab Notes`} href="/rss.xml" />}
 {themeColors.map(({ scheme, color }) => <meta name="theme-color" media={`(prefers-color-scheme: ${scheme})`} content={color} />)}
 <meta property="og:type" content={article ? 'article' : 'website'} />
