@@ -957,5 +957,11 @@
     "category": "changed",
     "title": "Routine dependency and tooling updates",
     "description": "Updated Astro, the Cloudflare adapter, Wrangler, Playwright and Preact to their latest patch and minor releases, and the CI cache action to 6.1.0, with no visible change. Forks should expect the same."
+  },
+  "home-sidebar-test-deterministic": {
+    "date": "2026-10-16",
+    "category": "fixed",
+    "title": "A steadier browser test for the home sidebar",
+    "description": "The test that checks how the home sidebar cards line up now pins the footprint counter, so the number of cards is the same on every run instead of depending on when the stubbed read answers. Nothing changes for visitors."
   }
 }
