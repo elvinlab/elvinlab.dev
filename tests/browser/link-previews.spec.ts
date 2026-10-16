@@ -93,17 +93,19 @@ test.describe('other pages keep the default card', () => {
   }
 });
 
-for (const { path, locale, card, bio } of [
+for (const { path, locale, card, role, bio } of [
   {
     path: '/me/',
     locale: 'es_ES',
     card: 'me-es',
+    role: identityIn('es').role,
     bio: identityIn('es').bio.split(' ').slice(0, 2).join(' '),
   },
   {
     path: '/en/me/',
     locale: 'en_US',
     card: 'me-en',
+    role: identityIn('en').role,
     bio: identityIn('en').bio.split(' ').slice(0, 2).join(' '),
   },
 ]) {
@@ -123,7 +125,7 @@ for (const { path, locale, card, bio } of [
       );
       await expect(meta(page, 'property', 'og:title')).toHaveAttribute(
         'content',
-        `${site.name} · ${site.title}`,
+        `${site.name} · ${role} · ${site.title}`,
       );
       await expect(meta(page, 'property', 'og:description')).toHaveAttribute(
         'content',
