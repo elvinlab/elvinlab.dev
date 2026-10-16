@@ -301,33 +301,13 @@ test('the decision record follows the preset spacing and keeps every label', asy
   expect(order).toBeGreaterThan(0);
 });
 
-test('the decision record sits in the banner from lg up and inline in the article below it', async ({
-  page,
-}, testInfo) => {
+test('the decision record is rendered once, in the article, at every width', async ({ page }) => {
   test.skip(!has({ routes: ['notes'] }), 'needs the notes routes');
   await page.goto('/notes/smoke-es/');
-  const inBanner = page.locator('[data-banner] section[aria-label]');
   const inArticle = page.locator('[data-article] section[aria-label]');
-  await expect(inBanner).toHaveCount(1);
   await expect(inArticle).toHaveCount(1);
-  if (testInfo.project.name === 'chromium-360') {
-    await expect(inArticle).toBeVisible();
-    await expect(inBanner).toBeHidden();
-    return;
-  }
-  await expect(inBanner).toBeVisible();
-  await expect(inArticle).toBeHidden();
-  // Three stacked fields, labelled as in the inline record, to the right of the title block. The
-  // decorative stamp is a fourth span and is not one of the fields.
-  await expect(inBanner.locator('span:not([data-stamp])')).toHaveCount(3);
-  await expect(inBanner.locator('p')).toHaveCount(3);
-  const record = await inBanner.boundingBox();
-  const title = await page.locator('[data-banner] h1').boundingBox();
-  const banner = await page.locator('[data-banner]').boundingBox();
-  if (!record || !title || !banner) throw new Error('missing box');
-  expect(record.x).toBeGreaterThanOrEqual(title.x + title.width);
-  expect(record.y).toBeGreaterThanOrEqual(banner.y);
-  expect(record.y + record.height).toBeLessThanOrEqual(banner.y + banner.height);
+  await expect(page.locator('[data-banner] section[aria-label]')).toHaveCount(0);
+  await expect(inArticle).toBeVisible();
 });
 
 test('the note header keeps date and reading time, and the preset places badge, author and tags', async ({
