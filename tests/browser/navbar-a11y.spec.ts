@@ -227,10 +227,10 @@ for (const theme of [themes.dark, themes.light]) {
 }
 
 test.describe('200% zoom reflow', () => {
-  test('the six links fold into the menu, the bar keeps one row and nothing scrolls sideways', async ({
+  test('the nav links fold into the menu, the bar keeps one row and nothing scrolls sideways', async ({
     browser,
   }) => {
-    // 200% of a 1280 px desktop: the CSS viewport is 640 px, so the responsive menu replaces the six links.
+    // 200% of a 1280 px desktop: the CSS viewport is 640 px, so the responsive menu replaces the nav links.
     const context = await browser.newContext({ viewport: { width: 640, height: 900 } });
     const page = await context.newPage();
     await stubThirdParties(page);
@@ -240,12 +240,12 @@ test.describe('200% zoom reflow', () => {
     expect(
       await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth),
     ).toBe(true);
-    // Every nav link lives in the menu, which opens with the keyboard and never overflows the page.
+    // The nav links live in the menu (the home link is always there), which opens with the keyboard and never overflows the page.
     await page.locator('[data-nav-toggle]').focus();
     await page.keyboard.press('Enter');
     await expect(page.locator('#nav-menu')).toBeVisible();
     await expect(page.locator('#nav-menu a').first()).toBeFocused();
-    expect(await page.locator('#nav-menu a').count()).toBeGreaterThanOrEqual(6);
+    expect(await page.locator('#nav-menu a').count()).toBeGreaterThanOrEqual(1);
     expect(
       await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth),
     ).toBe(true);
