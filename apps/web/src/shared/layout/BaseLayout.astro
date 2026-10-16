@@ -72,7 +72,9 @@ const beaconToken = integrations.analyticsToken;
 // the 2500 ms gate; dropping the JetBrains preload gave ~2265 ms; dropping the Plex one too moved
 // the home to 1556-1971 ms and /me/ to 1665-2115 ms (CLS 0.025 on the note page, gate 0.1). Latin-ext,
 // Vietnamese and Press Start 2P stay lazy via `unicode-range`. Only the small pixel Latin file
-// (~12 KB) is preloaded, on pages whose H1 uses it; the home preloads it itself.
+// (~12 KB) is preloaded, on pages whose H1 uses it; the home preloads it itself. /me/ additionally
+// preloads Plex through the `head` slot (MePage.astro): its hero reflowed when the late swap landed
+// (CI CLS 0.31 once against the 0.1 gate, issue #124), and the preload zeroed the shift.
 const preloadedFonts = pixelTitle ? [pixelifySansLatin] : [];
 ---
 

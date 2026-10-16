@@ -963,5 +963,11 @@
     "category": "fixed",
     "title": "A steadier browser test for the home sidebar",
     "description": "The test that checks how the home sidebar cards line up now pins the footprint counter, so the number of cards is the same on every run instead of depending on when the stubbed read answers. Nothing changes for visitors."
+  },
+  "me-font-preload": {
+    "date": "2026-10-16",
+    "category": "fixed",
+    "title": "The profile page no longer jumps when its fonts load",
+    "description": "The /me hero text reflowed when IBM Plex Sans swapped in on a slow load (the headline and the action row re-wrapped and pushed the rest of the page, measured as CLS 0.31 once in CI against the 0.1 gate). The page now preloads the font, so the layout settles once and stays put."
   }
 }
