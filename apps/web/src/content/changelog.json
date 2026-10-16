@@ -1059,5 +1059,11 @@
     "category": "changed",
     "title": "The profile shows notes curated by capability",
     "description": "The /me notes now show three notes picked by capability, each with a one-line framing of what it demonstrates. On the English page, Spanish notes carry an 'Article in Spanish' label."
+  },
+  "me-seo": {
+    "date": "2026-10-16",
+    "category": "changed",
+    "title": "The profile page has its own title and description",
+    "description": "/me now uses a specific title (name and role) and the pitch as its meta description, instead of sharing the home page title. Its share card stays the profile card."
   }
 }

@@ -51,14 +51,13 @@ const curated = (site.me.curatedNotes ?? []).flatMap(({ slug, framing }) => {
 });
 const notes = curated.length > 0 ? curated.map((entry) => entry.note) : allNotes.slice(0, 3);
 const hasNotes = hasPublishedNotes(allNotes);
-const bio = site.identity.bio[locale];
 ---
 
 <BaseLayout
   locale={locale}
   path="/me/"
-  title={site.identity.name}
-  {...(bio ? { description: bio } : {})}
+  title={`${site.identity.name} · ${site.identity.role[locale]}`}
+  {...(site.me.pitch ? { description: site.me.pitch[locale] } : {})}
   ogImage={site.features.me ? profileCardPath(locale) : DEFAULT_OG_IMAGE}
   ogImageAlt={`${site.identity.name} · ${site.identity.role[locale]}`}
   printable
