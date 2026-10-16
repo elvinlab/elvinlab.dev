@@ -951,5 +951,11 @@
     "date": "2026-10-13",
     "category": "added",
     "title": "Note 010: a visitor changelog without semver"
+  },
+  "deps-tooling-2026-10-16": {
+    "date": "2026-10-16",
+    "category": "changed",
+    "title": "Routine dependency and tooling updates",
+    "description": "Updated Astro, the Cloudflare adapter, Wrangler, Playwright and Preact to their latest patch and minor releases, and the CI cache action to 6.1.0, with no visible change. Forks should expect the same."
   }
 }
