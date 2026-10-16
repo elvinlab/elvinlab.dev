@@ -1005,5 +1005,11 @@
     "category": "changed",
     "title": "Share cards keep their layout after the satori update",
     "description": "satori was updated from 0.33.5 to 0.44 and the Open Graph and profile card layouts were adapted to its box-sizing change, so the cards render unchanged."
+  },
+  "me-stack-trimmed": {
+    "date": "2026-10-16",
+    "category": "changed",
+    "title": "The profile shows a shorter, focused tech stack",
+    "description": "The /me stack now shows about 12 core tools across the four layers. The jargon tools were removed, with their scope explained at the group level, so the card is shorter and lighter."
   }
 }
