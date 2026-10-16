@@ -201,27 +201,24 @@ for (const path of PAGES) {
       await shot(page).scrollIntoViewIfNeeded();
       const accent = await primary(page);
       const rest = await bracketSize(page);
-      await thumbs(page).nth(1).hover();
-      const thumb = await thumbs(page)
-        .nth(1)
-        .evaluate((node) => {
-          const style = getComputedStyle(node);
-          return {
-            edge: style.borderTopColor,
-            transform: style.transform,
-            duration: style.transitionDuration,
-          };
-        });
-      expect(thumb.edge).toBe(accent);
-      expect(thumb.transform).toBe('none');
-      expect(longest(thumb.duration)).toBeLessThanOrEqual(0.001);
+      const thumb = thumbs(page).nth(1);
+      await thumb.hover();
+      // Web-first: retries until the :hover edge color lands. Under reduced motion there is no
+      // transition, but the pseudo-class still applies a frame after the mouse move, so an
+      // immediate read raced and flaked intermittently.
+      await expect(thumb).toHaveCSS('border-top-color', accent);
+      const thumbStyle = await thumb.evaluate((node) => {
+        const style = getComputedStyle(node);
+        return { transform: style.transform, duration: style.transitionDuration };
+      });
+      expect(thumbStyle.transform).toBe('none');
+      expect(longest(thumbStyle.duration)).toBeLessThanOrEqual(0.001);
       await shot(page).hover();
+      await expect(shot(page)).toHaveCSS('color', accent);
       const frame = await shot(page).evaluate((node) => ({
-        color: getComputedStyle(node).color,
         duration: getComputedStyle(node).transitionDuration,
         armDuration: getComputedStyle(node, '::after').transitionDuration,
       }));
-      expect(frame.color).toBe(accent);
       expect(longest(frame.duration)).toBeLessThanOrEqual(0.001);
       expect(longest(frame.armDuration)).toBeLessThanOrEqual(0.001);
       expect(await bracketSize(page)).toBe(rest);
