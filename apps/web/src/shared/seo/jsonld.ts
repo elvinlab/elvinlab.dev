@@ -24,14 +24,16 @@ export function personJsonLd(site: SiteLike, locale: Locale): Record<string, unk
   };
 }
 
-/** schema.org WebSite node. */
-export function websiteJsonLd(site: SiteLike): Record<string, unknown> {
+/** schema.org WebSite node. `description` is the localized site description (the page summary). */
+export function websiteJsonLd(site: SiteLike, description: string): Record<string, unknown> {
   return {
     '@context': 'https://schema.org',
     '@type': 'WebSite',
     '@id': `${site.url}/#website`,
     url: site.url,
     name: site.title,
+    alternateName: site.identity.name,
+    description,
     publisher: { '@id': personId(site) },
   };
 }

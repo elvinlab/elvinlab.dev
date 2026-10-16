@@ -87,7 +87,7 @@ const themeColors = ['dark', 'light'].flatMap((scheme) => {
 <meta name="twitter:image:alt" content={ogImageAlt} />
 <meta property="og:locale" content={ogLocale(locale)} />
 {article && articleMetaTags(article).map((tag) => <meta property={tag.property} content={tag.content} />)}
-<script type="application/ld+json" is:inline set:html={jsonLdScript(websiteJsonLd(site))} />
+<script type="application/ld+json" is:inline set:html={jsonLdScript(websiteJsonLd(site, summary))} />
 <script type="application/ld+json" is:inline set:html={jsonLdScript(personJsonLd(site, locale))} />
 {article && (
   <script
