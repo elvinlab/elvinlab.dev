@@ -54,7 +54,7 @@ const css = experimentsCss({
 });
 ---
 
-<BaseLayout locale={locale} path={`/experiments/${experiment.id}/`} title={experiment.title} description={description}>
+<BaseLayout locale={locale} path={`/experiments/${experiment.id}/`} title={experiment.title} description={description} ogImage={`/og/experiments/${experiment.id}.png`} ogImageAlt={experiment.title}>
   <style is:inline set:html={css} />
   <article class="mx-auto flex max-w-4xl flex-col gap-10 px-6 py-10 md:px-10">
     <nav aria-label={t(locale, 'experiment.back')}>

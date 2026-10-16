@@ -36,7 +36,7 @@ type Props = {
 
 const { locale, path, title, description, translated = true, noindex = false, article, alternates, ogImage: ogImagePath, ogImageAlt: ogImageAltProp } = Astro.props;
 const siteIndexable = buildEnv.siteIndexable;
-const fullTitle = title ? `${title} · ${site.title}` : site.title;
+const fullTitle = title && title !== site.title ? `${title} · ${site.title}` : site.title;
 // Link previews cut long titles (about 70 characters), so an article's preview title drops the site
 // suffix: `og:site_name` carries it and the share card draws the domain.
 const socialTitle = article && title ? title : fullTitle;

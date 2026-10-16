@@ -8,8 +8,10 @@ import { afterEach, describe, expect, it } from 'vitest';
 
 import {
   cardContentFor,
+  caseCardContent,
   ogImages,
   parseNoteFrontmatter,
+  readExperimentCardSourcesFromDisk,
   readNoteCardSourcesFromDisk,
 } from './og-images.ts';
 
@@ -133,7 +135,7 @@ describe('ogImages integration: /me cards', () => {
         .toBuffer();
       writeFileSync(join(assetsDir, 'avatar.png'), photo);
     }
-    const config = { ...site, features: { me: options.me ?? true } };
+    const config = { ...site, features: { me: options.me ?? true, experiments: false } };
     const hook = ogImages(contentDir({}), { assetsDir, site: config }).hooks[
       'astro:build:done'
     ] as (arg: unknown) => Promise<void>;
@@ -205,7 +207,7 @@ describe('ogImages integration: /me card portrait', () => {
         ...identity,
       },
       recruiter: { available: false, openToWork: false, status: {} },
-      features: { me: true },
+      features: { me: true, experiments: false },
     };
     const hook = ogImages(contentDir({}), { assetsDir, site: config }).hooks[
       'astro:build:done'
@@ -249,5 +251,33 @@ describe('ogImages integration: /me card portrait', () => {
     const noImage = await card({}, {});
     expect(cropped.equals(noImage)).toBe(false);
     expect(cropped.equals(allRed)).toBe(true);
+  });
+});
+
+describe('experiment case cards', () => {
+  it('reads experiments.json and builds a card with the year, title and owner', () => {
+    const root = mkdtempSync(join(tmpdir(), 'og-exp-'));
+    temporary.push(root);
+    writeFileSync(
+      join(root, 'experiments.json'),
+      JSON.stringify({
+        'elvinlab-dev': { title: 'elvinlab.dev', year: 2026 },
+        'agentic-dev-setup': { title: 'agentic-dev-setup', year: 2026 },
+        broken: { title: 42 },
+      }),
+    );
+    expect(readExperimentCardSourcesFromDisk(root)).toEqual([
+      { slug: 'agentic-dev-setup', title: 'agentic-dev-setup', year: 2026 },
+      { slug: 'elvinlab-dev', title: 'elvinlab.dev', year: 2026 },
+    ]);
+    const owner = { domain: 'elvinlab.dev', owner: 'Elvin González' };
+    expect(
+      caseCardContent({ slug: 'agentic-dev-setup', title: 'agentic-dev-setup', year: 2026 }, owner),
+    ).toEqual({
+      domain: 'elvinlab.dev/experiments',
+      eyebrow: '2026',
+      title: 'agentic-dev-setup',
+      footer: 'Elvin González',
+    });
   });
 });

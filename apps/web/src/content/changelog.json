@@ -1023,5 +1023,11 @@
     "category": "added",
     "title": "Experiment case pages",
     "description": "Each experiment now has its own detail page (/experiments/<slug>/, ES and EN) with the problem, my part, gallery and result sections, plus a note card at the end that links to the note discussing it. The decisions, tech, learned and different sections appear as they are filled in."
+  },
+  "case-page-share-cards": {
+    "date": "2026-10-16",
+    "category": "changed",
+    "title": "Experiment case pages share their own card",
+    "description": "Each case page now has its own share card (/og/experiments/<slug>.png) with the year, title and owner, and its title no longer repeats the site name when the experiment is named after the site."
   }
 }

@@ -97,9 +97,41 @@ export function cardContentFor(
   };
 }
 
+export type ExperimentCardSource = { slug: string; title: string; year: number };
+
+/** The experiments read from `experiments.json` (keyed by the slug), one card source per entry. */
+export function readExperimentCardSourcesFromDisk(contentDir: string): ExperimentCardSource[] {
+  const file = join(contentDir, 'experiments.json');
+  if (!existsSync(file)) return [];
+  const parsed = JSON.parse(readFileSync(file, 'utf8')) as Record<
+    string,
+    { title?: unknown; year?: unknown }
+  >;
+  const sources: ExperimentCardSource[] = [];
+  for (const [slug, data] of Object.entries(parsed)) {
+    if (typeof data.title === 'string' && typeof data.year === 'number') {
+      sources.push({ slug, title: data.title, year: data.year });
+    }
+  }
+  return sources.sort((a, b) => a.slug.localeCompare(b.slug));
+}
+
+/** The card of a case page: the experiment year as the eyebrow, the title and the owner. */
+export function caseCardContent(
+  source: ExperimentCardSource,
+  owner: { domain: string; owner: string },
+): CardContent {
+  return {
+    domain: `${owner.domain}/experiments`,
+    eyebrow: String(source.year),
+    title: source.title,
+    footer: owner.owner,
+  };
+}
+
 export type OgSite = ProfileSite & {
   identity: { avatar?: string | undefined; photo?: string | undefined };
-  features: { me: boolean };
+  features: { me: boolean; experiments: boolean };
 };
 /** `assetsDir` is `apps/web/src/assets`, where `identity.photo` and `identity.avatar` name files. */
 export type OgOptions = { assetsDir?: string; site?: OgSite };
@@ -157,6 +189,19 @@ export function ogImages(contentDir: string, options: OgOptions = {}): AstroInte
             });
             writeFileSync(join(root, `me-${locale}.png`), png);
             written += 1;
+          }
+        }
+
+        if (config.features.experiments) {
+          const experiments = readExperimentCardSourcesFromDisk(contentDir);
+          if (experiments.length > 0) {
+            mkdirSync(join(root, 'experiments'), { recursive: true });
+            const owner = { domain: new URL(config.url).host, owner: config.identity.name };
+            for (const experiment of experiments) {
+              const png = await renderCardPng(caseCardContent(experiment, owner));
+              writeFileSync(join(root, 'experiments', `${experiment.slug}.png`), png);
+              written += 1;
+            }
           }
         }
 
