@@ -1065,5 +1065,11 @@
     "category": "added",
     "title": "New Lab Note 011: De React a Preact: 69 KiB contra 7,3 KiB por un solo botón",
     "description": "Elegí React en un ADR por costumbre. El primer botón interactivo medía 69 KiB; Preact, 7,3. Reverté la decisión el mismo día, con la misma sintaxis."
+  },
+  "note-011-author-voice": {
+    "date": "2026-10-17",
+    "category": "fixed",
+    "title": "Author voice corrected in the React-to-Preact note",
+    "description": "Removed an assistant narrator, corrected wording and numerical comparisons, and documented a required editorial review for new and edited notes."
   }
 }

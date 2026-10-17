@@ -6,6 +6,7 @@ Esta guía explica, paso a paso y con todos los detalles, cómo escribir y publi
 
 - [Resumen en 9 pasos](#resumen-en-9-pasos)
 - [1. Qué es una nota aquí](#1-qué-es-una-nota-aquí)
+  - [1.1 Voz del autor](#11-quién-narra-y-cómo-mantener-su-voz) · [1.2 Revisión editorial](#12-revisión-editorial-antes-de-publicar)
 - [2. Crear el borrador](#2-crear-el-borrador)
 - [3. El frontmatter, campo por campo](#3-el-frontmatter-campo-por-campo)
 - [4. El registro de decisión](#4-el-registro-de-decisión)
@@ -25,7 +26,7 @@ Esta guía explica, paso a paso y con todos los detalles, cómo escribir y publi
 2. Arranca el sitio: `mise exec -- pnpm --filter web dev` y abre `http://localhost:4321/notes/<slug>/` (los borradores solo existen en desarrollo).
 3. Completa el frontmatter y el **registro de decisión** (sección 3 y 4).
 4. Escribe sobre **una** decisión concreta, empezando por el problema (la sección 5 dice qué hace el diseño de cuaderno por ti y qué haces a mano). No hay límite de palabras: el borrador sugiere unas 500, pero una nota más larga está bien cuando la decisión lo pide (la nota 003 tiene unas 1.500).
-5. Revisa el resultado en escritorio y móvil, en tema claro y oscuro, y en modo lectura.
+5. Completa la revisión editorial (1.1 y 1.2) y revisa el resultado en escritorio y móvil, en tema claro y oscuro, y en modo lectura.
 6. Ensaya la publicación: `mise exec -- pnpm publish-note <slug> --dry-run` (no cambia nada).
 7. Publica: `mise exec -- pnpm publish-note <slug>`. Mueve la carpeta, pone la fecha de hoy, añade la entrada del changelog, compila, hace commit y release.
 8. Espera al CI: una nota usa el carril rápido (unos minutos, sin los 4 shards de `e2e` ni Lighthouse, pero con la comprobación del output construido y el spec del changelog).
@@ -42,6 +43,28 @@ La voz está definida en [`docs/BRAND.md`](BRAND.md). Las reglas que más import
 - **Los frameworks se nombran como herramientas**, no como identidad profesional.
 - **Humor con medida**; no compite con el contenido.
 - **Nunca anuncies un proyecto que aún no existe**, ni enlaces un repositorio **privado**, ni escribas tu correo en texto plano (el contacto es `/contact`).
+
+### 1.1. Quién narra y cómo mantener su voz
+
+La primera persona es **la persona que firma la nota**, no el asistente que ayuda a redactarla. En este sitio escribe Elvin; en un fork, quien figure como autor. Quien ayuda a escribir debe mantener esa perspectiva en el título, la descripción, el registro de decisión, el cuerpo y el cierre.
+
+- Antes de redactar, lee dos o tres notas publicadas del mismo idioma para reconocer el tono. Úsalas como referencia de ritmo y vocabulario, no como prueba de sus afirmaciones: una nota anterior también puede contener errores.
+- Cuenta las decisiones desde el autor: «comparé las cifras y elegí Preact». Frases como «le enseñé las cifras a Elvin», «el usuario decidió» o «le recomendé cambiar» revelan que está narrando el asistente y deben reescribirse.
+- Se puede explicar el trabajo con IA cuando sea relevante: «usé un agente para comparar alternativas y revisé el resultado». No inventes conversaciones, citas, emociones, dificultades ni acciones personales para hacer más atractiva la historia. Si una experiencia no está documentada o confirmada, omítela o pide el dato que falta.
+- Usa frases concretas y naturales. Quita eslóganes, moralejas grandilocuentes, repeticiones de la cifra principal y preguntas de cierre de plantilla. La voz no se consigue añadiendo muletillas o faltas de ortografía.
+- Una decisión local no demuestra que una herramienta gane siempre. Explica el caso, las restricciones, lo que descartaste y el coste que aceptaste.
+
+**Ejemplo de perspectiva.** «Le mostré las cifras a Elvin y dijo “vamos con Preact”» pasa a «Comparé las cifras y elegí Preact porque encajaba en el presupuesto de esta isla». No conserves el diálogo si no hay una fuente que lo respalde.
+
+### 1.2. Revisión editorial antes de publicar
+
+Esta revisión es obligatoria tanto para una nota nueva como para una edición. El build y el carril rápido comprueban estructura, enlaces y presupuestos; **no comprueban quién narra ni si lo contado es cierto**.
+
+1. **Reúne la evidencia.** Contrasta la decisión con los ADR, el código y los registros de verificación. En el registro de la tarea anota las fuentes de cifras, fechas, versiones y resultados, y cuáles son históricos. Si no hay evidencia suficiente, elimina la afirmación o deja explícita la incertidumbre; nunca rellenes el hueco con una anécdota.
+2. **Revisa la perspectiva completa.** Lee la nota de principio a fin preguntando quién es «yo» en cada párrafo. Busca el nombre del autor y menciones a «usuario», «asistente» o «le propuse» como señales para revisar, no como una prohibición automática: un nombre en una cita o ejemplo de código puede ser correcto.
+3. **Comprueba los números y su alcance.** Conserva unidades y contexto de medición: gzip o sin comprimir, isla o página completa, fixture o producción, runtime propio o terceros. Recalcula diferencias, porcentajes y frases como «la mitad». No presentes un resultado histórico como una medición nueva.
+4. **Edita el tono y la coherencia.** Lee en voz alta, corrige verbos y cronología, recorta frases que no aporten y sustituye afirmaciones absolutas por el caso demostrado. Comprueba que título, descripción y registro de decisión siguen diciendo lo mismo que el cuerpo.
+5. **Revisa el resultado visible y el diff.** Usa los recursos de la sección 5 solo donde aclaren algo; no hace falta usar todos. Muestra el texto completo inline cuando el autor lo pida y revisa la página con la sección 6. Registra qué se comprobó y qué queda pendiente. La revisión editorial no sustituye las comprobaciones técnicas ni autoriza un release por sí sola.
 
 ## 2. Crear el borrador
 
@@ -479,7 +502,7 @@ Después, en producción: abre la nota, comprueba que la tarjeta se ve bien al c
 
 1. Mueve la carpeta: `mv apps/web/src/content/drafts/<slug> apps/web/src/content/notes/<slug>` (es un `mv` normal: `drafts/` no está en git). La URL final es `/notes/<slug>/`, igual que en el borrador.
 2. Pon en `pubDate` la fecha de publicación.
-3. Verifica: `pnpm test`, `pnpm typecheck`, `pnpm lint`, `pnpm --filter web build`, `pnpm check:page-weight`, `pnpm check:js-budget` y `pnpm test:e2e` (los tests de navegador usan notas de prueba aisladas: tus notas reales no entran; los dos checks de tamaño sí revisan el build real).
+3. Planifica con `pnpm verify` y sigue la verificación por alcance de `docs/TESTING.md`. Para cambios solo de notas: `pnpm lint`, `pnpm --filter web build`, `pnpm check:built-notes`, `pnpm check:page-weight` y `pnpm check:js-budget`. Los tests de navegador usan notas de prueba aisladas; no sustituyen la revisión de tu nota real. Si cambias código, configuración o las guías, añade sus comprobaciones según el plan.
 4. Revisa la tarjeta: `apps/web/dist/client/og/notes/<slug>.png`.
 5. Commit, con mensaje convencional: `feat(notes): publish "Título"`. Si quieres avisar a los visitantes, añade una entrada al `changelog.json` (guía de configuración, receta 6.4).
 6. Push a `develop` y release a `main` ([guía de configuración, sección 7](CONFIGURATION.md#7-publicar-release-y-revertir)).
@@ -509,6 +532,9 @@ Para una nota con imágenes grandes o mucho código, mide también esa URL real:
 ## 11. Lista de verificación antes de publicar
 
 - [ ] Una sola decisión, empezando por el problema; números y nombres, no adjetivos.
+- [ ] Revisión editorial de 1.1 y 1.2 completa: el «yo» siempre es el autor, sin narrador asistente ni diálogos o vivencias inventadas.
+- [ ] Cifras, cronología, comparaciones y alcance de las mediciones contrastados con fuentes anotadas en la tarea; título, descripción y registro coherentes con el cuerpo.
+- [ ] Texto leído completo y revisado por tono y ortografía; los recursos visuales aclaran el contenido y el cierre aporta algo concreto.
 - [ ] `title` ≤ 90, `description` ≤ 160, cada campo de `decision` ≤ 280, máximo 5 `tags`.
 - [ ] `category` y `tags` en minúsculas con guiones y coherentes con tus otras notas.
 - [ ] `pubDate`: `publish-note` lo pone con la fecha de hoy; en la publicación manual, con la fecha real en formato `AAAA-MM-DD`.
