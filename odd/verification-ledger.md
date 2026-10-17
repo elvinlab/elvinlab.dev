@@ -270,3 +270,7 @@ Release commit `87f53b8` (the CI follows the site config). CI: static, e2e (4 sh
 ### Release 21 candidate: reduced-motion entrance and sidebar flake (2026-10-13, local, before the release)
 
 Candidate: `develop` after `fix(a11y)` (no fade-in entrance with reduced motion) and `test(e2e)` (home sidebar columns skip detached nodes). Root cause of the sidebar flake: the marks card is removed from the sidebar when the counter is unavailable (stubbed API), so it could be detached between lookup and read. Verified: `test:profiles` 4 of 4 green, default e2e 3 viewports 1633 passed, 0 failed before the spec fix; after it `test:e2e:quick` three full runs, 786 passed each, 0 failed.
+
+### Note 011 author voice and editorial guide (2026-10-17)
+
+See odd/tasks/note-author-voice.md for touched files, evidence and full run/skip details. Passed: docs-quality 16 tests, lint, standalone final-note schema and MDX compile, diff whitespace. Production build blocked during Cloudflare prerender startup by uv_interface_addresses; built-output and weight validation remain pending. No production deploy or visual verification claimed.

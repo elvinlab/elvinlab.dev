@@ -6,6 +6,7 @@ This guide explains, step by step and in detail, how to write and publish a **La
 
 - [The 9-step summary](#the-9-step-summary)
 - [1. What a note is here](#1-what-a-note-is-here)
+  - [1.1 Author voice](#11-who-narrates-and-how-to-preserve-their-voice) · [1.2 Editorial review](#12-editorial-review-before-publication)
 - [2. Creating the draft](#2-creating-the-draft)
 - [3. The frontmatter, field by field](#3-the-frontmatter-field-by-field)
 - [4. The decision record](#4-the-decision-record)
@@ -25,7 +26,7 @@ This guide explains, step by step and in detail, how to write and publish a **La
 2. Start the site: `mise exec -- pnpm --filter web dev` and open `http://localhost:4321/notes/<slug>/` (drafts only exist in development).
 3. Fill in the frontmatter and the **decision record** (sections 3 and 4).
 4. Write on **one** concrete decision, starting with the problem (section 5 says what the notebook design does for you and what you do by hand). There is no word limit: the draft suggests about 500 words, but a longer note is fine when the decision needs it (note 003 has about 1,500).
-5. Check the result on desktop and phone, in light and dark theme, and in reading mode.
+5. Complete the editorial review (1.1 and 1.2) and check the result on desktop and phone, in light and dark theme, and in reading mode.
 6. Rehearse the publication: `mise exec -- pnpm publish-note <slug> --dry-run` (changes nothing).
 7. Publish: `mise exec -- pnpm publish-note <slug>`. It moves the folder, sets today's date, adds the changelog entry, builds, commits and releases.
 8. Wait for CI: a note takes the fast lane (a few minutes, without the 4 `e2e` shards or Lighthouse, but with the built-output check and the changelog spec).
@@ -42,6 +43,28 @@ The voice is defined in [`docs/BRAND.md`](BRAND.md) (in Spanish). The rules that
 - **Frameworks are named as tools**, not as a professional identity.
 - **Humor in measure**; it does not compete with the content.
 - **Never announce a project that does not exist yet**, never link a **private** repository, and never write your email in plain text (contact is `/contact`).
+
+### 1.1. Who narrates and how to preserve their voice
+
+The first person is **the person who signs the note**, not the assistant helping draft it. On this site that is Elvin; in a fork, it is the configured author. Anyone helping write must preserve that perspective in the title, description, decision record, body and ending.
+
+- Before drafting, read two or three published notes in the same language to recognize the tone. Use them for rhythm and vocabulary, not as evidence for their claims: an earlier note can also contain mistakes.
+- Tell decisions from the author's perspective: “I compared the figures and chose Preact.” Phrases such as “I showed the figures to Elvin,” “the user decided” or “I recommended switching” expose an assistant narrator and must be rewritten.
+- Describe AI assistance when relevant: “I used an agent to compare alternatives and reviewed the result.” Do not invent conversations, quotes, emotions, difficulties or personal actions to make a story more engaging. If an experience is neither documented nor confirmed, omit it or ask for the missing fact.
+- Use concrete, natural sentences. Remove slogans, sweeping lessons, repeated headline figures and template closing questions. Voice does not come from adding catchphrases or spelling mistakes.
+- A local decision does not prove a tool always wins. Explain the case, constraints, rejected options and accepted cost.
+
+**Perspective example.** “I showed Elvin the figures and he said ‘let's use Preact’” becomes “I compared the figures and chose Preact because it fitted this island's budget.” Do not retain the dialogue without a supporting source.
+
+### 1.2. Editorial review before publication
+
+This review is required for both a new note and an edit. The build and fast lane check structure, links and budgets; **they do not check who narrates or whether the story is true**.
+
+1. **Gather evidence.** Check the decision against ADRs, code and verification records. Record sources for figures, dates, versions and results in the task log, noting historical ones. If evidence is insufficient, remove the claim or state the uncertainty; never fill the gap with an anecdote.
+2. **Review the whole perspective.** Read the note from start to finish and ask who “I” is in every paragraph. Search for the author's name and mentions of “user,” “assistant” or “I proposed to them” as review signals, not automatic bans: a name inside a quotation or code example can be valid.
+3. **Check numbers and scope.** Preserve units and measurement context: gzip or uncompressed, island or entire page, fixture or production, own runtime or third parties. Recalculate differences, percentages and phrases such as “half.” Do not present a historical result as a new measurement.
+4. **Edit tone and consistency.** Read aloud, correct verbs and chronology, cut sentences that add nothing and replace absolute claims with the demonstrated case. Check that title, description and decision record still agree with the body.
+5. **Review the visible result and diff.** Use section 5's features only where they clarify something; there is no need to use all of them. Show the full text inline when the author asks and inspect the page using section 6. Record what was checked and what remains pending. Editorial review neither replaces technical checks nor authorizes a release on its own.
 
 ## 2. Creating the draft
 
@@ -479,7 +502,7 @@ Afterwards, in production: open the note, check that the card looks right when y
 
 1. Move the folder: `mv apps/web/src/content/drafts/<slug> apps/web/src/content/notes/<slug>` (a plain `mv`: `drafts/` is not in git). The final URL is `/notes/<slug>/`, the same as in the draft.
 2. Put the publication date in `pubDate`.
-3. Verify: `pnpm test`, `pnpm typecheck`, `pnpm lint`, `pnpm --filter web build`, `pnpm check:page-weight`, `pnpm check:js-budget` and `pnpm test:e2e` (browser tests use isolated test notes; the two size checks inspect the real build).
+3. Plan with `pnpm verify` and follow touch-scoped verification in `docs/TESTING.md`. For note-only changes: `pnpm lint`, `pnpm --filter web build`, `pnpm check:built-notes`, `pnpm check:page-weight` and `pnpm check:js-budget`. Browser tests use isolated fixture notes; they do not replace reviewing the real note. If code, configuration or guides change, add their checks according to the plan.
 4. Check the card: `apps/web/dist/client/og/notes/<slug>.png`.
 5. Commit, with a conventional message: `feat(notes): publish "Title"`. If you want to tell visitors, add an entry to `changelog.json` (configuration guide, recipe 6.4).
 6. Push to `develop` and release to `main` ([configuration guide, section 7](CONFIGURATION.en.md#7-releasing-and-rolling-back)).
@@ -508,6 +531,9 @@ code-heavy articles: Lighthouse's synthetic notes do not cover every real articl
 
 ## 11. Checklist before publishing
 
+- [ ] Editorial review in 1.1 and 1.2 complete: “I” always means the author, with no assistant narrator or invented dialogue or experiences.
+- [ ] Figures, chronology, comparisons and measurement scope checked against sources recorded in the task; title, description and decision record agree with the body.
+- [ ] Full text read and reviewed for tone and spelling; visual features clarify the content and the ending adds something concrete.
 - [ ] One decision only, starting with the problem; numbers and names, not adjectives.
 - [ ] `title` ≤ 90, `description` ≤ 160, each `decision` field ≤ 280, at most 5 `tags`.
 - [ ] `category` and `tags` lowercase and hyphenated, consistent with your other notes.

@@ -1,20 +1,21 @@
 ---
 number: 11
 title: "De React a Preact: 69 KiB contra 7,3 KiB por un solo botón"
-description: "Elegí React en un ADR por costumbre. El primer botón interactivo medía 69 KiB; Preact, 7,3. Reverté la decisión el mismo día, con la misma sintaxis."
+description: "Elegí React en un ADR por costumbre. El primer botón interactivo medía 69 KiB; Preact, 7,3. Revertí la decisión el mismo día, con la misma sintaxis."
 pubDate: 2026-10-17
+updatedDate: 2026-10-17
 lang: es
 category: decisiones
 tags: [rendimiento, preact, javascript, islas, astro]
 decision:
   context: "ADR 0001 eligió React por consistencia con otro sitio, antes de que el sitio tuviera una sola isla. El primer componente interactivo real, el formulario de contacto, fue la primera vez que pude medir qué costaba de verdad en el navegador."
-  decision: "Medí un botón: React 19 pesaba unos 69 KiB gzip; Preact, unos 7,3 con la misma sintaxis de componentes, hooks y JSX. Reverté el ADR el mismo día y adopté Preact sin la capa de compatibilidad, porque ninguna librería la pedía."
-  outcome: "La isla de contacto quedó en 16,63 de los 30 KiB del presupuesto de JavaScript por página; Lighthouse móvil 98-100 en rendimiento y LCP de 1,06 a 1,82 s. De paso descubrí que el control de presupuesto no veía las islas: reportaba 1,95 KiB mientras cargaba 69."
+  decision: "Medí un botón: React 19 pesaba unos 69 KiB gzip; Preact, unos 7,3 con la misma sintaxis de componentes, hooks y JSX. Revertí el ADR el mismo día y adopté Preact sin la capa de compatibilidad, porque ninguna librería la pedía."
+  outcome: "El 30 de septiembre de 2026, la página de contacto quedó en 16,63 de los 30 KiB de JavaScript permitidos; Lighthouse móvil dio 98-100 y LCP de 1,06 a 1,82 s. También corregí el control de presupuesto para que contara los módulos de las islas."
 ---
 
-Cuando arranqué este sitio escribí una decisión de arquitectura que decía, tan tranquilo, que las partes interactivas irían en React. No la medí. La copié de otro proyecto donde ya usaba React, por costumbre y por no tener que pensarlo dos veces. El sitio pasó semanas sin una sola parte interactiva, así que la decisión nunca se puso a prueba.
+Cuando arranqué este sitio escribí una decisión de arquitectura que decía, tan tranquilo, que las partes interactivas irían en React. No la medí. La copié de otro proyecto donde ya usaba React, por costumbre y por no tener que pensarlo dos veces. El sitio pasó unos días sin una sola parte interactiva, así que la decisión nunca se puso a prueba.
 
-Hasta que llegó el formulario de contacto. Un formulario es, literalmente, el primer trozo de este sitio que corre JavaScript en el navegador de quien lo visita. Y la primera vez que pude poner un número a mi decisión, el número fue **69 KiB** para un botón.
+Hasta que llegó el formulario de contacto. El formulario fue la primera isla interactiva del sitio y la primera vez que tuve que enviar el runtime de un framework al navegador. Y la primera vez que pude poner un número a mi decisión, el número fue **69 KiB** para un botón.
 
 ## React estaba decidido, pero nunca medido
 
@@ -24,7 +25,7 @@ Esa última cláusula era una trampa que me puse a mí mismo y no noté. Yo esta
 
 > Una decisión copiada de otro proyecto no es una decisión; es una suposición que todavía no te ha pasado la factura.
 
-El sitio es estático. Astro renderiza todo en el servidor y manda HTML; el navegador no ejecuta nada hasta que una "isla" lo pide. Una isla es un componente que sí se hidrata en el cliente: se le manda su JavaScript y su framework para que responda a clics y a lo que escribe la gente. Mientras no hubo islas, daba igual qué framework había en el ADR. El coste es cero si nadie lo descarga.
+Astro genera el HTML de las páginas. El runtime de React o Preact solo se descarga cuando una isla lo necesita. Una isla es un componente que sí se hidrata en el cliente: se le manda su JavaScript y su framework para que responda a clics y a lo que escribe la gente. Mientras no hubo islas, daba igual qué framework había en el ADR. El coste es cero si nadie lo descarga.
 
 El formulario de contacto rompió ese cero.
 
@@ -32,7 +33,7 @@ El formulario de contacto rompió ese cero.
 
 El formulario no es complicado: unos campos, validación, un widget de Turnstile que se carga solo cuando hace falta, y un botón de enviar. Antes de construirlo entero, armé una isla de prueba con un solo botón y la hidraté, nada más que para ver cuánto JavaScript mandaba al navegador. Construí la misma isla mínima dos veces: una con React 19, otra con Preact.
 
-La comparación importa porque las dos son casi lo mismo de escribir. Preact tiene la misma API: componentes, hooks, JSX. El código de la isla era idéntico salvo de dónde importaba. Lo único que cambiaba era el motor que viajaba con él.
+La comparación importa porque las dos son casi lo mismo de escribir. Para esta isla, Preact me dejaba usar el mismo estilo de componentes, hooks y JSX. El código de la isla era idéntico salvo de dónde importaba. Lo único que cambiaba era el motor que viajaba con él.
 
 ```txt title="la misma isla de un botón, dos motores"
 runtime     chunk principal    total gzip al navegador
@@ -46,9 +47,9 @@ Puesto en contexto: este sitio tiene un presupuesto de **30 KiB de JavaScript po
 
 ## 69 KiB contra 7,3 KiB
 
-Con esos dos números delante, decidí el mismo día. Escribí un ADR nuevo, el 0005, que no reemplaza al 0001 entero: solo tacha la línea de React y la cambia por Preact. Astro, Tailwind, pnpm y TypeScript se quedan como estaban.
+Con esos dos números delante, decidí cambiar a Preact el mismo día. Escribí un ADR nuevo, el 0005, que no reemplaza al 0001 entero: solo tacha la línea de React y la cambia por Preact. Astro, Tailwind, pnpm y TypeScript se quedan como estaban.
 
-No hubo mucho que pensar. 69 contra 7,3 no es un empate que haya que argumentar; es un factor de casi diez, y con esa diferencia la elección se hace sola.
+La diferencia de peso fue lo que me terminó de convencer: **69 KiB contra 7,3 KiB**, casi diez veces menos en esa prueba. React ya superaba el presupuesto con un botón; Preact me dejaba margen para construir el formulario. Para lo que necesitaba en este sitio, elegí Preact y dejé los costes del cambio por escrito.
 
 Lo que perdí al cambiar lo escribí en el mismo ADR, porque toda decisión cuesta algo:
 
@@ -56,7 +57,7 @@ Lo que perdí al cambiar lo escribí en el mismo ADR, porque toda decisión cues
 - Algunas librerías del ecosistema de React no corren tal cual sobre Preact. Para eso existe `preact/compat`, una capa que finge ser React. No la activé: ninguna librería me la pidió todavía, y una capa de compatibilidad que nadie usa es peso y complejidad gratis.
 - Comparto menos código con el sitio de las guías. La sintaxis es la misma, el motor no, así que un componente se copia pero no se enlaza entre los dos repos.
 
-Esa última es la que de verdad dolió, porque compartir con el otro sitio era la razón original de elegir React. Pero "compartir componentes" pesaba 62 KiB más en cada visita, y un sitio que nadie comparte conmigo tiene prioridad sobre uno que sí.
+Esa última es la que de verdad dolió, porque compartir con el otro sitio era la razón original de elegir React. Pero mantener el mismo runtime para facilitar esa reutilización costaba unos 62 KiB más cuando se cargaba la isla. Preferí reducir lo que descargaba quien visitaba el sitio, aunque compartir componentes con el otro proyecto requiriera más trabajo.
 
 ## El presupuesto que no veía la isla
 
@@ -75,14 +76,12 @@ obtenido   131 bytes          ← GREEN
 
 Ese RED de `0 contra 131` es el que confirma que el arreglo sirve de algo. Sin verlo fallar, no sabría si el control empezó a contar las islas o si siempre dio el número por casualidad. Es la misma disciplina que uso para todo lo que toca rendimiento: la cifra que importa no es la que pasa, es la que fallaba antes y ahora no.
 
-Con el control arreglado, cualquier intento futuro de meter React (o cualquier isla pesada) rompe el release en vez de pasar desapercibido. El arreglo del presupuesto vale más, a la larga, que el cambio de framework: el framework fue una decisión de un día; el control la protege en cada push.
+Con el control arreglado, una página que supere los 30 KiB contando sus islas bloquea el release en vez de pasar desapercibida. El arreglo del presupuesto vale más, a la larga, que el cambio de framework: el framework fue una decisión de un día; el control la protege en cada push.
 
 ## Lo que no toqué
 
 Cambiar de framework suena a reescribir. No lo fue. Preact entró como `@astrojs/preact` con las versiones fijadas (`preact` 10.29.8, `@astrojs/preact` 6.0.5), un ajuste en la config de TypeScript para que el JSX apunte a Preact en vez de a React, y nada más en el código de los componentes. El formulario se escribió con `preact/hooks` desde el principio; nunca existió una versión React del formulario real, solo la isla de prueba.
 
-El resultado final, ya con el formulario entero y Turnstile cargado solo al primer toque: la isla ocupa **16,63 de los 30 KiB** del presupuesto, con sitio de sobra. Lighthouse móvil, en el peor de tres corridas, da 98 a 100 en rendimiento, 100 en accesibilidad, buenas prácticas y SEO, LCP de 1,06 a 1,82 s, TBT en 0 y CLS en 0,049. Un formulario con validación, estado y un captcha, por debajo de la mitad del presupuesto que React se comía con un botón vacío.
+En la medición del 30 de septiembre de 2026, con el formulario entero y Turnstile configurado para cargarse al primer toque, la página de contacto quedó en **16,63 de los 30 KiB** del presupuesto. Lighthouse móvil, tomando el peor resultado de tres corridas en cada URL de contacto, dio 98 a 100 en rendimiento, 100 en accesibilidad, buenas prácticas y SEO, LCP de 1,06 a 1,82 s, TBT en 0 y CLS en 0,049. La página quedó en algo más de la mitad del presupuesto de 30 KiB, frente a los 69 KiB de la prueba de React con un botón. La carga de Turnstile se trata aparte: esas cifras no representan todo el tráfico del captcha.
 
-La lección que me llevo no es "Preact gana". Es que una decisión de arquitectura sin un número detrás es una preferencia disfrazada, y las preferencias se copian de un proyecto a otro sin pensar. El ADR 0001 decía "mientras el rendimiento siga bien" y yo nunca había mirado si seguía bien. El primer botón real me obligó a mirar.
-
-¿Tú fijas tu stack midiendo el primer caso de verdad, o lo decides por lo que usaste la última vez y ya? Cuéntame en los comentarios cuál fue la última decisión técnica que diste por buena sin medirla.
+La lección que me llevo no es "Preact gana". Es que, si una decisión depende del rendimiento, necesito medirla con un caso real. Haber usado una herramienta en otro proyecto no me dice cuánto va a costar en este. El ADR 0001 decía "mientras el rendimiento siga bien" y yo nunca había mirado si seguía bien. El primer botón real me obligó a mirar.
