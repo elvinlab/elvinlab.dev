@@ -1059,5 +1059,11 @@
     "category": "changed",
     "title": "The profile page has its own title and description",
     "description": "/me now uses a specific title (name and role) and the pitch as its meta description, instead of sharing the home page title. Its share card stays the profile card."
+  },
+  "note-011": {
+    "date": "2026-10-17",
+    "category": "added",
+    "title": "New Lab Note 011: De React a Preact: 69 KiB contra 7,3 KiB por un solo botón",
+    "description": "Elegí React en un ADR por costumbre. El primer botón interactivo medía 69 KiB; Preact, 7,3. Reverté la decisión el mismo día, con la misma sintaxis."
   }
 }
