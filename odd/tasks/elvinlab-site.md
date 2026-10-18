@@ -1,8 +1,15 @@
 # Feature: elvinlab.dev — portfolio + Lab Notes
 
-## Current state (release-ready 2026-10-16)
+## Current state (synced 2026-10-18)
 
-Delivered and committed on `develop` this session (pi + gentle-ai), not pushed, not released:
+- `develop` (`6bcec59`) equals `origin/develop`; production is the 2026-10-16 release (`origin/main` `5c91365`, built from `develop` `42ba3fe`), which carried the items listed below and note 011 ("De React a Preact"). `changelog:audit` is clean (0 pending entries).
+- Only drift between `main` and `develop`: `.claude/settings.json` was deleted on `develop` (`6bcec59`); it reaches `main` with the next release, no code change.
+- Toolchain is Claude Code (Sonnet) + gentle-ai again, with Tier 1/2 delegated to OpenCode via herdr; `CLAUDE.md` and `AGENTS.md` were updated to say so (the pi + Deepseek wording below is historical).
+- Open follow-ups unchanged: owner content and release decisions for the backlog in the section below (#140 to #147 and the Dependabot PRs #115 and #123).
+
+## Release 2026-10-16 (released; written before the push)
+
+Delivered and committed on `develop` in that session (pi + gentle-ai), then released:
 - `ci(gates)` noisy-gate retry policy (ADR 0018): Playwright `retries: 1` in CI, one Lighthouse re-run of a failed URL, flakes reported in the run summary.
 - `fix(verify)`: `pnpm verify --files` no longer applies registry freshness to a simulated change set.
 - Docs: E7 (config-follows docs), TESTING retries note, PORTFOLIO experience/notes sections.

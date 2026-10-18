@@ -2,7 +2,7 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
-> **Current toolchain:** development is now driven by **pi (el Gentleman)** with the **gentle-ai** ecosystem and **Deepseek** models. Claude Code, Codex, RTK and Caveman are **not currently in use**; they are kept below (and in `.claude/`, `.codex/`, `RTK.md`) for when/if we return to them. Repo conventions below apply regardless of toolchain.
+> **Current toolchain:** development is driven by **Claude Code** (Sonnet) as orchestrator with the **gentle-ai** ecosystem, delegating Tier 1/2 work to **OpenCode** free models via herdr + OmniRoute. Context is capped by an auto-compact window and the global delegation policy lives in `~/.claude/CLAUDE.md`. Caveman and RTK are intentionally **not used**. pi (el Gentleman) and Codex remain optional. Repo conventions below apply regardless of toolchain.
 
 ## Status and commands
 
@@ -89,16 +89,6 @@ packages/core/   → @elvinlab/core: tokens, themes, i18n (presentation-only)
 
 Blog live with 3 posts within 6 weeks. If time goes into polishing `core` with nothing published, flag it — that is the identified risk.
 
-<!-- rtk-instructions v2 — LEGACY, not currently in use (pi + gentle-ai handles command compaction now; kept for when we return to Codex/Claude Code) -->
-# Command output
-
-Command output here is condensed to save tokens, keeping every signal and
-dropping costly noise. Treat it as the complete result: run commands
-normally, and batch related commands into one call to avoid extra turns.
-Truncated results state their recovery path in their own output. Re-run a
-command as `rtk proxy <cmd>` only when its result is unusable: empty when
-output was clearly expected, contradicting its exit code, or garbled.
-<!-- /rtk-instructions -->
 ## Shared agent instructions
 
-See [`AGENTS.md`](AGENTS.md) for repository-local Caveman and RTK guidance *(legacy — Caveman and RTK are not currently in use under pi; `AGENTS.md` now documents the pi + gentle-ai toolchain)*.
+See [`AGENTS.md`](AGENTS.md) for repository-local agent tooling notes and the production deploy rule.
