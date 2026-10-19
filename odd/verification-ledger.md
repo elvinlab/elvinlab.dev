@@ -278,3 +278,7 @@ See odd/tasks/note-author-voice.md for touched files, evidence and full run/skip
 ### Subscribe backfill: state verified on production D1 (2026-10-19, issue #147)
 
 What was run: read-only `SELECT` counts through the owner's authorized `wrangler` session against `elvinlab-dev-db` (remote); nothing was written and no address was read. Result: `subscribers` has 4 `confirmed` and 1 `unsubscribed`; all 5 have a `subscriber_notes` row for `vibe-coding-o-especificar-primero`, and the table holds exactly 5 rows for that slug. This proves the backfill's effect is present, not when or how the `INSERT OR IGNORE` ran: the individual execution still has no recorded evidence, and the statement was not re-run.
+
+### DMARC policy p=none -> p=quarantine (2026-10-19, issue #91)
+
+Changed by the owner's authorization: the single `_dmarc` TXT record of `elvinlab.dev`, only `p=none` to `p=quarantine`, report address unchanged; confirmed in public DNS afterwards. Evidence before: a Gmail "Show original" of the 2026-10-06 note email with SPF pass, DKIM pass (aligned, `d=elvinlab.dev`) and DMARC pass. Not verified: the same results on an email sent after the change, and Outlook. The few weeks of reports the issue asked for were not waited out.

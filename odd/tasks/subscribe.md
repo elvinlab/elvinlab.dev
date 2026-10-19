@@ -131,5 +131,5 @@ Dry run first (4 confirmed Spanish subscribers had never received a note; pool 9
 
 ## Closing state, 2026-10-06 (owner decisions)
 - Note 2 is not sent to subscribers (owner decision). Notes 1 and 3 reached every confirmed subscriber; after the release a dry run `pnpm notify:note vibe-coding-o-especificar-primero` must report 0 recipients (the ledger covers it).
-- Next step: DMARC `p=quarantine` after weeks of reports; the policy is `p=none` today.
+- DMARC: on 2026-10-19 the owner authorized changing the single `_dmarc` TXT record from `p=none` to `p=quarantine` (report address kept, not recorded here); applied through the Cloudflare API with a zone-scoped DNS Edit token the owner then revoked, and confirmed in public DNS. Basis: a received Gmail note email of 2026-10-06 showed SPF pass, DKIM pass (`d=elvinlab.dev`, `s=resend`) and DMARC pass. Not verified yet: the same three results on an email sent after the change, and Outlook. Done sooner than the 'few weeks' of reports the issue asked for, at the owner's decision; the volume is about 5 subscribers.
 - Do not run `pnpm notify:note` against production before the release that reads `subscriber_notes`.
