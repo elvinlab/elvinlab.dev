@@ -65,7 +65,7 @@ const css = experimentsCss({
     <header class="flex flex-col gap-3">
       <p class="flex flex-wrap items-center gap-3">
         <span class="flex items-center gap-2">
-          <span class="size-2 shrink-0 rounded-pill" data-status={experiment.status} aria-hidden="true"></span>
+          <span class:list={['size-2 shrink-0', experiment.status === 'running' ? 'bg-ok' : experiment.status === 'archived' ? 'bg-muted' : 'bg-primary']} aria-hidden="true"></span>
           {t(locale, `exp.status.${experiment.status}`)}
         </span>
         <span class="font-mono text-sm text-muted">{experiment.year}</span>
