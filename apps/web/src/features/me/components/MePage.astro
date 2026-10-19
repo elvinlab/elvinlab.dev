@@ -26,6 +26,7 @@ import Banner from '@/shared/layout/Banner.astro';
 import BaseLayout from '@/shared/layout/BaseLayout.astro';
 import { pickLocale } from '@/shared/lib/localized.ts';
 import { DEFAULT_OG_IMAGE, profileCardPath } from '@/shared/seo/og.ts';
+import { pageSeo } from '@/shared/seo/page-seo.ts';
 import SectionHeading from '@/shared/ui/SectionHeading.astro';
 import SocialIcon from '@/shared/ui/SocialIcon.astro';
 
@@ -51,13 +52,18 @@ const curated = (site.me.curatedNotes ?? []).flatMap(({ slug, framing }) => {
 });
 const notes = curated.length > 0 ? curated.map((entry) => entry.note) : allNotes.slice(0, 3);
 const hasNotes = hasPublishedNotes(allNotes);
+const seo = pageSeo('me', locale);
+// The pitch is the more specific snippet, but only while it fits a search result (160 characters).
+const pitch = site.me.pitch?.[locale];
+const meDescription = pitch && pitch.length <= 160 ? pitch : seo.description;
 ---
 
 <BaseLayout
   locale={locale}
   path="/me/"
-  title={`${site.identity.name} · ${site.identity.role[locale]}`}
-  {...(site.me.pitch ? { description: site.me.pitch[locale] } : {})}
+  title={seo.title}
+  pageType="ProfilePage"
+  description={meDescription}
   ogImage={site.features.me ? profileCardPath(locale) : DEFAULT_OG_IMAGE}
   ogImageAlt={`${site.identity.name} · ${site.identity.role[locale]}`}
   printable

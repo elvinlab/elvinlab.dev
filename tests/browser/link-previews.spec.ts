@@ -1,7 +1,7 @@
 import { expect, type Page, test } from '@playwright/test';
 
 import { has, requires } from './helpers/features';
-import { escapeRegExp, identityIn, site } from './helpers/site';
+import { escapeRegExp, site } from './helpers/site';
 
 const meta = (page: Page, attribute: 'property' | 'name', key: string) =>
   page.locator(`meta[${attribute}="${key}"]`);
@@ -93,20 +93,16 @@ test.describe('other pages keep the default card', () => {
   }
 });
 
-for (const { path, locale, card, role, bio } of [
+for (const { path, locale, card } of [
   {
     path: '/me/',
     locale: 'es_ES',
     card: 'me-es',
-    role: identityIn('es').role,
-    bio: identityIn('es').bio.split(' ').slice(0, 2).join(' '),
   },
   {
     path: '/en/me/',
     locale: 'en_US',
     card: 'me-en',
-    role: identityIn('en').role,
-    bio: identityIn('en').bio.split(' ').slice(0, 2).join(' '),
   },
 ]) {
   // The /me card is generated only with `features.me`; without it the page falls back to the
@@ -125,11 +121,11 @@ for (const { path, locale, card, role, bio } of [
       );
       await expect(meta(page, 'property', 'og:title')).toHaveAttribute(
         'content',
-        `${site.name} · ${role} · ${site.title}`,
+        new RegExp(`^${escapeRegExp(site.name)}.* · ${escapeRegExp(site.title)}$`),
       );
       await expect(meta(page, 'property', 'og:description')).toHaveAttribute(
         'content',
-        new RegExp(escapeRegExp(bio)),
+        /^.{70,170}$/,
       );
       await expect(meta(page, 'property', 'og:image:alt')).toHaveAttribute(
         'content',

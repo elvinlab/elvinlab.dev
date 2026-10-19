@@ -9,6 +9,8 @@ import { buildTermsContent } from '@/features/terms/content.ts';
 import { isEnabled, site } from '@/shared/config/index.ts';
 import type { Locale } from '@/shared/i18n/index.ts';
 import BaseLayout from '@/shared/layout/BaseLayout.astro';
+import { pageCardPath } from '@/shared/seo/og.ts';
+import { pageSeo } from '@/shared/seo/page-seo.ts';
 import PageHeader from '@/shared/ui/PageHeader.astro';
 
 type Props = { locale: Locale };
@@ -23,9 +25,10 @@ const content = buildTermsContent({
   comments: isEnabled('comments') && Boolean(site.giscus),
   me: isEnabled('me'),
 })[locale];
+const seo = pageSeo('terms', locale, content.pageDescription);
 ---
 
-<BaseLayout locale={locale} path="/terms/" title={content.pageTitle} description={content.pageDescription} pixelTitle>
+<BaseLayout locale={locale} path="/terms/" title={seo.title} description={seo.description} ogImage={pageCardPath('terms', locale)} pixelTitle>
   <PageHeader slot="banner" title={content.pageTitle} description={content.pageDescription} />
   <article class="max-w-[68ch]">
     {content.sections.map((section) => (

@@ -12,6 +12,16 @@ export function noteCardPath(slug: string): string {
   return `/og/notes/${slug}.png`;
 }
 
+/** Site path of the share card of a listing or legal page, generated at build time for each locale. */
+export function pageCardPath(page: string, locale: string): string {
+  return `/og/pages/${page}-${locale}.png`;
+}
+
+/** Site path of the share card of a notes topic page. */
+export function topicCardPath(slug: string): string {
+  return `/og/topics/${slug}.png`;
+}
+
 /** Site path of the `/me` share card for a locale, generated at build time. */
 export function profileCardPath(locale: string): string {
   return `/og/me-${locale}.png`;

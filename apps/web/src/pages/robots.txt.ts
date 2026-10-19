@@ -8,6 +8,7 @@ export const GET: APIRoute = () => {
   const body = buildRobotsTxt({
     indexable: buildEnv.siteIndexable,
     sitemapUrl: new URL('/sitemap-index.xml', site.url).href,
+    aiCrawlers: site.seo.aiCrawlers,
   });
   return new Response(body, { headers: { 'content-type': 'text/plain; charset=utf-8' } });
 };

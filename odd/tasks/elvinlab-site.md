@@ -1,11 +1,11 @@
 # Feature: elvinlab.dev — portfolio + Lab Notes
 
-## Current state (synced 2026-10-18)
+## Current state (synced 2026-10-19)
 
-- `develop` (`6bcec59`) equals `origin/develop`; production is the 2026-10-16 release (`origin/main` `5c91365`, built from `develop` `42ba3fe`), which carried the items listed below and note 011 ("De React a Preact"). `changelog:audit` is clean (0 pending entries).
-- Only drift between `main` and `develop`: `.claude/settings.json` was deleted on `develop` (`6bcec59`); it reaches `main` with the next release, no code change.
+- `develop` (`e5a8764`) equals `origin/develop`; production is the latest release (`origin/main` `ac7488a`, built from `develop` `e5a8764`), so `git diff origin/main develop` is empty. No open pull requests.
+- GitHub Project #2: 98 items, 95 Done, 3 Todo, all `tier:human`: #49 T31 (Search Console property and sitemap), #67 T43 (first research and public-learning cycle), #89 T60 (image originals to R2, deferred by the owner until asked).
 - Toolchain is Claude Code (Sonnet) + gentle-ai again, with Tier 1/2 delegated to OpenCode via herdr; `CLAUDE.md` and `AGENTS.md` were updated to say so (the pi + Deepseek wording below is historical).
-- Open follow-ups unchanged: owner content and release decisions for the backlog in the section below (#140 to #147 and the Dependabot PRs #115 and #123).
+- Remaining work is owner-driven: those three issues and writing notes (success criterion: 3 posts). Nothing is pending for a delegated worker.
 
 ## Release 2026-10-16 (released; written before the push)
 
@@ -92,7 +92,7 @@ Approved plan: `docs/PLAN.md`. Design: canvas https://claude.ai/artifact/9xzGdZD
 - [x] T03 Astro + `@astrojs/cloudflare` + Tailwind v4 placeholder page on a Cloudflare preview; verify `<Image>` on Workers. Route: delegated writer. Check: preview URL loads.
 - [x] T04 CI (Biome, typecheck, test, build) as required checks; Cloudflare `main` → production, `develop` → staging, PR → preview. Route: inline (Tier 3, re-tiered from delegated). Check: green Action + three URLs.
 - [x] T05 `docs/CONVENTIONS.md`, `docs/DESIGN.md` (design brief v3), first ADRs, accessible token variants in `docs/BRAND.md`. Route: delegated writer. Check: structural readback.
-- [ ] T06–T23 as in the GitHub Project (core, content, interactivity, launch).
+- [x] T06–T23 and later tasks: tracked and closed in the GitHub Project (95 of 98 Done on 2026-10-19; the three open ones are listed in Current state).
 
 ## Acceptance criteria (feature)
 

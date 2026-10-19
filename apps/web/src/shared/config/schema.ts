@@ -14,6 +14,20 @@ const siteHref = z.union([httpsUrl, z.string().regex(/^\/(?!\/)\S*$/)], {
 export const LISTING_SORTS = ['newest', 'oldest', 'title'] as const;
 export type ListingSort = (typeof LISTING_SORTS)[number];
 
+/** Pages whose search and share copy (`seo.pages`) the owner can override. */
+export const SEO_PAGES = [
+  'notes',
+  'me',
+  'contact',
+  'education',
+  'experiments',
+  'changelog',
+  'subscribe',
+  'privacy',
+  'terms',
+] as const;
+export type SeoPage = (typeof SEO_PAGES)[number];
+
 /** Text keyed by locale, e.g. `{ es: 'Hola', en: 'Hello' }`. Checked against `locales` below. */
 /**
  * A visible text with a length limit, so a longer one fails the build with the field's path instead
@@ -22,6 +36,23 @@ export type ListingSort = (typeof LISTING_SORTS)[number];
  */
 const text = (max: number) => z.string().trim().min(1).max(max);
 const localizedText = (max: number) => z.record(z.string(), text(max));
+
+/** Title and description override of one page (`seo.pages.<page>`), per locale. */
+const seoPageCopy = z
+  .strictObject({
+    title: localizedText(48)
+      .optional()
+      .describe(
+        'Search and share title per locale, without the site suffix. Max 48 characters per locale.',
+      ),
+    description: localizedText(160)
+      .optional()
+      .describe(
+        'Meta description per locale (search results and link previews). Max 160 characters per locale.',
+      ),
+  })
+  .optional()
+  .describe('Title and description override of this page.');
 
 /**
  * The shape of `src/site.config.ts`: the one file that holds every setting of the site. Each field
@@ -684,6 +715,66 @@ export const siteConfigSchema = z
       .describe(
         'Giscus comments (GitHub Discussions). Optional: without it nothing renders even when `features.comments` is on.',
       ),
+    seo: z
+      .object({
+        country: z
+          .string()
+          .regex(/^[A-Z]{2}$/, { error: 'must be an ISO 3166-1 alpha-2 code such as "CR"' })
+          .optional()
+          .describe(
+            'Country of the owner as an ISO 3166-1 alpha-2 code (for example `CR`). Search engines read it from the `Person` structured data to tell people with the same name apart.',
+          ),
+        knowsAbout: z
+          .array(text(60))
+          .max(15)
+          .default([])
+          .describe(
+            'Topics the owner is an expert in, as short phrases. They go into the `Person` structured data and the `llms.txt` file. Up to 15, 60 characters each.',
+          ),
+        sameAs: z
+          .array(httpsUrl)
+          .max(10)
+          .default([])
+          .describe(
+            'Extra profile URLs of the owner (besides `socials`) that confirm the same identity to search engines, for example a course platform or a talks page. Up to 10.',
+          ),
+        aiCrawlers: z
+          .enum(['allow', 'search-only'])
+          .default('allow')
+          .describe(
+            'Policy for AI crawlers in `robots.txt`. `allow` lets every AI crawler read and cite the site; `search-only` blocks the ones that collect training data (GPTBot, Google-Extended, CCBot and similar) and keeps the AI search crawlers.',
+          ),
+        llmsSummary: localizedText(400)
+          .optional()
+          .describe(
+            'Optional paragraph per locale for the top of `/llms.txt`. Omit it to use the identity bio and the site description. Max 400 characters per locale.',
+          ),
+        homeTitle: localizedText(48)
+          .optional()
+          .describe(
+            'Optional title of the home per locale, shown in search results and browser tabs before the site title (for example `Jane Doe · Full-stack engineer`). Omit it to use `identity.name`. Max 48 characters per locale.',
+          ),
+        pages: z
+          .strictObject({
+            notes: seoPageCopy,
+            me: seoPageCopy,
+            contact: seoPageCopy,
+            education: seoPageCopy,
+            experiments: seoPageCopy,
+            changelog: seoPageCopy,
+            subscribe: seoPageCopy,
+            privacy: seoPageCopy,
+            terms: seoPageCopy,
+          })
+          .default({})
+          .describe(
+            'Per-page overrides of the search and share copy. A page without an entry uses the built-in copy, which names the owner from `identity`.',
+          ),
+      })
+      .default({ knowsAbout: [], sameAs: [], aiCrawlers: 'allow', pages: {} })
+      .describe(
+        'Search and AI visibility: who the owner is for search engines, the AI crawler policy and optional page copy overrides.',
+      ),
     notice: localizedText(160)
       .optional()
       .describe(
@@ -721,6 +812,27 @@ export const siteConfigSchema = z
       ...(config.experiments.words && {
         'experiments.words': { path: ['experiments', 'words'], text: config.experiments.words },
       }),
+      ...(config.seo.homeTitle && {
+        'seo.homeTitle': { path: ['seo', 'homeTitle'], text: config.seo.homeTitle },
+      }),
+      ...(config.seo.llmsSummary && {
+        'seo.llmsSummary': { path: ['seo', 'llmsSummary'], text: config.seo.llmsSummary },
+      }),
+      ...Object.fromEntries(
+        SEO_PAGES.flatMap((page) =>
+          (['title', 'description'] as const).flatMap((field) => {
+            const value = config.seo.pages[page]?.[field];
+            return value
+              ? [
+                  [
+                    `seo.pages.${page}.${field}`,
+                    { path: ['seo', 'pages', page, field], text: value },
+                  ],
+                ]
+              : [];
+          }),
+        ),
+      ),
       ...Object.fromEntries(
         (config.now?.items ?? []).map((item, index) => [
           `now.items.${index}`,

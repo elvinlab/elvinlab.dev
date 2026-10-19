@@ -180,6 +180,41 @@ The descriptions come from the schema (`.describe()`), which is why they are in 
 | `giscus.repoId` | `string` | yes |  | Repository node id from https://giscus.app (starts with `R_`). |
 | `giscus.category` | `string` | yes |  | Discussion category name (an Announcements-type category). |
 | `giscus.categoryId` | `string` | yes |  | Category node id from https://giscus.app (starts with `DIC_`). |
+| `seo` | `object` | no | `{"knowsAbout":[],"sameAs":[],"aiCrawlers":"allow","pages":{}}` | Search and AI visibility: who the owner is for search engines, the AI crawler policy and optional page copy overrides. |
+| `seo.country` | `string` | no |  | Country of the owner as an ISO 3166-1 alpha-2 code (for example `CR`). Search engines read it from the `Person` structured data to tell people with the same name apart. |
+| `seo.knowsAbout` | `string (max 60)[] (max 15)` | no | `[]` | Topics the owner is an expert in, as short phrases. They go into the `Person` structured data and the `llms.txt` file. Up to 15, 60 characters each. |
+| `seo.sameAs` | `URL[] (max 10)` | no | `[]` | Extra profile URLs of the owner (besides `socials`) that confirm the same identity to search engines, for example a course platform or a talks page. Up to 10. |
+| `seo.aiCrawlers` | `'allow' \| 'search-only'` | no | `allow` | Policy for AI crawlers in `robots.txt`. `allow` lets every AI crawler read and cite the site; `search-only` blocks the ones that collect training data (GPTBot, Google-Extended, CCBot and similar) and keeps the AI search crawlers. |
+| `seo.llmsSummary` | `{ <locale>: string (max 400) }` | no |  | Optional paragraph per locale for the top of `/llms.txt`. Omit it to use the identity bio and the site description. Max 400 characters per locale. |
+| `seo.homeTitle` | `{ <locale>: string (max 48) }` | no |  | Optional title of the home per locale, shown in search results and browser tabs before the site title (for example `Jane Doe · Full-stack engineer`). Omit it to use `identity.name`. Max 48 characters per locale. |
+| `seo.pages` | `object` | no | `{}` | Per-page overrides of the search and share copy. A page without an entry uses the built-in copy, which names the owner from `identity`. |
+| `seo.pages.notes` | `object` | no |  | Title and description override of this page. |
+| `seo.pages.notes.title` | `{ <locale>: string (max 48) }` | no |  | Search and share title per locale, without the site suffix. Max 48 characters per locale. |
+| `seo.pages.notes.description` | `{ <locale>: string (max 160) }` | no |  | Meta description per locale (search results and link previews). Max 160 characters per locale. |
+| `seo.pages.me` | `object` | no |  | Title and description override of this page. |
+| `seo.pages.me.title` | `{ <locale>: string (max 48) }` | no |  | Search and share title per locale, without the site suffix. Max 48 characters per locale. |
+| `seo.pages.me.description` | `{ <locale>: string (max 160) }` | no |  | Meta description per locale (search results and link previews). Max 160 characters per locale. |
+| `seo.pages.contact` | `object` | no |  | Title and description override of this page. |
+| `seo.pages.contact.title` | `{ <locale>: string (max 48) }` | no |  | Search and share title per locale, without the site suffix. Max 48 characters per locale. |
+| `seo.pages.contact.description` | `{ <locale>: string (max 160) }` | no |  | Meta description per locale (search results and link previews). Max 160 characters per locale. |
+| `seo.pages.education` | `object` | no |  | Title and description override of this page. |
+| `seo.pages.education.title` | `{ <locale>: string (max 48) }` | no |  | Search and share title per locale, without the site suffix. Max 48 characters per locale. |
+| `seo.pages.education.description` | `{ <locale>: string (max 160) }` | no |  | Meta description per locale (search results and link previews). Max 160 characters per locale. |
+| `seo.pages.experiments` | `object` | no |  | Title and description override of this page. |
+| `seo.pages.experiments.title` | `{ <locale>: string (max 48) }` | no |  | Search and share title per locale, without the site suffix. Max 48 characters per locale. |
+| `seo.pages.experiments.description` | `{ <locale>: string (max 160) }` | no |  | Meta description per locale (search results and link previews). Max 160 characters per locale. |
+| `seo.pages.changelog` | `object` | no |  | Title and description override of this page. |
+| `seo.pages.changelog.title` | `{ <locale>: string (max 48) }` | no |  | Search and share title per locale, without the site suffix. Max 48 characters per locale. |
+| `seo.pages.changelog.description` | `{ <locale>: string (max 160) }` | no |  | Meta description per locale (search results and link previews). Max 160 characters per locale. |
+| `seo.pages.subscribe` | `object` | no |  | Title and description override of this page. |
+| `seo.pages.subscribe.title` | `{ <locale>: string (max 48) }` | no |  | Search and share title per locale, without the site suffix. Max 48 characters per locale. |
+| `seo.pages.subscribe.description` | `{ <locale>: string (max 160) }` | no |  | Meta description per locale (search results and link previews). Max 160 characters per locale. |
+| `seo.pages.privacy` | `object` | no |  | Title and description override of this page. |
+| `seo.pages.privacy.title` | `{ <locale>: string (max 48) }` | no |  | Search and share title per locale, without the site suffix. Max 48 characters per locale. |
+| `seo.pages.privacy.description` | `{ <locale>: string (max 160) }` | no |  | Meta description per locale (search results and link previews). Max 160 characters per locale. |
+| `seo.pages.terms` | `object` | no |  | Title and description override of this page. |
+| `seo.pages.terms.title` | `{ <locale>: string (max 48) }` | no |  | Search and share title per locale, without the site suffix. Max 48 characters per locale. |
+| `seo.pages.terms.description` | `{ <locale>: string (max 160) }` | no |  | Meta description per locale (search results and link previews). Max 160 characters per locale. |
 | `notice` | `{ <locale>: string (max 160) }` | no |  | Optional site-wide notice strip per locale (for example "under construction"). Remove the key to hide it. Max 160 characters per locale. |
 <!-- docs:end site-config -->
 
@@ -546,6 +581,7 @@ A text that is too long overflows a button, wraps a menu entry onto two lines or
 | Key group | Limit (characters, in each language) | Where it appears |
 | --- | --- | --- |
 | `subscribe.*` | 200 | The subscription form, its messages and the confirmation pages |
+| `changelog.page.description.*` | 170 | Meta description of changelog pages 2 and up (search snippets, 100 to 160 characters) |
 | `education.*` | 140 | Intro, labels and sort descriptions of `/education/` |
 | `experiments.*` | 140 | Intro and sort descriptions of `/experiments/` |
 | `author.*` | 130 | The author card on the home |

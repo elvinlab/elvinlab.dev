@@ -282,3 +282,7 @@ What was run: read-only `SELECT` counts through the owner's authorized `wrangler
 ### DMARC policy p=none -> p=quarantine (2026-10-19, issue #91)
 
 Changed by the owner's authorization: the single `_dmarc` TXT record of `elvinlab.dev`, only `p=none` to `p=quarantine`, report address unchanged; confirmed in public DNS afterwards. Evidence before: a Gmail "Show original" of the 2026-10-06 note email with SPF pass, DKIM pass (aligned, `d=elvinlab.dev`) and DMARC pass. Verified after the change: a Gmail "Show original" of a confirmation email sent 2026-10-19 21:02 UTC (after the change) shows SPF pass, DKIM pass (aligned, `d=elvinlab.dev`) and DMARC pass with `p=QUARANTINE`. Not verified: Outlook. The few weeks of reports the issue asked for were not waited out.
+
+### SEO and metadata (2026-10-19)
+
+Run after commit 8d19384 plus the spec updates: unit tests over `shared`, `features/{me,contact}` and `integrations`; typecheck 0 errors; Biome clean; `docs:config`; indexable build crawled (43 pages); full `test:e2e:quick` 1096 passed; `test:white-label` ok. Not re-run: Lighthouse and the JS budget (no script or layout change), cold start (no toolchain change). Not verified: how Google or the AI engines render it, which needs a recrawl.

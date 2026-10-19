@@ -4,7 +4,7 @@ import { expect, type Page, test } from '@playwright/test';
 
 import { describeViolations, scan } from './helpers/axe';
 import { requires, seedTheme } from './helpers/features';
-import { text, themes } from './helpers/site';
+import { escapeRegExp, site, text, themes } from './helpers/site';
 
 requires({ flags: ['education'] });
 
@@ -90,7 +90,7 @@ for (const { path, locale } of PAGES) {
       page.getByRole('heading', { level: 1, name: text(locale, 'education.title') }),
     ).toBeVisible();
     await expect(page.getByText(text(locale, 'education.intro'))).toBeVisible();
-    await expect(page).toHaveTitle(new RegExp(`^${text(locale, 'education.title')} · `));
+    await expect(page).toHaveTitle(new RegExp(` · ${escapeRegExp(site.title)}$`));
     await expect(page.locator('[data-education-item]')).toHaveCount(credentials.length);
     await expect(page.locator('link[rel="canonical"]')).toHaveAttribute(
       'href',
@@ -358,11 +358,11 @@ for (const { path, locale } of PAGES) {
     await page.goto(path);
     await expect(page.locator('meta[name="description"]')).toHaveAttribute(
       'content',
-      text(locale, 'education.description'),
+      /^.{70,170}$/,
     );
     await expect(page.locator('meta[property="og:title"]')).toHaveAttribute(
       'content',
-      new RegExp(`^${text(locale, 'education.title')}`),
+      new RegExp(` · ${escapeRegExp(site.title)}$`),
     );
     await expect(page.locator('meta[property="og:locale"]')).toHaveCount(1);
   });

@@ -75,7 +75,7 @@ const canonical = new URL(localizePath(path, data.lang, LOCALES), site.url).href
 const readingLabel = t(locale, 'notes.readingTime', { min: readingMinutes(entry.body ?? '') });
 ---
 
-<BaseLayout locale={locale} path={path} title={data.title} description={data.description} translated={false} {...(alternates.length > 0 && { alternates })} translations={translations} article={{ pubDate: data.pubDate, updatedDate: data.updatedDate, tags: data.tags }} ogImage={noteCardPath(entry.id)}>
+<BaseLayout locale={locale} path={path} title={data.title} description={data.description} trail={[{ name: t(locale, 'nav.notes'), path: '/notes/' }]} translated={false} {...(alternates.length > 0 && { alternates })} translations={translations} article={{ pubDate: data.pubDate, updatedDate: data.updatedDate, tags: data.tags }} ogImage={noteCardPath(entry.id)}>
   <ReadingMode slot="head" part="boot" locale={locale} />
   {/* Inlined here, minified by `?inline`: a bundled CSS import leaks into every page that reaches NotePage through the feature barrel (measured +4.3 KB of style on the home, privacy, subscribe and topic pages), while this ships only with a rendered note. */}
   <style slot="head" is:inline set:html={noteProseCss + recordCardCss + stampCss} />

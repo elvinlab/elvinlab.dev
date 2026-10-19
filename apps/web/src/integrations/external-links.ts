@@ -45,7 +45,7 @@ export function externalLinksPlugin({ siteUrl, hint }: ExternalLinksOptions) {
         ctx.appendChild(node, {
           type: 'element',
           tagName: 'span',
-          properties: { className: ['sr-only'] },
+          properties: { className: ['sr-only'], dataNosnippet: '' },
           children: [
             { type: 'text', value: ` (${hint(typeof lang === 'string' ? lang : undefined)})` },
           ],

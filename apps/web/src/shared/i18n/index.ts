@@ -139,7 +139,7 @@ export const DICTIONARIES = {
     'changelog.empty': 'Todavía no hay cambios registrados.',
     'changelog.page.title': 'Changelog, página {page}',
     'changelog.page.description':
-      'Registro de cambios visibles del sitio, página {page} de {pages}.',
+      'Registro de cambios visibles de elvinlab.dev, página {page} de {pages}: funciones nuevas, correcciones, rendimiento y documentación, por día de publicación.',
     'changelog.pager.label': 'Paginación del changelog',
     'changelog.entries': '{n} cambios',
     'changelog.kind.added': 'Novedades',
@@ -270,7 +270,6 @@ export const DICTIONARIES = {
     'subscribe.working': 'Procesando…',
     'subscribe.unavailable': 'No está disponible por ahora. Inténtalo más tarde.',
     'subscribe.back': 'Volver a las notas',
-    'subscribe.page.metaTitle': 'Suscríbete a las notas',
     'subscribe.page.description':
       'Recibe por correo cada nota nueva de Lab Notes: las decisiones detrás de lo que construyo, sin relleno y sin ruido.',
     'subscribe.page.title': 'Lo que construyo, en tu correo.',
@@ -464,7 +463,8 @@ export const DICTIONARIES = {
     'changelog.intro': 'Every day something reached production, grouped by kind of change.',
     'changelog.empty': 'No changes recorded yet.',
     'changelog.page.title': 'Changelog, page {page}',
-    'changelog.page.description': 'Log of visible site changes, page {page} of {pages}.',
+    'changelog.page.description':
+      'Log of visible changes to elvinlab.dev, page {page} of {pages}: new features, fixes, performance and documentation, by release day.',
     'changelog.pager.label': 'Changelog pagination',
     'changelog.entries': '{n} changes',
     'changelog.kind.added': 'New',
@@ -593,7 +593,6 @@ export const DICTIONARIES = {
     'subscribe.working': 'Working…',
     'subscribe.unavailable': 'Not available right now. Please try again later.',
     'subscribe.back': 'Back to the notes',
-    'subscribe.page.metaTitle': 'Subscribe to the notes',
     'subscribe.page.description':
       'Get every new Lab Notes post by email: the decisions behind what I build, with no filler and no noise.',
     'subscribe.page.title': 'What I build, in your inbox.',

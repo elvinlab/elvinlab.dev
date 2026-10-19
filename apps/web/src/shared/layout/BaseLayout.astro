@@ -20,6 +20,7 @@ import Navbar from '@/shared/layout/Navbar.astro';
 import SiteNotice from '@/shared/layout/SiteNotice.astro';
 import { showSubscribeCta, showSubscribeLink } from '@/shared/layout/subscribe-cta.ts';
 import { themeBootScript } from '@/shared/layout/theme-boot.ts';
+import type { PageType } from '@/shared/seo/jsonld.ts';
 import Seo from '@/shared/seo/Seo.astro';
 import BackToTop from '@/shared/ui/BackToTop.astro';
 import LanguageHint from '@/shared/ui/LanguageHint.astro';
@@ -29,7 +30,7 @@ type Props = {
   /** Route path without locale prefix, e.g. `/notes/`. */
   path: string;
   title?: string;
-  description?: string;
+  description?: string | undefined;
   translated?: boolean;
   noindex?: boolean;
   article?: { pubDate: Date; updatedDate?: Date | undefined; tags?: readonly string[] | undefined };
@@ -37,6 +38,11 @@ type Props = {
   alternates?: { hreflang: string; href: string }[];
   /** Path of this page's translation per locale: the language switch and hint go there. */
   translations?: Record<string, string>;
+  /** schema.org type of the page, for pages that are not a note (see `Seo.astro`). */
+  pageType?: PageType;
+  keywords?: readonly string[];
+  /** Parents between the home and this page in its breadcrumb. */
+  trail?: readonly { name: string; path: string }[];
   /** Site path of this page's share image; the default card is used when omitted. */
   ogImage?: string;
   ogImageAlt?: string;

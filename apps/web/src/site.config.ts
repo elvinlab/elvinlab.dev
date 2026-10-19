@@ -12,8 +12,8 @@ export const siteConfig = {
   url: 'https://elvinlab.dev',
   title: 'elvinlab.dev',
   description: {
-    es: 'Portafolio y Lab Notes de Elvin González: decisiones de ingeniería full-stack y agentes de IA, documentadas.',
-    en: "Elvin González's portfolio and Lab Notes: full-stack engineering and AI agent decisions, documented.",
+    es: 'Elvin González, ingeniero full-stack en Costa Rica. Portafolio y Lab Notes: decisiones de ingeniería y agentes de IA, documentadas.',
+    en: 'Elvin González, full-stack engineer in Costa Rica. Portfolio and Lab Notes: engineering and AI agent decisions, documented.',
   },
   locales: { default: 'es', supported: ['es', 'en'] },
   identity: {
@@ -73,6 +73,27 @@ export const siteConfig = {
     { label: 'GitHub', url: 'https://github.com/elvinlab', icon: 'github' },
     { label: 'LinkedIn', url: 'https://www.linkedin.com/in/elvinlab', icon: 'linkedin' },
   ],
+  // Search and AI visibility: tells search engines who this is (the owner's country, topics and any
+  // extra profile URL besides `socials`), whether AI crawlers may read the site, and optionally
+  // overrides the title or description of a page (`pages`); see docs/CONFIGURATION.md.
+  seo: {
+    country: 'CR',
+    knowsAbout: [
+      'Full-stack development',
+      'AI agents',
+      'TypeScript',
+      'Astro',
+      'Cloudflare Workers',
+      'Web performance',
+      'Software architecture',
+      'AWS',
+    ],
+    aiCrawlers: 'allow',
+    homeTitle: {
+      es: 'Elvin González · Ingeniero full-stack',
+      en: 'Elvin González · Full-stack engineer',
+    },
+  },
   features: {
     blog: true,
     comments: true,

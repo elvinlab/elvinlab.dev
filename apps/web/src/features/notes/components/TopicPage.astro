@@ -1,15 +1,12 @@
 ---
 /** A static topic page `/notes/tag/<topic>/`: compact paper banner with the title and intro, the
  * topic's notes newest first, and a link back to the index. Static HTML, no script. */
-import { localizePath } from '@elvinlab/core';
-
 import { BackgroundCanvas } from '@/features/backgrounds/index.ts';
 import { type ActiveTopic, topicHref } from '@/features/notes/lib/topics.ts';
-import { site } from '@/shared/config/index.ts';
-import { LOCALES, type Locale, t } from '@/shared/i18n/index.ts';
+import { type Locale, t } from '@/shared/i18n/index.ts';
 import Banner from '@/shared/layout/Banner.astro';
 import BaseLayout from '@/shared/layout/BaseLayout.astro';
-import { breadcrumbJsonLd, jsonLdScript } from '@/shared/seo/jsonld.ts';
+import { topicCardPath } from '@/shared/seo/og.ts';
 import Stamp from '@/shared/ui/Stamp.astro';
 import stampCss from '@/shared/ui/stamp.css?inline';
 import stampCornerCss from '@/shared/ui/stamp-corner.css?inline';
@@ -21,16 +18,9 @@ type Props = { active: ActiveTopic; locale: Locale };
 const { active, locale } = Astro.props;
 const { topic, notes } = active;
 const path = topicHref(topic.slug);
-const absolute = (target: string): string => new URL(target, site.url).href;
-const trail = breadcrumbJsonLd([
-  { name: t(locale, 'nav.home'), url: absolute(localizePath('/', locale, LOCALES)) },
-  { name: t(locale, 'nav.notes'), url: absolute('/notes/') },
-  { name: topic.data.title, url: absolute(path) },
-]);
 ---
 
-<BaseLayout locale={locale} path={path} title={topic.data.title} description={topic.data.description} translated={false} pixelTitle>
-  <script type="application/ld+json" is:inline slot="head" set:html={jsonLdScript(trail)} />
+<BaseLayout locale={locale} path={path} title={topic.data.title} description={topic.data.description} pageType="CollectionPage" ogImage={topicCardPath(topic.slug)} trail={[{ name: t(locale, 'nav.notes'), path: '/notes/' }]} translated={false} pixelTitle>
   <style slot="head" is:inline set:html={stampCss + stampCornerCss} />
   <Banner slot="banner" height="320px">
     <BackgroundCanvas slot="background" />

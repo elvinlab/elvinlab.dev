@@ -6,7 +6,9 @@ import type { AstroIntegration } from 'astro';
 import sharp from 'sharp';
 
 import { site } from '@/shared/config/index.ts';
+import type { SeoPage, SiteConfig } from '@/shared/config/schema.ts';
 import { LOCALES, type Locale, t } from '@/shared/i18n/index.ts';
+import { pageCopy } from '@/shared/seo/page-copy.ts';
 
 import { type CardContent, renderCardPng } from './og-card.ts';
 import {
@@ -129,9 +131,68 @@ export function caseCardContent(
   };
 }
 
+/** The listing and legal pages that get a card (`/me` has its own), with the route and the feature that gates them. */
+const HUB_PAGES = [
+  { page: 'notes', path: '/notes/', feature: 'blog', label: 'notes.title' },
+  {
+    page: 'experiments',
+    path: '/experiments/',
+    feature: 'experiments',
+    label: 'experiments.title',
+  },
+  { page: 'education', path: '/education/', feature: 'education', label: 'education.title' },
+  { page: 'contact', path: '/contact/', feature: 'contact', label: 'nav.contact' },
+  { page: 'changelog', path: '/changelog/', feature: 'changelog', label: 'changelog.title' },
+  { page: 'subscribe', path: '/subscribe/', feature: 'subscribe', label: 'footer.subscribe' },
+  { page: 'privacy', path: '/privacy/', feature: undefined, label: 'footer.privacy' },
+  { page: 'terms', path: '/terms/', feature: undefined, label: 'footer.terms' },
+] as const satisfies readonly {
+  page: SeoPage;
+  path: string;
+  feature: string | undefined;
+  label: Parameters<typeof t>[1];
+}[];
+
+/** The card of a listing or legal page: the section as the eyebrow, the page title and the owner. */
+export function hubCardContent(
+  hub: (typeof HUB_PAGES)[number],
+  locale: Locale,
+  owner: { domain: string; owner: string; overrides: SiteConfig['seo']['pages'] },
+): CardContent {
+  const copy = pageCopy({
+    page: hub.page,
+    locale,
+    defaultLocale: LOCALES.defaultLocale,
+    name: owner.owner,
+    domain: owner.domain,
+    overrides: owner.overrides,
+  });
+  return {
+    domain: `${owner.domain}${hub.path.replace(/\/$/, '')}`,
+    eyebrow: t(locale, hub.label),
+    title: copy.title,
+    footer: owner.owner,
+  };
+}
+
+export type TopicCardSource = { slug: string; title: string };
+
+/** The notes topics read from `topics.json` (keyed by the slug), one card source per entry. */
+export function readTopicCardSourcesFromDisk(contentDir: string): TopicCardSource[] {
+  const file = join(contentDir, 'topics.json');
+  if (!existsSync(file)) return [];
+  const parsed = JSON.parse(readFileSync(file, 'utf8')) as Record<string, { title?: unknown }>;
+  return Object.entries(parsed)
+    .flatMap(([slug, data]) =>
+      typeof data.title === 'string' ? [{ slug, title: data.title }] : [],
+    )
+    .sort((a, b) => a.slug.localeCompare(b.slug));
+}
+
 export type OgSite = ProfileSite & {
   identity: { avatar?: string | undefined; photo?: string | undefined };
-  features: { me: boolean; experiments: boolean };
+  features: { me: boolean; experiments: boolean } & Partial<Record<string, boolean>>;
+  seo?: { pages: SiteConfig['seo']['pages'] };
 };
 /** `assetsDir` is `apps/web/src/assets`, where `identity.photo` and `identity.avatar` name files. */
 export type OgOptions = { assetsDir?: string; site?: OgSite };
@@ -200,6 +261,39 @@ export function ogImages(contentDir: string, options: OgOptions = {}): AstroInte
             for (const experiment of experiments) {
               const png = await renderCardPng(caseCardContent(experiment, owner));
               writeFileSync(join(root, 'experiments', `${experiment.slug}.png`), png);
+              written += 1;
+            }
+          }
+        }
+
+        const owner = {
+          domain: new URL(config.url).host,
+          owner: config.identity.name,
+          overrides: config.seo?.pages ?? {},
+        };
+        const pagesDir = join(root, 'pages');
+        for (const hub of HUB_PAGES) {
+          if (hub.feature && config.features[hub.feature] === false) continue;
+          mkdirSync(pagesDir, { recursive: true });
+          for (const locale of LOCALES.locales) {
+            const png = await renderCardPng(hubCardContent(hub, locale, owner));
+            writeFileSync(join(pagesDir, `${hub.page}-${locale}.png`), png);
+            written += 1;
+          }
+        }
+
+        if (config.features['blog'] !== false) {
+          const topics = readTopicCardSourcesFromDisk(contentDir);
+          if (topics.length > 0) {
+            mkdirSync(join(root, 'topics'), { recursive: true });
+            for (const topic of topics) {
+              const png = await renderCardPng({
+                domain: `${owner.domain}/notes/tag/${topic.slug}`,
+                eyebrow: t(LOCALES.defaultLocale, 'notes.topics'),
+                title: topic.title,
+                footer: owner.owner,
+              });
+              writeFileSync(join(root, 'topics', `${topic.slug}.png`), png);
               written += 1;
             }
           }

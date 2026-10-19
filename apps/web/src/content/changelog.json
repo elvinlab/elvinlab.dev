@@ -1119,5 +1119,11 @@
     "category": "fixed",
     "title": "Readable avatar caption and visible status dot",
     "description": "The name and role under the home avatar no longer sit behind the banner fade, and the status dot on the experiment case pages is drawn again."
+  },
+  "seo-metadata-and-ai-search": {
+    "date": "2026-10-19",
+    "category": "added",
+    "title": "Search and share metadata for every page, plus llms.txt",
+    "description": "Each page now has its own in-language title, description, breadcrumbs and structured data, listing and legal pages and topics have their own share cards, new-tab hints no longer leak into search snippets, robots.txt names the AI crawlers explicitly and /llms.txt maps the site for language models. The home title now carries the role (seo.homeTitle). All of it is driven by the new optional seo block in site.config.ts."
   }
 }

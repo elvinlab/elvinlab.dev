@@ -12,6 +12,8 @@ import { isEnabled } from '@/shared/config/index.ts';
 import { type Locale, t } from '@/shared/i18n/index.ts';
 import Banner from '@/shared/layout/Banner.astro';
 import BaseLayout from '@/shared/layout/BaseLayout.astro';
+import { pageCardPath } from '@/shared/seo/og.ts';
+import { pageSeo } from '@/shared/seo/page-seo.ts';
 import Chip from '@/shared/ui/Chip.astro';
 
 import NoteRow from './NoteRow.astro';
@@ -41,10 +43,11 @@ for (const note of notes) categoryCounts.set(note.data.category, (categoryCounts
 const categories = [...categoryCounts.entries()]
   .map(([name, count]) => ({ name, count }))
   .sort((a, b) => b.count - a.count);
+const seo = pageSeo('notes', locale);
 const { top: tags, rest: moreTags } = topTags(notes.map((note) => note.data.tags));
 ---
 
-<BaseLayout locale={locale} path="/notes/" title={t(locale, 'notes.title')} noindex={noindex} translated={false} pixelTitle>
+<BaseLayout locale={locale} path="/notes/" title={seo.title} description={seo.description} pageType="Blog" ogImage={pageCardPath('notes', locale)} noindex={noindex} translated={false} pixelTitle>
   <style slot="head" is:inline set:html={isEnabled('readingProgress') ? notesIndexCss + notesIndexMarksCss : notesIndexCss} />
   <Banner slot="banner" height="320px">
     <BackgroundCanvas slot="background" />

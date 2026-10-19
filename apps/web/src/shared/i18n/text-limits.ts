@@ -18,6 +18,7 @@ export const TEXT_LIMITS: Readonly<Record<string, number>> = {
   privacy: 100,
   notes: 100,
   changelog: 90,
+  'changelog.page.description': 170,
   comments: 90,
   home: 90,
   placeholder: 80,
@@ -54,6 +55,8 @@ export const TEXT_LIMIT_NOTES: Readonly<Record<string, string>> = {
   privacy: 'Short fragments of the privacy page',
   notes: 'The notes index, filters, topics and start-here block',
   changelog: 'The changelog page',
+  'changelog.page.description':
+    'Meta description of changelog pages 2 and up (search snippets, 100 to 160 characters)',
   comments: 'The comments block under a note',
   home: 'Sections of the home',
   placeholder: 'The placeholder page',
