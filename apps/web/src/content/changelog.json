@@ -1077,5 +1077,11 @@
     "category": "fixed",
     "title": "Claims tightened in notes 001 and 002",
     "description": "Cost, fallback, review and Lighthouse statements now state their conditions and dates, with hand-drawn marks on the corrected figure and the key rules. The LCP gate wording in the docs matches the CI configuration."
+  },
+  "note-010-restructured": {
+    "date": "2026-10-19",
+    "category": "changed",
+    "title": "Changelog note restructured",
+    "description": "The note about the visitor changelog now opens on the problem and follows the same shape as the other notes, with the same facts and a corrected-rule mark."
   }
 }
