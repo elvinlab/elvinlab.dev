@@ -44,7 +44,7 @@ const categories = [...categoryCounts.entries()]
 const { top: tags, rest: moreTags } = topTags(notes.map((note) => note.data.tags));
 ---
 
-<BaseLayout locale={locale} path="/notes/" title={t(locale, 'notes.title')} noindex={noindex} translated={false} pixelTitle>
+<BaseLayout locale={locale} path="/notes/" title={t(locale, 'notes.title')} description={t(locale, 'notes.description')} noindex={noindex} translated={false} pixelTitle>
   <style slot="head" is:inline set:html={isEnabled('readingProgress') ? notesIndexCss + notesIndexMarksCss : notesIndexCss} />
   <Banner slot="banner" height="320px">
     <BackgroundCanvas slot="background" />

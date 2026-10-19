@@ -47,7 +47,7 @@ const links = [
           {...externalLinkAttrs(link.href, site.url, link.rel)}
           class="grid size-11 place-items-center rounded-control bg-chip text-primary transition-colors duration-150 hover:bg-card-hover"
         >
-          <span class="sr-only">{link.label}</span><ExternalHint href={link.href} locale={locale} />
+          <span class="sr-only" data-nosnippet>{link.label}</span><ExternalHint href={link.href} locale={locale} />
           <SocialIcon name={link.icon} />
         </a>
       </li>

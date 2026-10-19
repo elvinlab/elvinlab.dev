@@ -195,7 +195,7 @@ describe('buildPrivacyContent with comments', () => {
       for (const anchor of anchors) {
         expect(anchor).toContain('target="_blank"');
         expect(anchor).toContain('rel="noopener noreferrer"');
-        expect(anchor).toContain(`<span class="sr-only"> (${hints[locale]})</span>`);
+        expect(anchor).toContain(`<span class="sr-only" data-nosnippet> (${hints[locale]})</span>`);
       }
       // Links inside the site keep the default behavior.
       for (const anchor of html.match(/<a href="\/[^>]*>/g) ?? [])

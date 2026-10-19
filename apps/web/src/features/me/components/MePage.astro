@@ -56,7 +56,7 @@ const hasNotes = hasPublishedNotes(allNotes);
 <BaseLayout
   locale={locale}
   path="/me/"
-  title={`${site.identity.name} · ${site.identity.role[locale]}`}
+  title={`${site.identity.name} · ${t(locale, 'me.seoTitle')}`}
   {...(site.me.pitch ? { description: site.me.pitch[locale] } : {})}
   ogImage={site.features.me ? profileCardPath(locale) : DEFAULT_OG_IMAGE}
   ogImageAlt={`${site.identity.name} · ${site.identity.role[locale]}`}

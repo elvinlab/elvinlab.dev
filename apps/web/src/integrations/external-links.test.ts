@@ -46,7 +46,7 @@ describe('externalLinksPlugin', () => {
     expect(ctx.appendChild).toHaveBeenCalledWith(expect.anything(), {
       type: 'element',
       tagName: 'span',
-      properties: { className: ['sr-only'] },
+      properties: { className: ['sr-only'], dataNosnippet: '' },
       children: [{ type: 'text', value: ' (se abre en una pestaña nueva)' }],
     });
   });

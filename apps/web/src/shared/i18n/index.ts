@@ -220,6 +220,9 @@ export const DICTIONARIES = {
     'notes.title': 'Lab Notes',
     'notes.subtitle':
       'Decisiones de ingeniería documentadas: contexto, qué elegí y qué pasó después.',
+    'me.seoTitle': 'CV de ingeniero full-stack',
+    'notes.description':
+      'Lab Notes de Elvin González: decisiones de ingeniería full-stack y con agentes de IA, con el contexto, lo que elegí y lo que midió después.',
     'notes.search': 'Buscar notas',
     'notes.fix.correctedTo': 'corregido a',
     'notes.filter.all': 'Todas',
@@ -545,6 +548,9 @@ export const DICTIONARIES = {
     'notes.title': 'Lab Notes',
     'notes.subtitle':
       'Engineering decisions, documented: the context, what I chose and what happened.',
+    'me.seoTitle': 'Full-stack engineer CV',
+    'notes.description':
+      "Lab Notes by Elvin González: full-stack and AI-agent engineering decisions, with the context, what I chose and what the numbers said.",
     'notes.search': 'Search notes',
     'notes.fix.correctedTo': 'corrected to',
     'notes.filter.all': 'All',

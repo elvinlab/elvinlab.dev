@@ -6,6 +6,6 @@ import { type Locale, t } from '@/shared/i18n/index.ts';
  * Use it only for links that are always external; component markup uses `externalLinkAttrs`.
  */
 export function externalAnchorHtml(locale: Locale, href: string, label: string): string {
-  const hint = `<span class="sr-only"> (${t(locale, 'link.newTab')})</span>`;
+  const hint = `<span class="sr-only" data-nosnippet> (${t(locale, 'link.newTab')})</span>`;
   return `<a href="${href}" target="_blank" rel="noopener noreferrer">${label}${hint}</a>`;
 }

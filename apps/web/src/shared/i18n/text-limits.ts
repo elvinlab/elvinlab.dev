@@ -11,6 +11,7 @@
  */
 export const TEXT_LIMITS: Readonly<Record<string, number>> = {
   subscribe: 200,
+  'notes.description': 160,
   experiments: 140,
   education: 140,
   author: 130,
@@ -47,6 +48,7 @@ export const TEXT_LIMITS: Readonly<Record<string, number>> = {
 /** Where the texts of each group appear, which is what the limit protects (used by the docs). */
 export const TEXT_LIMIT_NOTES: Readonly<Record<string, string>> = {
   subscribe: 'The subscription form, its messages and the confirmation pages',
+  'notes.description': 'Meta description of the notes index (search results and link previews, up to 160)',
   experiments: 'Intro and sort descriptions of `/experiments/`',
   education: 'Intro, labels and sort descriptions of `/education/`',
   author: 'The author card on the home',
