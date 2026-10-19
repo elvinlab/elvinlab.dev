@@ -49,7 +49,7 @@ const { top: tags, rest: moreTags } = topTags(notes.map((note) => note.data.tags
 
 <BaseLayout locale={locale} path="/notes/" title={seo.title} description={seo.description} pageType="Blog" ogImage={pageCardPath('notes', locale)} noindex={noindex} translated={false} pixelTitle>
   <style slot="head" is:inline set:html={isEnabled('readingProgress') ? notesIndexCss + notesIndexMarksCss : notesIndexCss} />
-  <Banner slot="banner" height="320px">
+  <Banner slot="banner" height="320px" grid>
     <BackgroundCanvas slot="background" />
     <h1 class="font-pixel text-hero font-semibold leading-[1.1] text-balance">
       {t(locale, 'notes.title')}<span aria-hidden="true" class="ml-1 inline-block h-3 w-2 bg-pink align-baseline md:h-4"></span>

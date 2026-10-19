@@ -77,7 +77,7 @@ const meDescription = pitch && pitch.length <= 160 ? pitch : seo.description;
     hero never renders in the fallback. The pixel font keeps its own preload (BaseLayout, H1 pages).
   */}
   <link slot="head" rel="preload" as="font" type="font/woff2" href={plexSansLatin} crossorigin />
-  <Banner slot="banner" height="clamp(420px, 52vh, 520px)">
+  <Banner slot="banner" height="clamp(420px, 52vh, 520px)" grid>
     <BackgroundCanvas slot="background" />
     <MeHero locale={locale} />
   </Banner>

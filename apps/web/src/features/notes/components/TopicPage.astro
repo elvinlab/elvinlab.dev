@@ -22,7 +22,7 @@ const path = topicHref(topic.slug);
 
 <BaseLayout locale={locale} path={path} title={topic.data.title} description={topic.data.description} pageType="CollectionPage" ogImage={topicCardPath(topic.slug)} trail={[{ name: t(locale, 'nav.notes'), path: '/notes/' }]} translated={false} pixelTitle>
   <style slot="head" is:inline set:html={stampCss + stampCornerCss} />
-  <Banner slot="banner" height="320px">
+  <Banner slot="banner" height="320px" grid>
     <BackgroundCanvas slot="background" />
     <div class="relative">
       <Stamp class="stamp-corner">{t(locale, 'stamp.topic')}</Stamp>
