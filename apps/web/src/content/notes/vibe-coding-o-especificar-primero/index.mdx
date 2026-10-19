@@ -3,6 +3,7 @@ number: 3
 title: "Vibe coding o especificar primero: por qué defino antes de pedirle código a la IA"
 description: "Un rollback en el trabajo me enseñó a entender antes de delegar. Qué me da escribir la intención primero y qué me cuesta mantenerla al día."
 pubDate: 2026-10-05
+updatedDate: 2026-10-19
 lang: es
 category: agentes-ia
 tags: [agentes-ia, sdd, vibe-coding, documentacion, tdd]
@@ -13,6 +14,9 @@ decision:
   decision: "Definir intención, alcance y decisiones por escrito antes de delegar código. Descarté pedir código sin plan, pero no la experimentación: experimento sobre un proyecto ya documentado."
   outcome: "En este sitio: 12 ADR, tokens probados (8/8) antes del layout y un cambio fuera de alcance revertido en revisión. El costo: un seguimiento desactualizado casi me hace rehacer el contacto."
 ---
+
+import Fix from '@/features/notes/components/Fix.astro';
+import Ink from '@/shared/ui/Ink.astro';
 
 ## El problema: pedirle código a la IA sin plan
 
@@ -50,7 +54,7 @@ idea
              └─ odd/tasks/  ¿qué pasó, qué se corrigió, qué se midió?
 ```
 
-`PLAN.md` no describe cómo se ve el sitio; describe qué quiero construir, por qué, cuál es la condición de éxito y qué queda explícitamente fuera de alcance. Los ADR guardan cada decisión con sus alternativas: hoy son 12. Y cada tarea es un issue escrito como un brief de delegación, con un campo que ya me salvó al menos una vez (lo cuento más abajo):
+`PLAN.md` no describe cómo se ve el sitio; describe qué quiero construir, por qué, cuál es la condición de éxito y qué queda explícitamente fuera de alcance. Los ADR guardan cada decisión con sus alternativas: <Fix wrong="hoy son 12" right="eran 12 al escribir esto, hoy son 18" />. Y cada tarea es un issue escrito como un brief de delegación, con un campo que ya me salvó al menos una vez (lo cuento más abajo):
 
 ```yaml title=".github/ISSUE_TEMPLATE/task.yml (extracto)"
 - type: textarea
@@ -112,7 +116,7 @@ Me cuestan las dos puntas.
 
 La primera es **definir antes de implementar**. Escribir qué quiero, qué queda fuera y cómo sé que está listo exige pensar antes de ver resultados, y eso es más lento que abrir el chat y pedir código.
 
-La segunda es **mantener la documentación alineada cuando el proyecto cambia**, y esa ya me cobró. El 30 de septiembre terminé la interfaz del formulario de contacto, pero el seguimiento del proyecto siguió diciendo que estaba pendiente. Al día siguiente pedí "empezar" la interfaz de contacto. El agente leyó un documento que mentía por omisión y estuvo a punto de reconstruir algo que ya existía. Lo salvó una exploración del código hecha antes de tocar un solo archivo, no la documentación.
+La segunda es **mantener la documentación alineada cuando el proyecto cambia**, y esa ya me cobró. El 30 de septiembre terminé la interfaz del formulario de contacto, pero el seguimiento del proyecto siguió diciendo que estaba <Fix wrong="pendiente" right="terminada" />. Al día siguiente pedí "empezar" la interfaz de contacto. El agente leyó un documento que mentía por omisión y estuvo a punto de reconstruir algo que ya existía. Lo salvó una exploración del código hecha antes de tocar un solo archivo, no la documentación.
 
 ```txt title="lo que decía el seguimiento vs. lo que había en develop"
 odd/tasks/elvinlab-site.md   → "/contact/ is still a 404 until T19 UI"
@@ -131,7 +135,7 @@ Lo que evito son los dos extremos. Generar código sin plan, como en el feature 
 
 ## Lo que me llevo
 
-Aquel rollback no me enseñó que la IA sea mala programando. Me enseñó que delegar no reemplaza entender. Especificar primero es, para mí, la forma de obligarme a entender antes de delegar: si no puedo escribir qué quiero y cómo sé que está bien, todavía no estoy listo para pedírselo a nadie, humano o modelo.
+Aquel rollback no me enseñó que la IA sea mala programando. Me enseñó que <Ink>delegar no reemplaza entender</Ink>. Especificar primero es, para mí, la forma de obligarme a entender antes de delegar: si no puedo escribir qué quiero y cómo sé que está bien, todavía no estoy listo para pedírselo a nadie, humano o modelo.
 
 Esta nota se quedó a propósito en el porqué. El cómo, es decir, cómo escribo una especificación, qué pongo en un brief y qué parte del proceso todavía no me convence, lo iré contando con más detalle en próximas notas, a medida que lo vaya aprendiendo.
 

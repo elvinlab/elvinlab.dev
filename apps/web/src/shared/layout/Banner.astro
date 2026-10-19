@@ -17,6 +17,8 @@ type Props = {
   compactExpandedHeight?: string;
   /** The banner starts expanded (`data-expanded`); pair it with a `BannerToggle` in the `toggle` slot. */
   expandable?: boolean;
+  /** Draw the lab-paper grid (home only: elsewhere it repeats until it reads as a template). */
+  grid?: boolean;
 };
 
 const {
@@ -24,6 +26,7 @@ const {
   expandedHeight = 'clamp(520px, 72vh, 640px)',
   compactExpandedHeight = expandedHeight,
   expandable = false,
+  grid = false,
 } = Astro.props;
 ---
 
@@ -35,7 +38,7 @@ const {
   data-banner
   data-expanded={expandable ? true : undefined}
 >
-  <div class="banner-grid absolute inset-0 -z-20" aria-hidden="true"></div>
+  {grid && <div class="banner-grid absolute inset-0 -z-20" aria-hidden="true"></div>}
   <slot name="background" />
   <div aria-hidden="true" class="pointer-events-none absolute inset-x-0 bottom-0 z-0 h-[120px] bg-gradient-to-b from-transparent to-page" data-banner-fade></div>
   <div data-banner-inner class="relative z-10 mx-auto flex h-full min-h-[inherit] max-w-[1200px] flex-col justify-end px-4">

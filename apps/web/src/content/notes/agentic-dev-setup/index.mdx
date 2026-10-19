@@ -3,15 +3,17 @@ number: 2
 title: "Claude piensa, los modelos baratos teclean: mi entorno multi-agente por US$20 al mes"
 description: "Un orquestador de pago decide y revisa; modelos gratuitos y uno local ejecutan. Así enruto el trabajo con herdr, OpenCode, OmniRoute, Ollama y Engram."
 pubDate: 2026-10-01
-updatedDate: 2026-10-11
+updatedDate: 2026-10-19
 lang: es
 category: agentes-ia
 tags: [agentes-ia, herdr, opencode, ollama, engram]
 decision:
   context: "Quería programar a diario con agentes de IA sin pagar una suscripción por cada modelo y sin quedarme sin trabajo cuando se agota una cuota."
   decision: "Un solo cerebro de pago decide, delega y revisa; el trabajo acotado corre en modelos gratuitos enrutados por OmniRoute, con un modelo local como último escalón."
-  outcome: "US$20 al mes en total, US$0 en el trabajo delegado y una tubería que sigue funcionando aunque se agoten todas las cuotas en la nube."
+  outcome: "US$20 al mes de suscripción a Claude Pro, US$0 en el trabajo delegado (sin contar el hardware ni la electricidad) y una tubería que sigue respondiendo, degradada, si se agotan las cuotas en la nube."
 ---
+
+import Ink from '@/shared/ui/Ink.astro';
 
 ## El problema
 
@@ -40,11 +42,11 @@ El trabajo se reparte en tres niveles:
 - **Nivel 2, acotado:** tests, boilerplate, documentación, componentes simples y refactors con una especificación clara.
 - **Nivel 3, complejo:** arquitectura, decisiones de diseño, depuración difícil, código sensible a seguridad y requisitos ambiguos. Lo hace Claude Code, sin delegar.
 
-Hay una regla más, y es la que evita delegar por reflejo: si escribir el brief cuesta más que hacer el cambio, lo hago yo.
+Hay una regla más, y es la que evita delegar por reflejo: <Ink>si escribir el brief cuesta más que hacer el cambio, lo hago yo</Ink>.
 
 ## Combos y degradación elegante
 
-OmniRoute agrupa los modelos en tres combos con estrategia de prioridad: responde el primer proveedor sano y el resto son respaldo. Los dos primeros terminan siempre en el modelo local.
+OmniRoute agrupa los modelos en tres combos con estrategia de prioridad: responde el primer proveedor sano y el resto son respaldo. Los dos primeros terminan siempre en el modelo local. Estos son los combos de septiembre de 2026: los proveedores y los modelos cambian, y el archivo de configuración del repositorio es la fuente vigente.
 
 ```txt title="los tres combos"
 elvinlabFast   (nivel 1)  Groq gpt-oss-120b → Groq gpt-oss-20b → NVIDIA nemotron-3.5-lightning → qwen3:14b local
@@ -54,7 +56,7 @@ elvinlabLocal  (offline)  qwen3:14b local
 
 Cambiar toda la delegación entre nube y local es un comando: `agent-profile cloud` o `agent-profile local`. Y ningún modelo está escrito a fuego: Claude lee un archivo de configuración antes de cada delegación, así que cambiar de proveedor es cambiar ese archivo, no las reglas.
 
-> Las cuotas se agotan; la tubería no.
+> Las cuotas se agotan; la tubería sigue respondiendo, aunque con menos contexto.
 
 ## Una IA local que cabe en 12 GB
 
@@ -83,7 +85,7 @@ Codex, de hecho, entra como un segundo orquestador cuando Claude Code no está d
 El repositorio tiene un archivo de lecciones donde escribo cada problema resuelto. Cuatro que cambiaron cómo trabajo:
 
 - **Las instrucciones también cuestan.** Cada petición lleva unos 45–50k tokens entre instrucciones y herramientas. Eso agota las cuotas rápido y ni siquiera cabe en el contexto de 16k del modelo local, que la recibe truncada.
-- **Los modelos gratuitos a veces inventan.** Uno guardó en la memoria que un proyecto usaba la Composition API cuando en realidad usaba la Options API. Por eso Claude verifica cada afirmación y cada resultado antes de darlo por bueno.
+- **Los modelos gratuitos a veces inventan.** Uno guardó en la memoria que un proyecto usaba la Composition API cuando en realidad usaba la Options API. Por eso Claude revisa el diff, el build y los reportes de cada agente antes de darlos por buenos.
 - **Un modelo local que no cabe se nota en la GPU.** Si `ollama ps` muestra algo como `31%/69% CPU/GPU`, el modelo no entra en la VRAM. En mi caso otra aplicación estaba ocupando unos 3 GB.
 - **Los interruptores automáticos esconden el problema.** Si un combo salta directo al último paso sin probar los anteriores, es que sus proveedores quedaron marcados como no saludables tras muchos errores: se corrige la causa y se reinicia la puerta de enlace.
 
@@ -94,11 +96,12 @@ De la parte de agentes, además, salió una regla que apliqué en este mismo sit
 - **Los secretos nunca tocan git.** Se leen de variables de entorno, y las claves se respaldan en un archivo cifrado con `age`.
 - **Solo localhost.** La puerta de enlace se enlaza a `127.0.0.1` y exige clave de API. Sin túneles.
 - **"Local" significa enrutado a local, no sellado.** El modelo local se alcanza a través de OmniRoute, así que la garantía de privacidad vive en el enrutamiento y no en el cliente.
-- **Los humanos siguen al mando.** Nada sale de mi máquina sin que Claude revise el diff. Como cuento en [la nota 007](/notes/ahorrar-tokens/), los modelos baratos ya pueden hacer commit solos con `--auto`, pero el push y el deploy les están denegados.
+- **Quién revisa.** Claude revisa cada diff delegado antes de que cuente; yo no reviso el resultado antes de publicar. Como cuento en [la nota 007](/notes/ahorrar-tokens/), los modelos baratos ya pueden hacer commit solos con `--auto`, pero el push y el deploy les están denegados. Y lo delegado viaja a Groq, NVIDIA, Mistral o Gemini: si algo no debe salir de mi máquina, uso el combo local.
+- **Quién decide qué.** Los niveles, los proveedores y la regla de no delegar si el brief cuesta más que el cambio los definí yo; los modelos proponen y ejecutan dentro de ese marco.
 - **Todo es reconstruible.** Scripts idempotentes de arranque, restauración y parches devuelven una máquina nueva a este estado.
 
 ## Probarlo
 
-El repositorio está pensado para quien quiere construir proyectos personales con agentes sin pagar una suscripción cara: una sola suscripción de US$20 al mes y una GPU de 12 GB alcanzan. Una nota de transparencia que también está en el README: se desarrolla y se prueba con Claude Sonnet a esfuerzo medio, no con el modelo más grande. Es a propósito, para mostrar que un modelo intermedio bien orquestado rinde lo suficiente para proyectos reales.
+El repositorio está pensado para quien quiere construir proyectos personales con agentes sin pagar una suscripción cara: una sola suscripción de US$20 al mes y una GPU de 12 GB alcanzan. Los US$20 son solo la suscripción. La GPU ya la tenía antes de armar este entorno y no entra en esa cuenta; tampoco la electricidad ni los límites de los niveles gratuitos, que pueden cambiar. Una nota de transparencia que también está en el README: se desarrolla y se prueba con Claude Sonnet a esfuerzo medio, no con el modelo más grande. Es a propósito, para mostrar que un modelo intermedio bien orquestado rinde lo suficiente para proyectos reales.
 
 Si lo pruebas, la caja de comentarios de abajo es el mejor lugar para contarme qué falló.

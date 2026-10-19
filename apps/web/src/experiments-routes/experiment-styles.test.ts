@@ -203,12 +203,12 @@ describe('experimentsCss', () => {
       );
     });
 
-    it('sets the result off with a square 3 px primary rule, a primary label and larger full-color text', () => {
+    it('sets the result off with a dashed hairline above, a primary label and larger full-color text', () => {
       const css = experimentsCss(ALL);
       expect(css).toMatch(
-        /\.xp-facts \[data-result\]\{[^}]*border-left:3px solid var\(--color-primary\)/,
+        /\.xp-facts \[data-result\]\{[^}]*border-top:1px dashed var\(--color-divider\)/,
       );
-      expect(css).toMatch(/\.xp-facts \[data-result\]\{[^}]*padding-left:/);
+      expect(css).not.toMatch(/\.xp-facts \[data-result\]\{[^}]*border-left/);
       expect(css).not.toMatch(/\.xp-facts \[data-result\]\{[^}]*border-radius/);
       expect(css).toMatch(/\.xp-facts \[data-result\] dt\{[^}]*color:var\(--color-primary\)/);
       expect(css).toMatch(/\.xp-facts \[data-result\] dd\{[^}]*color:var\(--color-text\)/);

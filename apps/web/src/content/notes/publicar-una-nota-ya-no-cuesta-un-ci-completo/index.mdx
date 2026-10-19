@@ -3,7 +3,7 @@ number: 9
 title: "Publicar una nota ya no cuesta un CI completo"
 description: "Publicar una nota era un release con todo el CI y nueve pasos a mano. Separé los dos problemas: un comando para los pasos y un carril rápido para el CI."
 pubDate: 2026-10-12
-updatedDate: 2026-10-12
+updatedDate: 2026-10-19
 lang: es
 category: decisiones
 tags: [ci, verificacion, rendimiento, flujo-de-trabajo]
@@ -12,6 +12,8 @@ decision:
   decision: "Un comando, pnpm publish-note, hace los pasos; y un carril rápido en el CI salta e2e y Lighthouse si el push solo toca notas. Descarté un CMS, editar desde la web de GitHub y programar publicaciones."
   outcome: "Publicar esta nota tomó 15 s de comando y 89 s de CI, frente a 325 s del CI completo anterior (73 % menos). Su primera publicación la frenó el presupuesto de peso, y eso destapó un defecto de diseño."
 ---
+
+import Ink from '@/shared/ui/Ink.astro';
 
 ## Publicar una nota era más trabajo que escribirla
 
@@ -111,4 +113,4 @@ Esta nota fue el primer push que solo tocaba notas.
 
 ## Qué sigue sin resolver
 
-Dos cosas. La intermitencia de `/me/` sigue sin causa conocida: está en el issue y no la voy a esconder detrás de un reintento. Y todavía no tengo una política para las mediciones ruidosas del CI (Lighthouse, accesibilidad): hoy un fallo aislado bloquea el release y lo repito yo a mano. La idea es un reintento automático que deje el fallo anotado en el resumen del run, para que no se esconda.
+Dos cosas. La intermitencia de `/me/` sigue sin causa conocida: está en el issue y <Ink>no la voy a esconder detrás de un reintento</Ink>. Y todavía no tengo una política para las mediciones ruidosas del CI (Lighthouse, accesibilidad): hoy un fallo aislado bloquea el release y lo repito yo a mano. La idea es un reintento automático que deje el fallo anotado en el resumen del run, para que no se esconda.

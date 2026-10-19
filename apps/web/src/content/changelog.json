@@ -1071,5 +1071,47 @@
     "category": "fixed",
     "title": "Author voice corrected in the React-to-Preact note",
     "description": "Removed an assistant narrator, corrected wording and numerical comparisons, and documented a required editorial review for new and edited notes."
+  },
+  "notes-001-002-editorial-review": {
+    "date": "2026-10-19",
+    "category": "fixed",
+    "title": "Claims tightened in notes 001 and 002",
+    "description": "Cost, fallback, review and Lighthouse statements now state their conditions and dates, with hand-drawn marks on the corrected figure and the key rules. The LCP gate wording in the docs matches the CI configuration."
+  },
+  "note-010-restructured": {
+    "date": "2026-10-19",
+    "category": "changed",
+    "title": "Changelog note restructured",
+    "description": "The note about the visitor changelog now opens on the problem and follows the same shape as the other notes, with the same facts and a corrected-rule mark."
+  },
+  "notes-ink-fix-marks": {
+    "date": "2026-10-19",
+    "category": "changed",
+    "title": "Hand-drawn marks across the notes",
+    "description": "Every note now uses the underline and in-place correction marks, and each correction states what it replaces. Notes carry about 1.1 KB more inline CSS for them."
+  },
+  "now-card-refreshed": {
+    "date": "2026-10-19",
+    "category": "changed",
+    "title": "Now card re-confirmed",
+    "description": "The home Now card was reviewed against what is actually in progress and its date moved to 19 October 2026. The content itself did not change."
+  },
+  "experiment-case-decisions": {
+    "date": "2026-10-19",
+    "category": "changed",
+    "title": "More substance in the experiment case pages",
+    "description": "Both case pages now list the stack, five decisions and what was learned, in Spanish and English; the elvinlab.dev one also gives the measured reasons."
+  },
+  "design-template-patterns-removed": {
+    "date": "2026-10-19",
+    "category": "changed",
+    "title": "Fewer template-looking details",
+    "description": "The gradient bars on top of cards and the accent stripe beside the experiment result are gone, and the lab-paper grid in the banner now appears only on the home. Colors and brand are unchanged."
+  },
+  "notes-001-002-claims-narrowed": {
+    "date": "2026-10-19",
+    "category": "fixed",
+    "title": "More precise claims in notes 001 and 002",
+    "description": "Note 001 now states the Firefox, inline stylesheet and test-first claims as far as they were checked, and both notes say that the GPU predates the setup and that results are not reviewed before publishing."
   }
 }

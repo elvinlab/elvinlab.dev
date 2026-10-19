@@ -598,7 +598,7 @@ Reglas que acompañan a la tabla:
 
 ### 6.12 Presupuestos de calidad
 
-- Lighthouse móvil (≥ 95 en las cuatro categorías, LCP ≤ 2,5 s, CLS ≤ 0,1): `lighthouserc.json`.
+- Lighthouse móvil (≥ 95 en las cuatro categorías, LCP ≤ 2,7 s como mediana de tres corridas, CLS ≤ 0,1): `lighthouserc.json`.
 - JavaScript por página (30 KiB gzip): `apps/web/scripts/performance-budget.ts`.
 - Un presupuesto no se sube para «hacer pasar» un cambio: se arregla el cambio.
 

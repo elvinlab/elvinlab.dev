@@ -21,6 +21,54 @@
       "es": "Sitio publicado con código público, documentación y controles automáticos: pruebas, accesibilidad, presupuesto de JavaScript y Lighthouse.",
       "en": "Published site with public code, documentation and automated checks: tests, accessibility, JavaScript budget and Lighthouse."
     },
+    "decisions": [
+      {
+        "es": "Preact en lugar de React para las islas: unos 7 KiB frente a 69 KiB gzip, medidos en una isla de un solo botón.",
+        "en": "Preact instead of React for the islands: about 7 KiB against 69 KiB gzip, measured on a one-button island."
+      },
+      {
+        "es": "Un solo CI por release, sin staging ni previews: el push directo a main corre los controles y despliega en la misma ejecución.",
+        "en": "One CI run per release, no staging and no previews: the direct push to main runs the checks and deploys in the same run."
+      },
+      {
+        "es": "Identidad por configuración: una build con identidad alternativa falla si se filtra una sola cadena mía en el HTML.",
+        "en": "Identity by configuration: a build with an alternative identity fails if a single string of mine leaks into the HTML."
+      },
+      {
+        "es": "Las imágenes viven en el repositorio y pasan por astro:assets; si falta una, el build falla en vez de publicar un enlace roto.",
+        "en": "Images live in the repository and go through astro:assets; a missing one fails the build instead of publishing a broken link."
+      },
+      {
+        "es": "Una base compartida nace en el proyecto y se mueve a core solo cuando se repite, nunca por adelantado.",
+        "en": "A shared base is born in the project and moves to core only when it repeats, never ahead of need."
+      }
+    ],
+    "tech": [
+      "Astro",
+      "Tailwind v4",
+      "Preact",
+      "TypeScript",
+      "Cloudflare Workers",
+      "D1",
+      "Biome",
+      "Vitest",
+      "Playwright",
+      "pnpm"
+    ],
+    "learned": [
+      {
+        "es": "Medir antes de elegir: la cifra de Preact contra React salió de una isla real, no de una suposición.",
+        "en": "Measure before choosing: the Preact against React figure came from a real island, not an assumption."
+      },
+      {
+        "es": "Un CI en cada push con staging me hacía esperar; lo reduje a una sola ejecución en main que despliega si todo pasa.",
+        "en": "A CI run on every push plus staging made me wait; I cut it to a single run on main that deploys if everything passes."
+      },
+      {
+        "es": "Decir que algo es white-label es fácil; lo difícil es que siga siendo cierto, y por eso lo verifica una prueba.",
+        "en": "Saying something is white-label is easy; keeping it true is the hard part, so a test verifies it."
+      }
+    ],
     "tags": ["astro", "cloudflare", "d1", "typescript"],
     "year": 2026,
     "url": "https://elvinlab.dev",
@@ -97,6 +145,57 @@
       "es": "Entorno público y documentado, usado para construir este sitio.",
       "en": "A public, documented setup, used to build this site."
     },
+    "decisions": [
+      {
+        "es": "Un cerebro de pago decide y revisa; el trabajo acotado corre en modelos gratuitos enrutados por OmniRoute, con un modelo local como último escalón.",
+        "en": "One paid brain decides and reviews; bounded work runs on free models routed by OmniRoute, with a local model as the last step."
+      },
+      {
+        "es": "Tres niveles de trabajo: lo trivial y lo acotado se delega; lo complejo o sensible a seguridad lo hace Claude Code sin delegar.",
+        "en": "Three work tiers: trivial and bounded work is delegated; complex or security-sensitive work stays with Claude Code, undelegated."
+      },
+      {
+        "es": "Una regla contra delegar por reflejo: si escribir el brief cuesta más que hacer el cambio, lo hago yo.",
+        "en": "A rule against delegating by reflex: if writing the brief costs more than making the change, I do it myself."
+      },
+      {
+        "es": "Los secretos nunca tocan git: se leen de variables de entorno y las claves se respaldan en un archivo cifrado con age.",
+        "en": "Secrets never touch git: they are read from environment variables and the keys are backed up in an age-encrypted file."
+      },
+      {
+        "es": "Solo localhost: la puerta de enlace se enlaza a 127.0.0.1 y exige clave de API, sin túneles.",
+        "en": "Localhost only: the gateway binds to 127.0.0.1 and requires an API key, with no tunnels."
+      }
+    ],
+    "tech": [
+      "Claude Code",
+      "OpenCode",
+      "herdr",
+      "OmniRoute",
+      "Ollama",
+      "Engram",
+      "qwen3:14b",
+      "systemd",
+      "age"
+    ],
+    "learned": [
+      {
+        "es": "Las instrucciones también cuestan: cada petición lleva unos 45–50k tokens entre instrucciones y herramientas, y eso agota las cuotas rápido.",
+        "en": "Instructions cost too: each request carries about 45–50k tokens of instructions and tools, which burns through quotas quickly."
+      },
+      {
+        "es": "Los modelos gratuitos a veces inventan: uno guardó un dato falso en la memoria, por eso reviso el diff, el build y el reporte de cada agente.",
+        "en": "Free models sometimes make things up: one saved a false fact to memory, so I check each agent's diff, build and report."
+      },
+      {
+        "es": "Un modelo local que no cabe se nota en la GPU: si ollama ps muestra un reparto CPU/GPU, el modelo no entra en la VRAM.",
+        "en": "A local model that does not fit shows on the GPU: if ollama ps reports a CPU/GPU split, the model does not fit in VRAM."
+      },
+      {
+        "es": "Los interruptores automáticos esconden el problema: si un combo salta al último paso, sus proveedores quedaron marcados como no saludables.",
+        "en": "Circuit breakers hide the problem: if a combo jumps straight to the last step, its providers were marked unhealthy."
+      }
+    ],
     "tags": ["ai-agents", "tooling"],
     "year": 2026,
     "repo": "https://github.com/elvinlab/agentic-dev-setup",

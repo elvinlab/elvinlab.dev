@@ -3,6 +3,7 @@ number: 8
 title: "Verificar solo lo que toca el cambio: de 340 segundos a 53 por una nota"
 description: "pnpm verify lee qué archivos cambiaron y corre solo las comprobaciones que los cubren. Qué ahorra, qué se le escapó y qué queda en manos del CI."
 pubDate: 2026-10-11
+updatedDate: 2026-10-19
 lang: es
 category: decisiones
 tags: [testing, verificacion, ci, rendimiento, lighthouse]
@@ -11,6 +12,8 @@ decision:
   decision: "Verifico solo lo que el cambio toca, con tres tamaños de cambio y una huella por comprobación. Descarté correr todo siempre y dejarle todo al CI de main."
   outcome: "Un cambio de layout bajó a 115 s y uno en una nota a 53 s (84 % menos). El CI completo pasó de unos 328 s a 221 s, sin bajar ningún umbral."
 ---
+
+import Ink from '@/shared/ui/Ink.astro';
 
 ## 340 segundos para revisar un cambio de una línea
 
@@ -89,6 +92,6 @@ Ese es el fallo que más me preocupa de una herramienta así: no que corra de m�
 
 ## Si te pasa lo mismo
 
-No necesitas mi script. Lo que sí necesitas es una lista honesta de qué comprobación depende de qué archivos, y anotar lo que no corriste. Con eso, 340 segundos por cambio se vuelven una decisión y no una costumbre.
+No necesitas mi script. Lo que sí necesitas es <Ink>una lista honesta de qué comprobación depende de qué archivos, y anotar lo que no corriste</Ink>. Con eso, 340 segundos por cambio se vuelven una decisión y no una costumbre.
 
 ¿Cómo decides tú qué pruebas correr antes de hacer push? Si tu grafo de imports sí ve tus pruebas de navegador, cuéntame cómo en los comentarios.

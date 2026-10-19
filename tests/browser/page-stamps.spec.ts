@@ -1,24 +1,13 @@
 import { expect, test } from '@playwright/test';
 
-import { has, liveByPath } from './helpers/features';
+import { liveByPath } from './helpers/features';
 
 /**
- * One meaningful stamp in the shared page header of Experiments, Changelog and Contact, and in the
- * banner of the topic pages (DESIGN.md, "Notebook ink system", "Stamps"). The text says what the page
- * is. Pages that do not opt in (subscribe, privacy, terms) carry none.
+ * One meaningful stamp in the banner of the topic pages (DESIGN.md, "Notebook ink system", "Stamps").
+ * The headers of Experiments, Education, Changelog and Contact carry none since 2026-10-19: the stamp
+ * only repeated the title. Pages that do not opt in (subscribe, privacy, terms) carry none either.
  */
-const PAGES = liveByPath(
-  [
-    ['/experiments/', 'EN PRUEBA'],
-    ['/en/experiments/', 'ON TEST'],
-    ['/changelog/', 'REGISTRO'],
-    ['/en/changelog/', 'LOG'],
-    ['/contact/', 'ESCRÍBEME'],
-    ['/en/contact/', 'WRITE ME'],
-    ['/notes/tag/pruebas/', 'ÍNDICE'],
-  ] as const,
-  ([path]) => path,
-);
+const PAGES = liveByPath([['/notes/tag/pruebas/', 'ÍNDICE']] as const, ([path]) => path);
 
 const WIDTHS = [360, 390, 768, 1280] as const;
 
@@ -106,9 +95,8 @@ for (const [path, text] of PAGES) {
 }
 
 test('the stamp is rotated 5 to 8 degrees and framed', async ({ page }) => {
-  test.skip(!has({ routes: ['changelog'] }), 'needs route changelog');
   await page.setViewportSize({ width: 1280, height: 900 });
-  await page.goto('/changelog/');
+  await page.goto('/notes/tag/pruebas/');
   await page.emulateMedia({ reducedMotion: 'reduce' });
   const info = await page.locator('[data-banner] [data-stamp]').evaluate((el) => {
     const s = getComputedStyle(el);
@@ -123,7 +111,17 @@ test('the stamp is rotated 5 to 8 degrees and framed', async ({ page }) => {
   expect(Math.abs(info.deg)).toBeLessThanOrEqual(8);
 });
 
-for (const path of ['/subscribe/', '/privacy/', '/terms/', '/en/privacy/', '/en/terms/']) {
+for (const path of [
+  '/subscribe/',
+  '/privacy/',
+  '/terms/',
+  '/en/privacy/',
+  '/en/terms/',
+  '/experiments/',
+  '/education/',
+  '/changelog/',
+  '/contact/',
+]) {
   test(`${path} has no stamp`, async ({ page }) => {
     await page.goto(path);
     await expect(page.locator('[data-stamp]')).toHaveCount(0);

@@ -3,6 +3,7 @@ number: 10
 title: "Un changelog para visitantes, sin semver"
 description: "Por qué agrupé los cambios por día de producción, escribo las entradas en un solo idioma y audito el changelog antes de liberar."
 pubDate: 2026-10-13
+updatedDate: 2026-10-19
 lang: es
 category: decisiones
 tags: [documentacion, flujo-de-trabajo, verificacion, arquitectura]
@@ -12,35 +13,30 @@ decision:
   outcome: "Cuatro días por página y un comando de publicación que se detiene si un commit revisado no tocó el changelog. Detecta olvidos; comprobar que la entrada explica el cambio sigue siendo trabajo mío."
 ---
 
-Un changelog parece una lista sencilla: qué cambió y cuándo. En este sitio terminó juntando tres decisiones: cómo agrupar las entregas, cuánto trabajo dedicarle a cada entrada y cómo evitar que se me olvide escribirla.
+import Fix from '@/features/notes/components/Fix.astro';
+import Ink from '@/shared/ui/Ink.astro';
 
-La primera versión quedó en el ADR 0010. Empezó como una lista con fechas y después tuve que revisarla, porque el historial creció más rápido de lo que la página podía mostrar con comodidad.
-
-## Una fecha que diga cuándo llegó el cambio
-
-Este sitio se despliega continuamente. Puedo publicar una funcionalidad y corregirla el mismo día. Quería que alguien pudiera abrir el historial y entender qué había cambiado desde su última visita, sin tener que recorrer los commits.
-
-Usar versiones semánticas me añadía una decisión que aquí aportaba poco: qué cambio merece subir qué número. No estoy publicando un paquete que otros proyectos instalan en una versión concreta. Estoy registrando cambios de una web.
-
-Elegí **la fecha de producción**. Si trabajé en algo el lunes y lo publiqué el jueves, la entrada lleva la fecha del jueves. Es la fecha desde la que alguien pudo usarlo.
-
-> El changelog tiene que explicar qué entregué de una forma que se pueda leer sin abrir el repositorio.
-
-Si más adelante extraigo una librería que otros proyectos consuman, el versionado tendrá otro propósito: comunicar compatibilidad. Esta decisión tiene el alcance del sitio.
-
-## La lista plana dejó de alcanzar
+## 83 entradas en seis días y una lista que ya no se podía recorrer
 
 Al revisar el changelog el 7 de octubre, había **83 entradas en seis días** y la página rondaba los **130 KB**. Son las cifras que quedaron en la enmienda del ADR, no el tamaño actual del historial.
 
-La alternativa más cercana era agrupar por despliegue. El historial de `main` mostraba unos **22 despliegues de producción en cuatro días**, con seis el 1 de octubre y otros seis el 6. Eso habría dejado unos 22 bloques de una a cuatro entradas. Cambiaba la forma de la lista, pero seguía habiendo muchos bloques pequeños.
+La primera versión, la del ADR 0010, era una lista plana con fechas. Funcionó mientras el historial cabía en una pantalla; después creció más rápido de lo que la página podía mostrar con comodidad.
 
-Me quedé con una unidad que las entradas ya tenían: [un release es un día de producción](https://github.com/elvinlab/elvinlab.dev/blob/main/docs/adr/0010-visitor-changelog-no-semver-single-language.md). Si publico tres veces en un día, los cambios quedan juntos. No tuve que migrar las entradas ni inventar una numeración de releases.
+Lo que quería era sencillo: que alguien abriera el historial y entendiera qué había cambiado desde su última visita, sin recorrer los commits. Este sitio se despliega continuamente, y puedo publicar una funcionalidad y corregirla el mismo día.
+
+## Por qué un día de producción y no una versión ni un despliegue
+
+Usar versiones semánticas me añadía una decisión que aquí aportaba poco: qué cambio merece subir qué número. No publico un paquete que otros proyectos instalan en una versión concreta; registro cambios de una web. Si más adelante extraigo una librería que otros consuman, el versionado tendrá otro propósito, comunicar compatibilidad, y esta decisión tiene el alcance del sitio.
+
+La alternativa más cercana era agrupar por despliegue. El historial de `main` mostraba unos **22 despliegues de producción en cuatro días**, con seis el 1 de octubre y otros seis el 6. Eso habría dejado unos 22 bloques de una a cuatro entradas: cambiaba la forma de la lista, pero seguía habiendo muchos bloques pequeños.
+
+Me quedé con una unidad que las entradas ya tenían: [un release es un día de producción](https://github.com/elvinlab/elvinlab.dev/blob/main/docs/adr/0010-visitor-changelog-no-semver-single-language.md). Si trabajé en algo el lunes y lo publiqué el jueves, la entrada lleva la fecha del jueves, que es desde cuando alguien pudo usarlo. Si publico tres veces en un día, los cambios quedan juntos. No tuve que migrar las entradas ni inventar una numeración de releases.
 
 ![Changelog real del sitio: días de producción con contadores por categoría y un día abierto que muestra sus entradas.](./changelog-por-dia.png)
 
 *Captura local con el contenido del repositorio. Los bloques representan días, no despliegues.*
 
-Dentro de cada día, las categorías conservan un orden fijo: novedades, cambios, correcciones, retiradas, seguridad y obsolescencias. Dentro de cada categoría, las entradas se ordenan por título. El orden del archivo no cambia la presentación.
+Dentro de cada día, las categorías conservan un orden fijo: novedades, cambios, correcciones, retiradas, seguridad y obsolescencias. Dentro de cada categoría, las entradas se ordenan por título, así que el orden del archivo no cambia la presentación.
 
 La paginación cuenta **días, no entradas**: cuatro por página, por defecto. Los dos más recientes de la primera página empiezan abiertos y el resto queda plegado con `details` nativo. Funciona sin JavaScript y el contenido sigue en el HTML aunque el bloque esté cerrado. Las páginas anteriores tienen URL propia y aparecen en el sitemap.
 
@@ -59,17 +55,11 @@ Las entradas viven en `changelog.json`, dentro de `apps/web/src/content/`. Esta 
 }
 ```
 
-La clave identifica el cambio. La fecha dice cuándo salió. El título y la descripción explican qué pasó. Las categorías son las de Keep a Changelog: `added`, `changed`, `fixed`, `removed`, `security` y `deprecated`. Una mejora de rendimiento va en `changed`; no añadí una categoría por cada tipo de commit.
+La clave identifica el cambio, la fecha dice cuándo salió y el título y la descripción explican qué pasó. Las categorías son las de Keep a Changelog: `added`, `changed`, `fixed`, `removed`, `security` y `deprecated`. Una mejora de rendimiento va en `changed`; no añadí una categoría por cada tipo de commit. Cuando un día necesita un titular, lo escribo en `releases.json`, que es opcional.
 
-Cuando un día necesita un titular, lo escribo en `releases.json`. Es opcional. Si no tiene, muestra solo la fecha.
+Descarté generar las descripciones desde git. Un mensaje de commit puede ser preciso para revisar código y decir muy poco a quien visita la web. <Ink>Traducir el cambio a una explicación útil sigue siendo trabajo mío.</Ink> También registro documentación, configuración y herramientas que le sirven a quien reutilice el proyecto, aunque no se vean en la interfaz.
 
-Descarté generar las descripciones desde git. Un mensaje de commit puede ser preciso para revisar código y decir muy poco a quien visita la web. **Traducir el cambio a una explicación útil** sigue siendo trabajo mío. También registro documentación, configuración y herramientas que le sirven a quien reutilice el proyecto, aunque no se vean en la interfaz.
-
-El contenido se escribe **solo en inglés** y se comparte entre `/changelog/` y `/en/changelog/`. Las etiquetas y el formato de las fechas siguen el idioma de la interfaz; los títulos y las descripciones no se traducen.
-
-Ese es un costo visible: alguien que entra en español encuentra las entradas en inglés. Lo acepté para mantener una sola explicación por cambio. Las notas tienen su propia regla de idioma; esta nota está en español y puede tener una traducción vinculada sin obligarme a traducir todo el historial.
-
----
+El contenido se escribe **solo en inglés** y se comparte entre `/changelog/` y `/en/changelog/`. Las etiquetas y el formato de las fechas siguen el idioma de la interfaz; los títulos y las descripciones no se traducen. Ese es un costo visible: alguien que entra en español encuentra las entradas en inglés. Lo acepté para mantener una sola explicación por cambio.
 
 ## La entrada que dejé para después
 
@@ -77,7 +67,7 @@ Escribir las entradas a mano conserva el criterio, pero también conserva el olv
 
 La auditoría lo detectó. Como los commits todavía no estaban empujados, integré la entrada en el correspondiente. El caso ya lo conté en [la nota 009](/notes/publicar-una-nota-ya-no-cuesta-un-ci-completo/); aquí importa la regla que hizo visible el descuido:
 
-~~La entrada al terminar todo~~ <ins>La entrada en el mismo commit que el cambio.</ins>
+<Fix wrong="La entrada al terminar todo" right="La entrada en el mismo commit que el cambio." />
 
 ```bash title="revisar antes del release"
 pnpm changelog:audit
@@ -91,15 +81,11 @@ El comando busca los commits `feat`, `fix` y `perf` desde el último release y l
 
 En `pnpm publish-note`, la auditoría corre después del commit local y antes del push. Si falla, **el comando se detiene antes de empujar**. No es un job del CI ni una protección de la rama: hacer un push manual sin esa revisión también permite saltársela.
 
-El punto de partida sale de la línea `develop: <sha>` que registra el último commit de release en `origin/main`. Hace falta porque construyo los releases desde el árbol de `develop` con una historia distinta: comparar sin más `origin/main..develop` incluiría trabajo ya publicado.
+## Lo que la auditoría comprueba y lo que se le escapa
 
-La auditoría usa referencias locales y no hace `fetch`. Si están viejas, revisa desde un punto viejo. Si no encuentra aquella línea, termina con código `2`, porque no puede determinar el último release.[^audit]
+La auditoría no puede afirmar que cada cambio tenga una entrada correcta. Comprueba si un commit tocó un archivo. Puedo modificar una entrada anterior y pasar sin explicar el cambio nuevo, y puedo guardar una mejora visible con un tipo de commit que el script no revisa. **La regla editorial es más exigente que el detector**: cada cambio relevante lleva una explicación, aunque no lo atrape el comando.
 
-## Lo que comprueba y lo que se le escapa
-
-La auditoría no puede afirmar que cada cambio tenga una entrada correcta. Comprueba si un commit tocó un archivo.
-
-Puedo modificar una entrada anterior y pasar sin explicar el cambio nuevo. También puedo guardar una mejora visible con un tipo de commit que el script no revisa. **La regla editorial es más exigente que el detector**: cada cambio relevante lleva una explicación, aunque no lo atrape el comando.
+Tampoco es una comprobación sin condiciones. El punto de partida sale de la línea `develop: <sha>` que registra el último commit de release en `origin/main`. Hace falta porque construyo los releases desde el árbol de `develop` con una historia distinta: comparar sin más `origin/main..develop` incluiría trabajo ya publicado. La auditoría usa referencias locales y no hace `fetch`, así que si están viejas revisa desde un punto viejo; y si no encuentra aquella línea termina con código `2`, porque no puede determinar el último release. Su implementación está en [changelog-audit.ts](https://github.com/elvinlab/elvinlab.dev/blob/main/apps/web/scripts/changelog-audit.ts), y sus pruebas cubren el reconocimiento de commits, la detección de entradas ausentes y la lectura del identificador de release.
 
 La fecha tiene otra comprobación:
 
@@ -110,12 +96,14 @@ pnpm changelog:stamp
 
 `stamp` compara las claves actuales con las de `origin/main` y fecha solo las nuevas. Las publicadas quedan intactas. Lo corro al preparar el release; si la entrega se mueve a otro día, toca volver a fechar las pendientes.
 
-## Lo que me cuesta mantenerlo
+## Lo que me cuesta
 
-Sigo escribiendo cada entrada. Mantengo un solo idioma a costa de que parte del contenido no coincida con la interfaz española. Y reviso lo que el script no puede juzgar: que la explicación corresponda al cambio y se entienda.
+- **Escribir cada entrada.** El script no la escribe por mí ni sabe si la explicación corresponde al cambio; eso lo reviso yo.
+- **Un solo idioma.** Mantengo una explicación por cambio a costa de que parte del contenido no coincida con la interfaz española.
+- **Dos problemas resueltos, uno no.** La auditoría reduce una dependencia concreta, acordarme al final, y el agrupado por día permite recorrer el historial cuando ya no cabe en una lista corta. Ninguna de las dos cosas escribe el changelog por mí.
 
-La auditoría reduce una dependencia concreta: acordarme al final. El agrupado por día resuelve otra: poder recorrer el historial cuando ya no cabe en una lista corta. Ninguna de las dos cosas escribe el changelog por mí.
+## Si llevas un changelog a mano
 
-El resultado se puede recorrer en [el changelog del sitio](/changelog/). La decisión y la revisión del agrupado quedaron en el ADR 0010. La siguiente vez que cambie esa estructura, quiero poder volver ahí y entender qué problema estaba resolviendo.
+No necesitas mi script. Necesitas elegir la unidad que agrupa las entradas, decidir quién escribe la explicación y tener una comprobación que te avise cuando olvidas una. El resultado de mi elección se puede recorrer en [el changelog del sitio](/changelog/), y la decisión y su enmienda quedaron en el ADR 0010 para que, la próxima vez que cambie esa estructura, pueda volver ahí y entender qué problema estaba resolviendo.
 
-[^audit]: La implementación está en [changelog-audit.ts](https://github.com/elvinlab/elvinlab.dev/blob/main/apps/web/scripts/changelog-audit.ts). Sus pruebas cubren el reconocimiento de commits, la detección de entradas ausentes y la lectura del identificador de release.
+¿Cómo agrupas tú los cambios de tu proyecto: por versión, por fecha o por otra unidad? Cuéntame en los comentarios.

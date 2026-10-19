@@ -3,6 +3,7 @@ number: 4
 title: "Cuando la documentación se queda atrás: los puntos de control que puse para que no mienta"
 description: "Un seguimiento desactualizado casi me hace rehacer trabajo. Una regla antes de cada commit, tests y un registro de lo verificado me obligan a revisarlo."
 pubDate: 2026-10-11
+updatedDate: 2026-10-19
 lang: es
 category: agentes-ia
 tags: [agentes-ia, documentacion, testing, verificacion, engram]
@@ -11,6 +12,9 @@ decision:
   decision: "Poner puntos de control: una regla antes de cada commit, tests que fallan si la guía no coincide con el código y un registro de qué se verificó y qué no. Descarté confiar en acordarme."
   outcome: "Las tablas de configuración ya no pueden desviarse sin romper un test. Aun así, el 2 de octubre tres guías seguían hablando de un staging que había quitado el día anterior."
 ---
+
+import Fix from '@/features/notes/components/Fix.astro';
+import Ink from '@/shared/ui/Ink.astro';
 
 ## El documento que mentía por omisión
 
@@ -129,13 +133,13 @@ CLAUDE.md                  → un release con `git merge develop` que ya no func
 
 El último es el más grave. `CLAUDE.md` es lo primero que lee un agente al entrar al repo, y le estaba dando instrucciones para un release que fallaba porque `main` y `develop` ya tenían historiales separados.
 
-Lo mismo pasó ese 2 de octubre con el preset de apariencia. Cuando cambié a `full`, la marca, el diseño, la guía de configuración y un comentario en el código seguían diciendo que el sitio usaba `minimal`. Y nueve specs e2e asumían `minimal`, así que 16 resultados se rompieron. Esos los atrapó el test. Los documentos en prosa, no.
+Lo mismo pasó ese 2 de octubre con el preset de apariencia. Cuando cambié a `full`, la marca, el diseño, la guía de configuración y un comentario en el código seguían diciendo que el sitio usaba <Fix wrong="minimal" right="full" />. Y nueve specs e2e asumían `minimal`, así que 16 resultados se rompieron. Esos los atrapó el test. Los documentos en prosa, no.
 
 La lección es incómoda pero clara. Los puntos de control atrapan lo que está cerca del cambio: el archivo que el agente toca, la tabla que sale del schema, la decisión que Engram recuerda. Lo que vive lejos, en una guía que nadie abrió durante ese cambio, se sigue escapando. La regla pregunta "¿este cambio vuelve falso algún documento?", pero solo puede responder con los documentos que conoce.
 
 ## Lo que me llevo
 
-No creo que exista una documentación que nunca se quede atrás. Lo que sí puedo hacer es acortar cuánto tiempo pasa atrasada y quién se da cuenta. Antes, me daba cuenta yo, cuando un agente estaba a punto de rehacer algo. Ahora, en los casos que conté aquí, se dio cuenta un test o una memoria, antes de que el error llegara a producción.
+No creo que exista una documentación que nunca se quede atrás. Lo que sí puedo hacer es <Ink>acortar cuánto tiempo pasa atrasada y quién se da cuenta</Ink>. Antes, me daba cuenta yo, cuando un agente estaba a punto de rehacer algo. Ahora, en los casos que conté aquí, se dio cuenta un test o una memoria, antes de que el error llegara a producción.
 
 Y cuando algo se escapa, la corrección queda escrita con fecha, en el mismo documento, explicando qué decía y por qué dejó de ser verdad. No borro lo viejo; lo tacho y explico. Así la próxima sesión sabe que ese documento ya mintió una vez y lo lee con más cuidado.
 

@@ -598,7 +598,7 @@ Rules that go with the table:
 
 ### 6.12 Quality budgets
 
-- Mobile Lighthouse (≥ 95 in the four categories, LCP ≤ 2.5 s, CLS ≤ 0.1): `lighthouserc.json`.
+- Mobile Lighthouse (≥ 95 in the four categories, LCP ≤ 2.7 s as the median of three runs, CLS ≤ 0.1): `lighthouserc.json`.
 - JavaScript per page (30 KiB gzip): `apps/web/scripts/performance-budget.ts`.
 - A budget is never raised to "make a change pass": the change gets fixed.
 

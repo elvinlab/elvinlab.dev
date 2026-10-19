@@ -3,6 +3,7 @@ number: 6
 title: "Mis suscriptores viven en mi base de datos, no en un servicio de newsletter"
 description: "Cómo armé la suscripción por correo de Lab Notes con mi propia lista, doble confirmación y un proveedor que puedo cambiar sin migrar a nadie."
 pubDate: 2026-10-11
+updatedDate: 2026-10-19
 lang: es
 category: decisiones
 tags: [suscripcion, correo, cloudflare-d1, arquitectura, privacidad]
@@ -11,6 +12,8 @@ decision:
   decision: "La lista vive en Cloudflare D1 y Resend envía detrás de un puerto que puedo cambiar. Doble confirmación y baja propia. Descarté las campañas de Resend: la lista habría vivido en dos lugares."
   outcome: "Del ADR a producción en 11 horas. Plan gratis: 100 correos al día, 30 reservados como tope para confirmaciones. Tres fallos en producción el primer día, ninguno mandó un correo duplicado."
 ---
+
+import Ink from '@/shared/ui/Ink.astro';
 
 ## Una visita no es un lector
 
@@ -179,6 +182,6 @@ Al cierre de ese primer día había 4 personas confirmadas. Es poco, y está bie
 
 ## Si llegaste hasta aquí
 
-Esa es la idea entera: una visita se convierte en lector cuando tiene una forma de volver, y esa forma no debería depender de un proveedor que no controlo.
+Esa es la idea entera: <Ink>una visita se convierte en lector cuando tiene una forma de volver, y esa forma no debería depender de un proveedor que no controlo</Ink>.
 
 Si quieres enterarte de la próxima nota, el formulario está al pie de esta página o en `/subscribe/`. Y si manejas tu propia lista, cuéntame en los comentarios qué te hizo elegir entre un servicio y tu propia base, o qué se te rompió a ti el primer día.

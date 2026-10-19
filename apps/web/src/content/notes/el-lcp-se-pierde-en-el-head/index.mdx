@@ -3,6 +3,7 @@ number: 5
 title: "337 bytes de CSS y un LCP reprobado: el rendimiento de mi sitio se decide en el head"
 description: "Por qué cada KB de CSS antes del primer pintado me cuesta de 8 a 11 ms, y cómo dejé de pagar por estilos que la página ni siquiera muestra."
 pubDate: 2026-10-11
+updatedDate: 2026-10-19
 lang: es
 category: decisiones
 tags: [rendimiento, lcp, css, lighthouse, astro]
@@ -13,6 +14,9 @@ decision:
   decision: "Enviar el CSS de cada componente solo en las páginas donde se muestra, con un presupuesto de peso por tipo de página. Descarté la hoja de estilos externa: su peor caso empeoró."
   outcome: "/experiments/ pasó de 70,5 a 60,8 KB de CSS y su peor LCP de 2.271 a 2.122 ms. Después, dejar de precargar dos fuentes que suman 87 KB bajó la página de nota de 2.588 a 2.266 ms."
 ---
+
+import Fix from '@/features/notes/components/Fix.astro';
+import Ink from '@/shared/ui/Ink.astro';
 
 ## 337 bytes que reprobaron el control
 
@@ -66,7 +70,7 @@ Tengo la prueba de la otra mitad de esa frase: cuando agregué el bloque de proy
 
 ## El fixture que medía una página que no existe
 
-Antes de seguir recortando, me tocó desconfiar de mi propia regla. El 5 de octubre apareció algo que no cuadraba: el reporte de Lighthouse decía que la página de nota pesaba 126.930 bytes. En producción pesaba unos 94 KB.
+Antes de seguir recortando, me tocó desconfiar de mi propia regla. El 5 de octubre apareció algo que no cuadraba: el reporte de Lighthouse decía que la página de nota pesaba <Fix wrong="126.930 bytes" right="unos 94 KB, como en producción" />.
 
 Lighthouse no mide la página que publico. Mide un *fixture*: una copia del sitio construida en una carpeta aislada, para que las pruebas no dependan de mi entorno. Y esa copia tenía el CSS **dos veces**. Se notaba en el mismo reporte: 14 reglas `@font-face` donde producción tiene 7.
 
@@ -190,6 +194,6 @@ No todo está resuelto. En la última medición completa, con tres corridas por 
 
 En la página de nota ya tengo el siguiente candidato: el registro de decisión se escribe dos veces en el HTML, unos 1,3 KB. No lo voy a cambiar sin medirlo primero, igual que hice con `/experiments/` y con las fuentes.
 
-Lo que me quedó de todo esto es una regla que ya está escrita en la guía de diseño del sitio: **los bytes arriba son caros, los de abajo son baratos**. Mi sitio casi no tiene JavaScript y su LCP es texto, y aun así unos cientos de bytes de estilos, o una fuente precargada de más, bastaban para reprobar el control.
+Lo que me quedó de todo esto es una regla que ya está escrita en la guía de diseño del sitio: <Ink>los bytes arriba son caros, los de abajo son baratos</Ink>. Mi sitio casi no tiene JavaScript y su LCP es texto, y aun así unos cientos de bytes de estilos, o una fuente precargada de más, bastaban para reprobar el control.
 
 Si tu sitio también mete el CSS en línea, te invito a hacer la cuenta: abre la página que más te importa, mide cuántos KB hay en el `<head>` y multiplícalos por 8. Cuéntame en los comentarios cuánto te dio y si te sorprendió.
