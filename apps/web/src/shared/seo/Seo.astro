@@ -5,12 +5,12 @@
  */
 
 import { getCollection } from 'astro:content';
-import { tokens } from '@elvinlab/core';
+import { localizePath, tokens } from '@elvinlab/core';
 
 import { buildEnv, site } from '@/shared/config/index.ts';
-import { LOCALES, type Locale } from '@/shared/i18n/index.ts';
+import { LOCALES, type Locale, t } from '@/shared/i18n/index.ts';
 import { hasPublishedNotes } from '@/shared/lib/notes-helpers.ts';
-import { blogPostingJsonLd, jsonLdScript, personJsonLd, websiteJsonLd } from '@/shared/seo/jsonld.ts';
+import { blogPostingJsonLd, breadcrumbJsonLd, jsonLdScript, type PageType, pageJsonLd, personJsonLd, websiteJsonLd } from '@/shared/seo/jsonld.ts';
 import { seoLinks } from '@/shared/seo/links.ts';
 import { articleMetaTags, DEFAULT_OG_IMAGE, ogLocale } from '@/shared/seo/og.ts';
 
@@ -20,7 +20,7 @@ type Props = {
   path: string;
   /** Page title; the site title is appended. Omit on the home page. */
   title?: string;
-  description?: string;
+  description?: string | undefined;
   /** False for pages that exist in one locale only. */
   translated?: boolean;
   noindex?: boolean;
@@ -30,11 +30,17 @@ type Props = {
   alternates?: { hreflang: string; href: string }[];
   /** Site path of this page's share image; the default card is used when omitted. */
   ogImage?: string;
+  /** schema.org type of the page, for pages that are not a note: adds its structured data node. */
+  pageType?: PageType;
+  /** Topics of the page (an experiment's stack), written to its structured data. */
+  keywords?: readonly string[];
+  /** Parents between the home and this page in its breadcrumb (`{ name, path }`, path without locale prefix). */
+  trail?: readonly { name: string; path: string }[];
   /** Alt text for the share image; defaults to the page title (or the owner's name on the default card). */
   ogImageAlt?: string;
 };
 
-const { locale, path, title, description, translated = true, noindex = false, article, alternates, ogImage: ogImagePath, ogImageAlt: ogImageAltProp } = Astro.props;
+const { locale, path, title, description, translated = true, noindex = false, article, alternates, ogImage: ogImagePath, ogImageAlt: ogImageAltProp, pageType, keywords, trail = [] } = Astro.props;
 const siteIndexable = buildEnv.siteIndexable;
 const fullTitle = title && title !== site.title ? `${title} · ${site.title}` : site.title;
 // Link previews cut long titles (about 70 characters), so an article's preview title drops the site
@@ -54,6 +60,19 @@ const links = seoLinks({
 });
 const ogImage = new URL(ogImagePath ?? DEFAULT_OG_IMAGE, site.url).toString();
 const ogImageAlt = ogImageAltProp ?? (ogImagePath ? fullTitle : `${site.identity.name} · ${site.identity.role[locale] ?? site.title}`);
+const absolute = (target: string): string => new URL(localizePath(target, locale, LOCALES), site.url).href;
+// Every page below the home gets a breadcrumb: Google shows it instead of the raw URL in the result.
+const breadcrumb =
+  path === '/' || noindex
+    ? undefined
+    : breadcrumbJsonLd([
+        { name: t(locale, 'nav.home'), url: absolute('/') },
+        ...trail.map((step) => ({ name: step.name, url: absolute(step.path) })),
+        { name: title ?? site.title, url: links.canonical },
+      ]);
+const pageNode = pageType
+  ? pageJsonLd(pageType, { site, locale, url: links.canonical, name: title ?? site.title, description: summary, keywords, image: ogImage })
+  : undefined;
 // First theme of each scheme colors the browser UI to match the page.
 const themeColors = ['dark', 'light'].flatMap((scheme) => {
   const theme = Object.values(tokens.themes).find((candidate) => candidate.scheme === scheme);
@@ -89,6 +108,8 @@ const themeColors = ['dark', 'light'].flatMap((scheme) => {
 {article && articleMetaTags(article).map((tag) => <meta property={tag.property} content={tag.content} />)}
 <script type="application/ld+json" is:inline set:html={jsonLdScript(websiteJsonLd(site, summary))} />
 <script type="application/ld+json" is:inline set:html={jsonLdScript(personJsonLd(site, locale))} />
+{pageNode && <script type="application/ld+json" is:inline set:html={jsonLdScript(pageNode)} />}
+{breadcrumb && <script type="application/ld+json" is:inline set:html={jsonLdScript(breadcrumb)} />}
 {article && (
   <script
     type="application/ld+json"

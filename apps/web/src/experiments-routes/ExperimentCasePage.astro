@@ -15,6 +15,7 @@ import { LOCALES, type Locale, t } from '@/shared/i18n/index.ts';
 import BaseLayout from '@/shared/layout/BaseLayout.astro';
 import { externalLinkAttrs } from '@/shared/lib/external-link.ts';
 import { pickLocale } from '@/shared/lib/localized.ts';
+import { caseTitle } from '@/shared/seo/page-copy.ts';
 import ExternalHint from '@/shared/ui/ExternalHint.astro';
 
 import ExperimentMedia from './ExperimentMedia.astro';
@@ -54,7 +55,7 @@ const css = experimentsCss({
 });
 ---
 
-<BaseLayout locale={locale} path={`/experiments/${experiment.id}/`} title={experiment.title} description={description} ogImage={`/og/experiments/${experiment.id}.png`} ogImageAlt={experiment.title}>
+<BaseLayout locale={locale} path={`/experiments/${experiment.id}/`} title={caseTitle(experiment.title, locale, LOCALES.defaultLocale)} description={description} pageType="CreativeWork" keywords={tech} trail={[{ name: t(locale, 'nav.experiments'), path: '/experiments/' }]} ogImage={`/og/experiments/${experiment.id}.png`} ogImageAlt={experiment.title}>
   <style is:inline set:html={css} />
   <style>.xp-case-list { list-style: disc; padding-left: 1.25rem; }</style>
   <article class="mx-auto flex max-w-4xl flex-col gap-10 px-6 py-10 md:px-10">

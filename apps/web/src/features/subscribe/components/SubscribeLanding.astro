@@ -13,6 +13,7 @@ import { filterByLang, formatDate, readingMinutes, sortNotes } from '@/features/
 import { integrations, isEnabled, site } from '@/shared/config/index.ts';
 import { LOCALES, type Locale, t } from '@/shared/i18n/index.ts';
 import BaseLayout from '@/shared/layout/BaseLayout.astro';
+import { pageSeo } from '@/shared/seo/page-seo.ts';
 import { isSubscribeFormShown } from '@/shared/subscribe/availability.ts';
 import SubscribeForm from '@/shared/subscribe/SubscribeForm.astro';
 import { subscribeRootAttributes } from '@/shared/subscribe/subscribe-root.ts';
@@ -32,13 +33,14 @@ const [latest] = filterByLang(
   locale,
 );
 const showForm = isSubscribeFormShown(site.features, integrations.turnstileSiteKey);
+const seo = pageSeo('subscribe', locale, t(locale, 'subscribe.page.description'));
 ---
 
 <BaseLayout
   locale={locale}
   path="/subscribe/"
-  title={t(locale, 'subscribe.page.metaTitle')}
-  description={t(locale, 'subscribe.page.description')}
+  title={seo.title}
+  description={seo.description}
 >
   <link slot="head" rel="preload" as="font" type="font/woff2" href={pixelifySansLatin} crossorigin />
   <PageHeader slot="banner" title={t(locale, 'subscribe.page.title')} description={t(locale, 'subscribe.page.subtitle')} />

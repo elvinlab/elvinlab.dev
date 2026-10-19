@@ -73,6 +73,23 @@ export const siteConfig = {
     { label: 'GitHub', url: 'https://github.com/elvinlab', icon: 'github' },
     { label: 'LinkedIn', url: 'https://www.linkedin.com/in/elvinlab', icon: 'linkedin' },
   ],
+  // Search and AI visibility: tells search engines who this is (the owner's country, topics and any
+  // extra profile URL besides `socials`), whether AI crawlers may read the site, and optionally
+  // overrides the title or description of a page (`pages`); see docs/CONFIGURATION.md.
+  seo: {
+    country: 'CR',
+    knowsAbout: [
+      'Full-stack development',
+      'AI agents',
+      'TypeScript',
+      'Astro',
+      'Cloudflare Workers',
+      'Web performance',
+      'Software architecture',
+      'AWS',
+    ],
+    aiCrawlers: 'allow',
+  },
   features: {
     blog: true,
     comments: true,

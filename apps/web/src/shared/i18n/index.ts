@@ -220,9 +220,6 @@ export const DICTIONARIES = {
     'notes.title': 'Lab Notes',
     'notes.subtitle':
       'Decisiones de ingeniería documentadas: contexto, qué elegí y qué pasó después.',
-    'me.seoTitle': 'CV de ingeniero full-stack',
-    'notes.description':
-      'Lab Notes de Elvin González: decisiones de ingeniería full-stack y con agentes de IA, con el contexto, lo que elegí y lo que midió después.',
     'notes.search': 'Buscar notas',
     'notes.fix.correctedTo': 'corregido a',
     'notes.filter.all': 'Todas',
@@ -273,7 +270,6 @@ export const DICTIONARIES = {
     'subscribe.working': 'Procesando…',
     'subscribe.unavailable': 'No está disponible por ahora. Inténtalo más tarde.',
     'subscribe.back': 'Volver a las notas',
-    'subscribe.page.metaTitle': 'Suscríbete a las notas',
     'subscribe.page.description':
       'Recibe por correo cada nota nueva de Lab Notes: las decisiones detrás de lo que construyo, sin relleno y sin ruido.',
     'subscribe.page.title': 'Lo que construyo, en tu correo.',
@@ -548,9 +544,6 @@ export const DICTIONARIES = {
     'notes.title': 'Lab Notes',
     'notes.subtitle':
       'Engineering decisions, documented: the context, what I chose and what happened.',
-    'me.seoTitle': 'Full-stack engineer CV',
-    'notes.description':
-      "Lab Notes by Elvin González: full-stack and AI-agent engineering decisions, with the context, what I chose and what the numbers said.",
     'notes.search': 'Search notes',
     'notes.fix.correctedTo': 'corrected to',
     'notes.filter.all': 'All',
@@ -599,7 +592,6 @@ export const DICTIONARIES = {
     'subscribe.working': 'Working…',
     'subscribe.unavailable': 'Not available right now. Please try again later.',
     'subscribe.back': 'Back to the notes',
-    'subscribe.page.metaTitle': 'Subscribe to the notes',
     'subscribe.page.description':
       'Get every new Lab Notes post by email: the decisions behind what I build, with no filler and no noise.',
     'subscribe.page.title': 'What I build, in your inbox.',
