@@ -274,3 +274,7 @@ Candidate: `develop` after `fix(a11y)` (no fade-in entrance with reduced motion)
 ### Note 011 author voice and editorial guide (2026-10-17)
 
 See odd/tasks/note-author-voice.md for touched files, evidence and full run/skip details. Passed: docs-quality 16 tests, lint, standalone final-note schema and MDX compile, diff whitespace. Production build blocked during Cloudflare prerender startup by uv_interface_addresses; built-output and weight validation remain pending. No production deploy or visual verification claimed.
+
+### Subscribe backfill: state verified on production D1 (2026-10-19, issue #147)
+
+What was run: read-only `SELECT` counts through the owner's authorized `wrangler` session against `elvinlab-dev-db` (remote); nothing was written and no address was read. Result: `subscribers` has 4 `confirmed` and 1 `unsubscribed`; all 5 have a `subscriber_notes` row for `vibe-coding-o-especificar-primero`, and the table holds exactly 5 rows for that slug. This proves the backfill's effect is present, not when or how the `INSERT OR IGNORE` ran: the individual execution still has no recorded evidence, and the statement was not re-run.
