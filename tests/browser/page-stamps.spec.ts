@@ -1,6 +1,6 @@
 import { expect, test } from '@playwright/test';
 
-import { liveByPath } from './helpers/features';
+import { liveByPath, requires, routeNeeds } from './helpers/features';
 
 /**
  * One meaningful stamp in the banner of the topic pages (DESIGN.md, "Notebook ink system", "Stamps").
@@ -95,6 +95,7 @@ for (const [path, text] of PAGES) {
 }
 
 test('the stamp is rotated 5 to 8 degrees and framed', async ({ page }) => {
+  requires(routeNeeds('/notes/tag/pruebas/'));
   await page.setViewportSize({ width: 1280, height: 900 });
   await page.goto('/notes/tag/pruebas/');
   await page.emulateMedia({ reducedMotion: 'reduce' });

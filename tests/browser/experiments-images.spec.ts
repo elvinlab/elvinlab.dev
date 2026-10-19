@@ -156,10 +156,10 @@ for (const path of PAGES) {
         const dd = getComputedStyle(node.querySelector('dd') as Element);
         const box = getComputedStyle(node);
         return {
-          rule: Number.parseFloat(box.borderLeftWidth),
-          ruleColor: box.borderLeftColor,
+          rule: Number.parseFloat(box.borderTopWidth),
+          ruleStyle: box.borderTopStyle,
           radius: box.borderTopLeftRadius,
-          padding: Number.parseFloat(box.paddingLeft),
+          padding: Number.parseFloat(box.paddingTop),
           labelColor: dt.color,
           labelFont: dt.fontFamily,
           labelTransform: dt.textTransform,
@@ -186,10 +186,10 @@ for (const path of PAGES) {
       probe.remove();
       return value;
     });
-    expect(result.rule).toBe(3);
-    expect(result.ruleColor).toBe(primary);
+    expect(result.rule).toBe(1);
+    expect(result.ruleStyle).toBe('dashed');
     expect(result.radius).toBe('0px');
-    expect(result.padding).toBeGreaterThanOrEqual(12);
+    expect(result.padding).toBeGreaterThanOrEqual(8);
     expect(result.labelColor).toBe(primary);
     expect(result.labelColor).not.toBe(problem.labelColor);
     expect(result.labelFont).toBe(problem.labelFont);
@@ -210,7 +210,7 @@ for (const path of PAGES) {
       piece?.setAttribute('data-solo', '');
     });
     const result = page.locator('.xp-piece').first().locator('.xp-facts > div').nth(2);
-    await expect(result).toHaveCSS('border-left-width', '3px');
+    await expect(result).toHaveCSS('border-top-width', '1px');
     expect(
       await page.evaluate(
         () => document.documentElement.scrollWidth <= document.documentElement.clientWidth,
