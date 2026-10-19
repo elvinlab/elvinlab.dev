@@ -3,7 +3,7 @@ import { localizePath } from '@elvinlab/core';
 import type { APIRoute } from 'astro';
 
 import { sortNotes } from '@/features/notes/index.ts';
-import { loadExperiments } from '@/features/portfolio/lib/load-experiments.ts';
+import { loadExperiments } from '@/features/portfolio/index.ts';
 import { buildEnv, type Feature, isEnabled, site } from '@/shared/config/index.ts';
 import type { SeoPage } from '@/shared/config/schema.ts';
 import { LOCALES, type Locale } from '@/shared/i18n/index.ts';
