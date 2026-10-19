@@ -53,6 +53,9 @@ const curated = (site.me.curatedNotes ?? []).flatMap(({ slug, framing }) => {
 const notes = curated.length > 0 ? curated.map((entry) => entry.note) : allNotes.slice(0, 3);
 const hasNotes = hasPublishedNotes(allNotes);
 const seo = pageSeo('me', locale);
+// The pitch is the more specific snippet, but only while it fits a search result (160 characters).
+const pitch = site.me.pitch?.[locale];
+const meDescription = pitch && pitch.length <= 160 ? pitch : seo.description;
 ---
 
 <BaseLayout
@@ -60,7 +63,7 @@ const seo = pageSeo('me', locale);
   path="/me/"
   title={seo.title}
   pageType="ProfilePage"
-  description={site.me.pitch?.[locale] ?? seo.description}
+  description={meDescription}
   ogImage={site.features.me ? profileCardPath(locale) : DEFAULT_OG_IMAGE}
   ogImageAlt={`${site.identity.name} · ${site.identity.role[locale]}`}
   printable

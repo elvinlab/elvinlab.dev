@@ -19,12 +19,12 @@ describe('buildLlmsTxt', () => {
       ],
     });
     expect(body).toBe(
-      [
+      `${[
         '# Jane Doe',
         '> Engineer and writer.',
         '- Based in Costa Rica\n- Topics: Astro, AI agents',
         '## Notes\n\n- [First](https://example.dev/notes/first/): Why.\n- [Second](https://example.dev/notes/second/)',
-      ].join('\n\n') + '\n',
+      ].join('\n\n')}\n`,
     );
   });
 

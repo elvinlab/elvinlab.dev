@@ -580,6 +580,7 @@ Un texto demasiado largo desborda un botón, parte una entrada del menú en dos 
 | Key group | Limit (characters, in each language) | Where it appears |
 | --- | --- | --- |
 | `subscribe.*` | 200 | The subscription form, its messages and the confirmation pages |
+| `changelog.page.description.*` | 170 | Meta description of changelog pages 2 and up (search snippets, 100 to 160 characters) |
 | `education.*` | 140 | Intro, labels and sort descriptions of `/education/` |
 | `experiments.*` | 140 | Intro and sort descriptions of `/experiments/` |
 | `author.*` | 130 | The author card on the home |
