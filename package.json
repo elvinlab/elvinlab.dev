@@ -33,13 +33,13 @@
     "verify": "node apps/web/scripts/verify-scope.ts"
   },
   "devDependencies": {
-    "@axe-core/playwright": "4.13.0",
+    "@axe-core/playwright": "4.14.0",
     "@biomejs/biome": "2.5.15",
     "@lhci/cli": "0.15.1",
-    "@playwright/test": "1.64.0",
-    "@types/node": "24.19.1",
-    "dependency-cruiser": "18.5.0",
+    "@playwright/test": "1.64.1",
+    "@types/node": "24.19.2",
+    "dependency-cruiser": "18.6.0",
     "typescript": "6.0.3",
-    "vitest": "5.0.3"
+    "vitest": "5.0.5"
   }
 }
