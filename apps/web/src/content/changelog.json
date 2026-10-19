@@ -1089,5 +1089,11 @@
     "category": "changed",
     "title": "Hand-drawn marks across the notes",
     "description": "Every note now uses the underline and in-place correction marks, and each correction states what it replaces. Notes carry about 1.1 KB more inline CSS for them."
+  },
+  "now-card-refreshed": {
+    "date": "2026-10-19",
+    "category": "changed",
+    "title": "Now card re-confirmed",
+    "description": "The home Now card was reviewed against what is actually in progress and its date moved to 19 October 2026. The content itself did not change."
   }
 }

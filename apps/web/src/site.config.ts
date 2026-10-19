@@ -44,7 +44,7 @@ export const siteConfig = {
   // What the owner is focused on: the sidebar "Now" card of the home (one to three rows, dated).
   // Bump `updatedAt` (YYYY-MM-DD) when the rows change; remove the whole block to hide the card.
   now: {
-    updatedAt: '2026-10-02',
+    updatedAt: '2026-10-19',
     items: [
       {
         kind: 'focus',

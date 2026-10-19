@@ -27,7 +27,7 @@ describe('site.config.ts', () => {
   it('shows the focus and the learning rows in the Now card, dated with a real date', () => {
     const config = parseSiteConfig(siteConfig);
     expect(config.now).toEqual({
-      updatedAt: '2026-10-02',
+      updatedAt: '2026-10-19',
       items: [
         {
           kind: 'focus',
