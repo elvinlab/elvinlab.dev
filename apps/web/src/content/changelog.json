@@ -1113,5 +1113,11 @@
     "category": "fixed",
     "title": "More precise claims in notes 001 and 002",
     "description": "Note 001 now states the Firefox, inline stylesheet and test-first claims as far as they were checked, and both notes say that the GPU predates the setup and that results are not reviewed before publishing."
+  },
+  "home-caption-and-case-status-dot": {
+    "date": "2026-10-19",
+    "category": "fixed",
+    "title": "Readable avatar caption and visible status dot",
+    "description": "The name and role under the home avatar no longer sit behind the banner fade, and the status dot on the experiment case pages is drawn again."
   }
 }
