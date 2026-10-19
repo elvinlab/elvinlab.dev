@@ -1095,5 +1095,11 @@
     "category": "changed",
     "title": "Now card re-confirmed",
     "description": "The home Now card was reviewed against what is actually in progress and its date moved to 19 October 2026. The content itself did not change."
+  },
+  "experiment-case-decisions": {
+    "date": "2026-10-19",
+    "category": "changed",
+    "title": "More substance in the experiment case pages",
+    "description": "Both case pages now list the stack, five decisions and what was learned, in Spanish and English; the elvinlab.dev one also gives the measured reasons."
   }
 }
