@@ -1071,5 +1071,11 @@
     "category": "fixed",
     "title": "Author voice corrected in the React-to-Preact note",
     "description": "Removed an assistant narrator, corrected wording and numerical comparisons, and documented a required editorial review for new and edited notes."
+  },
+  "notes-001-002-editorial-review": {
+    "date": "2026-10-19",
+    "category": "fixed",
+    "title": "Claims tightened in notes 001 and 002",
+    "description": "Cost, fallback, review and Lighthouse statements now state their conditions and dates, with hand-drawn marks on the corrected figure and the key rules. The LCP gate wording in the docs matches the CI configuration."
   }
 }

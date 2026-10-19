@@ -3,6 +3,7 @@ number: 1
 title: "Cómo construí este sitio: decisiones, presupuestos y un CI que fui simplificando"
 description: "Del plan a producción en menos de una semana: qué decidí, qué medí y qué se rompió al construir elvinlab.dev desde cero con Astro, Cloudflare y agentes de IA."
 pubDate: 2026-10-01
+updatedDate: 2026-10-19
 lang: es
 category: decisiones
 tags: [astro, cloudflare, arquitectura, ci, testing]
@@ -11,8 +12,11 @@ startHereNote: "La visión completa: cómo pasé del plan a producción y qué d
 decision:
   context: "Tenía un sitio anterior que funcionaba, pero quería un blog con una base de diseño reutilizable, medible y configurable solo con contenido."
   decision: "Reconstruir desde cero: monorepo con base compartida, identidad por configuración y presupuestos de rendimiento verificados en CI."
-  outcome: "En producción desde el 1 de octubre de 2026, con Lighthouse móvil de 95 o más y un CI que corre una sola vez y despliega si todo pasa."
+  outcome: "En producción desde el 1 de octubre de 2026. El umbral de Lighthouse móvil es 95; en las mediciones registradas en octubre el rendimiento fue de 0,96 a 0,99 y el LCP de 2,1 a 2,4 s. El CI corre una sola vez y despliega si todo pasa."
 ---
+
+import Fix from '@/features/notes/components/Fix.astro';
+import Ink from '@/shared/ui/Ink.astro';
 
 ## El punto de partida
 
@@ -54,12 +58,14 @@ Decir que algo es white-label es fácil; lo difícil es que siga siendo cierto. 
 Tres controles que se verifican en cada versión:
 
 - **30 KiB** de JavaScript comprimido como máximo por página. La home pesa unos 6.
-- **Lighthouse móvil** con las cuatro categorías en 95 o más, un LCP de 2.5 s como máximo y un CLS de 0.1 como máximo. Si no se cumple, el CI falla.
+- **Lighthouse móvil** con las cuatro categorías en 95 o más (93 en una página de prueba), un CLS de 0.1 como máximo y un LCP de <Fix wrong="2.5 s" right="2.7 s sobre la mediana de tres corridas, desde el 13 de octubre" /> como máximo. Si no se cumple, el CI falla.
 - **Accesibilidad con axe** (reglas WCAG 2 A, AA y 2.1 AA) en los dos temas y en tres anchos: 360, 768 y 1280 px.
 
-Para que el JavaScript entre en el presupuesto, Preact aparece solo donde hay una isla real. Hoy es una: el formulario de contacto. El resto es HTML estático.
+Para que el JavaScript entre en el presupuesto, Preact aparece solo donde hay una isla real. Al 1 de octubre era una: el formulario de contacto. El resto es HTML estático.
 
 ## Un CI que fui simplificando
+
+> Actualización del 19 de octubre de 2026: después de esta nota se sumaron un carril rápido para las notas (ADR 0016) y una política de reintento para las puertas ruidosas (ADR 0018). Lo que sigue describe el CI del 1 de octubre.
 
 Empezó con lo que hace casi todo el mundo. Puertas en paralelo (análisis estático, pruebas e2e y Lighthouse) detrás de un único job agregado que exigía la protección de ramas, más un entorno de staging y un despliegue de preview por cada PR.
 
@@ -99,5 +105,5 @@ Si al final de esta nota ves comentarios, son de [giscus](https://giscus.app): v
 Tres reglas que se repitieron a lo largo del proyecto:
 
 - Nace en el proyecto, se mueve a `core` cuando se repite.
-- Si no se mide, es una promesa.
+- <Ink>Si no se mide, es una promesa.</Ink>
 - Cada decisión que cambia queda escrita, con lo que cuesta.
