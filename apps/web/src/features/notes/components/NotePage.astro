@@ -81,7 +81,7 @@ const readingLabel = t(locale, 'notes.readingTime', { min: readingMinutes(entry.
   <style slot="head" is:inline set:html={noteProseCss + recordCardCss + stampCss} />
   <ReadingProgress slot="banner" />
   <ReadingProgressMemory slot="floating" part="note" slug={entry.id} />
-  <Banner slot="banner" height="360px">
+  <Banner slot="banner" height="360px" grid>
     <BackgroundCanvas slot="background" />
     <div data-banner-split>
       <div>

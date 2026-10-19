@@ -17,7 +17,7 @@ type Props = {
   compactExpandedHeight?: string;
   /** The banner starts expanded (`data-expanded`); pair it with a `BannerToggle` in the `toggle` slot. */
   expandable?: boolean;
-  /** Draw the lab-paper grid (home only: elsewhere it repeats until it reads as a template). */
+  /** Draw the lab-paper grid. Every page's banner passes it; the bottom fade keeps short banners reading as a strip of paper. */
   grid?: boolean;
 };
 

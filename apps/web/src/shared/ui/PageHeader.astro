@@ -8,6 +8,10 @@
  * Use it as `<PageHeader slot="banner" ...>`: it renders into the banner slot of `BaseLayout`, so
  * the banner sits exactly where `/notes/` puts it, under the floating navbar. The banner asks for
  * 176 to 232 px; the `appearance` preset caps it (`calm-layout.css`). Titles are one or two words.
+ * The grid is drawn here too: the band is short and the banner's own bottom fade dissolves it into the page,
+ * so it reads as a strip of paper, not a pattern over the whole screen. The title carries one hand-drawn ink
+ * underline: the `Ink` underline rules are copied into this file's own style block because importing
+ * `ink-underline.css?inline` or `Ink.astro` here made Astro emit the global stylesheet twice on note pages (+58 KB).
  * An optional `stamp` (already localized, at most 2 words and 12 characters, what the page is) adds the
  * notebook `Stamp`: above the title on phones, over the top-right corner of the header block from `md`.
  * Without it nothing is added; with it the page inlines `stamp.css` (a page that does not opt in pays no bytes).
@@ -24,13 +28,13 @@ const { title, description, stamp } = Astro.props;
 ---
 
 {stamp && <style is:inline set:html={stampCss + stampCornerCss} />}
-<Banner height="clamp(176px, 22vh, 232px)">
+<Banner grid height="clamp(176px, 22vh, 232px)">
   <div class="relative">
     {stamp && <Stamp class="stamp-corner">{stamp}</Stamp>}
     <div class="flex items-end justify-between gap-8">
       <div>
         <h1 class="flex items-center gap-2.5 font-pixel text-page-title font-semibold leading-[1.15] text-balance">
-          <slot name="icon" />{title}
+          <slot name="icon" /><span class="ink-underline">{title}</span>
         </h1>
         {description && <p class="mt-2 max-w-[60ch] text-pretty text-[1.0625rem] leading-[1.55] text-text-secondary">{description}</p>}
       </div>
@@ -38,3 +42,33 @@ const { title, description, stamp } = Astro.props;
     </div>
   </div>
 </Banner>
+
+<style is:global>
+.ink-underline {
+  padding-bottom: 0.15em;
+  background-repeat: no-repeat;
+  background-size: 100% 0.4em;
+  background-position: 0 100%;
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
+}
+[data-theme="elvinlab-dark"] .ink-underline {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 8' preserveAspectRatio='none'%3E%3Cpath d='M1 5 C20 2 40 7 60 4 S88 3 99 5' fill='none' stroke='%23ec4899' stroke-width='2.2' stroke-linecap='round' vector-effect='non-scaling-stroke'/%3E%3C/svg%3E");
+}
+[data-theme="elvinlab-light"] .ink-underline {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 8' preserveAspectRatio='none'%3E%3Cpath d='M1 5 C20 2 40 7 60 4 S88 3 99 5' fill='none' stroke='%23be185d' stroke-width='2.2' stroke-linecap='round' vector-effect='non-scaling-stroke'/%3E%3C/svg%3E");
+}
+@media (prefers-reduced-motion: no-preference) {
+  .ink-underline {
+    animation: ink-grow 700ms cubic-bezier(0.65, 0, 0.35, 1) 400ms both;
+  }
+}
+@keyframes ink-grow {
+  from {
+    background-size: 0 0.4em;
+  }
+  to {
+    background-size: 100% 0.4em;
+  }
+}
+</style>

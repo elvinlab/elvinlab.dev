@@ -1125,5 +1125,11 @@
     "category": "added",
     "title": "Search and share metadata for every page, plus llms.txt",
     "description": "Each page now has its own in-language title, description, breadcrumbs and structured data, listing and legal pages and topics have their own share cards, new-tab hints no longer leak into search snippets, robots.txt names the AI crawlers explicitly and /llms.txt maps the site for language models. The home title now carries the role (seo.homeTitle). All of it is driven by the new optional seo block in site.config.ts."
+  },
+  "paper-grid-on-every-page": {
+    "date": "2026-10-19",
+    "category": "changed",
+    "title": "Lab-paper grid and ink underline on every page",
+    "description": "The inner pages (notes, notes index, topics, about, experiments and their cases, contact, changelog, education and legal pages) draw the lab-paper grid again in their title strip, and the page titles carry the hand-drawn ink underline, so they share the look of the home instead of reading as plain forms."
   }
 }

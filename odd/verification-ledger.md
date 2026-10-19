@@ -286,3 +286,7 @@ Changed by the owner's authorization: the single `_dmarc` TXT record of `elvinla
 ### SEO and metadata (2026-10-19)
 
 Run after commit 8d19384 plus the spec updates: unit tests over `shared`, `features/{me,contact}` and `integrations`; typecheck 0 errors; Biome clean; `docs:config`; indexable build crawled (43 pages); full `test:e2e:quick` 1096 passed; `test:white-label` ok. Not re-run: Lighthouse and the JS budget (no script or layout change), cold start (no toolchain change). Not verified: how Google or the AI engines render it, which needs a recrawl.
+
+### Paper grid on every banner (2026-10-19)
+
+Run on the uncommitted work before its commit: typecheck 0 errors; Biome clean; depcruise clean; `pnpm test` 1780 passed; `check:page-weight` 50 of 50 within budget (inner-page budgets raised, see the dated notes in `page-weight-budget.json`); `check:js-budget` pass; `test:white-label` ok; full `test:e2e:quick` 1096 passed. Gotcha found by the weight check: importing `Ink.astro` or `ink-underline.css?inline` into `PageHeader.astro` made Astro emit the global stylesheet twice on every note page (+58 KB), so the underline rules live in the file's own `<style is:global>`. Not re-run: Lighthouse (CI runs it on the release push), the three-viewport `test:e2e`, cold start (no toolchain change). Not verified: visual check on phone widths beyond the e2e overflow checks.
