@@ -1101,5 +1101,11 @@
     "category": "changed",
     "title": "More substance in the experiment case pages",
     "description": "Both case pages now list the stack, five decisions and what was learned, in Spanish and English; the elvinlab.dev one also gives the measured reasons."
+  },
+  "design-template-patterns-removed": {
+    "date": "2026-10-19",
+    "category": "changed",
+    "title": "Fewer template-looking details",
+    "description": "The gradient bars on top of cards and the accent stripe beside the experiment result are gone, and the lab-paper grid in the banner now appears only on the home. Colors and brand are unchanged."
   }
 }

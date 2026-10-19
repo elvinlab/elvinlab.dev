@@ -63,7 +63,7 @@ const folded = groups.filter(({ group }) => !group.layer && group.folded);
   </section>
 
   {isEnabled('contact') && (
-    <section class="tip-card flex flex-col gap-3 rounded-card bg-card bg-[length:100%_3px] bg-no-repeat p-5 bg-gradient-to-r from-primary via-cyan to-pink print:hidden">
+    <section class="tip-card flex flex-col gap-3 rounded-card bg-card p-5 print:hidden">
       <h2 class="font-display text-base font-bold">
         <InfoTip id="contact-tip" text={t(locale, 'me.tip.contact')} place="up"><SocialIcon name="mail" />{t(locale, 'me.letsTalk.title')}</InfoTip>
       </h2>

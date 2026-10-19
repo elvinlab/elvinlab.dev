@@ -282,8 +282,8 @@ const PIECE = `
     text-wrap: pretty;
   }
   .xp-facts [data-result] {
-    padding-left: 1rem;
-    border-left: 3px solid var(--color-primary);
+    padding-top: 0.75rem;
+    border-top: 1px dashed var(--color-divider);
   }
   .xp-facts [data-result] dt {
     color: var(--color-primary);
