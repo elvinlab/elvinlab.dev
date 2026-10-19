@@ -96,12 +96,12 @@ De la parte de agentes, además, salió una regla que apliqué en este mismo sit
 - **Los secretos nunca tocan git.** Se leen de variables de entorno, y las claves se respaldan en un archivo cifrado con `age`.
 - **Solo localhost.** La puerta de enlace se enlaza a `127.0.0.1` y exige clave de API. Sin túneles.
 - **"Local" significa enrutado a local, no sellado.** El modelo local se alcanza a través de OmniRoute, así que la garantía de privacidad vive en el enrutamiento y no en el cliente.
-- **Reviso lo que cuenta.** Claude revisa cada diff delegado antes de que cuente. Como cuento en [la nota 007](/notes/ahorrar-tokens/), los modelos baratos ya pueden hacer commit solos con `--auto`, pero el push y el deploy les están denegados. Y lo delegado viaja a Groq, NVIDIA, Mistral o Gemini: si algo no debe salir de mi máquina, uso el combo local.
+- **Quién revisa.** Claude revisa cada diff delegado antes de que cuente; yo no reviso el resultado antes de publicar. Como cuento en [la nota 007](/notes/ahorrar-tokens/), los modelos baratos ya pueden hacer commit solos con `--auto`, pero el push y el deploy les están denegados. Y lo delegado viaja a Groq, NVIDIA, Mistral o Gemini: si algo no debe salir de mi máquina, uso el combo local.
 - **Quién decide qué.** Los niveles, los proveedores y la regla de no delegar si el brief cuesta más que el cambio los definí yo; los modelos proponen y ejecutan dentro de ese marco.
 - **Todo es reconstruible.** Scripts idempotentes de arranque, restauración y parches devuelven una máquina nueva a este estado.
 
 ## Probarlo
 
-El repositorio está pensado para quien quiere construir proyectos personales con agentes sin pagar una suscripción cara: una sola suscripción de US$20 al mes y una GPU de 12 GB alcanzan. Los US$20 son solo la suscripción: la GPU, la electricidad y los límites de los niveles gratuitos, que pueden cambiar, quedan fuera de esa cuenta. Una nota de transparencia que también está en el README: se desarrolla y se prueba con Claude Sonnet a esfuerzo medio, no con el modelo más grande. Es a propósito, para mostrar que un modelo intermedio bien orquestado rinde lo suficiente para proyectos reales.
+El repositorio está pensado para quien quiere construir proyectos personales con agentes sin pagar una suscripción cara: una sola suscripción de US$20 al mes y una GPU de 12 GB alcanzan. Los US$20 son solo la suscripción. La GPU ya la tenía antes de armar este entorno y no entra en esa cuenta; tampoco la electricidad ni los límites de los niveles gratuitos, que pueden cambiar. Una nota de transparencia que también está en el README: se desarrolla y se prueba con Claude Sonnet a esfuerzo medio, no con el modelo más grande. Es a propósito, para mostrar que un modelo intermedio bien orquestado rinde lo suficiente para proyectos reales.
 
 Si lo pruebas, la caja de comentarios de abajo es el mejor lugar para contarme qué falló.
