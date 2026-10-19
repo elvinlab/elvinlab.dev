@@ -55,7 +55,7 @@ const experiments = homeSections.experiments
   : [];
 ---
 
-<BaseLayout locale={locale} path="/" title={site.identity.name}>
+<BaseLayout locale={locale} path="/" title={site.seo.homeTitle?.[locale] ?? site.identity.name}>
   <link slot="head" rel="preload" as="font" type="font/woff2" href={pixelifySansLatin} crossorigin />
   {/* Inlined in the head, not bundled: a bundled import would leak into every page that reaches Home through the feature barrel. */}
   <style slot="head" is:inline set:html={inkCss} />

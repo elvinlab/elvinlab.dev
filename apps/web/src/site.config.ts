@@ -89,6 +89,10 @@ export const siteConfig = {
       'AWS',
     ],
     aiCrawlers: 'allow',
+    homeTitle: {
+      es: 'Elvin González · Ingeniero full-stack',
+      en: 'Elvin González · Full-stack engineer',
+    },
   },
   features: {
     blog: true,

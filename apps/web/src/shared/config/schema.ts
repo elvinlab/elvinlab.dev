@@ -749,6 +749,11 @@ export const siteConfigSchema = z
           .describe(
             'Optional paragraph per locale for the top of `/llms.txt`. Omit it to use the identity bio and the site description. Max 400 characters per locale.',
           ),
+        homeTitle: localizedText(48)
+          .optional()
+          .describe(
+            'Optional title of the home per locale, shown in search results and browser tabs before the site title (for example `Jane Doe · Full-stack engineer`). Omit it to use `identity.name`. Max 48 characters per locale.',
+          ),
         pages: z
           .strictObject({
             notes: seoPageCopy,
@@ -806,6 +811,9 @@ export const siteConfigSchema = z
       }),
       ...(config.experiments.words && {
         'experiments.words': { path: ['experiments', 'words'], text: config.experiments.words },
+      }),
+      ...(config.seo.homeTitle && {
+        'seo.homeTitle': { path: ['seo', 'homeTitle'], text: config.seo.homeTitle },
       }),
       ...(config.seo.llmsSummary && {
         'seo.llmsSummary': { path: ['seo', 'llmsSummary'], text: config.seo.llmsSummary },

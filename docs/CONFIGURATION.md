@@ -186,6 +186,7 @@ Las descripciones vienen del esquema (`.describe()`), por eso están en inglés.
 | `seo.sameAs` | `URL[] (max 10)` | no | `[]` | Extra profile URLs of the owner (besides `socials`) that confirm the same identity to search engines, for example a course platform or a talks page. Up to 10. |
 | `seo.aiCrawlers` | `'allow' \| 'search-only'` | no | `allow` | Policy for AI crawlers in `robots.txt`. `allow` lets every AI crawler read and cite the site; `search-only` blocks the ones that collect training data (GPTBot, Google-Extended, CCBot and similar) and keeps the AI search crawlers. |
 | `seo.llmsSummary` | `{ <locale>: string (max 400) }` | no |  | Optional paragraph per locale for the top of `/llms.txt`. Omit it to use the identity bio and the site description. Max 400 characters per locale. |
+| `seo.homeTitle` | `{ <locale>: string (max 48) }` | no |  | Optional title of the home per locale, shown in search results and browser tabs before the site title (for example `Jane Doe · Full-stack engineer`). Omit it to use `identity.name`. Max 48 characters per locale. |
 | `seo.pages` | `object` | no | `{}` | Per-page overrides of the search and share copy. A page without an entry uses the built-in copy, which names the owner from `identity`. |
 | `seo.pages.notes` | `object` | no |  | Title and description override of this page. |
 | `seo.pages.notes.title` | `{ <locale>: string (max 48) }` | no |  | Search and share title per locale, without the site suffix. Max 48 characters per locale. |
