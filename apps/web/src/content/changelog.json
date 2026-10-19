@@ -1107,5 +1107,11 @@
     "category": "changed",
     "title": "Fewer template-looking details",
     "description": "The gradient bars on top of cards and the accent stripe beside the experiment result are gone, and the lab-paper grid in the banner now appears only on the home. Colors and brand are unchanged."
+  },
+  "notes-001-002-claims-narrowed": {
+    "date": "2026-10-19",
+    "category": "fixed",
+    "title": "More precise claims in notes 001 and 002",
+    "description": "Note 001 now states the Firefox, inline stylesheet and test-first claims as far as they were checked, and both notes say that the GPU predates the setup and that results are not reviewed before publishing."
   }
 }
