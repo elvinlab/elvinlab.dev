@@ -14,6 +14,7 @@ import { changelogHref, formatReleaseDate } from '@/features/changelog/lib/relea
 import { site } from '@/shared/config/index.ts';
 import { LOCALES, type Locale, t } from '@/shared/i18n/index.ts';
 import BaseLayout from '@/shared/layout/BaseLayout.astro';
+import { pageCardPath } from '@/shared/seo/og.ts';
 import { pageSeo } from '@/shared/seo/page-seo.ts';
 import ListingSummary from '@/shared/ui/ListingSummary.astro';
 import PageHeader from '@/shared/ui/PageHeader.astro';
@@ -41,7 +42,7 @@ const description = paged
   : (seo.description ?? t(locale, 'changelog.description'));
 ---
 
-<BaseLayout locale={locale} path={changelogHref(page)} title={title} description={description} pageType="CollectionPage" pixelTitle>
+<BaseLayout locale={locale} path={changelogHref(page)} title={title} description={description} pageType="CollectionPage" ogImage={pageCardPath('changelog', locale)} pixelTitle>
   {paged && <link slot="head" rel="prev" href={pageUrl(page - 1)} />}
   {page < pages.length && <link slot="head" rel="next" href={pageUrl(page + 1)} />}
   <style is:inline set:html={CHANGELOG_CSS} />

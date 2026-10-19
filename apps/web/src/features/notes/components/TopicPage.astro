@@ -6,6 +6,7 @@ import { type ActiveTopic, topicHref } from '@/features/notes/lib/topics.ts';
 import { type Locale, t } from '@/shared/i18n/index.ts';
 import Banner from '@/shared/layout/Banner.astro';
 import BaseLayout from '@/shared/layout/BaseLayout.astro';
+import { topicCardPath } from '@/shared/seo/og.ts';
 import Stamp from '@/shared/ui/Stamp.astro';
 import stampCss from '@/shared/ui/stamp.css?inline';
 import stampCornerCss from '@/shared/ui/stamp-corner.css?inline';
@@ -19,7 +20,7 @@ const { topic, notes } = active;
 const path = topicHref(topic.slug);
 ---
 
-<BaseLayout locale={locale} path={path} title={topic.data.title} description={topic.data.description} pageType="CollectionPage" trail={[{ name: t(locale, 'nav.notes'), path: '/notes/' }]} translated={false} pixelTitle>
+<BaseLayout locale={locale} path={path} title={topic.data.title} description={topic.data.description} pageType="CollectionPage" ogImage={topicCardPath(topic.slug)} trail={[{ name: t(locale, 'nav.notes'), path: '/notes/' }]} translated={false} pixelTitle>
   <style slot="head" is:inline set:html={stampCss + stampCornerCss} />
   <Banner slot="banner" height="320px">
     <BackgroundCanvas slot="background" />

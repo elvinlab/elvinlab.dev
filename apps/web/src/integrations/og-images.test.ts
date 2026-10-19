@@ -9,10 +9,12 @@ import { afterEach, describe, expect, it } from 'vitest';
 import {
   cardContentFor,
   caseCardContent,
+  hubCardContent,
   ogImages,
   parseNoteFrontmatter,
   readExperimentCardSourcesFromDisk,
   readNoteCardSourcesFromDisk,
+  readTopicCardSourcesFromDisk,
 } from './og-images.ts';
 
 const temporary: string[] = [];
@@ -279,5 +281,74 @@ describe('experiment case cards', () => {
       title: 'agentic-dev-setup',
       footer: 'Elvin González',
     });
+  });
+});
+
+describe('listing and topic cards', () => {
+  const owner = { domain: 'elvinlab.dev', owner: 'Elvin González', overrides: {} };
+  const contact = {
+    page: 'contact',
+    path: '/contact/',
+    feature: 'contact',
+    label: 'nav.contact',
+  } as const;
+
+  it('builds a hub card with the section, the page title in the locale and the owner', () => {
+    expect(hubCardContent(contact, 'es', owner)).toEqual({
+      domain: 'elvinlab.dev/contact',
+      eyebrow: 'Contacto',
+      title: 'Contacto con Elvin González',
+      footer: 'Elvin González',
+    });
+    expect(hubCardContent(contact, 'en', owner).title).toBe('Contact Elvin González');
+  });
+
+  it('takes the title from the config override', () => {
+    const overrides = { contact: { title: { es: 'Hablemos' } } };
+    expect(hubCardContent(contact, 'es', { ...owner, overrides }).title).toBe('Hablemos');
+  });
+
+  it('reads topics.json and skips an entry without a title', () => {
+    const root = mkdtempSync(join(tmpdir(), 'og-topics-'));
+    temporary.push(root);
+    writeFileSync(
+      join(root, 'topics.json'),
+      JSON.stringify({ 'agentes-de-ia': { title: 'Agentes de IA' }, broken: { title: 1 } }),
+    );
+    expect(readTopicCardSourcesFromDisk(root)).toEqual([
+      { slug: 'agentes-de-ia', title: 'Agentes de IA' },
+    ]);
+    expect(readTopicCardSourcesFromDisk(join(root, 'missing'))).toEqual([]);
+  });
+
+  it('writes a card per page and locale, per topic, and none for a page whose feature is off', async () => {
+    const content = mkdtempSync(join(tmpdir(), 'og-content-'));
+    const out = mkdtempSync(join(tmpdir(), 'og-out-'));
+    temporary.push(content, out);
+    writeFileSync(
+      join(content, 'topics.json'),
+      JSON.stringify({ 'agentes-de-ia': { title: 'Agentes de IA' } }),
+    );
+    const config = {
+      url: 'https://example.dev',
+      identity: { name: 'Jane Doe', role: { es: 'Ingeniera', en: 'Engineer' }, startedYear: 2020 },
+      recruiter: { available: false, openToWork: false, status: {} },
+      features: { me: false, experiments: false, contact: false },
+    };
+    const hook = ogImages(content, { site: config }).hooks['astro:build:done'] as (
+      arg: unknown,
+    ) => Promise<void>;
+    await hook({ dir: pathToFileURL(`${out}/`), logger: { info: () => undefined } });
+    for (const file of [
+      'pages/notes-es.png',
+      'pages/privacy-en.png',
+      'pages/terms-es.png',
+      'topics/agentes-de-ia.png',
+    ]) {
+      const meta = await sharp(readFileSync(join(out, 'og', file))).metadata();
+      expect([meta.width, meta.height], file).toEqual([1200, 630]);
+    }
+    expect(existsSync(join(out, 'og', 'pages', 'contact-es.png'))).toBe(false);
+    expect(existsSync(join(out, 'og', 'pages', 'experiments-es.png'))).toBe(false);
   });
 });
