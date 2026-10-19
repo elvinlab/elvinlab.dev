@@ -1083,5 +1083,11 @@
     "category": "changed",
     "title": "Changelog note restructured",
     "description": "The note about the visitor changelog now opens on the problem and follows the same shape as the other notes, with the same facts and a corrected-rule mark."
+  },
+  "notes-ink-fix-marks": {
+    "date": "2026-10-19",
+    "category": "changed",
+    "title": "Hand-drawn marks across the notes",
+    "description": "Every note now uses the underline and in-place correction marks, and each correction states what it replaces. Notes carry about 1.1 KB more inline CSS for them."
   }
 }

@@ -3,7 +3,7 @@ number: 11
 title: "De React a Preact: 69 KiB contra 7,3 KiB por un solo botón"
 description: "Elegí React en un ADR por costumbre. El primer botón interactivo medía 69 KiB; Preact, 7,3. Revertí la decisión el mismo día, con la misma sintaxis."
 pubDate: 2026-10-17
-updatedDate: 2026-10-17
+updatedDate: 2026-10-19
 lang: es
 category: decisiones
 tags: [rendimiento, preact, javascript, islas, astro]
@@ -12,6 +12,9 @@ decision:
   decision: "Medí un botón: React 19 pesaba unos 69 KiB gzip; Preact, unos 7,3 con la misma sintaxis de componentes, hooks y JSX. Revertí el ADR el mismo día y adopté Preact sin la capa de compatibilidad, porque ninguna librería la pedía."
   outcome: "El 30 de septiembre de 2026, la página de contacto quedó en 16,63 de los 30 KiB de JavaScript permitidos; Lighthouse móvil dio 98-100 y LCP de 1,06 a 1,82 s. También corregí el control de presupuesto para que contara los módulos de las islas."
 ---
+
+import Fix from '@/features/notes/components/Fix.astro';
+import Ink from '@/shared/ui/Ink.astro';
 
 Cuando arranqué este sitio escribí una decisión de arquitectura que decía, tan tranquilo, que las partes interactivas irían en React. No la medí. La copié de otro proyecto donde ya usaba React, por costumbre y por no tener que pensarlo dos veces. El sitio pasó unos días sin una sola parte interactiva, así que la decisión nunca se puso a prueba.
 
@@ -61,7 +64,7 @@ Esa última es la que de verdad dolió, porque compartir con el otro sitio era l
 
 ## El presupuesto que no veía la isla
 
-Aquí está la parte que casi me la cuela. Cuando medí la isla de prueba de React, el control de presupuesto de JavaScript me dijo que todo estaba bien: **1,95 KiB**. Debería haber gritado. Estaba cargando 69.
+Aquí está la parte que casi me la cuela. Cuando medí la isla de prueba de React, el control de presupuesto de JavaScript me dijo que todo estaba bien: <Fix wrong="1,95 KiB" right="69 KiB" />. Debería haber gritado.
 
 El control, `check:js-budget`, sumaba el JavaScript de la página pero no contaba los chunks de las islas: el módulo del componente y el del renderer del framework se le escapaban. Medía la cáscara de la página e ignoraba justo lo caro, el motor de React que viajaba aparte. Un presupuesto que no mira el gasto más grande no es un presupuesto; es un adorno.
 
@@ -84,4 +87,4 @@ Cambiar de framework suena a reescribir. No lo fue. Preact entró como `@astrojs
 
 En la medición del 30 de septiembre de 2026, con el formulario entero y Turnstile configurado para cargarse al primer toque, la página de contacto quedó en **16,63 de los 30 KiB** del presupuesto. Lighthouse móvil, tomando el peor resultado de tres corridas en cada URL de contacto, dio 98 a 100 en rendimiento, 100 en accesibilidad, buenas prácticas y SEO, LCP de 1,06 a 1,82 s, TBT en 0 y CLS en 0,049. La página quedó en algo más de la mitad del presupuesto de 30 KiB, frente a los 69 KiB de la prueba de React con un botón. La carga de Turnstile se trata aparte: esas cifras no representan todo el tráfico del captcha.
 
-La lección que me llevo no es "Preact gana". Es que, si una decisión depende del rendimiento, necesito medirla con un caso real. Haber usado una herramienta en otro proyecto no me dice cuánto va a costar en este. El ADR 0001 decía "mientras el rendimiento siga bien" y yo nunca había mirado si seguía bien. El primer botón real me obligó a mirar.
+La lección que me llevo no es "Preact gana". Es que, <Ink>si una decisión depende del rendimiento, necesito medirla con un caso real</Ink>. Haber usado una herramienta en otro proyecto no me dice cuánto va a costar en este. El ADR 0001 decía "mientras el rendimiento siga bien" y yo nunca había mirado si seguía bien. El primer botón real me obligó a mirar.

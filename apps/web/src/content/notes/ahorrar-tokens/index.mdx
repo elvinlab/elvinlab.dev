@@ -3,6 +3,7 @@ number: 7
 title: "Mis agentes hablan como cavernícolas y el modelo barato hace commit: así ahorro tokens"
 description: "Caveman acorta lo que el agente dice, RTK lo que lee de la terminal y --auto las veces que vuelve a preguntar. Qué ahorra cada pieza y qué me cuesta."
 pubDate: 2026-10-11
+updatedDate: 2026-10-19
 lang: es
 category: agentes-ia
 tags: [agentes-ia, tokens, rtk, caveman, opencode]
@@ -11,6 +12,9 @@ decision:
   decision: "Caveman comprime lo que el agente dice, RTK lo que lee y OpenCode con --auto termina el trabajo y hace commit solo. Push, deploy y rm -rf quedan denegados, no en pregunta."
   outcome: "RTK: 2,4 M tokens de terminal reducidos a 1,2 M (50,1 %) en 5.462 comandos. Caveman y --auto no los medí; mi sensación es que ahorran bastante sin bajar la calidad."
 ---
+
+import Fix from '@/features/notes/components/Fix.astro';
+import Ink from '@/shared/ui/Ink.astro';
 
 ## Cada petición ya pesaba 45.000 tokens antes de empezar
 
@@ -133,7 +137,7 @@ ESLint output (JSON parse failed: EOF while parsing a value at line 1 column 0)
 
 RTK reconoce `pnpm lint` y lo pasa por su filtro de ESLint. Este repo no usa ESLint, usa Biome, así que el filtro esperaba un formato que nunca llegaba. La solución fue saltarse el filtro para ese comando: `rtk proxy pnpm lint` revisó 146 archivos sin nada que corregir. Lo dejé escrito en `RTK.md` para que el próximo agente no lo tenga que descubrir.
 
-La lección: un filtro que adivina qué herramienta corres también puede adivinar mal.
+La lección: <Ink>un filtro que adivina qué herramienta corres también puede adivinar mal</Ink>.
 
 ### Los modelos baratos llevaban tiempo sin trabajar
 
@@ -167,7 +171,7 @@ Nada de esto es gratis, y quiero dejarlo escrito igual que lo bueno:
 - **RTK puede esconder la línea que importa.** Casi nunca pasa, pero cuando pasa hay que saber que existe `rtk proxy`. Y su filtro de lint ya me demostró que puede equivocarse de herramienta.
 - **Solo uno de los tres ahorros está medido.** RTK tiene su 50,1 %. Caveman y `--auto` no tienen número. Mi sensación es que ahorran bastante sin perder calidad, pero es una sensación, no una medición.
 
-Y una corrección para la 002. Ahí escribí que los modelos baratos nunca envían código sin revisar. Sigue siendo cierto si "enviar" significa que salga de mi máquina: nada se sube sin que Claude revise el diff, y el push está denegado. Ya no es cierto si significa hacer commit: eso ahora lo hacen solos.
+Y una corrección para la 002. Ahí escribí que los modelos baratos <Fix wrong="nunca envían código sin revisar" right="ya hacen commit solos" />. Sigue siendo cierto si "enviar" significa que salga de mi máquina: nada se sube sin que Claude revise el diff, y el push está denegado. Ya no es cierto si significa hacer commit: eso ahora lo hacen solos.
 
 ## Si te pasa lo mismo
 
