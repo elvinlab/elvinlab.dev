@@ -1137,5 +1137,11 @@
     "category": "fixed",
     "title": "Footprint button no longer shifts the page when it fails to load",
     "description": "If the footprint count cannot be read, the space under the note title stays reserved and empty instead of collapsing, so the text below does not jump."
+  },
+  "code-styles-deferred": {
+    "date": "2026-10-20",
+    "category": "changed",
+    "title": "Notes with code blocks paint sooner",
+    "description": "The stylesheet of the code blocks no longer blocks the first paint of a note: it loads right after, with a no-script fallback, so the title shows earlier and the code frames still arrive styled."
   }
 }
