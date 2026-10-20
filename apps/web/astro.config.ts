@@ -19,6 +19,7 @@ import { isSubscribeActive } from './src/features/subscribe/availability.ts';
 import { blogRoutesIntegration } from './src/integrations/blog-routes.ts';
 import { changelogRoutesIntegration } from './src/integrations/changelog-routes.ts';
 import { contactRoutesIntegration } from './src/integrations/contact-routes.ts';
+import { deferCodeStylesIntegration } from './src/integrations/defer-code-styles.ts';
 import { educationRoutesIntegration } from './src/integrations/education-routes.ts';
 import { experimentsRoutesIntegration } from './src/integrations/experiments-routes.ts';
 import { externalLinks } from './src/integrations/external-links.ts';
@@ -100,6 +101,7 @@ export default defineConfig({
         lastmod: (noteDates.get(new URL(item.url).pathname) ?? buildTime).toISOString(),
       }),
     }),
+    deferCodeStylesIntegration(),
     noindexHeaders(),
     ogImages(contentDir, { assetsDir: fileURLToPath(new URL('./src/assets', import.meta.url)) }),
   ],

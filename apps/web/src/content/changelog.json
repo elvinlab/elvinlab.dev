@@ -1131,5 +1131,29 @@
     "category": "changed",
     "title": "Lab-paper grid and ink underline on every page",
     "description": "The inner pages (notes, notes index, topics, about, experiments and their cases, contact, changelog, education and legal pages) draw the lab-paper grid again in their title strip, and the page titles carry the hand-drawn ink underline, so they share the look of the home instead of reading as plain forms."
+  },
+  "marks-reserved-space": {
+    "date": "2026-10-20",
+    "category": "fixed",
+    "title": "Footprint button no longer shifts the page when it fails to load",
+    "description": "If the footprint count cannot be read, the space under the note title stays reserved and empty instead of collapsing, so the text below does not jump."
+  },
+  "code-styles-deferred": {
+    "date": "2026-10-20",
+    "category": "changed",
+    "title": "Notes with code blocks paint sooner",
+    "description": "The stylesheet of the code blocks no longer blocks the first paint of a note: it loads right after, with a no-script fallback, so the title shows earlier and the code frames still arrive styled."
+  },
+  "notes-most-active": {
+    "date": "2026-10-20",
+    "category": "added",
+    "title": "The notes index shows which notes are most active",
+    "description": "A short ranked list in the sidebar of /notes/ points to the five notes with the most footprints, so a first-time reader can see where other people stopped. It is frozen at build time, so it adds no request and no script. Forks that keep the snapshot empty see nothing, and `pnpm pulse:snapshot` refreshes it from the footprint counts before a release."
+  },
+  "marks-thanks-feedback": {
+    "date": "2026-10-20",
+    "category": "changed",
+    "title": "Leaving a footprint on a young note now says thanks",
+    "description": "On a note with fewer than five footprints, the line next to the button kept saying \"be the first\" even right after you left yours. It now thanks you instead, without revealing the total, so a brand-new note still never shows a lonely \"1 mark\"."
   }
 }

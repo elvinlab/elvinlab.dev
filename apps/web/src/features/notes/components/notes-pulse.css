@@ -1,0 +1,43 @@
+/* "Most active" list in the sidebar: rank, title (two lines at most) and the strongest signal in
+   mono. No box, like its neighbours; the whole row is the link and at least 44 px high. */
+.ni-pulse ol {
+  display: flex;
+  flex-direction: column;
+}
+.ni-pulse a {
+  display: grid;
+  grid-template-columns: 1.125rem 1fr;
+  column-gap: 0.625rem;
+  align-items: baseline;
+  min-height: 2.75rem;
+  padding: 0.5rem 0;
+}
+.ni-pulse-rank,
+.ni-pulse-meta {
+  font-family: var(--font-mono);
+  font-size: 0.8125rem;
+  color: var(--color-muted);
+}
+.ni-pulse-rank {
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+.ni-pulse-title {
+  display: -webkit-box;
+  overflow: hidden;
+  font-size: 0.875rem;
+  font-weight: 500;
+  line-height: 1.35;
+  text-wrap: balance;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  transition: color 150ms;
+}
+.ni-pulse-meta {
+  grid-column: 2;
+}
+@media (hover: hover) {
+  .ni-pulse a:hover .ni-pulse-title {
+    color: var(--color-primary);
+  }
+}

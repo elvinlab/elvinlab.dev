@@ -271,3 +271,34 @@ test('reading mode keeps the counter inline and the ornaments quiet', async ({ p
   expect(reading.position).toBe('static');
   expect(reading.overflow).toBe(true);
 });
+
+test.describe('code block stylesheet', () => {
+  test('loads after the first paint, still applies to the frame and shifts nothing', async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width: 1280, height: 800 });
+    await page.addInitScript(() => {
+      (window as unknown as { shifts: number }).shifts = 0;
+      new PerformanceObserver((list) => {
+        for (const entry of list.getEntries()) {
+          const shift = entry as unknown as { value: number; hadRecentInput: boolean };
+          if (!shift.hadRecentInput)
+            (window as unknown as { shifts: number }).shifts += shift.value;
+        }
+      }).observe({ type: 'layout-shift', buffered: true });
+    });
+    await page.goto(ES);
+    const link = page.locator('link[href*="/_astro/ec."]');
+    await expect(link).toHaveAttribute('media', 'all');
+    const served = await (await page.request.get(ES)).text();
+    expect(served).toMatch(
+      /<noscript><link rel="stylesheet" href="\/_astro\/ec\.[^"]+\.css"\s*\/?><\/noscript>/u,
+    );
+    const frame = page.locator('.expressive-code .frame').first();
+    await frame.scrollIntoViewIfNeeded();
+    expect(await style(page, '.expressive-code .frame pre', 'font-family')).toContain('mono');
+    expect(
+      await page.evaluate(() => (window as unknown as { shifts: number }).shifts),
+    ).toBeLessThan(0.01);
+  });
+});

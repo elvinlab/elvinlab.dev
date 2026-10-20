@@ -5,6 +5,8 @@ import { getCollection } from 'astro:content';
 import { BackgroundCanvas } from '@/features/backgrounds/index.ts';
 import { loadTopics } from '@/features/notes/lib/load-topics.ts';
 import { groupByYear, readingMinutes } from '@/features/notes/lib/notes.ts';
+import { rankPulse } from '@/features/notes/lib/pulse.ts';
+import { PULSE_SNAPSHOT } from '@/features/notes/lib/pulse-snapshot.ts';
 import { assertStartHere, selectStartHere } from '@/features/notes/lib/start-here.ts';
 import { topTags } from '@/features/notes/lib/top-tags.ts';
 import { topicHref } from '@/features/notes/lib/topics.ts';
@@ -21,6 +23,7 @@ import NotesFilter from './NotesFilter.astro';
 import NotesSidebar from './NotesSidebar.astro';
 import notesIndexCss from './notes-index.css?inline';
 import notesIndexMarksCss from './notes-index-marks.css?inline';
+import notesPulseCss from './notes-pulse.css?inline';
 import StartHere from './StartHere.astro';
 
 type Props = { locale: Locale; noindex?: boolean };
@@ -37,6 +40,7 @@ assertStartHere(notes);
 const { active: topics, tagMap: topicTags } = await loadTopics();
 const startHere = selectStartHere(notes, locale);
 const groups = groupByYear(notes);
+const pulse = rankPulse(notes, PULSE_SNAPSHOT, locale);
 
 const categoryCounts = new Map<string, number>();
 for (const note of notes) categoryCounts.set(note.data.category, (categoryCounts.get(note.data.category) ?? 0) + 1);
@@ -48,7 +52,7 @@ const { top: tags, rest: moreTags } = topTags(notes.map((note) => note.data.tags
 ---
 
 <BaseLayout locale={locale} path="/notes/" title={seo.title} description={seo.description} pageType="Blog" ogImage={pageCardPath('notes', locale)} noindex={noindex} translated={false} pixelTitle>
-  <style slot="head" is:inline set:html={isEnabled('readingProgress') ? notesIndexCss + notesIndexMarksCss : notesIndexCss} />
+  <style slot="head" is:inline set:html={notesIndexCss + (isEnabled('readingProgress') ? notesIndexMarksCss : '') + (pulse.length > 0 ? notesPulseCss : '')} />
   <Banner slot="banner" height="320px" grid>
     <BackgroundCanvas slot="background" />
     <h1 class="font-pixel text-hero font-semibold leading-[1.1] text-balance">
@@ -90,5 +94,5 @@ const { top: tags, rest: moreTags } = topTags(notes.map((note) => note.data.tags
 
   <slot name="end" />
 
-  <NotesSidebar slot="aside" locale={locale} categories={categories} tags={tags} moreTags={moreTags} topics={topicTags} />
+  <NotesSidebar slot="aside" locale={locale} categories={categories} tags={tags} moreTags={moreTags} topics={topicTags} pulse={pulse} />
 </BaseLayout>
