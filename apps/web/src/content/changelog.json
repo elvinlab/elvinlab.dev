@@ -1149,5 +1149,11 @@
     "category": "added",
     "title": "The notes index shows which notes are most active",
     "description": "A short ranked list in the sidebar of /notes/ points to the five notes with the most footprints, so a first-time reader can see where other people stopped. It is frozen at build time, so it adds no request and no script. Forks that keep the snapshot empty see nothing, and `pnpm pulse:snapshot` refreshes it from the footprint counts before a release."
+  },
+  "marks-thanks-feedback": {
+    "date": "2026-10-20",
+    "category": "changed",
+    "title": "Leaving a footprint on a young note now says thanks",
+    "description": "On a note with fewer than five footprints, the line next to the button kept saying \"be the first\" even right after you left yours. It now thanks you instead, without revealing the total, so a brand-new note still never shows a lonely \"1 mark\"."
   }
 }

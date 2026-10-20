@@ -35,4 +35,18 @@ describe('describeMarks', () => {
       note: '12 huellas',
     });
   });
+
+  it('thanks the visitor below the threshold once they left a footprint, without the total', () => {
+    expect(describeMarks({ total: 2, mine: 1, capped: false }, 5, strings).note).toBe(
+      strings.thanks,
+    );
+  });
+
+  it('still shows the hint below the threshold while the visitor has left nothing', () => {
+    expect(describeMarks({ total: 2, mine: 0, capped: false }, 5, strings).note).toBe(strings.hint);
+  });
+
+  it('keeps showing the count from the threshold on, even after the visitor left a footprint', () => {
+    expect(describeMarks({ total: 7, mine: 3, capped: false }, 5, strings).note).toBe('7 huellas');
+  });
 });

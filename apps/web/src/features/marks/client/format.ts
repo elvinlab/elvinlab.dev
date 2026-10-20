@@ -17,15 +17,18 @@ export function formatCount(total: number, strings: MarksStrings): string {
 
 /**
  * What the button says: its label (the cap text once the visitor reached the cap) and a note
- * that is the count from `showCountFrom` on, or the invitation to be among the first.
+ * that is the count from `showCountFrom` on. Below it, a visitor who already left a footprint is
+ * thanked (the total stays private, so a young note never reads "1 huella") instead of being told
+ * to be the first; everyone else gets the invitation.
  */
 export function describeMarks(
-  state: { total: number; capped: boolean },
+  state: { total: number; mine?: number; capped: boolean },
   showCountFrom: number,
   strings: MarksStrings,
 ): { label: string; note: string } {
+  const below = (state.mine ?? 0) > 0 ? strings.thanks : strings.hint;
   return {
     label: state.capped ? strings.cap : strings.button,
-    note: state.total >= showCountFrom ? formatCount(state.total, strings) : strings.hint,
+    note: state.total >= showCountFrom ? formatCount(state.total, strings) : below,
   };
 }

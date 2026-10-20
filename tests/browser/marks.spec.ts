@@ -19,6 +19,7 @@ const NOTES = [
     button: text('es', 'marks.button'),
     many: (n: number) => `${n} huellas`,
     hint: text('es', 'marks.hint'),
+    thanks: text('es', 'marks.thanks'),
     cap: text('es', 'marks.cap'),
     invite: text('es', 'marks.invite'),
   },
@@ -28,6 +29,7 @@ const NOTES = [
     button: text('en', 'marks.button'),
     many: (n: number) => `${n} marks`,
     hint: text('en', 'marks.hint'),
+    thanks: text('en', 'marks.thanks'),
     cap: text('en', 'marks.cap'),
     invite: text('en', 'marks.invite'),
   },
@@ -153,6 +155,17 @@ for (const note of NOTES) {
       await mockMarks(page, { total: 3 });
       await page.goto(note.path);
       await expect(header(page).locator('.mn')).toHaveText(note.hint);
+    });
+
+    test('a footprint below the threshold swaps the invitation for thanks, without the total', async ({
+      page,
+    }) => {
+      await mockMarks(page, { total: 2, leaveTotal: 3 });
+      await page.goto(note.path);
+      await expect(header(page).locator('.mn')).toHaveText(note.hint);
+      await headerButton(page).click();
+      await expect(header(page).locator('.mn')).toHaveText(note.thanks);
+      await expect(page.getByText(note.many(3))).toHaveCount(0);
     });
 
     test('the end of the article carries its own invitation', async ({ page }) => {
