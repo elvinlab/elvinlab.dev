@@ -20,6 +20,19 @@ Esta guía explica, paso a paso y con todos los detalles, cómo escribir y publi
 - [11. Lista de verificación antes de publicar](#11-lista-de-verificación-antes-de-publicar)
 - [12. Errores frecuentes](#12-errores-frecuentes)
 
+## Receta rápida (para quien ya sabe cómo)
+
+```bash
+mise exec -- pnpm new-post "Título"                  # 1. borrador (sin git)
+mise exec -- pnpm --filter web dev                   # 2. escribir y ver en /notes/<slug>/
+mise exec -- pnpm publish-note <slug> --dry-run      # 3. ensayo, no cambia nada
+mise exec -- pnpm publish-note <slug>                # 4. publica (commit + push + release)
+gh run watch                                         # 5. el carril rápido tarda 2-3 min
+SUBSCRIBE_ADMIN_TOKEN=... mise exec -- pnpm notify:note <slug> --send   # 6. avisar a la lista (opcional)
+```
+
+Antes del paso 4: revisión editorial (1.1 y 1.2) y [lista de verificación](#11-lista-de-verificación-antes-de-publicar). El resto de esta guía es la referencia detallada.
+
 ## Resumen en 9 pasos
 
 1. Crea el borrador: `mise exec -- pnpm new-post "Título de la nota"`.
@@ -495,6 +508,8 @@ mise exec -- pnpm publish-note <slug>             # publica
 Hace, en orden y deteniéndose en el primer fallo: mueve `drafts/<slug>` a `notes/<slug>`, pone `pubDate` con la fecha local de hoy, añade la entrada `note-NNN` al `changelog.json`, compila y comprueba los presupuestos de tamaño y el output construido (`check:built-notes`; el build valida el frontmatter y `translationOf`; si algo falla, la nota vuelve a `drafts/`), fecha el changelog, hace el commit `feat(notes): publish "Título"`, comprueba la auditoría del changelog, empuja `develop` y publica el release en `main`. **Ejecutarlo es tu autorización para empujar a `main`.** Con `--no-release` se detiene tras el commit local.
 
 Ese push dispara el CI por el **carril rápido para notas** ([ADR 0016](adr/0016-publish-note-command-and-notes-fast-lane.md)): si el push solo toca notas publicadas y el changelog, se saltan `e2e` y Lighthouse y corren `static`, `notes-gate` y el deploy. `notes-gate` hace el build, los presupuestos de JavaScript y de peso, `pnpm check:built-notes` (cada nota publicada tiene su página, `<h1>` y canonical, aparece en el índice y el sitemap (las notas en español también en el RSS), existen sus páginas de tema y todos los enlaces internos resuelven) y el spec `tests/browser/changelog.spec.ts`, porque publicar siempre edita `changelog.json`. Tras el deploy, el smoke-check exige 200 en `/notes/`, `/rss.xml` y cada nota publicada cuando la configuración candidata activa `features.blog`; omite esas rutas cuando el blog está desactivado. El workflow deriva y valida ese indicador antes del despliegue y falla si no puede determinar las notas modificadas. `pnpm docs:config` y `pnpm changelog:audit` no son pasos del CI (`publish-note` ejecuta la auditoría; `docs:config` se corre al cambiar un esquema). El carril cuesta unos tres minutos más que antes y no mide el render de la nota. Si el push incluye cualquier otro cambio, corre todo. Mira el run con `gh run watch`; si algo falla, no hay deploy.
+
+Al terminar, el comando imprime esta misma lista con tu slug (seguir el CI, abrir la nota, avisar a la lista). La espera es de 2 a 3 minutos: `static` cerca de 1 minuto, `notes-gate` de 1 a 1,5 minutos y luego el deploy, cerca de 1 minuto, en serie. Repite a propósito el build y los presupuestos que el comando ya corrió en local: es la decisión «verdad antes que velocidad» del [addendum del ADR 0016](adr/0016-publish-note-command-and-notes-fast-lane.md). No hace falta quedarse esperando: el push ya está hecho y `gh run watch` solo observa.
 
 Después, en producción: abre la nota, comprueba que la tarjeta se ve bien al compartir el enlace (refresca la caché con el [Facebook Sharing Debugger](https://developers.facebook.com/tools/debug/) o el [LinkedIn Post Inspector](https://www.linkedin.com/post-inspector/)) y que los comentarios cargan. Si la suscripción está encendida, avisa a la lista con `SUBSCRIBE_ADMIN_TOKEN=... pnpm notify:note <slug>` (prueba en seco) y luego con `--send` (receta 6.14).
 

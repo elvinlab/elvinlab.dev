@@ -150,6 +150,15 @@ export const ENV_VARS: readonly EnvVar[] = [
     setIn: 'the shell (for example `~/.profile`), never a tracked file',
   },
   {
+    name: 'DEMO_URL',
+    scope: 'local',
+    secret: false,
+    required: false,
+    description:
+      'Public address of the generic demo site, used by `pnpm demo:deploy` for its canonical links and share cards. Without it the demo is built for `https://example.com`.',
+    setIn: 'the shell, only when running `pnpm demo:deploy`',
+  },
+  {
     name: 'DEV_CHECK_STRIP_DEPS',
     scope: 'local',
     secret: false,

@@ -8,6 +8,7 @@ import { isEnabled, site } from '@/shared/config/index.ts';
 import { LOCALES, type Locale, t } from '@/shared/i18n/index.ts';
 import { resolveAvatar } from '@/shared/lib/avatar.ts';
 import { externalLinkAttrs } from '@/shared/lib/external-link.ts';
+import { pickLocale } from '@/shared/lib/localized.ts';
 import ExternalHint from '@/shared/ui/ExternalHint.astro';
 import SocialIcon from '@/shared/ui/SocialIcon.astro';
 
@@ -37,7 +38,7 @@ const links = [
   </div>
   <div class="author-text flex flex-col gap-1">
     <p class="font-display text-lg font-bold">{site.identity.name}</p>
-    <p class="text-sm leading-relaxed text-text-secondary">{t(locale, 'author.bio')}</p>
+    <p class="text-sm leading-relaxed text-text-secondary">{pickLocale(site.identity.bio, locale, LOCALES.defaultLocale)}</p>
   </div>
   <ul class="author-links flex flex-wrap gap-1.5">
     {links.map((link) => (

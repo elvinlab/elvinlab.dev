@@ -409,6 +409,7 @@ Cuatro ámbitos: **build** (se leen al compilar), **Worker** (en producción, en
 | `CLOUDFLARE_API_TOKEN` | CI | yes | yes | Cloudflare API token with permission to deploy the Worker; used only by the deploy job. | GitHub environment secret (`production`) |
 | `CLOUDFLARE_ACCOUNT_ID` | CI | no | yes | Cloudflare account id the deploy job targets. Not a secret. `pnpm pulse:snapshot` also reads it locally (instead of `--account`) to query Web Analytics. | GitHub repository variable; the shell for `pnpm pulse:snapshot` |
 | `CLOUDFLARE_ANALYTICS_TOKEN` | local tooling | yes | no | Cloudflare API token with only `Account Analytics: Read`, used by `pnpm pulse:snapshot` to read 30 days of page views for the "most active" list. Without it the command stops unless you pass `--marks-only`. | the shell (for example `~/.profile`), never a tracked file |
+| `DEMO_URL` | local tooling | no | no | Public address of the generic demo site, used by `pnpm demo:deploy` for its canonical links and share cards. Without it the demo is built for `https://example.com`. | the shell, only when running `pnpm demo:deploy` |
 | `DEV_CHECK_STRIP_DEPS` | local tooling | no | no | Set to `1` to run `pnpm check:dev-cold-start` as its own negative control: it removes the pre-optimized dependencies first and must then fail. | the shell, only when running that check |
 | `FIXTURE_APPEARANCE` | local tooling | no | no | Set to `minimal` or `full` to build the browser-test fixture with that appearance preset instead of the one in `site.config.ts` (only the temporary copy changes). Any other value fails the run. | the shell, only when running `pnpm test:e2e` (for example to verify the `minimal` preset) |
 <!-- docs:end env-vars -->
@@ -756,11 +757,25 @@ La primera vez, para los tests de navegador: `mise exec -- pnpm exec playwright 
 
 El sitio está pensado para que otra persona lo adopte **solo cambiando configuración y contenido**; el estilo (layout, movimiento, motivos) queda en el código.
 
-1. Reemplaza `site.config.ts` (identidad, idiomas, funciones, ids de terceros, fechas legales).
-2. Reemplaza el contenido de `apps/web/src/content/` (notas, experiencia, certificados, experimentos, changelog) y los archivos de `apps/web/public/` (foto, favicon, `og-image.png`).
-3. Ajusta el tema en `packages/core/src/tokens/tokens.json` si quieres otra paleta.
-4. Pon tus secretos de Cloudflare (sección 6.7) y tus variables de CI (sección 7).
-5. Verifica: `pnpm test:white-label` construye el sitio con una identidad alternativa y **falla si se filtra una sola cadena del dueño original**.
+1. **Empieza limpio.** Clona o usa el repositorio como plantilla (`mise install && mise exec -- pnpm install`). El código es MIT ([`LICENSE`](../LICENSE)); las notas y las imágenes del autor **no son tuyas**: bórralas en el paso 3 en vez de reutilizarlas (las notas están bajo CC BY-NC-SA 4.0).
+2. **Identidad.** Reemplaza [`site.config.ts`](../apps/web/src/site.config.ts): nombre, `handle`, bio, URL, redes, idiomas, funciones (sección 6.2), ids de Giscus, analítica y fechas legales. Un valor inválido rompe el build y lo nombra.
+3. **Contenido.** Vacía `apps/web/src/content/`: `notes/` (y `drafts/`), `topics.json`, `experiments.json`, `credentials.json`, `changelog.json`, `releases.json` y la experiencia; escribe los tuyos con [NOTES.md](NOTES.md) y [PORTFOLIO.md](PORTFOLIO.md). Borra también las imágenes del autor de `apps/web/src/assets/` (`avatar.png`, `photo.jpg`, `education/`, `experiments/`) y pon las tuyas.
+4. **Lo que vive fuera de `site.config.ts` y sigue siendo del autor.** Revisa esta lista; ningún test la cubre completa:
+
+   | Dónde | Qué cambiar |
+   | --- | --- |
+   | [`shared/i18n/index.ts`](../apps/web/src/shared/i18n/index.ts) | El titular, las píldoras y demás textos de la portada son la voz del autor: reescríbelos. Cada texto tiene límite de longitud (6.10) |
+   | `features/privacy/content.ts` y `features/terms/content.ts` | Privacidad y términos: ajusta quién eres, qué datos tratas y a quién escribir; deben decir solo lo que tu sitio hace |
+   | `public/` | `favicon.svg` (su `<title>`), `favicon.ico`, `apple-touch-icon.png`, `icon-192.png`, `icon-512.png`, `og-image.png`, `email/logo.png` |
+   | `apps/web/wrangler.jsonc` | `name` del Worker, el nombre y el `database_id` de la base D1, y los `namespace_id` de los limitadores (únicos por cuenta) |
+   | `.github/workflows/ci.yml` | `PRODUCTION_WORKER` (el nombre de tu Worker) y los secretos del repositorio (sección 7) |
+   | `SECURITY.md` | El sitio y el contacto de reporte |
+   | `apps/web/migrations/` | Solo los comentarios nombran la base `elvinlab-dev-db`; aplica las migraciones a la tuya (6.14) |
+
+5. **Marca y tema.** Cambia la paleta en [`packages/core/src/tokens/tokens.json`](../packages/core/src/tokens/tokens.json). Los temas se llaman `elvinlab-dark` y `elvinlab-light`: es el identificador del sistema de diseño (como el nombre de un framework) y puedes dejarlo; si lo cambias, hazlo en `tokens.json` y en todos los selectores `[data-theme="elvinlab-…"]`.
+6. **Servicios (todos opcionales).** Cloudflare (Worker, y D1 solo si enciendes `marks` o `subscribe`), Turnstile y Resend para el contacto, Giscus para comentarios y Web Analytics. Cada uno tiene su receta en la sección 6; apagado, no se envía nada.
+7. **Archivos de trabajo del autor, que puedes borrar.** `CLAUDE.md`, `AGENTS.md`, `RTK.md`, `odd/` (seguimiento de tareas), `docs/PLAN.md`, `docs/BRAND.md`, `docs/DESIGN.md` y `docs/adr/` son las decisiones del autor, útiles como ejemplo. `docs/CONFIGURATION.md`, `NOTES.md`, `PORTFOLIO.md`, `SUBSCRIPTION.md` y `TESTING.md` sí son guías para operar el sitio.
+8. **Verifica.** `pnpm test:white-label` construye el sitio con una identidad alternativa (Jane Doe) y **falla si se filtra el nombre, las imágenes o los textos del dueño original** que la configuración controla. Atención: solo busca lo que `site.config.ts` y `content/` gobiernan; los textos de código del paso 4 (i18n, manifest, wrangler) **no** los puede ver, así que revísalos a mano. Luego `pnpm typecheck`, `pnpm lint`, `pnpm test` y `pnpm --filter web build`.
 
 #### Qué hace el CI con tus cambios
 
@@ -770,6 +785,4 @@ El pipeline sigue tu configuración; no deberías tener que editar pruebas para 
 - **Nombre, dominio, bio, redes y nombres de tema.** Las pruebas los leen de `site.config.ts` y de `tokens.json`; un test unitario (`pnpm test`) falla si una prueba escribe alguno a mano.
 - **Textos de la interfaz, en español e inglés.** Las pruebas los leen del diccionario, y cada texto tiene un límite de longitud para que no desborde un botón ni parta un menú: ver [6.10](#cambiar-un-texto-límites-de-longitud-español-e-inglés).
 - **Colores.** Cambiá `tokens.json`. La prueba de accesibilidad (`a11y.spec.ts`) revisa el contraste en ambos temas, así que una paleta sin suficiente contraste falla a propósito; ninguna prueba compara contra un color copiado.
-- **Lo que sí te toca.** Reemplazar el contenido y las imágenes (paso 2), poner tus secretos (paso 4) y correr la comprobación white-label (paso 5). Las pruebas de navegador construyen el sitio con sus propias notas de fixture, así que tus notas reales no tienen que coincidir con nada.
-
-Este proyecto aún no incluye un archivo de licencia; antes de que otra persona lo reutilice, define bajo qué licencia se comparte.
+- **Lo que sí te toca.** Reemplazar la identidad, el contenido y las imágenes (pasos 2 a 4), poner tus secretos (sección 6) y correr la comprobación white-label (paso 8); esta no ve los textos de código del paso 4. Las pruebas de navegador construyen el sitio con sus propias notas de fixture, así que tus notas reales no tienen que coincidir con nada.

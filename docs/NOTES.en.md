@@ -20,6 +20,19 @@ This guide explains, step by step and in detail, how to write and publish a **La
 - [11. Checklist before publishing](#11-checklist-before-publishing)
 - [12. Common errors](#12-common-errors)
 
+## Quick recipe (if you already know the way)
+
+```bash
+mise exec -- pnpm new-post "Title"                   # 1. draft (not in git)
+mise exec -- pnpm --filter web dev                   # 2. write and preview at /notes/<slug>/
+mise exec -- pnpm publish-note <slug> --dry-run      # 3. rehearsal, changes nothing
+mise exec -- pnpm publish-note <slug>                # 4. publishes (commit + push + release)
+gh run watch                                         # 5. the fast lane takes 2-3 min
+SUBSCRIBE_ADMIN_TOKEN=... mise exec -- pnpm notify:note <slug> --send   # 6. tell the list (optional)
+```
+
+Before step 4: the editorial review (1.1 and 1.2) and the [pre-publish checklist](#11-checklist-before-publishing). The rest of this guide is the detailed reference.
+
 ## The 9-step summary
 
 1. Create the draft: `mise exec -- pnpm new-post "Note title"`.
@@ -495,6 +508,8 @@ mise exec -- pnpm publish-note <slug>             # publishes
 It does the following in order and stops at the first failure: moves `drafts/<slug>` to `notes/<slug>`, sets `pubDate` to today's local date, adds the `note-NNN` entry to `changelog.json`, builds and checks the size budgets and the built output (`check:built-notes`) (the build validates the frontmatter and `translationOf`; if anything fails the note goes back to `drafts/`), dates the changelog, commits `feat(notes): publish "Title"`, runs the changelog audit, pushes `develop` and releases to `main`. **Running it is your authorization to push to `main`.** With `--no-release` it stops after the local commit.
 
 That push triggers CI through the **notes-only fast lane** ([ADR 0016](adr/0016-publish-note-command-and-notes-fast-lane.md)): when the push only touches published notes and the changelog, `e2e` and Lighthouse are skipped and `static`, `notes-gate` and the deploy run. `notes-gate` does the build, the JavaScript and weight budgets, `pnpm check:built-notes` (every published note has its page, `<h1>` and canonical link, is in the index and sitemap (Spanish notes also in RSS), its topic pages exist and every internal link resolves) and the `tests/browser/changelog.spec.ts` spec, because a publish always edits `changelog.json`. After the deploy, smoke requires 200 on `/notes/`, `/rss.xml` and each published note when the candidate enables `features.blog`; blog-off builds omit those routes. The workflow derives and validates that flag before deployment and fails closed if changed note targets cannot be determined. `pnpm docs:config` and `pnpm changelog:audit` are not CI steps (`publish-note` runs the audit; `docs:config` is run when a schema changes). The lane costs about three minutes more than before and does not measure how the note renders. If the push includes any other change, everything runs. Follow the run with `gh run watch`; if anything fails, there is no deploy.
+
+When it finishes, the command prints this same checklist with your slug filled in (follow CI, open the note, tell the list). The wait is about 2 to 3 minutes: `static` about 1 minute, `notes-gate` 1 to 1.5 minutes, then the deploy about 1 minute, in series. It repeats the build and budgets the command already ran locally on purpose: that is the "truth over speed" decision of the [ADR 0016 addendum](adr/0016-publish-note-command-and-notes-fast-lane.md). You do not need to stay waiting: the push is already done, and `gh run watch` only observes.
 
 Afterwards, in production: open the note, check that the card looks right when you share the link (refresh the cache with the [Facebook Sharing Debugger](https://developers.facebook.com/tools/debug/) or the [LinkedIn Post Inspector](https://www.linkedin.com/post-inspector/)) and that comments load. If the subscription is on, tell the list with `SUBSCRIBE_ADMIN_TOKEN=... pnpm notify:note <slug>` (a dry run) and then with `--send` (recipe 6.14).
 

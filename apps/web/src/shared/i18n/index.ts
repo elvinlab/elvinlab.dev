@@ -139,7 +139,7 @@ export const DICTIONARIES = {
     'changelog.empty': 'Todavía no hay cambios registrados.',
     'changelog.page.title': 'Changelog, página {page}',
     'changelog.page.description':
-      'Registro de cambios visibles de elvinlab.dev, página {page} de {pages}: funciones nuevas, correcciones, rendimiento y documentación, por día de publicación.',
+      'Registro de cambios visibles del sitio, página {page} de {pages}: funciones nuevas, correcciones, rendimiento y documentación, por día de publicación.',
     'changelog.pager.label': 'Paginación del changelog',
     'changelog.entries': '{n} cambios',
     'changelog.kind.added': 'Novedades',
@@ -171,8 +171,6 @@ export const DICTIONARIES = {
     'now.kind.building': 'Construyendo',
     'now.kind.exploring': 'Explorando',
     'now.kind.learning': 'Aprendiendo',
-    'author.bio':
-      'Ingeniero full-stack en Costa Rica. Construyo con agentes de IA desde que fueron útiles; software desde 2020.',
     'me.hello': 'hola, soy',
     'me.cv': 'Ver CV (PDF)',
     'me.cv.short': 'Ver CV',
@@ -471,7 +469,7 @@ export const DICTIONARIES = {
     'changelog.empty': 'No changes recorded yet.',
     'changelog.page.title': 'Changelog, page {page}',
     'changelog.page.description':
-      'Log of visible changes to elvinlab.dev, page {page} of {pages}: new features, fixes, performance and documentation, by release day.',
+      'Log of visible changes to the site, page {page} of {pages}: new features, fixes, performance and documentation, by release day.',
     'changelog.pager.label': 'Changelog pagination',
     'changelog.entries': '{n} changes',
     'changelog.kind.added': 'New',
@@ -503,8 +501,6 @@ export const DICTIONARIES = {
     'now.kind.building': 'Building',
     'now.kind.exploring': 'Exploring',
     'now.kind.learning': 'Learning',
-    'author.bio':
-      'Full-stack engineer in Costa Rica. Building with AI agents since they became useful; software since 2020.',
     'me.hello': "hello, I'm",
     'me.cv': 'View CV (PDF)',
     'me.cv.short': 'View CV',

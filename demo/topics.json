@@ -1,0 +1,8 @@
+{
+  "engineering": {
+    "title": "Engineering decisions",
+    "description": "Notes about the trade-offs behind a codebase: what was chosen, what was dropped and why.",
+    "intro": "Every project is a pile of decisions, and most of them are forgotten within a month. These notes write the important ones down while the reasons are still fresh: the problem, the options that were considered, the numbers that settled the choice and the parts worth revisiting later when the context changes.",
+    "tags": ["architecture", "performance"]
+  }
+}

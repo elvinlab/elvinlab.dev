@@ -8,14 +8,9 @@ import { existsSync, readdirSync, readFileSync, realpathSync, writeFileSync } fr
 import { basename, extname, join, resolve } from 'node:path';
 
 import { createFixtureWorkspace } from './fixture-workspace.ts';
+import { DESIGN_SYSTEM, OWNER, OWNER_CONTENT } from './owner-strings.ts';
 
 const source = resolve(import.meta.dirname, '../../..');
-// Site-owner identity strings that white-label must remove from the output.
-const OWNER = [/elvin/i, /gonz[aá]lez/i];
-// Design-system identifiers are intentionally kept: `@elvinlab/core` is the shared design base
-// others adopt (like a framework name), and the theme names come from its tokens.
-const DESIGN_SYSTEM = [/@elvinlab\/core/g, /elvinlab-(?:dark|light)/g];
-
 function fail(message: string): never {
   console.error(`✗ white-label: ${message}`);
   process.exit(1);
@@ -28,6 +23,14 @@ const NOW_FOCUS = ['Optimizar IA y proyectos personales', 'Optimizing AI and per
 const realConfig = readFileSync(join(source, 'apps/web/src/site.config.ts'), 'utf8');
 if (!OWNER.every((token) => token.test(realConfig))) {
   fail('owner tokens not found in the real site.config.ts — the check would be vacuous');
+}
+
+// Same control for the owner's employers and schools, which live in the content files.
+const realContent =
+  readFileSync(join(source, 'apps/web/src/content/experience.json'), 'utf8') +
+  readFileSync(join(source, 'apps/web/src/content/credentials.json'), 'utf8');
+if (!OWNER_CONTENT.every((token) => token.test(realContent))) {
+  fail('owner content tokens not found in the real content files — the check would be vacuous');
 }
 
 if (!NOW_FOCUS.every((text) => realConfig.includes(text))) {
@@ -87,6 +90,7 @@ try {
     readFileSync(join(source, 'tests/fixtures/site.config.alt.ts'), 'utf8'),
   );
   writeFileSync(join(workspace.web, 'src/content/experiments.json'), '{}\n');
+  writeFileSync(join(workspace.web, 'src/content/experience.json'), '{}\n');
   // The owner's degrees and certificates (with their verification links) are identity-bearing too.
   writeFileSync(join(workspace.web, 'src/content/credentials.json'), '{}\n');
   // The owner's changelog entries and release headlines must not reach a fork's build.
@@ -190,8 +194,16 @@ try {
       );
     }
   }
-  const html = DESIGN_SYSTEM.reduce((acc, token) => acc.replace(token, ''), rawHtml);
-  const leaked = OWNER.filter((token) => token.test(html));
+  // The web app manifest is not HTML: it is built from the config and must carry the new identity too.
+  const manifest = readFileSync(join(workspace.web, 'dist/client/manifest.webmanifest'), 'utf8');
+  if (!manifest.includes('Ingeniera de software')) {
+    fail('the manifest does not carry the alternative identity — the grep would be meaningless');
+  }
+  const html = DESIGN_SYSTEM.reduce(
+    (acc, token) => acc.replace(token, ''),
+    `${rawHtml}\n${manifest}`,
+  );
+  const leaked = [...OWNER, ...OWNER_CONTENT].filter((token) => token.test(html));
   if (leaked.length > 0) fail(`owner strings leaked into the build: ${leaked.join(', ')}`);
 
   console.log('✓ white-label: no owner strings in an alternative-identity build');

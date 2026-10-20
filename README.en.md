@@ -84,11 +84,12 @@ This is how work goes here: every task is an *issue* written as a delegation bri
 | Services | **Turnstile**, **Resend**, **Web Analytics**, **Giscus** | Anti-bot, form email, minimal analytics and comments on GitHub Discussions |
 | Quality | **Vitest 5**, **Playwright** + **axe-core**, **Lighthouse CI**, **Biome**, **dependency-cruiser** | Tests, accessibility, performance, formatting and architecture boundaries |
 | Tooling | **pnpm 12** (workspaces), **mise** (Node 24), **GitHub Actions**, **Dependabot** | Monorepo, pinned versions, CI/CD and weekly updates |
-| Assisted development | **agentic-dev-setup**: Claude Code, herdr, OpenCode, OmniRoute, Ollama and Engram | How it was built (previous section) |
+| Assisted development | **agentic-dev-setup**: Claude Code, herdr, OpenCode, OmniRoute, Ollama and Engram, with **gentle-ai** for review and verification (pi and Codex optional) | How it was built (previous section) |
 
 ## What it includes
 
 - **Lab Notes**: index by year with a filter, side table of contents with progress, decision record, reading time, related notes, previous/next and RSS.
+- **"Most active"**: in the `/notes/` index, the notes with the most footprints, comments and reads over the last 30 days; refreshed with `pnpm pulse:snapshot` before a release.
 - Optional **reading mode** on every note: a single column, no animated banner or sidebar, for comfortable reading on mobile and desktop.
 - **Comments and reactions** with Giscus, loaded only when you reach them.
 - Own **share cards** for each note, each experiment case page and `/me`, generated at build time.
@@ -141,7 +142,7 @@ The CI verifies all of this; if something fails, there is no deploy:
 - **Mobile Lighthouse** ≥ 95 in all four categories, CLS ≤ 0.1 and LCP ≤ 2.7 s ([testing](docs/TESTING.md)).
 - **JavaScript** ≤ 30 KiB (gzip) per page.
 - **Accessibility with axe** (WCAG 2 A, AA and 2.1 AA) in light and dark theme and at 360, 768 and 1280 px.
-- Over **1700 unit tests** and over **320 e2e** tests in a browser.
+- Over **1800 unit tests** and over **500 e2e** tests in a browser.
 - One test checks that the site **sets no cookies of its own** and another that nothing of the owner leaks into a build with another identity.
 
 ## Getting started
@@ -172,6 +173,8 @@ The contact form needs Cloudflare secrets; without them it shows the "unavailabl
 | `pnpm test:white-label` | Builds with another identity and looks for owner leaks |
 | `pnpm new-post "Title"` | Creates a note draft |
 | `pnpm publish-note <slug>` | Publishes a draft end to end (move, date, changelog, build, commit and release; `--dry-run`, `--no-release`) |
+| `pnpm verify` | Touch-scoped verification plan for uncommitted changes (`--run` executes it) |
+| `pnpm pulse:snapshot` | Refreshes the "most active" list from footprints and views (read-only; needs a `wrangler` session and `CLOUDFLARE_ANALYTICS_TOKEN`) |
 | `pnpm docs:config` | Regenerates the tables in the configuration guide |
 
 All of them run with `mise exec -- pnpm ...` to use the pinned versions.
@@ -192,7 +195,8 @@ odd/tasks/       → tracking of each feature
 | Document | What it covers |
 | --- | --- |
 | [Configuration and update guide](docs/CONFIGURATION.en.md) | **Where each thing is configured and how everything is updated**: settings, content, secrets, dependencies and releases |
-| [How to create a note](docs/NOTES.en.md) | Detailed step by step, from draft to production |
+| [How to create a note](docs/NOTES.en.md) | A six-command quick recipe and, below it, the detailed step by step from draft to production |
+| [`docs/PORTFOLIO.en.md`](docs/PORTFOLIO.en.md) | Editing `/me` and adding an experiment (also in [Spanish](docs/PORTFOLIO.md)) |
 | [`docs/SUBSCRIPTION.en.md`](docs/SUBSCRIPTION.en.md) | Email subscription: how it works, data and privacy, limits, how to send a note and common problems (also in [Spanish](docs/SUBSCRIPTION.md)) |
 | [`docs/PLAN.md`](docs/PLAN.md) | Vision, scope and rules (in Spanish) |
 | [`docs/BRAND.md`](docs/BRAND.md) | Narrative, voice and brand tokens (in Spanish) |
@@ -203,11 +207,11 @@ odd/tasks/       → tracking of each feature
 
 ## Releasing
 
-Work happens on `develop` with free pushes. A release is a push to `main`, which triggers the CI once (`static`, `e2e` and `lighthouse` → `checks` → `deploy`) and deploys to production with a smoke check and automatic rollback. The exact steps, how to roll back and what to check afterwards are in [the configuration guide](docs/CONFIGURATION.en.md#7-releasing-and-rolling-back).
+Work happens on `develop` with free pushes. A release is a push to `main`, which triggers the CI once (`static`, `e2e` and `lighthouse` → `checks` → `deploy`) and deploys to production with a smoke check and automatic rollback. A new **note** does not need that full run: `pnpm publish-note <slug>` publishes it and CI takes a **fast lane** (`static` → `notes-gate` → `deploy`, about 2 to 3 minutes; [ADR 0016](docs/adr/0016-publish-note-command-and-notes-fast-lane.md)). The exact steps, how to roll back and what to check afterwards are in [the configuration guide](docs/CONFIGURATION.en.md#7-releasing-and-rolling-back).
 
 ## Using it as a base
 
-The site is meant to be adopted by someone else by replacing `site.config.ts`, the content and the images in `public/`. The full recipe and how to verify it are in [the guide](docs/CONFIGURATION.en.md#10-using-this-site-as-a-base-for-someone-else-white-label).
+The site is meant to be adopted by someone else by replacing `site.config.ts`, the content and the images in `public/`. The full recipe, with the list of everything that still belongs to the author (`i18n` texts, `manifest`, `wrangler`, CI) and how to verify it, is in [the guide](docs/CONFIGURATION.en.md#10-using-this-site-as-a-base-for-someone-else-white-label).
 
 **The CI follows your configuration.** Switching features off (or changing a name, a text or the palette) does not require editing tests: the browser specs read what is on and skip what is off. Four adopter scenarios (`quiet`, `blog-only`, `me-only`, `bare`) run the whole suite with `pnpm test:profiles`, and a CI job runs them without blocking the release. Texts have length limits in both languages so they cannot overflow. Details in [the guide](docs/CONFIGURATION.en.md#10-using-this-site-as-a-base-for-someone-else-white-label) and [TESTING.md](docs/TESTING.md#the-suite-follows-the-config-adopter-profiles).
 
