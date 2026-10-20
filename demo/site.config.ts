@@ -3,7 +3,7 @@
  * and only the features that need no secrets or database, so anyone can see the theme working.
  */
 export const siteConfig = {
-  url: process.env.DEMO_URL ?? 'https://example.com',
+  url: 'https://example.com',
   title: 'Lab Notes',
   description: { es: 'Portafolio de Jane Doe.', en: "Jane Doe's portfolio." },
   locales: { default: 'en', supported: ['es', 'en'] },

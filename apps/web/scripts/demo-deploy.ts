@@ -36,7 +36,12 @@ function collectText(dir: string): string {
 
 const workspace = createFixtureWorkspace(source, join(demo, 'notes'));
 try {
-  cpSync(join(demo, 'site.config.ts'), join(workspace.web, 'src/site.config.ts'));
+  // The config also runs inside workerd, which has no `process.env`, so the URL is written into the copy.
+  const demoUrl = (process.env.DEMO_URL ?? 'https://example.com').replace(/\/$/, '');
+  writeFileSync(
+    join(workspace.web, 'src/site.config.ts'),
+    readFileSync(join(demo, 'site.config.ts'), 'utf8').replace('https://example.com', demoUrl),
+  );
   cpSync(join(demo, 'wrangler.jsonc'), join(workspace.web, 'wrangler.jsonc'));
   // The owner's identity-bearing content never reaches the demo.
   for (const file of ['experiments', 'credentials', 'changelog', 'releases']) {
