@@ -71,7 +71,7 @@ flowchart LR
 
 Así se trabaja aquí: cada tarea es un *issue* escrito como un brief de delegación con un **nivel** (1 trivial, 2 acotado, 3 complejo); el desarrollo es con **TDD estricto**; y un modelo más caro **revisa cada diff** que escribió uno más barato. La historia completa está en la nota [Claude piensa, los modelos baratos teclean](https://elvinlab.dev/notes/agentic-dev-setup/).
 
-**Actualización:** el desarrollo ahora lo lleva **pi** (el Gentleman) como orquestador, con el ecosistema **gentle-ai** para el ciclo de revisión y verificación, y modelos **Deepseek**. Es un flujo experimental y en evolución, así que convive con el setup de arriba, que dejo documentado por si vuelvo a Claude Code o Codex. La arquitectura, los presupuestos de calidad y las convenciones del repo no cambian.
+**Hoy:** el desarrollo lo lleva **Claude Code** como orquestador, con el ecosistema **gentle-ai** para el ciclo de revisión y verificación, y delega el trabajo acotado a OpenCode como en el diagrama. **pi** (el Gentleman) y Codex quedan como alternativas. La arquitectura, los presupuestos de calidad y las convenciones del repo no dependen de la herramienta.
 
 ## Tecnologías
 
@@ -86,11 +86,12 @@ Así se trabaja aquí: cada tarea es un *issue* escrito como un brief de delegac
 | Servicios | **Turnstile**, **Resend**, **Web Analytics**, **Giscus** | Anti-bot, correo del formulario, analítica mínima y comentarios en GitHub Discussions |
 | Calidad | **Vitest 5**, **Playwright** + **axe-core**, **Lighthouse CI**, **Biome**, **dependency-cruiser** | Tests, accesibilidad, rendimiento, formato y fronteras de arquitectura |
 | Herramientas | **pnpm 12** (workspaces), **mise** (Node 24), **GitHub Actions**, **Dependabot** | Monorepo, versiones fijas, CI/CD y actualizaciones semanales |
-| Desarrollo asistido | **agentic-dev-setup**: Claude Code, herdr, OpenCode, OmniRoute, Ollama y Engram → hoy: **pi (el Gentleman) + gentle-ai + Deepseek** (experimental) | Cómo se construyó (sección anterior) |
+| Desarrollo asistido | **agentic-dev-setup**: Claude Code, herdr, OpenCode, OmniRoute, Ollama y Engram → hoy: **Claude Code + gentle-ai** (pi y Codex opcionales) | Cómo se construyó (sección anterior) |
 
 ## Qué incluye
 
 - **Lab Notes**: índice por año con filtro, índice lateral con progreso, registro de decisión, tiempo de lectura, notas relacionadas, anterior/siguiente y RSS.
+- **«Lo que más se mueve»**: en el índice de `/notes/`, las notas más activas según huellas, comentarios y lecturas de los últimos 30 días; se actualiza con `pnpm pulse:snapshot` antes de un release.
 - **Modo lectura** opcional en cada nota: una sola columna, sin banner animado ni barra lateral, para leer cómodo en móvil y escritorio.
 - **Comentarios y reacciones** con Giscus, cargados solo al llegar a ellos.
 - **Tarjetas al compartir** propias para cada nota, cada case page de experimento y `/me`, generadas al compilar.
@@ -143,7 +144,7 @@ Todo esto lo verifica el CI; si algo falla, no hay despliegue:
 - **Lighthouse móvil** ≥ 95 en las cuatro categorías, CLS ≤ 0,1 y LCP ≤ 2,7 s ([pruebas](docs/TESTING.md)).
 - **JavaScript** ≤ 30 KiB (gzip) por página.
 - **Accesibilidad con axe** (WCAG 2 A, AA y 2.1 AA) en tema claro y oscuro y en 360, 768 y 1280 px.
-- Más de **1700 tests unitarios** y más de **320 e2e** en navegador.
+- Más de **1800 tests unitarios** y más de **500 pruebas e2e** en navegador.
 - Un test comprueba que el sitio **no establece cookies propias** y otro que nada del dueño se filtra en una compilación con otra identidad.
 
 ## Empezar
@@ -174,6 +175,8 @@ El formulario de contacto necesita secretos de Cloudflare; sin ellos muestra el 
 | `pnpm test:white-label` | Compila con otra identidad y busca filtraciones del dueño |
 | `pnpm new-post "Título"` | Crea el borrador de una nota |
 | `pnpm publish-note <slug>` | Publica un borrador de punta a punta (mueve, fecha, changelog, build, commit y release; `--dry-run`, `--no-release`) |
+| `pnpm verify` | Plan de verificación por alcance para los cambios sin commitear (`--run` lo ejecuta) |
+| `pnpm pulse:snapshot` | Actualiza la lista «Lo que más se mueve» desde huellas y lecturas (solo lectura; necesita sesión de `wrangler` y `CLOUDFLARE_ANALYTICS_TOKEN`) |
 | `pnpm docs:config` | Regenera las tablas de la guía de configuración |
 
 Todos se ejecutan con `mise exec -- pnpm ...` para usar las versiones fijas.
@@ -194,7 +197,8 @@ odd/tasks/       → seguimiento de cada funcionalidad
 | Documento | Qué cuenta |
 | --- | --- |
 | [Guía de configuración y actualización](docs/CONFIGURATION.md) | **Dónde se configura cada cosa y cómo se actualiza todo**: ajustes, contenido, secretos, dependencias y releases |
-| [Cómo crear una nota](docs/NOTES.md) | Paso a paso detallado, del borrador a producción |
+| [Cómo crear una nota](docs/NOTES.md) | Receta rápida de 6 comandos y, debajo, el paso a paso detallado del borrador a producción |
+| [`docs/PORTFOLIO.md`](docs/PORTFOLIO.md) | Editar `/me` y agregar un experimento (también en [inglés](docs/PORTFOLIO.en.md)) |
 | [`docs/SUBSCRIPTION.md`](docs/SUBSCRIPTION.md) | Suscripción por correo: cómo funciona, datos y privacidad, límites, cómo enviar una nota y problemas comunes (también en [inglés](docs/SUBSCRIPTION.en.md)) |
 | [`docs/PLAN.md`](docs/PLAN.md) | Visión, alcance y reglas (en español) |
 | [`docs/BRAND.md`](docs/BRAND.md) | Narrativa, voz y tokens de marca (en español) |
@@ -205,11 +209,11 @@ odd/tasks/       → seguimiento de cada funcionalidad
 
 ## Publicar
 
-Se trabaja en `develop` con push libre. El release es un push a `main`, que dispara el CI una sola vez (`static`, `e2e` y `lighthouse` → `checks` → `deploy`) y despliega a producción con una comprobación de humo y rollback automático. Los pasos exactos, cómo revertir y qué revisar después están en [la guía de configuración](docs/CONFIGURATION.md#7-publicar-release-y-revertir).
+Se trabaja en `develop` con push libre. El release es un push a `main`, que dispara el CI una sola vez (`static`, `e2e` y `lighthouse` → `checks` → `deploy`) y despliega a producción con una comprobación de humo y rollback automático. Una **nota** nueva no necesita ese recorrido completo: `pnpm publish-note <slug>` publica y el CI usa un **carril rápido** (`static` → `notes-gate` → `deploy`, unos 2 a 3 minutos; [ADR 0016](docs/adr/0016-publish-note-command-and-notes-fast-lane.md)). Los pasos exactos, cómo revertir y qué revisar después están en [la guía de configuración](docs/CONFIGURATION.md#7-publicar-release-y-revertir).
 
 ## Usarlo como base
 
-El sitio está pensado para que otra persona lo adopte reemplazando `site.config.ts`, el contenido y las imágenes de `public/`. La receta completa y su verificación están en [la guía](docs/CONFIGURATION.md#10-usar-este-sitio-como-base-para-otra-persona-white-label).
+El sitio está pensado para que otra persona lo adopte reemplazando `site.config.ts`, el contenido y las imágenes de `public/`. La receta completa, con la lista de todo lo que sigue siendo del autor (textos de `i18n`, `manifest`, `wrangler`, CI) y su verificación, está en [la guía](docs/CONFIGURATION.md#10-usar-este-sitio-como-base-para-otra-persona-white-label).
 
 **El CI sigue tu configuración.** Apagar funciones (o cambiar un nombre, un texto o la paleta) no exige editar pruebas: las pruebas de navegador leen qué está encendido y se saltan lo que está apagado. Cuatro escenarios de adopción (`quiet`, `blog-only`, `me-only`, `bare`) corren toda la suite con `pnpm test:profiles`, y un trabajo del CI los corre sin bloquear el release. Los textos tienen límites de longitud en ambos idiomas para que no desborden. Detalle en [la guía](docs/CONFIGURATION.md#10-usar-este-sitio-como-base-para-otra-persona-white-label) y en [TESTING.md](docs/TESTING.md#the-suite-follows-the-config-adopter-profiles).
 

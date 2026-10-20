@@ -756,11 +756,25 @@ The first time, for the browser tests: `mise exec -- pnpm exec playwright instal
 
 The site is meant to be adopted by someone else by **changing only configuration and content**; the style (layout, motion, motifs) stays in the code.
 
-1. Replace `site.config.ts` (identity, languages, features, third-party ids, legal dates).
-2. Replace the content of `apps/web/src/content/` (notes, experience, certificates, experiments, changelog) and the files in `apps/web/public/` (photo, favicon, `og-image.png`).
-3. Adjust the theme in `packages/core/src/tokens/tokens.json` if you want another palette.
-4. Set your Cloudflare secrets (section 6.7) and your CI variables (section 7).
-5. Verify: `pnpm test:white-label` builds the site with an alternative identity and **fails if a single string of the original owner leaks**.
+1. **Start clean.** Clone the repository or use it as a template (`mise install && mise exec -- pnpm install`). The code is MIT ([`LICENSE`](../LICENSE)); the author's notes and images **are not yours**: delete them in step 3 instead of reusing them (the notes are CC BY-NC-SA 4.0).
+2. **Identity.** Replace [`site.config.ts`](../apps/web/src/site.config.ts): name, `handle`, bio, URL, socials, languages, features (section 6.2), Giscus ids, analytics and legal dates. An invalid value breaks the build and names the problem.
+3. **Content.** Empty `apps/web/src/content/`: `notes/` (and `drafts/`), `topics.json`, `experiments.json`, `credentials.json`, `changelog.json`, `releases.json` and the experience; write your own with [NOTES.en.md](NOTES.en.md) and [PORTFOLIO.en.md](PORTFOLIO.en.md). Also delete the author's images from `apps/web/src/assets/` (`avatar.png`, `photo.jpg`, `education/`, `experiments/`) and add yours.
+4. **What lives outside `site.config.ts` and still belongs to the author.** Go through this list; no test covers all of it:
+
+   | Where | What to change |
+   | --- | --- |
+   | [`shared/i18n/index.ts`](../apps/web/src/shared/i18n/index.ts) | The home headline, pills and other texts are also the author's voice: rewrite them. Every text has a length limit (6.10) |
+   | `features/privacy/content.ts` and `features/terms/content.ts` | Privacy and terms: adjust who you are, which data you handle and whom to write to; they must say only what your site does |
+   | `public/` | `favicon.svg` (its `<title>`), `favicon.ico`, `apple-touch-icon.png`, `icon-192.png`, `icon-512.png`, `og-image.png`, `email/logo.png` |
+   | `apps/web/wrangler.jsonc` | The Worker `name`, the D1 database name and `database_id`, and the rate limiters' `namespace_id` (unique per account) |
+   | `.github/workflows/ci.yml` | `PRODUCTION_WORKER` (your Worker's name) and the repository secrets (section 7) |
+   | `SECURITY.md` | The site and the reporting contact |
+   | `apps/web/migrations/` | Only the comments name the `elvinlab-dev-db` database; apply the migrations to yours (6.14) |
+
+5. **Brand and theme.** Change the palette in [`packages/core/src/tokens/tokens.json`](../packages/core/src/tokens/tokens.json). The themes are called `elvinlab-dark` and `elvinlab-light`: that is the design system's identifier (like a framework name) and you may keep it; if you rename it, do it in `tokens.json` and in every `[data-theme="elvinlab-…"]` selector.
+6. **Services (all optional).** Cloudflare (a Worker, and D1 only if you turn on `marks` or `subscribe`), Turnstile and Resend for contact, Giscus for comments and Web Analytics. Each has its recipe in section 6; when off, nothing is sent.
+7. **The author's working files, which you can delete.** `CLAUDE.md`, `AGENTS.md`, `RTK.md`, `odd/` (task tracking), `docs/PLAN.md`, `docs/BRAND.md`, `docs/DESIGN.md` and `docs/adr/` are the author's decisions, useful as an example. `docs/CONFIGURATION.md`, `NOTES.md`, `PORTFOLIO.md`, `SUBSCRIPTION.md` and `TESTING.md` are guides for operating the site.
+8. **Verify.** `pnpm test:white-label` builds the site with an alternative identity (Jane Doe) and **fails if the original owner's name, images or texts leak** where the configuration controls them. Caution: it only looks at what `site.config.ts` and `content/` govern; the code-level texts from step 4 (i18n, manifest, wrangler) it **cannot** see, so review them by hand. Then `pnpm typecheck`, `pnpm lint`, `pnpm test` and `pnpm --filter web build`.
 
 #### What the CI does with your changes
 
@@ -770,6 +784,4 @@ The pipeline follows your configuration; you should not have to edit tests to sw
 - **Name, domain, bio, socials, theme names.** The specs read them from `site.config.ts` and `tokens.json`; a unit test (`pnpm test`) fails if a spec writes one out.
 - **Interface texts, Spanish and English.** The specs read them from the dictionary, and every text has a length limit so it cannot overflow a button or wrap a menu: see [6.10](#changing-a-text-length-limits-spanish-and-english).
 - **Colors.** Change `tokens.json`. The accessibility spec (`a11y.spec.ts`) checks contrast in both themes, so a palette without enough contrast fails on purpose; no spec compares against a copied color.
-- **What you still do.** Replace the content and the images (step 2), set your secrets (step 4) and run the white-label check (step 5). The browser specs build the site with their own fixture notes, so your real notes do not have to match anything.
-
-This project does not include a license file yet; before someone else reuses it, decide under which license it is shared.
+- **What you still do.** Replace the identity, the content and the images (steps 2 to 4), set your secrets (section 6) and run the white-label check (step 8); it cannot see the code-level texts of step 4. The browser specs build the site with their own fixture notes, so your real notes do not have to match anything.
