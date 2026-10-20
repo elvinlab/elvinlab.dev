@@ -37,7 +37,7 @@ function collectText(dir: string): string {
 const workspace = createFixtureWorkspace(source, join(demo, 'notes'));
 try {
   // The config also runs inside workerd, which has no `process.env`, so the URL is written into the copy.
-  const demoUrl = (process.env.DEMO_URL ?? 'https://example.com').replace(/\/$/, '');
+  const demoUrl = (process.env['DEMO_URL'] ?? 'https://example.com').replace(/\/$/, '');
   writeFileSync(
     join(workspace.web, 'src/site.config.ts'),
     readFileSync(join(demo, 'site.config.ts'), 'utf8').replace('https://example.com', demoUrl),
