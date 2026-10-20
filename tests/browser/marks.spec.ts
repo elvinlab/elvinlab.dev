@@ -223,18 +223,15 @@ for (const note of NOTES) {
       await expect(header(page)).not.toHaveAttribute('data-n', '');
     });
 
-    test('an unavailable store leaves no marks UI and shifts nothing beyond the reserved box', async ({
-      page,
-    }) => {
+    test('an unavailable store leaves no marks UI and shifts nothing', async ({ page }) => {
       await mockMarks(page, { getStatus: 503, getDelay: 1500 });
       await page.goto(note.path);
       await expect(header(page)).toBeAttached();
       const before = (await page.locator('[data-article]').boundingBox())?.y ?? 0;
       await expect(page.locator('[data-marks]')).toHaveCount(0);
       const after = (await page.locator('[data-article]').boundingBox())?.y ?? 0;
-      // The reserved box is 44 px plus its margin.
-      expect(before - after).toBeGreaterThanOrEqual(0);
-      expect(before - after).toBeLessThanOrEqual(44 + 16);
+      // The header box stays as an empty reserved space, so nothing below it moves.
+      expect(after).toBe(before);
       await expect(page.locator('.mb')).toHaveCount(0);
       await expect(page.getByText(note.hint)).toHaveCount(0);
     });

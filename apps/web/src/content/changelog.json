@@ -1131,5 +1131,11 @@
     "category": "changed",
     "title": "Lab-paper grid and ink underline on every page",
     "description": "The inner pages (notes, notes index, topics, about, experiments and their cases, contact, changelog, education and legal pages) draw the lab-paper grid again in their title strip, and the page titles carry the hand-drawn ink underline, so they share the look of the home instead of reading as plain forms."
+  },
+  "marks-reserved-space": {
+    "date": "2026-10-20",
+    "category": "fixed",
+    "title": "Footprint button no longer shifts the page when it fails to load",
+    "description": "If the footprint count cannot be read, the space under the note title stays reserved and empty instead of collapsing, so the text below does not jump."
   }
 }
