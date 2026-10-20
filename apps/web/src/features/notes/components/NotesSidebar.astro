@@ -3,9 +3,13 @@
 import { localizePath } from '@elvinlab/core';
 
 import { tagHref } from '@/features/notes/lib/note-tags.ts';
+import type { NoteLike } from '@/features/notes/lib/notes.ts';
+import type { PulseEntry } from '@/features/notes/lib/pulse.ts';
 import { isEnabled, site } from '@/shared/config/index.ts';
 import { LOCALES, type Locale, t } from '@/shared/i18n/index.ts';
 import Chip from '@/shared/ui/Chip.astro';
+
+import NotesPulse from './NotesPulse.astro';
 
 type Props = {
   locale: Locale;
@@ -15,13 +19,17 @@ type Props = {
   /** The remaining tags, inside the native disclosure (none: no disclosure). */
   moreTags?: string[];
   topics: ReadonlyMap<string, string>;
+  /** The most active notes, already ranked; empty hides the block. */
+  pulse?: PulseEntry<NoteLike>[];
 };
 
-const { locale, categories, tags, moreTags = [], topics } = Astro.props;
+const { locale, categories, tags, moreTags = [], topics, pulse = [] } = Astro.props;
+// With the "most active" block the column is about 1250 px tall against 700 to 980 px of room on most
+// screens, and a taller sticky column cuts off its tags and RSS until the list ends: it flows instead.
 const aboutHref = localizePath('/me/', locale, LOCALES);
 ---
 
-<div class="ni-page flex flex-col gap-6 lg:sticky lg:top-24">
+<div class:list={['ni-page flex flex-col gap-6', pulse.length === 0 && 'lg:sticky lg:top-24']}>
   <section class="flex flex-col gap-3">
     <p class="font-display text-lg font-bold">{site.identity.name}</p>
     <p class="text-sm text-text-secondary">{site.identity.role[locale]}</p>
@@ -31,6 +39,8 @@ const aboutHref = localizePath('/me/', locale, LOCALES);
       </a>
     )}
   </section>
+
+  <NotesPulse locale={locale} entries={pulse} />
 
   {categories.length > 0 && (
     <section class="flex flex-col gap-3 border-t border-dashed border-divider pt-5">
