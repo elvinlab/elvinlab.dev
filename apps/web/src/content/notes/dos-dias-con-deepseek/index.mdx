@@ -1,0 +1,117 @@
+---
+number: 12
+title: "US$17,86 en dos días: probé un modelo chino por API y volví a mi setup"
+description: "Quise ver cuánto duraban US$20 de DeepSeek por API trabajando como siempre. Duraron dos días, y la nota que salió de ahí no sonaba a mí."
+pubDate: 2026-10-20
+lang: es
+category: agentes-ia
+tags: [agentes-ia, tokens, deepseek, costos, gentle-ai]
+decision:
+  context: "Quería gastar menos tokens y probar pi con el ecosistema de Gentleman. El experimento: cargar US$20 en la API de DeepSeek y ver cuánto duraban con mi trabajo normal en este repo."
+  decision: "Cambié Claude Code por pi + gentle-ai con deepseek-v4-pro, sin borrar nada del setup anterior. Al ver el gasto volví a Claude Code y dejé fuera Caveman y RTK, porque gentle-ai ya compacta a su manera."
+  outcome: "En dos días: US$17,86, 483,5 millones de tokens y 1.178 peticiones, a cambio de 44 commits y dos releases. La nota 011 salió con voz de asistente y hubo que corregirla. Los US$2,14 restantes siguen sin usar."
+---
+
+import Fix from '@/features/notes/components/Fix.astro';
+import Ink from '@/shared/ui/Ink.astro';
+
+Pago US$20 al mes por Claude Pro, y con eso armé el setup que conté en [la nota 002](/notes/agentic-dev-setup/). Un día quise saber otra cosa: cuánto duran US$20 cuando no son una suscripción, sino saldo de API que se descuenta token a token.
+
+Cargué los US$20 en la API de DeepSeek, un modelo chino que cobra muy poco por token, y trabajé como trabajo siempre, con las tareas de siempre. Spoiler: no duraron ni cuatro días. En dos había gastado US$17,86.
+
+## Por qué quise salir de mi setup
+
+Tenía dos motivos.
+
+El primero era el ahorro de tokens. En [la nota 007](/notes/ahorrar-tokens/) conté cómo los persigo: lo que el agente dice, lo que lee de la terminal y cuántas veces vuelve a preguntar. Un modelo con un precio por token tan bajo parecía la forma más directa de pagar menos por el mismo trabajo.
+
+El segundo era la curiosidad. Quería probar **pi**, un agente de terminal, junto con todo el ecosistema de Gentleman (gentle-ai). Promete cosas que me interesan, como optimización de tokens y buen rendimiento, y quería verlas sobre mi propio repo.
+
+El experimento quedó así:
+
+```txt title="el experimento"
+antes (hasta el 15 de octubre)       durante (15 al 17 de octubre)
+──────────────────────────────       ─────────────────────────────
+Claude Code (Pro, US$20 al mes)      pi + gentle-ai
+  decide y revisa                      decide, delega y revisa
+OpenCode + modelos gratuitos         deepseek-v4-pro por API
+  teclea lo delegado                   cobra cada token
+Caveman + RTK                        compactación de gentle-ai
+  ahorran tokens
+```
+
+Cambiar costó poco porque el repo no depende de la herramienta. Las convenciones viven en `CLAUDE.md`, y para que pi las leyera convertí `AGENTS.md` en un puente que apunta ahí. El cambio fue un commit de documentación de 3 archivos, y no borré nada del setup anterior. Esa decisión, la de no borrar, fue la que después hizo barata la vuelta.
+
+## Lo que pagaron esos dos días
+
+Así quedó el panel de uso de DeepSeek después del experimento:
+
+![Panel de uso de la plataforma de DeepSeek con el filtro de los últimos 30 días: costo de 17,86 dólares, 1.178 peticiones a la API y 483.518.442 tokens. El gráfico de costo por día tiene solo dos barras, juntas, a mediados de octubre; la etiqueta de la más alta dice 16 de octubre de 2026, deepseek-v4-pro, 12,91 dólares.](./panel-deepseek.png)
+
+Yo recordaba <Fix wrong="unos 16 millones de tokens" right="483.518.442 tokens" />. Me equivoqué por un factor de 30, y esa diferencia es justamente de lo que trata esta nota.
+
+Leído en simple:
+
+- **US$17,86 en total, US$12,91 en un solo día.** El 16 de octubre, el día del release, se fueron casi tres cuartas partes del gasto. La otra barra, justo antes, suma los US$4,95 restantes.
+- **1.178 peticiones, unos 410.000 tokens cada una en promedio.** Es una división (483,5 millones entre 1.178), no una medición por petición. El panel no separa entrada, salida y caché, así que el promedio mezcla todo.
+- **Unos 3,7 centavos de dólar por millón de tokens.** El precio por token sí era bajo; lo que pesó fue el volumen.
+
+Mi lectura, sin ese desglose: cada petición de un agente vuelve a mandar el contexto completo, así que el contador cuenta la misma conversación una y otra vez. En la 007 escribí que cada petición ya cargaba 45.000 a 50.000 tokens antes de empezar. Con suscripción, ese volumen solo se nota cuando llegas al límite. Por API, cada vuelta se cobra.
+
+> El precio por token decide poco. Lo que decide es cuántos tokens quema el flujo, y un agente quema muchos.
+
+### Lo que salió del otro lado
+
+Para ser justo con el experimento, los US$17,86 sí compraron trabajo. Entre el commit del cambio, el 15 de octubre a las 19:23, y la publicación de la nota 011, el 17 a las 00:47, el historial tiene:
+
+- **44 commits**: 11 `feat`, 4 `fix`, 15 `docs`, 7 `chore`, 4 `test`, 1 `perf`, 1 `ci` y 1 `revert`.
+- **175 archivos tocados**, con 2.702 líneas agregadas y 950 borradas.
+- **Releases a producción el 16 y el 17.** El del 16 incluyó las páginas de caso de los experimentos, el sitio instalable como app, los aportes por puesto en la línea de tiempo de `/me` y la política de reintentos de las pruebas inestables del CI. El del 17 publicó la nota 011.
+
+No fue tiempo perdido. Era mi trabajo de siempre, y por eso fue un golpe duro: con mi forma normal de trabajar, US$20 no llegaban ni a cuatro días.
+
+## Lo que se rompió: una nota que no sonaba a mí
+
+La nota 011, [la de React a Preact](/notes/de-react-a-preact/), se escribió en esos dos días. Por más instrucciones que le di sobre mi voz, la seguía leyendo como escrita por una IA. El tono y la forma de redactar no eran los míos.
+
+No era solo una impresión. La corrección que entró ese mismo 17 de octubre dejó registrado lo que había:
+
+- La nota hablaba con la voz de un asistente, no con la mía.
+- Tenía un diálogo entre el asistente y yo que nunca existió.
+- Cerraba con una pregunta genérica, de plantilla.
+- Algunas cifras estaban fuera de su alcance: datos históricos de la página entera presentados como si fueran solo de la isla, y una comparación con "la mitad" del presupuesto que no daba (16,63 de 30 KiB es el 55 %, no menos de la mitad).
+
+Lo que me llevo no es "este modelo escribe mal". Es que <Ink>un build verde no dice nada de quién narra</Ink>. El build validó el frontmatter, los enlaces y los presupuestos, y la nota llegó a producción. Ninguna de esas comprobaciones pregunta si el "yo" del texto soy yo.
+
+Por eso ahora la guía de notas del repo tiene una revisión editorial obligatoria antes de publicar: leer la nota completa preguntando quién es "yo" en cada párrafo, contrastar cada cifra con su fuente y no inventar conversaciones ni vivencias para hacerla más atractiva.
+
+## Lo que me gustó: verlo todo, también cómo se iba el saldo
+
+Del experimento no me quedé solo con lo malo. Lo que más me gustó de pi fue la interfaz: te muestra todo a la vista. El razonamiento, qué plugins y qué skills usa, el consumo y el contexto.
+
+Lo curioso es que esa transparencia no me salvó. Veía el consumo, y aun así el saldo se fue en dos días. Ver el gasto no lo frena si el flujo está pensado para gastar.
+
+Mi sensación, que no es una medición, es que el ecosistema está más enfocado en suscripciones grandes, de más de US$100 al mes, con los modelos top de Anthropic y OpenAI. Mi lectura de por qué: con una tarifa plana, 400.000 tokens por petición son una forma de trabajar; pagando por token, son una factura. Y yo trabajo con una suscripción de US$20.
+
+Tampoco quiero sacar más conclusiones de las que el experimento da. Fueron dos días, con un modelo y con mi forma de trabajar. No es un veredicto sobre DeepSeek ni sobre pi, y otra persona, con otro flujo, puede llegar a otro número.
+
+## Volver y ajustar
+
+El 18 de octubre volví a Claude Code. Como no había borrado nada, la vuelta fue otro commit de documentación de 3 archivos, y el setup quedó un poco distinto del que conté en la 002:
+
+```txt title="el setup después de volver"
+Claude Code (Sonnet)          decide y revisa; el contexto se limita
+                              con una ventana de auto-compact
+OpenCode + modelos gratuitos  lo delegado de nivel 1 y 2,
+  vía herdr + OmniRoute       igual que antes
+gentle-ai                     se queda
+Caveman y RTK                 fuera
+```
+
+Lo que cambió respecto a la 007 es que Caveman y RTK ya no están activos. Les quité los hooks de la configuración global de Claude Code. Si no recuerdo mal, el motivo fue que gentle-ai ya hace eso a su manera. Los archivos de configuración siguen en el repo, inertes, por si algún día vuelvo a ellos.
+
+Los US$2,14 que sobraron siguen en la cuenta de DeepSeek. No los usé: preferí volver a mi setup, ajustarlo, y aquí sigo.
+
+## Si pagas tus agentes por API
+
+Si trabajas con agentes pagando por API, me gustaría saber cuánto te dura el saldo con tu forma normal de trabajar y qué hiciste para que dure más. Cuéntamelo en los comentarios.
