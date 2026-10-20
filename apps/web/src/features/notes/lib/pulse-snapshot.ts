@@ -6,14 +6,16 @@ import type { PulseSignals } from './pulse.ts';
  * "most active" block renders nothing, not even its CSS, which is what a fork without marks gets.
  */
 export const PULSE_SNAPSHOT: Readonly<Record<string, PulseSignals>> = {
-  'agentic-dev-setup': { marks: 10 },
-  'ahorrar-tokens': { marks: 1 },
-  'como-construi-este-sitio': { marks: 4 },
-  'cuando-la-documentacion-se-queda-atras': { marks: 1 },
-  'de-react-a-preact': { marks: 5 },
+  'agentic-dev-setup': { marks: 10, reads: 160 },
+  'ahorrar-tokens': { marks: 1, reads: 40 },
+  'como-construi-este-sitio': { marks: 4, reads: 80 },
+  'cuando-la-documentacion-se-queda-atras': { marks: 1, reads: 20 },
+  'de-react-a-preact': { marks: 5, reads: 20 },
+  'el-lcp-se-pierde-en-el-head': { reads: 20 },
   home: { marks: 49 },
-  'la-lista-de-suscriptores-es-mia': { marks: 3 },
-  'publicar-una-nota-ya-no-cuesta-un-ci-completo': { marks: 1 },
-  'un-changelog-para-visitantes-sin-semver': { marks: 2 },
-  'vibe-coding-o-especificar-primero': { marks: 8 },
+  'la-lista-de-suscriptores-es-mia': { marks: 4, reads: 30 },
+  'publicar-una-nota-ya-no-cuesta-un-ci-completo': { marks: 1, reads: 40 },
+  'un-changelog-para-visitantes-sin-semver': { marks: 2, reads: 40 },
+  'verificar-solo-lo-que-toca': { reads: 20 },
+  'vibe-coding-o-especificar-primero': { marks: 8, reads: 160 },
 };

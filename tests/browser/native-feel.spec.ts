@@ -19,12 +19,16 @@ const themeColors = (page: import('@playwright/test').Page) =>
     ),
   );
 
-test('the viewport meta opts into the full screen so safe-area insets apply', async ({ page }) => {
+test('the viewport meta does not opt into the full screen, so in-app browsers reserve no top gap', async ({
+  page,
+}) => {
   await page.goto('/');
-  await expect(page.locator('meta[name="viewport"]')).toHaveAttribute(
-    'content',
-    /viewport-fit=cover/,
-  );
+  const content = await page.locator('meta[name="viewport"]').getAttribute('content');
+  expect(content).not.toContain('viewport-fit');
+  const padding = await page
+    .locator('[data-navbar]')
+    .evaluate((nav) => getComputedStyle(nav).paddingTop);
+  expect(padding).toBe('0px');
 });
 
 test('the page does not chain scroll or flash a tap highlight', async ({ page }) => {

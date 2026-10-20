@@ -1155,5 +1155,17 @@
     "category": "changed",
     "title": "Leaving a footprint on a young note now says thanks",
     "description": "On a note with fewer than five footprints, the line next to the button kept saying \"be the first\" even right after you left yours. It now thanks you instead, without revealing the total, so a brand-new note still never shows a lonely \"1 mark\"."
+  },
+  "in-app-browser-top-gap": {
+    "date": "2026-10-20",
+    "category": "fixed",
+    "title": "No more empty strip above the header in in-app browsers",
+    "description": "Opening the site from Facebook, Instagram or TikTok left a blank band between the app's own toolbar and the site header. The page no longer asks the browser to draw edge to edge, so those apps place it right under their toolbar."
+  },
+  "notes-most-active-reads": {
+    "date": "2026-10-20",
+    "category": "changed",
+    "title": "The most-active list now counts views, not only footprints",
+    "description": "The ranking in the sidebar of /notes/ adds 30 days of page views from Web Analytics to the footprints, so a note people read but rarely mark still shows up. Views are sampled estimates, and the numbers stay frozen at build time."
   }
 }

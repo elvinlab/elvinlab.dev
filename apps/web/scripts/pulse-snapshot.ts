@@ -4,16 +4,23 @@ import { resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 /**
- * Pulse snapshot (`pnpm pulse:snapshot [--dry-run]`): at release time, reads the footprint totals
- * from the production D1 (one read-only SELECT through the logged-in `wrangler`) and rewrites
- * `pulse-snapshot.ts`, which the "most active" block of `/notes/` reads at build time. Run it before
- * the release build and commit the result. Notes without footprints are left out.
+ * Pulse snapshot (`pnpm pulse:snapshot [--dry-run] [--marks-only] [--account <id>] [--site-tag <tag>]`): at release
+ * time, reads the footprint totals from the production D1 (one read-only SELECT through the
+ * logged-in `wrangler`) and the page views of the last 30 days from Cloudflare Web Analytics (one
+ * read-only GraphQL query with `CLOUDFLARE_ANALYTICS_TOKEN`, an `Account Analytics: Read` token, for the account of `--account` or `CLOUDFLARE_ACCOUNT_ID`), and
+ * rewrites `pulse-snapshot.ts`, which the "most active" block of `/notes/` reads at build time. Run
+ * it before the release build and commit the result. Views are estimates: Cloudflare samples them.
+ * Without the token the run stops instead of dropping the views; `--marks-only` opts out on purpose.
  */
 
 const FILE = 'apps/web/src/features/notes/lib/pulse-snapshot.ts';
 const QUERY = 'SELECT slug, total FROM note_footprints WHERE total > 0 ORDER BY slug';
+const GRAPHQL = 'https://api.cloudflare.com/client/v4/graphql';
+const DAYS = 30;
+const NOTE_PATH = /^\/(?:en\/)?notes\/([^/]+)\/?$/;
 
 export type FootprintRow = { slug: string; total: number };
+export type Reads = Readonly<Record<string, number>>;
 
 /** The `rows` of `wrangler d1 execute --json`; anything else throws, so a failed read never wipes the file. */
 export function parseRows(output: string): FootprintRow[] {
@@ -33,12 +40,50 @@ export function parseRows(output: string): FootprintRow[] {
 /** Biome formats a property bare when it is a plain identifier, so the generated file must too. */
 const key = (slug: string): string => (/^[A-Za-z_$][\w$]*$/.test(slug) ? slug : `'${slug}'`);
 
-/** The source of `pulse-snapshot.ts` for these rows, sorted by slug so reruns diff cleanly. */
-export function renderSnapshot(rows: readonly FootprintRow[]): string {
-  const body = [...rows]
-    .filter((row) => row.total > 0)
-    .sort((a, b) => a.slug.localeCompare(b.slug))
-    .map((row) => `  ${key(row.slug)}: { marks: ${row.total} },\n`)
+type Group = { count: number; dimensions: { siteTag: string; requestPath: string } };
+
+/**
+ * Page views per note slug from the `data` of a Web Analytics GraphQL answer. The English path
+ * counts for the same slug. Throws on GraphQL errors, and when the account holds several sites and
+ * none was named, so a wrong site is never summed in silently.
+ */
+export function parseReads(body: unknown, siteTag?: string): Reads {
+  const answer = body as {
+    errors?: { message?: string }[] | null;
+    data?: { viewer?: { accounts?: { rumPageloadEventsAdaptiveGroups?: Group[] }[] } };
+  };
+  if (answer.errors?.length) {
+    throw new Error(`the Analytics query failed: ${answer.errors[0]?.message ?? 'unknown error'}`);
+  }
+  const groups = answer.data?.viewer?.accounts?.[0]?.rumPageloadEventsAdaptiveGroups;
+  if (!Array.isArray(groups)) throw new Error('the Analytics answer has no page-load groups');
+  const tags = new Set(groups.map((group) => group.dimensions.siteTag));
+  if (siteTag === undefined && tags.size > 1) {
+    throw new Error(`the account has ${tags.size} sites; pass --site-tag <tag> to pick one`);
+  }
+  const reads: Record<string, number> = {};
+  for (const group of groups) {
+    if (siteTag !== undefined && group.dimensions.siteTag !== siteTag) continue;
+    const slug = NOTE_PATH.exec(group.dimensions.requestPath)?.[1];
+    if (slug !== undefined) reads[slug] = (reads[slug] ?? 0) + group.count;
+  }
+  return reads;
+}
+
+/** The source of `pulse-snapshot.ts`, sorted by slug so reruns diff cleanly. */
+export function renderSnapshot(rows: readonly FootprintRow[], reads: Reads = {}): string {
+  const marks = new Map(rows.map((row) => [row.slug, row.total]));
+  const slugs = [...new Set([...marks.keys(), ...Object.keys(reads)])].sort((a, b) =>
+    a.localeCompare(b),
+  );
+  const body = slugs
+    .map((slug) => {
+      const parts = [
+        (marks.get(slug) ?? 0) > 0 ? `marks: ${marks.get(slug)}` : '',
+        (reads[slug] ?? 0) > 0 ? `reads: ${reads[slug]}` : '',
+      ].filter(Boolean);
+      return parts.length === 0 ? '' : `  ${key(slug)}: { ${parts.join(', ')} },\n`;
+    })
     .join('');
   return `import type { PulseSignals } from './pulse.ts';
 
@@ -50,7 +95,32 @@ export function renderSnapshot(rows: readonly FootprintRow[]): string {
 export const PULSE_SNAPSHOT: Readonly<Record<string, PulseSignals>> = {${body === '' ? '};\n' : `\n${body}};\n`}`;
 }
 
-function run(root: string, argv: readonly string[]): void {
+async function fetchReads(
+  token: string,
+  account: string,
+  siteTag: string | undefined,
+): Promise<Reads> {
+  const post = async (query: string, variables: object): Promise<unknown> => {
+    const response = await fetch(GRAPHQL, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ query, variables }),
+    });
+    if (!response.ok) throw new Error(`Cloudflare answered ${response.status}`);
+    return response.json();
+  };
+  const to = new Date();
+  const from = new Date(to.getTime() - DAYS * 86_400_000);
+  const body = await post(
+    `query ($a: String!, $from: Time!, $to: Time!) { viewer { accounts(filter: { accountTag: $a }) {
+      rumPageloadEventsAdaptiveGroups(limit: 1000, filter: { datetime_geq: $from, datetime_leq: $to, bot: 0 }, orderBy: [count_DESC]) {
+        count dimensions { siteTag requestPath } } } } }`,
+    { a: account, from: from.toISOString(), to: to.toISOString() },
+  );
+  return parseReads(body, siteTag);
+}
+
+async function run(root: string, argv: readonly string[]): Promise<void> {
   const output = execFileSync(
     'pnpm',
     [
@@ -68,7 +138,23 @@ function run(root: string, argv: readonly string[]): void {
     ],
     { cwd: root, encoding: 'utf8' },
   );
-  const source = renderSnapshot(parseRows(output));
+  const at = argv.indexOf('--site-tag');
+  const token = process.env['CLOUDFLARE_ANALYTICS_TOKEN'];
+  if (token === undefined && !argv.includes('--marks-only')) {
+    throw new Error('CLOUDFLARE_ANALYTICS_TOKEN is not set; export it or pass --marks-only');
+  }
+  const flag = argv.indexOf('--account');
+  const account = flag === -1 ? process.env['CLOUDFLARE_ACCOUNT_ID'] : argv[flag + 1];
+  if (token !== undefined && !account) {
+    throw new Error(
+      'the Cloudflare account id is missing; pass --account <id> or set CLOUDFLARE_ACCOUNT_ID',
+    );
+  }
+  const reads =
+    token === undefined || !account
+      ? {}
+      : await fetchReads(token, account, at === -1 ? undefined : argv[at + 1]);
+  const source = renderSnapshot(parseRows(output), reads);
   if (argv.includes('--dry-run')) {
     console.log(source);
     return;
@@ -78,5 +164,8 @@ function run(root: string, argv: readonly string[]): void {
 }
 
 if (process.argv[1] && resolve(process.argv[1]) === resolve(fileURLToPath(import.meta.url))) {
-  run(resolve(import.meta.dirname, '../../..'), process.argv.slice(2));
+  run(resolve(import.meta.dirname, '../../..'), process.argv.slice(2)).catch((error: unknown) => {
+    console.error(error instanceof Error ? error.message : error);
+    process.exitCode = 1;
+  });
 }
