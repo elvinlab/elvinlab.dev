@@ -137,8 +137,17 @@ export const ENV_VARS: readonly EnvVar[] = [
     secret: false,
     required: true,
     description:
-      'Cloudflare account id the deploy job targets. Not a secret, but not needed anywhere else.',
-    setIn: 'GitHub repository variable',
+      'Cloudflare account id the deploy job targets. Not a secret. `pnpm pulse:snapshot` also reads it locally (instead of `--account`) to query Web Analytics.',
+    setIn: 'GitHub repository variable; the shell for `pnpm pulse:snapshot`',
+  },
+  {
+    name: 'CLOUDFLARE_ANALYTICS_TOKEN',
+    scope: 'local',
+    secret: true,
+    required: false,
+    description:
+      'Cloudflare API token with only `Account Analytics: Read`, used by `pnpm pulse:snapshot` to read 30 days of page views for the "most active" list. Without it the command stops unless you pass `--marks-only`.',
+    setIn: 'the shell (for example `~/.profile`), never a tracked file',
   },
   {
     name: 'DEV_CHECK_STRIP_DEPS',

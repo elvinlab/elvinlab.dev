@@ -29,7 +29,7 @@ mise exec -- pnpm check:dev-cold-start # cold `astro dev` in an isolated workspa
 mise exec -- pnpm changelog:audit   # feat/fix/perf commits since the last release that have no changelog entry
 mise exec -- pnpm changelog:stamp   # date the unreleased entries with the release day (--date, --dry-run)
 mise exec -- pnpm publish-note <slug>  # publish a drafted note end to end: move, date, changelog, build, commit, push, release to main (--dry-run, --no-release); notes-only pushes take the CI fast lane (ADR 0016)
-mise exec -- pnpm pulse:snapshot # refresh the "most active" list of /notes/ from the production footprint counts (read-only D1 SELECT via wrangler; run before a release, commit the result; --dry-run prints it)
+mise exec -- pnpm pulse:snapshot --account <id> # refresh the "most active" list of /notes/ from the production footprint counts (read-only D1 SELECT via wrangler) and 30 days of page views (read-only Web Analytics GraphQL query with `CLOUDFLARE_ANALYTICS_TOKEN`, an `Account Analytics: Read` token kept in the shell, never in the repo; `CLOUDFLARE_ACCOUNT_ID` replaces --account); run before a release, commit the result; --dry-run prints it, --marks-only skips the views
 mise exec -- pnpm docs:config      # regenerate the tables of docs/CONFIGURATION*.md and docs/NOTES*.md and the .env/.dev.vars examples
 
 mise exec -- pnpm --filter web dev          # Astro dev server (workerd runtime)
