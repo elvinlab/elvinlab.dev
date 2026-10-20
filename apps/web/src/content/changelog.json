@@ -1191,5 +1191,11 @@
     "category": "added",
     "title": "A script builds and deploys a generic demo of the theme",
     "description": "pnpm demo:deploy builds the site with a fictional author, three sample notes and no secrets, checks that no owner string leaks, and with --deploy publishes it to its own Worker (demo/wrangler.jsonc)."
+  },
+  "demo-content": {
+    "date": "2026-10-20",
+    "category": "changed",
+    "title": "The demo site shows a fictional author with every section",
+    "description": "The generic demo now ships invented experience, projects, credentials and changelog, so the nav shows every section, and white-label and demo builds reject the owner's employers and schools."
   }
 }

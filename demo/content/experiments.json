@@ -1,0 +1,91 @@
+{
+  "lab-notes": {
+    "title": "Lab Notes",
+    "description": {
+      "es": "Un blog bilingüe con identidad reemplazable y controles de calidad.",
+      "en": "A bilingual blog with a replaceable identity and quality controls."
+    },
+    "subtitle": {
+      "es": "Blog y portafolio configurable",
+      "en": "A configurable blog and portfolio"
+    },
+    "problem": {
+      "es": "Publicar notas con un perfil profesional sin pelear con la plantilla.",
+      "en": "Publish notes next to a professional profile without fighting the template."
+    },
+    "contribution": {
+      "es": "Diseño, construcción y publicación completos.",
+      "en": "Design, build and publishing, end to end."
+    },
+    "result": {
+      "es": "Un sitio rápido que cualquiera puede adoptar cambiando solo configuración.",
+      "en": "A fast site anyone can adopt by changing only configuration."
+    },
+    "decisions": [
+      {
+        "es": "Configuración y contenido separados del diseño.",
+        "en": "Configuration and content kept apart from the design."
+      },
+      {
+        "es": "Presupuesto de JavaScript por página.",
+        "en": "A JavaScript budget per page."
+      }
+    ],
+    "tech": ["Astro", "TypeScript", "Tailwind CSS", "Cloudflare Workers"],
+    "tags": ["astro", "typescript"],
+    "year": 2026,
+    "publishedAt": "2026-03-01",
+    "status": "running",
+    "note": "why-i-deleted-the-wrapper",
+    "featured": true,
+    "order": 0
+  },
+  "queue-lens": {
+    "title": "Queue Lens",
+    "description": {
+      "es": "Una herramienta de línea de comandos para inspeccionar colas de trabajo.",
+      "en": "A command-line tool to inspect job queues."
+    },
+    "problem": {
+      "es": "Depurar colas atascadas exigía leer logs a mano.",
+      "en": "Debugging stuck queues meant reading logs by hand."
+    },
+    "contribution": {
+      "es": "Diseñé la interfaz de línea de comandos y el formato de salida.",
+      "en": "Designed the command-line interface and the output format."
+    },
+    "result": {
+      "es": "Los atascos se diagnostican en minutos, no en horas.",
+      "en": "Stuck queues are diagnosed in minutes, not hours."
+    },
+    "tech": ["Node.js", "TypeScript"],
+    "tags": ["cli", "node"],
+    "year": 2025,
+    "publishedAt": "2025-06-12",
+    "status": "shipped",
+    "repo": "https://github.com/janedoe/queue-lens",
+    "order": 10
+  },
+  "seed-garden": {
+    "title": "Seed Garden",
+    "description": {
+      "es": "Un experimento visual con generación de patrones en el navegador.",
+      "en": "A visual experiment with pattern generation in the browser."
+    },
+    "learned": [
+      {
+        "es": "Mover cálculo fuera del hilo principal mantiene la interfaz fluida.",
+        "en": "Moving computation off the main thread keeps the interface smooth."
+      }
+    ],
+    "different": {
+      "es": "Empezaría con un presupuesto de rendimiento desde el primer día.",
+      "en": "I would start with a performance budget on day one."
+    },
+    "tech": ["Canvas", "TypeScript"],
+    "tags": ["canvas", "experiment"],
+    "year": 2024,
+    "status": "archived",
+    "order": 20
+  }
+}

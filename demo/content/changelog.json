@@ -1,0 +1,26 @@
+{
+  "launch": {
+    "date": "2026-09-01",
+    "category": "added",
+    "title": "The site goes live",
+    "description": "First release: home, notes, profile and an RSS feed, in English and Spanish."
+  },
+  "reading-mode": {
+    "date": "2026-09-15",
+    "category": "added",
+    "title": "A reading mode for notes",
+    "description": "A distraction-free layout with a progress bar, switchable from any note."
+  },
+  "faster-notes": {
+    "date": "2026-10-01",
+    "category": "changed",
+    "title": "Notes load faster",
+    "description": "Code blocks load their stylesheet after the first paint, so the text shows up sooner."
+  },
+  "dark-contrast": {
+    "date": "2026-10-12",
+    "category": "fixed",
+    "title": "Better contrast in the dark theme",
+    "description": "Secondary text now meets the contrast guidelines on every page."
+  }
+}

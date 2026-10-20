@@ -1,0 +1,71 @@
+{
+  "fernwood": {
+    "role": {
+      "es": "Ingeniera de software senior",
+      "en": "Senior Software Engineer"
+    },
+    "company": "Fernwood Systems",
+    "start": 2023,
+    "location": {
+      "es": "Remoto",
+      "en": "Remote"
+    },
+    "summary": {
+      "es": "Dueña técnica de la plataforma de reservas: APIs en TypeScript, base de datos PostgreSQL y una interfaz React usada por miles de personas.",
+      "en": "Technical owner of the booking platform: TypeScript APIs, a PostgreSQL database and a React interface used by thousands of people."
+    },
+    "contributions": [
+      {
+        "es": "Rediseñé el modelo de datos de reservas y eliminé una clase entera de errores de doble reserva.",
+        "en": "Redesigned the booking data model and removed a whole class of double-booking bugs."
+      },
+      {
+        "es": "Introduje revisiones de diseño por escrito para cambios de arquitectura.",
+        "en": "Introduced written design reviews for architecture changes."
+      }
+    ],
+    "tags": ["typescript", "react", "postgresql"]
+  },
+  "brightline": {
+    "role": {
+      "es": "Ingeniera full-stack",
+      "en": "Full-stack Engineer"
+    },
+    "company": "Brightline Labs",
+    "start": 2021,
+    "end": 2023,
+    "location": {
+      "es": "Lisboa",
+      "en": "Lisbon"
+    },
+    "summary": {
+      "es": "Construí paneles de análisis y la API que los alimenta, con foco en rendimiento y pruebas.",
+      "en": "Built analytics dashboards and the API behind them, with a focus on performance and testing."
+    },
+    "contributions": [
+      {
+        "es": "Reduje el tiempo de carga del panel principal a menos de dos segundos.",
+        "en": "Cut the main dashboard load time to under two seconds."
+      }
+    ],
+    "tags": ["node", "vue", "testing"]
+  },
+  "quill": {
+    "role": {
+      "es": "Desarrolladora web",
+      "en": "Web Developer"
+    },
+    "company": "Quill & Co",
+    "start": 2019,
+    "end": 2021,
+    "location": {
+      "es": "Lisboa",
+      "en": "Lisbon"
+    },
+    "summary": {
+      "es": "Sitios y herramientas internas para una agencia pequeña: del diseño a la entrega.",
+      "en": "Websites and internal tools for a small agency, from design to delivery."
+    },
+    "tags": ["javascript", "css"]
+  }
+}
