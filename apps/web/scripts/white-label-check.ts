@@ -11,7 +11,7 @@ import { createFixtureWorkspace } from './fixture-workspace.ts';
 
 const source = resolve(import.meta.dirname, '../../..');
 // Site-owner identity strings that white-label must remove from the output.
-const OWNER = [/elvin/i, /gonz[aá]lez/i];
+const OWNER = [/elvin/i, /gonz[aá]lez/i, /costa rica/i];
 // Design-system identifiers are intentionally kept: `@elvinlab/core` is the shared design base
 // others adopt (like a framework name), and the theme names come from its tokens.
 const DESIGN_SYSTEM = [/@elvinlab\/core/g, /elvinlab-(?:dark|light)/g];
@@ -190,7 +190,15 @@ try {
       );
     }
   }
-  const html = DESIGN_SYSTEM.reduce((acc, token) => acc.replace(token, ''), rawHtml);
+  // The web app manifest is not HTML: it is built from the config and must carry the new identity too.
+  const manifest = readFileSync(join(workspace.web, 'dist/client/manifest.webmanifest'), 'utf8');
+  if (!manifest.includes('Ingeniera de software')) {
+    fail('the manifest does not carry the alternative identity — the grep would be meaningless');
+  }
+  const html = DESIGN_SYSTEM.reduce(
+    (acc, token) => acc.replace(token, ''),
+    `${rawHtml}\n${manifest}`,
+  );
   const leaked = OWNER.filter((token) => token.test(html));
   if (leaked.length > 0) fail(`owner strings leaked into the build: ${leaked.join(', ')}`);
 

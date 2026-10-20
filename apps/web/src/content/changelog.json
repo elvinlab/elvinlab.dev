@@ -1173,5 +1173,17 @@
     "category": "changed",
     "title": "Publishing a note ends with a checklist and the guides open with a quick recipe",
     "description": "pnpm publish-note now prints the next steps with the slug filled in (follow CI, open the note, tell the list), and docs/NOTES.md and NOTES.en.md start with a six-line recipe and explain where the two to three minutes of the fast lane go."
+  },
+  "readme-refresh": {
+    "date": "2026-10-20",
+    "category": "changed",
+    "title": "The README screenshots and tooling notes match the current site",
+    "description": "The README (Spanish and English) now shows the redesigned home, a note, reading mode on a phone and the current /me share card, lists the most-active list, pnpm verify and pnpm pulse:snapshot, links the portfolio guide and the notes fast lane, describes the current toolchain, and the white-label guide now lists every author-owned file outside site.config.ts (i18n copy, manifest, wrangler, CI) and fixes its stale licence note."
+  },
+  "white-label-copy": {
+    "date": "2026-10-20",
+    "category": "changed",
+    "title": "The author card bio and the web app manifest now come from the site config",
+    "description": "The sidebar bio reads identity.bio and the manifest is generated from the title and bio, so a fork no longer ships the owner's text there. pnpm test:white-label now also scans the manifest and rejects the owner's country."
   }
 }
