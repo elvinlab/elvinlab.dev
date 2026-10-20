@@ -109,6 +109,7 @@ run('pnpm', ['changelog:audit']);
 
 if (!release) {
   console.log('Committed on develop. Push and release when you are ready (--no-release).');
+  console.log('Release steps: docs/CONFIGURATION.md, section 7.');
   process.exit(0);
 }
 
@@ -125,4 +126,12 @@ const releaseSha = out('git', [
 ]);
 run('git', ['push', 'origin', `${releaseSha}:refs/heads/main`]);
 run('git', ['fetch', 'origin', 'main']);
-console.log(`Released ${releaseSha.slice(0, 7)} to main. Follow CI: gh run watch`);
+console.log(`Released ${releaseSha.slice(0, 7)} to main.`);
+console.log(`
+Next (the notes fast lane takes about 2-3 minutes; a failed gate means no deploy):
+  1. Follow CI:   gh run watch
+  2. Open it:     /notes/${slug}/ on the live site, then check the share card and the comments
+  3. Tell the list (only if the subscription is on), once the deploy is green:
+       SUBSCRIBE_ADMIN_TOKEN=... mise exec -- pnpm notify:note ${slug}           (dry run)
+       SUBSCRIBE_ADMIN_TOKEN=... mise exec -- pnpm notify:note ${slug} --send
+Guide: docs/NOTES.md, section 9.`);

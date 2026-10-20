@@ -1167,5 +1167,11 @@
     "category": "changed",
     "title": "The most-active list now counts views, not only footprints",
     "description": "The ranking in the sidebar of /notes/ adds 30 days of page views from Web Analytics to the footprints, so a note people read but rarely mark still shows up. Views are sampled estimates, and the numbers stay frozen at build time."
+  },
+  "publish-note-checklist": {
+    "date": "2026-10-20",
+    "category": "changed",
+    "title": "Publishing a note ends with a checklist and the guides open with a quick recipe",
+    "description": "pnpm publish-note now prints the next steps with the slug filled in (follow CI, open the note, tell the list), and docs/NOTES.md and NOTES.en.md start with a six-line recipe and explain where the two to three minutes of the fast lane go."
   }
 }
