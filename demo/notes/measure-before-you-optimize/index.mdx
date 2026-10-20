@@ -1,0 +1,41 @@
+---
+number: 2
+title: "Measure before you optimize: a 40 KiB surprise"
+description: "A single date library was most of my JavaScript. I only found out after I stopped guessing and read the bundle report."
+pubDate: 2026-09-28
+lang: en
+category: decisions
+tags: [performance, tooling]
+decision:
+  context: "Pages felt slow on a mid-range phone and I suspected images."
+  decision: "Read the bundle report before touching anything and fix only what it showed."
+  outcome: "Swapping one dependency cut JavaScript from 58 KiB to 18 KiB gzip and the images were never the problem."
+---
+
+import Fix from '@/features/notes/components/Fix.astro';
+import Ink from '@/shared/ui/Ink.astro';
+
+My first instinct was to compress every image. It felt productive. It was also a guess.
+
+## The report
+
+I ran the bundler's analyzer and sorted by size. One entry stood out: a date-formatting library that I used in exactly <Ink variant="circle">one place</Ink>.
+
+I had assumed <Fix wrong="images dominate the page weight" right="one dependency was two thirds of the JavaScript" />.
+
+## The fix
+
+The platform already formats dates, so the library went away.
+
+```typescript
+const label = new Intl.DateTimeFormat('en', { dateStyle: 'long' }).format(date);
+```
+
+| | Before | After |
+| --- | --- | --- |
+| JavaScript (gzip) | 58 KiB | 18 KiB |
+| Largest paint | 2.9 s | 1.4 s |
+
+## The rule I kept
+
+Write the measurement down before the change, so the result has something honest to be compared with.

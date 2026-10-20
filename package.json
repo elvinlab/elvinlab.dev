@@ -19,6 +19,7 @@
     "new-post": "pnpm --filter web new-post",
     "publish-note": "pnpm --filter web publish-note",
     "test:white-label": "node apps/web/scripts/white-label-check.ts",
+    "demo:deploy": "node apps/web/scripts/demo-deploy.ts",
     "changelog:audit": "node apps/web/scripts/changelog-audit.ts",
     "changelog:stamp": "node apps/web/scripts/changelog-stamp.ts",
     "pulse:snapshot": "node apps/web/scripts/pulse-snapshot.ts",

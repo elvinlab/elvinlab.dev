@@ -1185,5 +1185,11 @@
     "category": "changed",
     "title": "The author card bio and the web app manifest now come from the site config",
     "description": "The sidebar bio reads identity.bio and the manifest is generated from the title and bio, so a fork no longer ships the owner's text there. pnpm test:white-label now also scans the manifest and rejects the owner's country."
+  },
+  "demo-deploy": {
+    "date": "2026-10-20",
+    "category": "added",
+    "title": "A script builds and deploys a generic demo of the theme",
+    "description": "pnpm demo:deploy builds the site with a fictional author, three sample notes and no secrets, checks that no owner string leaks, and with --deploy publishes it to its own Worker (demo/wrangler.jsonc)."
   }
 }

@@ -1,0 +1,14 @@
+// Worker config of the generic demo site. It needs no secrets, database or rate limiters because the
+// demo turns off contact, comments, footprints and subscriptions. Deployed by `pnpm demo:deploy`.
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "lab-notes-demo",
+  "main": "@astrojs/cloudflare/entrypoints/server",
+  "compatibility_date": "2026-09-25",
+  "compatibility_flags": ["nodejs_compat"],
+  "workers_dev": true,
+  "preview_urls": false,
+  "assets": {
+    "not_found_handling": "404-page"
+  }
+}

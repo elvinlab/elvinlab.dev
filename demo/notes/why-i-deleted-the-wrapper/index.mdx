@@ -1,0 +1,35 @@
+---
+number: 3
+title: "Why I deleted my own wrapper"
+description: "I built a tidy abstraction over a fetch call. Six months later it was the thing every bug passed through."
+pubDate: 2026-10-06
+lang: en
+category: decisions
+tags: [architecture, refactoring]
+decision:
+  context: "A small HTTP wrapper had grown options for retries, caching and logging that only one caller used."
+  decision: "Delete the wrapper and call the platform API directly, keeping retries only where they are needed."
+  outcome: "120 fewer lines, one less layer to debug and the two callers that needed retries now say so explicitly."
+---
+
+import Fix from '@/features/notes/components/Fix.astro';
+import Ink from '@/shared/ui/Ink.astro';
+
+The wrapper began as five lines. Six months later it had nine options and a README.
+
+## How it grew
+
+Every new caller asked for one small thing, and each ask was reasonable on its own. Nobody asked whether the layer still earned its place. I told myself <Fix wrong="it keeps the calls consistent" right="it hides what each call really does" />.
+
+## The deletion
+
+I removed it in one commit and let the type checker show me every caller.
+
+```diff
+- const user = await http.get('/user', { retries: 3, cache: 'short' });
++ const user = await fetch('/user').then((response) => response.json());
+```
+
+Two callers really needed retries. They now carry their own, and it is visible at the call site.
+
+> Abstractions should be earned by repetition, not by optimism.

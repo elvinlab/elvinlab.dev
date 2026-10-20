@@ -1,0 +1,45 @@
+---
+number: 1
+title: "Choosing a database for a site with one table"
+description: "I almost reached for Postgres. A single SQLite-compatible table did the job, cost nothing and shipped in an afternoon."
+pubDate: 2026-09-14
+lang: en
+category: decisions
+tags: [architecture, databases]
+decision:
+  context: "The site needed to count reactions per page. One table, a few writes a minute, no relations."
+  decision: "Use the platform's built-in SQLite-compatible database instead of a managed Postgres instance."
+  outcome: "No new service to operate, no connection pool to tune and a monthly bill of zero."
+---
+
+import Fix from '@/features/notes/components/Fix.astro';
+import Ink from '@/shared/ui/Ink.astro';
+
+I started this feature by opening a pricing page, which is usually a sign I am solving the wrong problem.
+
+The requirement was small: <Ink>count reactions per page</Ink> and show the total. One table, a handful of writes a minute, no joins.
+
+## What I almost did
+
+My reflex was a managed Postgres instance. It is the tool I know best, so it felt safe. Then I wrote down what I would have to run: a connection pool, a migration tool, a backup policy and a second secret to rotate.
+
+I had planned for <Fix wrong="a database that scales to millions of rows" right="a table that will hold a few thousand rows for years" /> and that gap was the whole story.
+
+## What I did instead
+
+The platform already ships a SQLite-compatible database that lives next to the code. The schema is eight lines.
+
+```sql
+CREATE TABLE reactions (
+  page TEXT NOT NULL,
+  kind TEXT NOT NULL,
+  total INTEGER NOT NULL DEFAULT 0,
+  PRIMARY KEY (page, kind)
+);
+```
+
+> A boring database you do not have to operate beats a clever one you do.
+
+## What I would revisit
+
+If the product ever needs reporting across pages and users, this is the decision to reopen. Until then it stays.
