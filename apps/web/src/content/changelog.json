@@ -1143,5 +1143,11 @@
     "category": "changed",
     "title": "Notes with code blocks paint sooner",
     "description": "The stylesheet of the code blocks no longer blocks the first paint of a note: it loads right after, with a no-script fallback, so the title shows earlier and the code frames still arrive styled."
+  },
+  "notes-most-active": {
+    "date": "2026-10-20",
+    "category": "added",
+    "title": "The notes index shows which notes are most active",
+    "description": "A short ranked list in the sidebar of /notes/ points to the five notes with the most footprints, so a first-time reader can see where other people stopped. It is frozen at build time, so it adds no request and no script. Forks that keep the snapshot empty see nothing, and `pnpm pulse:snapshot` refreshes it from the footprint counts before a release."
   }
 }
