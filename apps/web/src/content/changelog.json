@@ -1197,5 +1197,11 @@
     "category": "changed",
     "title": "The demo site shows a fictional author with every section",
     "description": "The generic demo now ships invented experience, projects, credentials and changelog, so the nav shows every section, and white-label and demo builds reject the owner's employers and schools."
+  },
+  "note-012": {
+    "date": "2026-10-20",
+    "category": "added",
+    "title": "New Lab Note 012: US$17,86 en dos días: probé un modelo chino por API y volví a mi setup",
+    "description": "Quise ver cuánto duraban US$20 de DeepSeek por API trabajando como siempre. Duraron dos días, y la nota que salió de ahí no sonaba a mí."
   }
 }
