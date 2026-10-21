@@ -1201,7 +1201,7 @@
   "note-012": {
     "date": "2026-10-20",
     "category": "added",
-    "title": "New Lab Note 012: US$17,86 en dos días: probé un modelo chino por API y volví a mi setup",
+    "title": "New Lab Note 012: US$17,86 en dos días: probé DeepSeek por API y volví a mi setup",
     "description": "Quise ver cuánto duraban US$20 de DeepSeek por API trabajando como siempre. Duraron dos días, y la nota que salió de ahí no sonaba a mí."
   },
   "note-012-balance": {
@@ -1209,5 +1209,11 @@
     "category": "fixed",
     "title": "Note 012 shows the real remaining balance and a clearer usage capture",
     "description": "The remaining DeepSeek balance now reads US$2,13, as the panel shows, and the screenshot is a wider desktop capture where both daily bars are visible."
+  },
+  "note-012-title": {
+    "date": "2026-10-20",
+    "category": "changed",
+    "title": "Note 012 names DeepSeek in its title",
+    "description": "The title now says which model was tested instead of describing it by origin, which is clearer and easier to find."
   }
 }
