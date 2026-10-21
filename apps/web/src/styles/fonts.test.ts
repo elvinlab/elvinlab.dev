@@ -43,12 +43,15 @@ describe('fonts.css', () => {
     }
   });
 
-  it('declares one metric-matched local fallback for Plex Sans, with no download', () => {
-    expect(fallbacks.map(family)).toEqual(['IBM Plex Sans Fallback']);
-    const [rule = ''] = fallbacks;
-    expect(rule).toMatch(/src:\s*local\(/);
-    expect(rule).toMatch(/size-adjust:\s*102%/);
-    expect(rule).toMatch(/ascent-override:\s*100\.49%/);
-    expect(rule).toMatch(/descent-override:\s*26\.96%/);
+  it('declares metric-matched local fallbacks for Plex Sans and Press Start 2P, with no download', () => {
+    expect(fallbacks.map(family)).toEqual(['IBM Plex Sans Fallback', 'Press Start 2P Fallback']);
+    const [plex = '', retro = ''] = fallbacks;
+    for (const rule of fallbacks) expect(rule).toMatch(/src:\s*local\(/);
+    expect(plex).toMatch(/size-adjust:\s*102%/);
+    expect(plex).toMatch(/ascent-override:\s*100\.49%/);
+    expect(plex).toMatch(/descent-override:\s*26\.96%/);
+    expect(retro).toMatch(/size-adjust:\s*166\.67%/);
+    expect(retro).toMatch(/ascent-override:\s*60%/);
+    expect(retro).toMatch(/descent-override:\s*0%/);
   });
 });

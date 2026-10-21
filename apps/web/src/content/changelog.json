@@ -1227,5 +1227,11 @@
     "category": "fixed",
     "title": "Link previews pick up a note's new title",
     "description": "A note's share image URL now carries a version key built from its number and title, so WhatsApp, LinkedIn and X fetch the new card after a title change instead of reusing the cached one."
+  },
+  "pixel-signature-fallback": {
+    "date": "2026-10-21",
+    "category": "fixed",
+    "title": "Footer and navbar signature no longer shift when the pixel font loads",
+    "description": "The Press Start 2P signature now has a local fallback matched to its metrics, like the body text already had, so swapping in the real font moves nothing."
   }
 }

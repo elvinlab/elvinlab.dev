@@ -27,6 +27,17 @@
   descent-override: 26.96%;
 }
 
+/* Metric-matched fallback for the Press Start 2P signature, so the late swap moves nothing. The pixel face
+   advances 1 em per glyph (ascent 1.0, descent 0, no line gap); Liberation Mono (Courier New) advances
+   0.6001 em, so the factor is 1 / 0.6001 = 166.67%. Ascent 1.0 / 1.6667 -> 60%, descent 0%. */
+@font-face {
+  font-family: "Press Start 2P Fallback";
+  src: local("Liberation Mono"), local("Courier New");
+  size-adjust: 166.67%;
+  ascent-override: 60%;
+  descent-override: 0%;
+}
+
 /* ibm-plex-sans-latin-ext-wght-normal */
 @font-face {
   font-family: "IBM Plex Sans Variable";
