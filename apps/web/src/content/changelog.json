@@ -1245,5 +1245,11 @@
     "category": "changed",
     "title": "The home card now invites collaboration instead of asking if anyone is hiring",
     "description": "The card reads \"Let's talk\" with the status \"Collaborations and good talk\", so it no longer looks like a job search. The profile keeps saying that only collaborations and projects are of interest."
+  },
+  "core-stays-small-pattern-documented": {
+    "date": "2026-10-21",
+    "category": "changed",
+    "title": "The shared core package stays small, and the development pattern is written down",
+    "description": "Moving components into @elvinlab/core was tried in a spike and dropped for now (ADR 0019); the package keeps tokens, themes and i18n. A new playbook, docs/DEVELOPMENT-PATTERN.md, explains how this repository is built so a new project can start the same way."
   }
 }

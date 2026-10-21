@@ -43,3 +43,4 @@ Short (≤40 lines each).
 | [0016](./0016-publish-note-command-and-notes-fast-lane.md) | One-command note publishing and a notes-only CI fast lane | Accepted |
 | [0017](./0017-the-ci-follows-the-site-config.md) | The CI follows the site config: adopter profiles, non-blocking | Accepted |
 | [0018](./0018-noisy-gate-retry-policy.md) | Noisy gates retry once and report flakes | Accepted |
+| [0019](./0019-core-stays-tokens-themes-i18n.md) | `core` stays tokens, themes and i18n; no component extraction for now | Accepted |

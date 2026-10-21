@@ -24,7 +24,7 @@
 
 Es mi portafolio (`/me`) y mi blog (`/notes`) en un solo sitio, y el primer proyecto de la marca **elvinlab**. Cada nota cuenta **una decisión concreta**: el problema, qué probé, qué descarté y por qué, con números. Está construido para ser **rápido, accesible, honesto y fácil de operar**, y para que otra persona pueda adoptarlo cambiando solo configuración y contenido.
 
-Además es el terreno donde nace [`@elvinlab/core`](packages/core), la base de diseño (tokens, temas e i18n) que van a compartir mis próximos proyectos.
+Además aloja [`@elvinlab/core`](packages/core), la base de diseño (tokens, temas e i18n). Por ahora no crece ni sale de este repositorio: ver [ADR 0019](docs/adr/0019-core-stays-tokens-themes-i18n.md).
 
 ## Capturas
 

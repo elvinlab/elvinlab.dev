@@ -68,8 +68,8 @@ Señal de alerta: si se sigue puliendo `core`, los fondos o el tooling sin lanza
 ## Qué viene después (no ahora, no es parte de este alcance)
 
 - **Template del blog**, como subproducto: consume `core` como dependencia (nunca lo copia). Un solo template, no una colección. Sale de este mismo código una vez que ya demostró que funciona en producción.
-- **Fin de semana de extracción**, después de publicar el blog: sacar `core` a su propio repo, con landing, documentación y el ritual completo de publicación (versionado, changelog, releases) que aquí adentro no aplica.
-- **Plantilla comercial** (landing + blog en un solo producto): planificada el 2026-10-03, sin implementar. Ver "Decisiones 2026-10-03: plantilla comercial". Un paquete para agencias o freelancers sigue siendo alcance posterior.
+- **Fin de semana de extracción** (descartado por ahora el 2026-10-21, ver "Decisión 2026-10-21: `core` no crece"), después de publicar el blog: sacar `core` a su propio repo, con landing, documentación y el ritual completo de publicación (versionado, changelog, releases) que aquí adentro no aplica.
+- **Plantilla comercial** (landing + blog en un solo producto): planificada el 2026-10-03, sin implementar; **descartada el 2026-10-21**. Ver "Decisiones 2026-10-03: plantilla comercial". Un paquete para agencias o freelancers sigue siendo alcance posterior.
 
 ## Explícitamente fuera de alcance aquí
 
@@ -101,7 +101,7 @@ El sitio actual está en Astro. Por consistencia con el resto de elvinlab (el si
 - [x] ¿Los posts se escriben en un solo idioma o se traducen todos? → Resuelto: un idioma por nota (ver "Decisiones 2026-09-30").
 - [x] Confirmar el stack → Resuelto: [ADR 0001](adr/0001-astro-tailwind-pnpm-monorepo.md).
 - [ ] Confirmar la escala de espaciado propuesta en `BRAND.md`.
-- [ ] Mecanismo de distribución por GitHub al extraer `core`: dependencia git con tags (`github:elvinlab/<repo>#v1.0.0`, sin autenticación en repos públicos), GitHub Packages (requiere token incluso para paquetes públicos) o repositorio plantilla ("Use this template") para el starter.
+- [ ] *(En pausa desde el 2026-10-21: no se extrae `core`)* Mecanismo de distribución por GitHub al extraer `core`: dependencia git con tags (`github:elvinlab/<repo>#v1.0.0`, sin autenticación en repos públicos), GitHub Packages (requiere token incluso para paquetes públicos) o repositorio plantilla ("Use this template") para el starter.
 - [x] Evaluar arrancar con una sola app y una carpeta `src/core/` en lugar del monorepo completo → Resuelto: se construyó el monorepo (`apps/web` + `packages/core`, [ADR 0003](adr/0003-screaming-architecture-and-core-boundary.md)).
 
 ## Decisiones 2026-09-30
@@ -120,6 +120,8 @@ Revisión del plan hecha con el usuario. El detalle operativo (tareas, tiers, or
 
 ## Decisiones 2026-10-03: plantilla comercial
 
+> **Descartada el 2026-10-21** (ver "Decisión 2026-10-21: `core` no crece y la plantilla comercial se descarta"). Se conserva abajo como registro histórico de lo que se pensó; nada de esto está en curso.
+
 Planificación hecha con el usuario; **solo decisiones, nada implementado**. Matiza el criterio de "evaluar mucho más adelante" de la sección "Qué viene después". El documento portátil completo está fuera del repo (`~/Downloads/commercial-template-plan.md`); el seguimiento vive en la sección "Status 2026-10-05" de `odd/tasks/elvinlab-site.md` y en el issue de seguimiento.
 
 - **Producto:** una plantilla única de landing + blog en un **repo nuevo y privado** (es el producto que se vende). Consume `@elvinlab/core` como dependencia versionada, nunca copiada. El comprador activa o desactiva secciones; no compra productos separados.
@@ -135,3 +137,13 @@ Planificación hecha con el usuario; **solo decisiones, nada implementado**. Mat
 - **Requisito de configurabilidad (corregido 2026-10-05):** quien reciba este repo (otra persona, o un comprador de la plantilla) debe poder quedarse **solo con el blog o solo con el portafolio** mediante configuración y `core`, sin rehacer nada. **No** se pide dividir este sitio en dos apps ni desplegar por separado: el blog y `/me` de elvinlab.dev quedan como están. Hoy ya existen los flags `features.blog`, `features.me`, `features.credentials` y `features.experiments`, y el código los respeta en varios puntos (`MePage.astro:34`, `Home.astro:29`). Verificado el 2026-10-05 con dos builds de fixture: ambos compilan; con `me` apagado `/me/` queda `noindex` y fuera del sitemap; con `blog` apagado las rutas de notas, el RSS y el sitemap se seguían generando. **Corregido el 2026-10-05** (`odd/tasks/blog-feature-flag.md`): ahora `blog: false` no genera rutas de notas, RSS ni entradas en el sitemap; con `blog: true` la salida de producción es idéntica. Falta probar `credentials`/`experiments` apagados y los flags `home.*`. La auditoría de `shared/` (detalle en `odd/tasks/elvinlab-site.md`, "Audit 2026-10-05") sirve solo si más adelante se quiere subir piezas a `core`. Seguimiento: #77.
 - **Abiertas:** nombre y ubicación del repo; prueba final de CMS y runtime; licencia y empaquetado de `core`; términos de uso de la plantilla; método de pago y entrega; política de actualizaciones; límite entre soporte incluido y servicio adicional; captación de los 3 clientes; precio estándar. No hay conclusiones legales.
 - **Riesgo señalado (no es una decisión):** este trabajo puede desplazar el criterio de éxito (3 notas) y chocar con el congelamiento de "Decisiones 2026-09-30". Cuándo empezar la fase 1 lo decide el usuario.
+
+## Decisión 2026-10-21: `core` no crece y la plantilla comercial se descarta
+
+Se revisó todo el repositorio para ver qué subir a `core` (12 piezas candidatas, más otras para después) y se probó con un spike de tres piezas (`Card`, `Chip`, `external-link.ts`): todas las verificaciones pasaron y la mudanza es mecánica. Aun así **no se continúa**: hay otros proyectos esperando y una librería sin segundo consumidor real no devuelve nada. `core` queda en tokens, temas e i18n y no sale del monorepo.
+
+**La plantilla comercial también se descarta.** Dependía de `core` como paquete versionado (fase 2 del plan), y sin eso no hay base. No se hace piloto, ni repo privado, ni CMS. Las secciones "Decisiones 2026-10-03: plantilla comercial" y "Qué viene después" se dejan como registro histórico. Lo que sigue vigente es el requisito de configurabilidad de ese bloque (quedarse solo con el blog o solo con el portafolio por configuración): sirve a quien haga un fork, no depende de la plantilla.
+
+**Lo que sí se lleva el autor de toda esta experiencia** (y probablemente aplica a proyectos futuros): el **stack** (tabla de Tecnologías del `README.md`), el **entorno de desarrollo** (`mise` con versiones fijas, monorepo pnpm, CI en un solo push) y el **patrón agéntico** con el que se trabaja este repo (un orquestador decide y revisa, modelos baratos ejecutan lo acotado, memoria persistente y tareas escritas en `odd/tasks/`; ver la nota 2 de Lab Notes y, ya documentado paso a paso, [`DEVELOPMENT-PATTERN.md`](DEVELOPMENT-PATTERN.md)).
+
+**Cómo se guarda:** como aprendizaje, no como pendiente. El spike, lo que costó y lo que no se probó (una segunda app consumiendo `core`) están en el [ADR 0019](adr/0019-core-stays-tokens-themes-i18n.md), en la nota 13 de Lab Notes (borrador) y en `odd/tasks/core-extraction-review.md`. Retomar solo con un segundo consumidor real.

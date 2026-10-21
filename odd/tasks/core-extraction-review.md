@@ -102,3 +102,39 @@ None — every inventory item is used.
 ### Next (after the owner approves)
 
 Each "core now" item becomes its own migration task: move to `packages/core/src/<ui|lib>/`, re-export from `packages/core/src/index.ts`, swap the app import, then run `pnpm depcruise`, `pnpm check:js-budget`, `pnpm test:white-label` and the affected e2e. "core later" items move only when their trigger fires.
+
+## Verdicts update (2026-10-21, read-only)
+
+Why: the owner planned a second consumer (a portfolio like `/me` for another person, plus a landing and docs page for the core). The inventory was repeated for everything that exists today, `features/*` included. The scan was a heuristic (it cannot see CSS imported through `?raw`), so each "scan says pure" item must be read in full when its migration starts.
+
+| Item | Verdict | Reason |
+| --- | --- | --- |
+| `shared/lib/external-link.ts` (15 files) | **core now** (new, 12th item) | The site URL is a parameter; nothing is read from config. |
+| `stamp.css`, `stamp-corner.css` | core now, with `Stamp` | Companions of an approved item. |
+| `Pager`, `SortSwitch`, `ListingSummary`, `listing-styles.ts` | core later | Only the labels come from i18n; trigger: labels as props. |
+| `Ink` + `ink-*.css` + `ink-once.ts` | core later | A second page or the core landing fires it. |
+| `shared/layout/Banner.astro` | core later | Its heights depend on `calm-layout.css` caps; trigger: they become a token contract. |
+| `locale-target.ts`, `shared/seo/{links,robots,isIndexable,llms}.ts` | core later (scan says pure) | Confirm inputs; `og.ts` mixes generic helpers with note-specific `noteCardPath`: split first. |
+| `features/backgrounds/lib/*` (about 14 KB WebGL engine) | core later, strong candidate | Token-driven and self-contained; persistence and the site default stay in the app. |
+| `note-prose.css` + `Fix`, `DecisionRecord`, `Toc` | core later | The prose design a docs site needs. |
+| `turnstile`, `provider-json`, `avatar`, `experiment-image`, `background-preference`, `notes-helpers`, `features/comments/*` | not core | `fetch`, Astro assets, persistence or site-specific. |
+
+New category, the **portfolio kit**: `features/me/*`, `credentials`, the experiments cards and the blog read `site.config`; they are what a portfolio for another person reuses, and the config schema cannot live in presentation-only `core`. Defining that layer was an open owner decision.
+
+## Spike result (2026-10-21)
+
+Branch `spike/core-components` (local, not pushed, commit `e763588`) moved `Card.astro`, `Chip.astro` and `external-link.ts` (+ its test) into `packages/core/src/{ui,lib}`: 29 files, +40/-26 lines, most of them import rewrites.
+
+| Check | Result |
+| --- | --- |
+| typecheck, lint, depcruise, build | pass |
+| unit tests | 1790 passed |
+| `check:js-budget` | 0 FAIL (30 KiB gzip per page) |
+| `test:white-label` | pass |
+| `test:e2e:quick` | 1099 passed, 46 skipped |
+
+What it needed: `@source` for Tailwind v4 in `global.css`; `text-meta` (used by `Chip`) lives in the app theme and would move to `tokens.json`; `pages-are-thin` widened for `core/src/ui|lib`; `exports` `./ui/*` and `./lib/*`. Not tested: a second app consuming `core`.
+
+## Outcome
+
+Owner decision, 2026-10-21: not worth the effort now, other projects are waiting. `core` stays tokens, themes and i18n, and the commercial template (which depended on it) is dropped too; all of it is kept as learning. What the owner takes to future projects: the stack, the development environment and the agentic working pattern of this repo, not the shared package. Recorded in ADR 0019 and `docs/PLAN.md`; a Lab Note is drafted (not published). Reopen with a real second consumer, starting from the 12 "core now" items and the four points above.

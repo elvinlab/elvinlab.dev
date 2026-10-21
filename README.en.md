@@ -24,7 +24,7 @@
 
 It is my portfolio (`/me`) and my blog (`/notes`) in a single site, and the first project of the **elvinlab** brand. Each note tells **one concrete decision**: the problem, what I tried, what I ruled out and why, with numbers. It is built to be **fast, accessible, honest and easy to operate**, and so that someone else can adopt it by changing only configuration and content.
 
-It is also where [`@elvinlab/core`](packages/core) is born, the design base (tokens, themes and i18n) my next projects will share.
+It also hosts [`@elvinlab/core`](packages/core), the design base (tokens, themes and i18n). For now it does not grow or leave this repository: see [ADR 0019](docs/adr/0019-core-stays-tokens-themes-i18n.md).
 
 ## Screenshots
 

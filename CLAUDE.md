@@ -44,14 +44,14 @@ pnpm enforces a minimum release age: when it proposes `minimumReleaseAgeExclude`
 
 CI runs the production JavaScript gzip budget, Playwright/a11y/theme checks, white-label build, and mobile Lighthouse budgets on every push to `main`, before that same run deploys. Lighthouse audits an isolated production-build fixture and writes HTML/JSON reports to the ignored `.lighthouseci/` directory; it does not upload reports.
 
-Read `docs/PLAN.md`, `docs/BRAND.md` (both in Spanish; decisions in them are settled), `docs/DESIGN.md`, `docs/CONVENTIONS.md` and `docs/adr/` before any work. To change a setting, secret, dependency or release, follow `docs/CONFIGURATION.md`; to edit the `/me` profile or add an experiment, `docs/PORTFOLIO.md`; to write a note, `docs/NOTES.md` (each has an English twin, `*.en.md`). Their reference tables are generated from the code: after changing a schema or `shared/config/env-vars.ts`, run `pnpm docs:config`.
+For how this repository is built and how to start the next project the same way (layers, loop, tiers, checklist), read `docs/DEVELOPMENT-PATTERN.md`. Read `docs/PLAN.md`, `docs/BRAND.md` (both in Spanish; decisions in them are settled), `docs/DESIGN.md`, `docs/CONVENTIONS.md` and `docs/adr/` before any work. To change a setting, secret, dependency or release, follow `docs/CONFIGURATION.md`; to edit the `/me` profile or add an experiment, `docs/PORTFOLIO.md`; to write a note, `docs/NOTES.md` (each has an English twin, `*.en.md`). Their reference tables are generated from the code: after changing a schema or `shared/config/env-vars.ts`, run `pnpm docs:config`.
 
 `docs/NOTES.md` (twin `NOTES.en.md`) also carries the visual authoring guide for notes (what the notebook design gives every note automatically, `Fix`/`Ink`, density rules, budgets, previewing and the pre-publish checklist, section 5 and 11): follow it whenever you create or edit a note. Its editorial review (sections 1.1, 1.2 and 11) is mandatory: the narrator is the signing author, never the assistant; verify claims against sources and review the complete text before publication. A successful build does not validate author voice or factual accuracy.
 
 ## What this repo is
 
 - Portfolio at `elvinlab.dev` plus the blog **Lab Notes — by an eternal junior** at `/notes`, and a recruiter page at `/me`.
-- The birthplace of `@elvinlab/core`, a shared design base that later moves to its own repo so others can build blogs/landings with this style.
+- Home of `@elvinlab/core` (tokens, themes, i18n). Extracting components into it or splitting it into its own repo was evaluated and dropped for now (ADR 0019); reopen only with a real second consumer.
 - **White-label by design:** another developer must be able to replace name, bio, posts, experience, colors, favicon and socials through configuration and content only, while the visual style (layout, motion, motifs) stays in code.
 - A from-scratch rebuild of the legacy site; reuse only content and ideas, never its components.
 
