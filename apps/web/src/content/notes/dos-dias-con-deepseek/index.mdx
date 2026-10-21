@@ -9,7 +9,7 @@ tags: [agentes-ia, tokens, deepseek, costos, gentle-ai]
 decision:
   context: "Quería gastar menos tokens y probar pi con el ecosistema de Gentleman. El experimento: cargar US$20 en la API de DeepSeek y ver cuánto duraban con mi trabajo normal en este repo."
   decision: "Cambié Claude Code por pi + gentle-ai con deepseek-v4-pro, sin borrar nada del setup anterior. Al ver el gasto volví a Claude Code y dejé fuera Caveman y RTK, porque gentle-ai ya compacta a su manera."
-  outcome: "En dos días: US$17,86, 483,5 millones de tokens y 1.178 peticiones, a cambio de 44 commits y dos releases. La nota 011 salió con voz de asistente y hubo que corregirla. Los US$2,14 restantes siguen sin usar."
+  outcome: "En dos días: US$17,86, 483,5 millones de tokens y 1.178 peticiones, a cambio de 44 commits y dos releases. La nota 011 salió con voz de asistente y hubo que corregirla. Los US$2,13 restantes siguen sin usar."
 ---
 
 import Fix from '@/features/notes/components/Fix.astro';
@@ -46,7 +46,7 @@ Cambiar costó poco porque el repo no depende de la herramienta. Las convencione
 
 Así quedó el panel de uso de DeepSeek después del experimento:
 
-![Panel de uso de la plataforma de DeepSeek con el filtro de los últimos 30 días: costo de 17,86 dólares, 1.178 peticiones a la API y 483.518.442 tokens. El gráfico de costo por día tiene solo dos barras, juntas, a mediados de octubre; la etiqueta de la más alta dice 16 de octubre de 2026, deepseek-v4-pro, 12,91 dólares.](./panel-deepseek.png)
+![Panel de uso de la plataforma de DeepSeek con el filtro de los últimos 30 días: costo de 17,86 dólares, 1.178 peticiones a la API y 483.518.442 tokens, con un saldo recargado de 2,13 dólares. El gráfico de costo por día tiene solo dos barras, juntas, a mediados de octubre: una de unos 5 dólares y otra más alta, de unos 13.](./panel-deepseek.png)
 
 Yo recordaba <Fix wrong="unos 16 millones de tokens" right="483.518.442 tokens" />. Me equivoqué por un factor de 30, y esa diferencia es justamente de lo que trata esta nota.
 
@@ -110,7 +110,7 @@ Caveman y RTK                 fuera
 
 Lo que cambió respecto a la 007 es que Caveman y RTK ya no están activos. Les quité los hooks de la configuración global de Claude Code. Si no recuerdo mal, el motivo fue que gentle-ai ya hace eso a su manera. Los archivos de configuración siguen en el repo, inertes, por si algún día vuelvo a ellos.
 
-Los US$2,14 que sobraron siguen en la cuenta de DeepSeek. No los usé: preferí volver a mi setup, ajustarlo, y aquí sigo.
+Los US$2,13 que sobraron siguen en la cuenta de DeepSeek. No los usé: preferí volver a mi setup, ajustarlo, y aquí sigo.
 
 ## Si pagas tus agentes por API
 
