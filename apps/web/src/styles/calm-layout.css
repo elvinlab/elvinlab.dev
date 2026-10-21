@@ -21,7 +21,7 @@
   --record-title-gap: 1rem;
   --record-col-pad: 1.25rem;
   --record-title: 0.875rem;
-  --record-label: 0.8125rem;
+  --record-label: 0.875rem;
   --record-body: 0.875rem;
 }
 
@@ -32,12 +32,12 @@
   --banner-pad-top: 5.5rem;
   --banner-pad-bottom: 1.5rem;
   --hero-measure: 16ch;
-  --record-pad: 1rem;
-  --record-gap: 0.875rem;
-  --record-title-gap: 0.75rem;
-  --record-col-pad: 1rem;
-  --record-title: 0.8125rem;
-  --record-label: 0.8125rem;
+  --record-pad: 1.25rem;
+  --record-gap: 1.25rem;
+  --record-title-gap: 1rem;
+  --record-col-pad: 1.25rem;
+  --record-title: 0.875rem;
+  --record-label: 0.875rem;
   --record-body: 0.875rem;
 }
 
