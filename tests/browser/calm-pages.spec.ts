@@ -320,7 +320,8 @@ test('the note header keeps date and reading time, and the preset places badge, 
   await expect(header.locator('time')).toHaveCount(1);
   await expect(header).toContainText(/\d+ min/);
   const meta = header.locator('time').locator('..');
-  const foot = page.locator('article > div').last();
+  // The footprint box (`.mk`) can follow the foot, empty, when its count fails to load.
+  const foot = page.locator('article > div:not(.mk)').last();
   const badge = /^es$/i;
   if (preset === 'minimal') {
     // The calm header keeps the date and the reading time; badge and tags live in the foot.
