@@ -1215,5 +1215,17 @@
     "category": "changed",
     "title": "Note 012 names DeepSeek in its title",
     "description": "The title now says which model was tested instead of describing it by origin, which is clearer and easier to find."
+  },
+  "notes-guide-language-and-figures": {
+    "date": "2026-10-20",
+    "category": "changed",
+    "title": "The notes guide rules out stigmatizing descriptors and derived figures",
+    "description": "The editorial review in docs/NOTES.md now asks to name tools, companies and people instead of describing them by nationality, origin or social class, and to copy every figure from its source instead of calculating it."
+  },
+  "note-share-card-version": {
+    "date": "2026-10-20",
+    "category": "fixed",
+    "title": "Link previews pick up a note's new title",
+    "description": "A note's share image URL now carries a version key built from its number and title, so WhatsApp, LinkedIn and X fetch the new card after a title change instead of reusing the cached one."
   }
 }

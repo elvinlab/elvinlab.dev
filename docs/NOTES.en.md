@@ -75,9 +75,10 @@ This review is required for both a new note and an edit. The build and fast lane
 
 1. **Gather evidence.** Check the decision against ADRs, code and verification records. Record sources for figures, dates, versions and results in the task log, noting historical ones. If evidence is insufficient, remove the claim or state the uncertainty; never fill the gap with an anecdote.
 2. **Review the whole perspective.** Read the note from start to finish and ask who “I” is in every paragraph. Search for the author's name and mentions of “user,” “assistant” or “I proposed to them” as review signals, not automatic bans: a name inside a quotation or code example can be valid.
-3. **Check numbers and scope.** Preserve units and measurement context: gzip or uncompressed, island or entire page, fixture or production, own runtime or third parties. Recalculate differences, percentages and phrases such as “half.” Do not present a historical result as a new measurement.
-4. **Edit tone and consistency.** Read aloud, correct verbs and chronology, cut sentences that add nothing and replace absolute claims with the demonstrated case. Check that title, description and decision record still agree with the body.
-5. **Review the visible result and diff.** Use section 5's features only where they clarify something; there is no need to use all of them. Show the full text inline when the author asks and inspect the page using section 6. Record what was checked and what remains pending. Editorial review neither replaces technical checks nor authorizes a release on its own.
+3. **Check numbers and scope.** Preserve units and measurement context: gzip or uncompressed, island or entire page, fixture or production, own runtime or third parties. Recalculate differences, percentages and phrases such as “half.” Do not present a historical result as a new measurement. **Copy every figure from its source; never derive it.** If a value is not visible (a balance, a total, a date), ask for it or show the source that contains it: note 012 stated a US$2.14 balance computed as 20 − 17.86, while the panel said US$2.13.
+4. **Check that the language does not stigmatize.** Name tools, companies, models and people by their name. Do not use nationality, ethnic origin, social class, religion, gender or disability as a descriptor, least of all as shorthand for cheap, bad, suspicious or inferior. “A Chinese model that charges very little” implies the origin explains the price; “DeepSeek, which charges very little per token” says the same without that charge and is easier to find. Origin belongs only when it is the subject (for example, the jurisdiction where data is processed), and then it is stated as the concrete fact. Review the title, description, decision record, alt text and changelog, not only the body.
+5. **Edit tone and consistency.** Read aloud, correct verbs and chronology, cut sentences that add nothing and replace absolute claims with the demonstrated case. Check that title, description and decision record still agree with the body.
+6. **Review the visible result and diff.** Use section 5's features only where they clarify something; there is no need to use all of them. Show the full text inline when the author asks and inspect the page using section 6. Record what was checked and what remains pending. Editorial review neither replaces technical checks nor authorizes a release on its own.
 
 ## 2. Creating the draft
 
@@ -547,6 +548,8 @@ code-heavy articles: Lighthouse's synthetic notes do not cover every real articl
 ## 11. Checklist before publishing
 
 - [ ] Editorial review in 1.1 and 1.2 complete: “I” always means the author, with no assistant narrator or invented dialogue or experiences.
+- [ ] No derived figures: every number was copied from a visible source (screenshot, panel, log) or confirmed by the author.
+- [ ] No stigmatizing language: tools, companies and people named by their name, never described by nationality, origin, social class, religion, gender or disability (1.2, step 4); this includes the title, description, alt text and changelog.
 - [ ] Figures, chronology, comparisons and measurement scope checked against sources recorded in the task; title, description and decision record agree with the body.
 - [ ] Full text read and reviewed for tone and spelling; visual features clarify the content and the ending adds something concrete.
 - [ ] One decision only, starting with the problem; numbers and names, not adjectives.

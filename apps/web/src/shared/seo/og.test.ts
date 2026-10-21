@@ -25,6 +25,14 @@ describe('noteCardPath', () => {
     expect(noteCardPath('como-construi-este-sitio')).toBe('/og/notes/como-construi-este-sitio.png');
   });
 
+  it('versions the card URL by what it draws, so an edited title busts link-preview caches', () => {
+    const before = noteCardPath('x', { number: 12, title: 'Old title' });
+    const after = noteCardPath('x', { number: 12, title: 'New title' });
+    expect(before).toMatch(/^\/og\/notes\/x\.png\?v=[0-9a-f]{8}$/);
+    expect(after).not.toBe(before);
+    expect(noteCardPath('x', { number: 12, title: 'Old title' })).toBe(before);
+  });
+
   it('keeps the default card for everything else', () => {
     expect(DEFAULT_OG_IMAGE).toBe('/og-image.png');
   });
