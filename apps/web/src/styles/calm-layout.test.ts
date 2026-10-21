@@ -44,14 +44,14 @@ describe('calm layout: full is exactly the pre-preset look', () => {
     expect(md.get(FULL)).toMatchObject({ '--hero-measure': '24ch' });
   });
 
-  it('keeps the decision record as it was (p-5, gap-5, 14 px text, 13 px labels)', () => {
+  it('keeps the decision record roomy (p-5, gap-5, 14 px text and labels)', () => {
     expect(base.get(FULL)).toMatchObject({
       '--record-pad': '1.25rem',
       '--record-gap': '1.25rem',
       '--record-title-gap': '1rem',
       '--record-col-pad': '1.25rem',
       '--record-title': '0.875rem',
-      '--record-label': '0.8125rem',
+      '--record-label': '0.875rem',
       '--record-body': '0.875rem',
     });
   });
@@ -84,14 +84,14 @@ describe('calm layout: minimal is the calm preset', () => {
     expect(md.get(MINIMAL)).toMatchObject({ '--hero-measure': '24ch' });
   });
 
-  it('compacts the decision record: tighter padding and gaps, 13 px labels, 14 px body', () => {
+  it('gives the minimal decision record the same room as full (p-5, gap-5, 14 px text and labels)', () => {
     expect(base.get(MINIMAL)).toMatchObject({
-      '--record-pad': '1rem',
-      '--record-gap': '0.875rem',
-      '--record-title-gap': '0.75rem',
-      '--record-col-pad': '1rem',
-      '--record-title': '0.8125rem',
-      '--record-label': '0.8125rem',
+      '--record-pad': '1.25rem',
+      '--record-gap': '1.25rem',
+      '--record-title-gap': '1rem',
+      '--record-col-pad': '1.25rem',
+      '--record-title': '0.875rem',
+      '--record-label': '0.875rem',
       '--record-body': '0.875rem',
     });
   });
