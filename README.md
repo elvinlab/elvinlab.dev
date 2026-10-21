@@ -107,6 +107,21 @@ Así se trabaja aquí: cada tarea es un *issue* escrito como un brief de delegac
 - **Bilingüe** (ES/EN) sin redirecciones por idioma.
 - **Instalable** como app (manifest + íconos), sin service worker.
 
+## Tareas frecuentes
+
+Lo que se hace a mano y se suele olvidar, con comandos para copiar y pegar en [`docs/HOW-TO.md`](docs/HOW-TO.md):
+
+| Quiero... | Receta |
+| --- | --- |
+| Escribir y publicar una nota | [Receta 1](docs/HOW-TO.md) |
+| Avisar por correo de una nota o de un proyecto nuevo | [Receta 2](docs/HOW-TO.md) |
+| Cambiar «Empieza aquí» | [Receta 3](docs/HOW-TO.md) |
+| Actualizar el ranking «más activas» (antes de cada release) | [Receta 4](docs/HOW-TO.md) |
+| Cambiar la tarjeta «Ahora» de la portada | [Receta 5](docs/HOW-TO.md) |
+| Agregar o editar un proyecto, sus imágenes y datos | [Receta 6](docs/HOW-TO.md) |
+| Actualizar CV, disponibilidad, experiencia y certificados | [Receta 7](docs/HOW-TO.md) |
+| Anotar el cambio en el changelog y liberar a producción | [Recetas 8 y 9](docs/HOW-TO.md) |
+
 ## Encender y apagar cosas
 
 Todo lo opcional es un interruptor en [`site.config.ts`](apps/web/src/site.config.ts), dentro de `features`. Apagado significa que no se envía nada: ni ruta, ni entrada de menú, ni script ni CSS. Un valor inválido rompe el build y nombra el problema.
@@ -197,6 +212,7 @@ odd/tasks/       → seguimiento de cada funcionalidad
 | Documento | Qué cuenta |
 | --- | --- |
 | [Guía de configuración y actualización](docs/CONFIGURATION.md) | **Dónde se configura cada cosa y cómo se actualiza todo**: ajustes, contenido, secretos, dependencias y releases |
+| [Tareas frecuentes](docs/HOW-TO.md) | Recetas paso a paso: nota, aviso por correo, «Empieza aquí», ranking, «Ahora», proyectos, CV, changelog y release |
 | [Cómo crear una nota](docs/NOTES.md) | Receta rápida de 6 comandos y, debajo, el paso a paso detallado del borrador a producción |
 | [`docs/PORTFOLIO.md`](docs/PORTFOLIO.md) | Editar `/me` y agregar un experimento (también en [inglés](docs/PORTFOLIO.en.md)) |
 | [`docs/SUBSCRIPTION.md`](docs/SUBSCRIPTION.md) | Suscripción por correo: cómo funciona, datos y privacidad, límites, cómo enviar una nota y problemas comunes (también en [inglés](docs/SUBSCRIPTION.en.md)) |

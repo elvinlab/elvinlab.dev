@@ -83,6 +83,7 @@ export function createResendMailer(
         const payload = messages.map((mail) => {
           const email = renderNoteEmail({
             ...site(mail.locale),
+            kind: mail.kind,
             title: mail.title,
             summary: mail.summary,
             noteUrl: mail.url,

@@ -26,7 +26,39 @@ describe('parseArgs', () => {
   );
 });
 
+describe('parseArgs for a project', () => {
+  it('names the key, keeps the dry run by default and tags the kind', () => {
+    expect(parseArgs(['my-project'], 'project')).toEqual({
+      ok: true,
+      args: { slug: 'my-project', send: false, kind: 'project' },
+    });
+    expect(parseArgs(['--send', 'my-project'], 'project')).toEqual({
+      ok: true,
+      args: { slug: 'my-project', send: true, kind: 'project' },
+    });
+  });
+
+  it('rejects a bad key and points to the project command', () => {
+    const parsed = parseArgs(['Bad Key'], 'project');
+    expect(parsed.ok).toBe(false);
+    expect(parsed.ok ? '' : parsed.message).toContain('project key');
+    const usage = parseArgs([], 'project');
+    expect(usage.ok ? '' : usage.message).toBe('Usage: pnpm notify:project <key> [--send]');
+  });
+});
+
 describe('buildRequest', () => {
+  it('adds the project kind to the body only for a project', () => {
+    const body = (args: Parameters<typeof buildRequest>[2]) =>
+      JSON.parse(String(buildRequest(BASE, TOKEN, args).init.body));
+    expect(body({ slug: 'my-project', send: false, kind: 'project' })).toEqual({
+      slug: 'my-project',
+      kind: 'project',
+      dryRun: true,
+    });
+    expect(body({ slug: 'a-note', send: true })).toEqual({ slug: 'a-note', dryRun: false });
+  });
+
   it('builds a JSON POST with the token in the header only', () => {
     const { url, init } = buildRequest(`${BASE}/`, TOKEN, { slug: 'a-note', send: false });
     expect(url).toBe(`${BASE}/api/subscribe/notify`);
@@ -128,5 +160,38 @@ describe('run', () => {
       run(['a-note'], { SUBSCRIBE_ADMIN_TOKEN: TOKEN }, BASE, request, out),
     ).resolves.toBe(1);
     expect(lines.join('\n')).not.toContain(TOKEN);
+  });
+});
+
+describe('run for a project', () => {
+  it('words the dry run and the missing key for projects', async () => {
+    const dry = harness(200, { recipients: 4, wouldSend: 4, remainingPool: 90 });
+    expect(
+      await run(
+        ['my-project'],
+        { SUBSCRIBE_ADMIN_TOKEN: TOKEN },
+        BASE,
+        dry.request,
+        dry.out,
+        'project',
+      ),
+    ).toBe(0);
+    expect(dry.lines[0]).toContain('4 subscribers of both languages');
+    expect(JSON.parse(String(dry.request.mock.calls[0]?.[1]?.body))).toMatchObject({
+      kind: 'project',
+    });
+
+    const missing = harness(404, {});
+    expect(
+      await run(
+        ['nope'],
+        { SUBSCRIBE_ADMIN_TOKEN: TOKEN },
+        BASE,
+        missing.request,
+        missing.out,
+        'project',
+      ),
+    ).toBe(1);
+    expect(missing.lines[0]).toContain('experiments.json');
   });
 });

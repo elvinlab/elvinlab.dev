@@ -254,3 +254,79 @@ describe('notifySubscribers real send', () => {
     expect(text).not.toContain('sig-');
   });
 });
+
+describe('notifySubscribers for a project', () => {
+  const PROJECT = (locale: 'es' | 'en') => ({
+    slug: 'project:my-tool',
+    kind: 'project' as const,
+    title: 'My tool',
+    summary: locale === 'es' ? 'Una herramienta' : 'A tool',
+    url: `https://site.test${locale === 'es' ? '' : '/en'}/experiments/my-tool/`,
+    locale,
+  });
+  const body = (change: Record<string, unknown> = {}) =>
+    JSON.stringify({ slug: 'my-tool', kind: 'project', ...change });
+
+  async function projectSetup(count = 0) {
+    const fixture = await setup(count);
+    const findProject = vi.fn(async (key: string) =>
+      key === 'my-tool' ? [PROJECT('es'), PROJECT('en')] : null,
+    );
+    return { ...fixture, ports: { ...fixture.ports, findProject }, findProject };
+  }
+
+  it('sends the Spanish notice to Spanish subscribers as a project and records it apart', async () => {
+    const { ports, rows, batches } = await projectSetup(2);
+    await expect(notifySubscribers(request({ body: body() }), ports)).resolves.toEqual({
+      status: 200,
+      body: { sent: 2, remaining: 0, failed: false },
+    });
+    expect(batches[0]?.messages[0]).toMatchObject({
+      kind: 'project',
+      url: 'https://site.test/experiments/my-tool/',
+    });
+    expect([...rows.values()].every((row) => row.lastNote === 'project:my-tool')).toBe(true);
+  });
+
+  it('never sends twice to the same subscriber and counts a dry run per locale', async () => {
+    const { ports, batches } = await projectSetup(2);
+    await expect(
+      notifySubscribers(request({ body: body({ dryRun: true }) }), ports),
+    ).resolves.toMatchObject({ status: 200, body: { recipients: 2, wouldSend: 2 } });
+    expect(batches).toHaveLength(0);
+    await notifySubscribers(request({ body: body() }), ports);
+    await expect(notifySubscribers(request({ body: body() }), ports)).resolves.toEqual({
+      status: 200,
+      body: { sent: 0, remaining: 0, failed: false },
+    });
+  });
+
+  it('respects the shared pool for a project too', async () => {
+    const { ports, days } = await projectSetup(5);
+    days.set(utcToday, 97);
+    await expect(notifySubscribers(request({ body: body() }), ports)).resolves.toEqual({
+      status: 200,
+      body: { sent: 3, remaining: 2, failed: false },
+    });
+  });
+
+  it('answers 404 for an unknown key or when the site has no project lookup', async () => {
+    const { ports } = await projectSetup(1);
+    await expect(
+      notifySubscribers(request({ body: body({ slug: 'nope' }) }), ports),
+    ).resolves.toEqual({ status: 404 });
+    const { findProject: _unused, ...withoutLookup } = ports;
+    await expect(notifySubscribers(request({ body: body() }), withoutLookup)).resolves.toEqual({
+      status: 404,
+    });
+  });
+
+  it('keeps a note slug a note when no kind is sent, and rejects an unknown kind', async () => {
+    const { ports, findNote } = await projectSetup(1);
+    await notifySubscribers(request(), ports);
+    expect(findNote).toHaveBeenCalledWith('una-nota');
+    await expect(
+      notifySubscribers(request({ body: body({ kind: 'other' }) }), ports),
+    ).resolves.toEqual({ status: 400 });
+  });
+});

@@ -16,6 +16,8 @@ export type EmailSiteInput = {
 
 export type ConfirmationEmailInput = EmailSiteInput & { confirmUrl: string };
 export type NoteEmailInput = EmailSiteInput & {
+  /** A note when left out. */
+  kind?: 'note' | 'project' | undefined;
   title: string;
   summary?: string | undefined;
   noteUrl: string;
@@ -54,6 +56,9 @@ const COPY = {
     noteSubject: (title: string) => `Nueva nota: ${title}`,
     notePreheader: 'Hay una nota nueva en Lab Notes.',
     noteButton: 'Leer la nota',
+    projectSubject: (title: string) => `Nuevo proyecto: ${title}`,
+    projectPreheader: 'Hay un proyecto nuevo en elvinlab.dev.',
+    projectButton: 'Ver el proyecto',
     noSpam: 'Sin spam: solo notas nuevas y avisos ocasionales de proyectos.',
     noteFooter: (domain: string) =>
       `Recibes este correo porque te suscribiste en ${domain} (notas nuevas y avisos de proyectos).`,
@@ -63,6 +68,7 @@ const COPY = {
     sentBy: 'Enviado por',
     greeting: 'Hola,',
     readIt: 'Léela aquí:',
+    readProject: 'Míralo aquí:',
   },
   en: {
     confirmSubject: 'Confirm your subscription to Lab Notes',
@@ -82,6 +88,9 @@ const COPY = {
     noteSubject: (title: string) => `New note: ${title}`,
     notePreheader: 'There is a new note on Lab Notes.',
     noteButton: 'Read the note',
+    projectSubject: (title: string) => `New project: ${title}`,
+    projectPreheader: 'There is a new project on elvinlab.dev.',
+    projectButton: 'See the project',
     noSpam: 'No spam: only new notes and the occasional project announcement.',
     noteFooter: (domain: string) =>
       `You receive this because you subscribed on ${domain} (new notes and project announcements).`,
@@ -91,6 +100,7 @@ const COPY = {
     sentBy: 'Sent by',
     greeting: 'Hello,',
     readIt: 'Read it here:',
+    readProject: 'See it here:',
   },
 } satisfies Record<SubscribeLocale, unknown>;
 
@@ -245,12 +255,13 @@ export function renderNoteEmail(input: NoteEmailInput): RenderedEmail {
   const copy = COPY[input.locale];
   const domain = domainOf(input.siteUrl);
   const title = oneLine(input.title);
-  const subject = oneLine(copy.noteSubject(title));
+  const project = input.kind === 'project';
+  const subject = oneLine((project ? copy.projectSubject : copy.noteSubject)(title));
   const summary = input.summary?.trim();
   const body = [
     `<h1 class="em-text" style="margin:0 0 16px;font-family:${SANS};font-size:20px;line-height:28px;font-weight:700;color:${COLOR.text}">${escapeHtml(title)}</h1>`,
     summary ? paragraph(escapeHtml(summary)) : '',
-    button(input.noteUrl, copy.noteButton),
+    button(input.noteUrl, project ? copy.projectButton : copy.noteButton),
     `<p class="em-muted" style="margin:16px 0 0;font-family:${SANS};font-size:13px;line-height:20px;color:${COLOR.muted}">${escapeHtml(copy.noSpam)}</p>`,
   ]
     .filter(Boolean)
@@ -265,7 +276,7 @@ export function renderNoteEmail(input: NoteEmailInput): RenderedEmail {
     title,
     '',
     ...(summary ? [summary, ''] : []),
-    copy.readIt,
+    project ? copy.readProject : copy.readIt,
     input.noteUrl,
     '',
     '--',
@@ -280,7 +291,11 @@ export function renderNoteEmail(input: NoteEmailInput): RenderedEmail {
     html: layout({
       locale: input.locale,
       subject,
-      preheader: summary ? oneLine(summary).slice(0, 110) : copy.notePreheader,
+      preheader: summary
+        ? oneLine(summary).slice(0, 110)
+        : project
+          ? copy.projectPreheader
+          : copy.notePreheader,
       siteUrl: input.siteUrl,
       siteName: input.siteName,
       body,

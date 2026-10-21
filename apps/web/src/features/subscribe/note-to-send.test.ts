@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { noteToSend } from './note-to-send.ts';
+import { noteToSend, projectToSend } from './note-to-send.ts';
 
 const base = { title: 'A title', description: 'A description' };
 
@@ -21,5 +21,40 @@ describe('noteToSend', () => {
       url: 'https://site.test/en/notes/a-note/',
       locale: 'en',
     });
+  });
+});
+
+describe('projectToSend', () => {
+  it('builds one notice per locale from the experiment, apart from note slugs', () => {
+    const project = {
+      id: 'my-tool',
+      data: { title: 'My tool', description: { es: 'Una herramienta', en: 'A tool' } },
+    };
+    expect(projectToSend(project, 'https://site.test')).toEqual([
+      {
+        slug: 'project:my-tool',
+        kind: 'project',
+        title: 'My tool',
+        summary: 'Una herramienta',
+        url: 'https://site.test/experiments/my-tool/',
+        locale: 'es',
+      },
+      {
+        slug: 'project:my-tool',
+        kind: 'project',
+        title: 'My tool',
+        summary: 'A tool',
+        url: 'https://site.test/en/experiments/my-tool/',
+        locale: 'en',
+      },
+    ]);
+  });
+
+  it('uses a plain description for every locale', () => {
+    const notices = projectToSend(
+      { id: 'x', data: { title: 'X', description: 'Same text' } },
+      'https://site.test',
+    );
+    expect(notices.map((notice) => notice.summary)).toEqual(['Same text', 'Same text']);
   });
 });

@@ -21,10 +21,13 @@ const ipSchema = z.union([z.ipv4(), z.ipv6()]);
 const confirmTokenSchema = z.string().min(1).max(SUBSCRIBE_POLICY.tokenMaxLength);
 const subscriberIdSchema = z.string().regex(/^[0-9a-f]{32}$/);
 const noteSchema = z.strictObject({
+  // A project notice is recorded under `project:<key>`, so it can never collide with a note slug.
   slug: z
     .string()
     .max(80)
-    .regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/),
+    .regex(/^(?:project:)?[a-z0-9]+(?:-[a-z0-9]+)*$/),
+  /** What the email announces; a note when left out. */
+  kind: z.enum(['note', 'project']).optional(),
   title: z.string().min(1).max(300),
   url: z
     .url()
@@ -211,7 +214,7 @@ export async function sendNote(
   >,
   options: { dailyCap?: number; batchSize?: number } = {},
 ): Promise<SendNoteResult> {
-  const { slug, title, url, summary, locale } = noteSchema.parse(note);
+  const { slug, kind, title, url, summary, locale } = noteSchema.parse(note);
   // Confirmations and notes share the provider's daily pool; notes use what is left of it.
   const left =
     SUBSCRIBE_POLICY.providerDailyTotal -
@@ -245,6 +248,7 @@ export async function sendNote(
           locale: subscriber.locale,
           title,
           url,
+          ...(kind === undefined ? {} : { kind }),
           ...(summary === undefined ? {} : { summary }),
           unsubscribeUrl: ports.links.unsubscribe(unsubscribeToken, subscriber.locale),
         };

@@ -147,9 +147,18 @@ Sending is **manual on purpose**: the owner decided to keep it that way while th
 4. **Read the counts.** The simulation says how many recipients are still waiting and how many would go out today. The send says how many went out and how many are still waiting. If `remaining` is greater than 0, run it again the next day: it resumes where it stopped, because the `subscriber_notes` table records who already got that note.
 5. **Order does not matter and nothing is duplicated.** You can send older notes, or send in any order, and re-run a command: each person receives each note once. Someone who confirms later receives the note when it is next sent, and nobody else gets it again.
 
+**Announcing a new project.** Same flow, with another command and the key of the `experiments.json` entry (the one in `/experiments/<key>/`); the project must be released:
+
+```bash
+SUBSCRIBE_ADMIN_TOKEN="$(cat ~/.config/elvinlab/subscribe-admin-token)" mise exec -- pnpm notify:project <key>          # simulate
+SUBSCRIBE_ADMIN_TOKEN="$(cat ~/.config/elvinlab/subscribe-admin-token)" mise exec -- pnpm notify:project <key> --send   # send
+```
+
+The email is built from the experiment itself (title, description, link to its page) and each person gets it in their own language: a project is bilingual, so both notices go out. The daily cap is one for both languages, and repeating the command duplicates nothing.
+
 Rules to keep in mind:
 
-- **Language:** a Spanish note goes only to Spanish subscribers; an English note, only to English ones.
+- **Language:** a Spanish note goes only to Spanish subscribers; an English note, only to English ones. A subscriber's language is the language of the page where they subscribed.
 - **Only the slug is sent.** Title, summary and link come from the published note, so a leaked token cannot put custom text in front of the list.
 - **A draft or unknown slug answers 404.** Release the note first.
 - **The token** lives in `~/.config/elvinlab/subscribe-admin-token` on the owner's machine and should also be in a password manager. The command reads it only from the `SUBSCRIBE_ADMIN_TOKEN` environment variable (never an argument) and never prints it. The site URL must be `https`.
