@@ -45,7 +45,7 @@ me: {
 }
 ```
 
-- **Availability:** `recruiter.status` is the short label ("Collaborations and projects") and `recruiter.lookingFor` the sidebar line. `recruiter.available: false` hides the whole line.
+- **Availability:** `recruiter.status` is the short label ("Collaborations and good talk") and `recruiter.lookingFor` the sidebar line. `recruiter.available: false` hides the whole line.
 - **CV:** `recruiter.cvUrl` takes one https URL or one per language. With no CV the button does not render.
 - **Stack:** each `me.stack` group has `label`, `items` and, optionally, `icon`, `hint` (the tooltip sentence) and `layer`. Groups with `layer: true` are drawn as numbered layers of the product (for example data, backend, frontend, cloud) joined by a vertical line; list them first. Groups without `layer` (AI, quality, projects) cut across the layers and sit below; with `folded: true` they go inside a collapsed "More tools" block (no JavaScript) so the stack stays short. To keep `/me` fast, do not add icons or tooltips per tool.
 - **Raw data:** under the stack, `/me` shows a collapsed block (`<details>`, no JavaScript) with the page's own data as `field / type / value` rows. It is generated only from `identity` (name, handle, role, location, start year), `me.headline` and `me.stack` in the active locale; there is nothing to configure, and no key outside those fields is shown.

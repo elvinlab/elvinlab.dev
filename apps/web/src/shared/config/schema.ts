@@ -145,7 +145,7 @@ export const siteConfigSchema = z
           .boolean()
           .optional()
           .describe(
-            'The sidebar "Hiring?" recruiter card: availability and links to /me and the CV.',
+            'The sidebar "Let’s talk" recruiter card: availability and links to /me and the CV.',
           ),
         marks: z
           .boolean()

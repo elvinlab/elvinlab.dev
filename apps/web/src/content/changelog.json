@@ -1239,5 +1239,11 @@
     "category": "fixed",
     "title": "Footprint box at the end of a note no longer collapses when the count fails to load",
     "description": "If the footprint service answered late with an error, the empty box under the note disappeared and pulled the previous and next links and the comments up. It now keeps its space, like the one under the title."
+  },
+  "collaboration-card-wording": {
+    "date": "2026-10-21",
+    "category": "changed",
+    "title": "The home card now invites collaboration instead of asking if anyone is hiring",
+    "description": "The card reads \"Let's talk\" with the status \"Collaborations and good talk\", so it no longer looks like a job search. The profile keeps saying that only collaborations and projects are of interest."
   }
 }
