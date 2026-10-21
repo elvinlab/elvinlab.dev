@@ -85,7 +85,7 @@ export const CHANGELOG_CSS = minifyCss(`
     flex-wrap: wrap;
     justify-content: flex-end;
     gap: 0.25rem 0.75rem;
-    font: 400 0.8125rem / 1 var(--font-mono);
+    font: 400 0.875rem / 1 var(--font-mono);
     color: var(--color-text-secondary);
   }
   .cl-count {
@@ -143,7 +143,7 @@ export const CHANGELOG_CSS = minifyCss(`
     align-items: center;
     gap: 0.5rem;
     margin: 0 0 0.5rem;
-    font: 400 0.8125rem / 1.2 var(--font-mono);
+    font: 400 0.875rem / 1.2 var(--font-mono);
     color: var(--color-text-secondary);
   }
   .cl-kind h3 .cl-ico {

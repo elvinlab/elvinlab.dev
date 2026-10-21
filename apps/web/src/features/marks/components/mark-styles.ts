@@ -39,7 +39,7 @@ export const MARKS_CSS =
   '.mb{position:relative;display:inline-flex;align-items:center;gap:.5rem;min-height:44px;padding:.5rem .875rem;border:1.5px solid var(--color-pink);border-radius:var(--radius-pill);background:var(--color-card);color:var(--color-text);font:.8125rem var(--font-mono);text-align:left;cursor:pointer;transition:background .15s}' +
   '.mb:hover{background:var(--color-chip)}' +
   '.mt{position:relative;display:inline-flex}' +
-  '.mx{position:absolute;left:0;top:calc(100% + .5rem);z-index:5;width:max-content;max-width:min(15rem,calc(100vw - 3rem));padding:.5rem .75rem;border:1px solid var(--color-divider);border-radius:var(--radius-inner);background:var(--color-card);color:var(--color-text-secondary);font:.8125rem/1.4 var(--font-mono);visibility:hidden}' +
+  '.mx{position:absolute;left:0;top:calc(100% + .5rem);z-index:5;width:max-content;max-width:min(15rem,calc(100vw - 3rem));padding:.5rem .75rem;border:1px solid var(--color-divider);border-radius:var(--radius-inner);background:var(--color-card);color:var(--color-text-secondary);font:.875rem/1.4 var(--font-mono);visibility:hidden}' +
   '.mx:before{content:"";position:absolute;inset:-.6rem 0 auto;height:.6rem}' +
   '[data-marks-card]:not(:has([data-r])){display:none}' +
   '.mk[data-v=h] .mx,.mk[data-v=c] .mx{top:auto;bottom:calc(100% + .5rem)}' +
@@ -49,7 +49,7 @@ export const MARKS_CSS =
   '.mt:has(:focus-visible) .mx,.mt[data-t] .mx{visibility:visible}' +
   '.mt[data-x] .mx{visibility:hidden}' +
   '.mi{width:21px;height:18px;shape-rendering:crispEdges;color:var(--color-pink);fill:currentColor}' +
-  '.mn{font:.75rem var(--font-mono);color:var(--color-text-secondary)}' +
+  '.mn{font:.875rem var(--font-mono);color:var(--color-text-secondary)}' +
   '.mf{position:absolute;top:50%;left:calc(.875rem + 10px);width:0;height:0;pointer-events:none}' +
   '.mr{position:absolute;width:20px;height:20px;margin:-10px 0 0 -10px;border:2px solid var(--color-pink);opacity:0}' +
   '.mp{position:absolute;width:4px;height:4px;margin:-2px 0 0 -2px;background:var(--color-primary);opacity:0}' +

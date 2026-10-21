@@ -69,7 +69,7 @@ const LAB = `
     margin: 0;
     padding: 0;
     list-style: none;
-    font: 400 0.8125rem / 1.35 var(--font-mono);
+    font: 400 0.875rem / 1.35 var(--font-mono);
     color: var(--color-muted);
     user-select: none;
   }
@@ -239,7 +239,7 @@ const PIECE = `
     padding: 0.125rem 0.5rem;
     border-radius: var(--radius-pill);
     background: var(--color-chip);
-    font: 400 0.8125rem / 1.125rem var(--font-mono);
+    font: 400 0.875rem / 1.125rem var(--font-mono);
     color: var(--color-text-secondary);
   }
   /* Square 8 x 8 status dot: no radius, like the other pixel details. */
@@ -272,7 +272,7 @@ const PIECE = `
   }
   .xp-facts dt,
   .xp-num {
-    font: 400 0.8125rem / 1.125rem var(--font-mono);
+    font: 400 0.875rem / 1.125rem var(--font-mono);
     color: var(--color-muted);
   }
   .xp-facts dd {
@@ -309,7 +309,7 @@ const PIECE = `
     padding: 0.125rem 0.625rem;
     border-radius: var(--radius-pill);
     background: var(--color-chip);
-    font: 400 0.8125rem / 1.125rem var(--font-mono);
+    font: 400 0.875rem / 1.125rem var(--font-mono);
     color: var(--color-text-secondary);
   }
   .xp-actions {
@@ -514,7 +514,7 @@ const MEDIA = `
     gap: 1rem;
     margin-top: 0.625rem;
     padding-inline: 0.25rem;
-    font: 400 0.75rem / 1.4 var(--font-mono);
+    font: 400 0.875rem / 1.4 var(--font-mono);
     color: var(--color-muted);
   }
   .xp-cap-text {
@@ -770,7 +770,7 @@ const COMPACT = `
     padding: 0.125rem 0.5rem;
     border-radius: var(--radius-pill);
     background: var(--color-chip);
-    font: 400 0.8125rem / 1.125rem var(--font-mono);
+    font: 400 0.875rem / 1.125rem var(--font-mono);
     color: var(--color-text-secondary);
   }
   .xc-dot {
@@ -813,7 +813,7 @@ const COMPACT = `
     padding: 0.125rem 0.625rem;
     border-radius: var(--radius-pill);
     background: var(--color-chip);
-    font: 400 0.8125rem / 1.125rem var(--font-mono);
+    font: 400 0.875rem / 1.125rem var(--font-mono);
     color: var(--color-text-secondary);
   }
   .xc-arrow {
