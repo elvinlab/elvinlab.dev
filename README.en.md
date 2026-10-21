@@ -105,6 +105,21 @@ This is how work goes here: every task is an *issue* written as a delegation bri
 - **Bilingual** (ES/EN) with no language redirects.
 - **Installable** as an app (manifest + icons), with no service worker.
 
+## Frequent tasks
+
+The things done by hand that are easy to forget, with copy-paste commands in [`docs/HOW-TO.en.md`](docs/HOW-TO.en.md):
+
+| I want to... | Recipe |
+| --- | --- |
+| Write and publish a note | [Recipe 1](docs/HOW-TO.en.md) |
+| Email a note or a new project to subscribers | [Recipe 2](docs/HOW-TO.en.md) |
+| Change "Start here" | [Recipe 3](docs/HOW-TO.en.md) |
+| Refresh the "most active" ranking (before every release) | [Recipe 4](docs/HOW-TO.en.md) |
+| Change the home "Now" card | [Recipe 5](docs/HOW-TO.en.md) |
+| Add or edit a project, its images and data | [Recipe 6](docs/HOW-TO.en.md) |
+| Update CV, availability, experience and certificates | [Recipe 7](docs/HOW-TO.en.md) |
+| Record the change in the changelog and release to production | [Recipes 8 and 9](docs/HOW-TO.en.md) |
+
 ## Turning things on and off
 
 Everything optional is a switch in [`site.config.ts`](apps/web/src/site.config.ts), under `features`. Off means it ships nothing: no route, no menu entry, no script or CSS. An invalid value breaks the build and names the problem.
@@ -195,6 +210,7 @@ odd/tasks/       → tracking of each feature
 | Document | What it covers |
 | --- | --- |
 | [Configuration and update guide](docs/CONFIGURATION.en.md) | **Where each thing is configured and how everything is updated**: settings, content, secrets, dependencies and releases |
+| [Frequent tasks](docs/HOW-TO.en.md) | Step-by-step recipes: note, email notice, Start here, ranking, Now, projects, CV, changelog and release |
 | [How to create a note](docs/NOTES.en.md) | A six-command quick recipe and, below it, the detailed step by step from draft to production |
 | [`docs/PORTFOLIO.en.md`](docs/PORTFOLIO.en.md) | Editing `/me` and adding an experiment (also in [Spanish](docs/PORTFOLIO.md)) |
 | [`docs/SUBSCRIPTION.en.md`](docs/SUBSCRIPTION.en.md) | Email subscription: how it works, data and privacy, limits, how to send a note and common problems (also in [Spanish](docs/SUBSCRIPTION.md)) |

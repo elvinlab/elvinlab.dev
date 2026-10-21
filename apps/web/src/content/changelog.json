@@ -1257,5 +1257,11 @@
     "category": "added",
     "title": "Subscribers can now be emailed about a new project, not only about notes",
     "description": "pnpm notify:project <key> sends a notice built from the experiment itself (title, description and link to its page), each subscriber in their own language, with the same dry run, daily cap and no-duplicates rule as notes."
+  },
+  "frequent-tasks-recipes": {
+    "date": "2026-10-21",
+    "category": "added",
+    "title": "A step-by-step recipe sheet for the manual tasks",
+    "description": "docs/HOW-TO.md (with an English twin) gathers copy-paste recipes for publishing a note, emailing it to subscribers, changing Start here, refreshing the most active ranking, updating the Now card, projects and the CV, plus the changelog and release steps. The README now links to it from a Frequent tasks section."
   }
 }
