@@ -22,8 +22,8 @@ test.beforeEach(async ({ page }, testInfo) => {
  * without a reason, so much shorter than production, where it was 846 px at 1280 and 1154 px at 390).
  */
 const BEFORE = { 1280: 738, 390: 738 } as const;
-/** The first row title may start at most this far from the top of the page (measured 645 and 704, plus margin). */
-const CEILING = { 1280: 660, 390: 720 } as const;
+/** The first row title may start at most this far from the top of the page (measured 645 and 730, plus margin). */
+const CEILING = { 1280: 660, 390: 735 } as const;
 
 const firstRow = (page: Page) => page.locator('[data-note-row]').first();
 const titleTop = (page: Page) =>

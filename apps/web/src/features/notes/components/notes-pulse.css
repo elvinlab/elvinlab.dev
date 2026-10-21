@@ -15,7 +15,7 @@
 .ni-pulse-rank,
 .ni-pulse-meta {
   font-family: var(--font-mono);
-  font-size: 0.8125rem;
+  font-size: 0.875rem;
   color: var(--color-muted);
 }
 .ni-pulse-rank {

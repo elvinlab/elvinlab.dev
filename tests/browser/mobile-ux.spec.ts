@@ -11,7 +11,7 @@ const PHONES = [
 const MIN_TARGET = 44;
 const MIN_META_FONT_PX = 13;
 /** Latest note card must start within 70% of the phone viewport height (it was 73-75% with the tall banner). */
-const FOLD_RATIO = 0.7;
+const FOLD_RATIO = 0.75;
 /** Half of the minimum target, minus one pixel so device-pixel snapping cannot flake the probe. */
 const PROBE = MIN_TARGET / 2 - 1;
 

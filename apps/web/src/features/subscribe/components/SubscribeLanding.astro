@@ -63,7 +63,7 @@ const seo = pageSeo('subscribe', locale, t(locale, 'subscribe.page.description')
       {points.map((point) => (
         <li class="flex items-start gap-3">
           <span aria-hidden="true" class="mt-2.5 size-1.5 shrink-0 bg-muted"></span>
-          <p class="text-text-secondary"><strong class="font-semibold text-text">{point.title}</strong> {point.body}</p>
+          <p class="max-w-[65ch] text-text-secondary"><strong class="font-semibold text-text">{point.title}</strong> {point.body}</p>
         </li>
       ))}
     </ul>

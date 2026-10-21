@@ -54,11 +54,11 @@ const href = localizePath(`/notes/${note.slug}/`, data.lang, LOCALES);
       <span class="whitespace-nowrap">{t(locale, 'notes.readingTime', { min: note.readingMinutes })}</span>
       <ReadingProgressMemory part="label" locale={locale} />
     </div>
-    <p class="text-sm leading-relaxed text-text-secondary">{data.description}</p>
+    <p class="max-w-[65ch] text-sm leading-relaxed text-text-secondary max-md:line-clamp-2">{data.description}</p>
     <div class="flex flex-wrap items-center gap-1.5">
       {secondaryMetaSlot === 'foot' && <LangBadge lang={data.lang} />}
       <Chip href={tagHref(data.category, topics)} class="ni-chip relative z-10">{data.category}</Chip>
-      {rowChipTags(data.tags, data.category).map((tag) => <Chip href={tagHref(tag, topics)} class="ni-chip relative z-10">#{tag}</Chip>)}
+      {rowChipTags(data.tags, data.category).map((tag) => <Chip href={tagHref(tag, topics)} class="ni-chip relative z-10 max-md:hidden">#{tag}</Chip>)}
     </div>
   </div>
 </article>

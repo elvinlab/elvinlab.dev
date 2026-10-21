@@ -98,7 +98,7 @@ export const SORT_CSS = minifyCss(`
     max-width: 100%;
   }
   .lk-sort-label {
-    font: 400 0.8125rem / 1 var(--font-mono);
+    font: 400 0.875rem / 1 var(--font-mono);
     color: var(--color-muted);
   }
   .lk-sort-options {
@@ -118,7 +118,7 @@ export const SORT_CSS = minifyCss(`
     min-height: 2.75rem;
     padding: 0 0.75rem;
     border-radius: calc(var(--radius-control) - 0.125rem);
-    font: 400 0.8125rem / 1 var(--font-mono);
+    font: 400 0.875rem / 1 var(--font-mono);
     white-space: nowrap;
     color: var(--color-text-secondary);
     text-decoration: none;

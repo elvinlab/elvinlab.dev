@@ -33,11 +33,11 @@ const period = (e: Experience) => `${e.start} — ${e.end ?? t(locale, 'me.prese
               <span class="text-lg font-bold">{pick(entry.role)}</span>
               <span class="text-sm font-medium text-primary">{entry.company}</span>
             </p>
-            <p class="leading-relaxed text-text-secondary">{pick(entry.summary)}</p>
+            <p class="max-w-[65ch] leading-relaxed text-text-secondary">{pick(entry.summary)}</p>
             {entry.contributions && entry.contributions.length > 0 && (
               <ul class="flex flex-col gap-1.5">
                 {entry.contributions.map((contribution) => (
-                  <li class="flex gap-2.5 leading-relaxed text-text-secondary">
+                  <li class="flex max-w-[65ch] gap-2.5 leading-relaxed text-text-secondary">
                     <span class="mt-[0.6em] size-1 shrink-0 rounded-pill bg-primary" aria-hidden="true"></span>
                     <span>{pick(contribution)}</span>
                   </li>
