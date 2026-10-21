@@ -1221,5 +1221,11 @@
     "category": "changed",
     "title": "The notes guide rules out stigmatizing descriptors and derived figures",
     "description": "The editorial review in docs/NOTES.md now asks to name tools, companies and people instead of describing them by nationality, origin or social class, and to copy every figure from its source instead of calculating it."
+  },
+  "note-share-card-version": {
+    "date": "2026-10-21",
+    "category": "fixed",
+    "title": "Link previews pick up a note's new title",
+    "description": "A note's share image URL now carries a version key built from its number and title, so WhatsApp, LinkedIn and X fetch the new card after a title change instead of reusing the cached one."
   }
 }
