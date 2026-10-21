@@ -168,3 +168,21 @@ describe('note email details', () => {
     expect(html).not.toContain('elvinlab.dev');
   });
 });
+
+describe.each(locales)('project notice in %s', (locale) => {
+  const project = renderNoteEmail(note(locale, { kind: 'project' }));
+  const plain = renderNoteEmail(note(locale));
+
+  it('changes the subject and the button, not the structure or the escaping', () => {
+    expect(project.subject).not.toBe(plain.subject);
+    expect(project.subject.toLowerCase()).toContain(locale === 'es' ? 'proyecto' : 'project');
+    expect(project.html).not.toContain('<script>');
+    expect(project.html).toContain(escapeAttr('https://example.test/notes/tags/?a=1&b=2'));
+    expect(project.text).toContain('https://example.test/notes/tags/?a=1&b=2');
+    expect(project.text).toContain('https://example.test/subscribe/unsubscribe/');
+  });
+
+  it('is identical to a note notice when no kind is given', () => {
+    expect(renderNoteEmail(note(locale, { kind: 'note' }))).toEqual(plain);
+  });
+});

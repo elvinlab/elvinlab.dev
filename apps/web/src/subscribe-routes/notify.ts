@@ -3,7 +3,7 @@ import { env } from 'cloudflare:workers';
 import type { APIRoute } from 'astro';
 
 import { resolveClientIp } from '@/features/contact/index.ts';
-import { noteToSend, notifyConfigured } from '@/features/subscribe/index.ts';
+import { noteToSend, notifyConfigured, projectToSend } from '@/features/subscribe/index.ts';
 import { site } from '@/shared/config/index.ts';
 
 // A server route: it reads the request, so it can never be prerendered.
@@ -11,7 +11,7 @@ export const prerender = false;
 
 const identity = { url: site.url, name: site.identity.handle, ownerName: site.identity.name };
 
-/** Owner trigger (ADR 0014): `POST /api/subscribe/notify` with `{ slug, dryRun? }` and a Bearer token. */
+/** Owner trigger (ADR 0014): `POST /api/subscribe/notify` with `{ slug, kind?, dryRun? }` and a Bearer token (`kind: 'project'` names an experiment key). */
 export const POST: APIRoute = async ({ request }) => {
   const result = await notifyConfigured(
     {
@@ -26,6 +26,12 @@ export const POST: APIRoute = async ({ request }) => {
     async (slug) => {
       const entry = (await getCollection('notes')).find((note) => note.id === slug);
       return entry ? noteToSend(entry, site.url) : null;
+    },
+    fetch,
+    console.error,
+    async (key) => {
+      const entry = (await getCollection('experiments')).find((project) => project.id === key);
+      return entry ? projectToSend(entry, site.url) : null;
     },
   );
   const headers = { 'cache-control': 'no-store' };

@@ -21,6 +21,7 @@ import {
   type NotifyRequest,
   type NotifyResponse,
   notifySubscribers,
+  type ProjectLookup,
 } from './notify.ts';
 import type { EmailSite, SubscribeLinks, SubscribePorts } from './ports.ts';
 import {
@@ -192,6 +193,7 @@ export async function notifyConfigured(
   findNote: NoteLookup,
   fetcher: typeof fetch = fetch,
   log: (message: string) => void = console.error,
+  findProject?: ProjectLookup,
 ): Promise<NotifyResponse> {
   const parsed = notifyBindingsSchema.safeParse(bindings);
   if (!parsed.success) {
@@ -205,6 +207,7 @@ export async function notifyConfigured(
     now: Date.now,
     adminToken: config.SUBSCRIBE_ADMIN_TOKEN,
     findNote,
+    ...(findProject === undefined ? {} : { findProject }),
     repository: createD1SubscriberRepository(config.SITE_DB as D1Like),
     quota: createD1SubscribeQuota(config.SITE_DB as D1Like),
     tokens: createWebCryptoTokens(config.SUBSCRIBE_TOKEN_SECRET),

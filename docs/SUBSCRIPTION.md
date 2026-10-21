@@ -147,9 +147,18 @@ El envío es **manual a propósito**: se decidió mantenerlo así mientras se ob
 4. **Lee los conteos.** La simulación dice cuántos destinatarios faltan y cuántos se enviarían hoy. El envío dice cuántos salieron y cuántos siguen esperando. Si `remaining` es mayor que 0, vuelve a correrlo al día siguiente: continúa donde quedó, porque la tabla `subscriber_notes` registra a quién ya se le envió esa nota.
 5. **El orden no importa y no hay duplicados.** Puedes enviar notas antiguas o en cualquier orden, y repetir un comando: cada persona recibe cada nota una sola vez. Quien confirma más tarde recibe la nota cuando se envíe de nuevo, y nadie más la recibe otra vez.
 
+**Avisar de un proyecto nuevo.** Mismo flujo, con otro comando y la clave de la entrada de `experiments.json` (la misma de `/experiments/<clave>/`); el proyecto debe estar liberado:
+
+```bash
+SUBSCRIBE_ADMIN_TOKEN="$(cat ~/.config/elvinlab/subscribe-admin-token)" mise exec -- pnpm notify:project <clave>          # simula
+SUBSCRIBE_ADMIN_TOKEN="$(cat ~/.config/elvinlab/subscribe-admin-token)" mise exec -- pnpm notify:project <clave> --send   # envía
+```
+
+El correo sale del propio experimento (título, descripción, enlace a su página) y cada persona lo recibe en su idioma: un proyecto es bilingüe, así que salen los dos avisos. El tope diario es uno solo para ambos idiomas, y repetir el comando no duplica nada.
+
 Reglas que conviene tener presentes:
 
-- **Idioma:** una nota en español llega solo a suscriptores en español; una en inglés, solo a los de inglés.
+- **Idioma:** una nota en español llega solo a suscriptores en español; una en inglés, solo a los de inglés. El idioma de cada suscriptor es el de la página donde se suscribió.
 - **Solo viaja el slug.** Título, resumen y enlace salen de la nota publicada, así que un token filtrado no permite poner texto propio frente a la lista.
 - **Un borrador o un slug desconocido responde 404.** Libera primero la nota.
 - **El token** vive en `~/.config/elvinlab/subscribe-admin-token` en la máquina del dueño y debe estar también en un gestor de contraseñas. El comando lo lee solo de la variable de entorno `SUBSCRIBE_ADMIN_TOKEN` (nunca como argumento) y no lo imprime. La URL del sitio debe ser `https`.

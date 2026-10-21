@@ -75,6 +75,8 @@ export type ConfirmationMail = {
 export type NoteMail = {
   to: string;
   locale: SubscribeLocale;
+  /** A note when left out; a project changes the subject, the button and the footer wording. */
+  kind?: 'note' | 'project';
   title: string;
   summary?: string;
   url: string;

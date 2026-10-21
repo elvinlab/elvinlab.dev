@@ -11,6 +11,8 @@ const bodySchema = z.strictObject({
     .string()
     .max(80)
     .regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/),
+  /** What the slug names: a published note (the default) or a portfolio experiment. */
+  kind: z.enum(['note', 'project']).optional(),
   dryRun: z.boolean().optional(),
 });
 const bearerPattern = /^Bearer (\S+)$/;
@@ -33,6 +35,9 @@ export type NotifyResponse = { status: number; body?: NotifyBody };
 /** Looks up a published note and builds what the email carries; null for an unknown or draft slug. */
 export type NoteLookup = (slug: string) => Promise<NoteToSend | null>;
 
+/** Looks up a portfolio experiment and builds one notice per locale; null for an unknown key. */
+export type ProjectLookup = (key: string) => Promise<NoteToSend[] | null>;
+
 export type NotifyPorts = Pick<
   SubscribePorts,
   'repository' | 'quota' | 'mailer' | 'tokens' | 'links' | 'limiter' | 'report' | 'now'
@@ -40,6 +45,8 @@ export type NotifyPorts = Pick<
   /** The owner secret; an empty value means the endpoint is not configured. */
   adminToken: string;
   findNote: NoteLookup;
+  /** Absent when the site has no experiments: a project request then answers 404. */
+  findProject?: ProjectLookup;
 };
 
 const utcDay = (time: number): string => new Date(time).toISOString().slice(0, 10);
@@ -79,11 +86,18 @@ export async function notifySubscribers(
     const parsed = bodySchema.safeParse(json);
     if (!parsed.success) return { status: 400 };
 
-    const note = await ports.findNote(parsed.data.slug);
-    if (!note) return { status: 404 };
+    const notices =
+      parsed.data.kind === 'project'
+        ? await ports.findProject?.(parsed.data.slug)
+        : [await ports.findNote(parsed.data.slug)];
+    // A project is bilingual: one notice per locale, each going only to that locale's subscribers.
+    const found = notices?.filter((notice): notice is NoteToSend => notice != null) ?? [];
+    if (found.length === 0) return { status: 404 };
 
     if (parsed.data.dryRun === true) {
-      const recipients = await ports.repository.countUnnotified(note.slug, note.locale);
+      let recipients = 0;
+      for (const notice of found)
+        recipients += await ports.repository.countUnnotified(notice.slug, notice.locale);
       const remainingPool = Math.max(
         0,
         SUBSCRIBE_POLICY.providerDailyTotal -
@@ -99,7 +113,20 @@ export async function notifySubscribers(
       };
     }
 
-    const result = await sendNote(note, ports);
+    // The daily cap is shared by the locales of one notice, so a project never doubles it.
+    let sent = 0;
+    let remaining = 0;
+    let failed = false;
+    for (const notice of found) {
+      const result = await sendNote(notice, ports, {
+        dailyCap: Math.max(0, SUBSCRIBE_POLICY.dailyCap - sent),
+      });
+      sent += result.sent;
+      remaining += result.remaining;
+      failed = failed || result.failed;
+      if (failed) break;
+    }
+    const result = { sent, remaining, failed };
     return { status: result.failed ? 502 : 200, body: result };
   } catch {
     return reject(503, 'notify_unavailable');

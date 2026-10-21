@@ -163,6 +163,18 @@ describe('D1 subscriber repository', () => {
     ]);
   });
 
+  it('remembers a project notice apart from a note with the same name', async () => {
+    await confirm('a');
+    await repo.markNotified(['a'], 'project:my-tool', 5_000);
+    await repo.markNotified(['a'], 'project:my-tool', 6_000);
+    await expect(repo.countUnnotified('project:my-tool', 'es')).resolves.toBe(0);
+    await expect(repo.listUnnotified('project:my-tool', 'es', 10)).resolves.toEqual([]);
+    await expect(repo.countUnnotified('my-tool', 'es')).resolves.toBe(1);
+    expect(sqlite.prepare('SELECT slug, sent_at FROM subscriber_notes').all()).toEqual([
+      { slug: 'project:my-tool', sent_at: 5_000 },
+    ]);
+  });
+
   it('records nothing for a subscriber that does not exist', async () => {
     await repo.markNotified(['ghost'], 'n1', 5_000).catch(() => undefined);
     expect(sqlite.prepare('SELECT COUNT(*) AS n FROM subscriber_notes').get()).toEqual({ n: 0 });

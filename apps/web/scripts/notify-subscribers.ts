@@ -1,6 +1,7 @@
 /**
- * Owner command: emails a published note to the subscriber list through the protected endpoint
- * `POST /api/subscribe/notify` (ADR 0014). Usage: `pnpm notify:note <slug> [--send]`.
+ * Owner command: emails a published note, or a portfolio project, to the subscriber list through the
+ * protected endpoint `POST /api/subscribe/notify` (ADR 0014). Usage: `pnpm notify:note <slug> [--send]`
+ * or `pnpm notify:project <key> [--send]` (the key of an entry of `experiments.json`).
  *
  * It is a dry run unless `--send` is given. The token comes from the environment variable
  * `SUBSCRIBE_ADMIN_TOKEN` only (never an argument, so it stays out of the shell history) and is
@@ -12,12 +13,17 @@ const TOKEN_VARIABLE = 'SUBSCRIBE_ADMIN_TOKEN';
 const ENDPOINT = '/api/subscribe/notify';
 const SLUG = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 
-export type NotifyArgs = { slug: string; send: boolean };
+export type NotifyKind = 'note' | 'project';
+/** `kind` is only present for a project; a note is the default. */
+export type NotifyArgs = { slug: string; send: boolean; kind?: 'project' };
 
 export type ParsedArgs = { ok: true; args: NotifyArgs } | { ok: false; message: string };
 
-export function parseArgs(argv: readonly string[]): ParsedArgs {
-  const usage = 'Usage: pnpm notify:note <slug> [--send]';
+export function parseArgs(argv: readonly string[], kind: NotifyKind = 'note'): ParsedArgs {
+  const usage =
+    kind === 'project'
+      ? 'Usage: pnpm notify:project <key> [--send]'
+      : 'Usage: pnpm notify:note <slug> [--send]';
   let send = false;
   const positional: string[] = [];
   for (const arg of argv) {
@@ -29,8 +35,11 @@ export function parseArgs(argv: readonly string[]): ParsedArgs {
   const [slug, ...extra] = positional;
   if (!slug || extra.length > 0) return { ok: false, message: usage };
   if (!SLUG.test(slug) || slug.length > 80)
-    return { ok: false, message: `"${slug}" is not a note slug (lowercase words joined by "-").` };
-  return { ok: true, args: { slug, send } };
+    return {
+      ok: false,
+      message: `"${slug}" is not a ${kind === 'project' ? 'project key' : 'note slug'} (lowercase words joined by "-").`,
+    };
+  return { ok: true, args: { slug, send, ...(kind === 'project' ? { kind } : {}) } };
 }
 
 export function buildRequest(
@@ -43,18 +52,26 @@ export function buildRequest(
     init: {
       method: 'POST',
       headers: { authorization: `Bearer ${token}`, 'content-type': 'application/json' },
-      body: JSON.stringify({ slug: args.slug, dryRun: !args.send }),
+      body: JSON.stringify({
+        slug: args.slug,
+        ...(args.kind === 'project' ? { kind: args.kind } : {}),
+        dryRun: !args.send,
+      }),
       // A redirect would resend the token to somewhere else.
       redirect: 'manual',
     },
   };
 }
 
+const NOT_FOUND = {
+  note: 'No published note has that slug. Release the note first, then notify.',
+  project: 'No project has that key in experiments.json. Release the project first, then notify.',
+} as const;
+
 const FAILURES: Record<number, string> = {
   400: 'The server rejected the request.',
   401: 'Unauthorized: the token was not accepted.',
   403: 'Forbidden.',
-  404: 'No published note has that slug. Release the note first, then notify.',
   413: 'The request was too large.',
   415: 'The server rejected the content type.',
   429: 'Too many attempts. Wait a minute and try again.',
@@ -75,8 +92,9 @@ export async function run(
   baseUrl: string,
   request: typeof fetch,
   out: Output = { log: console.log, error: console.error },
+  kind: NotifyKind = 'note',
 ): Promise<number> {
-  const parsed = parseArgs(argv);
+  const parsed = parseArgs(argv, kind);
   if (!parsed.ok) {
     out.error(parsed.message);
     return 1;
@@ -102,7 +120,11 @@ export async function run(
     return 1;
   }
   if (!response.ok) {
-    out.error(FAILURES[response.status] ?? `The server answered ${response.status}.`);
+    out.error(
+      response.status === 404
+        ? NOT_FOUND[kind]
+        : (FAILURES[response.status] ?? `The server answered ${response.status}.`),
+    );
     // A failed batch still reports how far it got.
     if (response.status !== 502) return 1;
   }
@@ -111,7 +133,7 @@ export async function run(
 
   if (!parsed.args.send) {
     out.log(
-      `Dry run for "${parsed.args.slug}": ${plural(count(data['recipients']), 'subscriber', 'subscribers')} of its language have not received it.`,
+      `Dry run for "${parsed.args.slug}": ${plural(count(data['recipients']), 'subscriber', 'subscribers')} of ${kind === 'project' ? 'both languages' : 'its language'} have not received it.`,
     );
     out.log(
       `Today's pool allows ${count(data['remainingPool'])} emails; a real send would deliver ${count(data['wouldSend'])}.`,
@@ -129,5 +151,15 @@ export async function run(
 
 if (process.argv[1] === fileURLToPath(import.meta.url)) {
   const { siteConfig } = await import('@/site.config.ts');
-  process.exitCode = await run(process.argv.slice(2), process.env, siteConfig.url, fetch);
+  // `notify:project` passes `--project` first; every other argument is the same as `notify:note`.
+  const [first, ...rest] = process.argv.slice(2);
+  const project = first === '--project';
+  process.exitCode = await run(
+    project ? rest : process.argv.slice(2),
+    process.env,
+    siteConfig.url,
+    fetch,
+    undefined,
+    project ? 'project' : 'note',
+  );
 }
