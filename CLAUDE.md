@@ -6,7 +6,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Status and commands
 
-Live in production at elvinlab.dev (Astro on Cloudflare Workers, CI and deploy in place). Current work and history: `odd/tasks/elvinlab-site.md` and the GitHub Project (https://github.com/users/elvinlab/projects/2).
+Live in production at elvinlab.dev (Astro on Cloudflare Workers, CI and deploy in place). The project was declared finished on 2026-10-21: all issues and the GitHub Project (https://github.com/users/elvinlab/projects/2) are closed. History and closure: `odd/tasks/elvinlab-site.md`.
 
 Tool versions are pinned in `.mise.toml` (single source of truth; `packageManager` in package.json must match). Run everything through mise:
 
