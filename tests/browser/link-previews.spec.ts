@@ -37,7 +37,11 @@ for (const { path, slug, title, locale } of NOTES) {
       await expect(meta(page, 'property', 'og:site_name')).toHaveAttribute('content', site.title);
       await expect(page).toHaveTitle(`${title} · ${site.title}`);
 
-      const image = `${site.origin}/og/notes/${slug}.png`;
+      // The card URL carries a `?v=` key from the number and title, so an edited title busts the
+      // image caches of link previews.
+      const image = new RegExp(
+        `^${escapeRegExp(`${site.origin}/og/notes/${slug}.png`)}\\?v=[0-9a-f]{8}$`,
+      );
       await expect(meta(page, 'property', 'og:image')).toHaveAttribute('content', image);
       await expect(meta(page, 'name', 'twitter:image')).toHaveAttribute('content', image);
       // The card shows the title and the domain, so the alt text names both.
@@ -68,7 +72,9 @@ for (const { path, slug, title, locale } of NOTES) {
         .locator('script[type="application/ld+json"]')
         .evaluateAll((nodes) => nodes.map((node) => JSON.parse(node.textContent ?? '{}')));
       const post = blocks.find((block) => block['@type'] === 'BlogPosting');
-      expect(post.image).toBe(`${site.origin}/og/notes/${slug}.png`);
+      expect(post.image).toMatch(
+        new RegExp(`^${escapeRegExp(`${site.origin}/og/notes/${slug}.png`)}\\?v=[0-9a-f]{8}$`),
+      );
       expect(post.author.url).toBe(site.origin);
     });
   });
