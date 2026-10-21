@@ -166,8 +166,8 @@ const TIMELINE = `
   .ed-item {
     display: flex;
     flex-direction: column;
-    gap: 0.5rem;
-    padding: 1rem 0.5rem;
+    gap: 0.75rem;
+    padding: 1.5rem 0.5rem;
     border-top: 1px dashed var(--color-divider);
   }
   .ed-item:first-child {
@@ -211,7 +211,7 @@ const TIMELINE = `
     flex-wrap: wrap;
     align-items: center;
     gap: 0.5rem 0.75rem;
-    font: 500 0.8125rem / 1.3 var(--font-mono);
+    font: 500 0.875rem / 1.3 var(--font-mono);
     color: var(--color-muted);
   }
   .ed-badge {
@@ -490,7 +490,13 @@ const COVER = `
     );
     color: var(--color-text-secondary);
     font-family: var(--font-mono);
-    font-size: 0.8125rem;
+    font-size: 0.875rem;
+  }
+  /* Phones: the stand-in only repeats the year, type and issuer the entry already shows, so it is dropped. */
+  @media (max-width: 767.98px) {
+    .ed-cover {
+      display: none;
+    }
   }
   @media (min-width: 768px) {
     .ed-cover {
