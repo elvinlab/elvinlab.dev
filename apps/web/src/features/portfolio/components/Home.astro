@@ -64,14 +64,14 @@ const experiments = homeSections.experiments
     <BannerToggle slot="toggle" locale={locale} />
     <div data-hero-content data-home-hero class="flex flex-col md:grid md:grid-cols-[minmax(0,1fr)_auto] lg:grid-cols-[minmax(0,1fr)_280px] md:items-end md:gap-12">
       <div class="flex flex-col">
-        <p data-hero-byline class="mb-3 flex flex-col gap-0.5 md:hidden">
+        <p data-hero-byline class="mb-1 flex flex-col gap-0.5 md:hidden">
           <span class="font-display text-lg font-bold">{site.identity.name}</span>
           <span class="text-sm text-text-secondary">{site.identity.role[locale]}</span>
         </p>
         <h1 class="max-w-hero font-pixel text-hero font-semibold leading-[1.1] text-balance">
           {headline.map((part) => (part.marked ? <Ink inlineCss={false}>{part.text}</Ink> : part.text))}<span aria-hidden="true" class="ml-1 inline-block h-3 w-2.5 bg-pink align-baseline md:h-4"></span>
         </h1>
-        <p class="mt-5 max-w-[52ch] text-intro leading-relaxed text-text-secondary">{t(locale, 'home.intro')}</p>
+        <p class="mt-4 max-w-[52ch] text-intro leading-relaxed text-text-secondary">{t(locale, 'home.intro')}</p>
         {homeSections.heroPills && (
           <ul class="mt-5 hidden flex-wrap gap-2 md:flex">
             {pills.map((pill) => (
@@ -80,7 +80,7 @@ const experiments = homeSections.experiments
           </ul>
         )}
         {isEnabled('me') && (
-          <a data-hero-cta href={localizePath('/me/', locale, LOCALES)} class="mt-5 inline-flex h-11 items-center justify-center self-start rounded-control bg-chip px-4 font-medium text-primary active:scale-96 md:hidden">
+          <a data-hero-cta href={localizePath('/me/', locale, LOCALES)} class="mt-2.5 inline-flex h-11 items-center justify-center self-start rounded-control bg-chip px-4 font-medium text-primary active:scale-96 md:hidden">
             {t(locale, 'recruiter.openProfile')}
           </a>
         )}
