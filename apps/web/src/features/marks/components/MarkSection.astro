@@ -101,8 +101,8 @@ const privacyHref = `${localizePath('/privacy/', locale, LOCALES)}#marks`;
       const state = store.getState();
       if (state.status === 'hidden') {
         for (const { root } of views) {
-          // The header box keeps its reserved height, empty, so a late failure shifts nothing.
-          if (root.dataset['v'] === 'h') {
+          // The header and end boxes keep their reserved height, empty, so a late failure shifts nothing.
+          if (root.dataset['v'] === 'h' || root.dataset['v'] === 'e') {
             root.replaceChildren();
             root.removeAttribute('data-marks');
           } else (root.closest('[data-marks-card]') ?? root).remove();

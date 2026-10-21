@@ -240,10 +240,10 @@ for (const note of NOTES) {
       await mockMarks(page, { getStatus: 503, getDelay: 1500 });
       await page.goto(note.path);
       await expect(header(page)).toBeAttached();
-      const before = (await page.locator('[data-article]').boundingBox())?.y ?? 0;
+      const before = (await page.locator('[data-article]').boundingBox())?.height ?? 0;
       await expect(page.locator('[data-marks]')).toHaveCount(0);
-      const after = (await page.locator('[data-article]').boundingBox())?.y ?? 0;
-      // The header box stays as an empty reserved space, so nothing below it moves.
+      const after = (await page.locator('[data-article]').boundingBox())?.height ?? 0;
+      // The header and end boxes stay as empty reserved space, so nothing below them moves.
       expect(after).toBe(before);
       await expect(page.locator('.mb')).toHaveCount(0);
       await expect(page.getByText(note.hint)).toHaveCount(0);
