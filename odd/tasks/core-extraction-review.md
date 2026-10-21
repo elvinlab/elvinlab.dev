@@ -123,7 +123,7 @@ New category, the **portfolio kit**: `features/me/*`, `credentials`, the experim
 
 ## Spike result (2026-10-21)
 
-Branch `spike/core-components` (local, not pushed, commit `e763588`) moved `Card.astro`, `Chip.astro` and `external-link.ts` (+ its test) into `packages/core/src/{ui,lib}`: 29 files, +40/-26 lines, most of them import rewrites.
+A local branch (`spike/core-components`, never pushed, deleted 2026-10-21) moved `Card.astro`, `Chip.astro` and `external-link.ts` (+ its test) into `packages/core/src/{ui,lib}`: 29 files, +40/-26 lines, most of them import rewrites.
 
 | Check | Result |
 | --- | --- |

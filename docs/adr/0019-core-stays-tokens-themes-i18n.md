@@ -30,7 +30,7 @@ All checks passed with the three pieces in `core`: typecheck, 1790 unit tests, l
 - **What carries over to future projects** is the stack, the development environment and the agentic working pattern of this repository (README "Tecnologías", `.mise.toml`, `odd/tasks/`), not the shared package. That is the owner's own reading of what this experience was worth.
 - No work, no new surface and no versioning to maintain; `apps/web` keeps its own copies of these pieces.
 - A future fork or second site starts by copying or by reopening the extraction with the list above, not from zero.
-- The spike commit stays on the local branch `spike/core-components` (not pushed), as a reference.
+- The spike branch was local, never pushed, and was deleted on 2026-10-21. Its code is not kept: the findings above are what it left, and redoing it is a mechanical move of the same three pieces.
 
 ## Reverting
 
