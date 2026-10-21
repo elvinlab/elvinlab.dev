@@ -138,8 +138,8 @@ export const siteConfig = {
     available: true,
     openToWork: false,
     status: {
-      es: 'Abierto a charlar',
-      en: 'Open to chat',
+      es: 'Colaboraciones y buena charla',
+      en: 'Collaborations and good talk',
     },
     lookingFor: {
       es: 'Solo colaboraciones y proyectos',

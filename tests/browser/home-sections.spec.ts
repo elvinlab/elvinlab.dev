@@ -51,7 +51,7 @@ const HOMES = [
     retired: 'Lab log',
     pillars: text('en', 'home.pillars'),
     notebook: 'Notebook',
-    hiring: 'Hiring?',
+    hiring: text('en', 'recruiter.title'),
   },
 ];
 

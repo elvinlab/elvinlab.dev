@@ -75,7 +75,7 @@ Las descripciones vienen del esquema (`.describe()`), por eso están en inglés.
 | `home` | `object` | no | `{}` | Show or hide each home section; a key you set wins over the `appearance` preset, a key you omit follows it. `minimal` hides `heroPills` and `pillars`; `full` shows everything. A hidden section renders nothing. |
 | `home.heroPills` | `boolean` | no |  | The three keyword pills under the hero intro (desktop only). |
 | `home.authorCard` | `boolean` | no |  | The sidebar author card: photo, name, bio and social buttons. |
-| `home.hiringCard` | `boolean` | no |  | The sidebar "Hiring?" recruiter card: availability and links to /me and the CV. |
+| `home.hiringCard` | `boolean` | no |  | The sidebar "Let’s talk" recruiter card: availability and links to /me and the CV. |
 | `home.marks` | `boolean` | no |  | The sidebar footprint card (heart button with its own counter). It also needs the top-level `features.marks`: with that flag off it never shows. |
 | `home.now` | `boolean` | no |  | The sidebar "Now" card: what you are focused on, from the top-level `now` block. It also needs that block: without it the card never shows. |
 | `home.pillars` | `boolean` | no |  | The four pillars strip at the bottom of the home (desktop only). |
