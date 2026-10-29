@@ -1269,5 +1269,11 @@
     "category": "changed",
     "title": "More room to read on phones",
     "description": "Small labels, dates and tags now start at 14 px instead of 11 to 13 px, the sidebar cards and the home sections have more space between them, the Now labels no longer use the monospace face, and the home keeps one filled action (Read the note) while the profile link and the footer Subscribe button turn soft. On phones the notes index shows two lines of each excerpt, and the education timeline drops the placeholder cover and spaces its entries out."
+  },
+  "note-013": {
+    "date": "2026-10-29",
+    "category": "added",
+    "title": "New Lab Note 013: TDD con agentes: la revisión del diff atrapó lo que los tests no",
+    "description": "Pedí TDD estricto a mis agentes de IA y acepté tests en verde que nunca vi fallar. La suite perdió 13 tests sin ponerse roja; lo encontró la revisión."
   }
 }

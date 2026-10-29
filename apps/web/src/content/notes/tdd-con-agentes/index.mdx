@@ -1,0 +1,124 @@
+---
+number: 13
+title: "TDD con agentes: la revisión del diff atrapó lo que los tests no"
+description: "Pedí TDD estricto a mis agentes de IA y acepté tests en verde que nunca vi fallar. La suite perdió 13 tests sin ponerse roja; lo encontró la revisión."
+pubDate: 2026-10-29
+lang: es
+category: agentes-ia
+tags: [tdd, testing, agentes-ia, revision-de-codigo, vitest]
+decision:
+  context: "Adopté TDD con agentes de IA porque escuché que funcionaba bien. En el formulario de contacto pedí ver cada test fallar antes del código (el RED); el agente nunca lo mostró, aunque lo pedí dos veces."
+  decision: "Lo acepté igual, por confianza y por tiempo, y dejé que la revisión del diff hiciera de red. Descarté frenar la entrega hasta ver el RED, que era lo que el método pedía."
+  outcome: "Un agente sacó 13 tests de la suite (de 257 a 244) y todo siguió en verde; lo encontró la revisión, no los tests. La suite quedó en 265. Otras cuatro tareas registran tests sin RED."
+---
+
+import Ink from '@/shared/ui/Ink.astro';
+
+El 30 de septiembre, un agente me entregó la lógica del formulario de contacto de este sitio con 38 tests nuevos, todos en verde. Un test es un pequeño programa que comprueba que otro hace lo que debe; en verde significa que pasa. El lint (el revisor automático de estilo y errores comunes), la revisión de tipos y el build (la compilación del sitio) también pasaban. Yo había pedido TDD estricto, desarrollo guiado por tests: ver cada test fallar antes de escribir el código que lo hace pasar. Ese fallo inicial nunca apareció en el reporte. Lo pedí dos veces. Acepté el trabajo igual.
+
+Esta nota es sobre esa decisión, lo que costó y lo que terminó haciendo el trabajo que yo esperaba del método.
+
+## Por qué pedí TDD a mis agentes
+
+Llegué a TDD con agentes porque escuché que es una buena forma de trabajar con IA, no porque viniera de años practicándolo. La idea me convenció rápido: si el agente escribe primero un test que falla, ese test describe lo que quiero antes de que exista el código, y el agente tiene una meta verificable en lugar de una instrucción ambigua.
+
+El ciclo tiene tres pasos, y el primero es el que importa aquí:
+
+- **RED:** escribes el test y lo ves fallar, por la razón que esperabas.
+- **GREEN:** escribes el código mínimo para que pase.
+- **Refactor:** ordenas y limpias el código sin cambiar lo que hace, con el test como red de seguridad.
+
+En el registro de la tarea del formulario quedó escrito así: TDD "strict", con la condición "RED observed before each implementation". El RED no es un trámite. Es la única prueba de que el test mira algo real: un test que nunca falló puede estar verde porque el código funciona o porque no está comprobando nada.
+
+## 38 tests en verde y ningún RED
+
+El formulario se partió en cuatro tareas. La segunda, la lógica que corre en el navegador y la isla de Preact (el único trozo interactivo de una página que, por lo demás, es HTML estático), fue a un agente de OpenCode: un modelo de IA que escribe código por su cuenta a partir de un encargo. Usé el combo `elvinlabCode`, el grupo de modelos gratuitos de nivel 2 que describo en [mi entorno multi-agente](/notes/agentic-dev-setup/). Le tomó dos rondas.
+
+El resultado tenía buena pinta: una máquina de estados del formulario (la lista de situaciones posibles, como escribiendo, enviando, enviado o con error, y cómo se pasa de una a otra), validación con los límites de la configuración, el mapeo de errores del servidor, un honeypot (un campo oculto que una persona nunca llena y un bot sí, para detectar spam) y la carga diferida de Turnstile, el captcha de Cloudflare, que solo se descarga cuando alguien empieza a usar el formulario. 38 tests en `form.test.ts` y `turnstile.test.ts`. Lo que no tenía era la salida de esos tests fallando antes de la implementación.
+
+```txt title="lo que pedí y lo que llegó"
+pedido      RED → GREEN → refactor, con la salida del RED en el reporte
+entregado   GREEN (38 tests)
+pedí el RED 2 veces
+recibí      0 salidas de RED
+```
+
+La nota que quedó en el registro de esa tarea es seca: el agente nunca reportó el RED, y el RED de esa parte no se observó.
+
+## El costo de exigir el RED
+
+Lo acepté por dos razones: confianza y tiempo.
+
+Confianza, porque los tests pasaban, el build pasaba y el código hacía lo que tenía que hacer. Tiempo, porque exigir el RED después de los hechos no es gratis. Con el código ya escrito, ver un test fallar implica revertir la implementación, correr la suite, mirar el fallo y volver a aplicar el cambio. O tirar los tests y pedirlos de nuevo en orden. Cualquiera de las dos es otra ronda con el agente, y yo ya llevaba dos.
+
+En otra tarea de esos días, el registro cuenta lo mismo desde otro ángulo: anota que pedí dos veces que se corrieran menos pruebas. No estaba en contra de los tests; estaba pagando por ellos en minutos y quería pagar menos.
+
+> Aceptar un GREEN sin RED no es saltarse un paso del método: es cambiar una prueba por una suposición.
+
+La decisión real no fue "TDD sí o no". Fue en qué confiar cuando el método no se cumple. Yo confié en la revisión del diff.
+
+## La suite siguió en verde con 13 tests menos
+
+La tercera tarea, las páginas de contacto, también fue delegada. El agente se topó con un error real. La feature tiene un archivo índice, un barrel, que reúne en un solo lugar todo lo que exporta, y ese índice incluye un componente `.astro`. Vitest, la herramienta que corre los tests, usa Vite sin el compilador de Astro, así que no sabe leer `.astro`. El test que importaba ese índice fallaba.
+
+La solución del agente fue editar `vitest.config.ts`, un archivo fuera del alcance que le había dado, y añadir un `include`, la lista de archivos que se deben ejecutar, que sin avisar dejaba fuera de la suite 13 tests. La suite es el conjunto de todos los tests del proyecto. El error seguía ahí; la suite quedó en verde.
+
+```txt title="la suite antes y después del arreglo del agente"
+antes del cambio        257 tests
+con el include          244 tests   ← verde, con 13 tests menos
+con el arreglo real     265 tests   (34 archivos)
+```
+
+Ningún test podía avisar de esto, porque los tests que habrían fallado ya no corrían. El verde era real: lo que había cambiado era qué se estaba midiendo.
+
+Lo encontró la revisión del diff que hace Claude Code antes de dar por bueno cualquier cambio delegado. El diff es la lista exacta de líneas que un cambio agrega, quita o modifica, archivo por archivo. Ahí aparece todo lo que el agente tocó, aunque su reporte no lo mencione. El arreglo de verdad fue un plugin corto, una extensión de Vite, que entrega un archivo vacío en lugar de cada `.astro`, solo dentro de los tests unitarios. Esos tests prueban funciones sueltas y nunca dibujan la página, así que no necesitan el componente:
+
+```ts title="apps/web/vitest.config.ts"
+plugins: [
+  {
+    // Feature barrels re-export Astro components for the pages. Unit tests never render them,
+    // so an empty module lets a test import the barrel without an Astro compiler.
+    name: 'stub-astro-components',
+    enforce: 'pre',
+    load(id) {
+      if (id.split('?', 1)[0]?.endsWith('.astro')) return 'export default {};';
+      return undefined;
+    },
+  },
+],
+```
+
+Con eso volvieron los 13 tests y la suite subió a 265.
+
+## Lo que atrapó la revisión
+
+El caso de los 13 tests no fue el único. En las cuatro tareas del formulario, la revisión encontró cosas que ningún test en verde había señalado:
+
+- **9 defectos en la primera ronda de la lógica del cliente.** Entre ellos, un honeypot que nunca se enviaba al servidor, el cargador de Turnstile reconstruido en cada `focusin` y colores rojos escritos a mano en lugar de tokens del tema.
+- **2 más que el agente no corrigió o reportó mal** después de la segunda ronda. Uno: la función que se ejecuta cuando responde Turnstile seguía viendo un valor viejo de `submitPending`, que indica si hay un envío pendiente, en lugar del actual (un closure desactualizado). Otro: faltaba el aviso de "no disponible" cuando no hay clave de Turnstile.
+- **Un spec de Playwright que no podía pasar.** Playwright abre el sitio en un navegador real y lo usa como lo haría una persona; un spec es un archivo de esas pruebas. En la cuarta tarea, el agente pasó unos 15 minutos en un ciclo sobre su propio test: esperaba una variable `window.turnstileToken` que no existe y buscaba una alerta con `getByRole('alert', { name })`, que nunca coincide. Claude lo reescribió en la revisión.
+
+Ese último es el espejo del RED que faltaba. Un test que nunca puede fallar y uno que nunca puede pasar tienen el mismo problema: no describen el comportamiento real. Ninguno de los dos se descubre mirando el color de la suite.
+
+## No fue una sola vez
+
+Cuando revisé los registros de tareas para escribir esta nota, esperaba encontrar el formulario de contacto como excepción. No lo es. El mismo hueco aparece, dicho con honestidad en cada registro, en al menos cuatro tareas más:
+
+- **Retoques de diseño (12 de octubre):** "Tests written after the fix (no RED observed)".
+- **Página de formación:** dos funciones y los casos e2e (pruebas de punta a punta, en el navegador) se escribieron junto con el código, "so their RED was not observed separately".
+- **Etiquetas en la barra de notas:** el fixture de e2e, el sitio de prueba con datos inventados sobre el que corren esas pruebas, tiene solo 2 etiquetas, así que el chequeo de "como máximo 12" pasa también con el código viejo: "no RED possible".
+- **Preset de apariencia mínima:** un spec escrito después de la implementación, sin RED porque, para verlo fallar, había que deshacer temporalmente la implementación con `git stash` o `git checkout`, y en esa tarea no se podía.
+
+Dos detalles me hicieron cambiar la lectura. El primero: en la tarea del preset, el que escribía era Claude, no un modelo gratuito. El hueco no depende del modelo; depende de que nadie bloquee la entrega cuando falta el RED. El segundo: también hay tareas donde el RED sí quedó registrado, como el presupuesto de JavaScript que conté en [la nota de React a Preact](/notes/de-react-a-preact/), con 0 bytes contados contra 131 esperados antes del arreglo. El método funciona cuando se exige. Yo no lo exigí siempre.
+
+## Lo que el RED tampoco habría visto
+
+Hay un fallo que ningún RED habría atrapado. Los tests de los adaptadores de Turnstile y Resend, el código que habla con esos servicios externos, mockeaban `fetch`: reemplazaban la función que hace peticiones por internet por una imitación que responde lo que el test le dice. En producción, Cloudflare Workers, el entorno donde corre el sitio, rechazaba la opción `redirect: 'error'` que usaban. Cada verificación de Turnstile fallaba. Lo conté en [cómo construí este sitio](/notes/como-construi-este-sitio/); el arreglo fue una línea, `redirect: 'manual'`.
+
+Un RED prueba que el test mira algo. No prueba que mire lo correcto. Un `fetch` simulado se comporta como yo creo que se comporta `fetch`, no como se comporta en el runtime real. Eso lo encontré reproduciendo el formulario en workerd, la versión local del entorno de Cloudflare, no en la suite.
+
+## Lo que me llevo
+
+TDD con agentes me sigue pareciendo una buena forma de trabajar. Lo que cambió es dónde pongo la confianza: <Ink>un test en verde que nunca vi fallar es una suposición, y la revisión del diff es la que la comprueba</Ink>. En este proyecto, la revisión encontró los 13 tests desaparecidos, los 9 defectos de la primera ronda, los 2 que quedaron después y el spec imposible; el color de la suite no encontró ninguno.
+
+La pregunta que me queda abierta es si vale la pena frenar una entrega hasta ver el RED, o si basta con tratar cualquier cambio a la configuración de los tests como código de producción y revisarlo como tal. Si trabajas con agentes y alguno te "arregló" un test quitándolo de la suite, cuéntame en los comentarios cómo lo detectaste.
