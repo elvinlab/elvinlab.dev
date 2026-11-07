@@ -1275,5 +1275,11 @@
     "category": "added",
     "title": "New Lab Note 013: TDD con agentes: la revisión del diff atrapó lo que los tests no",
     "description": "Pedí TDD estricto a mis agentes de IA y acepté tests en verde que nunca vi fallar. La suite perdió 13 tests sin ponerse roja; lo encontró la revisión."
+  },
+  "note-014": {
+    "date": "2026-11-07",
+    "category": "added",
+    "title": "New Lab Note 014: 22 acciones fijadas y ningún escáner: cómo protejo mi sitio de sus dependencias",
+    "description": "No puse pnpm audit en el CI. Puse capas que actúan antes de instalar: esperar, bloquear scripts, fijar versiones y revisar cada actualización."
   }
 }

@@ -1,0 +1,87 @@
+---
+number: 14
+title: "22 acciones fijadas y ningún escáner: cómo protejo mi sitio de sus dependencias"
+description: "No puse pnpm audit en el CI. Puse capas que actúan antes de instalar: esperar, bloquear scripts, fijar versiones y revisar cada actualización."
+pubDate: 2026-11-07
+lang: es
+category: decisiones
+tags: [dependencias, seguridad, pnpm, dependabot, ci]
+decision:
+  context: "Mi sitio depende de cientos de paquetes que no escribí. Por lo que se ha visto en npm, lo último no siempre es lo mejor, y el CI solo corre al publicar en main: un PR de Dependabot llega a develop sin checks."
+  decision: "Elegí capas que actúan antes de instalar: edad mínima de publicación, scripts de instalación solo para esbuild y workerd, todo fijado (22 acciones por SHA) y revisión de cada PR. Descarté pnpm audit en el CI."
+  outcome: "7 actualizaciones de Dependabot entraron revisadas; wrangler se quedó en 4.141.0 por la edad mínima. Un hallazgo: Dependabot subió sharp a 0.35.5 y un override siguió instalando 0.35.4."
+---
+
+Casi todo el código que corre en este sitio no lo escribí yo. Astro, Preact, Vitest, wrangler y las dependencias de sus dependencias terminan en `pnpm-lock.yaml`, y cada `pnpm install` es un voto de confianza en cientos de personas.
+
+En el CI (el proceso automático que compila, prueba y despliega el sitio) no hay `pnpm audit` ni ningún escáner de vulnerabilidades. Esta nota cuenta por qué y qué puse en su lugar.
+
+## El hueco: Dependabot llega sin checks
+
+Dependabot es un bot de GitHub que cada semana propone, en un PR, subir mis dependencias a versiones nuevas. Esos PR van a `develop`, mi rama de trabajo, y ahí no corre nada: como conté en [cómo construí este sitio](/notes/como-construi-este-sitio/), el CI solo corre al publicar en `main`.
+
+```txt title="el camino de una actualización"
+Dependabot ──PR──▶ develop ──(sin CI)──▶ revisión + verificación local
+                                              │
+                                              ▼
+                              main ──▶ CI completo ──▶ deploy
+```
+
+Así que la pregunta no era qué alarma poner, sino qué impide que algo malo llegue a instalarse.
+
+## Por qué no puse pnpm audit
+
+`pnpm audit` compara lo instalado contra una base de vulnerabilidades conocidas. Para este proyecto no lo vi necesario: según mi criterio, las prácticas que ya tenía cubrían lo que me preocupaba.
+
+Y lo que me preocupaba era otra cosa: lo que se ha visto en npm, y también en PHP, con versiones comprometidas o vulnerables de paquetes muy usados. Lo último no siempre es lo mejor.
+
+> Un audit avisa de lo que ya se sabe. Yo quería que lo peligroso no llegara a instalarse.
+
+El costo, dicho de una vez: si una versión que ya tengo fijada resulta vulnerable, nada en el CI me lo va a gritar.
+
+## Cuatro capas antes de instalar
+
+**1. Esperar.** pnpm, el gestor de paquetes que uso, se niega a instalar versiones recién publicadas; desde pnpm 11 la espera por defecto es de un día. Muchas versiones comprometidas se retiran en horas. Cuando pnpm propone saltarse la regla con `minimumReleaseAgeExclude`, mi repo dice que no: se fija una versión más vieja. Por eso `wrangler`, la herramienta con la que publico en Cloudflare, arrancó en 4.141.0 y no en la más nueva.
+
+**2. Nadie ejecuta código al instalarse.** Algunos paquetes traen scripts que corren apenas se descargan, la vía favorita de muchos ataques. pnpm los bloquea salvo permiso explícito, y en mi repo la lista tiene dos nombres:
+
+```yaml title="pnpm-workspace.yaml"
+allowBuilds:
+  esbuild: true
+  workerd: true
+```
+
+Los dos necesitan bajar un binario para funcionar. Nadie más puede.
+
+**3. Todo fijado.** Fijar es escribir la versión exacta en lugar de un rango como `^1.2.0`. Node y pnpm están fijados en `.mise.toml`, los seis jobs del CI instalan con `--frozen-lockfile` (falla si el lockfile, el registro de versiones exactas, no coincide) y las 22 acciones de GitHub que usa el CI se referencian por el SHA del commit, no por una etiqueta que alguien podría mover:
+
+```yaml title=".github/workflows/ci.yml"
+- uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+```
+
+El CI además solo puede leer el repo, y el único secreto, el token de Cloudflare, lo usa solo el deploy.
+
+**4. Una persona lee cada actualización.** Cuando llega un PR, lo leo, veo si aplica según mi criterio y se lo paso a mi agente para un doble chequeo: el PR se prueba fusionado sobre `develop` en una copia aislada, con tipos, tests, build y pruebas de navegador. En una sola ronda del 5 de octubre salieron cuatro decisiones distintas: un grupo de cinco paquetes fusionado, `mise-action` fusionado, `@types/node` 26 cerrado porque el sitio corre en Node 24, y Preact 11 subido a mano porque rompía los tipos del formulario de contacto.
+
+## La actualización de sharp que nunca se aplicó
+
+Escribiendo esta nota encontré algo que ninguna capa atrapó.
+
+`sharp` optimiza las imágenes al compilar. Para tener una sola versión en todo el repo puse un override, una regla que le dice a pnpm "instala esta versión, la pida quien la pida". El PR #74 de Dependabot decía "sharp 0.35.4 → 0.35.5", pasó los nueve pasos de verificación y lo fusioné. Pero el override ganó:
+
+```txt title="lo que dice cada archivo"
+PR #74                     sharp 0.35.4 → 0.35.5
+apps/web/package.json      "sharp": "0.35.5"
+pnpm-workspace.yaml        overrides: sharp: 0.35.4
+pnpm-lock.yaml             sharp@0.35.4   ← lo que se instala
+```
+
+No se rompió nada; las pruebas verdes eran ciertas, solo que probaban 0.35.4. Lo que falló fue la lectura: el PR contaba una historia y el lockfile otra. La lección es mirar qué cambió en `pnpm-lock.yaml`, no solo el título del PR.
+
+## Dónde terminan estas capas
+
+- Una vulnerabilidad en algo ya fijado: fijar protege de lo nuevo, no de lo viejo.
+- Un paquete malicioso que pasa más de un día sin que nadie lo note.
+- El código que sí ejecuto en el build: bloquear scripts no lo cubre.
+
+Para un sitio personal, ese balance me parece razonable. ¿Tú corres `npm audit` en tus proyectos, o también confías en otras capas? Cuéntame en los comentarios si alguna te salvó de algo.
