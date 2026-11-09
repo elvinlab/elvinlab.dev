@@ -1281,5 +1281,11 @@
     "category": "added",
     "title": "New Lab Note 014: 22 acciones fijadas y ningún escáner: cómo protejo mi sitio de sus dependencias",
     "description": "No puse pnpm audit en el CI. Puse capas que actúan antes de instalar: esperar, bloquear scripts, fijar versiones y revisar cada actualización."
+  },
+  "readme-theme-section": {
+    "date": "2026-11-09",
+    "category": "added",
+    "title": "README section for adopting the site as a theme",
+    "description": "Both READMEs now open with a short \"Use it as a theme\" recipe: get the code, edit site.config.ts and the content, run the white-label check, write notes."
   }
 }

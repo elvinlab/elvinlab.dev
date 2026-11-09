@@ -26,6 +26,17 @@ Es mi portafolio (`/me`) y mi blog (`/notes`) en un solo sitio, y el primer proy
 
 Además aloja [`@elvinlab/core`](packages/core), la base de diseño (tokens, temas e i18n). Por ahora no crece ni sale de este repositorio: ver [ADR 0019](docs/adr/0019-core-stays-tokens-themes-i18n.md).
 
+## Usarlo como theme
+
+Lab Notes es un starter bilingüe de portafolio y blog para Astro sobre Cloudflare Workers. Está pensado para adoptarse, no solo para leerse: reemplazas la configuración y el contenido, y el diseño se queda.
+
+1. **Obtén el código.** Clona el repositorio y ejecuta los comandos de [Empezar](#empezar).
+2. **Hazlo tuyo.** Edita [`apps/web/src/site.config.ts`](apps/web/src/site.config.ts) (nombre, bio, redes, colores, qué funciones están activas) y el contenido en `apps/web/src/content/` (notas en MDX, `experience.json`, `credentials.json`). Cada clave está documentada en [la guía de configuración](docs/CONFIGURATION.md#3-referencia-siteconfigts).
+3. **Comprueba que no quede nada mío.** `pnpm test:white-label` compila el sitio con otra identidad y falla si se filtra alguna cadena del autor original. La receta completa está en [Usar este sitio como base](docs/CONFIGURATION.md#10-usar-este-sitio-como-base-para-otra-persona-white-label).
+4. **Escribe notas.** [Cómo crear una nota](docs/NOTES.md) explica el formato, el registro de decisión y las comprobaciones antes de publicar.
+
+Las funciones opcionales (formulario de contacto, comentarios, reacciones, suscripciones por correo, página de cambios) son interruptores en `features`: pon cualquiera en `false` para apagarla.
+
 ## Capturas
 
 <div align="center">
